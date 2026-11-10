@@ -28,37 +28,38 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def isBooted(self: Self) -> bool:
         """
-        Check whether configuration and provider registration have completed.
+        Report whether configuration and eager registration are complete.
 
         Returns
         -------
         bool
-            True after create() completes. Asynchronous provider startup and
-            HTTP kernel readiness complete during the server lifespan startup.
+            ``True`` after ``create()`` completes, independently of asynchronous
+            provider startup and HTTP kernel readiness.
         """
 
     @property
     @abstractmethod
     def isCreated(self: Self) -> bool:
         """
-        Check whether configuration and service registration are complete.
+        Report the configuration-stage state exposed by ``isBooted``.
 
         Returns
         -------
         bool
-            Alias of the legacy ``isBooted`` configuration-stage flag.
+            Legacy creation flag, identical to ``isBooted``.
         """
 
     @property
     @abstractmethod
     def areProvidersBooted(self: Self) -> bool:
         """
-        Check whether every eager provider has finished startup.
+        Check whether all eager providers have finished booting.
 
         Returns
         -------
         bool
-            True after creation and eager startup; deferred providers remain lazy.
+            ``True`` after creation and eager startup. Deferred providers
+            still boot on first resolution.
         """
 
     @property
@@ -70,107 +71,105 @@ class IApplication(IContainer, ABC):
         Returns
         -------
         bool
-            HTTP kernel readiness, excluding sockets and deployment health.
+            ``True`` after eager startup and handler publication; this does not
+            indicate listening sockets or deployment health.
         """
 
     @property
     @abstractmethod
     def startAt(self: Self) -> int:
         """
-        Return the application startup timestamp in nanoseconds.
+        Return the instance initialization timestamp in Unix nanoseconds.
 
         Returns
         -------
         int
-            Timestamp in nanoseconds since Unix epoch when the application
-            instance was initialized.
+            Time recorded when this singleton was first initialized.
         """
 
     @property
     @abstractmethod
     def routeHealthCheck(self: Self) -> str:
         """
-        Return the health check route for the application.
+        Return the configured health-check URL path.
 
         Returns
         -------
         str
-            The configured health check route path. Returns "/up" if not set.
+            Health-check path, or ``"/up"`` when no nonempty path is configured.
         """
 
     @property
     @abstractmethod
     def entryPoint(self: Self) -> str | None:
         """
-        Return the entry point module path where the application was created.
+        Return the creation entry point as a module path with an app suffix.
 
         Returns
         -------
         str | None
-            The module path in the format 'folder.subfolder.file:app' where
-            the application instance was created, or None if not available.
+            Inferred ``module:app`` path, or ``None`` before creation records
+            the caller's filename.
         """
 
     @property
     @abstractmethod
     def basePath(self: Self) -> Path:
         """
-        Return the base path of the application.
+        Return the resolved application root directory.
 
         Returns
         -------
         pathlib.Path
-            The base directory path of the application.
+            Absolute root selected when this singleton was first initialized.
         """
 
     @property
     @abstractmethod
     def compiled(self: Self) -> bool:
         """
-        Indicate whether the application is running in compiled mode.
+        Check whether compiled bootstrap caching is enabled.
 
         Returns
         -------
         bool
-            True if the application is configured to run in compiled mode,
-            otherwise False.
+            ``True`` when compiled caching is enabled, even before a cache hit.
         """
 
     @property
     @abstractmethod
     def compiledPath(self: Self) -> Path | None:
         """
-        Return the path where compiled cache files are stored.
+        Return the configured bootstrap cache directory.
 
         Returns
         -------
         pathlib.Path or None
-            The directory path for compiled cache storage, or None if not
-            configured.
+            Resolved cache directory, or ``None`` before caching is configured.
         """
 
     @property
     @abstractmethod
     def compiledInvalidationPathsDirs(self: Self) -> list[Path]:
         """
-        Return the list of directory paths monitored for cache invalidation.
+        Return configured directories used for bootstrap cache invalidation.
 
         Returns
         -------
         list of pathlib.Path
-            List of directory paths monitored for cache invalidation.
+            Configured directory invalidation paths as a new list.
         """
 
     @property
     @abstractmethod
     def compiledInvalidationPathsFiles(self: Self) -> list[Path]:
         """
-        Return the list of file paths monitored for cache invalidation.
+        Return configured files used for bootstrap cache invalidation.
 
         Returns
         -------
         list of pathlib.Path
-            List of file paths monitored for cache invalidation.
+            Configured file invalidation paths as a new list.
         """
 
     @abstractmethod
@@ -180,19 +179,26 @@ class IApplication(IContainer, ABC):
         invalidation_paths: list[str] | None = None,
     ) -> None:
         """
-        Configure the directory and source paths for compiled application state.
+        Configure bootstrap caching and restore any valid compiled state.
 
         Parameters
         ----------
-        path : str or None, optional
-            Directory used to store the compiled application cache.
-        invalidation_paths : list of str or None, optional
-            Paths monitored for changes that invalidate the cache.
+        path : str | None, optional
+            Cache directory, defaulting to the application's framework cache path.
+        invalidation_paths : list[str] | None, optional
+            Existing files or directories monitored relative to the application
+            root, or ``None`` for no additional invalidation paths.
 
         Returns
         -------
         None
-            Configure compiled application state in place.
+            Configure the cache and commit a valid restored snapshot, if present.
+
+        Notes
+        -----
+        Core application path definitions are always monitored so framework
+        updates invalidate outdated snapshots. Configuration setters leave
+        restored snapshots unchanged.
         """
 
     @abstractmethod
@@ -203,34 +209,32 @@ class IApplication(IContainer, ABC):
         runtime: Runtime | None = None,
     ) -> Self:
         """
-        Register callbacks for a specific application lifespan event.
+        Register unique callbacks for a runtime's startup or shutdown event.
 
         Parameters
         ----------
-        lifespan : orionis.foundation.enums.Lifespan
-            The application lifespan event to register callbacks for.
-        *callbacks
-            One or more callback functions to execute during the event.
-        runtime : orionis.foundation.enums.Runtime | None, optional
-            The runtime environment for which to register the callbacks.
-            If None, callbacks are registered for all runtimes.
+        lifespan : orionis.foundation.enums.lifespan.Lifespan
+            Lifecycle event that triggers the callbacks.
+        *callbacks : collections.abc.Callable
+            Synchronous or asynchronous callbacks invoked through the container.
+        runtime : orionis.foundation.enums.runtimes.Runtime or None, optional
+            Target runtime, or ``None`` for callbacks shared by HTTP and CLI.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         TypeError
-            If ``lifespan`` is not a Lifespan enum or any callback is not callable.
+            If ``lifespan`` is not a ``Lifespan`` or a callback is not callable.
         ValueError
             If no callbacks are provided.
 
         Notes
         -----
-        Callbacks are stored as-is and executed during the specified lifespan
-        event. Lambdas and dynamic callables are supported.
+        Callbacks are deduplicated in sets; execution order is unspecified.
         """
 
     @abstractmethod
@@ -239,29 +243,35 @@ class IApplication(IContainer, ABC):
         *middleware: type[IBaseMiddleware],
     ) -> Self:
         """
-        Register middleware for the application.
+        Register unique middleware classes in application execution order.
 
         Parameters
         ----------
-        middleware
-            Middleware classes to register. Each must inherit from
-            IBaseMiddleware.
+        *middleware : type[IBaseMiddleware]
+            Middleware classes implementing ``IBaseMiddleware``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        TypeError
+            If an argument is not a middleware class.
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
     def getMiddleware(self: Self) -> list[type[IBaseMiddleware]]:
         """
-        Retrieve the list of registered middleware classes.
+        Resolve registered middleware classes in application execution order.
 
         Returns
         -------
         list[type[orionis.http.layer.contracts.middleware.IBaseMiddleware]]
-            A list of middleware classes registered in the application.
+            Registered classes in order, or an empty list when none are stored.
         """
 
     @abstractmethod
@@ -270,24 +280,24 @@ class IApplication(IContainer, ABC):
         *providers: type[IServiceProvider],
     ) -> Self:
         """
-        Register service providers for the application.
+        Register eager or deferred service provider classes for bootstrap.
 
         Parameters
         ----------
-        providers
-            Service provider classes to register. Each must inherit from
-            IServiceProvider.
+        *providers : type[IServiceProvider]
+            Provider classes implementing ``IServiceProvider``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         TypeError
-            If any argument is not a class or does not inherit from
-            IServiceProvider.
+            If a provider class or deferred service identifier is invalid.
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -302,35 +312,36 @@ class IApplication(IContainer, ABC):
         websocket: str | list[str] | None = None,
     ) -> Self:
         """
-        Configure routing paths for the application.
+        Configure route files and the health-check path for each protocol.
 
         Parameters
         ----------
         api : str | list[str] | None, optional
-            Path(s) to API routing files.
+            API route files relative to the application root, or ``None``.
         web : str | list[str] | None, optional
-            Path(s) to web routing files.
+            Web route files relative to the application root, or ``None``.
         console : str | list[str] | None, optional
-            Path(s) to console routing files.
+            CLI route files relative to the application root, or ``None``.
         health : str | None, optional
-            Path to health check route.
+            Health-check URL path, or ``None`` to use ``"/up"``.
         ai : str | list[str] | None, optional
-            MCP registration files loaded for HTTP and CLI runtimes.
+            MCP registration files loaded before HTTP or CLI startup.
         websocket : str | list[str] | None, optional
             WebSocket and Hub route files using the web middleware profile.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         TypeError
-            If routing arguments are of invalid types or do not contain valid
-            routing definitions.
+            If an argument has an invalid type or a route file lacks valid imports.
         FileNotFoundError
-            If a specified routing file does not exist.
+            If a route file is missing outside an active recovery context.
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -339,29 +350,24 @@ class IApplication(IContainer, ABC):
         handler: type[IBaseExceptionHandler],
     ) -> Self:
         """
-        Register a custom exception handler class for the application.
+        Set the exception handler class used for lazy singleton resolution.
 
         Parameters
         ----------
         handler : type[orionis.failure.contracts.handler.IBaseExceptionHandler]
-            Exception handler class to use. Must inherit from BaseExceptionHandler.
+            Handler class implementing ``IBaseExceptionHandler``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         TypeError
-            If the handler is not a class or not a subclass of BaseExceptionHandler.
+            If ``handler`` is not a class implementing the handler contract.
         RuntimeError
-            If attempting to set handler after application has been booted.
-
-        Notes
-        -----
-        Stores the handler class for later instantiation. Any previously
-        registered handler is silently replaced.
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -369,18 +375,17 @@ class IApplication(IContainer, ABC):
         self: Self,
     ) -> IBaseExceptionHandler:
         """
-        Retrieve the registered exception handler instance.
+        Resolve and cache the configured exception handler instance.
 
         Returns
         -------
         orionis.failure.contracts.handler.IBaseExceptionHandler
-            The registered exception handler instance. If none is set, returns
-            the default BaseExceptionHandler instance.
+            Shared handler instance, using the core default when not overridden.
 
         Raises
         ------
         RuntimeError
-            If called before the application is booted.
+            If application creation has not completed.
         """
 
     @abstractmethod
@@ -389,29 +394,24 @@ class IApplication(IContainer, ABC):
         scheduler: type[IBaseScheduler],
     ) -> Self:
         """
-        Register a custom scheduler class for the application.
+        Set the scheduler class built by ``getScheduler``.
 
         Parameters
         ----------
         scheduler : type[orionis.console.base.contracts.scheduler.IBaseScheduler]
-            The scheduler class to be used. Must inherit from IBaseScheduler.
+            Scheduler class implementing ``IBaseScheduler``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         RuntimeError
-            If attempting to set scheduler after application has been booted.
+            If bootstrap configuration is locked.
         TypeError
-            If the provided scheduler is not a subclass of IBaseScheduler.
-
-        Notes
-        -----
-        Stores the scheduler class metadata for later instantiation. Any
-        previously registered scheduler is silently replaced.
+            If ``scheduler`` is not a class implementing ``IBaseScheduler``.
         """
 
     @abstractmethod
@@ -419,17 +419,17 @@ class IApplication(IContainer, ABC):
         self: Self,
     ) -> IBaseScheduler:
         """
-        Retrieve the currently registered scheduler instance.
+        Resolve the scheduler class and build its instance.
 
         Returns
         -------
         orionis.console.base.contracts.scheduler.IBaseScheduler
-            The registered scheduler instance.
+            Instance built from the cached configured scheduler class.
 
         Raises
         ------
         RuntimeError
-            If the application is not booted.
+            If application creation has not completed.
         """
 
     @abstractmethod
@@ -438,35 +438,43 @@ class IApplication(IContainer, ABC):
         **app_config: object,
     ) -> Self:
         """
-        Configure application settings using keyword arguments.
+        Set application configuration overrides for bootstrap.
 
         Parameters
         ----------
         **app_config : object
-            Configuration parameters for the application. Keys must match the
-            field names and types expected by the App dataclass from
-            orionis.foundation.config.app.entities.app.App.
+            Field values for the ``app`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
     def withConfigMcp(self: Self, **mcp_config: object) -> Self:
         """
-        Configure MCP protocol limits and the explicit Origin allowlist.
+        Set MCP protocol limits and allowed origins for bootstrap.
 
         Parameters
         ----------
         **mcp_config : object
-            Fields accepted by the native McpConfig entity.
+            MCP configuration fields, including limits and the Origin allowlist.
 
         Returns
         -------
         typing.Self
-            The application for further configuration.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -475,19 +483,22 @@ class IApplication(IContainer, ABC):
         **auth_config: object,
     ) -> Self:
         """
-        Configure authentication subsystem using keyword arguments.
+        Set authentication configuration overrides for bootstrap.
 
         Parameters
         ----------
         **auth_config : object
-            Keyword arguments for authentication configuration. Keys must match
-            the fields of the ``Auth`` dataclass from
-            ``orionis.foundation.config.auth.entities.auth.Auth``.
+            Field values for the ``auth`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -496,19 +507,22 @@ class IApplication(IContainer, ABC):
         **cache_config: object,
     ) -> Self:
         """
-        Configure the cache subsystem using keyword arguments.
+        Set cache configuration overrides for bootstrap.
 
         Parameters
         ----------
         **cache_config : object
-            Keyword arguments representing cache configuration options. Keys must
-            match the field names and types expected by the ``Cache`` dataclass from
-            ``orionis.foundation.config.cache.entities.cache.Cache``.
+            Field values for the ``cache`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -517,19 +531,22 @@ class IApplication(IContainer, ABC):
         **http_config: object,
     ) -> Self:
         """
-        Configure the HTTP subsystem using keyword arguments.
+        Set HTTP configuration overrides for bootstrap.
 
         Parameters
         ----------
         **http_config : object
-            Keyword arguments for HTTP configuration. Keys must match the field
-            names and types expected by the ``HTTP`` dataclass from
-            ``orionis.foundation.config.http.entitites.http.HTTP``.
+            Field values for the ``http`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -538,19 +555,22 @@ class IApplication(IContainer, ABC):
         **database_config: object,
     ) -> Self:
         """
-        Configure the database subsystem using keyword arguments.
+        Set database configuration overrides for bootstrap.
 
         Parameters
         ----------
         **database_config : object
-            Keyword arguments for database configuration. Keys must match the
-            fields of the ``Database`` dataclass from
-            ``orionis.foundation.config.database.entities.database.Database``.
+            Field values for the ``database`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -559,19 +579,22 @@ class IApplication(IContainer, ABC):
         **filesystems_config: object,
     ) -> Self:
         """
-        Configure the filesystems subsystem using keyword arguments.
+        Set filesystem configuration overrides for bootstrap.
 
         Parameters
         ----------
         **filesystems_config : object
-            Keyword arguments for filesystems configuration. Keys must match the
-            fields of the ``Filesystems`` dataclass from
-            ``orionis.foundation.config.filesystems.entitites.filesystems.Filesystems``.
+            Field values for the ``filesystems`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -580,19 +603,22 @@ class IApplication(IContainer, ABC):
         **logging_config: object,
     ) -> Self:
         """
-        Configure logging subsystem using keyword arguments.
+        Set logging configuration overrides for bootstrap.
 
         Parameters
         ----------
         **logging_config : object
-            Keyword arguments for logging configuration. Keys must match the
-            fields of the ``Logging`` dataclass from
-            ``orionis.foundation.config.logging.entities.logging.Logging``.
+            Field values for the ``logging`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -601,19 +627,22 @@ class IApplication(IContainer, ABC):
         **mail_config: object,
     ) -> Self:
         """
-        Configure mail subsystem using keyword arguments.
+        Set mail configuration overrides for bootstrap.
 
         Parameters
         ----------
         **mail_config : object
-            Keyword arguments for mail configuration. Keys must match the fields
-            of the ``Mail`` dataclass from
-            ``orionis.foundation.config.mail.entities.mail.Mail``.
+            Field values for the ``mail`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -622,19 +651,22 @@ class IApplication(IContainer, ABC):
         **queue_config: object,
     ) -> Self:
         """
-        Configure the queue subsystem using keyword arguments.
+        Set queue configuration overrides for bootstrap.
 
         Parameters
         ----------
         **queue_config : object
-            Keyword arguments representing queue configuration options. Keys must
-            match the field names and types expected by the ``Queue`` dataclass from
-            ``orionis.foundation.config.queue.entities.queue.Queue``.
+            Field values for the ``queue`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -643,19 +675,22 @@ class IApplication(IContainer, ABC):
         **session_config: object,
     ) -> Self:
         """
-        Configure session subsystem using keyword arguments.
+        Set session configuration overrides for bootstrap.
 
         Parameters
         ----------
         **session_config : object
-            Keyword arguments for session configuration. Keys must match the
-            fields of the ``Session`` dataclass from
-            ``orionis.foundation.config.session.entities.session.Session``.
+            Field values for the ``session`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -664,19 +699,22 @@ class IApplication(IContainer, ABC):
         **testing_config: object,
     ) -> Self:
         """
-        Configure the testing subsystem using keyword arguments.
+        Set testing configuration overrides for bootstrap.
 
         Parameters
         ----------
         **testing_config : object
-            Keyword arguments for testing configuration. Keys must match the
-            fields of the ``Testing`` dataclass from
-            ``orionis.foundation.config.testing.entities.testing.Testing``.
+            Field values for the ``testing`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
@@ -685,50 +723,77 @@ class IApplication(IContainer, ABC):
         **paths: str | Path | None,
     ) -> Self:
         """
-        Set and resolve application directory paths.
+        Configure resolved application directories with core path overrides.
 
         Parameters
         ----------
         **paths : str | pathlib.Path | None
-            Optional directory path overrides. Valid keys are 'app', 'console',
-            'exceptions', 'http', 'models', 'providers', 'notifications',
-            'services', 'jobs', 'bootstrap', 'config', 'database', 'resources',
-            'routes', 'storage' and 'tests'. The root always comes from basePath.
+            Overrides keyed by core path names such as ``app_providers``,
+            ``config``, and ``storage_framework``. Relative strings use the root;
+            path objects use the working directory. ``None`` uses defaults.
+            Unknown keys are ignored, and ``root`` remains ``basePath``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
 
     @abstractmethod
     def create(self: Self) -> Self:
         """
-        Bootstrap and initialize the application framework.
+        Create application configuration and register eager services once.
 
-        Register the application instance, load all configurations, set timezone
-        and locale, and mark the application as booted.
+        Apply locale settings and cache runtime flags without awaiting
+        asynchronous provider boots or preparing HTTP handlers.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application after configuration and registration complete.
+
+        Raises
+        ------
+        TypeError
+            If ``http.monitor_disconnects`` is neither a boolean nor ``None``.
         """
 
     @abstractmethod
     async def boot(self: Self) -> Self:
         """
-        Create the application and await eager providers for headless use.
+        Create the application and start eager providers for headless use.
+
+        Coordinate repeated calls and acquire headless reporting ownership.
+        Leave HTTP and CLI kernels and lifecycle callbacks to their runtimes.
 
         Returns
         -------
         typing.Self
-            The application after successful eager provider startup.
+            This application after all eager providers finish booting.
 
         Raises
         ------
         Exception
-            Propagate configuration or provider startup failures for retry.
+            If creation, provider boot, or reporting startup fails. Unfinished
+            providers remain pending for a later retry.
+        """
+
+    async def aclose(self: Self) -> None:
+        """
+        Close a headless lifetime when the implementation owns one.
+
+        Keep the default implementation as a no-op for custom applications
+        that do not manage headless reporting ownership.
+
+        Returns
+        -------
+        None
+            Release owned resources in overrides; do nothing in the default method.
         """
 
     @abstractmethod
@@ -737,22 +802,22 @@ class IApplication(IContainer, ABC):
         args: list[str] | None = None,
     ) -> int:
         """
-        Run a CLI command through the configured command kernel.
+        Run a CLI command within its startup and shutdown lifecycle.
 
         Parameters
         ----------
         args : list of str or None, optional
-            Command-line arguments passed to the CLI kernel.
+            Command arguments, or ``None`` to pass an empty argument list.
 
         Returns
         -------
         int
-            Exit code returned by the command kernel.
+            Exit code returned by the CLI kernel.
 
         Raises
         ------
         RuntimeError
-            If the CLI kernel is not configured.
+            If no CLI kernel is configured.
         TypeError
             If the configured kernel does not implement the CLI interface.
         """
@@ -764,43 +829,41 @@ class IApplication(IContainer, ABC):
         value: object = _SENTINEL,
     ) -> object:
         """
-        Get or set an application configuration value.
+        Read or update the mutable runtime configuration.
 
         Parameters
         ----------
         key : str or None, optional
-            Dot-notated key specifying the configuration value to get or set.
-            If None and value is not provided, returns the entire configuration.
+            Dot-separated key, or ``None`` with no value to return all settings.
         value : object, optional
-            Value to set at the specified key. If not provided, retrieves the value.
+            Replacement value; omit to read the key. Explicit ``None`` is stored.
 
         Returns
         -------
         object
-            The configuration value for the given key, or the entire configuration
-            if no key is provided. If setting a value, returns the value set.
+            Requested value, assigned value, or the full mutable mapping.
+            Missing keys and non-dictionary parents return ``None`` on reads.
 
         Raises
         ------
         RuntimeError
             If the application configuration is not initialized.
         TypeError
-            If the configuration key is not a string.
+            If a keyed read or write uses a non-string key.
         """
 
     @abstractmethod
     def resetRuntimeConfig(self: Self) -> bool:
         """
-        Reset the runtime configuration to a mutable copy of the bootstrap config.
+        Restore mutable runtime settings from the bootstrap configuration.
 
-        Resets the application's runtime configuration to a mutable and isolated
-        copy of the bootstrap configuration. The application remains booted and
-        subsequent accesses use the restored runtime values.
+        Replace runtime containers with an isolated copy without changing
+        creation or readiness flags.
 
         Returns
         -------
         bool
-            True if the configuration was reset successfully.
+            ``True`` after the runtime mapping has been replaced.
         """
 
     @abstractmethod
@@ -809,25 +872,25 @@ class IApplication(IContainer, ABC):
         key: str | None = None,
     ) -> Path | Mapping[str, Path] | None:
         """
-        Retrieve an application path by key or return all paths.
+        Return one configured application path or the read-only path mapping.
 
         Parameters
         ----------
         key : str | None, optional
-            The key for the desired path. If None, returns all paths.
+            Core path name, or ``None`` to return the complete path mapping.
 
         Returns
         -------
         pathlib.Path | collections.abc.Mapping[str, pathlib.Path] | None
-            The resolved path for the given key, all paths as a read-only
-            mapping, or None if the key does not exist.
+            Resolved path, read-only mapping when omitted, or ``None`` for an
+            unknown key.
 
         Raises
         ------
         RuntimeError
             If the application configuration is not initialized.
         TypeError
-            If the key is not a string.
+            If a supplied key is not a string.
         """
 
     @abstractmethod
@@ -836,80 +899,77 @@ class IApplication(IContainer, ABC):
         key: str | None = None,
     ) -> list[Path] | dict | None:
         """
-        Retrieve routing file paths from configuration.
-
-        Only 'api', 'web', and 'console' routing types are supported.
-        The health-check route is exposed through the ``routeHealthCheck``
-        property and is not accessible via this method.
+        Return mutable copies of configured routing paths.
 
         Parameters
         ----------
         key : str | None, optional
-            Routing type to retrieve: 'api', 'web', or 'console'.
-            If None, returns the complete routing configuration dictionary.
+            Routing type: ``api``, ``web``, ``console``, ``ai``, or ``websocket``.
+            Use ``None`` to return the complete routing dictionary.
 
         Returns
         -------
         list[pathlib.Path] | dict | None
-            List of Path objects for the specified routing type, the complete
-            routing configuration dictionary if no key is provided, or None
-            if the key is not one of the valid routing types.
+            Copied route list, full mutable routing dictionary, or ``None`` for
+            an unsupported or unconfigured type. The full dictionary may also
+            contain the health-check setting.
 
         Raises
         ------
         RuntimeError
             If the application configuration is not initialized.
         TypeError
-            If the key is not a string or None.
+            If a supplied key is neither a string nor ``None``.
         """
 
     @abstractmethod
     def isProduction(self: Self) -> bool:
         """
-        Determine if the application is running in a production environment.
-
-        Checks the 'app.env' configuration value to see if it contains 'prod'.
-        This is useful for toggling production-specific features.
+        Check the production flag cached during application creation.
 
         Returns
         -------
         bool
-            True if the application environment contains 'prod', otherwise False.
+            ``True`` when the creation-time ``app.env`` string contains ``"prod"``.
 
         Raises
         ------
         RuntimeError
-            If the application configuration is not initialized.
+            If application creation has not completed.
         """
 
     @abstractmethod
     def isDebug(self: Self) -> bool:
         """
-        Determine if the application is running in debug mode.
+        Check the debug flag cached during application creation.
 
         Returns
         -------
         bool
-            True if debug mode is enabled in the configuration, otherwise False.
+            ``True`` only when the creation-time ``app.debug`` value is ``True``.
 
         Raises
         ------
         RuntimeError
-            If the application configuration is not initialized.
+            If application creation has not completed.
         """
 
     @abstractmethod
     def underMaintenance(self: Self) -> bool:
         """
-        Determine if the application is currently in maintenance mode.
+        Check effective maintenance mode using a short-lived worker cache.
+
+        Refresh the shared marker at most every 100 ms. Treat unreadable markers
+        as maintenance mode; use configuration for missing or unrecognized values.
 
         Returns
         -------
         bool
-            True if configuration or the runtime marker enables maintenance.
+            ``True`` when maintenance is enabled. Marker values ``"down"`` and
+            ``"up"`` override ``app.maintenance``.
 
         Raises
         ------
         RuntimeError
-            If the application configuration is not initialized.
+            If application creation has not completed.
         """

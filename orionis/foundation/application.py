@@ -8,7 +8,7 @@ import os
 import sys
 import time
 from collections import OrderedDict, deque
-from contextlib import suppress
+from contextlib import nullcontext, suppress
 from dataclasses import asdict
 from functools import lru_cache
 from importlib import import_module
@@ -24,6 +24,7 @@ from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.failure.contracts.handler import IBaseExceptionHandler
+from orionis.failure.runtime import capture, operation, prepare
 from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.core_config import get_core_config_mapping
 from orionis.foundation.core_exception_handler import CORE_EXCEPTION_HANDLER
@@ -51,6 +52,7 @@ if TYPE_CHECKING:
     )
     from orionis.cache.contracts.file_based_cache import IFileBasedCache
     from orionis.container.contracts.deferrable_provider import IDeferrableProvider
+    from orionis.failure.runtime import FailureRuntime
 
 _SENTINEL = object()
 """Sentinel distinguishing sentinel from ordinary values."""
@@ -64,6 +66,10 @@ _CONFIG_KEY_CACHE_SIZE = 256
 """Config key cache size value used by ``application``."""
 _MAINTENANCE_REFRESH_NS = 100_000_000
 """Maintenance refresh ns value used by ``application``."""
+_HTTP_FAILURE_OWNER = object()
+"""Owner retaining failure reporting for the HTTP server lifetime."""
+_HEADLESS_FAILURE_OWNER = object()
+"""Owner retaining failure reporting after explicit headless boot."""
 _ROUTER_FACADE_MODULE = "orionis.support.facades"
 """Router facade module identifier: ``orionis.support.facades``."""
 _ERR_NOT_CONFIGURED: str = (
@@ -77,17 +83,17 @@ Please call create() first.``.
 @lru_cache(maxsize=_CONFIG_KEY_CACHE_SIZE)
 def _parse_config_key(key: str) -> tuple[str, ...]:
     """
-    Parse a dot-notated configuration key into immutable path components.
+    Split a dot-notated configuration key into immutable path components.
 
     Parameters
     ----------
     key : str
-        Validated configuration key whose empty segments must be preserved.
+        Validated configuration key, including any empty path segments.
 
     Returns
     -------
-    tuple[str, ``...``]
-        Path components shared independently of application configuration values.
+    tuple of str
+        Cached components independent of application configuration values.
     """
     return tuple(key.split("."))
 
@@ -96,20 +102,20 @@ def _create_http_handler_task(
     coroutine: Coroutine,
 ) -> asyncio.Task:
     """
-    Start a monitored handler through the event loop's task factory.
+    Schedule an HTTP handler through the event loop's task factory.
 
     Parameters
     ----------
     loop : asyncio.AbstractEventLoop
-        Running request event loop.
+        Event loop serving the request.
     coroutine : collections.abc.Coroutine
-        Kernel handler coroutine to schedule.
+        Handler coroutine to schedule.
 
     Returns
     -------
     asyncio.Task
-        Handler task. The native loop without a custom factory starts it eagerly;
-        other loops and factories receive their standard task-creation arguments.
+        Scheduled handler, started eagerly only on a native loop without a
+        custom task factory.
     """
     if (
         type(loop).create_task is asyncio.BaseEventLoop.create_task
@@ -124,25 +130,24 @@ async def _asgi_receive_dispatcher(
     handler_task: asyncio.Task,
 ) -> bool:
     """
-    Consume ASGI receive messages and dispatch them concurrently.
+    Dispatch ASGI body messages and cancel the handler on disconnect.
 
-    Forward body chunks through a bounded queue and cancel the handler when
-    the receive channel reports a disconnect or fails. A full queue pauses
-    receive calls until the handler consumes a buffered message.
+    Pause receive calls while the bounded queue is full. Cancel the handler
+    before propagating a receive-channel failure.
 
     Parameters
     ----------
-    receive : Callable[[], Awaitable[dict[str, Any]]]
-        ASGI receive callable provided by the server.
+    receive : collections.abc.Callable
+        Asynchronous callable yielding ASGI request messages.
     request_queue : asyncio.Queue
-        Queue that buffers body messages for the handler.
+        Bounded message queue consumed by the handler.
     handler_task : asyncio.Task
-        Kernel task to cancel when the receive channel closes.
+        Handler task to cancel when the client disconnects.
 
     Returns
     -------
     bool
-        Whether the disconnect requested cancellation of the handler.
+        Whether the disconnect message requested handler cancellation.
     """
     if handler_task.done():
         return False
@@ -162,19 +167,19 @@ async def _rsgi_disconnect_watcher(
     handler_task: asyncio.Task,
 ) -> bool:
     """
-    Cancel the kernel task when the RSGI disconnect awaitable completes.
+    Cancel the RSGI handler when the client disconnects.
 
     Parameters
     ----------
     protocol : ``granian.rsgi.HTTPProtocol``
-        Protocol providing the client disconnect awaitable.
+        Protocol exposing the client-disconnect awaitable.
     handler_task : asyncio.Task
-        Kernel task associated with the connection.
+        Handler task associated with the connection.
 
     Returns
     -------
     bool
-        Whether the disconnect requested cancellation of the handler.
+        Whether the disconnect requested handler cancellation.
     """
     if handler_task.done():
         return False
@@ -189,32 +194,44 @@ async def _rsgi_disconnect_watcher(
 async def _await_http_tasks(
     handler_task: asyncio.Task,
     disconnect_task: asyncio.Task[bool],
+    transport: str | None = None,
 ) -> Any:
     """
-    Await the kernel and finish its disconnect monitor before returning.
+    Await an HTTP handler and clean up its disconnect monitor.
 
     Parameters
     ----------
     handler_task : asyncio.Task
-        Kernel task handling the request.
+        Task executing the kernel handler.
     disconnect_task : asyncio.Task[bool]
-        Monitor returning whether it cancelled the kernel on disconnect.
+        Monitor indicating whether it requested disconnect cancellation.
+    transport : str | None, optional
+        Transport identifier included in failure-reporting metadata.
 
     Returns
     -------
     typing.Any
-        Kernel result, or None after a client disconnect.
+        Handler result, or ``None`` after disconnect-driven cancellation.
 
     Raises
     ------
     asyncio.CancelledError
-        If the caller or kernel is cancelled independently of a disconnect.
+        If the caller or handler is cancelled independently of a disconnect.
     Exception
-        If the kernel or disconnect monitor fails.
+        If the handler or disconnect monitor fails.
     """
     parent_task = asyncio.current_task()
     try:
-        return await handler_task
+        try:
+            return await handler_task
+        except Exception as error:
+            await capture(
+                error,
+                flow="http",
+                phase="execution",
+                metadata={"transport": transport},
+            )
+            raise
     except asyncio.CancelledError:  # NOSONAR
         if parent_task.cancelling() or not disconnect_task.done():
             raise
@@ -230,6 +247,39 @@ async def _await_http_tasks(
             # Preserve cancellation of the request during monitor cleanup.
             if parent_task.cancelling():
                 raise
+        except Exception as error:
+            await capture(
+                error,
+                flow="http",
+                phase="disconnect",
+                metadata={"transport": transport},
+            )
+            raise
+
+def _retire_shared_runtime(
+    runtime: FailureRuntime | None,
+    owner: object | None,
+) -> bool:
+    """
+    Retire a shared runtime owner under the caller's lifecycle lock.
+
+    Parameters
+    ----------
+    runtime : orionis.failure.runtime.FailureRuntime or None
+        Failure runtime to inspect, or ``None`` when reporting is unavailable.
+    owner : object or None
+        Ownership token to release, or ``None`` to leave ownership unchanged.
+
+    Returns
+    -------
+    bool
+        Whether shared resources must remain available to another owner.
+    """
+    if runtime is None or runtime.ownerCount <= 1:
+        return False
+    if owner is not None:
+        runtime.deactivate(owner)
+    return True
 
 class Application(Container, IApplication):
     """
@@ -319,22 +369,21 @@ class Application(Container, IApplication):
         send: Callable[[dict[str, Any]], Awaitable[None]],
     ) -> Any | None:
         """
-        Dispatch ASGI requests to the appropriate handler by scope type.
+        Route ASGI HTTP, WebSocket, and lifespan scopes to their handlers.
 
         Parameters
         ----------
         scope : dict
-            ASGI connection scope containing request metadata and type.
-        receive : typing.Callable[[], typing.Awaitable[dict[str, typing.Any]]]
-            ASGI receive callable for message retrieval.
-        send : typing.Callable[[dict[str, typing.Any]], typing.Awaitable[None]]
-            ASGI send callable for response transmission.
+            Connection metadata, including the ASGI scope type.
+        receive : collections.abc.Callable
+            Asynchronous callable receiving connection messages.
+        send : collections.abc.Callable
+            Asynchronous callable sending connection messages.
 
         Returns
         -------
         typing.Any | None
-            Result from the lifespan or HTTP handler, or ``None`` for
-            unsupported scope types.
+            Handler result, or ``None`` for an unsupported scope type.
         """
         scope_type: str = scope["type"]
 
@@ -355,31 +404,28 @@ class Application(Container, IApplication):
         send: Callable[[dict], Awaitable[None]],
     ) -> None:
         """
-        Handle ASGI lifespan startup and shutdown events.
+        Receive ASGI lifespan messages until shutdown or disconnect.
 
         Parameters
         ----------
-        receive : collections.abc.Callable[[], collections.abc.Awaitable[dict]]
-            ASGI receive callable for lifespan message retrieval.
-        send : collections.abc.Callable[[dict], collections.abc.Awaitable[None]]
-            ASGI send callable for lifespan response transmission.
+        receive : collections.abc.Callable
+            Asynchronous callable receiving lifespan messages.
+        send : collections.abc.Callable
+            Asynchronous callable sending lifespan acknowledgements.
 
         Returns
         -------
         None
-            Returns after shutdown completes or a fatal error occurs.
+            Finish after shutdown, disconnect, or a reported lifecycle failure.
         """
-        # Map each lifespan event to its corresponding lifecycle method
-        handler_map: dict[Lifespan, Callable[..., Any]] = {
-            Lifespan.STARTUP: self.__onStartup,
-            Lifespan.SHUTDOWN: self.__onShutdown,
-        }
-
-        # Guard against duplicate startup execution
         started: bool = False
 
         while True:
-            message: dict = await receive()
+            try:
+                message: dict = await receive()
+            except Exception as error:
+                await capture(error, app=self, flow="lifecycle", phase="receive")
+                raise
             message_type: str | None = message.get("type")
 
             # Exit on client lifespan disconnect
@@ -392,38 +438,112 @@ class Application(Container, IApplication):
             except ValueError:
                 continue
 
-            # Skip unrecognised events
-            handler: Callable | None = handler_map.get(event)
-            if handler is None:
-                continue
-
-            try:
-                # Prevent duplicate startup if the server fires it twice
-                if event is Lifespan.STARTUP and not started:
-                    started = True
-                elif event is Lifespan.STARTUP:
-                    await send({"type": "lifespan.startup.complete"})
-                    continue
-
-                # Execute the corresponding lifecycle callback
-                await handler(runtime=Runtime.HTTP)
-
-                # Acknowledge the event to the server
-                await send({"type": f"{message_type}.complete"})
-
-                # Exit after shutdown is confirmed
-                if event is Lifespan.SHUTDOWN:
-                    return
-
-            except Exception as exc:
-                error_msg: str = str(exc)
-                await send(
-                    {
-                        "type": f"{message_type}.failed",
-                        "message": error_msg,
-                    },
-                )
+            if not await self.__handleLifespanEvent(event, send, started=started):
                 return
+            started = True
+
+    async def __handleLifespanEvent(
+        self: Self, event: Lifespan,
+        send: Callable[[dict], Awaitable[None]], *, started: bool,
+    ) -> bool:
+        """
+        Process one ASGI lifespan event and report its outcome.
+
+        Parameters
+        ----------
+        event : orionis.foundation.enums.lifespan.Lifespan
+            Startup or shutdown event to process.
+        send : collections.abc.Callable
+            Asynchronous callable sending the event acknowledgement.
+        started : bool
+            Whether an earlier startup event completed successfully.
+
+        Returns
+        -------
+        bool
+            ``True`` after successful startup; ``False`` after shutdown or failure.
+        """
+        with operation(self, flow="lifecycle", operation=event.value):
+            try:
+                if event is Lifespan.STARTUP and started:
+                    await send({"type": "lifespan.startup.complete"})
+                    return True
+                await self.__runLifespanEvent(event, send)
+                return event is Lifespan.STARTUP
+            except Exception as error:
+                await self.__sendLifespanFailure(event, send, error)
+                return False
+            finally:
+                if event is Lifespan.SHUTDOWN and self._failure_runtime is not None:
+                    self._failure_runtime.deactivate(_HTTP_FAILURE_OWNER)
+
+    async def __runLifespanEvent(
+        self: Self, event: Lifespan, send: Callable[[dict], Awaitable[None]],
+    ) -> None:
+        """
+        Run lifespan callbacks and acknowledge successful completion.
+
+        Activate HTTP failure reporting only after startup acknowledgement.
+
+        Parameters
+        ----------
+        event : orionis.foundation.enums.lifespan.Lifespan
+            Startup or shutdown event whose callbacks should run.
+        send : collections.abc.Callable
+            Asynchronous callable sending the completion message.
+
+        Returns
+        -------
+        None
+            Complete the event callbacks and send their acknowledgement.
+        """
+        if event is Lifespan.STARTUP:
+            await self.__onStartup(runtime=Runtime.HTTP)
+            failure_runtime = await prepare(self)
+            if failure_runtime is not None:
+                async with failure_runtime.lifecycle_lock:
+                    await send({"type": "lifespan.startup.complete"})
+                    failure_runtime.activate(_HTTP_FAILURE_OWNER)
+                return
+        else:
+            await self.__onShutdown(runtime=Runtime.HTTP)
+        await send({"type": f"{event.value}.complete"})
+
+    async def __sendLifespanFailure(
+        self: Self, event: Lifespan, send: Callable[[dict], Awaitable[None]],
+        error: Exception,
+    ) -> None:
+        """
+        Report a lifespan failure and send the ASGI failure response.
+
+        Parameters
+        ----------
+        event : orionis.foundation.enums.lifespan.Lifespan
+            Lifecycle event that failed.
+        send : collections.abc.Callable
+            Asynchronous callable sending the failure response.
+        error : Exception
+            Original lifecycle exception to report.
+
+        Returns
+        -------
+        None
+            Send the failed-event message without activating startup reporting.
+
+        Raises
+        ------
+        Exception
+            If the failure response cannot be sent.
+        """
+        await capture(
+            error, app=self, flow="lifecycle",
+            phase="startup" if event is Lifespan.STARTUP else "shutdown",
+        )
+        try:
+            await send({"type": f"{event.value}.failed", "message": str(error)})
+        except Exception as send_error:
+            await capture(send_error, app=self, flow="lifecycle", phase="send")
+            raise
 
     async def __handleHttpAsgi(
         self: Self,
@@ -432,57 +552,63 @@ class Application(Container, IApplication):
         send: Callable[[dict[str, Any]], Awaitable[None]],
     ) -> Any | None:
         """
-        Handle an HTTP request using the configured disconnect policy.
+        Dispatch ASGI connections under the configured disconnect policy.
 
-        Direct dispatch uses the server task and receive callable. When
-        ``http.monitor_disconnects`` or a compiled endpoint policy enables
-        monitoring, a receive dispatcher cancels the kernel on disconnect
-        and buffers incoming body messages.
-        At most nine body messages are retained outside the kernel: eight
-        in the queue and one waiting to enter it. Disconnect detection
-        pauses while the queue is full.
+        Monitor HTTP disconnects when enabled globally or by an endpoint.
+        Buffer at most nine body messages: eight queued and one pending.
+        Pause receive calls while the queue is full. Dispatch WebSockets
+        directly in the server task without a disconnect monitor.
 
         Parameters
         ----------
         scope : dict
-            ASGI connection scope containing request metadata.
-        receive : typing.Callable[[], typing.Awaitable[dict[str, typing.Any]]]
-            ASGI receive callable provided by the server.
-        send : typing.Callable[[dict[str, typing.Any]], typing.Awaitable[None]]
-            ASGI send callable for transmitting the response.
+            ASGI HTTP or WebSocket connection metadata.
+        receive : collections.abc.Callable
+            Asynchronous callable receiving connection messages.
+        send : collections.abc.Callable
+            Asynchronous callable transmitting response messages.
 
         Returns
         -------
         typing.Any | None
-            Result of the kernel handler, or ``None`` if the client
-            disconnected before the response was sent.
+            Kernel result, or ``None`` after disconnect-driven cancellation.
         """
         handler = self.__kernel_http_asgi
         if handler is None:
-            await self.__initializeHttpKernel("asgi")
+            await self.__initializeHttpKernel("asgi", start_runtime=True)
             handler = self.__kernel_http_asgi
 
-        monitoring = self.__http_disconnect_monitoring
-        if not monitoring and self.__http_disconnect_paths:
-            monitoring = (
-                normalize_request_path(scope.get("path", ""))
-                in self.__http_disconnect_paths
-            )
-        if not monitoring or scope.get("type") == "websocket":
-            return await handler(scope, receive, send)
+        with operation(self, runtime=self._failure_runtime, flow="http", isolated=True):
+            try:
+                monitoring = self.__http_disconnect_monitoring
+                if not monitoring and self.__http_disconnect_paths:
+                    monitoring = (
+                        normalize_request_path(scope.get("path", ""))
+                        in self.__http_disconnect_paths
+                    )
+                if not monitoring or scope.get("type") == "websocket":
+                    return await handler(scope, receive, send)
 
-        loop = asyncio.get_running_loop()
-        request_queue: asyncio.Queue = asyncio.Queue(maxsize=_ASGI_BODY_QUEUE_SIZE)
-        handler_task = _create_http_handler_task(
-            loop,
-            handler(scope, request_queue.get, send),
-        )
-        if handler_task.done():
-            return handler_task.result()
-        dispatcher_task = loop.create_task(
-            _asgi_receive_dispatcher(receive, request_queue, handler_task),
-        )
-        return await _await_http_tasks(handler_task, dispatcher_task)
+                loop = asyncio.get_running_loop()
+                request_queue: asyncio.Queue = asyncio.Queue(
+                    maxsize=_ASGI_BODY_QUEUE_SIZE,
+                )
+                handler_task = _create_http_handler_task(
+                    loop,
+                    handler(scope, request_queue.get, send),
+                )
+                if handler_task.done():
+                    return handler_task.result()
+                dispatcher_task = loop.create_task(
+                    _asgi_receive_dispatcher(receive, request_queue, handler_task),
+                )
+                return await _await_http_tasks(handler_task, dispatcher_task, "asgi")
+            except Exception as error:
+                await capture(
+                    error, app=self, flow="http", phase="dispatch",
+                    metadata={"transport": "asgi"},
+                )
+                raise
 
     # --- RSGI Application Handling ---
 
@@ -492,19 +618,19 @@ class Application(Container, IApplication):
         protocol: HTTPProtocol | WebsocketProtocol | ProtocolError | ProtocolClosed,
     ) -> object:
         """
-        Handle the RSGI protocol for incoming requests.
+        Route RSGI HTTP and WebSocket connections to the HTTP kernel.
 
         Parameters
         ----------
         scope : ``granian.rsgi.Scope``
-            The connection scope information.
-        protocol
-            The RSGI protocol instance representing the connection.
+            Connection metadata, including the RSGI protocol type.
+        protocol : object
+            RSGI HTTP, WebSocket, error, or closed-connection protocol instance.
 
         Returns
         -------
         object
-            The result of handling the RSGI request.
+            Kernel result, or ``None`` for an unsupported protocol.
         """
         # Delegate to the appropriate kernel handler based on protocol type.
         if scope.proto in {"http", "ws"}:
@@ -518,44 +644,74 @@ class Application(Container, IApplication):
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         """
-        Initialize the RSGI application lifecycle and execute startup callbacks.
+        Run RSGI startup on the server's event loop.
 
         Parameters
         ----------
         loop : asyncio.AbstractEventLoop
-            The event loop for asynchronous execution.
+            Server event loop used to complete startup synchronously.
 
         Returns
         -------
         None
-            This method executes startup callbacks and does not return a value.
+            Complete provider, kernel, and startup-hook initialization.
         """
         # Trigger application startup lifecycle and run all startup callbacks.
         loop.run_until_complete(
-            self.__onStartup(runtime=Runtime.HTTP, http_interface="rsgi"),
+            self.__startRsgi(),
         )
+
+    async def __startRsgi(self: Self) -> None:
+        """
+        Complete RSGI startup before activating failure reporting.
+
+        Returns
+        -------
+        None
+            Acquire HTTP reporting ownership after successful initialization.
+        """
+        await self.__onStartup(runtime=Runtime.HTTP, http_interface="rsgi")
+        failure_runtime = await prepare(self)
+        if failure_runtime is not None:
+            await failure_runtime.start(_HTTP_FAILURE_OWNER)
 
     def __rsgi_del__(
         self: Self,
         loop: asyncio.AbstractEventLoop,
     ) -> None:
         """
-        Execute the RSGI application shutdown lifecycle.
+        Run RSGI shutdown on the server's event loop.
 
         Parameters
         ----------
         loop : asyncio.AbstractEventLoop
-            The event loop for asynchronous execution.
+            Server event loop used to complete shutdown synchronously.
 
         Returns
         -------
         None
-            This method executes shutdown callbacks and does not return a value.
+            Complete shutdown hooks and release HTTP reporting ownership.
         """
         # Trigger application shutdown lifecycle and run all shutdown callbacks.
         loop.run_until_complete(
-            self.__onShutdown(runtime=Runtime.HTTP),
+            self.__stopRsgi(),
         )
+
+    async def __stopRsgi(self: Self) -> None:
+        """
+        Run RSGI shutdown before releasing failure-reporting ownership.
+
+        Returns
+        -------
+        None
+            Release HTTP ownership even if shutdown raises an exception.
+        """
+        try:
+            with operation(self, flow="lifecycle", operation="http.shutdown"):
+                await self.__onShutdown(runtime=Runtime.HTTP)
+        finally:
+            if self._failure_runtime is not None:
+                self._failure_runtime.deactivate(_HTTP_FAILURE_OWNER)
 
     async def __handleHttpRsgi(
         self: Self,
@@ -563,81 +719,95 @@ class Application(Container, IApplication):
         protocol: HTTPProtocol,
     ) -> object:
         """
-        Handle HTTP requests using the KernelHTTP in RSGI mode.
+        Dispatch RSGI connections under the configured disconnect policy.
 
-        Direct dispatch executes in the server task. When
-        ``http.monitor_disconnects`` or a compiled endpoint policy enables
-        monitoring, a watcher requests cancellation when the client disconnects.
-        The watcher is joined before returning.
+        Monitor HTTP disconnects when enabled globally or by an endpoint,
+        and finish the watcher before returning. Dispatch WebSockets directly.
 
         Parameters
         ----------
         scope : ``granian.rsgi.Scope``
-            The connection scope information for the RSGI protocol.
+            RSGI connection metadata.
         protocol : ``granian.rsgi.HTTPProtocol``
-            The RSGI protocol instance; must expose a ``client_disconnect``
-            coroutine that resolves when the client closes the connection.
+            Connection protocol exposing a ``client_disconnect`` awaitable
+            when HTTP disconnect monitoring is enabled.
 
         Returns
         -------
         object
-            The result returned by the HTTP kernel's handleRSGI method, or
-            ``None`` when execution is cancelled due to client disconnect.
+            Kernel result, or ``None`` after disconnect-driven cancellation.
 
         Raises
         ------
-        RuntimeError
-            If KernelHTTP is not configured in the application.
         TypeError
-            If the HTTP kernel does not have a handleRSGI method.
+            If the configured kernel does not implement the HTTP interface.
         """
         handler = self.__kernel_http_rsgi
         if handler is None:
-            await self.__initializeHttpKernel("rsgi")
+            await self.__initializeHttpKernel("rsgi", start_runtime=True)
             handler = self.__kernel_http_rsgi
 
-        monitoring = self.__http_disconnect_monitoring
-        if not monitoring and self.__http_disconnect_paths:
-            monitoring = (
-                normalize_request_path(scope.path) in self.__http_disconnect_paths
-            )
-        if not monitoring or scope.proto == "ws":
-            return await handler(scope, protocol)
+        with operation(self, runtime=self._failure_runtime, flow="http", isolated=True):
+            try:
+                monitoring = self.__http_disconnect_monitoring
+                if not monitoring and self.__http_disconnect_paths:
+                    monitoring = (
+                        normalize_request_path(scope.path)
+                        in self.__http_disconnect_paths
+                    )
+                if not monitoring or scope.proto == "ws":
+                    return await handler(scope, protocol)
 
-        loop = asyncio.get_running_loop()
-        handler_task = _create_http_handler_task(loop, handler(scope, protocol))
-        if handler_task.done():
-            return handler_task.result()
-        disconnect_task = loop.create_task(
-            _rsgi_disconnect_watcher(protocol, handler_task),
-        )
-        return await _await_http_tasks(handler_task, disconnect_task)
+                loop = asyncio.get_running_loop()
+                handler_task = _create_http_handler_task(loop, handler(scope, protocol))
+                if handler_task.done():
+                    return handler_task.result()
+                disconnect_task = loop.create_task(
+                    _rsgi_disconnect_watcher(protocol, handler_task),
+                )
+                return await _await_http_tasks(handler_task, disconnect_task, "rsgi")
+            except Exception as error:
+                await capture(
+                    error, app=self, flow="http", phase="dispatch",
+                    metadata={"transport": "rsgi"},
+                )
+                raise
 
     # --- Kernel Handling Methods ---
 
-    async def __initializeHttpKernel(self: Self, interface: str) -> None:
+    async def __initializeHttpKernel(
+        self: Self, interface: str, *, start_runtime: bool = False,
+    ) -> None:
         """
-        Build and boot the HTTP kernel once for concurrent first requests.
+        Initialize both HTTP handlers under a shared startup lock.
 
         Parameters
         ----------
         interface : str
-            Server interface recorded before the kernel is built.
+            Transport identifier recorded as ``app.interface``.
+        start_runtime : bool, optional
+            Start HTTP failure reporting for requests without lifespan startup.
 
         Returns
         -------
         None
-            Both protocol handlers are published after a successful boot.
+            Publish handlers after kernel boot and failure-runtime preparation.
         """
         async with self.__kernel_http_lock:
             if self.__kernel_http_asgi is not None:
                 return
             self.config("app.interface", interface)
             kernel = await self.__loadHTTPKernel()
-            self.__http_disconnect_paths = kernel.disconnectPaths()
-            """Http disconnect paths produced by ``kernel.disconnectPaths``."""
+            disconnect_paths = kernel.disconnectPaths()
             asgi_handler = kernel.handleASGI
             rsgi_handler = kernel.handleRSGI
+            # Prepare the shared handler before publishing either entry point.
+            # Concurrent first requests must not bypass an unfinished prepare.
+            failure_runtime = await prepare(self)
+            if start_runtime and failure_runtime is not None:
+                await failure_runtime.start(_HTTP_FAILURE_OWNER)
+            self.__http_disconnect_paths = disconnect_paths
+            """Http disconnect paths produced by ``kernel.disconnectPaths``."""
             self.__kernel_http_asgi = asgi_handler
             """Kernel http asgi supplied through ``asgi_handler``."""
             self.__kernel_http_rsgi = rsgi_handler
@@ -647,17 +817,17 @@ class Application(Container, IApplication):
         self: Self,
     ) -> IKernelHTTP:
         """
-        Load and return the configured HTTP kernel instance.
+        Build and boot the configured HTTP kernel.
 
         Returns
         -------
         orionis.http.contracts.kernel.IKernelHTTP
-            An instance of the configured HTTP kernel.
+            Validated kernel after its boot method completes.
 
         Raises
         ------
         TypeError
-            If the loaded kernel does not implement IKernelHTTP.
+            If the configured kernel does not implement ``IKernelHTTP``.
         """
         # Retrieve HTTP kernel configuration from bootstrap
         kernel_metadata = self.__bootstrap["kernels"]["KernelHTTP"]
@@ -683,19 +853,19 @@ class Application(Container, IApplication):
         self: Self,
     ) -> IKernelCLI:
         """
-        Load and return the configured CLI kernel instance.
+        Build and validate the configured CLI kernel.
 
         Returns
         -------
         orionis.console.contracts.kernel.IKernelCLI
-            An instance of the configured CLI kernel.
+            Validated kernel awaiting command-handler initialization.
 
         Raises
         ------
         RuntimeError
-            If KernelCLI is not configured in the application.
+            If no CLI kernel metadata is configured.
         TypeError
-            If the loaded kernel does not implement IKernelCLI.
+            If the configured kernel does not implement ``IKernelCLI``.
         """
         # Try to retrieve CLI kernel configuration from bootstrap
         try:
@@ -723,25 +893,24 @@ class Application(Container, IApplication):
         args: list[str] | None = None,
     ) -> int:
         """
-        Handle a CLI command using the configured KernelCLI.
+        Run a CLI command within its startup and shutdown lifecycle.
 
         Parameters
         ----------
-        args : list[str] | None, optional
-            Arguments to pass to the kernel's handle method. Defaults to an
-            empty list if not provided.
+        args : list of str or None, optional
+            Command arguments, or ``None`` to pass an empty argument list.
 
         Returns
         -------
         int
-            The exit code returned by the CLI kernel's handle method.
+            Exit code returned by the CLI kernel.
 
         Raises
         ------
         RuntimeError
-            If KernelCLI is not configured in the application.
+            If no CLI kernel is configured.
         TypeError
-            If the CLI kernel does not have a handle method.
+            If the configured kernel does not implement the CLI interface.
         """
         with protocol_stdio(args):
             # Reserve protocol output before providers or lifecycle hooks execute.
@@ -749,20 +918,37 @@ class Application(Container, IApplication):
                 await self.__initializeCliKernel()
 
             await self.__onStartup(runtime=Runtime.CLI)
+            failure_runtime = await prepare(self)
+            failure_owner = object()
+            if failure_runtime is not None:
+                await failure_runtime.start(failure_owner)
             try:
-                response = await self.__kernel_cli(args or [])
+                with operation(self, flow="cli", isolated=True):
+                    try:
+                        response = await self.__kernel_cli(args or [])
+                    except Exception as error:
+                        await capture(error, app=self, flow="cli", phase="execution")
+                        raise
+                    finally:
+                        if failure_runtime is None:
+                            await self.__onShutdown(runtime=Runtime.CLI)
+                        else:
+                            await self.__onShutdown(
+                                runtime=Runtime.CLI, failure_owner=failure_owner,
+                            )
             finally:
-                await self.__onShutdown(runtime=Runtime.CLI)
+                if failure_runtime is not None:
+                    failure_runtime.deactivate(failure_owner)
             return response
 
     async def __initializeCliKernel(self: Self) -> None:
         """
-        Build and boot the CLI kernel once for concurrent commands.
+        Boot the CLI kernel and cache its handler under a shared lock.
 
         Returns
         -------
         None
-            The command handler is published after the kernel boots.
+            Publish the command handler only after kernel boot completes.
         """
         async with self.__kernel_cli_lock:
             if self.__kernel_cli is not None:
@@ -779,64 +965,64 @@ class Application(Container, IApplication):
     @classmethod
     def current(cls: type[Self]) -> Self | None:
         """
-        Return the existing application without constructing or booting it.
+        Return this class's existing singleton without initializing it.
 
         Returns
         -------
         typing.Self or None
-            Application singleton for this class, if already instantiated.
-            Its configuration may still be uninitialized before ``create()``.
+            Existing instance, or ``None`` before construction. Configuration
+            may remain uninitialized until ``create()`` completes.
         """
         return cls._instances.get(cls)
 
     @property
     def isBooted(self: Self) -> bool:
         """
-        Check whether configuration and provider registration have completed.
+        Report whether configuration and eager registration are complete.
 
         Returns
         -------
         bool
-            True after create() finishes. Asynchronous provider startup and HTTP
-            kernel readiness are completed separately during lifespan startup.
+            ``True`` after ``create()`` completes, independently of asynchronous
+            provider startup and HTTP kernel readiness.
         """
         return self.__booted
 
     @property
     def isCreated(self: Self) -> bool:
         """
-        Check whether configuration and service registration are complete.
+        Report the configuration-stage state exposed by ``isBooted``.
 
         Returns
         -------
         bool
-            Alias of the legacy ``isBooted`` configuration-stage flag.
+            Legacy creation flag, identical to ``isBooted``.
         """
         return self.__booted
 
     @property
     def areProvidersBooted(self: Self) -> bool:
         """
-        Check whether every registered eager provider has finished startup.
+        Check whether all eager providers have finished booting.
 
         Returns
         -------
         bool
-            True after creation and successful eager provider startup. Deferred
-            providers still boot on first resolution.
+            ``True`` after creation and eager startup. Deferred providers
+            still boot on first resolution.
         """
         return self.__booted and not self.__pending_boot_providers
 
     @property
     def isHttpReady(self: Self) -> bool:
         """
-        Check whether both HTTP protocol handlers have been published.
+        Check whether eager providers and both HTTP handlers are ready.
 
         Returns
         -------
         bool
-            True after eager providers and the HTTP kernel finish startup.
-            This flag does not report listening sockets or deployment health.
+            ``True`` after eager startup and handler publication; this does not
+            indicate listening sockets or deployment health.
         """
         return (
             self.areProvidersBooted
@@ -847,25 +1033,24 @@ class Application(Container, IApplication):
     @property
     def startAt(self: Self) -> int:
         """
-        Return the application startup timestamp in nanoseconds.
+        Return the instance initialization timestamp in Unix nanoseconds.
 
         Returns
         -------
         int
-            Timestamp in nanoseconds since Unix epoch when the application
-            instance was initialized.
+            Time recorded when this singleton was first initialized.
         """
         return self.__start_at
 
     @property
     def routeHealthCheck(self: Self) -> str:
         """
-        Return the health check route for the application.
+        Return the configured health-check URL path.
 
         Returns
         -------
         str
-            The configured health check route path. Returns "/up" if not set.
+            Health-check path, or ``"/up"`` when no nonempty path is configured.
         """
         # Get health check route from routing config, default to "/up"
         routing_config: dict = self.__bootstrap.get("routing", {})
@@ -874,13 +1059,13 @@ class Application(Container, IApplication):
     @property
     def entryPoint(self: Self) -> str | None:
         """
-        Return the entry point module path where the application was created.
+        Return the creation entry point as a module path with an app suffix.
 
         Returns
         -------
         str | None
-            The module path in the format 'folder.subfolder.file:app' where
-            the application instance was created, or None if not available.
+            Inferred ``module:app`` path, or ``None`` before creation records
+            the caller's filename.
         """
         # Return None if the creation stack is not set
         if not self.__entry_point:
@@ -912,62 +1097,60 @@ class Application(Container, IApplication):
     @property
     def basePath(self: Self) -> Path:
         """
-        Return the base path of the application.
+        Return the resolved application root directory.
 
         Returns
         -------
         pathlib.Path
-            The base directory path of the application.
+            Absolute root selected when this singleton was first initialized.
         """
         return self.__basePath
 
     @property
     def compiled(self: Self) -> bool:
         """
-        Indicate whether the application is running in compiled mode.
+        Check whether compiled bootstrap caching is enabled.
 
         Returns
         -------
         bool
-            True if the application is configured to run in compiled mode,
-            otherwise False.
+            ``True`` when compiled caching is enabled, even before a cache hit.
         """
         return self.__compiled
 
     @property
     def compiledPath(self: Self) -> Path | None:
         """
-        Return the path where compiled cache files are stored.
+        Return the configured bootstrap cache directory.
 
         Returns
         -------
         pathlib.Path or None
-            The directory path for compiled cache storage, or None if not
-            configured.
+            Resolved cache directory, or ``None`` before caching is configured.
         """
         return self.__compiled_path
 
     @property
     def compiledInvalidationPathsDirs(self: Self) -> list[Path]:
         """
-        Return the list of directory paths monitored for cache invalidation.
+        Return configured directories used for bootstrap cache invalidation.
 
         Returns
         -------
         list of pathlib.Path
-            List of directory paths monitored for cache invalidation.
+            Configured directory invalidation paths as a new list.
         """
         return list(self.__compiled_invalidation_paths_dirs)
 
     @property
     def compiledInvalidationPathsFiles(self: Self) -> list[Path]:
         """
-        Return the list of file paths monitored for cache invalidation.
+        Return configured files used for bootstrap cache invalidation.
 
         Returns
         -------
         list of pathlib.Path
-            List of file paths monitored for cache invalidation.
+            Configured file invalidation paths as a new list.
         """
         return list(self.__compiled_invalidation_paths_files)
 
@@ -978,17 +1161,24 @@ class Application(Container, IApplication):
         base_path: Path = _CWD,
     ) -> None:
         """
-        Initialize the Application instance.
+        Initialize the application singleton and its lifecycle state once.
 
         Parameters
         ----------
-        base_path : pathlib.Path
-            The base directory path of the application.
+        base_path : pathlib.Path, optional
+            Application root, defaulting to the working directory at import time.
 
         Returns
         -------
         None
-            This method initializes the Application instance in place.
+            Initialize container, configuration, and lifecycle state in place.
+
+        Raises
+        ------
+        RuntimeError
+            If the Python runtime is below the framework's minimum version.
+        TypeError
+            If the root is neither a path object nor a string.
         """
         # Ensure the application is initialized only once (singleton pattern).
         if not hasattr(self, "_Application__initialized"):
@@ -1021,6 +1211,10 @@ class Application(Container, IApplication):
             # Initialize references to resolved service classes.
             self.__scheduler_resolved: type[IBaseScheduler] | None = None
             self.__exception_handler_resolved: type[IBaseExceptionHandler] | None = None
+            self.__exception_handler_instance: IBaseExceptionHandler | None = None
+            self.__exception_handler_lock = asyncio.Lock()
+            self.__headless_close_lock = asyncio.Lock()
+            self._failure_runtime = None
 
             # Initialize application state flags.
             self.__booted: bool = False
@@ -1076,26 +1270,26 @@ class Application(Container, IApplication):
         invalidation_paths: list[str] | None = None,
     ) -> None:
         """
-        Compile the application with the specified caching and invalidation settings.
+        Configure bootstrap caching and restore any valid compiled state.
 
         Parameters
         ----------
         path : str | None, optional
-            The path where compiled files should be stored.
-            Defaults to None.
+            Cache directory, defaulting to the application's framework cache path.
         invalidation_paths : list[str] | None, optional
-            List of paths that trigger cache invalidation when modified.
-            Defaults to None.
+            Existing files or directories monitored relative to the application
+            root, or ``None`` for no additional invalidation paths.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Configure the cache and commit a valid restored snapshot, if present.
 
         Notes
         -----
         Core application path definitions are always monitored so framework
-        updates invalidate snapshots containing outdated directory keys.
+        updates invalidate outdated snapshots. Configuration setters leave
+        restored snapshots unchanged.
         """
         self.__bootCompiledState(
             compiled_path=path,
@@ -1104,18 +1298,17 @@ class Application(Container, IApplication):
 
     def __assertPythonVersion(self: Self) -> None:
         """
-        Assert that the current Python version meets the minimum requirement.
-
-        Raises
-        ------
-        RuntimeError
-            If the current Python version is lower than the required version.
+        Reject Python runtimes below the framework's minimum version.
 
         Returns
         -------
         None
-            This method does not return a value.
-            It raises if the version is insufficient.
+            Leave application state unchanged when the runtime is supported.
+
+        Raises
+        ------
+        RuntimeError
+            If the interpreter version is below ``PYTHON_REQUIRES``.
         """
         # Compare current Python version with the required minimum version.
         if sys.version_info < PYTHON_REQUIRES:
@@ -1131,22 +1324,24 @@ class Application(Container, IApplication):
         path: Path | str,
     ) -> Path:
         """
-        Validate and return a resolved Path object.
+        Resolve a supported path to an absolute filesystem path.
 
         Parameters
         ----------
         path : pathlib.Path or str
-            The path to validate and resolve.
+            Path to resolve. Relative strings use the application root, or the
+            import-time working directory before the root is initialized.
+            Relative path objects use the current working directory.
 
         Returns
         -------
         pathlib.Path
-            The validated and resolved Path object.
+            Resolved absolute path.
 
         Raises
         ------
         TypeError
-            If ``path`` is not a Path or str.
+            If ``path`` is neither a path object nor a string.
         """
         # Convert string to Path. basePath may not be set yet (e.g. during __init__),
         # so fall back to the process working directory for relative strings.
@@ -1171,34 +1366,32 @@ class Application(Container, IApplication):
         runtime: Runtime | None = None,
     ) -> Self:
         """
-        Register callbacks for a specific application lifespan event.
+        Register unique callbacks for a runtime's startup or shutdown event.
 
         Parameters
         ----------
-        lifespan : orionis.foundation.enums.Lifespan
-            The application lifespan event to register callbacks for.
-        *callbacks
-            One or more callback functions to execute during the event.
-        runtime : orionis.foundation.enums.Runtime | None, optional
-            The runtime environment for which to register the callbacks.
-            If None, callbacks are registered for all runtimes.
+        lifespan : orionis.foundation.enums.lifespan.Lifespan
+            Lifecycle event that triggers the callbacks.
+        *callbacks : collections.abc.Callable
+            Synchronous or asynchronous callbacks invoked through the container.
+        runtime : orionis.foundation.enums.runtimes.Runtime or None, optional
+            Target runtime, or ``None`` for callbacks shared by HTTP and CLI.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         TypeError
-            If ``lifespan`` is not a Lifespan enum or any callback is not callable.
+            If ``lifespan`` is not a ``Lifespan`` or a callback is not callable.
         ValueError
             If no callbacks are provided.
 
         Notes
         -----
-        Callbacks are stored as-is and executed during the specified lifespan
-        event. Lambdas and dynamic callables are supported.
+        Callbacks are deduplicated in sets; execution order is unspecified.
         """
         # Validate that lifespan is a Lifespan enum instance
         if not isinstance(lifespan, Lifespan):
@@ -1234,20 +1427,19 @@ class Application(Container, IApplication):
         http_interface: str = "asgi",
     ) -> None:
         """
-        Execute startup callbacks for the application lifecycle.
+        Boot eager providers and run runtime-specific startup hooks.
 
         Parameters
         ----------
-        runtime : orionis.foundation.enums.Runtime
-            The runtime environment (HTTP or CLI) for which to
-            execute startup callbacks.
+        runtime : orionis.foundation.enums.runtimes.Runtime
+            HTTP or CLI runtime whose startup hooks should run.
         http_interface : str, optional
-            HTTP transport recorded when the kernel is warmed during startup.
+            Transport recorded when HTTP startup initializes the kernel.
 
         Returns
         -------
         None
-            This method executes startup callbacks and does not return a value.
+            Complete hooks and, for HTTP, publish both kernel handlers.
         """
         # Ensure all pending eager providers are booted before startup hooks
         await self.__bootEagerProviders()
@@ -1285,20 +1477,23 @@ class Application(Container, IApplication):
     async def __onShutdown(
         self: Self,
         runtime: Runtime,
+        *,
+        failure_owner: object | None = None,
     ) -> None:
         """
-        Execute shutdown callbacks for the application lifecycle.
+        Run shutdown hooks before draining runtime resources.
 
         Parameters
         ----------
-        runtime : orionis.foundation.enums.Runtime
-            The runtime environment (HTTP or CLI) for which to
-            execute shutdown callbacks.
+        runtime : orionis.foundation.enums.runtimes.Runtime
+            HTTP or CLI runtime whose shutdown hooks should run.
+        failure_owner : object | None, optional
+            Reporting ownership token; HTTP uses its shared owner when omitted.
 
         Returns
         -------
         None
-            This method executes shutdown callbacks and does not return a value.
+            Finish resource cleanup even when a shutdown hook fails.
         """
         # Collect shutdown callbacks for the given runtime and global scope
         callbacks = (
@@ -1320,12 +1515,87 @@ class Application(Container, IApplication):
             elif runtime == Runtime.CLI:
                 for func in callbacks:
                     await self.invoke(func)
+        except Exception as error:
+            await capture(error, app=self, flow="lifecycle", phase="shutdown")
+            raise
         finally:
-            if self.__configured and self.config("logging.queue_capacity"):
-                from orionis.logging.contracts.logger import ILogger
+            if failure_owner is None and runtime is Runtime.HTTP:
+                failure_owner = _HTTP_FAILURE_OWNER
+            await Application.__closeRuntimeResources(self, failure_owner)
 
-                logger = await self.make(ILogger)
-                await logger.aclose()
+    async def __closeRuntimeResources(
+        self: Self, owner: object | None = None,
+    ) -> None:
+        """
+        Drain runtime tasks and close the logging sink for its final owner.
+
+        Parameters
+        ----------
+        owner : object | None, optional
+            Ownership token to retire, or ``None`` to check shared ownership
+            without releasing a token.
+
+        Returns
+        -------
+        None
+            Finish shared work and retain the sink while another owner needs it.
+        """
+        failure_runtime = getattr(self, "_failure_runtime", None)
+        if failure_runtime is not None:
+            try:
+                await failure_runtime.drain()
+                async with failure_runtime.lifecycle_lock:
+                    if _retire_shared_runtime(failure_runtime, owner):
+                        return
+                await failure_runtime.shutdown()
+            except Exception as error:
+                await capture(error, app=self, flow="lifecycle", phase="cleanup")
+                raise
+        lifecycle_lock = (
+            failure_runtime.lifecycle_lock if failure_runtime is not None
+            else nullcontext()
+        )
+        try:
+            async with lifecycle_lock:
+                if _retire_shared_runtime(failure_runtime, owner):
+                    return
+                if failure_runtime is not None and owner is not None:
+                    failure_runtime.beginClosing(owner)
+                await Application.__closeRuntimeLogger(self, failure_runtime)
+        except Exception as error:
+            await capture(error, app=self, flow="logging", phase="shutdown")
+            raise
+        finally:
+            if failure_runtime is not None:
+                await failure_runtime.drain()
+
+    async def __closeRuntimeLogger(
+        self: Self, failure_runtime: FailureRuntime | None,
+    ) -> None:
+        """
+        Close the bound logger under the final owner's lifecycle lock.
+
+        Parameters
+        ----------
+        failure_runtime : orionis.failure.runtime.FailureRuntime or None
+            Runtime whose automatic reporting must stop before logger cleanup.
+
+        Returns
+        -------
+        None
+            Disable failure reporting and close the logger when configured.
+        """
+        if not self.__configured:
+            return
+        from orionis.logging.contracts.logger import ILogger
+
+        bound = getattr(self, "bound", None)
+        if bound is not None and not bound(ILogger):
+            return
+        if failure_runtime is not None:
+            failure_runtime.stopReporting()
+        logger = await self.make(ILogger)
+        await logger.aclose()
 
     # --- Default Configuration Setup Methods ---
 
@@ -1333,13 +1603,12 @@ class Application(Container, IApplication):
         self: Self,
     ) -> dict[str, Any]:
         """
-        Return the default bootstrap configuration.
+        Build a fresh bootstrap mapping from core framework metadata.
 
         Returns
         -------
         dict[str, typing.Any]
-            Default bootstrap configuration dictionary with all core sections
-            initialized for application startup.
+            Mutable configuration, path, provider, routing, and kernel sections.
         """
         # Build and return the default bootstrap dictionary
         return {
@@ -1359,17 +1628,12 @@ class Application(Container, IApplication):
         self: Self,
     ) -> None:
         """
-        Initialize the bootstrap configuration with default values.
-
-        Initialize the internal bootstrap configuration dictionary with the default
-        bootstrap configuration if it is currently empty. This ensures the
-        application has a valid configuration structure before any customization.
+        Populate an empty bootstrap mapping with core defaults.
 
         Returns
         -------
         None
-            This method does not return a value. It modifies the internal bootstrap
-            configuration state in place.
+            Initialize defaults only when the bootstrap mapping is empty.
         """
         # If bootstrap is not empty, return immediately
         if self.__bootstrap:
@@ -1382,16 +1646,12 @@ class Application(Container, IApplication):
         self: Self,
     ) -> None:
         """
-        Ensure default application paths are set in the bootstrap configuration.
-
-        Initialize the 'paths' key in the bootstrap dictionary using default
-        configuration paths if it is missing or empty.
+        Populate missing bootstrap paths from the application defaults.
 
         Returns
         -------
         None
-            This method does not return a value. It modifies the internal
-            bootstrap state to ensure paths are set.
+            Resolve default paths only when no path mapping is configured.
         """
         # If paths exist and are not empty, return immediately
         if self.__bootstrap.get("paths"):
@@ -1406,17 +1666,17 @@ class Application(Container, IApplication):
         self: Self,
     ) -> None:
         """
-        Assert that configuration is mutable before modification.
-
-        Raises
-        ------
-        RuntimeError
-            If attempting to modify configuration after application boot.
+        Reject locked bootstrap changes and initialize mutable defaults.
 
         Returns
         -------
         None
-            This method does not return a value. Raises if configuration is locked.
+            Prepare a mutable bootstrap mapping for configuration updates.
+
+        Raises
+        ------
+        RuntimeError
+            If creation has already locked the bootstrap configuration.
         """
         # Prevent configuration changes after boot
         if self.__booted:
@@ -1430,16 +1690,12 @@ class Application(Container, IApplication):
         self: Self,
     ) -> None:
         """
-        Deeply freeze and lock the application configuration.
-
-        Freezes the internal bootstrap configuration in-place to prevent
-        further modifications. The booted flag is set separately in ``create()``.
+        Recursively freeze the bootstrap configuration.
 
         Returns
         -------
         None
-            This method does not return a value. The configuration is locked
-            in-place.
+            Replace mutable containers without changing the creation flag.
         """
         # Deep freeze the bootstrap configuration to make it immutable
         self.__bootstrap = FreezeThaw.freeze(self.__bootstrap)
@@ -1452,24 +1708,24 @@ class Application(Container, IApplication):
         compiled_invalidation_paths: list[str] | None = None,
     ) -> None:
         """
-        Initialize application compilation and configuration caching.
+        Configure bootstrap caching and restore a valid cached snapshot.
 
         Parameters
         ----------
         compiled_path : str | None, optional
-            Path to the cache directory, or None.
+            Cache directory, or ``None`` to use the framework cache path.
         compiled_invalidation_paths : list[str] | None, optional
-            List of paths to monitor for cache invalidation, or None.
+            Existing files and directories whose changes invalidate the snapshot.
 
         Returns
         -------
         None
-            Configure the cache and load any valid stored bootstrap state.
+            Initialize cache metadata and commit any valid restored configuration.
 
         Notes
         -----
-        This method sets up the cache driver and loads cached configuration
-        if available. It also tracks directories and files for cache invalidation.
+        Always monitor core path definitions. Skip snapshot loading during
+        Reactor bootstrap recovery.
         """
         # Load lightweight recovery state without expanding cold import paths.
         from orionis.console.bootstrap import bootstrap_recovery_active
@@ -1523,16 +1779,14 @@ class Application(Container, IApplication):
 
     def __persistCompiledState(self: Self) -> None:
         """
-        Persist the compiled application state to cache.
+        Save bootstrap metadata when compiled caching is active.
 
-        Save the current bootstrap configuration to the cache if the application
-        is running in compiled mode and the cache driver is initialized.
+        Skip writes during Reactor bootstrap recovery.
 
         Returns
         -------
         None
-            This method does not return a value. It persists the configuration
-            state to cache if applicable.
+            Persist state only when a cache driver is available.
         """
         # Inspect scoped recovery state before persisting compiled configuration.
         from orionis.console.bootstrap import bootstrap_recovery_active
@@ -1552,18 +1806,24 @@ class Application(Container, IApplication):
         *middleware: type[IBaseMiddleware],
     ) -> Self:
         """
-        Register middleware for the application.
+        Register unique middleware classes in application execution order.
 
         Parameters
         ----------
-        middleware
-            Middleware classes to register. Each must inherit from
-            IBaseMiddleware.
+        *middleware : type[IBaseMiddleware]
+            Middleware classes implementing ``IBaseMiddleware``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        TypeError
+            If an argument is not a middleware class.
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached: middleware is
         # stored inside __bootstrap["middleware"], which is serialised to
@@ -1592,12 +1852,12 @@ class Application(Container, IApplication):
 
     def getMiddleware(self: Self) -> list[type[IBaseMiddleware]]:
         """
-        Retrieve the list of registered middleware classes.
+        Resolve registered middleware classes in application execution order.
 
         Returns
         -------
         list[type[orionis.http.layer.contracts.middleware.IBaseMiddleware]]
-            A list of middleware classes registered in the application.
+            Registered classes in order, or an empty list when none are stored.
         """
         # Resolve and return middleware classes from bootstrap metadata.
         # Falls back to an empty list if the key is missing (e.g. old cache).
@@ -1612,24 +1872,24 @@ class Application(Container, IApplication):
         *providers: type[IServiceProvider],
     ) -> Self:
         """
-        Register service providers for the application.
+        Register eager or deferred service provider classes for bootstrap.
 
         Parameters
         ----------
-        providers
-            Service provider classes to register. Each must inherit from
-            IServiceProvider.
+        *providers : type[IServiceProvider]
+            Provider classes implementing ``IServiceProvider``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         TypeError
-            If any argument is not a class or does not inherit from
-            IServiceProvider.
+            If a provider class or deferred service identifier is invalid.
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -1647,21 +1907,12 @@ class Application(Container, IApplication):
 
     def __loadCoreProviders(self: Self) -> None:
         """
-        Load and register core framework service providers.
-
-        Import and register essential service providers required for framework
-        operation. Ensures core services are available before user-defined
-        providers.
-
-        Parameters
-        ----------
-        self : orionis.Application
-            The current Application instance.
+        Register the framework's core service provider classes.
 
         Returns
         -------
         None
-            This method modifies the internal providers registry in place.
+            Add core provider metadata to the bootstrap registries.
         """
         # Register each core provider in the providers registry
         for provider in get_core_providers_mapping():
@@ -1669,17 +1920,12 @@ class Application(Container, IApplication):
 
     def __ensureProvidersRegistryStructure(self: Self) -> None:
         """
-        Ensure the providers registry structure is properly initialized.
-
-        Initialize the eager and deferred provider registries in the bootstrap
-        configuration if they do not already exist. This method creates the
-        necessary dictionary structure for storing service provider information
-        and prevents duplicate initialization through a sentinel attribute.
+        Initialize eager and deferred provider registries once.
 
         Returns
         -------
         None
-            This method does not return a value. It modifies internal state.
+            Create missing registry mappings and mark their structure initialized.
         """
         # Ensure eager and deferred provider registries exist
         if not self.__providers_registry_initialized:
@@ -1694,23 +1940,22 @@ class Application(Container, IApplication):
         provider_class: type[IServiceProvider],
     ) -> None:
         """
-        Validate that the provider class meets IServiceProvider requirements.
+        Require a service provider class implementing ``IServiceProvider``.
 
         Parameters
         ----------
-        provider_class : type[container.contracts.service_provider.IServiceProvider]
-            The service provider class to validate.
+        provider_class : type[IServiceProvider]
+            Provider class to validate before storing its metadata.
 
         Returns
         -------
         None
-            This method does not return a value. Raises exceptions if validation
-            fails.
+            Accept a class that satisfies the provider contract.
 
         Raises
         ------
         TypeError
-            If the provider is not a class or not a subclass of IServiceProvider.
+            If the value is not a class implementing ``IServiceProvider``.
         """
         # Validate that the provider is a class
         if not isinstance(provider_class, type):
@@ -1732,23 +1977,17 @@ class Application(Container, IApplication):
         provider: type[IServiceProvider],
     ) -> None:
         """
-        Store an eager service provider instance in the eager registry.
+        Prepend validated provider metadata to the eager registry.
 
         Parameters
         ----------
-        provider : type[orionis.container.contracts.service_provider.IServiceProvider]
-            The service provider class to register.
+        provider : type[IServiceProvider]
+            Validated eager provider class.
 
         Returns
         -------
         None
-            This method does not return a value. It modifies the internal eager
-            providers registry in-place.
-
-        Raises
-        ------
-        TypeError
-            If the provider is not a class or not a subclass of IServiceProvider.
+            Store module and class names with highest registration priority.
         """
         # Direct reference to the registry for in-place mutation
         eager: OrderedDict = self.__bootstrap["providers"]["eager"]
@@ -1767,22 +2006,22 @@ class Application(Container, IApplication):
         provider: type[IDeferrableProvider],
     ) -> None:
         """
-        Store a deferred service provider instance in the deferred registry.
+        Map each deferred service identifier to its provider metadata.
 
         Parameters
         ----------
-        provider : type[container.contracts.deferrable_provider.IDeferrableProvider]
-            The service provider class to register.
+        provider : type[IDeferrableProvider]
+            Validated deferred provider class declaring its provided services.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Replace deferred bindings for the provider's declared services.
 
         Raises
         ------
         TypeError
-            If the provider is not a class or not a subclass of IServiceProvider.
+            If a provided service is neither a string identifier nor a class.
         """
         # Prepare deferred provider registry
         deferred: dict = self.__bootstrap["providers"]["deferred"]
@@ -1815,26 +2054,22 @@ class Application(Container, IApplication):
         provider: type[IServiceProvider],
     ) -> None:
         """
-        Store a service provider instance in the appropriate registry.
-
-        Register the provider class in either the eager or deferred registry based
-        on its inheritance hierarchy. Validates provider type and ensures proper
-        registry structure before storage.
+        Validate and store a provider class in its matching registry.
 
         Parameters
         ----------
-        provider : type[orionis.container.contracts.service_provider.IServiceProvider]
-            The service provider class to register.
+        provider : type[IServiceProvider]
+            Eager or deferred provider class to register.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Record eager metadata or deferred service bindings.
 
         Raises
         ------
         TypeError
-            If the provider is not a class or not a subclass of IServiceProvider.
+            If the provider class or a deferred service identifier is invalid.
         """
         # Ensure providers registry structure is initialized
         self.__ensureProvidersRegistryStructure()
@@ -1853,21 +2088,17 @@ class Application(Container, IApplication):
         modules: set[str],
     ) -> None:
         """
-        Discover and register service providers from the providers folder.
-
-        Imports each discovered module, identifies classes that are
-        subclasses of ServiceProvider, and registers them in the appropriate
-        registry based on whether they are deferred or immediate providers.
+        Import concrete providers declared by the discovered modules.
 
         Parameters
         ----------
         modules : set[str]
-            Dotted module names containing service provider classes.
+            Dotted module names searched in sorted order.
 
         Returns
         -------
         None
-            Modifies the internal providers registry in-place.
+            Register nonabstract provider classes defined by each module.
         """
         # Register concrete provider classes defined by each discovered module.
         for module_name in sorted(modules):
@@ -1884,21 +2115,12 @@ class Application(Container, IApplication):
 
     def __loadProviders(self: Self) -> None:
         """
-        Load and register all service providers.
-
-        Discovers provider modules, registers provider classes, and loads core
-        framework providers. Ensures all service providers are available for
-        dependency injection and application bootstrapping.
-
-        Parameters
-        ----------
-        self : orionis.Application
-            The current application instance.
+        Discover application providers, then register core framework providers.
 
         Returns
         -------
         None
-            This method updates the internal providers registry in place.
+            Populate registries from application and core provider classes.
         """
         # Discover provider modules in the providers directory.
         config_paths: dict[str, Any] = self.__bootstrap["paths"]
@@ -1916,17 +2138,14 @@ class Application(Container, IApplication):
 
     def __resolveEagerProvider(self: Self) -> None:
         """
-        Resolve and register all eager service providers.
+        Register eager providers and queue their asynchronous boot methods.
 
-        Resolves all eager service providers defined in the application's
-        bootstrap configuration. Registers each provider and schedules its boot
-        method if asynchronous.
+        Run synchronous boot methods immediately and skip resolved providers.
 
         Returns
         -------
         None
-            This method does not return a value. It registers and schedules
-            eager providers for booting.
+            Record resolved providers and retain asynchronous boots for startup.
         """
         eager_providers: dict = self.__bootstrap.get("providers", {}).get("eager", {})
 
@@ -1956,15 +2175,15 @@ class Application(Container, IApplication):
 
     async def __bootEagerProviders(self: Self) -> None:
         """
-        Boot all pending eager service providers.
+        Await pending eager providers under a shared startup lock.
 
-        Await providers in registration order and retain unfinished providers
-        so a later startup can retry them.
+        Process providers in registration order. Keep an unfinished provider
+        queued so a subsequent startup can retry it.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Remove each provider only after its boot method completes.
         """
         # Skip startup coordination when every provider has finished booting.
         if not self.__pending_boot_providers:
@@ -1990,35 +2209,36 @@ class Application(Container, IApplication):
         websocket: str | list[str] | None = None,
     ) -> Self:
         """
-        Configure separate routing files for each application protocol.
+        Configure route files and the health-check path for each protocol.
 
         Parameters
         ----------
-        api : str | list[str] | None
-            Path or list of paths to API routing files.
-        web : str | list[str] | None
-            Path or list of paths to web routing files.
-        console : str | list[str] | None
-            Path or list of paths to console routing files.
-        health : str | None
-            Path to the health check route.
-        ai : str | list[str] | None
+        api : str | list[str] | None, optional
+            API route files relative to the application root, or ``None``.
+        web : str | list[str] | None, optional
+            Web route files relative to the application root, or ``None``.
+        console : str | list[str] | None, optional
+            CLI route files relative to the application root, or ``None``.
+        health : str | None, optional
+            Health-check URL path, or ``None`` to use ``"/up"``.
+        ai : str | list[str] | None, optional
             MCP registration files loaded before HTTP or CLI startup.
-        websocket : str | list[str] | None
+        websocket : str | list[str] | None, optional
             WebSocket and Hub route files using the web middleware profile.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         TypeError
-            If routing arguments are of invalid types or do not contain valid
-            routing definitions.
+            If an argument has an invalid type or a route file lacks valid imports.
         FileNotFoundError
-            If a specified routing file does not exist.
+            If a route file is missing outside an active recovery context.
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2086,29 +2306,29 @@ class Application(Container, IApplication):
         context: str = "",
     ) -> list[Path]:
         """
-        Resolve and validate routing file paths.
+        Resolve route files and verify their required imports.
 
         Parameters
         ----------
         paths : str | list[str] | None
-            Routing file path(s) to validate and resolve.
+            Route files relative to the application root, or ``None``.
         required_imports : set[str]
-            Set of required module imports for validation.
-        context : str
-            Context whose missing files may be explicitly repaired by Reactor.
+            Module names accepted as routing imports.
+        context : str, optional
+            Routing context whose missing files Reactor may explicitly recover.
 
         Returns
         -------
         list[pathlib.Path]
-            List of resolved Path objects for valid routing files.
+            Resolved route files in input order, including recoverable missing
+            files when recovery is active for this context.
 
         Raises
         ------
         TypeError
-            If ``paths`` is not a str, list[str], or None, or if a file does not
-            contain valid routing definitions.
+            If path input is invalid or a nonempty file lacks required imports.
         FileNotFoundError
-            If a specified routing file does not exist.
+            If a file is missing outside an active recovery context.
         """
         # Keep missing-file recovery scoped to the explicitly requested context.
         from orionis.console.bootstrap import recovering_route
@@ -2162,29 +2382,24 @@ class Application(Container, IApplication):
         handler: type[IBaseExceptionHandler],
     ) -> Self:
         """
-        Register a custom exception handler class for the application.
+        Set the exception handler class used for lazy singleton resolution.
 
         Parameters
         ----------
         handler : type[orionis.failure.contracts.handler.IBaseExceptionHandler]
-            Exception handler class to use. Must inherit from BaseExceptionHandler.
+            Handler class implementing ``IBaseExceptionHandler``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         TypeError
-            If the handler is not a class or not a subclass of BaseExceptionHandler.
+            If ``handler`` is not a class implementing the handler contract.
         RuntimeError
-            If attempting to set handler after application has been booted.
-
-        Notes
-        -----
-        Stores the handler class for later instantiation. Any previously
-        registered handler is silently replaced.
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2219,23 +2434,17 @@ class Application(Container, IApplication):
         self: Self,
     ) -> IBaseExceptionHandler:
         """
-        Retrieve the registered exception handler instance.
-
-        Parameters
-        ----------
-        self : orionis.Application
-            The current application instance.
+        Resolve and cache the configured exception handler instance.
 
         Returns
         -------
         orionis.failure.contracts.handler.IBaseExceptionHandler
-            The registered exception handler instance. If none is set, returns
-            the default BaseExceptionHandler instance.
+            Shared handler instance, using the core default when not overridden.
 
         Raises
         ------
         RuntimeError
-            If called before the application is booted.
+            If application creation has not completed.
         """
         # Ensure the application is booted before accessing the exception handler
         if not self.__booted:
@@ -2244,14 +2453,19 @@ class Application(Container, IApplication):
             )
             raise RuntimeError(error_msg)
 
-        # Resolve and cache the exception handler class.
-        if self.__exception_handler_resolved is None:
-            exception_handler = self.__bootstrap.get("exception_handler")
-            concrete_handler = ModuleInspector.loadClass(metadata=exception_handler)
-            self.__exception_handler_resolved = concrete_handler
-
-        # Return the exception handler instance
-        return await self.build(self.__exception_handler_resolved)
+        handler = self.__exception_handler_instance
+        if handler is None:
+            async with self.__exception_handler_lock:
+                handler = self.__exception_handler_instance
+                if handler is None:
+                    if self.__exception_handler_resolved is None:
+                        metadata = self.__bootstrap.get("exception_handler")
+                        self.__exception_handler_resolved = ModuleInspector.loadClass(
+                            metadata=metadata,
+                        )
+                    handler = await self.build(self.__exception_handler_resolved)
+                    self.__exception_handler_instance = handler
+        return handler
 
     # --- Scheduler Configuration ---
 
@@ -2260,29 +2474,24 @@ class Application(Container, IApplication):
         scheduler: type[IBaseScheduler],
     ) -> Self:
         """
-        Register a custom scheduler class for the application.
+        Set the scheduler class built by ``getScheduler``.
 
         Parameters
         ----------
         scheduler : type[orionis.console.base.contracts.scheduler.IBaseScheduler]
-            The scheduler class to be used. Must inherit from IBaseScheduler.
+            Scheduler class implementing ``IBaseScheduler``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
 
         Raises
         ------
         RuntimeError
-            If attempting to set scheduler after application has been booted.
+            If bootstrap configuration is locked.
         TypeError
-            If the provided scheduler is not a subclass of IBaseScheduler.
-
-        Notes
-        -----
-        Stores the scheduler class metadata for later instantiation. Any
-        previously registered scheduler is silently replaced.
+            If ``scheduler`` is not a class implementing ``IBaseScheduler``.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2311,17 +2520,17 @@ class Application(Container, IApplication):
         self: Self,
     ) -> IBaseScheduler:
         """
-        Retrieve the currently registered scheduler instance.
+        Resolve the scheduler class and build its instance.
 
         Returns
         -------
         orionis.console.base.contracts.scheduler.IBaseScheduler
-            The registered scheduler instance.
+            Instance built from the cached configured scheduler class.
 
         Raises
         ------
         RuntimeError
-            If the application is not booted.
+            If application creation has not completed.
         """
         # Ensure the application is booted before accessing the scheduler
         if not self.__booted:
@@ -2344,19 +2553,22 @@ class Application(Container, IApplication):
         **app_config: object,
     ) -> Self:
         """
-        Configure application settings using keyword arguments.
+        Set application configuration overrides for bootstrap.
 
         Parameters
         ----------
         **app_config : object
-            Configuration parameters for the application. Keys must match the
-            field names and types expected by the App dataclass from
-            orionis.foundation.config.app.entities.app.App.
+            Field values for the ``app`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2376,19 +2588,22 @@ class Application(Container, IApplication):
         **auth_config: object,
     ) -> Self:
         """
-        Configure authentication subsystem using keyword arguments.
+        Set authentication configuration overrides for bootstrap.
 
         Parameters
         ----------
         **auth_config : object
-            Keyword arguments for authentication configuration. Keys must match
-            the fields of the ``Auth`` dataclass from
-            ``orionis.foundation.config.auth.entities.auth.Auth``.
+            Field values for the ``auth`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2405,17 +2620,22 @@ class Application(Container, IApplication):
 
     def withConfigMcp(self: Self, **mcp_config: object) -> Self:
         """
-        Configure validated MCP limits and the explicit Origin allowlist.
+        Set MCP protocol limits and allowed origins for bootstrap.
 
         Parameters
         ----------
         **mcp_config : object
-            Fields accepted by the native McpConfig entity.
+            MCP configuration fields, including limits and the Origin allowlist.
 
         Returns
         -------
         typing.Self
-            The application for further configuration.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         if self.__is_compiled:
             return self
@@ -2428,19 +2648,22 @@ class Application(Container, IApplication):
         **cache_config: object,
     ) -> Self:
         """
-        Configure the cache subsystem using keyword arguments.
+        Set cache configuration overrides for bootstrap.
 
         Parameters
         ----------
         **cache_config : object
-            Keyword arguments representing cache configuration options. Keys must
-            match the field names and types expected by the ``Cache`` dataclass from
-            ``orionis.foundation.config.cache.entities.cache.Cache``.
+            Field values for the ``cache`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance to enable method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2460,19 +2683,22 @@ class Application(Container, IApplication):
         **http_config: object,
     ) -> Self:
         """
-        Configure the HTTP subsystem using keyword arguments.
+        Set HTTP configuration overrides for bootstrap.
 
         Parameters
         ----------
         **http_config : object
-            Keyword arguments for HTTP configuration. Keys must match the field
-            names and types expected by the ``HTTP`` dataclass from
-            ``orionis.foundation.config.http.entitites.http.HTTP``.
+            Field values for the ``http`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2492,19 +2718,22 @@ class Application(Container, IApplication):
         **database_config: object,
     ) -> Self:
         """
-        Configure the database subsystem using keyword arguments.
+        Set database configuration overrides for bootstrap.
 
         Parameters
         ----------
         **database_config : object
-            Keyword arguments for database configuration. Keys must match the
-            fields of the ``Database`` dataclass from
-            ``orionis.foundation.config.database.entities.database.Database``.
+            Field values for the ``database`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2524,19 +2753,22 @@ class Application(Container, IApplication):
         **filesystems_config: object,
     ) -> Self:
         """
-        Configure the filesystems subsystem using keyword arguments.
+        Set filesystem configuration overrides for bootstrap.
 
         Parameters
         ----------
         **filesystems_config : object
-            Keyword arguments for filesystems configuration. Keys must match the
-            fields of the ``Filesystems`` dataclass from
-            ``orionis.foundation.config.filesystems.entitites.filesystems.Filesystems``.
+            Field values for the ``filesystems`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if already cached
         if self.__is_compiled:
@@ -2556,19 +2788,22 @@ class Application(Container, IApplication):
         **logging_config: object,
     ) -> Self:
         """
-        Configure logging subsystem using keyword arguments.
+        Set logging configuration overrides for bootstrap.
 
         Parameters
         ----------
         **logging_config : object
-            Keyword arguments for logging configuration. Keys must match the
-            fields of the ``Logging`` dataclass from
-            ``orionis.foundation.config.logging.entities.logging.Logging``.
+            Field values for the ``logging`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if already cached
         if self.__is_compiled:
@@ -2588,19 +2823,22 @@ class Application(Container, IApplication):
         **mail_config: object,
     ) -> Self:
         """
-        Configure mail subsystem using keyword arguments.
+        Set mail configuration overrides for bootstrap.
 
         Parameters
         ----------
         **mail_config : object
-            Keyword arguments for mail configuration. Keys must match the fields
-            of the ``Mail`` dataclass from
-            ``orionis.foundation.config.mail.entities.mail.Mail``.
+            Field values for the ``mail`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2620,19 +2858,22 @@ class Application(Container, IApplication):
         **queue_config: object,
     ) -> Self:
         """
-        Configure the queue subsystem using keyword arguments.
+        Set queue configuration overrides for bootstrap.
 
         Parameters
         ----------
         **queue_config : object
-            Keyword arguments representing queue configuration options. Keys must
-            match the field names and types expected by the ``Queue`` dataclass from
-            ``orionis.foundation.config.queue.entities.queue.Queue``.
+            Field values for the ``queue`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2652,19 +2893,22 @@ class Application(Container, IApplication):
         **session_config: object,
     ) -> Self:
         """
-        Configure session subsystem using keyword arguments.
+        Set session configuration overrides for bootstrap.
 
         Parameters
         ----------
         **session_config : object
-            Keyword arguments for session configuration. Keys must match the
-            fields of the ``Session`` dataclass from
-            ``orionis.foundation.config.session.entities.session.Session``.
+            Field values for the ``session`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2684,19 +2928,22 @@ class Application(Container, IApplication):
         **testing_config: object,
     ) -> Self:
         """
-        Configure the testing subsystem using keyword arguments.
+        Set testing configuration overrides for bootstrap.
 
         Parameters
         ----------
         **testing_config : object
-            Keyword arguments for testing configuration. Keys must match the
-            fields of the ``Testing`` dataclass from
-            ``orionis.foundation.config.testing.entities.testing.Testing``.
+            Field values for the ``testing`` configuration section.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2716,20 +2963,25 @@ class Application(Container, IApplication):
         **paths: str | Path | None,
     ) -> Self:
         """
-        Set and resolve application directory paths.
+        Configure resolved application directories with core path overrides.
 
         Parameters
         ----------
         **paths : str | pathlib.Path | None
-            Optional directory path overrides. Valid keys are 'app', 'console',
-            'exceptions', 'http', 'models', 'providers', 'notifications',
-            'services', 'jobs', 'bootstrap', 'config', 'database', 'resources',
-            'routes', 'storage' and 'tests'. The root always comes from basePath.
+            Overrides keyed by core path names such as ``app_providers``,
+            ``config``, and ``storage_framework``. Relative strings use the root;
+            path objects use the working directory. ``None`` uses defaults.
+            Unknown keys are ignored, and ``root`` remains ``basePath``.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application for method chaining.
+
+        Raises
+        ------
+        RuntimeError
+            If bootstrap configuration is locked.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -2769,21 +3021,27 @@ class Application(Container, IApplication):
         dataclasses: set[tuple[str, str, str, type[Any]]] | None = None,
     ) -> dict[str, Any]:
         """
-        Merge custom configuration and dataclass defaults into the base config.
+        Merge custom sections and discovered dataclasses into the defaults.
 
         Parameters
         ----------
         default_config : dict[str, typing.Any]
-            The base configuration dictionary containing default values.
+            Mutable defaults updated in place.
         custom_config : dict[str, typing.Any]
-            The custom configuration dictionary to merge into defaults.
+            Section dictionaries merged before discovered dataclass values.
         dataclasses : set[tuple[str, str, str, type[typing.Any]]] | None, optional
-            Set of tuples containing dataclass info to merge, or None.
+            Entries containing section name, module, class name, and dataclass
+            type, or ``None`` to skip discovered configuration.
 
         Returns
         -------
         dict[str, typing.Any]
-            The merged configuration dictionary containing all sections.
+            Input defaults mapping after both merge stages.
+
+        Raises
+        ------
+        RuntimeError
+            If a configuration dataclass cannot be instantiated or serialized.
         """
 
         # Helper function to update a config section
@@ -2793,21 +3051,21 @@ class Application(Container, IApplication):
             base: dict[str, Any],
         ) -> None:
             """
-            Merge one configuration section into the destination mapping.
+            Update a dictionary section or replace a non-dictionary value.
 
             Parameters
             ----------
             section : str
                 Name of the configuration section.
             values : dict[str, typing.Any]
-                Values overriding existing keys within the section.
+                Section values used to update or replace the existing entry.
             base : dict[str, typing.Any]
-                Destination configuration modified in place.
+                Destination configuration mapping modified in place.
 
             Returns
             -------
             None
-                The destination mapping contains the merged section.
+                Store the supplied values under the requested section.
             """
             # Merge values into the base config section
             current = base.get(section)
@@ -2835,16 +3093,14 @@ class Application(Container, IApplication):
 
     def __loadConfig(self: Self) -> None:
         """
-        Load and merge the final configuration from dataclasses and custom config.
+        Load core defaults, custom sections, and discovered configuration data.
 
-        Discovers configuration modules and dataclasses, loads default configuration
-        values, merges them with custom configuration, and updates the application's
-        bootstrap dictionary with the final configuration and discovered providers.
+        Apply programmatic overrides before discovered dataclass values.
 
         Returns
         -------
         None
-            This method updates the internal bootstrap configuration in place.
+            Replace bootstrap configuration with the merged section mapping.
         """
         # Use the core config as the default configuration
         default_config: dict = dict(get_core_config_mapping())
@@ -2877,16 +3133,12 @@ class Application(Container, IApplication):
         self: Self,
     ) -> None:
         """
-        Lock configuration and mark application as initialized.
-
-        Freeze the bootstrap configuration to prevent further modifications and
-        set the configured flag to indicate the application is ready for use.
+        Freeze bootstrap metadata and mark configuration initialized.
 
         Returns
         -------
         None
-            This method does not return a value. It modifies internal state
-            to lock configuration.
+            Lock bootstrap containers and enable runtime configuration access.
         """
         # Deep freeze the configuration to prevent further modifications
         self.__lockConfig()
@@ -2898,12 +3150,13 @@ class Application(Container, IApplication):
 
     def __setTimezoneAndLocale(self: Self) -> None:
         """
-        Apply the configured timezone and locale to dates and the environment.
+        Apply configured timezone and locale settings to runtime services.
 
         Returns
         -------
         None
-            Configure DateTime and update the supplied timezone and locale values.
+            Configure date handling, environment values, and supported system
+            timezone and locale settings.
         """
         # Retrieve timezone and locale from configuration
         tz: str | None = self.config("app.timezone")  # NOSONAR
@@ -2936,17 +3189,15 @@ class Application(Container, IApplication):
 
     def __load(self: Self) -> None:
         """
-        Load and initialize application configuration and service providers.
+        Load bootstrap state and register providers without awaiting async boots.
 
-        Ensures the bootstrap configuration is initialized, sets up default
-        paths, loads the final application configuration, loads service
-        providers, saves the configuration to cache, and locks the configuration.
-        Registers and boots all service providers.
+        Reuse restored compiled metadata; otherwise load configuration,
+        discover providers, persist the snapshot, and freeze bootstrap state.
 
         Returns
         -------
         None
-            This method modifies internal state and does not return a value.
+            Publish deferred bindings and register eager providers for startup.
         """
         # Skip loading if already cached
         if not self.__is_compiled:
@@ -2977,15 +3228,20 @@ class Application(Container, IApplication):
 
     def create(self: Self) -> Self:
         """
-        Bootstrap and initialize the application framework.
+        Create application configuration and register eager services once.
 
-        Register the application instance, load all configurations, set timezone
-        and locale, and mark the application as booted.
+        Apply locale settings and cache runtime flags without awaiting
+        asynchronous provider boots or preparing HTTP handlers.
 
         Returns
         -------
         typing.Self
-            The current Application instance for method chaining.
+            This application after configuration and registration complete.
+
+        Raises
+        ------
+        TypeError
+            If ``http.monitor_disconnects`` is neither a boolean nor ``None``.
         """
         # Prevent duplicate initialization if already booted
         if not self.__booted:
@@ -3026,25 +3282,54 @@ class Application(Container, IApplication):
 
     async def boot(self: Self) -> Self:
         """
-        Create the application and await eager providers for headless use.
+        Create the application and start eager providers for headless use.
 
-        Repeated and concurrent calls share provider startup coordination.
-        HTTP and Reactor continue to own their kernels and lifecycle callbacks.
+        Coordinate repeated calls and acquire headless reporting ownership.
+        Leave HTTP and CLI kernels and lifecycle callbacks to their runtimes.
 
         Returns
         -------
         typing.Self
-            The application with all eager provider boot methods completed.
+            This application after all eager providers finish booting.
 
         Raises
         ------
         Exception
-            Propagate configuration or provider startup failures. An unfinished
-            provider remains pending so another call can retry its startup.
+            If creation, provider boot, or reporting startup fails. Unfinished
+            providers remain pending for a later retry.
         """
         self.create()
         await self.__bootEagerProviders()
+        async with self.__headless_close_lock:
+            failure_runtime = await prepare(self)
+            if failure_runtime is not None:
+                await failure_runtime.start(_HEADLESS_FAILURE_OWNER)
         return self
+
+    async def aclose(self: Self) -> None:
+        """
+        Close the headless reporting lifetime acquired by ``boot``.
+
+        Do not run HTTP or CLI hooks. Preserve shared tasks and the logging
+        sink while another owner remains active.
+
+        Returns
+        -------
+        None
+            Drain final resources and release headless ownership when present.
+        """
+        async with self.__headless_close_lock:
+            failure_runtime = self._failure_runtime
+            if failure_runtime is None or not failure_runtime.hasOwner(
+                _HEADLESS_FAILURE_OWNER,
+            ):
+                return
+            try:
+                if failure_runtime.ownerCount == 1:
+                    with operation(self, flow="lifecycle", operation="headless.close"):
+                        await self.__closeRuntimeResources(_HEADLESS_FAILURE_OWNER)
+            finally:
+                failure_runtime.deactivate(_HEADLESS_FAILURE_OWNER)
 
     # --- Runtime Configuration Access Methods ---
 
@@ -3054,28 +3339,27 @@ class Application(Container, IApplication):
         value: object = _SENTINEL,
     ) -> object:
         """
-        Get or set an application configuration value.
+        Read or update the mutable runtime configuration.
 
         Parameters
         ----------
         key : str or None, optional
-            Dot-notated key specifying the configuration value to get or set.
-            If None and value is not provided, returns the entire configuration.
+            Dot-separated key, or ``None`` with no value to return all settings.
         value : object, optional
-            Value to set at the specified key. If not provided, retrieves the value.
+            Replacement value; omit to read the key. Explicit ``None`` is stored.
 
         Returns
         -------
         object
-            The configuration value for the given key, or the entire configuration
-            if no key is provided. If setting a value, returns the value set.
+            Requested value, assigned value, or the full mutable mapping.
+            Missing keys and non-dictionary parents return ``None`` on reads.
 
         Raises
         ------
         RuntimeError
             If the application configuration is not initialized.
         TypeError
-            If the configuration key is not a string.
+            If a keyed read or write uses a non-string key.
         """
         # Ensure configuration is initialized before accessing or modifying it
         if not self.__configured:
@@ -3106,16 +3390,15 @@ class Application(Container, IApplication):
 
     def resetRuntimeConfig(self: Self) -> bool:
         """
-        Reset the runtime configuration to a mutable copy of the bootstrap config.
+        Restore mutable runtime settings from the bootstrap configuration.
 
-        Resets the application's runtime configuration to a mutable and isolated
-        copy of the bootstrap configuration. The application remains booted
-        and subsequent accesses use the restored runtime values.
+        Replace runtime containers with an isolated copy without changing
+        creation or readiness flags.
 
         Returns
         -------
         bool
-            True if the configuration was reset successfully.
+            ``True`` after the runtime mapping has been replaced.
         """
         # Obtain current bootstrap configuration for runtime use
         bootstrap_config: dict = self.__bootstrap.get("config", {})
@@ -3134,17 +3417,17 @@ class Application(Container, IApplication):
         key_parts: tuple[str, ...],
     ) -> object:
         """
-        Retrieve a value from a nested dictionary using dot notation.
+        Read a runtime value through pre-parsed configuration components.
 
         Parameters
         ----------
-        key_parts : tuple[str, ``...``]
-            Keys representing the path in the nested dictionary.
+        key_parts : tuple of str
+            Configuration path components, including any empty-string keys.
 
         Returns
         -------
         object
-            The value found at the nested key path, or None if not found.
+            Resolved value, or ``None`` for a missing key or non-dictionary parent.
         """
         cfg: object = self.__runtime_config
         for part in key_parts:
@@ -3160,19 +3443,19 @@ class Application(Container, IApplication):
         value: object,
     ) -> object:
         """
-        Set a value in a nested dictionary using dot notation.
+        Write a runtime value, replacing non-dictionary parents as needed.
 
         Parameters
         ----------
-        key_parts : tuple[str, ``...``]
-            Keys representing the path in the nested dictionary.
+        key_parts : tuple of str
+            Nonempty sequence of configuration path components.
         value : object
-            The value to set at the specified nested key path.
+            Value stored at the final path component.
 
         Returns
         -------
         object
-            The value that was set.
+            The assigned value, unchanged.
         """
         # Traverse the nested dictionary structure, creating intermediate
         # dictionaries as needed, and set the value at the specified path.
@@ -3196,25 +3479,25 @@ class Application(Container, IApplication):
         key: str | None = None,
     ) -> Path | Mapping[str, Path] | None:
         """
-        Retrieve an application path by key or return all paths.
+        Return one configured application path or the read-only path mapping.
 
         Parameters
         ----------
         key : str | None, optional
-            The key for the desired path. If None, returns all paths.
+            Core path name, or ``None`` to return the complete path mapping.
 
         Returns
         -------
         pathlib.Path | collections.abc.Mapping[str, pathlib.Path] | None
-            The resolved path for the given key, all paths as a read-only
-            mapping, or None if the key does not exist.
+            Resolved path, read-only mapping when omitted, or ``None`` for an
+            unknown key.
 
         Raises
         ------
         RuntimeError
             If the application configuration is not initialized.
         TypeError
-            If the key is not a string.
+            If a supplied key is not a string.
         """
         # Ensure configuration is initialized before accessing paths
         if not self.__configured:
@@ -3243,31 +3526,27 @@ class Application(Container, IApplication):
         key: str | None = None,
     ) -> list[Path] | dict | None:
         """
-        Retrieve routing file paths from configuration.
-
-        The 'api', 'web', 'console', 'ai', and 'websocket' types are supported.
-        The health-check route is exposed through the ``routeHealthCheck``
-        property and is not accessible via this method.
+        Return mutable copies of configured routing paths.
 
         Parameters
         ----------
         key : str | None, optional
-            Routing type: 'api', 'web', 'console', 'ai', or 'websocket'.
-            If None, returns the complete routing configuration dictionary.
+            Routing type: ``api``, ``web``, ``console``, ``ai``, or ``websocket``.
+            Use ``None`` to return the complete routing dictionary.
 
         Returns
         -------
         list[pathlib.Path] | dict | None
-            List of Path objects for the specified routing type, the complete
-            routing configuration dictionary if no key is provided, or None
-            if the key is not one of the valid routing types.
+            Copied route list, full mutable routing dictionary, or ``None`` for
+            an unsupported or unconfigured type. The full dictionary may also
+            contain the health-check setting.
 
         Raises
         ------
         RuntimeError
             If the application configuration is not initialized.
         TypeError
-            If the key is not a string or None.
+            If a supplied key is neither a string nor ``None``.
         """
         # Ensure configuration is initialized before accessing routing
         if not self.__configured:
@@ -3302,20 +3581,17 @@ class Application(Container, IApplication):
 
     def isProduction(self: Self) -> bool:
         """
-        Determine if the application is running in a production environment.
-
-        Checks the 'app.env' configuration value to see if it contains 'prod'.
-        This is useful for toggling production-specific features.
+        Check the production flag cached during application creation.
 
         Returns
         -------
         bool
-            True if the application environment contains 'prod', otherwise False.
+            ``True`` when the creation-time ``app.env`` string contains ``"prod"``.
 
         Raises
         ------
         RuntimeError
-            If the application configuration is not initialized.
+            If application creation has not completed.
         """
         # Guard against access before application bootstrap is complete
         if not self.__booted:
@@ -3326,17 +3602,17 @@ class Application(Container, IApplication):
 
     def isDebug(self: Self) -> bool:
         """
-        Determine if the application is running in debug mode.
+        Check the debug flag cached during application creation.
 
         Returns
         -------
         bool
-            True if debug mode is enabled in the configuration, otherwise False.
+            ``True`` only when the creation-time ``app.debug`` value is ``True``.
 
         Raises
         ------
         RuntimeError
-            If the application configuration is not initialized.
+            If application creation has not completed.
         """
         # Guard against access before application bootstrap is complete
         if not self.__booted:
@@ -3347,21 +3623,21 @@ class Application(Container, IApplication):
 
     def underMaintenance(self: Self) -> bool:
         """
-        Determine if the application is currently in maintenance mode.
+        Check effective maintenance mode using a short-lived worker cache.
 
-        The shared marker is refreshed at most once every 100 ms per worker.
-        Runtime changes from other processes become visible after that interval.
+        Refresh the shared marker at most every 100 ms. Treat unreadable markers
+        as maintenance mode; use configuration for missing or unrecognized values.
 
         Returns
         -------
         bool
-            True when the effective maintenance state is enabled. The runtime
-            marker overrides the configured value when present.
+            ``True`` when maintenance is enabled. Marker values ``"down"`` and
+            ``"up"`` override ``app.maintenance``.
 
         Raises
         ------
         RuntimeError
-            If the application configuration is not initialized.
+            If application creation has not completed.
         """
         # Guard against access before application bootstrap is complete
         if not self.__booted:

@@ -72,4 +72,7 @@ class ICatch(ABC):
         ------
         RuntimeError
             If no application scope or kernel context is active.
+        BaseException
+            The primary failure if presentation fails or times out. Genuine
+            caller cancellation and process-control signals remain unchanged.
         """

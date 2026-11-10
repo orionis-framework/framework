@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 import asyncio
+import sys
 from typing import TYPE_CHECKING, Self
-from orionis.storage.buffering import READ_BUFFER_SIZE
+from orionis.storage.buffering import READ_BUFFER_SIZE, _close_buffer
 from orionis.storage.contracts.stream import IStorageStream
 from orionis.support.concurrency import complete_on_cancel
 
@@ -68,6 +69,11 @@ class AsyncStream(IStorageStream):
         -------
         typing.BinaryIO
             The open binary handle backing this stream.
+
+        Notes
+        -----
+        If cancellation races with opening, close the late handle and observe
+        cleanup failures without replacing the caller's cancellation.
         """
         # Open lazily so building the stream object stays side-effect free.
         if self._handle is None:
@@ -88,7 +94,7 @@ class AsyncStream(IStorageStream):
             except asyncio.CancelledError:
                 handle, self._handle = self._handle, None
                 if handle is not None:
-                    await complete_on_cancel(asyncio.to_thread(handle.close))
+                    await _close_buffer(handle.close, sys.exception())
                 raise
         return self._handle
 
@@ -194,7 +200,8 @@ class AsyncStream(IStorageStream):
 
         Invokes the *on_close* callback (when provided) before closing
         the handle. Closing an unopened or already closed stream is a
-        no-op.
+        no-op. A failed close does not replace a persistence or context-body
+        failure already propagating through the stream.
 
         Returns
         -------
@@ -207,22 +214,11 @@ class AsyncStream(IStorageStream):
                 return
             self._handle = None
 
-            def close_handle() -> None:
-                """
-                Release the file even when the persistence callback fails.
-
-                Returns
-                -------
-                None
-                    Complete the operation without returning a value.
-                """
-                try:
-                    if self._on_close is not None:
-                        self._on_close(handle)
-                finally:
-                    handle.close()
-
-            await complete_on_cancel(asyncio.to_thread(close_handle))
+            try:
+                if self._on_close is not None:
+                    await complete_on_cancel(asyncio.to_thread(self._on_close, handle))
+            finally:
+                await _close_buffer(handle.close, sys.exception())
 
     async def __aenter__(self: Self) -> IStorageStream:
         """

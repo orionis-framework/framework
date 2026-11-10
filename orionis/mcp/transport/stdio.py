@@ -184,9 +184,8 @@ class McpStdioTransport:
                         exc, app=self._app, flow="mcp", phase="cleanup",
                         metadata={"transport": "stdio"},
                     )
-                    if original is not None:
-                        raise original from exc
-                    raise
+                    if original is None:
+                        raise
 
     async def _invoke(self, request: JsonRpcRequest, writer: LineWriter) -> None:
         """

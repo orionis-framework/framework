@@ -250,31 +250,31 @@ class HubRuntime:
             keep a prior cleanup failure primary over a later close failure.
         """
         cleanup_error = None
+        close_error = None
         try:
             await connection.cleanup()
-        except BaseException as exc:
+        except Exception as exc:  # noqa: BLE001 - Propagate after finalization.
             cleanup_error = exc
             await capture(
                 exc, app=self._app, flow="realtime", phase="cleanup",
                 correlation_id=connection.context.connection_id,
             )
-            if original is not None:
-                raise original from exc
-            raise
         finally:
             try:
                 self._manager.unregister(connection)
                 await self._disconnect(connection, code, reason)
-            except BaseException as exc:
+            except Exception as exc:  # noqa: BLE001 - Propagate after finalization.
+                close_error = exc
                 await capture(
                     exc, app=self._app, flow="realtime", phase="close",
                     correlation_id=connection.context.connection_id,
                 )
-                if original is not None:
-                    raise original from exc
-                if cleanup_error is not None:
-                    raise cleanup_error from exc
-                raise
+        if cleanup_error is not None or close_error is not None:
+            if original is not None:
+                raise original
+            if cleanup_error is not None:
+                raise cleanup_error
+            raise close_error
 
     async def _disconnect(
         self, connection: RealtimeConnection, code: int, reason: str,
@@ -442,7 +442,7 @@ class HubRuntime:
             Compiled method, argument bindings, and dependency metadata.
         envelope : orionis.realtime.protocol.Invoke
             Validated client values and optional invocation timeout.
-        auth : orionis.auth.context.context.AuthenticationContext
+        auth : orionis.auth.context.AuthenticationContext
             Forked authentication state with an independent authorization cache.
 
         Returns
@@ -606,9 +606,8 @@ class HubRuntime:
                         exc, app=self._app, flow="realtime", phase="cleanup",
                         correlation_id=invocation_id,
                     )
-                    if original is not None:
-                        raise original from exc
-                    raise
+                    if original is None:
+                        raise
 
     @staticmethod
     async def _error(

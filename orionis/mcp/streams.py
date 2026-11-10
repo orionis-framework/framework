@@ -6,6 +6,27 @@ from typing import Protocol
 from orionis.failure.runtime import capture
 from orionis.http.adapters.response.streams import await_cleanup
 
+def _caller_cancelled(error: BaseException, cancellations: int) -> bool:
+    """
+    Identify new caller cancellation while an owned cleanup was awaited.
+
+    Parameters
+    ----------
+    error : BaseException
+        Outcome of joining cleanup, which may itself have been cancelled.
+    cancellations : int
+        Caller cancellation count recorded before the owned operation.
+
+    Returns
+    -------
+    bool
+        Whether the outcome carries a new cancellation request for this caller.
+    """
+    task = asyncio.current_task()
+    if not isinstance(error, asyncio.CancelledError) or task is None:
+        return False
+    return task.cancelling() > cancellations
+
 class AsyncClosable(Protocol):
     """Describe the awaited close operation of an owned asynchronous source."""
 
@@ -84,11 +105,16 @@ class OwnedStream[T](AsyncClosable):
         BaseException
             If iteration or cleanup fails. Preserve an iteration failure when
             cleanup also fails; surface cleanup errors after normal exhaustion.
+            Genuine caller cancellation propagates after cleanup is drained.
         """
         if self._closed:
             await self.aclose()
             raise StopAsyncIteration
+        task = asyncio.current_task()
+        cancellations = task.cancelling() if task is not None else 0
         try:
+            if cancellations:
+                await asyncio.sleep(0)
             if isinstance(self._source, AsyncIterator):
                 return await anext(self._source)
             try:
@@ -96,15 +122,22 @@ class OwnedStream[T](AsyncClosable):
             except StopIteration:
                 raise StopAsyncIteration from None
         except BaseException as original:
-            try:
+            if isinstance(original, StopAsyncIteration):
                 await self.aclose()
-            except BaseException as cleanup:
-                if not isinstance(original, StopAsyncIteration):
-                    await capture(original, flow="mcp", phase="stream")
-                await capture(cleanup, flow="mcp", phase="cleanup")
-                if not isinstance(original, StopAsyncIteration):
-                    raise original from cleanup
                 raise
+            receipt = None
+            try:
+                receipt = await capture(original, flow="mcp", phase="stream")
+            finally:
+                parent = receipt.event_id if receipt is not None else None
+                try:
+                    await self._close(parent_event_id=parent)
+                except (Exception, asyncio.CancelledError) as cleanup:
+                    await capture(
+                        cleanup, flow="mcp", phase="cleanup", parent_event_id=parent,
+                    )
+                    if _caller_cancelled(cleanup, cancellations):
+                        raise
             raise
 
     async def aclose(self) -> None:
@@ -122,17 +155,38 @@ class OwnedStream[T](AsyncClosable):
             If cleanup fails, or if caller cancellation must propagate after
             cleanup has finished.
         """
+        await self._close()
+
+    async def _close(self, *, parent_event_id: str | None = None) -> None:
+        """
+        Share cleanup while transferring its primary incident to the owned task.
+
+        Parameters
+        ----------
+        parent_event_id : str or None, optional
+            Producer incident associated with failures during resource closure.
+
+        Returns
+        -------
+        None
+            Join the existing cleanup or start it once with causal metadata.
+        """
         if self._cleanup is None:
             self._closed = True
-            self._cleanup = asyncio.ensure_future(self._closeOwned())
+            self._cleanup = asyncio.ensure_future(self._closeOwned(parent_event_id))
         await await_cleanup(self._cleanup)
 
-    async def _closeOwned(self) -> None:
+    async def _closeOwned(self, parent_event_id: str | None = None) -> None:
         """
         Close the source before releasing its nested owner.
 
         Prefer ``aclose`` over ``close`` and release the owner even when source
         cleanup fails or iteration never started.
+
+        Parameters
+        ----------
+        parent_event_id : str or None, optional
+            Producer incident transferred without changing exception chains.
 
         Returns
         -------
@@ -146,6 +200,8 @@ class OwnedStream[T](AsyncClosable):
             both source and owner cleanup fail.
         """
         original = None
+        task = asyncio.current_task()
+        cancellations = task.cancelling() if task is not None else 0
         try:
             close = getattr(self._source, "aclose", None)
             if close is not None:
@@ -156,14 +212,22 @@ class OwnedStream[T](AsyncClosable):
                     close()
         except BaseException as exc:
             original = exc
-            await capture(exc, flow="mcp", phase="cleanup")
+            receipt = await capture(
+                exc, flow="mcp", phase="cleanup", parent_event_id=parent_event_id,
+            )
+            if receipt is not None:
+                parent_event_id = receipt.event_id
             raise
         finally:
             if self._owner is not None:
                 try:
-                    await self._owner.aclose()
-                except BaseException as cleanup:
-                    await capture(cleanup, flow="mcp", phase="cleanup")
-                    if original is not None:
-                        raise original from cleanup
-                    raise
+                    await OwnedStream._close(
+                        self._owner, parent_event_id=parent_event_id,
+                    )
+                except (Exception, asyncio.CancelledError) as cleanup:
+                    await capture(
+                        cleanup, flow="mcp", phase="cleanup",
+                        parent_event_id=parent_event_id,
+                    )
+                    if original is None or _caller_cancelled(cleanup, cancellations):
+                        raise

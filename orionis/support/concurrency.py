@@ -26,12 +26,12 @@ async def wait_for_completion[T](pending: asyncio.Future[T]) -> T:
 
     Parameters
     ----------
-    pending : asyncio.Future[T]
+    pending : asyncio.Future[``T``]
         Owned operation whose result is collected after a successful notice.
 
     Returns
     -------
-    T
+    ``T``
         The operation's result, preserving its original exception on failure.
 
     Notes

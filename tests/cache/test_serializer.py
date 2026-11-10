@@ -1,5 +1,5 @@
 from __future__ import annotations
-import datetime
+import datetime as dt
 import decimal
 import enum
 import tempfile
@@ -89,12 +89,12 @@ class TestSerializer(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        original = datetime.datetime(
-            2024, 6, 15, 12, 30, 45, tzinfo=datetime.UTC,
+        original = dt.datetime(
+            2024, 6, 15, 12, 30, 45, tzinfo=dt.UTC,
         )
         result = Serializer.loads(Serializer.dumps(original))
         self.assertEqual(result, original)
-        self.assertIsInstance(result, datetime.datetime)
+        self.assertIsInstance(result, dt.datetime)
 
     def testDumpsAndLoadsDate(self) -> None:
         """Round-trip a datetime.date through the serializer.
@@ -106,11 +106,11 @@ class TestSerializer(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        original = datetime.date(2024, 6, 15)
+        original = dt.date(2024, 6, 15)
         result = Serializer.loads(Serializer.dumps(original))
         self.assertEqual(result, original)
-        self.assertIsInstance(result, datetime.date)
-        self.assertNotIsInstance(result, datetime.datetime)
+        self.assertIsInstance(result, dt.date)
+        self.assertNotIsInstance(result, dt.datetime)
 
     def testDumpsAndLoadsTime(self) -> None:
         """Round-trip a datetime.time through the serializer.
@@ -123,10 +123,10 @@ class TestSerializer(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        original = datetime.time(12, 30, 45)
+        original = dt.time(12, 30, 45)
         result = Serializer.loads(Serializer.dumps(original))
         self.assertEqual(result, original)
-        self.assertIsInstance(result, datetime.time)
+        self.assertIsInstance(result, dt.time)
 
     def testDumpsAndLoadsTimedelta(self) -> None:
         """Round-trip a datetime.timedelta through the serializer.
@@ -139,10 +139,10 @@ class TestSerializer(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        original = datetime.timedelta(days=3, seconds=7200, microseconds=500)
+        original = dt.timedelta(days=3, seconds=7200, microseconds=500)
         result = Serializer.loads(Serializer.dumps(original))
         self.assertEqual(result, original)
-        self.assertIsInstance(result, datetime.timedelta)
+        self.assertIsInstance(result, dt.timedelta)
 
     def testDumpsAndLoadsDecimal(self) -> None:
         """Round-trip a decimal.Decimal through the serializer.

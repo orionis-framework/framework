@@ -5,6 +5,7 @@ Includes ``read_chunks``, ``iterate_chunks``, ``spool_stream``.
 
 from __future__ import annotations
 import asyncio
+import sys
 import tempfile
 from typing import TYPE_CHECKING
 from orionis.support.concurrency import complete_on_cancel
@@ -15,6 +16,43 @@ if TYPE_CHECKING:
 
 READ_BUFFER_SIZE = 1024 * 1024
 """Read buffer size used by ``buffering``."""
+
+async def _close_buffer(
+    close: Callable[[], object], primary: BaseException | None,
+) -> None:
+    """
+    Drain one owned resource close without replacing an active failure.
+
+    Parameters
+    ----------
+    close : collections.abc.Callable
+        Synchronous close callback for an owned handle or SDK iterator.
+    primary : BaseException or None
+        Error already propagating from the stream, including control signals.
+
+    Returns
+    -------
+    None
+        Close once and observe a secondary failure when a primary already exists.
+
+    Raises
+    ------
+    Exception
+        If cleanup fails without an earlier stream failure.
+    asyncio.CancelledError
+        If the caller is cancelled, after the close completes.
+    """
+    try:
+        await complete_on_cancel(asyncio.to_thread(close))
+    except Exception as error:
+        if primary is None:
+            raise
+        from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+        if not isinstance(primary, (
+            asyncio.CancelledError, KeyboardInterrupt, SystemExit, GeneratorExit,
+        )):
+            capture_nowait(primary, flow="storage", phase="stream")
+        capture_nowait(error, flow="storage", phase="cleanup", operation="stream.close")
 
 async def read_chunks(
     opener: Callable[[], BinaryIO],
@@ -39,6 +77,7 @@ async def read_chunks(
     ------
     bytes
         File content in order. Cancellation drains the current read before close.
+        Cleanup failures are observed separately when a read already failed.
     """
     if (
         isinstance(chunk_size, bool)
@@ -77,7 +116,7 @@ async def read_chunks(
             read_size = batch_size
     finally:
         if handles:
-            await complete_on_cancel(asyncio.to_thread(handles[0].close))
+            await _close_buffer(handles[0].close, sys.exception())
 
 async def iterate_chunks(
     opener: Callable[[], Iterator[bytes]],
@@ -95,6 +134,7 @@ async def iterate_chunks(
     bytes
         Original SDK chunks. A batch holds at most sixteen chunks and stops
         when it reaches 1 MiB, so memory is bounded by 1 MiB plus one SDK chunk.
+        A cleanup failure does not replace the iterator's original failure.
     """
     iterators = []
 
@@ -144,7 +184,7 @@ async def iterate_chunks(
             limit = 16
     finally:
         if iterators and callable(close := getattr(iterators[0], "close", None)):
-            await complete_on_cancel(asyncio.to_thread(close))
+            await _close_buffer(close, sys.exception())
 
 async def spool_stream(stream: AsyncIterable[bytes], *, max_size: int) -> BinaryIO:
     """
@@ -161,13 +201,22 @@ async def spool_stream(stream: AsyncIterable[bytes], *, max_size: int) -> Binary
     -------
     typing.BinaryIO
         Rewound temporary buffer owned and closed by the uploading driver.
+
+    Notes
+    -----
+    Cancellation drains native opening, writing, and seeking before cleanup.
+    Cleanup failures do not replace the producer or buffer failure.
     """
-    buffer = await asyncio.to_thread(tempfile.SpooledTemporaryFile, max_size=max_size)
+    opening = asyncio.create_task(
+        asyncio.to_thread(tempfile.SpooledTemporaryFile, max_size=max_size),
+    )
     try:
+        buffer = await complete_on_cancel(opening)
         async for chunk in stream:
-            await asyncio.to_thread(buffer.write, chunk)
-        await asyncio.to_thread(buffer.seek, 0)
+            await complete_on_cancel(asyncio.to_thread(buffer.write, chunk))
+        await complete_on_cancel(asyncio.to_thread(buffer.seek, 0))
     except BaseException:
-        await asyncio.to_thread(buffer.close)
+        if not opening.cancelled() and opening.exception() is None:
+            await _close_buffer(opening.result().close, sys.exception())
         raise
     return buffer

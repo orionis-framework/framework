@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
+from orionis.failure.runtime import capture
 from orionis.http.responses import RedirectResponse
 
 if TYPE_CHECKING:
@@ -115,7 +116,8 @@ async def validation_response(
     # Repopulate the form with the submitted values, minus credentials.
     try:
         submitted = await request.data()
-    except Exception:  # noqa: BLE001
+    except Exception as error:  # noqa: BLE001
+        await capture(error, flow="http", phase="validation.input", expected=True)
         submitted = None
     if submitted:
         response.withInput(submitted)

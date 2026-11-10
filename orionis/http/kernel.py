@@ -3,7 +3,6 @@
 import asyncio
 import importlib
 import logging
-from contextlib import suppress
 from operator import attrgetter
 from threading import BoundedSemaphore
 from typing import TYPE_CHECKING, cast
@@ -18,6 +17,7 @@ from orionis.container.context.manager import ScopeManager
 from orionis.container.entities.invocation import callable_plan, warm_controller_plan
 from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
+from orionis.failure.runtime import capture, capture_result
 from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
@@ -657,13 +657,23 @@ class KernelHTTP(IKernelHTTP):
         None
             Send an RSGI HTTP response through the transport adapter.
         """
-        if policy is not None:
-            response = await policy.response(response)
-        self.__cors.after(adapter, response)
-        # Log request details only when the debug printer is active.
-        if self.__printer_enabled:
-            self.__request_printer.printRequest(adapter, response)
-        return await self.__rsgi_adapter.send(adapter, response, protocol)
+        try:
+            if policy is not None:
+                response = await policy.response(response)
+            self.__cors.after(adapter, response)
+            # Log request details only when the debug printer is active.
+            if self.__printer_enabled:
+                self.__request_printer.printRequest(adapter, response)
+            return await self.__rsgi_adapter.send(adapter, response, protocol)
+        except Exception as error:
+            await capture(
+                error,
+                app=self.__app,
+                flow="http",
+                phase="send",
+                metadata={"transport": "rsgi"},
+            )
+            raise
 
     async def __asgiResponse(
         self,
@@ -698,15 +708,25 @@ class KernelHTTP(IKernelHTTP):
         None
             Send ASGI HTTP response through transport adapter.
         """
-        if policy is not None:
-            response = await policy.response(response)
-        self.__cors.after(adapter, response)
-        # Log request details only when the debug printer is active.
-        if self.__printer_enabled:
-            self.__request_printer.printRequest(adapter, response)
-        return await self.__asgi_adapter.send(
-            adapter, response, receive, send,
-        )
+        try:
+            if policy is not None:
+                response = await policy.response(response)
+            self.__cors.after(adapter, response)
+            # Log request details only when the debug printer is active.
+            if self.__printer_enabled:
+                self.__request_printer.printRequest(adapter, response)
+            return await self.__asgi_adapter.send(
+                adapter, response, receive, send,
+            )
+        except Exception as error:
+            await capture(
+                error,
+                app=self.__app,
+                flow="http",
+                phase="send",
+                metadata={"transport": "asgi"},
+            )
+            raise
 
     async def __globalMiddleware(
         self,
@@ -859,6 +879,14 @@ class KernelHTTP(IKernelHTTP):
         try:
             return await self.__requestLayer(request, resolved_route)
         except ValidationException as exc:
+            await capture(
+                exc,
+                app=self.__app,
+                flow="http",
+                phase="validation",
+                expected=True,
+                metadata={"transport": request.interface.value},
+            )
             return await validation_response(exc, request, self.__default_responses)
 
     async def __requestLayer(
@@ -1087,6 +1115,41 @@ class KernelHTTP(IKernelHTTP):
         orionis.http.Response
             Response produced by ordinary failure handling.
         """
+        expected = isinstance(exc, (
+            PayloadTooLargeException, ValidationException,
+            RouteNotFound, MethodNotAllowed,
+        ))
+        classifier = getattr(policy, "isExpectedFailure", None)
+        if not expected and classifier is not None:
+            try:
+                expected = bool(classifier(exc))
+            except Exception as classification_error:
+                await capture(
+                    exc,
+                    app=self.__app,
+                    flow="http",
+                    phase="execution",
+                )
+                await capture(
+                    classification_error,
+                    app=self.__app,
+                    flow="http",
+                    phase="classification",
+                )
+        if isinstance(request, Request):
+            transport = request.interface.value
+        elif isinstance(request, ASGITransportAdapter):
+            transport = "asgi"
+        else:
+            transport = "rsgi"
+        await capture(
+            exc,
+            app=self.__app,
+            flow="http",
+            phase="execution",
+            expected=expected,
+            metadata={"transport": transport},
+        )
         if policy is not None:
             return await policy.exception(exc, request)
         if isinstance(exc, PayloadTooLargeException):
@@ -1146,7 +1209,7 @@ class KernelHTTP(IKernelHTTP):
             raise PayloadTooLargeException
         return None
 
-    async def __processRequest(
+    async def __processRequest(  # noqa: C901
         self,
         interface: Interface,
         adapter: TransportAdapter,
@@ -1195,6 +1258,15 @@ class KernelHTTP(IKernelHTTP):
             if response is None and self.__rate_limit_enabled:
                 response = await self.__rate_limit.handle(adapter)
             if response is not None:
+                status = response.getStatusCode()
+                if status >= HTTPStatus.BAD_REQUEST:
+                    await capture_result(
+                        status,
+                        app=self.__app,
+                        flow="http",
+                        phase="admission",
+                        expected=True,
+                    )
                 return response
 
             method = adapter.method()
@@ -1266,8 +1338,24 @@ class KernelHTTP(IKernelHTTP):
             if self.__endpoint_policies else None
         )
         if policy is not None and (response := policy.before(adapter)) is not None:
+            if (status := response.getStatusCode()) >= HTTPStatus.BAD_REQUEST:
+                await capture_result(
+                    status,
+                    app=self.__app,
+                    flow="http",
+                    phase="admission",
+                    expected=True,
+                    metadata={"transport": "rsgi"},
+                )
             return await self.__rsgiResponse(adapter, response, protocol, policy)
         if not self.__request_slots:
+            await capture_result(
+                503,
+                app=self.__app,
+                flow="http",
+                phase="admission",
+                expected=True,
+            )
             response = Response(
                 status_code=503, headers={"Retry-After": "1"},
                 content="HTTP request capacity exceeded.",
@@ -1284,10 +1372,27 @@ class KernelHTTP(IKernelHTTP):
                     return await self.__rsgiResponse(
                         adapter, response, protocol, policy,
                     )
+                except Exception as error:
+                    await capture(
+                        error,
+                        app=self.__app,
+                        flow="http",
+                        phase="response",
+                    )
+                    raise
                 finally:
                     request = request_context[Request]
                     if isinstance(request, Request):
-                        request.close()
+                        try:
+                            request.close()
+                        except Exception as error:
+                            await capture(
+                                error,
+                                app=self.__app,
+                                flow="http",
+                                phase="cleanup",
+                            )
+                            raise
         finally:
             self.__request_slots += 1
 
@@ -1325,8 +1430,24 @@ class KernelHTTP(IKernelHTTP):
             if self.__endpoint_policies else None
         )
         if policy is not None and (response := policy.before(adapter)) is not None:
+            if (status := response.getStatusCode()) >= HTTPStatus.BAD_REQUEST:
+                await capture_result(
+                    status,
+                    app=self.__app,
+                    flow="http",
+                    phase="admission",
+                    expected=True,
+                    metadata={"transport": "asgi"},
+                )
             return await self.__asgiResponse(adapter, response, receive, send, policy)
         if not self.__request_slots:
+            await capture_result(
+                503,
+                app=self.__app,
+                flow="http",
+                phase="admission",
+                expected=True,
+            )
             response = Response(
                 status_code=503, headers={"Retry-After": "1"},
                 content="HTTP request capacity exceeded.",
@@ -1342,10 +1463,27 @@ class KernelHTTP(IKernelHTTP):
                     return await self.__asgiResponse(
                         adapter, response, receive, send, policy,
                     )
+                except Exception as error:
+                    await capture(
+                        error,
+                        app=self.__app,
+                        flow="http",
+                        phase="response",
+                    )
+                    raise
                 finally:
                     request = request_context[Request]
                     if isinstance(request, Request):
-                        request.close()
+                        try:
+                            request.close()
+                        except Exception as error:
+                            await capture(
+                                error,
+                                app=self.__app,
+                                flow="http",
+                                phase="cleanup",
+                            )
+                            raise
         finally:
             self.__request_slots += 1
 
@@ -1456,6 +1594,13 @@ class KernelHTTP(IKernelHTTP):
             max_message_size=self.__websocket_config.max_message_size,
         )
         if not self.__websocket_slots.acquire(blocking=False):
+            await capture_result(
+                503,
+                app=self.__app,
+                flow="websocket",
+                phase="admission",
+                expected=True,
+            )
             await socket.reject(status_code=503)
             return
         task = asyncio.current_task()
@@ -1465,27 +1610,61 @@ class KernelHTTP(IKernelHTTP):
             async with self.__app.beginScope() as connection_context:
                 connection_context.set("kernel", _KERNEL_CONTEXT)
                 connection_context[WebSocket] = socket
-                try:
-                    await self.__processWebSocket(adapter, socket)
-                except WebSocketDisconnected:
-                    pass
-                except Exception:
-                    # Application exception strings may contain credentials.
-                    _LOGGER.error("WebSocket handler failed")
-                    if socket.accepted:
-                        # Cleanup failure must not replace the handler's error.
-                        with suppress(Exception):
-                            await socket.close(
-                                code=1011 if socket.supportsCloseDetails else 1000,
-                            )
-                    raise
-                finally:
-                    if not socket.closed:
-                        await socket.close()
+                await self.__runWebSocket(adapter, socket, interface)
         finally:
             self.__websocket_slots.release()
             if task is not None:
                 self.__websocket_tasks.discard(task)
+
+    async def __runWebSocket(
+        self, adapter: TransportAdapter, socket: WebSocket, interface: Interface,
+    ) -> None:
+        """Run an admitted connection and observe errors before transport cleanup."""
+        try:
+            await self.__processWebSocket(adapter, socket)
+        except WebSocketDisconnected:
+            pass
+        except Exception as error:
+            # Application exception strings may contain credentials.
+            delivered = await capture(
+                error,
+                app=self.__app,
+                flow="websocket",
+                phase="execution",
+                metadata={
+                    "transport": interface.value,
+                    "accepted": socket.accepted,
+                    "closed": socket.closed,
+                },
+            )
+            if delivered is None:
+                _LOGGER.error("WebSocket handler failed")
+            if socket.accepted:
+                # Cleanup failure must not replace the handler's error.
+                try:
+                    await socket.close(
+                        code=1011 if socket.supportsCloseDetails else 1000,
+                    )
+                except Exception as close_error:
+                    await capture(
+                        close_error,
+                        app=self.__app,
+                        flow="websocket",
+                        phase="cleanup",
+                    )
+            raise
+        finally:
+            if not socket.closed:
+                try:
+                    await socket.close()
+                except Exception as close_error:
+                    await capture(
+                        close_error,
+                        app=self.__app,
+                        flow="websocket",
+                        phase="cleanup",
+                    )
+                    raise
 
     async def __shutdownWebSockets(self) -> None:
         """Cancel connection lifetimes within the existing shutdown lifecycle.
@@ -1500,7 +1679,12 @@ class KernelHTTP(IKernelHTTP):
             return
         for task in tasks:
             task.cancel()
-        _, pending = await asyncio.wait(tasks, timeout=_SHUTDOWN_TIMEOUT)
+        done, pending = await asyncio.wait(tasks, timeout=_SHUTDOWN_TIMEOUT)
+        for task in done:
+            if not task.cancelled():
+                # Each request observes its failure before completing. Retrieve
+                # it here without reporting it again in the shutdown operation.
+                task.exception()
         if pending:
             _LOGGER.warning("WebSocket handlers exceeded shutdown cleanup deadline")
 
@@ -1532,16 +1716,37 @@ class KernelHTTP(IKernelHTTP):
             rejection = await self.__rate_limit.handle(adapter)
         if rejection is not None:
             status = rejection.getStatusCode()
+            await capture_result(
+                status,
+                app=self.__app,
+                flow="websocket",
+                phase="handshake",
+                expected=True,
+            )
             await socket.reject(
                 status_code=status if status >= HTTPStatus.BAD_REQUEST else 404,
             )
             return
         if not self.__websocketOriginAllowed(adapter):
+            await capture_result(
+                403,
+                app=self.__app,
+                flow="websocket",
+                phase="handshake",
+                expected=True,
+            )
             await socket.reject()
             return
         try:
             resolved = self.__routes.resolve("WEBSOCKET", adapter.path())
-        except (RouteNotFound, MethodNotAllowed):
+        except (RouteNotFound, MethodNotAllowed) as error:
+            await capture(
+                error,
+                app=self.__app,
+                flow="websocket",
+                phase="handshake",
+                expected=True,
+            )
             await socket.reject(status_code=404)
             return
         socket.routeParams().update(resolved.params)

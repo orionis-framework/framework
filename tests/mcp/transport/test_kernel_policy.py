@@ -1,6 +1,7 @@
 from typing import ClassVar
 import msgspec
 from orionis.auth.exceptions import AuthenticationException
+from orionis.failure.entities.handling import FailureHandling
 from orionis.http.adapters.response.asgi import ASGIResponseAdapter
 from orionis.http.adapters.response.rsgi import RSGIResponseAdapter
 from orionis.http.middleware import BaseMiddleware
@@ -60,10 +61,13 @@ class _Reporter:
         None
             Complete the documented checks or setup without a return value.
         """
-        if method != "report":
+        if method != "handleFailure":
             message = "The HTML exception presenter must not run"
             raise AssertionError(message)
-        self.reported.append(arguments["exception"])
+        async def log():
+            self.reported.append(arguments["exception"])
+
+        return FailureHandling(logging=log)
 
 class _Policy(McpHttpPolicy):
     """Supply concrete dependencies to the existing kernel test application."""

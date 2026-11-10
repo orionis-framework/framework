@@ -164,6 +164,16 @@
         
 
         
+            <div class="itemName"><code><a href="#capture" class="internal-link" title="orionis.failure.contracts.ICatch.capture">capture</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#exception" class="internal-link" title="orionis.failure.contracts.ICatch.exception">exception</a></code>
             </div>
         
@@ -199,7 +209,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6612"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6616"> 
                     
                 </input>
 
@@ -245,11 +255,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6613"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6617"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId6613">
+                <label class="lbl-toggle" for="expandableItemId6617">
                     
                     
                 </label>
@@ -310,7 +320,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6614"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6618"> 
                     
                 </input>
 
@@ -335,6 +345,16 @@
         <ul>
     
     <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#capture" class="internal-link" title="orionis.failure.contracts.ICatch.capture">capture</a></code>
+            </div>
+        
+
+    </li><li class="">
         
         
         
@@ -432,7 +452,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ICatch</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/failure/contracts/catch.py#L12" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.failure.Catch.html" class="internal-link">orionis.failure.Catch</a></code></p><p><a href="classIndex.html#orionis.failure.contracts.ICatch">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ICatch</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/contracts/catch.py#L13" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.failure.Catch.html" class="internal-link">orionis.failure.Catch</a></code></p><p><a href="classIndex.html#orionis.failure.contracts.ICatch">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -446,8 +466,13 @@
   <tr class="method">
     
     <td>Async Method</td>
+    <td><code><a href="#capture" class="internal-link" title="orionis.failure.contracts.ICatch.capture">capture</a></code></td>
+    <td>Observe an exception through the active failure runtime.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
     <td><code><a href="#exception" class="internal-link" title="orionis.failure.contracts.ICatch.exception">exception</a></code></td>
-    <td>Handle an exception based on the current kernel context.</td>
+    <td>Handle an exception in the current kernel context.</td>
   </tr>
 </table>
           
@@ -457,6 +482,37 @@
 
         <div id="child-list">
           <div class="basemethod">
+  
+  
+  <a name="orionis.failure.contracts.ICatch.capture">
+    
+  </a>
+  <a name="capture">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">capture</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">context: <code>FailureContext</code></span>) -&gt; <code>FailureReceipt | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/contracts/catch.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#capture" title="orionis.failure.contracts.ICatch.capture">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.failure.Catch.html" class="internal-link">orionis.failure.Catch</a></code></div>
+    <div><p>Observe an exception through the active failure runtime.</p>
+<p>Preserve compatibility by delegating to the active runtime without
+requiring a dependency-injection scope.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">Original exception instance to observe.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.failure.entities.FailureContext.html" class="internal-link" title="orionis.failure.entities.FailureContext">orionis.failure.entities.context.FailureContext</a></code></td><td class="fieldArgDesc">Immutable execution metadata for the failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.failure.entities.FailureReceipt.html" class="internal-link" title="orionis.failure.entities.FailureReceipt">orionis.failure.entities.context.FailureReceipt</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Delivery status, or <tt class="rst-docutils rst-literal">None</tt> if no runtime is active or the exception
+represents cancellation or process control.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
   
   
   <a name="orionis.failure.contracts.ICatch.exception">
@@ -469,7 +525,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">exception</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-param">request: <code>Request | TransportAdapter | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Response | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/failure/contracts/catch.py#L15">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/contracts/catch.py#L49">
       
       (source)
     </a>
@@ -481,12 +537,9 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.failure.Catch.html" class="internal-link">orionis.failure.Catch</a></code></div>
-    <div><p>Handle an exception based on the current kernel context.</p>
-<div class="rst-admonition rst-admonition-notes">
-<p class="rst-admonition-title rst-first">Notes</p>
-<p class="rst-last">Determines the context and delegates exception handling accordingly.</p>
-</div>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">The exception instance to handle.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code>Request | TransportAdapter | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The HTTP request or transport adapter associated with the exception.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>None | orionis.http.Response</code></td><td class="fieldArgDesc">This method performs side effects and may return a Response.</td></tr></table></div>
+    <div><p>Handle an exception in the current kernel context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">Original exception instance to handle.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">Request</a> or <a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">HTTP request or transport adapter used for presentation, when available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.Response.html" class="internal-link" title="orionis.http.Response">orionis.http.responses.Response</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Response produced by presentation, or <tt class="rst-docutils rst-literal">None</tt> when no response is
+available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If no application scope or kernel context is active.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>The primary failure if presentation fails or times out. Genuine
+caller cancellation and process-control signals remain unchanged.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -499,7 +552,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

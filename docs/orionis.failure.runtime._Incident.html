@@ -1,0 +1,2183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.failure.runtime._Incident.html" class="internal-link" title="This class">_<wbr></wbr>Incident</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.failure.runtime._Incident.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#abandon" class="internal-link" title="orionis.failure.runtime._Incident.abandon">abandon</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#finish" class="internal-link" title="orionis.failure.runtime._Incident.finish">finish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#reclaim" class="internal-link" title="orionis.failure.runtime._Incident.reclaim">reclaim</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#wait" class="internal-link" title="orionis.failure.runtime._Incident.wait">wait</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.failure.runtime._Incident.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#abandoned" class="internal-link" title="orionis.failure.runtime._Incident.abandoned">abandoned</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#context" class="internal-link" title="orionis.failure.runtime._Incident.context">context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#exception" class="internal-link" title="orionis.failure.runtime._Incident.exception">exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#handling" class="internal-link" title="orionis.failure.runtime._Incident.handling">handling</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ready" class="internal-link" title="orionis.failure.runtime._Incident.ready">ready</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#receipt" class="internal-link" title="orionis.failure.runtime._Incident.receipt">receipt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#started" class="internal-link" title="orionis.failure.runtime._Incident.started">started</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.failure.runtime.html" class="internal-link" title="The parent of this class">runtime</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6720"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId6720">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.failure.runtime._BorrowedOperation.html" class="internal-link" title="orionis.failure.runtime._BorrowedOperation">_<wbr></wbr>Borrowed<wbr></wbr>Operation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._BorrowedOperation.html#__enter__" class="internal-link" title="orionis.failure.runtime._BorrowedOperation.__enter__">__enter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._BorrowedOperation.html#__exit__" class="internal-link" title="orionis.failure.runtime._BorrowedOperation.__exit__">__exit__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._BorrowedOperation.html#__slots__" class="internal-link" title="orionis.failure.runtime._BorrowedOperation.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6721"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId6721">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.failure.runtime._InactiveOperation.html" class="internal-link" title="orionis.failure.runtime._InactiveOperation">_<wbr></wbr>Inactive<wbr></wbr>Operation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._InactiveOperation.html#__enter__" class="internal-link" title="orionis.failure.runtime._InactiveOperation.__enter__">__enter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._InactiveOperation.html#__exit__" class="internal-link" title="orionis.failure.runtime._InactiveOperation.__exit__">__exit__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._InactiveOperation.html#__slots__" class="internal-link" title="orionis.failure.runtime._InactiveOperation.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._InactiveOperation.html#closed" class="internal-link" title="orionis.failure.runtime._InactiveOperation.closed">closed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._InactiveOperation.html#ledger" class="internal-link" title="orionis.failure.runtime._InactiveOperation.ledger">ledger</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._InactiveOperation.html#runtime" class="internal-link" title="orionis.failure.runtime._InactiveOperation.runtime">runtime</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6722"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.failure.runtime._Incident.html" class="internal-link" title="orionis.failure.runtime._Incident">_<wbr></wbr>Incident</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.failure.runtime._Incident.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#abandon" class="internal-link" title="orionis.failure.runtime._Incident.abandon">abandon</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#finish" class="internal-link" title="orionis.failure.runtime._Incident.finish">finish</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#reclaim" class="internal-link" title="orionis.failure.runtime._Incident.reclaim">reclaim</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#wait" class="internal-link" title="orionis.failure.runtime._Incident.wait">wait</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__slots__" class="internal-link" title="orionis.failure.runtime._Incident.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#abandoned" class="internal-link" title="orionis.failure.runtime._Incident.abandoned">abandoned</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#context" class="internal-link" title="orionis.failure.runtime._Incident.context">context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#exception" class="internal-link" title="orionis.failure.runtime._Incident.exception">exception</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#handling" class="internal-link" title="orionis.failure.runtime._Incident.handling">handling</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#ready" class="internal-link" title="orionis.failure.runtime._Incident.ready">ready</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#receipt" class="internal-link" title="orionis.failure.runtime._Incident.receipt">receipt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#started" class="internal-link" title="orionis.failure.runtime._Incident.started">started</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6723"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId6723">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.failure.runtime._Operation.html" class="internal-link" title="orionis.failure.runtime._Operation">_<wbr></wbr>Operation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#__enter__" class="internal-link" title="orionis.failure.runtime._Operation.__enter__">__enter__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#__exit__" class="internal-link" title="orionis.failure.runtime._Operation.__exit__">__exit__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#__init__" class="internal-link" title="orionis.failure.runtime._Operation.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#_owner" class="internal-link" title="orionis.failure.runtime._Operation._owner">_owner</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#_propagate" class="internal-link" title="orionis.failure.runtime._Operation._propagate">_propagate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#adopt" class="internal-link" title="orionis.failure.runtime._Operation.adopt">adopt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#incident" class="internal-link" title="orionis.failure.runtime._Operation.incident">incident</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#lookup" class="internal-link" title="orionis.failure.runtime._Operation.lookup">lookup</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#__slots__" class="internal-link" title="orionis.failure.runtime._Operation.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#closed" class="internal-link" title="orionis.failure.runtime._Operation.closed">closed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#correlation_id" class="internal-link" title="orionis.failure.runtime._Operation.correlation_id">correlation<wbr></wbr>_id</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#flow" class="internal-link" title="orionis.failure.runtime._Operation.flow">flow</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#ledger" class="internal-link" title="orionis.failure.runtime._Operation.ledger">ledger</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#name" class="internal-link" title="orionis.failure.runtime._Operation.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#owns" class="internal-link" title="orionis.failure.runtime._Operation.owns">owns</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#parent" class="internal-link" title="orionis.failure.runtime._Operation.parent">parent</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#runtime" class="internal-link" title="orionis.failure.runtime._Operation.runtime">runtime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime._Operation.html#token" class="internal-link" title="orionis.failure.runtime._Operation.token">token</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6724"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId6724">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.failure.runtime.FailureRuntime.html" class="internal-link" title="orionis.failure.runtime.FailureRuntime"><wbr></wbr>Failure<wbr></wbr>Runtime</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#__init__" class="internal-link" title="orionis.failure.runtime.FailureRuntime.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_attempt" class="internal-link" title="orionis.failure.runtime.FailureRuntime._attempt">_attempt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_begin" class="internal-link" title="orionis.failure.runtime.FailureRuntime._begin">_begin</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_completeHandling" class="internal-link" title="orionis.failure.runtime.FailureRuntime._completeHandling">_complete<wbr></wbr>Handling</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_correlate" class="internal-link" title="orionis.failure.runtime.FailureRuntime._correlate">_correlate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_defaultHandling" class="internal-link" title="orionis.failure.runtime.FailureRuntime._defaultHandling">_default<wbr></wbr>Handling</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_fallbackPresentation" class="internal-link" title="orionis.failure.runtime.FailureRuntime._fallbackPresentation">_fallback<wbr></wbr>Presentation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_invoke" class="internal-link" title="orionis.failure.runtime.FailureRuntime._invoke">_invoke</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_recordIncident" class="internal-link" title="orionis.failure.runtime.FailureRuntime._recordIncident">_record<wbr></wbr>Incident</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#activate" class="internal-link" title="orionis.failure.runtime.FailureRuntime.activate">activate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#beginClosing" class="internal-link" title="orionis.failure.runtime.FailureRuntime.beginClosing">begin<wbr></wbr>Closing</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#capture" class="internal-link" title="orionis.failure.runtime.FailureRuntime.capture">capture</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#captureResult" class="internal-link" title="orionis.failure.runtime.FailureRuntime.captureResult">capture<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#createTask" class="internal-link" title="orionis.failure.runtime.FailureRuntime.createTask">create<wbr></wbr>Task</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#deactivate" class="internal-link" title="orionis.failure.runtime.FailureRuntime.deactivate">deactivate</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#dispatchFailure" class="internal-link" title="orionis.failure.runtime.FailureRuntime.dispatchFailure">dispatch<wbr></wbr>Failure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#drain" class="internal-link" title="orionis.failure.runtime.FailureRuntime.drain">drain</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#handlingFor" class="internal-link" title="orionis.failure.runtime.FailureRuntime.handlingFor">handling<wbr></wbr>For</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#hasOwner" class="internal-link" title="orionis.failure.runtime.FailureRuntime.hasOwner">has<wbr></wbr>Owner</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#prepare" class="internal-link" title="orionis.failure.runtime.FailureRuntime.prepare">prepare</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#presentHandling" class="internal-link" title="orionis.failure.runtime.FailureRuntime.presentHandling">present<wbr></wbr>Handling</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#shutdown" class="internal-link" title="orionis.failure.runtime.FailureRuntime.shutdown">shutdown</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#start" class="internal-link" title="orionis.failure.runtime.FailureRuntime.start">start</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#stopReporting" class="internal-link" title="orionis.failure.runtime.FailureRuntime.stopReporting">stop<wbr></wbr>Reporting</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_closing_owners" class="internal-link" title="orionis.failure.runtime.FailureRuntime._closing_owners">_closing<wbr></wbr>_owners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_fallback_handler" class="internal-link" title="orionis.failure.runtime.FailureRuntime._fallback_handler">_fallback<wbr></wbr>_handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_loop" class="internal-link" title="orionis.failure.runtime.FailureRuntime._loop">_loop</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_owners" class="internal-link" title="orionis.failure.runtime.FailureRuntime._owners">_owners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_pending" class="internal-link" title="orionis.failure.runtime.FailureRuntime._pending">_pending</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_pending_lock" class="internal-link" title="orionis.failure.runtime.FailureRuntime._pending_lock">_pending<wbr></wbr>_lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_prepare_lock" class="internal-link" title="orionis.failure.runtime.FailureRuntime._prepare_lock">_prepare<wbr></wbr>_lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_reporting_enabled" class="internal-link" title="orionis.failure.runtime.FailureRuntime._reporting_enabled">_reporting<wbr></wbr>_enabled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_tasks" class="internal-link" title="orionis.failure.runtime.FailureRuntime._tasks">_tasks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#_thread_pending" class="internal-link" title="orionis.failure.runtime.FailureRuntime._thread_pending">_thread<wbr></wbr>_pending</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#app" class="internal-link" title="orionis.failure.runtime.FailureRuntime.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#handler" class="internal-link" title="orionis.failure.runtime.FailureRuntime.handler">handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#lifecycle_lock" class="internal-link" title="orionis.failure.runtime.FailureRuntime.lifecycle_lock">lifecycle<wbr></wbr>_lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#timeout" class="internal-link" title="orionis.failure.runtime.FailureRuntime.timeout">timeout</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#active" class="internal-link" title="orionis.failure.runtime.FailureRuntime.active">active</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.FailureRuntime.html#ownerCount" class="internal-link" title="orionis.failure.runtime.FailureRuntime.ownerCount">owner<wbr></wbr>Count</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_cancellation_checkpoint" class="internal-link" title="orionis.failure.runtime._cancellation_checkpoint">_cancellation<wbr></wbr>_checkpoint</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_completed_receipt" class="internal-link" title="orionis.failure.runtime._completed_receipt">_completed<wbr></wbr>_receipt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_context" class="internal-link" title="orionis.failure.runtime._context">_context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_emergency" class="internal-link" title="orionis.failure.runtime._emergency">_emergency</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_find_runtime" class="internal-link" title="orionis.failure.runtime._find_runtime">_find<wbr></wbr>_runtime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_handler_dependencies" class="internal-link" title="orionis.failure.runtime._handler_dependencies">_handler<wbr></wbr>_dependencies</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_parent_context" class="internal-link" title="orionis.failure.runtime._parent_context">_parent<wbr></wbr>_context</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_pending_incident" class="internal-link" title="orionis.failure.runtime._pending_incident">_pending<wbr></wbr>_incident</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_previous_receipt" class="internal-link" title="orionis.failure.runtime._previous_receipt">_previous<wbr></wbr>_receipt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_runtime_operation" class="internal-link" title="orionis.failure.runtime._runtime_operation">_runtime<wbr></wbr>_operation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_submit_thread" class="internal-link" title="orionis.failure.runtime._submit_thread">_submit<wbr></wbr>_thread</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#capture" class="internal-link" title="orionis.failure.runtime.capture">capture</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#capture_nowait" class="internal-link" title="orionis.failure.runtime.capture_nowait">capture<wbr></wbr>_nowait</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#capture_result" class="internal-link" title="orionis.failure.runtime.capture_result">capture<wbr></wbr>_result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#current_operation" class="internal-link" title="orionis.failure.runtime.current_operation">current<wbr></wbr>_operation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#get_runtime" class="internal-link" title="orionis.failure.runtime.get_runtime">get<wbr></wbr>_runtime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#handoff" class="internal-link" title="orionis.failure.runtime.handoff">handoff</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#is_reporting" class="internal-link" title="orionis.failure.runtime.is_reporting">is<wbr></wbr>_reporting</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#operation" class="internal-link" title="orionis.failure.runtime.operation">operation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#prepare" class="internal-link" title="orionis.failure.runtime.prepare">prepare</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#reporting_from" class="internal-link" title="orionis.failure.runtime.reporting_from">reporting<wbr></wbr>_from</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#reporting_runtime" class="internal-link" title="orionis.failure.runtime.reporting_runtime">reporting<wbr></wbr>_runtime</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_borrowed_operation" class="internal-link" title="orionis.failure.runtime._borrowed_operation">_borrowed<wbr></wbr>_operation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_current" class="internal-link" title="orionis.failure.runtime._current">_current</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_inactive_operation" class="internal-link" title="orionis.failure.runtime._inactive_operation">_inactive<wbr></wbr>_operation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.failure.runtime.html#_reporting" class="internal-link" title="orionis.failure.runtime._reporting">_reporting</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.failure.html" class="internal-link" title="orionis.failure">failure</a></code><wbr></wbr>.<code><a href="orionis.failure.runtime.html" class="internal-link" title="orionis.failure.runtime">runtime</a></code><wbr></wbr>.<code><a href="orionis.failure.runtime._Incident.html" class="internal-link" title="orionis.failure.runtime._Incident">_Incident</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_Incident</span>: <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L158" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.failure.runtime._Incident.__init__">_Incident(exception, receipt)</a></code></p><p><a href="classIndex.html#orionis.failure.runtime._Incident">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Keep deferred effects and their completion inside an operation ledger.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id655">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.failure.runtime._Incident.__init__">__init__</a></code></td>
+    <td>Initialize an incident with its original exception and delivery status.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#abandon" class="internal-link" title="orionis.failure.runtime._Incident.abandon">abandon</a></code></td>
+    <td>Mark unstarted delivery as abandoned and notify waiting owners.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#finish" class="internal-link" title="orionis.failure.runtime._Incident.finish">finish</a></code></td>
+    <td>Store the selected handling plan and notify incident waiters.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#reclaim" class="internal-link" title="orionis.failure.runtime._Incident.reclaim">reclaim</a></code></td>
+    <td>Reset an abandoned incident for another delivery attempt.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#wait" class="internal-link" title="orionis.failure.runtime._Incident.wait">wait</a></code></td>
+    <td>Await incident completion without cancelling its delivery.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#__slots__" class="internal-link" title="orionis.failure.runtime._Incident.__slots__">__slots__</a></code></td>
+    <td>Incident fields retained only for the owning operation's lifetime.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#abandoned" class="internal-link" title="orionis.failure.runtime._Incident.abandoned">abandoned</a></code></td>
+    <td>Whether delivery was cancelled before starting and can be reclaimed.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#context" class="internal-link" title="orionis.failure.runtime._Incident.context">context</a></code></td>
+    <td>Metadata supplied to the hook when delivery starts.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#exception" class="internal-link" title="orionis.failure.runtime._Incident.exception">exception</a></code></td>
+    <td>Original exception used for incident identity and native traceback.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#handling" class="internal-link" title="orionis.failure.runtime._Incident.handling">handling</a></code></td>
+    <td>Selected deferred effects shared by incident consumers.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#ready" class="internal-link" title="orionis.failure.runtime._Incident.ready">ready</a></code></td>
+    <td>Thread-safe completion notice without an exception-valued result.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#receipt" class="internal-link" title="orionis.failure.runtime._Incident.receipt">receipt</a></code></td>
+    <td>Immutable delivery status shared by duplicate notifications.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#started" class="internal-link" title="orionis.failure.runtime._Incident.started">started</a></code></td>
+    <td>Whether delivery has started and may already have performed effects.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.failure.runtime._Incident.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-param">receipt: <code>FailureReceipt</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L166">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.failure.runtime._Incident.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Initialize an incident with its original exception and delivery status.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">Original exception retained for identity-based lookup.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">receipt:</span><code><a href="orionis.failure.entities.FailureReceipt.html" class="internal-link" title="orionis.failure.entities.FailureReceipt">FailureReceipt</a></code></td><td class="fieldArgDesc">Initial delivery status for the incident.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store the failure and prepare an unresolved completion signal.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.failure.runtime._Incident.abandon">
+    
+  </a>
+  <a name="abandon">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">abandon</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L197">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#abandon" title="orionis.failure.runtime._Incident.abandon">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Mark unstarted delivery as abandoned and notify waiting owners.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Degrade the receipt and finish the incident only if delivery has not
+started.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.failure.runtime._Incident.finish">
+    
+  </a>
+  <a name="finish">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">finish</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">handling: <code>FailureHandling | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L225">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#finish" title="orionis.failure.runtime._Incident.finish">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Store the selected handling plan and notify incident waiters.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">handling:</span><code><a href="orionis.failure.entities.FailureHandling.html" class="internal-link" title="orionis.failure.entities.FailureHandling">FailureHandling</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Deferred handling plan, or <tt class="rst-docutils rst-literal">None</tt> when no plan is available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Set the plan and resolve the completion signal if it is still pending.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.failure.runtime._Incident.reclaim">
+    
+  </a>
+  <a name="reclaim">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">reclaim</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L212">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#reclaim" title="orionis.failure.runtime._Incident.reclaim">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reset an abandoned incident for another delivery attempt.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Preserve the event identifier and replace receipt and completion state.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.failure.runtime._Incident.wait">
+    
+  </a>
+  <a name="wait">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">wait</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L243">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#wait" title="orionis.failure.runtime._Incident.wait">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Await incident completion without cancelling its delivery.</p>
+<p>Use a loop-local notification so cancelling one waiter leaves the shared
+completion signal intact.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Resume after the incident's completion signal is resolved.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If this waiter is cancelled.</td></tr></table></div>
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.failure.runtime._Incident.__slots__">
+    
+  </a>
+  <a name="__slots__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L161">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__slots__" title="orionis.failure.runtime._Incident.__slots__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Incident fields retained only for the owning operation's lifetime.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.failure.runtime._Incident.abandoned">
+    
+  </a>
+  <a name="abandoned">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">abandoned</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L194">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#abandoned" title="orionis.failure.runtime._Incident.abandoned">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Whether delivery was cancelled before starting and can be reclaimed.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.failure.runtime._Incident.context">
+    
+  </a>
+  <a name="context">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">context</span>: <code>FailureContext | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L186">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#context" title="orionis.failure.runtime._Incident.context">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Metadata supplied to the hook when delivery starts.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.failure.runtime._Incident.exception">
+    
+  </a>
+  <a name="exception">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">exception</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L182">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#exception" title="orionis.failure.runtime._Incident.exception">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Original exception used for incident identity and native traceback.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.failure.runtime._Incident.handling">
+    
+  </a>
+  <a name="handling">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">handling</span>: <code>FailureHandling | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L188">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#handling" title="orionis.failure.runtime._Incident.handling">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Selected deferred effects shared by incident consumers.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.failure.runtime._Incident.ready">
+    
+  </a>
+  <a name="ready">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">ready</span>: <code><a href="https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.Future" class="intersphinx-link">ThreadFuture</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L190">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#ready" title="orionis.failure.runtime._Incident.ready">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Thread-safe completion notice without an exception-valued result.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.failure.runtime._Incident.receipt">
+    
+  </a>
+  <a name="receipt">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">receipt</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L184">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#receipt" title="orionis.failure.runtime._Incident.receipt">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Immutable delivery status shared by duplicate notifications.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.failure.runtime._Incident.started">
+    
+  </a>
+  <a name="started">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">started</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/failure/runtime.py#L192">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#started" title="orionis.failure.runtime._Incident.started">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Whether delivery has started and may already have performed effects.</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

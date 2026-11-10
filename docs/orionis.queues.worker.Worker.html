@@ -184,6 +184,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_consumeJobs" class="internal-link" title="orionis.queues.worker.Worker._consumeJobs">_consume<wbr></wbr>Jobs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_fail" class="internal-link" title="orionis.queues.worker.Worker._fail">_fail</a></code>
             </div>
         
@@ -205,6 +215,16 @@
 
         
             <div class="itemName"><code><a href="#_handleFailure" class="internal-link" title="orionis.queues.worker.Worker._handleFailure">_handle<wbr></wbr>Failure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_observe" class="internal-link" title="orionis.queues.worker.Worker._observe">_observe</a></code>
             </div>
         
 
@@ -445,7 +465,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25044"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25216"> 
                     
                 </input>
 
@@ -495,6 +515,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_consumeJobs" class="internal-link" title="orionis.queues.worker.Worker._consumeJobs">_consume<wbr></wbr>Jobs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_fail" class="internal-link" title="orionis.queues.worker.Worker._fail">_fail</a></code>
             </div>
         
@@ -516,6 +546,16 @@
 
         
             <div class="itemName"><code><a href="#_handleFailure" class="internal-link" title="orionis.queues.worker.Worker._handleFailure">_handle<wbr></wbr>Failure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_observe" class="internal-link" title="orionis.queues.worker.Worker._observe">_observe</a></code>
             </div>
         
 
@@ -747,11 +787,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25045"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25217"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId25045">
+                <label class="lbl-toggle" for="expandableItemId25217">
                     
                     
                 </label>
@@ -945,7 +985,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Worker</span>(<a href="orionis.queues.contracts.worker.IWorker.html" class="internal-link" title="orionis.queues.contracts.worker.IWorker">IWorker</a>): <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L70" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.worker.Worker.__init__">Worker(app, driver, serializer, options, ...)</a></code></p><p><a href="classIndex.html#orionis.queues.worker.Worker">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Worker</span>(<a href="orionis.queues.contracts.worker.IWorker.html" class="internal-link" title="orionis.queues.contracts.worker.IWorker">IWorker</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L73" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.queues.worker.Worker.__init__">Worker(app, driver, serializer, options, ...)</a></code></p><p><a href="classIndex.html#orionis.queues.worker.Worker">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -953,59 +993,69 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1776">
+          <table class="children sortable" id="id1788">
   
   
   <tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="orionis.queues.worker.Worker.__init__">__init__</a></code></td>
-    <td>Initialize worker settings without opening backend connections.</td>
+    <td>Initialize a worker without opening queue-backend connections.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_consume" class="internal-link" title="orionis.queues.worker.Worker._consume">_consume</a></code></td>
-    <td>Consume reservations within the shared job budget.</td>
+    <td>Run one consumer in an isolated queue-failure observation context.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_consumeJobs" class="internal-link" title="orionis.queues.worker.Worker._consumeJobs">_consume<wbr></wbr>Jobs</a></code></td>
+    <td>Reserve and execute jobs within the worker's shared reservation budget.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_fail" class="internal-link" title="orionis.queues.worker.Worker._fail">_fail</a></code></td>
-    <td>Record a terminal failure before deleting the owned reservation.</td>
+    <td>Record a terminal job failure before deleting its leased reservation.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_finish" class="internal-link" title="orionis.queues.worker.Worker._finish">_finish</a></code></td>
-    <td>Acknowledge unfinished work or propagate an immediate job failure.</td>
+    <td>Acknowledge unfinished work or propagate an explicitly recorded job failure.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_handleFailure" class="internal-link" title="orionis.queues.worker.Worker._handleFailure">_handle<wbr></wbr>Failure</a></code></td>
-    <td>Choose a retry release or terminal failure from the job's retry policy.</td>
+    <td>Select a delayed retry or terminal handling from the envelope's policy.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_observe" class="internal-link" title="orionis.queues.worker.Worker._observe">_observe</a></code></td>
+    <td>Observe a job failure without letting fallback logging replace it.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_releaseCancelled" class="internal-link" title="orionis.queues.worker.Worker._releaseCancelled">_release<wbr></wbr>Cancelled</a></code></td>
-    <td>Release a cancelled reservation without replacing its cancellation.</td>
+    <td>Attempt reservation release while preserving the original cancellation.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#_validateReservation" class="internal-link" title="orionis.queues.worker.Worker._validateReservation">_validate<wbr></wbr>Reservation</a></code></td>
-    <td>Validate reservation routing, timeout and retry eligibility.</td>
+    <td>Validate reservation routing, timeout compatibility, and retry eligibility.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#execute" class="internal-link" title="orionis.queues.worker.Worker.execute">execute</a></code></td>
-    <td>Execute a reserved job with isolated DI and lease-aware completion.</td>
+    <td>Execute one leased job in an isolated scope and apply its lifecycle outcome.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#run" class="internal-link" title="orionis.queues.worker.Worker.run">run</a></code></td>
-    <td>Consume jobs concurrently until a stopping condition is reached.</td>
+    <td>Run concurrent consumers under shared stop and reservation limits.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#stop" class="internal-link" title="orionis.queues.worker.Worker.stop">stop</a></code></td>
-    <td>Request a graceful stop without waiting for active jobs.</td>
+    <td>Signal consumers to stop after their in-flight reservations finish.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
@@ -1102,7 +1152,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">driver: <code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link" title="orionis.queues.contracts.driver.IQueueDriver">IQueueDriver</a></code>, </span><span class="rst-sig-param">serializer: <code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link" title="orionis.queues.contracts.serializer.IJobSerializer">IJobSerializer</a></code>, </span><span class="rst-sig-param">options: <code><a href="orionis.queues.worker.WorkerOptions.html" class="internal-link" title="orionis.queues.worker.WorkerOptions">WorkerOptions</a></code>, </span><span class="rst-sig-param">failed: <code><a href="orionis.queues.contracts.failed_repository.IFailedJobRepository.html" class="internal-link" title="orionis.queues.contracts.failed_repository.IFailedJobRepository">IFailedJobRepository</a> | <a href="orionis.queues.worker.html#FailedResolver" class="internal-link" title="orionis.queues.worker.FailedResolver">FailedResolver</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L91">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L94">
       
       (source)
     </a>
@@ -1114,8 +1164,8 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize worker settings without opening backend connections.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application container used to create an isolated scope per job.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link">orionis.queues.contracts.driver.IQueueDriver</a></code></td><td class="fieldArgDesc">Backend used to reserve, release and acknowledge jobs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">serializer:</span><code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer</a></code></td><td class="fieldArgDesc">Serializer used to restore envelopes and registered jobs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">options:</span><code><a href="orionis.queues.worker.WorkerOptions.html" class="internal-link">orionis.queues.worker.WorkerOptions</a></code></td><td class="fieldArgDesc">Validated connection, queues, concurrency, lease and poll settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failed:</span><code>IFailedJobRepository | FailedResolver | None, <em>optional</em></code></td><td class="fieldArgDesc">Failure repository or async resolver invoked on terminal failure.
-If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be recorded.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store dependencies and initialize counters and stop state.</td></tr></table></div>
+    <div><p>Initialize a worker without opening queue-backend connections.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application used to create an isolated dependency scope per job.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">driver:</span><code><a href="orionis.queues.contracts.driver.IQueueDriver.html" class="internal-link">orionis.queues.contracts.driver.IQueueDriver</a></code></td><td class="fieldArgDesc">Backend used to reserve, release, and acknowledge jobs.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">serializer:</span><code><a href="orionis.queues.contracts.serializer.IJobSerializer.html" class="internal-link">orionis.queues.contracts.serializer.IJobSerializer</a></code></td><td class="fieldArgDesc">Serializer restoring dispatch envelopes and registered job instances.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">options:</span><code><a href="orionis.queues.worker.WorkerOptions.html" class="internal-link">orionis.queues.worker.WorkerOptions</a></code></td><td class="fieldArgDesc">Validated connection, queues, concurrency, lease, and polling settings.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">failed:</span><code>IFailedJobRepository | FailedResolver | None, <em>optional</em></code></td><td class="fieldArgDesc">Repository or asynchronous resolver, resolved lazily and cached.
+<tt class="rst-docutils rst-literal">None</tt> makes terminal failure storage unavailable.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Retain dependencies and initialize polling, counters, and stop state.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1130,7 +1180,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_consume</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">stop_when_empty: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>, </span><span class="rst-sig-param">max_jobs: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L214">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L220">
       
       (source)
     </a>
@@ -1142,7 +1192,36 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Consume reservations within the shared job budget.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stop<wbr></wbr>_when<wbr></wbr>_empty:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">End this consumer when the backend has no ready job.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_jobs:</span><code>int | None</code></td><td class="fieldArgDesc">Shared reservation limit, or <tt class="rst-docutils rst-literal">None</tt> to run without a job limit.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Process reserved jobs and update the shared counters.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If reservation or execution raises an unhandled error.</td></tr></table></div>
+    <div><p>Run one consumer in an isolated queue-failure observation context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stop<wbr></wbr>_when<wbr></wbr>_empty:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">End this consumer after an empty reservation attempt.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_jobs:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Shared reservation cap across consumers, or <tt class="rst-docutils rst-literal">None</tt> for no cap.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish this consumer when its stopping condition or budget is reached.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If polling or execution fails; observe the consumer failure before
+propagating it.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker._consumeJobs">
+    
+  </a>
+  <a name="_consumeJobs">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_consumeJobs</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">stop_when_empty: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>, </span><span class="rst-sig-param">max_jobs: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L259">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_consumeJobs" title="orionis.queues.worker.Worker._consumeJobs">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reserve and execute jobs within the worker's shared reservation budget.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stop<wbr></wbr>_when<wbr></wbr>_empty:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Return when the backend has no ready job instead of polling again.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_jobs:</span><code>int | None</code></td><td class="fieldArgDesc">Shared reservation limit across consumers, or <tt class="rst-docutils rst-literal">None</tt> for no cap.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Update shared counters and return on stop, an exhausted budget, or
+empty polling when requested.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If reservation or execution raises outside its own recovery policy.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1157,7 +1236,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_fail</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L469">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L608">
       
       (source)
     </a>
@@ -1169,7 +1248,8 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Record a terminal failure before deleting the owned reservation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Reservation whose lease must still be valid before recording failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Original job exception stored in the failure repository.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> if deletion succeeds; <tt class="rst-docutils rst-literal">False</tt> if the lease is expired or lost.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If no failed-job repository can be resolved.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If repository resolution, failure recording or job deletion fails.</td></tr></table></div>
+    <div><p>Record a terminal job failure before deleting its leased reservation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Reservation whose lease must remain valid before terminal recording.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Job or recovery exception to record in failed-job storage.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc"><tt class="rst-docutils rst-literal">True</tt> if deletion succeeds; <tt class="rst-docutils rst-literal">False</tt> if the lease expired or was lost.
+A failure may already be recorded when deletion returns false.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If terminal storage is required and no repository can be resolved.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If observation, repository resolution, recording, or deletion fails.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1184,7 +1264,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_finish</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">context: <code>JobContext</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">raise_errors: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L392">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L528">
       
       (source)
     </a>
@@ -1196,7 +1276,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Acknowledge unfinished work or propagate an immediate job failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.queues.JobContext.html" class="internal-link">orionis.queues.JobContext</a></code></td><td class="fieldArgDesc">Lifecycle state containing the reservation's explicit transitions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Raise a recorded failure when immediate execution requires propagation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Delete unfinished work or preserve an existing lifecycle transition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If deletion fails or a recorded failure must be propagated.</td></tr></table></div>
+    <div><p>Acknowledge unfinished work or propagate an explicitly recorded job failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="orionis.queues.JobContext.html" class="internal-link">orionis.queues.JobContext</a></code></td><td class="fieldArgDesc">Job state tracking release, deletion, and explicit failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Re-raise a recorded failure after an explicit lifecycle transition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt to delete unfinished work, or preserve an existing transition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If deletion fails or a recorded job failure must be propagated.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1211,7 +1291,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_handleFailure</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">envelope: <code>JobEnvelope | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">exception: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">raise_errors: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L418">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L554">
       
       (source)
     </a>
@@ -1223,7 +1303,38 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Choose a retry release or terminal failure from the job's retry policy.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Current reservation used to release or record the failed attempt.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code>orionis.queues.JobEnvelope | None</code></td><td class="fieldArgDesc">Decoded retry policy, or <tt class="rst-docutils rst-literal">None</tt> if the envelope is unavailable.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Original error used to determine retry eligibility and record failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Disable retries so immediate execution records a terminal failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt a delayed retry release or terminal failure recording.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If a terminal failure has no available failed-job repository.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If the backend or failure repository cannot complete the transition.</td></tr></table></div>
+    <div><p>Select a delayed retry or terminal handling from the envelope's policy.</p>
+<p>Reject retries for payload, configuration, or retry-policy errors.
+Reuse the last configured backoff entry for later attempts.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Current reservation whose lease controls release and terminal deletion.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code>orionis.queues.JobEnvelope | None</code></td><td class="fieldArgDesc">Retry limits and backoff schedule; <tt class="rst-docutils rst-literal">None</tt> selects terminal handling.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">exception:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Original error used to reject non-retryable failures and populate storage.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Force terminal handling for immediate execution instead of retrying.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt a backoff-delayed release or a terminal failure transition.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If terminal handling requires an unavailable failed-job repository.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If a backend transition, failure recording, or lease-loss warning fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.queues.worker.Worker._observe">
+    
+  </a>
+  <a name="_observe">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_observe</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">error: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">phase: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L485">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_observe" title="orionis.queues.worker.Worker._observe">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Observe a job failure without letting fallback logging replace it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">error:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td class="fieldArgDesc">Job or recovery exception sent through shared failure observation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Reservation supplying the job identifier and attempt metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">phase:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Queue operation phase associated with the failure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">message:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Fallback log template used when no capture receipt is returned.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Positional values interpolated into the fallback log message.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Await observation and, if no receipt is returned, attempt fallback
+logging while suppressing its ordinary exceptions.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1238,7 +1349,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_releaseCancelled</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L372">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L458">
       
       (source)
     </a>
@@ -1250,7 +1361,8 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Release a cancelled reservation without replacing its cancellation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Reservation whose execution was interrupted before completion.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt lease release and log backend errors without re-raising them.</td></tr></table></div>
+    <div><p>Attempt reservation release while preserving the original cancellation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Unfinished reservation to release after cancellation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt lease release and observe ordinary backend errors without
+re-raising them.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1265,7 +1377,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validateReservation</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-param">envelope: <code>JobEnvelope</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L257">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L314">
       
       (source)
     </a>
@@ -1277,7 +1389,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate reservation routing, timeout and retry eligibility.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Backend reservation containing routing metadata and attempt count.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link">orionis.queues.JobEnvelope</a></code></td><td class="fieldArgDesc">Decoded dispatch metadata and retry policy to match and enforce.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Accept a reservation that matches its envelope and retry limits.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueuePayloadError.html" class="internal-link">orionis.queues.exceptions.QueuePayloadError</a></code></td><td>If routing metadata differs or the attempt count is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If the timeout is missing or not shorter than worker <tt class="rst-docutils rst-literal">retry_after</tt>.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueRetryError.html" class="internal-link">orionis.queues.exceptions.QueueRetryError</a></code></td><td>If attempts exceed <tt class="rst-docutils rst-literal">max_tries</tt> or the retry deadline has expired.</td></tr></table></div>
+    <div><p>Validate reservation routing, timeout compatibility, and retry eligibility.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Reservation identifier, queue, and current attempt count.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.queues.JobEnvelope.html" class="internal-link">orionis.queues.JobEnvelope</a></code></td><td class="fieldArgDesc">Decoded routing, execution timeout, and retry policy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Accept matching routing, a valid attempt, and an eligible retry policy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueuePayloadError.html" class="internal-link">orionis.queues.exceptions.QueuePayloadError</a></code></td><td>If identifiers or routing differ, or the attempt count is invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If the timeout is missing or not strictly below worker <tt class="rst-docutils rst-literal">retry_after</tt>.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueRetryError.html" class="internal-link">orionis.queues.exceptions.QueueRetryError</a></code></td><td>If attempts exceed <tt class="rst-docutils rst-literal">max_tries</tt> or <tt class="rst-docutils rst-literal">retry_until</tt> has been reached.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1292,7 +1404,7 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">execute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reserved: <code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link" title="orionis.queues.entities.reserved_job.ReservedJob">ReservedJob</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">raise_errors: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L304">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L361">
       
       (source)
     </a>
@@ -1304,8 +1416,13 @@ If <tt class="rst-docutils rst-literal">None</tt>, terminal failures cannot be r
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.worker.IWorker.html#execute" class="internal-link">orionis.queues.contracts.worker.IWorker.execute</a></code></div>
-    <div><p>Execute a reserved job with isolated DI and lease-aware completion.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Backend reservation containing the payload, attempt count and lease.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Propagate execution errors and bypass automatic retries when true.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt acknowledgement, retry release or terminal failure recording.
-Skip expired reservations without executing their jobs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If cancelled, after attempting to release unfinished work.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If execution or completion fails and <tt class="rst-docutils rst-literal">raise_errors</tt> is true.</td></tr></table></div>
+    <div><p>Execute one leased job in an isolated scope and apply its lifecycle outcome.</p>
+<p>Limit handler execution to its configured timeout or 95% of the remaining
+lease, whichever is shorter.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reserved:</span><code><a href="orionis.queues.entities.reserved_job.ReservedJob.html" class="internal-link">orionis.queues.entities.reserved_job.ReservedJob</a></code></td><td class="fieldArgDesc">Backend reservation containing the payload, attempt count, and lease.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">raise<wbr></wbr>_errors:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Propagate the original execution or completion error and disable retries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Attempt acknowledgement, retry release, or terminal storage; skip
+expired reservations without invoking their jobs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If execution or failure observation is cancelled, after draining the
+release of unfinished work, including repeated cancellation.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If <tt class="rst-docutils rst-literal">raise_errors</tt> requests error propagation, or reporting an expired
+reservation itself fails.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1320,7 +1437,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">run</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">stop_when_empty: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">max_jobs: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L161">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L164">
       
       (source)
     </a>
@@ -1332,7 +1449,9 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.worker.IWorker.html#run" class="internal-link">orionis.queues.contracts.worker.IWorker.run</a></code></div>
-    <div><p>Consume jobs concurrently until a stopping condition is reached.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stop<wbr></wbr>_when<wbr></wbr>_empty:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Stop each consumer when no job is ready, even if delayed jobs remain.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_jobs:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">Limit reservations across all consumers; <tt class="rst-docutils rst-literal">None</tt> means no limit.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of processed reservations, including retried or failed jobs.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If already running or a supplied job limit is not a positive integer.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If cancelled, after in-flight consumers finish.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If a consumer fails, after the remaining consumers finish.</td></tr></table></div>
+    <div><p>Run concurrent consumers under shared stop and reservation limits.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">stop<wbr></wbr>_when<wbr></wbr>_empty:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Stop each consumer after an empty poll, even if delayed jobs remain.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_jobs:</span><code>int | None, <em>optional</em></code></td><td class="fieldArgDesc">Shared reservation cap, or <tt class="rst-docutils rst-literal">None</tt> for no job-count limit.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Number of processed reservations, including retries, handled failures,
+and skipped expired leases.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.queues.exceptions.QueueConfigurationError.html" class="internal-link">orionis.queues.exceptions.QueueConfigurationError</a></code></td><td>If already running or a supplied limit is not a positive, non-boolean
+integer.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If cancelled, after requesting a stop and draining active consumers.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If a consumer fails, after requesting a stop and joining its peers.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1347,7 +1466,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">stop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L150">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L153">
       
       (source)
     </a>
@@ -1359,7 +1478,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.queues.contracts.worker.IWorker.html#stop" class="internal-link">orionis.queues.contracts.worker.IWorker.stop</a></code></div>
-    <div><p>Request a graceful stop without waiting for active jobs.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Set the stop event; active consumers complete their current work.</td></tr></table></div>
+    <div><p>Signal consumers to stop after their in-flight reservations finish.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Set the shared stop event without waiting for active consumers.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1373,7 +1492,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L76">
       
       (source)
     </a>
@@ -1400,7 +1519,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L121">
       
       (source)
     </a>
@@ -1427,7 +1546,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_concurrency</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L128">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L131">
       
       (source)
     </a>
@@ -1454,7 +1573,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_connection</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L124">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L127">
       
       (source)
     </a>
@@ -1481,7 +1600,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_driver</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L120">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L123">
       
       (source)
     </a>
@@ -1508,7 +1627,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_failed</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L134">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L137">
       
       (source)
     </a>
@@ -1536,7 +1655,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_failed_resolver</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L139">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L142">
       
       (source)
     </a>
@@ -1563,7 +1682,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_processed</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L147">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L150">
       
       (source)
     </a>
@@ -1590,7 +1709,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_queues</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L126">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L129">
       
       (source)
     </a>
@@ -1617,7 +1736,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_retry_after</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L130">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L133">
       
       (source)
     </a>
@@ -1644,7 +1763,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_running</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L143">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L146">
       
       (source)
     </a>
@@ -1671,7 +1790,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_serializer</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L122">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L125">
       
       (source)
     </a>
@@ -1698,7 +1817,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_sleep</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L132">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L135">
       
       (source)
     </a>
@@ -1725,7 +1844,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_started</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L145">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L148">
       
       (source)
     </a>
@@ -1752,7 +1871,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="functionHeader">
     
     <span class="py-defname">_stop</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/queues/worker.py#L141">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/queues/worker.py#L144">
       
       (source)
     </a>
@@ -1778,7 +1897,7 @@ Skip expired reservations without executing their jobs.</td></tr></table><table 
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -214,6 +214,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_finishConnection" class="internal-link" title="orionis.realtime.runtime.HubRuntime._finishConnection">_finish<wbr></wbr>Connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_invoke" class="internal-link" title="orionis.realtime.runtime.HubRuntime._invoke">_invoke</a></code>
             </div>
         
@@ -355,7 +365,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25569"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25741"> 
                     
                 </input>
 
@@ -426,6 +436,16 @@
 
         
             <div class="itemName"><code><a href="#_disconnect" class="internal-link" title="orionis.realtime.runtime.HubRuntime._disconnect">_disconnect</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_finishConnection" class="internal-link" title="orionis.realtime.runtime.HubRuntime._finishConnection">_finish<wbr></wbr>Connection</a></code>
             </div>
         
 
@@ -643,7 +663,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HubRuntime</span>: <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L32" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.realtime.runtime.HubRuntime.__init__">HubRuntime(app, manager, hub, protocol)</a></code></p><p><a href="classIndex.html#orionis.realtime.runtime.HubRuntime">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HubRuntime</span>: <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L33" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.realtime.runtime.HubRuntime.__init__">HubRuntime(app, manager, hub, protocol)</a></code></p><p><a href="classIndex.html#orionis.realtime.runtime.HubRuntime">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -651,59 +671,64 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1815">
+          <table class="children sortable" id="id1827">
   
   
   <tr class="staticmethod">
     
     <td>Async Static Method</td>
     <td><code><a href="#_error" class="internal-link" title="orionis.realtime.runtime.HubRuntime._error">_error</a></code></td>
-    <td>Send a controlled error without exposing application exception text.</td>
+    <td>Send a sanitized terminal error with optional admission observation.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="orionis.realtime.runtime.HubRuntime.__init__">__init__</a></code></td>
-    <td>Compile trusted Hub metadata before accepting network messages.</td>
+    <td>Bind application services and compile a Hub's remote dispatch metadata.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#_bindContext" class="internal-link" title="orionis.realtime.runtime.HubRuntime._bindContext">_bind<wbr></wbr>Context</a></code></td>
-    <td>Publish connection primitives into an independent scope.</td>
+    <td>Bind connection state and targeting helpers into the supplied scope.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_buildHub" class="internal-link" title="orionis.realtime.runtime.HubRuntime._buildHub">_build<wbr></wbr>Hub</a></code></td>
-    <td>Construct a fresh Hub and attach its scoped connection primitives.</td>
+    <td>Build a Hub instance and attach connection-scoped client/group helpers.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_disconnect" class="internal-link" title="orionis.realtime.runtime.HubRuntime._disconnect">_disconnect</a></code></td>
-    <td>Run the final hook without allowing it to prevent socket cleanup.</td>
+    <td>Run the disconnect hook with a deadline, then close any open socket.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_finishConnection" class="internal-link" title="orionis.realtime.runtime.HubRuntime._finishConnection">_finish<wbr></wbr>Connection</a></code></td>
+    <td>Finalize connection work while preserving an escaping primary failure.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_invoke" class="internal-link" title="orionis.realtime.runtime.HubRuntime._invoke">_invoke</a></code></td>
-    <td>Execute one remote method inside its own contextvars-backed scope.</td>
+    <td>Execute one remote method with isolated dependencies and authentication.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_receive" class="internal-link" title="orionis.realtime.runtime.HubRuntime._receive">_receive</a></code></td>
-    <td>Keep the sole reader available while invocations execute concurrently.</td>
+    <td>Read Hub messages while admitted invocations execute concurrently.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_startInvocation" class="internal-link" title="orionis.realtime.runtime.HubRuntime._startInvocation">_start<wbr></wbr>Invocation</a></code></td>
-    <td>Validate admission before allocating an invocation task.</td>
+    <td>Admit a validated client invocation or send a controlled rejection.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_stream" class="internal-link" title="orionis.realtime.runtime.HubRuntime._stream">_stream</a></code></td>
-    <td>Deliver each item before advancing the producer and close its iterator.</td>
+    <td>Deliver stream items with send backpressure and close the source iterator.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#serve" class="internal-link" title="orionis.realtime.runtime.HubRuntime.serve">serve</a></code></td>
-    <td>Run one Hub connection and release all resources before returning.</td>
+    <td>Serve one scoped Hub connection and finalize its owned work.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
@@ -754,8 +779,8 @@
   <div class="functionHeader">
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_error</span><span class="function-signature long-signature">(<span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code>, </span><span class="rst-sig-param">invocation_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">code: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">streaming: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L459">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_error</span><span class="function-signature long-signature">(<span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code>, </span><span class="rst-sig-param">invocation_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">code: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">streaming: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">observed: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L612">
       
       (source)
     </a>
@@ -767,8 +792,8 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Send a controlled error without exposing application exception text.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Response destination.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">invocation<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Previously validated correlation ID.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">code:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Stable error classification.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">streaming:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Whether to terminate a stream instead of a scalar invocation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Release active invocation ownership and send a terminal error, or
-skip delivery when the connection is closing or already closed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ConnectionError" class="intersphinx-link">ConnectionError</a></code></td><td>If connection cleanup starts before the write acquires ownership.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If terminal error delivery is cancelled.</td></tr></table></div>
+    <div><p>Send a sanitized terminal error with optional admission observation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Destination connection and failure-observation runtime.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">invocation<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Validated identifier used for response and incident correlation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">code:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Stable classification controlling the public error code and safe message.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">streaming:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Terminate a stream instead of a scalar invocation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">observed:</span><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>, <em>optional</em></code></td><td class="fieldArgDesc">Suppress duplicate admission observation for an already reported failure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Send the terminal envelope after releasing any ID owned by the current
+task; skip writes to a closing or closed connection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ConnectionError" class="intersphinx-link">ConnectionError</a></code></td><td>If connection shutdown starts before the write acquires ownership.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the terminal delivery wait is cancelled.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -783,7 +808,7 @@ skip delivery when the connection is closing or already closed.</td></tr></table
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">manager: <code>IConnectionManager</code>, </span><span class="rst-sig-param">hub: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Hub]</code>, </span><span class="rst-sig-param">protocol: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">json</span><span class="rst-variable-quote">'</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L39">
       
       (source)
     </a>
@@ -795,7 +820,7 @@ skip delivery when the connection is closing or already closed.</td></tr></table
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Compile trusted Hub metadata before accepting network messages.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Existing application and dependency container.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">manager:</span><code><a href="orionis.realtime.contracts.IConnectionManager.html" class="internal-link">orionis.realtime.contracts.IConnectionManager</a></code></td><td class="fieldArgDesc">Shared worker-local registry and targeting service.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hub:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link">orionis.realtime.Hub</a>]</code></td><td class="fieldArgDesc">Application-declared Hub class.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">protocol:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">JSON or MessagePack selected by the route.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store runtime dependencies and compile dispatch and codec metadata.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If the Hub class, remote descriptors or annotations are unsupported.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If remote names, aliases, protocol or message size are invalid.</td></tr></table></div>
+    <div><p>Bind application services and compile a Hub's remote dispatch metadata.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Existing application used for dependency resolution and scoped execution.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">manager:</span><code><a href="orionis.realtime.contracts.IConnectionManager.html" class="internal-link" title="orionis.realtime.contracts.IConnectionManager">orionis.realtime.contracts.manager.IConnectionManager</a></code></td><td class="fieldArgDesc">Shared connection registry and client-targeting service.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hub:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.realtime.Hub.html" class="internal-link">orionis.realtime.Hub</a>]</code></td><td class="fieldArgDesc">Hub class whose remote methods and lifecycle hooks should run.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">protocol:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <em>optional</em></code></td><td class="fieldArgDesc">Route-selected JSON or MessagePack codec name.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store services and compile the Hub method table and selected codec.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If Hub metadata, remote descriptors, or type annotations are unsupported.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If remote names, aliases, protocol, or message-size settings are invalid.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -810,7 +835,7 @@ skip delivery when the connection is closing or already closed.</td></tr></table
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_bindContext</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">scope: <code><a href="orionis.container.context.manager.ScopeManager.html" class="internal-link" title="orionis.container.context.manager.ScopeManager">ScopeManager</a></code>, </span><span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L81">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L82">
       
       (source)
     </a>
@@ -822,8 +847,8 @@ skip delivery when the connection is closing or already closed.</td></tr></table
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Publish connection primitives into an independent scope.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code><a href="orionis.container.context.manager.ScopeManager.html" class="internal-link">orionis.container.context.manager.ScopeManager</a></code></td><td class="fieldArgDesc">Active connection or invocation scope.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Owner of network state.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register the socket, context, connection, client and group proxies,
-and HTTP kernel marker in the supplied scope.</td></tr></table></div>
+    <div><p>Bind connection state and targeting helpers into the supplied scope.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">scope:</span><code><a href="orionis.container.context.manager.ScopeManager.html" class="internal-link">orionis.container.context.manager.ScopeManager</a></code></td><td class="fieldArgDesc">Active connection or invocation dependency scope to populate.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection supplying the socket, identity, and Hub namespace.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register socket, context, connection, client/group helpers, and the HTTP
+kernel marker.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -838,7 +863,7 @@ and HTTP kernel marker in the supplied scope.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_buildHub</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code></span>) -&gt; <code>Hub</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L109">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L110">
       
       (source)
     </a>
@@ -850,7 +875,7 @@ and HTTP kernel marker in the supplied scope.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Construct a fresh Hub and attach its scoped connection primitives.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection used for lifecycle and client targeting.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.Hub.html" class="internal-link">orionis.realtime.Hub</a></code></td><td class="fieldArgDesc">Fresh instance with constructor injection resolved.</td></tr></table></div>
+    <div><p>Build a Hub instance and attach connection-scoped client/group helpers.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection supplying lifecycle context and client targeting.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.Hub.html" class="internal-link">orionis.realtime.Hub</a></code></td><td class="fieldArgDesc">Hub with constructor dependencies, context, clients, and groups bound.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -865,7 +890,7 @@ and HTTP kernel marker in the supplied scope.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_disconnect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code>, </span><span class="rst-sig-param">code: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">reason: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L202">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L279">
       
       (source)
     </a>
@@ -877,8 +902,36 @@ and HTTP kernel marker in the supplied scope.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Run the final hook without allowing it to prevent socket cleanup.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Already unregistered connection.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">code:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Observed or locally selected closure code.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reason:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Peer reason where available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Bound the disconnect hook to five seconds, log hook failures and
-close the socket if it remains open.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the final hook or socket closure is cancelled.</td></tr></table></div>
+    <div><p>Run the disconnect hook with a deadline, then close any open socket.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection already removed from the manager's registry.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">code:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Status supplied to the hook and normalized for the outbound close frame.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reason:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Reason supplied to <tt class="rst-docutils rst-literal">onDisconnect</tt>, not sent in the close frame.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Bound the hook to five seconds, observe ordinary hook failures, and
+close an open socket with an admissible wire status.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the hook or socket closure is cancelled.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If socket closure or another unhandled disconnect operation fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.realtime.runtime.HubRuntime._finishConnection">
+    
+  </a>
+  <a name="_finishConnection">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_finishConnection</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code>, </span><span class="rst-sig-param">code: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">reason: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">original: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L223">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_finishConnection" title="orionis.realtime.runtime.HubRuntime._finishConnection">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Finalize connection work while preserving an escaping primary failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection whose work, registration, and disconnect hook need cleanup.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">code:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Selected close status passed to disconnect handling.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">reason:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Peer or local close reason supplied to the disconnect hook.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">original:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Failure already escaping from the connection body, if any.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Join owned cleanup, unregister the connection, and run disconnect handling.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If finalization fails; preserve <tt class="rst-docutils rst-literal">original</tt> when present, otherwise
+keep a prior cleanup failure primary over a later close failure.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -893,7 +946,7 @@ close the socket if it remains open.</td></tr></table><table class="fieldTable">
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_invoke</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code>, </span><span class="rst-sig-param">method: <code><a href="orionis.realtime.metadata.RemoteMethod.html" class="internal-link" title="orionis.realtime.metadata.RemoteMethod">RemoteMethod</a></code>, </span><span class="rst-sig-param">envelope: <code><a href="orionis.realtime.protocol.Invoke.html" class="internal-link" title="orionis.realtime.protocol.Invoke">Invoke</a></code>, </span><span class="rst-sig-param">auth: <code>AuthenticationContext</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L335">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L427">
       
       (source)
     </a>
@@ -905,8 +958,12 @@ close the socket if it remains open.</td></tr></table><table class="fieldTable">
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Execute one remote method inside its own contextvars-backed scope.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Owner of tasks and response delivery.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="orionis.realtime.metadata.RemoteMethod.html" class="internal-link">orionis.realtime.metadata.RemoteMethod</a></code></td><td class="fieldArgDesc">Boot-compiled callable and binding metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.realtime.protocol.Invoke.html" class="internal-link">orionis.realtime.protocol.Invoke</a></code></td><td class="fieldArgDesc">Validated client values, never executable metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">auth:</span><code><a href="orionis.auth.context.AuthenticationContext.html" class="internal-link">orionis.auth.context.AuthenticationContext</a></code></td><td class="fieldArgDesc">Fresh authentication context with independent authorization cache.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Resolve dependencies, execute the method and send its result or a
-sanitized error after invocation-scope cleanup.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the invocation is cancelled after attempting its error response.</td></tr></table></div>
+    <div><p>Execute one remote method with isolated dependencies and authentication.</p>
+<p>Defer terminal delivery until producer cleanup and invocation-scope exit
+have run.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Owner of invocation tasks and response delivery.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">method:</span><code><a href="orionis.realtime.metadata.RemoteMethod.html" class="internal-link">orionis.realtime.metadata.RemoteMethod</a></code></td><td class="fieldArgDesc">Compiled method, argument bindings, and dependency metadata.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.realtime.protocol.Invoke.html" class="internal-link">orionis.realtime.protocol.Invoke</a></code></td><td class="fieldArgDesc">Validated client values and optional invocation timeout.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">auth:</span><code><a href="orionis.auth.context.AuthenticationContext.html" class="internal-link">orionis.auth.context.AuthenticationContext</a></code></td><td class="fieldArgDesc">Forked authentication state with an independent authorization cache.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Send scalar completion, stream termination, or a sanitized failure
+after exiting the invocation scope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the invocation is cancelled, after attempting its terminal response.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If terminal delivery, cleanup, or unhandled control flow escapes the
+invocation boundary.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -921,7 +978,7 @@ sanitized error after invocation-scope cleanup.</td></tr></table><table class="f
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_receive</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L243">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L334">
       
       (source)
     </a>
@@ -933,7 +990,7 @@ sanitized error after invocation-scope cleanup.</td></tr></table><table class="f
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Keep the sole reader available while invocations execute concurrently.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Ready connection with finite owned task registries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Peer close code and reason, or (1000, "") when local reading stops.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.ProtocolError.html" class="internal-link">orionis.realtime.errors.ProtocolError</a></code></td><td>If decoding fails or an active invocation identifier is reused.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.WebSocketDisconnected.html" class="internal-link">orionis.http.WebSocketDisconnected</a></code></td><td>If socket operations report a disconnected peer.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the connection reader is cancelled.</td></tr></table></div>
+    <div><p>Read Hub messages while admitted invocations execute concurrently.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Ready connection whose socket this method owns as the sole reader.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Peer disconnect code and reason, or <tt class="rst-docutils rst-literal">(1000, "")</tt> when local reading ends.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.ProtocolError.html" class="internal-link">orionis.realtime.errors.ProtocolError</a></code></td><td>If decoding fails or an active invocation ID is reused.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.http.WebSocketDisconnected.html" class="internal-link">orionis.http.WebSocketDisconnected</a></code></td><td>If socket operations report peer disconnection.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the connection's reader task is cancelled.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -948,7 +1005,7 @@ sanitized error after invocation-scope cleanup.</td></tr></table><table class="f
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_startInvocation</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code>, </span><span class="rst-sig-param">envelope: <code><a href="orionis.realtime.protocol.Invoke.html" class="internal-link" title="orionis.realtime.protocol.Invoke">Invoke</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L281">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L372">
       
       (source)
     </a>
@@ -960,7 +1017,8 @@ sanitized error after invocation-scope cleanup.</td></tr></table><table class="f
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate admission before allocating an invocation task.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection owning the invocation ID namespace.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.realtime.protocol.Invoke.html" class="internal-link">orionis.realtime.protocol.Invoke</a></code></td><td class="fieldArgDesc">Structurally validated client invocation.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register an admitted invocation task or send a controlled rejection.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.ProtocolError.html" class="internal-link">orionis.realtime.errors.ProtocolError</a></code></td><td>If an active invocation ID is reused.</td></tr></table></div>
+    <div><p>Admit a validated client invocation or send a controlled rejection.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection owning invocation IDs, task capacity, and client delivery.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">envelope:</span><code><a href="orionis.realtime.protocol.Invoke.html" class="internal-link">orionis.realtime.protocol.Invoke</a></code></td><td class="fieldArgDesc">Decoded invocation to check against compiled methods and limits.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Register a task with forked authentication state, or send a rejection
+for method, concurrency, timeout, or context failures.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.realtime.errors.ProtocolError.html" class="internal-link">orionis.realtime.errors.ProtocolError</a></code></td><td>If the client reuses an active invocation ID.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -975,7 +1033,7 @@ sanitized error after invocation-scope cleanup.</td></tr></table><table class="f
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_stream</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link" title="orionis.realtime.connection.RealtimeConnection">RealtimeConnection</a></code>, </span><span class="rst-sig-param">invocation_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">source: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">AsyncIterable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L417">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L553">
       
       (source)
     </a>
@@ -987,8 +1045,9 @@ sanitized error after invocation-scope cleanup.</td></tr></table><table class="f
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Deliver each item before advancing the producer and close its iterator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection providing natural send backpressure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">invocation<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Correlation ID selected at admission.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">source:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">collections.abc.AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Application-produced asynchronous stream.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Send correlated stream items and await iterator closure when an
-<tt class="rst-docutils rst-literal">aclose</tt> method is available.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code>TypeError, ValueError</code></td><td>If a stream item cannot be encoded by the selected codec.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ConnectionError" class="intersphinx-link">ConnectionError</a></code></td><td>If connection cleanup has started during delivery.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If streaming is cancelled while producing, sending or closing.</td></tr></table></div>
+    <div><p>Deliver stream items with send backpressure and close the source iterator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.realtime.connection.RealtimeConnection.html" class="internal-link">orionis.realtime.connection.RealtimeConnection</a></code></td><td class="fieldArgDesc">Connection whose serialized writes govern producer backpressure.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">invocation<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Invocation identifier attached to each stream item.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">source:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterable" class="intersphinx-link">collections.abc.AsyncIterable</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Application-produced iterable whose iterator owns streaming cleanup.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish ordered item delivery and invoke the iterator's optional
+asynchronous close hook.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If iteration, encoding, delivery, or cleanup fails, including
+cancellation. Preserve the primary failure if cleanup also fails.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1003,7 +1062,7 @@ sanitized error after invocation-scope cleanup.</td></tr></table><table class="f
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">serve</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">socket: <code><a href="orionis.http.WebSocket.html" class="internal-link" title="orionis.http.WebSocket">WebSocket</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L129">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L130">
       
       (source)
     </a>
@@ -1015,8 +1074,8 @@ sanitized error after invocation-scope cleanup.</td></tr></table><table class="f
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Run one Hub connection and release all resources before returning.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">socket:</span><code><a href="orionis.http.WebSocket.html" class="internal-link">orionis.http.WebSocket</a></code></td><td class="fieldArgDesc">Socket already registered in a kernel connection scope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Run connection hooks and message handling, then release owned work,
-registry membership and socket resources.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If called without the application's active connection scope.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If the connection owner is cancelled without a recorded failure.</td></tr></table></div>
+    <div><p>Serve one scoped Hub connection and finalize its owned work.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">socket:</span><code><a href="orionis.http.WebSocket.html" class="internal-link">orionis.http.WebSocket</a></code></td><td class="fieldArgDesc">WebSocket already bound to the application's active connection scope.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Run connection hooks and message dispatch, then remove registry ownership
+and close the socket.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#RuntimeError" class="intersphinx-link">RuntimeError</a></code></td><td>If the application has no active connection scope.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If owner cancellation is not replaced by a recorded fatal task failure.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If a fatal child, connection hook, or finalization failure escapes.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1030,7 +1089,7 @@ registry membership and socket resources.</td></tr></table><table class="fieldTa
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L36">
       
       (source)
     </a>
@@ -1057,7 +1116,7 @@ registry membership and socket resources.</td></tr></table><table class="fieldTa
   <div class="functionHeader">
     
     <span class="py-defname">_app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L69">
       
       (source)
     </a>
@@ -1084,7 +1143,7 @@ registry membership and socket resources.</td></tr></table><table class="fieldTa
   <div class="functionHeader">
     
     <span class="py-defname">_dispatch</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L75">
       
       (source)
     </a>
@@ -1111,7 +1170,7 @@ registry membership and socket resources.</td></tr></table><table class="fieldTa
   <div class="functionHeader">
     
     <span class="py-defname">_hub</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L72">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L73">
       
       (source)
     </a>
@@ -1138,7 +1197,7 @@ registry membership and socket resources.</td></tr></table><table class="fieldTa
   <div class="functionHeader">
     
     <span class="py-defname">_manager</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L71">
       
       (source)
     </a>
@@ -1165,7 +1224,7 @@ registry membership and socket resources.</td></tr></table><table class="fieldTa
   <div class="functionHeader">
     
     <span class="py-defname">_protocol</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/realtime/runtime.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/realtime/runtime.py#L77">
       
       (source)
     </a>
@@ -1191,7 +1250,7 @@ registry membership and socket resources.</td></tr></table><table class="fieldTa
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

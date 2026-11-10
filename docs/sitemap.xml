@@ -1921,6 +1921,21 @@
     <loc>https://api.orionis-framework.com/orionis.failure.contracts.ICatch.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.entities.context.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.entities.FailureContext.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.entities.FailureHandling.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.entities.FailureReceipt.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.entities.handling.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.failure.entities.html</loc>
   </url>
   <url>
@@ -1946,6 +1961,24 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.failure.provider.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.runtime._BorrowedOperation.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.runtime._InactiveOperation.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.runtime._Incident.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.runtime._Operation.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.runtime.FailureRuntime.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.runtime.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.foundation.application.html</loc>
@@ -2906,6 +2939,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.http.adapters.websocket.contracts.transport.IWebSocketTransport.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.http.adapters.websocket.failure.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.http.adapters.websocket.html</loc>
@@ -4334,6 +4370,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.mcp.provider.McpProvider.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.mcp.reporting.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.mcp.Resource.html</loc>
@@ -6509,6 +6548,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.test.provider.TestingProvider.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.view._failures.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.view.cache.html</loc>

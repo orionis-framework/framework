@@ -215,7 +215,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15641"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15795"> 
                     
                 </input>
 
@@ -287,11 +287,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15642"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15796"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId15642">
+                <label class="lbl-toggle" for="expandableItemId15796">
                     
                     
                 </label>
@@ -338,6 +338,16 @@
 
         
             <div class="itemName"><code><a href="orionis.mcp.streams.OwnedStream.html#__init__" class="internal-link" title="orionis.mcp.streams.OwnedStream.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.streams.OwnedStream.html#_close" class="internal-link" title="orionis.mcp.streams.OwnedStream._close">_close</a></code>
             </div>
         
 
@@ -437,8 +447,21 @@
     </li>
 </ul>
 
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.streams.html#_caller_cancelled" class="internal-link" title="orionis.mcp.streams._caller_cancelled">_caller<wbr></wbr>_cancelled</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -502,7 +525,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AsyncClosable</span>(<a href="https://docs.python.org/3/library/typing.html#typing.Protocol" class="intersphinx-link">Protocol</a>): <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L8" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.mcp.streams.OwnedStream.html" class="internal-link">orionis.mcp.streams.OwnedStream</a></code>, <code><a href="orionis.mcp.subscriptions.event_bus._Subscription.html" class="internal-link">orionis.mcp.subscriptions.event_bus._Subscription</a></code>, <code><a href="orionis.mcp.transport.http._EventFrames.html" class="internal-link">orionis.mcp.transport.http._EventFrames</a></code></p><p><a href="classIndex.html#orionis.mcp.streams.AsyncClosable">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AsyncClosable</span>(<a href="https://docs.python.org/3/library/typing.html#typing.Protocol" class="intersphinx-link">Protocol</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L30" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.mcp.streams.OwnedStream.html" class="internal-link">orionis.mcp.streams.OwnedStream</a></code>, <code><a href="orionis.mcp.subscriptions.event_bus._Subscription.html" class="internal-link">orionis.mcp.subscriptions.event_bus._Subscription</a></code>, <code><a href="orionis.mcp.transport.http._EventFrames.html" class="internal-link">orionis.mcp.transport.http._EventFrames</a></code></p><p><a href="classIndex.html#orionis.mcp.streams.AsyncClosable">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -510,14 +533,14 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1493">
+          <table class="children sortable" id="id1505">
   
   
   <tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#aclose" class="internal-link" title="orionis.mcp.streams.AsyncClosable.aclose">aclose</a></code></td>
-    <td>Release the resources owned by this source.</td>
+    <td>Release the resources owned by an asynchronous source.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
@@ -544,7 +567,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">aclose</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L36">
       
       (source)
     </a>
@@ -556,7 +579,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.mcp.streams.OwnedStream.html" class="internal-link">orionis.mcp.streams.OwnedStream</a></code>, <code><a href="orionis.mcp.subscriptions.event_bus._Subscription.html" class="internal-link">orionis.mcp.subscriptions.event_bus._Subscription</a></code>, <code><a href="orionis.mcp.transport.http._EventFrames.html" class="internal-link">orionis.mcp.transport.http._EventFrames</a></code></div>
-    <div><p>Release the resources owned by this source.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The source has completed its close operation.</td></tr></table></div>
+    <div><p>Release the resources owned by an asynchronous source.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the source's asynchronous cleanup contract.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -570,7 +593,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L11">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L33">
       
       (source)
     </a>
@@ -596,7 +619,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -194,6 +194,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_close" class="internal-link" title="orionis.mcp.streams.OwnedStream._close">_close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_closeOwned" class="internal-link" title="orionis.mcp.streams.OwnedStream._closeOwned">_close<wbr></wbr>Owned</a></code>
             </div>
         
@@ -295,11 +305,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15643"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15797"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId15643">
+                <label class="lbl-toggle" for="expandableItemId15797">
                     
                     
                 </label>
@@ -367,7 +377,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15644"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15798"> 
                     
                 </input>
 
@@ -418,6 +428,16 @@
 
         
             <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.mcp.streams.OwnedStream.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_close" class="internal-link" title="orionis.mcp.streams.OwnedStream._close">_close</a></code>
             </div>
         
 
@@ -517,8 +537,21 @@
     </li>
 </ul>
 
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.mcp.streams.html#_caller_cancelled" class="internal-link" title="orionis.mcp.streams._caller_cancelled">_caller<wbr></wbr>_cancelled</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -582,7 +615,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">OwnedStream</span>(<a href="orionis.mcp.streams.AsyncClosable.html" class="internal-link" title="orionis.mcp.streams.AsyncClosable">AsyncClosable</a>): <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L25" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mcp.streams.OwnedStream.__init__">OwnedStream(source, owner)</a></code></p><p><a href="classIndex.html#orionis.mcp.streams.OwnedStream">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">OwnedStream</span>(<a href="orionis.mcp.streams.AsyncClosable.html" class="internal-link" title="orionis.mcp.streams.AsyncClosable">AsyncClosable</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L47" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mcp.streams.OwnedStream.__init__">OwnedStream(source, owner)</a></code></p><p><a href="classIndex.html#orionis.mcp.streams.OwnedStream">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -590,34 +623,39 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1494">
+          <table class="children sortable" id="id1506">
   
   
   <tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__aiter__" class="internal-link" title="orionis.mcp.streams.OwnedStream.__aiter__">__aiter__</a></code></td>
-    <td>Return this single-consumer iterator.</td>
+    <td>Return this stream as its single-consumer asynchronous iterator.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#__anext__" class="internal-link" title="orionis.mcp.streams.OwnedStream.__anext__">__anext__</a></code></td>
-    <td>Advance one item and close when iteration ends for any reason.</td>
+    <td>Return the next source item and close on exhaustion or failure.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="orionis.mcp.streams.OwnedStream.__init__">__init__</a></code></td>
-    <td>Take ownership without advancing or buffering the source.</td>
+    <td>Take lazy ownership of a synchronous or asynchronous iterator.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#_close" class="internal-link" title="orionis.mcp.streams.OwnedStream._close">_close</a></code></td>
+    <td>Share cleanup while transferring its primary incident to the owned task.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#_closeOwned" class="internal-link" title="orionis.mcp.streams.OwnedStream._closeOwned">_close<wbr></wbr>Owned</a></code></td>
-    <td>Release a nested owner even when the outer iterator never started.</td>
+    <td>Close the source before releasing its nested owner.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
     <td><code><a href="#aclose" class="internal-link" title="orionis.mcp.streams.OwnedStream.aclose">aclose</a></code></td>
-    <td>Finish cleanup under repeated cancellation and close exactly once.</td>
+    <td>Await one shared cleanup task across repeated close calls.</td>
   </tr><tr class="classvariable">
     
     <td>Class Variable</td>
@@ -664,7 +702,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__aiter__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr>T]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L81">
       
       (source)
     </a>
@@ -676,7 +714,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return this single-consumer iterator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">collections.abc.AsyncIterator</a>[<tt class="rst-docutils rst-literal">T</tt>]</code></td><td class="fieldArgDesc">This single-consumer iterator.</td></tr></table></div>
+    <div><p>Return this stream as its single-consumer asynchronous iterator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">collections.abc.AsyncIterator</a>[<tt class="rst-docutils rst-literal">T</tt>]</code></td><td class="fieldArgDesc">This stream, without creating or advancing another iterator.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -691,7 +729,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__anext__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>T</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L92">
       
       (source)
     </a>
@@ -703,7 +741,9 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Advance one item and close when iteration ends for any reason.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">T</tt></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Return the next source item and close on exhaustion or failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">T</tt></code></td><td class="fieldArgDesc">Next value from the owned synchronous or asynchronous iterator.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#StopAsyncIteration" class="intersphinx-link">StopAsyncIteration</a></code></td><td>If the stream is closed or exhausted and cleanup succeeds.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If iteration or cleanup fails. Preserve an iteration failure when
+cleanup also fails; surface cleanup errors after normal exhaustion.
+Genuine caller cancellation propagates after cleanup is drained.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -718,7 +758,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">source: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr>T] | <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<wbr></wbr>T]</code>, </span><span class="rst-sig-param">owner: <code><a href="orionis.mcp.streams.OwnedStream.html" class="internal-link" title="orionis.mcp.streams.OwnedStream">OwnedStream</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L53">
       
       (source)
     </a>
@@ -730,7 +770,34 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Take ownership without advancing or buffering the source.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">source:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">collections.abc.AsyncIterator</a>[<tt class="rst-docutils rst-literal">T</tt>] | collections.abc.Iterator[<tt class="rst-docutils rst-literal">T</tt>]</code></td><td class="fieldArgDesc">Source whose values or lifecycle are consumed by this operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">owner:</span><code><a href="orionis.mcp.streams.OwnedStream.html" class="internal-link">orionis.mcp.streams.OwnedStream</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">owner</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Take lazy ownership of a synchronous or asynchronous iterator.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">source:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<tt class="rst-docutils rst-literal">T</tt>] or <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" class="intersphinx-link">Iterator</a>[<tt class="rst-docutils rst-literal">T</tt>]</code></td><td class="fieldArgDesc">Iterator whose values and cleanup lifecycle this stream owns.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">owner:</span><code><a href="orionis.mcp.streams.OwnedStream.html" class="internal-link">orionis.mcp.streams.OwnedStream</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Nested owner to close after this source, even if iteration never begins.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store source and owner without advancing either iterator.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.mcp.streams.OwnedStream._close">
+    
+  </a>
+  <a name="_close">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">parent_event_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L160">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_close" title="orionis.mcp.streams.OwnedStream._close">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Share cleanup while transferring its primary incident to the owned task.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parent<wbr></wbr>_event<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Producer incident associated with failures during resource closure.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Join the existing cleanup or start it once with causal metadata.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -744,8 +811,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_closeOwned</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L107">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_closeOwned</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">parent_event_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L179">
       
       (source)
     </a>
@@ -757,7 +824,11 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Release a nested owner even when the outer iterator never started.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Close the source before releasing its nested owner.</p>
+<p>Prefer <tt class="rst-docutils rst-literal">aclose</tt> over <tt class="rst-docutils rst-literal">close</tt> and release the owner even when source
+cleanup fails or iteration never started.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">parent<wbr></wbr>_event<wbr></wbr>_id:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Producer incident transferred without changing exception chains.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete available source hooks and nested-owner cleanup.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If either cleanup fails; retain the source failure as primary when
+both source and owner cleanup fail.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -772,7 +843,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">aclose</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L93">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L143">
       
       (source)
     </a>
@@ -784,7 +855,8 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.mcp.streams.AsyncClosable.html#aclose" class="internal-link">orionis.mcp.streams.AsyncClosable.aclose</a></code></div>
-    <div><p>Finish cleanup under repeated cancellation and close exactly once.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
+    <div><p>Await one shared cleanup task across repeated close calls.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Finish source and nested-owner cleanup without starting another task.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td>If cleanup fails, or if caller cancellation must propagate after
+cleanup has finished.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -798,7 +870,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L50">
       
       (source)
     </a>
@@ -825,7 +897,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_cleanup</span>: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L78">
       
       (source)
     </a>
@@ -852,7 +924,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_closed</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L76">
       
       (source)
     </a>
@@ -879,7 +951,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_owner</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L74">
       
       (source)
     </a>
@@ -906,7 +978,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_source</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/streams.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/streams.py#L72">
       
       (source)
     </a>
@@ -932,7 +1004,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

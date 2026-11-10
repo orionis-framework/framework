@@ -363,6 +363,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_reports" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport._reports">_reports</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_running" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport._running">_running</a></code>
             </div>
         
@@ -395,11 +405,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15784"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15940"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId15784">
+                <label class="lbl-toggle" for="expandableItemId15940">
                     
                     
                 </label>
@@ -454,11 +464,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15785"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15941"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId15785">
+                <label class="lbl-toggle" for="expandableItemId15941">
                     
                     
                 </label>
@@ -513,7 +523,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15786"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15942"> 
                     
                 </input>
 
@@ -742,6 +752,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_reports" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport._reports">_reports</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_running" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport._running">_running</a></code>
             </div>
         
@@ -828,7 +848,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpStdioTransport</span>: <a href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L62" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport.__init__">McpStdioTransport(app, compiled, config, bus)</a></code></p><p><a href="classIndex.html#orionis.mcp.transport.stdio.McpStdioTransport">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">McpStdioTransport</span>: <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L64" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport.__init__">McpStdioTransport(app, compiled, config, bus)</a></code></p><p><a href="classIndex.html#orionis.mcp.transport.stdio.McpStdioTransport">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -836,7 +856,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1515">
+          <table class="children sortable" id="id1527">
   
   
   <tr class="method">
@@ -937,6 +957,11 @@
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
+    <td><code><a href="#_reports" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport._reports">_reports</a></code></td>
+    <td>Failure delivery tasks owned until transport shutdown.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
     <td><code><a href="#_running" class="internal-link" title="orionis.mcp.transport.stdio.McpStdioTransport._running">_running</a></code></td>
     <td>Running flag used by <tt class="rst-docutils rst-literal">McpStdioTransport</tt>.</td>
   </tr>
@@ -960,7 +985,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">compiled: <code><a href="orionis.mcp.server.compiler.CompiledMcpServer.html" class="internal-link" title="orionis.mcp.server.compiler.CompiledMcpServer">CompiledMcpServer</a></code>, </span><span class="rst-sig-param">config: <code><a href="orionis.mcp.config.McpConfig.html" class="internal-link" title="orionis.mcp.config.McpConfig">McpConfig</a></code>, </span><span class="rst-sig-param">bus: <code><a href="orionis.mcp.contracts.event_bus.IMcpEventBus.html" class="internal-link" title="orionis.mcp.contracts.event_bus.IMcpEventBus">IMcpEventBus</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L81">
       
       (source)
     </a>
@@ -987,7 +1012,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_accept</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code>, </span><span class="rst-sig-param">writer: <code><a href="orionis.mcp.transport.stdio.LineWriter.html" class="internal-link" title="orionis.mcp.transport.stdio.LineWriter">LineWriter</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L244">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L294">
       
       (source)
     </a>
@@ -1014,7 +1039,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_cancel</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L220">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L262">
       
       (source)
     </a>
@@ -1041,7 +1066,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_done</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">task: <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L198">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L233">
       
       (source)
     </a>
@@ -1068,7 +1093,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_invoke</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code><a href="orionis.mcp.protocol.requests.JsonRpcRequest.html" class="internal-link" title="orionis.mcp.protocol.requests.JsonRpcRequest">JsonRpcRequest</a></code>, </span><span class="rst-sig-param">writer: <code><a href="orionis.mcp.transport.stdio.LineWriter.html" class="internal-link" title="orionis.mcp.transport.stdio.LineWriter">LineWriter</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L169">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L190">
       
       (source)
     </a>
@@ -1095,7 +1120,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_readLoop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reader: <code><a href="orionis.mcp.transport.stdio.LineReader.html" class="internal-link" title="orionis.mcp.transport.stdio.LineReader">LineReader</a></code>, </span><span class="rst-sig-param">writer: <code><a href="orionis.mcp.transport.stdio.LineWriter.html" class="internal-link" title="orionis.mcp.transport.stdio.LineWriter">LineWriter</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L283">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L337">
       
       (source)
     </a>
@@ -1122,7 +1147,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_stream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">writer: <code><a href="orionis.mcp.transport.stdio.LineWriter.html" class="internal-link" title="orionis.mcp.transport.stdio.LineWriter">LineWriter</a></code>, </span><span class="rst-sig-param">source: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.AsyncIterator" class="intersphinx-link">AsyncIterator</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L145">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L150">
       
       (source)
     </a>
@@ -1149,7 +1174,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_write</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">writer: <code><a href="orionis.mcp.transport.stdio.LineWriter.html" class="internal-link" title="orionis.mcp.transport.stdio.LineWriter">LineWriter</a></code>, </span><span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L123">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L128">
       
       (source)
     </a>
@@ -1176,7 +1201,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">run</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">reader: <code><a href="orionis.mcp.transport.stdio.LineReader.html" class="internal-link" title="orionis.mcp.transport.stdio.LineReader">LineReader</a></code>, </span><span class="rst-sig-param">writer: <code><a href="orionis.mcp.transport.stdio.LineWriter.html" class="internal-link" title="orionis.mcp.transport.stdio.LineWriter">LineWriter</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L325">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L379">
       
       (source)
     </a>
@@ -1203,7 +1228,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">runStandardStreams</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L363">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L437">
       
       (source)
     </a>
@@ -1229,7 +1254,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L67">
       
       (source)
     </a>
@@ -1256,7 +1281,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_active</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L113">
       
       (source)
     </a>
@@ -1283,7 +1308,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_app</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L107">
       
       (source)
     </a>
@@ -1310,7 +1335,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_closing</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L118">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L123">
       
       (source)
     </a>
@@ -1337,7 +1362,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_config</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L106">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L109">
       
       (source)
     </a>
@@ -1364,7 +1389,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_dispatcher</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L111">
       
       (source)
     </a>
@@ -1391,7 +1416,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_failed</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L114">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L117">
       
       (source)
     </a>
@@ -1418,7 +1443,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_failure</span>: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L116">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L119">
       
       (source)
     </a>
@@ -1445,7 +1470,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L112">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L115">
       
       (source)
     </a>
@@ -1463,6 +1488,33 @@
 </div><div class="baseinstancevariable">
   
   
+  <a name="orionis.mcp.transport.stdio.McpStdioTransport._reports">
+    
+  </a>
+  <a name="_reports">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_reports</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#set" class="intersphinx-link">set</a>[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L121">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_reports" title="orionis.mcp.transport.stdio.McpStdioTransport._reports">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Failure delivery tasks owned until transport shutdown.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
   <a name="orionis.mcp.transport.stdio.McpStdioTransport._running">
     
   </a>
@@ -1472,7 +1524,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_running</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/cdb7f8478088171dec64e1e908d982057286c9c1/orionis/mcp/transport/stdio.py#L120">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/transport/stdio.py#L125">
       
       (source)
     </a>
@@ -1498,7 +1550,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 11:00:41.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

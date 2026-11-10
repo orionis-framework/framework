@@ -256,12 +256,28 @@ class FormData(IFormData):
         Returns
         -------
         None
-            Always returns ``None``.
+            Release every upload, including those following a failed close.
+
+        Raises
+        ------
+        Exception
+            The original close failure when only one upload fails.
+        ExceptionGroup
+            All original close failures when more than one upload fails.
         """
         # Skip plain strings; only UploadedFile instances need closing.
+        failures: list[Exception] = []
         for _, v in self._items:
             if not isinstance(v, str):
-                v.close()
+                try:
+                    v.close()
+                except Exception as error:  # noqa: BLE001 - Re-raise after closing all.
+                    failures.append(error)
+        if len(failures) == 1:
+            raise failures[0]
+        if failures:
+            message = "Uploaded file cleanup failed"
+            raise ExceptionGroup(message, failures)
 
     # Context manager entry returning this instance
     def __enter__(self) -> Self:

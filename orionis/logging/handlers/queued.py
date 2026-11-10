@@ -82,7 +82,9 @@ class _Listener(QueueListener):
     error: Exception | None = None
     """First error retained while background work continues to drain."""
     app: object | None = None
+    """Application owning the sink and its failure policy."""
     runtime: FailureRuntime | None = None
+    """Prepared coordinator retained for deliveries outside a request context."""
 
     def handle(self: Self, record: logging.LogRecord) -> None:
         """

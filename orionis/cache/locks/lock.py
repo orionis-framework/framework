@@ -6,6 +6,7 @@ import sys
 import uuid
 from typing import TYPE_CHECKING, Any, Self
 from weakref import WeakValueDictionary
+from orionis.support.concurrency import complete_on_cancel
 
 if TYPE_CHECKING:
     import types
@@ -180,18 +181,35 @@ class CacheLock:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            Drain the release and preserve a failure from the protected body.
+
+        Raises
+        ------
+        Exception
+            If release fails without an earlier protected-operation failure.
         """
-        if _is_backend(
-            self._backend, "orionis.cache.stores.file", "FileCacheBackend",
-        ):
-            if isinstance(self._impl, asyncio.Lock):
-                self._impl.release()
-                self._impl = None
-        elif _is_backend(
-            self._backend, "orionis.cache.stores.database", "DatabaseCacheBackend",
-        ):
-            if self._owner is not None:
-                await self._backend.releaseLock(self._key, self._owner)
-        elif self._impl is not None:
-            await self._impl.__aexit__(exc_type, exc_val, exc_tb)
+        try:
+            if _is_backend(
+                self._backend, "orionis.cache.stores.file", "FileCacheBackend",
+            ):
+                if isinstance(self._impl, asyncio.Lock):
+                    self._impl.release()
+                    self._impl = None
+            elif _is_backend(
+                self._backend, "orionis.cache.stores.database", "DatabaseCacheBackend",
+            ):
+                if self._owner is not None:
+                    await complete_on_cancel(
+                        self._backend.releaseLock(self._key, self._owner),
+                    )
+            elif self._impl is not None:
+                await complete_on_cancel(
+                    self._impl.__aexit__(exc_type, exc_val, exc_tb),
+                )
+        except Exception as cleanup_error:
+            if exc_val is None:
+                raise
+            from orionis.failure.runtime import capture
+            await capture(exc_val, flow="cache", phase="execution")
+            await capture(cleanup_error, flow="cache", phase="cleanup",
+                          operation="lock.release")

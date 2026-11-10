@@ -17,6 +17,22 @@ class IHttpEndpointPolicy(ABC):
     monitor_disconnects: ClassVar[bool] = False
     """Monitor disconnects flag used by ``IHttpEndpointPolicy``."""
 
+    def isExpectedFailure(self, exception: Exception) -> bool:  # noqa: ARG002
+        """
+        Classify a protocol rejection before global failure observation.
+
+        Parameters
+        ----------
+        exception : Exception
+            Original exception that the endpoint will translate.
+
+        Returns
+        -------
+        bool
+            False unless the policy recognizes an expected client failure.
+        """
+        return False
+
     @abstractmethod
     def before(self, adapter: TransportAdapter) -> Response | None:
         """

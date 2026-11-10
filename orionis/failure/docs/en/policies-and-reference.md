@@ -43,6 +43,10 @@ The handler selects callbacks and returns the plan. Runtime reporting protection
 
 `capture`, `capture_result`, and `operation` are available from `orionis.failure.runtime`. Capture requires an active post-startup runtime. Owners explicitly notify failures and retain their response, retry, recovery, and propagation behavior. A custom result plan may log, but `capture_result` does not replace the original result or render automatically.
 
+When cleanup crosses a task boundary, an owner may pass the original receipt's
+`event_id` as `capture(..., parent_event_id=...)`. This preserves causal incident
+metadata without changing the secondary exception's Python cause or context.
+
 ## Configuration and defaults
 
 There is no dedicated configuration file. Register the handler class through `app.withExceptionHandler(...)` before `create()`. The base HTTP policy reads `app.debug`:
@@ -61,6 +65,7 @@ Known exceptions map to 401 authentication, 403 authorization, 404 route not fou
 - Missing scope or `kernel` raises `RuntimeError` in `Catch.exception()`; use capture for observation without a scope.
 - Pass the live request or adapter for HTTP presentation. The base plan has no HTTP output without it.
 - The runtime protects hook execution and deferred logging with recursion checks, a cooperative timeout, and a bounded stderr fallback. Reporting failure can degrade delivery while allowing presentation.
+- Presentation requested through `Catch` uses the same cooperative timeout and reentry guard. A failed or internally cancelled presenter is diagnosed once on stderr and propagates the primary failure without replacing its cause. Genuine caller cancellation still propagates. Output that may have partially completed is never retried; subsequent calls reuse the failed plan.
 - Cancellation, `KeyboardInterrupt`, `SystemExit`, and `GeneratorExit` are not converted into server failures.
 - Before activation, capture returns `None`. `create()` alone does not activate the runtime, and failures before successful startup are outside the coverage guarantee.
 - External code that consumes exceptions must notify explicitly. Orionis installs no global Python exception hooks for arbitrary external execution.

@@ -114,7 +114,7 @@ class ConnectionManager(IConnectionManager):
 
         Parameters
         ----------
-        config : orionis.foundation.config.realtime.entities.realtime.RealtimeConfig
+        config : orionis.realtime.config.RealtimeConfig
             Realtime limits shared by connections and broadcast workers.
 
         Returns
@@ -140,7 +140,7 @@ class ConnectionManager(IConnectionManager):
 
         Returns
         -------
-        orionis.foundation.config.realtime.entities.realtime.RealtimeConfig
+        orionis.realtime.config.RealtimeConfig
             Invocation, client-result, group, and broadcast limits used by the manager.
         """
         return self._config

@@ -110,10 +110,18 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
                     ],
                 ),
             )
-        except QueryException:
+        except QueryException as error:
             existing = await self.find(failure.id)
             if existing is None:
                 raise
+            from orionis.failure.runtime import capture  # noqa: PLC0415
+            await capture(
+                error,
+                flow="queue",
+                phase="recovery",
+                operation="failed.record",
+                expected=True,
+            )
             return existing
         return failure
 

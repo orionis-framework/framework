@@ -2,15 +2,18 @@
 
 import asyncio
 import logging
+from contextlib import suppress
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING
 from dataclasses import dataclass
+from orionis.failure.runtime import capture, capture_result, operation
 from orionis.queues.context import JobContext
 from orionis.queues.contracts.worker import IWorker
 from orionis.queues.exceptions import (
     QueueConfigurationError, QueuePayloadError, QueueRetryError,
 )
 from orionis.queues.functions import current_time, validate_name, validate_seconds
+from orionis.support.concurrency import complete_on_cancel
 
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
@@ -42,17 +45,17 @@ class WorkerOptions:
 
     def __post_init__(self) -> None:
         """
-        Validate worker concurrency, routing names and polling durations.
+        Validate concurrency, queue routing, and worker polling settings.
 
         Returns
         -------
         None
-            Leave valid settings unchanged.
+            Keep the frozen worker settings unchanged after successful validation.
 
         Raises
         ------
         orionis.queues.exceptions.QueueConfigurationError
-            If concurrency, queue selection, routing names or durations are invalid.
+            If concurrency, queue selection, routing names, or durations are invalid.
         """
         if (isinstance(self.concurrency, bool)
                 or not isinstance(self.concurrency, int)
@@ -94,26 +97,26 @@ class Worker(IWorker):
         failed: IFailedJobRepository | FailedResolver | None = None,
     ) -> None:
         """
-        Initialize worker settings without opening backend connections.
+        Initialize a worker without opening queue-backend connections.
 
         Parameters
         ----------
         app : orionis.IApplication
-            Application container used to create an isolated scope per job.
+            Application used to create an isolated dependency scope per job.
         driver : orionis.queues.contracts.driver.IQueueDriver
-            Backend used to reserve, release and acknowledge jobs.
+            Backend used to reserve, release, and acknowledge jobs.
         serializer : orionis.queues.contracts.serializer.IJobSerializer
-            Serializer used to restore envelopes and registered jobs.
+            Serializer restoring dispatch envelopes and registered job instances.
         options : orionis.queues.worker.WorkerOptions
-            Validated connection, queues, concurrency, lease and poll settings.
+            Validated connection, queues, concurrency, lease, and polling settings.
         failed : IFailedJobRepository | FailedResolver | None, optional
-            Failure repository or async resolver invoked on terminal failure.
-            If ``None``, terminal failures cannot be recorded.
+            Repository or asynchronous resolver, resolved lazily and cached.
+            ``None`` makes terminal failure storage unavailable.
 
         Returns
         -------
         None
-            Store dependencies and initialize counters and stop state.
+            Retain dependencies and initialize polling, counters, and stop state.
         """
         self._app = app
         """Application container used to create an isolated scope per job."""
@@ -149,12 +152,12 @@ class Worker(IWorker):
 
     def stop(self) -> None:
         """
-        Request a graceful stop without waiting for active jobs.
+        Signal consumers to stop after their in-flight reservations finish.
 
         Returns
         -------
         None
-            Set the stop event; active consumers complete their current work.
+            Set the shared stop event without waiting for active consumers.
         """
         self._stop.set()
 
@@ -165,28 +168,30 @@ class Worker(IWorker):
         max_jobs: int | None = None,
     ) -> int:
         """
-        Consume jobs concurrently until a stopping condition is reached.
+        Run concurrent consumers under shared stop and reservation limits.
 
         Parameters
         ----------
         stop_when_empty : bool, optional
-            Stop each consumer when no job is ready, even if delayed jobs remain.
+            Stop each consumer after an empty poll, even if delayed jobs remain.
         max_jobs : int | None, optional
-            Limit reservations across all consumers; ``None`` means no limit.
+            Shared reservation cap, or ``None`` for no job-count limit.
 
         Returns
         -------
         int
-            Number of processed reservations, including retried or failed jobs.
+            Number of processed reservations, including retries, handled failures,
+            and skipped expired leases.
 
         Raises
         ------
         orionis.queues.exceptions.QueueConfigurationError
-            If already running or a supplied job limit is not a positive integer.
+            If already running or a supplied limit is not a positive, non-boolean
+            integer.
         asyncio.CancelledError
-            If cancelled, after in-flight consumers finish.
+            If cancelled, after requesting a stop and draining active consumers.
         Exception
-            If a consumer fails, after the remaining consumers finish.
+            If a consumer fails, after requesting a stop and joining its peers.
         """
         if self._running or (max_jobs is not None and (
                 isinstance(max_jobs, bool) or not isinstance(max_jobs, int)
@@ -197,11 +202,12 @@ class Worker(IWorker):
         self._started = self._processed = 0
         self._stop.clear()
         consumers = tuple(asyncio.create_task(self._consume(
-            stop_when_empty=stop_when_empty, max_jobs=max_jobs,
+            stop_when_empty=stop_when_empty,
+            max_jobs=max_jobs,
         )) for _ in range(self._concurrency))
         group = asyncio.gather(*consumers)
         try:
-            await asyncio.shield(group)
+            await complete_on_cancel(group, on_cancel=self.stop)
         except BaseException:
             # Drain current executions after a stop or runtime interruption.
             self.stop()
@@ -212,36 +218,87 @@ class Worker(IWorker):
         return self._processed
 
     async def _consume(
+        self, *, stop_when_empty: bool, max_jobs: int | None,
+    ) -> None:
+        """
+        Run one consumer in an isolated queue-failure observation context.
+
+        Parameters
+        ----------
+        stop_when_empty : bool
+            End this consumer after an empty reservation attempt.
+        max_jobs : int or None
+            Shared reservation cap across consumers, or ``None`` for no cap.
+
+        Returns
+        -------
+        None
+            Finish this consumer when its stopping condition or budget is reached.
+
+        Raises
+        ------
+        Exception
+            If polling or execution fails; observe the consumer failure before
+            propagating it.
+        """
+        with operation(self._app, flow="queue", operation="consume", isolated=True):
+            try:
+                await self._consumeJobs(
+                    stop_when_empty=stop_when_empty,
+                    max_jobs=max_jobs,
+                )
+            except Exception as error:
+                await capture(
+                    error,
+                    app=self._app,
+                    flow="queue",
+                    phase="consumer",
+                )
+                raise
+
+    async def _consumeJobs(
         self,
         *,
         stop_when_empty: bool,
         max_jobs: int | None,
     ) -> None:
         """
-        Consume reservations within the shared job budget.
+        Reserve and execute jobs within the worker's shared reservation budget.
 
         Parameters
         ----------
         stop_when_empty : bool
-            End this consumer when the backend has no ready job.
+            Return when the backend has no ready job instead of polling again.
         max_jobs : int | None
-            Shared reservation limit, or ``None`` to run without a job limit.
+            Shared reservation limit across consumers, or ``None`` for no cap.
 
         Returns
         -------
         None
-            Process reserved jobs and update the shared counters.
+            Update shared counters and return on stop, an exhausted budget, or
+            empty polling when requested.
 
         Raises
         ------
         Exception
-            If reservation or execution raises an unhandled error.
+            If reservation or execution raises outside its own recovery policy.
         """
         while not self._stop.is_set():
             if max_jobs is not None and self._started >= max_jobs:
                 return
             self._started += 1
-            reserved = await self._driver.reserve(self._queues, self._retry_after)
+            try:
+                reserved = await self._driver.reserve(self._queues, self._retry_after)
+            except Exception as error:
+                # Observe each consumer before gather can discard sibling errors.
+                await capture(
+                    error,
+                    app=self._app,
+                    flow="queue",
+                    phase="reserve",
+                    metadata={"connection": self._connection},
+                )
+                raise
             if reserved is None:
                 self._started -= 1
                 if stop_when_empty:
@@ -260,28 +317,28 @@ class Worker(IWorker):
         envelope: JobEnvelope,
     ) -> None:
         """
-        Validate reservation routing, timeout and retry eligibility.
+        Validate reservation routing, timeout compatibility, and retry eligibility.
 
         Parameters
         ----------
         reserved : orionis.queues.entities.reserved_job.ReservedJob
-            Backend reservation containing routing metadata and attempt count.
+            Reservation identifier, queue, and current attempt count.
         envelope : orionis.queues.JobEnvelope
-            Decoded dispatch metadata and retry policy to match and enforce.
+            Decoded routing, execution timeout, and retry policy.
 
         Returns
         -------
         None
-            Accept a reservation that matches its envelope and retry limits.
+            Accept matching routing, a valid attempt, and an eligible retry policy.
 
         Raises
         ------
         orionis.queues.exceptions.QueuePayloadError
-            If routing metadata differs or the attempt count is invalid.
+            If identifiers or routing differ, or the attempt count is invalid.
         orionis.queues.exceptions.QueueConfigurationError
-            If the timeout is missing or not shorter than worker ``retry_after``.
+            If the timeout is missing or not strictly below worker ``retry_after``.
         orionis.queues.exceptions.QueueRetryError
-            If attempts exceed ``max_tries`` or the retry deadline has expired.
+            If attempts exceed ``max_tries`` or ``retry_until`` has been reached.
         """
         if (reserved.id != envelope.id or reserved.queue != envelope.queue
                 or envelope.connection != self._connection
@@ -308,107 +365,184 @@ class Worker(IWorker):
         raise_errors: bool = False,
     ) -> None:
         """
-        Execute a reserved job with isolated DI and lease-aware completion.
+        Execute one leased job in an isolated scope and apply its lifecycle outcome.
+
+        Limit handler execution to its configured timeout or 95% of the remaining
+        lease, whichever is shorter.
 
         Parameters
         ----------
         reserved : orionis.queues.entities.reserved_job.ReservedJob
-            Backend reservation containing the payload, attempt count and lease.
+            Backend reservation containing the payload, attempt count, and lease.
         raise_errors : bool, optional
-            Propagate execution errors and bypass automatic retries when true.
+            Propagate the original execution or completion error and disable retries.
 
         Returns
         -------
         None
-            Attempt acknowledgement, retry release or terminal failure recording.
-            Skip expired reservations without executing their jobs.
+            Attempt acknowledgement, retry release, or terminal storage; skip
+            expired reservations without invoking their jobs.
 
         Raises
         ------
         asyncio.CancelledError
-            If cancelled, after attempting to release unfinished work.
+            If execution is cancelled, after attempting to release unfinished work.
         Exception
-            If execution or completion fails and ``raise_errors`` is true.
+            If ``raise_errors`` requests error propagation, or reporting an expired
+            reservation itself fails.
         """
         if current_time() >= reserved.reserved_until:
-            _LOGGER.warning("Skipping expired queue reservation %s", reserved.id)
-            return
-        envelope = None
-        context = JobContext(self._driver, reserved, self._connection, self._fail)
-        try:
-            envelope = self._serializer.decodeEnvelope(reserved.payload)
-            self._validateReservation(reserved, envelope)
-            remaining = reserved.reserved_until - current_time()
-            if remaining <= 0:
-                return
-            execution_timeout = min(envelope.timeout, remaining * 0.95)
-            async with (
-                asyncio.timeout(execution_timeout),
-                self._app.beginScope(),
-            ):
-                self._app.instance(JobContext, context)
-                job = self._serializer.decode(envelope.job, envelope.payload)
-                await self._app.call(job, "handle")
-            await self._finish(context, raise_errors=raise_errors)
-        except asyncio.CancelledError:
-            if not context.finished:
-                await self._releaseCancelled(reserved)
-            raise
-        except Exception as exception:
-            # Persist or release each failed execution independently.
-            _LOGGER.exception("Queue job %s failed on attempt %s", reserved.id,
-                              reserved.attempts)
-            if not context.finished:
-                try:
-                    await self._handleFailure(reserved, envelope, exception,
-                                              raise_errors=raise_errors)
-                except Exception:
-                    # Retain an unacknowledged lease for crash recovery.
-                    _LOGGER.exception("Cannot complete failed queue job %s",
-                                      reserved.id)
-            if raise_errors:
+            try:
+                _LOGGER.warning("Skipping expired queue reservation %s", reserved.id)
+            except Exception as error:
+                await capture(
+                    error,
+                    app=self._app,
+                    flow="queue",
+                    phase="report",
+                    correlation_id=reserved.id,
+                )
                 raise
+            return
+        with operation(self._app, flow="queue", operation="execute",
+                       correlation_id=reserved.id, isolated=True):
+            envelope = None
+            context = JobContext(self._driver, reserved, self._connection, self._fail)
+            try:
+                envelope = self._serializer.decodeEnvelope(reserved.payload)
+                self._validateReservation(reserved, envelope)
+                remaining = reserved.reserved_until - current_time()
+                if remaining <= 0:
+                    return
+                execution_timeout = min(envelope.timeout, remaining * 0.95)
+                async with (
+                    asyncio.timeout(execution_timeout),
+                    self._app.beginScope(),
+                ):
+                    self._app.instance(JobContext, context)
+                    job = self._serializer.decode(envelope.job, envelope.payload)
+                    await self._app.call(job, "handle")
+                await self._finish(context, raise_errors=raise_errors)
+            except asyncio.CancelledError:
+                if not context.finished:
+                    await self._releaseCancelled(reserved)
+                raise
+            except Exception as exception:
+                # Reporting must never prevent the lease-aware recovery below.
+                await self._observe(
+                    exception,
+                    reserved,
+                    "execution",
+                    "Queue job %s failed on attempt %s",
+                    reserved.id,
+                    reserved.attempts,
+                )
+                if not context.finished:
+                    try:
+                        await self._handleFailure(reserved, envelope, exception,
+                                                  raise_errors=raise_errors)
+                    except Exception as recovery_error:  # noqa: BLE001
+                        # Retain an unacknowledged lease for crash recovery.
+                        await self._observe(
+                            recovery_error,
+                            reserved,
+                            "recovery",
+                            "Cannot complete failed queue job %s",
+                            reserved.id,
+                        )
+                if raise_errors:
+                    raise
 
     async def _releaseCancelled(self, reserved: ReservedJob) -> None:
         """
-        Release a cancelled reservation without replacing its cancellation.
+        Attempt reservation release while preserving the original cancellation.
 
         Parameters
         ----------
         reserved : orionis.queues.entities.reserved_job.ReservedJob
-            Reservation whose execution was interrupted before completion.
+            Unfinished reservation to release after cancellation.
 
         Returns
         -------
         None
-            Attempt lease release and log backend errors without re-raising them.
+            Attempt lease release and observe ordinary backend errors without
+            re-raising them.
         """
         try:
             await self._driver.release(reserved)
-        except Exception:
+        except Exception as error:  # noqa: BLE001
             # Preserve cancellation while leaving an unacknowledged lease.
-            _LOGGER.exception("Cannot release cancelled queue job %s", reserved.id)
+            await self._observe(
+                error,
+                reserved,
+                "release",
+                "Cannot release cancelled queue job %s",
+                reserved.id,
+            )
+
+    async def _observe(
+        self, error: Exception, reserved: ReservedJob, phase: str,
+        message: str, *args: object,
+    ) -> None:
+        """
+        Observe a job failure without letting fallback logging replace it.
+
+        Parameters
+        ----------
+        error : Exception
+            Job or recovery exception sent through shared failure observation.
+        reserved : orionis.queues.entities.reserved_job.ReservedJob
+            Reservation supplying the job identifier and attempt metadata.
+        phase : str
+            Queue operation phase associated with the failure.
+        message : str
+            Fallback log template used when no capture receipt is returned.
+        *args : object
+            Positional values interpolated into the fallback log message.
+
+        Returns
+        -------
+        None
+            Await observation and, if no receipt is returned, attempt fallback
+            logging while suppressing its ordinary exceptions.
+        """
+        receipt = await capture(
+            error,
+            app=self._app,
+            flow="queue",
+            phase=phase,
+            correlation_id=reserved.id,
+            metadata={"connection": self._connection, "attempt": reserved.attempts},
+        )
+        if receipt is None:
+            # Inactive standalone workers retain the original recovery policy.
+            with suppress(Exception):
+                _LOGGER.error(
+                    message,
+                    *args,
+                    exc_info=(type(error), error, error.__traceback__),
+                )
 
     async def _finish(self, context: JobContext, *, raise_errors: bool) -> None:
         """
-        Acknowledge unfinished work or propagate an immediate job failure.
+        Acknowledge unfinished work or propagate an explicitly recorded job failure.
 
         Parameters
         ----------
         context : orionis.queues.JobContext
-            Lifecycle state containing the reservation's explicit transitions.
+            Job state tracking release, deletion, and explicit failure.
         raise_errors : bool
-            Raise a recorded failure when immediate execution requires propagation.
+            Re-raise a recorded failure after an explicit lifecycle transition.
 
         Returns
         -------
         None
-            Delete unfinished work or preserve an existing lifecycle transition.
+            Attempt to delete unfinished work, or preserve an existing transition.
 
         Raises
         ------
         Exception
-            If deletion fails or a recorded failure must be propagated.
+            If deletion fails or a recorded job failure must be propagated.
         """
         if not context.finished:
             await context.delete()
@@ -424,30 +558,33 @@ class Worker(IWorker):
         raise_errors: bool,
     ) -> None:
         """
-        Choose a retry release or terminal failure from the job's retry policy.
+        Select a delayed retry or terminal handling from the envelope's policy.
+
+        Reject retries for payload, configuration, or retry-policy errors.
+        Reuse the last configured backoff entry for later attempts.
 
         Parameters
         ----------
         reserved : orionis.queues.entities.reserved_job.ReservedJob
-            Current reservation used to release or record the failed attempt.
+            Current reservation whose lease controls release and terminal deletion.
         envelope : orionis.queues.JobEnvelope | None
-            Decoded retry policy, or ``None`` if the envelope is unavailable.
+            Retry limits and backoff schedule; ``None`` selects terminal handling.
         exception : Exception
-            Original error used to determine retry eligibility and record failure.
+            Original error used to reject non-retryable failures and populate storage.
         raise_errors : bool
-            Disable retries so immediate execution records a terminal failure.
+            Force terminal handling for immediate execution instead of retrying.
 
         Returns
         -------
         None
-            Attempt a delayed retry release or terminal failure recording.
+            Attempt a backoff-delayed release or a terminal failure transition.
 
         Raises
         ------
         orionis.queues.exceptions.QueueConfigurationError
-            If a terminal failure has no available failed-job repository.
+            If terminal handling requires an unavailable failed-job repository.
         Exception
-            If the backend or failure repository cannot complete the transition.
+            If a backend transition, failure recording, or lease-loss warning fails.
         """
         delay = 0.0
         if envelope is not None and envelope.backoff:
@@ -468,27 +605,36 @@ class Worker(IWorker):
 
     async def _fail(self, reserved: ReservedJob, exception: Exception) -> bool:
         """
-        Record a terminal failure before deleting the owned reservation.
+        Record a terminal job failure before deleting its leased reservation.
 
         Parameters
         ----------
         reserved : orionis.queues.entities.reserved_job.ReservedJob
-            Reservation whose lease must still be valid before recording failure.
+            Reservation whose lease must remain valid before terminal recording.
         exception : Exception
-            Original job exception stored in the failure repository.
+            Job or recovery exception to record in failed-job storage.
 
         Returns
         -------
         bool
-            ``True`` if deletion succeeds; ``False`` if the lease is expired or lost.
+            ``True`` if deletion succeeds; ``False`` if the lease expired or was lost.
+            A failure may already be recorded when deletion returns false.
 
         Raises
         ------
         orionis.queues.exceptions.QueueConfigurationError
-            If no failed-job repository can be resolved.
+            If terminal storage is required and no repository can be resolved.
         Exception
-            If repository resolution, failure recording or job deletion fails.
+            If observation, repository resolution, recording, or deletion fails.
         """
+        await capture(
+            exception,
+            app=self._app,
+            flow="queue",
+            phase="terminal",
+            correlation_id=reserved.id,
+            metadata={"attempt": reserved.attempts},
+        )
         if current_time() >= reserved.reserved_until:
             return False
         repository = self._failed
@@ -498,4 +644,13 @@ class Worker(IWorker):
             message = "Terminal failures require a failed-job repository."
             raise QueueConfigurationError(message)
         await repository.record(reserved, self._connection, exception)
-        return await self._driver.delete(reserved)
+        acknowledged = await self._driver.delete(reserved)
+        await capture_result(
+            "failed",
+            app=self._app,
+            flow="queue",
+            phase="terminal",
+            correlation_id=reserved.id,
+            metadata={"attempt": reserved.attempts, "acknowledged": acknowledged},
+        )
+        return acknowledged

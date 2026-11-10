@@ -39,7 +39,7 @@ class _DatabaseStorage:
             if not self._ready:
                 try:
                     await self._connection.createTable(self._definition)
-                except QueryException:
+                except QueryException as error:
                     if self._connection.inTransaction():
                         raise
                     # Verify another worker created the complete table concurrently.
@@ -49,5 +49,13 @@ class _DatabaseStorage:
                             columns=self._definition.columnNames(),
                             limit_value=0,
                         ),
+                    )
+                    from orionis.failure.runtime import capture  # noqa: PLC0415
+                    await capture(
+                        error,
+                        flow="queue",
+                        phase="recovery",
+                        operation="database.schema",
+                        expected=True,
                     )
                 self._ready = not self._connection.inTransaction()

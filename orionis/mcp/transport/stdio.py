@@ -10,12 +10,14 @@ from functools import partial
 import sys
 from typing import TYPE_CHECKING, Protocol
 import msgspec
+from orionis.failure.runtime import capture, capture_nowait, get_runtime, operation
 from orionis.http.adapters.response.streams import await_cleanup
 from orionis.console.stdio import protocol_stdout
 from orionis.mcp.dispatcher import McpDispatcher
 from orionis.mcp.exceptions import McpProtocolException
 from orionis.mcp.protocol.codecs import decode_envelope, encode_error
 from orionis.mcp.protocol.requests import CancelledParams
+from orionis.mcp.reporting import report
 from orionis.mcp.transport.standard_io import StandardReader, StandardWriter
 
 if TYPE_CHECKING:
@@ -71,6 +73,7 @@ class McpStdioTransport:
         "_failed",
         "_failure",
         "_lock",
+        "_reports",
         "_running",
     )
     """Declare the instance attribute slots reserved by this class."""
@@ -115,6 +118,8 @@ class McpStdioTransport:
         """Backend retaining failed-job records."""
         self._failure: BaseException | None = None
         """Failure retained for propagation or reporting."""
+        self._reports: set[asyncio.Future] = set()
+        """Failure delivery tasks owned until transport shutdown."""
         self._closing = False
         """Whether resource cleanup is currently in progress."""
         self._running = False
@@ -158,13 +163,30 @@ class McpStdioTransport:
         None
             Complete the documented operation without returning a value.
         """
+        original = None
         try:
             async for data in source:
                 await self._write(writer, data)
+        except BaseException as exc:
+            original = exc
+            await capture(
+                exc, app=self._app, flow="mcp", phase="stream",
+                metadata={"transport": "stdio"},
+            )
+            raise
         finally:
             close = getattr(source, "aclose", None)
             if close is not None:
-                await await_cleanup(asyncio.ensure_future(close()))
+                try:
+                    await await_cleanup(asyncio.ensure_future(close()))
+                except BaseException as exc:
+                    await capture(
+                        exc, app=self._app, flow="mcp", phase="cleanup",
+                        metadata={"transport": "stdio"},
+                    )
+                    if original is not None:
+                        raise original from exc
+                    raise
 
     async def _invoke(self, request: JsonRpcRequest, writer: LineWriter) -> None:
         """
@@ -182,18 +204,32 @@ class McpStdioTransport:
         None
             Complete the documented operation without returning a value.
         """
-        try:
-            async with self._app.beginScope():
-                params = self._dispatcher.decode(request)
-                result = await self._dispatcher.dispatch(
-                    request, params, transport="stdio",
+        with operation(
+            self._app, flow="mcp", operation=request.method,
+            correlation_id=str(request.id), isolated=True,
+        ):
+            try:
+                async with self._app.beginScope():
+                    params = self._dispatcher.decode(request)
+                    result = await self._dispatcher.dispatch(
+                        request, params, transport="stdio",
+                    )
+                    if isinstance(result.body, bytes):
+                        await self._write(writer, result.body)
+                    else:
+                        await self._stream(writer, result.body)
+            except McpProtocolException as exc:
+                await report(
+                    exc, self._app, transport="stdio", expected=True,
+                    operation=request.method, correlation_id=request.id,
                 )
-                if isinstance(result.body, bytes):
-                    await self._write(writer, result.body)
-                else:
-                    await self._stream(writer, result.body)
-        except McpProtocolException as exc:
-            await self._write(writer, encode_error(exc, request.id))
+                await self._write(writer, encode_error(exc, request.id))
+            except BaseException as exc:
+                await report(
+                    exc, self._app, transport="stdio", phase="request",
+                    operation=request.method, correlation_id=request.id,
+                )
+                raise
 
     def _done(self, request_id: str | int, task: asyncio.Task[None]) -> None:
         """
@@ -214,6 +250,13 @@ class McpStdioTransport:
         if self._active.get(request_id) is task:
             del self._active[request_id]
         if not task.cancelled() and (failure := task.exception()) is not None:
+            pending = capture_nowait(
+                failure, app=self._app, flow="mcp", phase="request",
+                correlation_id=str(request_id), metadata={"transport": "stdio"},
+            )
+            if pending is not None:
+                self._reports.add(pending)
+                pending.add_done_callback(self._reports.discard)
             self._failure = failure
             self._failed.set()
 
@@ -235,7 +278,15 @@ class McpStdioTransport:
             return
         try:
             params = msgspec.json.decode(request.params, type=CancelledParams)
-        except msgspec.DecodeError, msgspec.ValidationError:
+        except (msgspec.DecodeError, msgspec.ValidationError) as exc:
+            pending = capture_nowait(
+                exc, app=self._app, flow="mcp", phase="cancellation",
+                operation=request.method, expected=True,
+                metadata={"transport": "stdio"},
+            )
+            if pending is not None:
+                self._reports.add(pending)
+                pending.add_done_callback(self._reports.discard)
             return
         task = self._active.get(params.requestId)
         if task is not None and not task.cancelling():
@@ -278,6 +329,10 @@ class McpStdioTransport:
             self._active[request_id] = task
             task.add_done_callback(partial(self._done, request_id))
         except McpProtocolException as exc:
+            await report(
+                exc, self._app, transport="stdio", phase="framing", expected=True,
+                correlation_id=None if request_id is msgspec.UNSET else request_id,
+            )
             await self._write(writer, encode_error(exc, request_id))
 
     async def _readLoop(self, reader: LineReader, writer: LineWriter) -> None:
@@ -315,12 +370,12 @@ class McpStdioTransport:
             for task in owned:
                 if not task.done():
                     task.cancel()
-            if reading is None:
-                await await_cleanup(asyncio.gather(failed, return_exceptions=True))
-            else:
-                await await_cleanup(
-                    asyncio.gather(failed, reading, return_exceptions=True),
-                )
+            results = await await_cleanup(
+                asyncio.gather(*owned, return_exceptions=True),
+            )
+            for failure in results:
+                if isinstance(failure, BaseException):
+                    await report(failure, self._app, transport="stdio", phase="read")
 
     async def run(self, reader: LineReader, writer: LineWriter) -> None:
         """
@@ -345,20 +400,40 @@ class McpStdioTransport:
         self._closing = False
         self._failure = None
         self._failed.clear()
-        try:
-            await self._readLoop(reader, writer)
-        finally:
-            self._closing = True
-            tasks = tuple(self._active.values())
-            for task in tasks:
-                if not task.cancelling():
-                    task.cancel()
+        with operation(self._app, flow="mcp", operation="stdio"):
             try:
-                if tasks:
-                    await await_cleanup(asyncio.gather(*tasks, return_exceptions=True))
+                await self._readLoop(reader, writer)
+            except BaseException as exc:
+                await report(exc, self._app, transport="stdio", phase="read")
+                raise
             finally:
-                self._active.clear()
-                self._running = False
+                self._closing = True
+                tasks = tuple(self._active.values())
+                for task in tasks:
+                    if not task.cancelling():
+                        task.cancel()
+                try:
+                    if tasks:
+                        results = await await_cleanup(
+                            asyncio.gather(*tasks, return_exceptions=True),
+                        )
+                        for failure in results:
+                            if isinstance(failure, BaseException):
+                                await report(
+                                    failure, self._app, transport="stdio",
+                                    phase="cleanup",
+                                )
+                    if self._failure is not None:
+                        await capture(
+                            self._failure, app=self._app, flow="mcp", phase="cleanup",
+                            metadata={"transport": "stdio"},
+                        )
+                    if self._reports:
+                        await await_cleanup(asyncio.gather(*self._reports))
+                finally:
+                    self._active.clear()
+                    self._reports.clear()
+                    self._running = False
 
     async def runStandardStreams(self) -> None:
         """
@@ -369,8 +444,13 @@ class McpStdioTransport:
         None
             Complete the documented operation without returning a value.
         """
-        reader = StandardReader(sys.stdin.buffer, self._config.max_request_size)
-        writer = StandardWriter(protocol_stdout() or sys.stdout.buffer)
+        runtime = get_runtime(self._app)
+        reader = StandardReader(
+            sys.stdin.buffer, self._config.max_request_size, runtime=runtime,
+        )
+        writer = StandardWriter(
+            protocol_stdout() or sys.stdout.buffer, runtime=runtime,
+        )
         try:
             with redirect_stdout(sys.stderr):
                 await self.run(reader, writer)

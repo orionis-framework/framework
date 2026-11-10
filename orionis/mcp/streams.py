@@ -3,6 +3,7 @@
 import asyncio
 from collections.abc import AsyncIterator, Iterator
 from typing import Protocol
+from orionis.failure.runtime import capture
 from orionis.http.adapters.response.streams import await_cleanup
 
 class AsyncClosable(Protocol):
@@ -13,12 +14,12 @@ class AsyncClosable(Protocol):
 
     async def aclose(self) -> None:
         """
-        Release the resources owned by this source.
+        Release the resources owned by an asynchronous source.
 
         Returns
         -------
         None
-            The source has completed its close operation.
+            Complete the source's asynchronous cleanup contract.
         """
         ...
 
@@ -33,19 +34,19 @@ class OwnedStream[T](AsyncClosable):
         owner: OwnedStream[object] | None = None,
     ) -> None:
         """
-        Take ownership without advancing or buffering the source.
+        Take lazy ownership of a synchronous or asynchronous iterator.
 
         Parameters
         ----------
-        source : collections.abc.AsyncIterator[``T``] | collections.abc.Iterator[``T``]
-            Source whose values or lifecycle are consumed by this operation.
-        owner : orionis.mcp.streams.OwnedStream[object] | None
-            Value supplied for ``owner``.
+        source : AsyncIterator[``T``] or Iterator[``T``]
+            Iterator whose values and cleanup lifecycle this stream owns.
+        owner : orionis.mcp.streams.OwnedStream[object] or None, optional
+            Nested owner to close after this source, even if iteration never begins.
 
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            Store source and owner without advancing either iterator.
         """
         self._source = source
         """Source whose values or lifecycle are consumed by this operation."""
@@ -58,23 +59,31 @@ class OwnedStream[T](AsyncClosable):
 
     def __aiter__(self) -> AsyncIterator[T]:
         """
-        Return this single-consumer iterator.
+        Return this stream as its single-consumer asynchronous iterator.
 
         Returns
         -------
         collections.abc.AsyncIterator[``T``]
-            This single-consumer iterator.
+            This stream, without creating or advancing another iterator.
         """
         return self
 
     async def __anext__(self) -> T:
         """
-        Advance one item and close when iteration ends for any reason.
+        Return the next source item and close on exhaustion or failure.
 
         Returns
         -------
         ``T``
-            Result of the operation described above.
+            Next value from the owned synchronous or asynchronous iterator.
+
+        Raises
+        ------
+        StopAsyncIteration
+            If the stream is closed or exhausted and cleanup succeeds.
+        BaseException
+            If iteration or cleanup fails. Preserve an iteration failure when
+            cleanup also fails; surface cleanup errors after normal exhaustion.
         """
         if self._closed:
             await self.aclose()
@@ -86,18 +95,32 @@ class OwnedStream[T](AsyncClosable):
                 return next(self._source)
             except StopIteration:
                 raise StopAsyncIteration from None
-        except BaseException:
-            await self.aclose()
+        except BaseException as original:
+            try:
+                await self.aclose()
+            except BaseException as cleanup:
+                if not isinstance(original, StopAsyncIteration):
+                    await capture(original, flow="mcp", phase="stream")
+                await capture(cleanup, flow="mcp", phase="cleanup")
+                if not isinstance(original, StopAsyncIteration):
+                    raise original from cleanup
+                raise
             raise
 
     async def aclose(self) -> None:
         """
-        Finish cleanup under repeated cancellation and close exactly once.
+        Await one shared cleanup task across repeated close calls.
 
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            Finish source and nested-owner cleanup without starting another task.
+
+        Raises
+        ------
+        BaseException
+            If cleanup fails, or if caller cancellation must propagate after
+            cleanup has finished.
         """
         if self._cleanup is None:
             self._closed = True
@@ -106,13 +129,23 @@ class OwnedStream[T](AsyncClosable):
 
     async def _closeOwned(self) -> None:
         """
-        Release a nested owner even when the outer iterator never started.
+        Close the source before releasing its nested owner.
+
+        Prefer ``aclose`` over ``close`` and release the owner even when source
+        cleanup fails or iteration never started.
 
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            Complete available source hooks and nested-owner cleanup.
+
+        Raises
+        ------
+        BaseException
+            If either cleanup fails; retain the source failure as primary when
+            both source and owner cleanup fail.
         """
+        original = None
         try:
             close = getattr(self._source, "aclose", None)
             if close is not None:
@@ -121,6 +154,16 @@ class OwnedStream[T](AsyncClosable):
                 close = getattr(self._source, "close", None)
                 if close is not None:
                     close()
+        except BaseException as exc:
+            original = exc
+            await capture(exc, flow="mcp", phase="cleanup")
+            raise
         finally:
             if self._owner is not None:
-                await self._owner.aclose()
+                try:
+                    await self._owner.aclose()
+                except BaseException as cleanup:
+                    await capture(cleanup, flow="mcp", phase="cleanup")
+                    if original is not None:
+                        raise original from cleanup
+                    raise

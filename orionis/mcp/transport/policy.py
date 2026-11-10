@@ -4,9 +4,9 @@ Includes ``McpProtocolResponse``, ``origin_allowed``, ``McpHttpPolicy``.
 """
 
 from http import HTTPStatus
-import logging
 from typing import TYPE_CHECKING, ClassVar
 from orionis.auth.exceptions import AuthenticationException, AuthorizationException
+from orionis.failure.runtime import capture_result
 from orionis.foundation.contracts.application import IApplication  # noqa: TC001 - Native DI.
 from orionis.http.adapters.response.streams import close_stream
 from orionis.http.contracts.endpoint_policy import IHttpEndpointPolicy
@@ -18,6 +18,7 @@ from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.mcp.config import McpConfig  # noqa: TC001 - Native DI.
 from orionis.mcp.exceptions import McpProtocolException
+from orionis.mcp.reporting import report
 from orionis.mcp.protocol.codecs import encode_error
 from orionis.schemas.exceptions.validation import ValidationException
 
@@ -39,8 +40,6 @@ _REPLACED_HEADERS = frozenset({"content-type", "content-length", "location"})
 """Replaced headers used by ``policy``."""
 _AUTHENTICATION_HEADERS = frozenset({"www-authenticate", "allow"})
 """Authentication headers used by ``policy``."""
-_LOGGER = logging.getLogger(__name__)
-"""Logger used by ``policy``."""
 _EXCEPTION_STATUS = {
     AuthenticationException: HTTPStatus.UNAUTHORIZED,
     AuthorizationException: HTTPStatus.FORBIDDEN,
@@ -206,7 +205,16 @@ class McpHttpPolicy(IHttpEndpointPolicy):
             isinstance(response, EventStreamResponse) or not response.getBody()
         ):
             return response
-        status = status if status >= _CLIENT_ERROR_START else HTTPStatus.FORBIDDEN
+        if status < _CLIENT_ERROR_START:
+            await capture_result(
+                "response_rejected",
+                app=self._app,
+                flow="mcp",
+                phase="policy",
+                expected=True,
+                metadata={"transport": "http", "status": status},
+            )
+            status = HTTPStatus.FORBIDDEN
         replacement = _error(status)
         replaced: set[str] = set()
         for name, value in response.getStringHeaders():
@@ -218,6 +226,26 @@ class McpHttpPolicy(IHttpEndpointPolicy):
                 replacement.addHeader(name, value)
         await close_stream(response.getStream(), None)
         return replacement
+
+    def isExpectedFailure(self, exception: BaseException) -> bool:
+        """
+        Identify expected MCP protocol and mapped HTTP policy failures.
+
+        Parameters
+        ----------
+        exception : BaseException
+            Failure to classify before HTTP observation.
+
+        Returns
+        -------
+        bool
+            ``True`` for MCP protocol errors with status below 500 or for mapped
+            policy exception types, including subclasses; otherwise ``False``.
+        """
+        return (
+            isinstance(exception, McpProtocolException)
+            and exception.status < _SERVER_ERROR_START
+        ) or any(ancestor in _EXCEPTION_STATUS for ancestor in type(exception).__mro__)
 
     async def exception(
         self, exception: Exception, request: Request | TransportAdapter,
@@ -238,11 +266,13 @@ class McpHttpPolicy(IHttpEndpointPolicy):
             Result of the operation described above.
         """
         del request
-        try:
-            handler = await self._app.getExceptionHandler()
-            await self._app.call(handler, "report", exception=exception)
-        except Exception:
-            _LOGGER.exception("MCP failure reporting could not complete")
+        await report(
+            exception,
+            self._app,
+            transport="http",
+            phase="policy",
+            expected=self.isExpectedFailure(exception),
+        )
         if isinstance(exception, McpProtocolException):
             return McpProtocolResponse(
                 content=encode_error(exception), status_code=exception.status,

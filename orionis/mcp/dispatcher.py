@@ -7,6 +7,8 @@ from dataclasses import dataclass, replace
 import inspect
 from typing import TYPE_CHECKING, Literal, cast
 import msgspec
+from orionis.failure.runtime import capture_result, operation
+from orionis.http.adapters.response.streams import await_cleanup
 from orionis.mcp.context import McpRequest
 from orionis.mcp.exceptions import (
     McpAuthorizationException,
@@ -52,6 +54,7 @@ from orionis.mcp.protocol.results import (
 )
 from orionis.mcp.protocol.validation import validate_result
 from orionis.mcp.responses import McpResponse
+from orionis.mcp.reporting import report
 from orionis.mcp.normalization import (
     response_items,
     tool_result,
@@ -91,6 +94,10 @@ _PROMPT_METHOD = "prompts/get"
 """Prompt method identifier: ``prompts/get``."""
 _INTERNAL_ERROR = "Internal error"
 """Error text for internal error: ``Internal error``."""
+_INTERNAL_ERROR_CODE = -32603
+"""JSON-RPC code identifying an unexpected application failure."""
+_UNAVAILABLE_STATUS = 503
+"""Expected admission rejection when bounded server capacity is unavailable."""
 _RESULT_TYPES = {
     _TOOL_METHOD: CallToolResult,
     "resources/read": ReadResourceResult,
@@ -110,12 +117,12 @@ class DispatchResult:
     @property
     def streaming(self) -> bool:
         """
-        Indicate whether the transport must preserve the request scope.
+        Check whether the body requires streaming and request-scope retention.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            ``True`` for an asynchronous body iterator; ``False`` for encoded bytes.
         """
         return not isinstance(self.body, bytes)
 
@@ -135,23 +142,23 @@ class McpDispatcher:
         event_bus: IMcpEventBus,
     ) -> None:
         """
-        Share immutable definitions and bounded worker services.
+        Bind compiled server metadata and shared services for stateless dispatch.
 
         Parameters
         ----------
         app : orionis.container.contracts.container.IContainer
-            Application container supplying configuration and dependencies.
+            Container used to build handlers and register request-scoped bindings.
         compiled : orionis.mcp.server.compiler.CompiledMcpServer
-            Precompiled metadata shared by request executions.
+            Compiled server definitions, primitives, and extension metadata.
         config : orionis.mcp.config.McpConfig
-            Validated configuration controlling this component.
+            Limits and protocol options shared by dispatcher calls.
         event_bus : orionis.mcp.contracts.event_bus.IMcpEventBus
-            Subscription service delivering server changes.
+            Event service used to open change-notification subscriptions.
 
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            Store shared services and precompute extension and listing lookups.
         """
         self.app = app
         """Application container supplying configuration and dependencies."""
@@ -185,17 +192,24 @@ class McpDispatcher:
 
     def decode(self, envelope: JsonRpcRequest) -> RequestParams:
         """
-        Validate core metadata before an extension's precompiled decoder.
+        Validate core request metadata and decode method-specific parameters.
 
         Parameters
         ----------
         envelope : orionis.mcp.protocol.requests.JsonRpcRequest
-            Value supplied for ``envelope``.
+            Decoded envelope whose method selects the parameter schema.
 
         Returns
         -------
         orionis.mcp.protocol.requests.RequestParams
-            Result of the operation described above.
+            Validated core parameters or the extension decoder's typed parameters.
+
+        Raises
+        ------
+        McpInvalidParams
+            If an extension payload cannot be decoded.
+        TypeError
+            If an extension decoder returns something other than ``RequestParams``.
         """
         extension = self._extensions.get(envelope.method)
         if extension is None:
@@ -223,21 +237,28 @@ class McpDispatcher:
         native_request: Request | None = None,
     ) -> DispatchResult:
         """
-        Decode one message; transports supply their own framing and scope.
+        Decode and dispatch one envelope without adding transport framing.
 
         Parameters
         ----------
         data : bytes
-            Value supplied for ``data``.
-        transport : orionis.mcp.dispatcher.TransportName
-            Value supplied for ``transport``.
-        native_request : orionis.http.Request | None
-            Value supplied for ``native_request``.
+            Encoded JSON-RPC envelope; the transport owns framing and request scope.
+        transport : orionis.mcp.dispatcher.TransportName, optional
+            Transport identifier recorded in execution and failure metadata.
+        native_request : orionis.http.Request or None, optional
+            Native request to attach to the execution context, when available.
 
         Returns
         -------
         orionis.mcp.dispatcher.DispatchResult
-            Result of the operation described above.
+            Encoded reply or lazy byte stream. Notifications return an empty 202
+            response; protocol decoding errors retain their response status.
+
+        Raises
+        ------
+        BaseException
+            If an unexpected decoder failure or unhandled control-flow
+            interruption must propagate.
         """
         envelope = None
         try:
@@ -247,17 +268,20 @@ class McpDispatcher:
             if envelope.id is msgspec.UNSET:
                 return DispatchResult(b"", 202)
             params = self.decode(envelope)
-            return await self.dispatch(
-                envelope,
-                params,
-                transport=transport,
-                native_request=native_request,
-            )
         except McpProtocolException as exc:
+            await self._report(
+                exc, transport=transport, phase="decode", expected=True,
+            )
             return DispatchResult(
                 encode_error(exc, envelope.id if envelope else msgspec.UNSET),
                 exc.status,
             )
+        except BaseException as exc:
+            await self._report(exc, transport=transport, phase="decode")
+            raise
+        return await self.dispatch(
+            envelope, params, transport=transport, native_request=native_request,
+        )
 
     async def dispatch(
         self,
@@ -268,43 +292,70 @@ class McpDispatcher:
         native_request: Request | None = None,
     ) -> DispatchResult:
         """
-        Execute the same availability, authorization and DI on every transport.
+        Execute a decoded request with shared policy checks and dependency bindings.
 
         Parameters
         ----------
         envelope : orionis.mcp.protocol.requests.JsonRpcRequest
-            Value supplied for ``envelope``.
+            Envelope supplying the request identifier and method.
         params : orionis.mcp.protocol.requests.RequestParams
-            Parameters decoded for the requested operation.
-        transport : orionis.mcp.dispatcher.TransportName
-            Value supplied for ``transport``.
-        native_request : orionis.http.Request | None
-            Value supplied for ``native_request``.
+            Method parameters already decoded by ``decode`` or the transport.
+        transport : orionis.mcp.dispatcher.TransportName, optional
+            Transport identifier included in request context and failure metadata.
+        native_request : orionis.http.Request or None, optional
+            Native request to expose to handlers, when available.
 
         Returns
         -------
         orionis.mcp.dispatcher.DispatchResult
-            Result of the operation described above.
+            Encoded result, sanitized error, or lazy byte stream. Notifications
+            return an empty 202 response.
+
+        Raises
+        ------
+        BaseException
+            If cancellation or other non-``Exception`` control flow interrupts
+            execution.
         """
         if envelope.id is msgspec.UNSET:
             return DispatchResult(b"", 202)
-        try:
-            if len(msgspec.json.encode(params.meta)) > self.config.max_metadata_size:
-                msg = "Metadata too large"
-                raise McpInvalidParams(msg)
-            request = self._request(envelope, params, transport, native_request)
-            self.app.instance(McpRequest, request)
-            self.app.instance(CompiledMcpServer, self.server)
-            result = await self._execute(request, params)
-            if isinstance(result, AsyncIterator):
-                return DispatchResult(result)
-            return DispatchResult(self._encode(request, result))
-        except McpProtocolException as exc:
-            return DispatchResult(encode_error(exc, envelope.id), exc.status)
-        except Exception as exc:  # noqa: BLE001 - Public protocol boundary.
-            await self._report(exc)
-            error = McpProtocolException(-32603, _INTERNAL_ERROR, status=500)
-            return DispatchResult(encode_error(error, envelope.id), error.status)
+        with operation(
+            self.app, flow="mcp", operation=envelope.method,
+            correlation_id=str(envelope.id),
+        ):
+            try:
+                if (
+                    len(msgspec.json.encode(params.meta))
+                    > self.config.max_metadata_size
+                ):
+                    msg = "Metadata too large"
+                    raise McpInvalidParams(msg)
+                request = self._request(envelope, params, transport, native_request)
+                self.app.instance(McpRequest, request)
+                self.app.instance(CompiledMcpServer, self.server)
+                result = await self._execute(request, params)
+                if isinstance(result, AsyncIterator):
+                    return DispatchResult(result)
+                return DispatchResult(self._encode(request, result))
+            except McpProtocolException as exc:
+                await self._report(
+                    exc, transport=transport, phase="dispatch", expected=True,
+                    correlation_id=envelope.id, operation_name=envelope.method,
+                )
+                return DispatchResult(encode_error(exc, envelope.id), exc.status)
+            except Exception as exc:  # noqa: BLE001 - Public protocol boundary.
+                await self._report(
+                    exc, transport=transport, phase="dispatch",
+                    correlation_id=envelope.id, operation_name=envelope.method,
+                )
+                error = McpProtocolException(-32603, _INTERNAL_ERROR, status=500)
+                return DispatchResult(encode_error(error, envelope.id), error.status)
+            except BaseException as exc:
+                await self._report(
+                    exc, transport=transport, phase="dispatch",
+                    correlation_id=envelope.id, operation_name=envelope.method,
+                )
+                raise
 
     def _request(
         self,
@@ -314,23 +365,23 @@ class McpDispatcher:
         native: Request | None,
     ) -> McpRequest:
         """
-        Create context from typed parameters, never from connection history.
+        Build request context from the current envelope and typed parameters.
 
         Parameters
         ----------
         envelope : orionis.mcp.protocol.requests.JsonRpcRequest
-            Value supplied for ``envelope``.
+            Envelope supplying the request identifier and method.
         params : orionis.mcp.protocol.requests.RequestParams
-            Parameters decoded for the requested operation.
+            Typed arguments, metadata, resource URI, and input-response retry state.
         transport : orionis.mcp.dispatcher.TransportName
-            Value supplied for ``transport``.
-        native : orionis.http.Request | None
-            Value supplied for ``native``.
+            Transport identifier to store in the request context.
+        native : orionis.http.Request or None
+            Native request to expose in context, or ``None``.
 
         Returns
         -------
         orionis.mcp.McpRequest
-            Result of the operation described above.
+            Context exposing arguments, metadata, retry state, and transport details.
         """
         retry = isinstance(params, InputResponseParams)
         responses = params.inputResponses if retry else msgspec.UNSET
@@ -355,19 +406,26 @@ class McpDispatcher:
 
     async def _execute(self, request: McpRequest, params: RequestParams) -> object:
         """
-        Route known core methods without reflection or dynamic imports.
+        Route a decoded request to a core method, extension, or primitive.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Request context identifying the operation and its caller.
         params : orionis.mcp.protocol.requests.RequestParams
-            Parameters decoded for the requested operation.
+            Typed parameters selecting the operation and target primitive.
 
         Returns
         -------
         object
-            Result of the operation described above.
+            Operation result, or an asynchronous byte stream for streamed calls.
+
+        Raises
+        ------
+        McpProtocolException
+            If the method is unsupported or an operation-specific protocol check fails.
+        McpInvalidParams
+            If the requested primitive is unknown or unavailable.
         """
         method = request.method
         if method in self._extensions:
@@ -405,19 +463,24 @@ class McpDispatcher:
 
     async def _extension(self, request: McpRequest, params: RequestParams) -> object:
         """
-        Run an explicitly negotiated extension without implicit capabilities.
+        Invoke an extension only when the client advertises its capability.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Request context containing the method and client capability metadata.
         params : orionis.mcp.protocol.requests.RequestParams
-            Parameters decoded for the requested operation.
+            Parameters accepted by the extension's decoder.
 
         Returns
         -------
         object
-            Result of the operation described above.
+            Handler result, awaited when the extension returns an awaitable.
+
+        Raises
+        ------
+        McpProtocolException
+            If the client has not advertised the required extension capability.
         """
         extension, handler = self._extensions[request.method]
         supported = request.clientCapabilities.get("extensions", {})
@@ -438,19 +501,25 @@ class McpDispatcher:
         uri: str,
     ) -> tuple[CompiledPrimitive | None, McpRequest]:
         """
-        Prefer exact URI lookup before compiled RFC 6570 template matchers.
+        Resolve exact resource URIs before matching compiled URI templates.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Base request context to enrich when a URI template matches.
         uri : str
-            Value supplied for ``uri``.
+            Resource URI to validate and resolve.
 
         Returns
         -------
-        tuple[CompiledPrimitive | None, orionis.mcp.McpRequest]
-            Result of the operation described above.
+        tuple[CompiledPrimitive | None, McpRequest]
+            Primitive and context, enriched with URI variables for a template
+            match, or ``(None, request)`` when no definition matches.
+
+        Raises
+        ------
+        McpInvalidParams
+            If the supplied resource URI is invalid.
         """
         try:
             validate_uri(uri)
@@ -480,21 +549,31 @@ class McpDispatcher:
         listing: bool = False,
     ) -> object | None:
         """
-        Resolve fresh handlers and enforce both independent access hooks.
+        Resolve a primitive handler and apply its request-specific access hooks.
+
+        Return synthetic primitives directly without invoking handler access hooks.
 
         Parameters
         ----------
         primitive : orionis.mcp.server.compiler.CompiledPrimitive
-            Compiled tool, resource or prompt declaration.
+            Compiled tool, resource, prompt, or synthetic catalog declaration.
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
-        listing : bool
-            Value supplied for ``listing``.
+            Context supplied to availability and authorization hooks.
+        listing : bool, optional
+            Return ``None`` for unavailable or unauthorized entries instead of raising.
 
         Returns
         -------
         object | None
-            Result of the operation described above.
+            Resolved handler, the synthetic primitive itself, or ``None`` when a
+            listing entry is denied.
+
+        Raises
+        ------
+        McpInvalidParams
+            If the primitive is unavailable and ``listing`` is false.
+        McpAuthorizationException
+            If authorization is denied and ``listing`` is false.
         """
         if primitive.synthetic:
             return primitive
@@ -524,19 +603,28 @@ class McpDispatcher:
         request: McpRequest,
     ) -> object:
         """
-        Share one execution path between direct and catalog calls.
+        Invoke a primitive through the shared policy and validation pipeline.
+
+        Return tool-error results for invalid tool arguments and ordinary
+        tool-handler failures.
 
         Parameters
         ----------
         primitive : orionis.mcp.server.compiler.CompiledPrimitive
-            Compiled tool, resource or prompt declaration.
+            Compiled tool, resource, prompt, or synthetic catalog declaration.
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context supplying arguments, retry state, and handler dependencies.
 
         Returns
         -------
         object
-            Result of the operation described above.
+            Normalized result, input-required response, or owned stream of encoded
+            messages.
+
+        Raises
+        ------
+        McpProtocolException
+            If access or protocol checks fail, or a non-tool handler raises.
         """
         self.app.instance(McpRequest, request, override=True)
         instance = await self._access(primitive, request)
@@ -547,7 +635,8 @@ class McpDispatcher:
                 if request.method == _TOOL_METHOD
                 else msgspec.UNSET
             )
-        except ValueError, TypeError, ValidationException:
+        except (ValueError, TypeError, ValidationException) as exc:
+            await self._report(exc, request, phase="validation", expected=True)
             return CallToolResult(
                 content=(TextContent(text="Invalid tool arguments"),),
                 isError=True,
@@ -576,7 +665,7 @@ class McpDispatcher:
         except McpProtocolException:
             raise
         except Exception as exc:
-            await self._report(exc)
+            await self._report(exc, request)
             if request.method == _TOOL_METHOD:
                 return CallToolResult(
                     content=(TextContent(text="Tool execution failed"),),
@@ -591,21 +680,22 @@ class McpDispatcher:
         result: object,
     ) -> object:
         """
-        Convert developer responses into the method's exact result type.
+        Normalize developer output into the requested method's validated result.
 
         Parameters
         ----------
         primitive : orionis.mcp.server.compiler.CompiledPrimitive
-            Compiled tool, resource or prompt declaration.
+            Primitive supplying output validation, descriptions, and cache policy.
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context identifying the result method and any input-response retry.
         result : object
-            Value supplied for ``result``.
+            Developer return value or an already typed protocol result.
 
         Returns
         -------
         object
-            Result of the operation described above.
+            Validated method result, including input-required or tool-error results
+            when applicable.
         """
         if isinstance(result, InputRequiredResult):
             validate_input_required(result, request)
@@ -613,6 +703,12 @@ class McpDispatcher:
             return result
         expected = _RESULT_TYPES[request.method]
         if isinstance(result, expected):
+            if isinstance(result, CallToolResult) and result.isError is True:
+                await capture_result(
+                    "tool_error", app=self.app, flow="mcp", phase="result",
+                    operation=request.method, correlation_id=str(request.id),
+                    expected=True, metadata={"transport": request.transport},
+                )
             if isinstance(result, CallToolResult) and result.isError is not True:
                 await validate_output(primitive, result.structuredContent)
             if isinstance(result, ReadResourceResult):
@@ -631,6 +727,12 @@ class McpDispatcher:
                 primitive, request, responses, self._cache(primitive, request),
             )
         validate_result(normalized, request.method)
+        if isinstance(normalized, CallToolResult) and normalized.isError is True:
+            await capture_result(
+                "tool_error", app=self.app, flow="mcp", phase="result",
+                operation=request.method, correlation_id=str(request.id),
+                expected=True, metadata={"transport": request.transport},
+            )
         return normalized
 
     async def _stream(
@@ -640,26 +742,35 @@ class McpDispatcher:
         source: AsyncIterator[object],
     ) -> AsyncIterator[bytes]:
         """
-        Pull notifications with transport backpressure and close on cancellation.
+        Yield progress notifications and a result with bounded response buffering.
+
+        Enforce the response-size budget for accumulated non-progress values.
 
         Parameters
         ----------
         primitive : orionis.mcp.server.compiler.CompiledPrimitive
-            Compiled tool, resource or prompt declaration.
+            Primitive supplying result normalization and output validation.
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context supplying the response identifier and optional progress token.
         source : collections.abc.AsyncIterator[object]
-            Source whose values or lifecycle are consumed by this operation.
+            Primitive iterator to consume and close when streaming ends.
 
         Yields
         ------
         bytes
-            Each item produced by the documented iteration.
+            Unframed JSON progress notifications when requested, followed by a
+            result or sanitized error response.
+
+        Raises
+        ------
+        BaseException
+            If cancellation or other control flow escapes, or source cleanup fails.
         """
         responses = []
         used = 0
         previous = float("-inf")
         token = request.meta.get("progressToken", msgspec.UNSET)
+        original = None
         try:
             async for item in source:
                 if isinstance(item, McpResponse) and item.progress_update is not None:
@@ -684,35 +795,96 @@ class McpDispatcher:
             )
             yield self._encode(request, result)
         except McpProtocolException as exc:
+            await self._report(exc, request, phase="stream", expected=True)
             yield encode_error(exc, request.id)
         except Exception as exc:  # noqa: BLE001 - Public protocol boundary.
-            await self._report(exc)
-            if request.method == _TOOL_METHOD:
-                yield self._encode(request, CallToolResult(
-                    content=(TextContent(text="Tool execution failed"),), isError=True,
-                ))
-            else:
-                yield encode_error(
-                    McpProtocolException(-32603, _INTERNAL_ERROR), request.id,
-                )
+            await self._report(exc, request, phase="stream")
+            yield self._streamError(request)
+        except BaseException as exc:
+            original = exc
+            await self._report(exc, request, phase="stream")
+            raise
         finally:
-            await _close(source)
+            await self._finishStream(request, source, original)
 
-    async def _list(self, request: McpRequest, params: PaginatedParams) -> object:
+    def _streamError(self, request: McpRequest) -> bytes:
         """
-        Build a bounded deterministic page after request-specific access checks.
+        Encode a sanitized result or protocol error for a failed primitive stream.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context whose method selects a tool-error result or protocol error.
+
+        Returns
+        -------
+        bytes
+            Encoded tool-error result for tool calls, or an internal JSON-RPC error.
+        """
+        if request.method == _TOOL_METHOD:
+            return self._encode(request, CallToolResult(
+                content=(TextContent(text="Tool execution failed"),), isError=True,
+            ))
+        return encode_error(
+            McpProtocolException(-32603, _INTERNAL_ERROR), request.id,
+        )
+
+    async def _finishStream(
+        self, request: McpRequest, source: AsyncIterator[object],
+        original: BaseException | None,
+    ) -> None:
+        """
+        Close a primitive stream without replacing an escaping primary failure.
+
+        Parameters
+        ----------
+        request : orionis.mcp.McpRequest
+            Request context attached to cleanup failure observation.
+        source : collections.abc.AsyncIterator[object]
+            Source whose optional asynchronous close hook should run.
+        original : BaseException or None
+            Escaping control-flow failure to preserve if cleanup also fails.
+
+        Returns
+        -------
+        None
+            Finish any asynchronous source cleanup.
+
+        Raises
+        ------
+        BaseException
+            If cleanup fails; re-raise ``original`` from that failure when supplied,
+            otherwise propagate the cleanup failure.
+        """
+        try:
+            await _close(source)
+        except BaseException as exc:
+            await self._report(exc, request, phase="cleanup")
+            if original is not None:
+                raise original from exc
+            raise
+
+    async def _list(self, request: McpRequest, params: PaginatedParams) -> object:
+        """
+        Build a bounded listing page after per-request access checks.
+
+        Parameters
+        ----------
+        request : orionis.mcp.McpRequest
+            Context selecting a listing method and its access policies.
         params : orionis.mcp.protocol.requests.PaginatedParams
-            Parameters decoded for the requested operation.
+            Listing parameters containing the previous page boundary, if any.
 
         Returns
         -------
         object
-            Result of the operation described above.
+            Method-specific listing with visible primitive metadata, a continuation
+            cursor when needed, and server cache hints.
+
+        Raises
+        ------
+        McpInvalidParams
+            If the pagination cursor is invalid or belongs to another method.
         """
         values, result_type, field = self._list_sources[request.method]
         after = self._cursor(request.method, params.cursor)
@@ -741,19 +913,24 @@ class McpDispatcher:
     @staticmethod
     def _cursor(method: str, cursor: str | msgspec.UnsetType) -> str:
         """
-        Decode a cursor without retaining any server-side pagination state.
+        Decode and validate a stateless cursor for the requested listing method.
 
         Parameters
         ----------
         method : str
-            Value supplied for ``method``.
+            Listing method to which the cursor must be bound.
         cursor : str | ``msgspec.UnsetType``
-            Value supplied for ``cursor``.
+            Encoded cursor, or ``msgspec.UNSET`` for the first page.
 
         Returns
         -------
         str
-            Result of the operation described above.
+            Last primitive name from the cursor, or ``""`` for the first page.
+
+        Raises
+        ------
+        McpInvalidParams
+            If the cursor encoding, contents, or bound method is invalid.
         """
         if cursor is msgspec.UNSET:
             return ""
@@ -780,19 +957,20 @@ class McpDispatcher:
         request: McpRequest | None = None,
     ) -> CacheOptions:
         """
-        Never share retry results or default request-dependent content publicly.
+        Select cache hints and disable caching for requests carrying retry state.
 
         Parameters
         ----------
-        primitive : orionis.mcp.server.compiler.CompiledPrimitive | None
-            Compiled tool, resource or prompt declaration.
-        request : orionis.mcp.McpRequest | None
-            Current request and its trusted execution context.
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive or None, optional
+            Primitive cache policy, or ``None`` to use server defaults.
+        request : orionis.mcp.McpRequest or None, optional
+            Request whose input-response or retry state can disable caching.
 
         Returns
         -------
         orionis.mcp.normalization.CacheOptions
-            Result of the operation described above.
+            Cache fields ``ttlMs`` and ``cacheScope``. Input-response or request-state
+            data forces zero TTL and private scope.
         """
         cache = primitive.cache if primitive is not None else self.server.cache
         if request is not None and (
@@ -807,21 +985,30 @@ class McpDispatcher:
         *, internal_meta: dict[str, object] | None = None,
     ) -> bytes:
         """
-        Attach precompiled identity and encode the response exactly once.
+        Validate a result, attach server metadata, and encode its response.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Request supplying the response identifier and protocol method.
         result : object
-            Value supplied for ``result``.
-        internal_meta : dict[str, object] | None
-            Value supplied for ``internal_meta``.
+            Completion or input-required result to validate and encode.
+        internal_meta : dict[str, object] or None, optional
+            Metadata merged over result metadata before server identity is set.
 
         Returns
         -------
         bytes
-            Result of the operation described above.
+            JSON-RPC response bytes within the configured response-size budget.
+
+        Raises
+        ------
+        TypeError
+            If the result is neither a complete nor input-required result.
+        ValueError
+            If result metadata exceeds its configured size limit.
+        McpProtocolException
+            If the encoded response exceeds its configured size limit.
         """
         if not isinstance(result, (CompleteResult, InputRequiredResult)):
             message = "Invalid server result"
@@ -845,19 +1032,26 @@ class McpDispatcher:
         params: CompleteParams,
     ) -> CompleteCompletionResult:
         """
-        Run completion through the referenced primitive's access policy.
+        Resolve completion values through the referenced primitive's access hooks.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context supplied to access and completion hooks.
         params : orionis.mcp.protocol.requests.CompleteParams
-            Parameters decoded for the requested operation.
+            Reference, argument, and context for a prompt or template completion.
 
         Returns
         -------
         orionis.mcp.protocol.results.CompleteCompletionResult
-            Result of the operation described above.
+            Completion containing a validated, bounded sequence of string values.
+
+        Raises
+        ------
+        McpProtocolException
+            If the server does not advertise completion support.
+        McpInvalidParams
+            If the reference, argument names, or returned completion values are invalid.
         """
         if "completions" not in self.server.capabilities:
             raise McpProtocolException(-32601, "Method not found", status=404)
@@ -898,19 +1092,19 @@ class McpDispatcher:
 
     def _supports(self, capability: str, feature: str) -> bool:
         """
-        Read one static compiled capability hint.
+        Check whether a compiled capability explicitly enables a feature.
 
         Parameters
         ----------
         capability : str
-            Value supplied for ``capability``.
+            Compiled capability section to inspect.
         feature : str
-            Value supplied for ``feature``.
+            Feature flag within the capability mapping.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            ``True`` only when the capability maps the feature to ``True``.
         """
         value = self.server.capabilities.get(capability)
         return isinstance(value, Mapping) and value.get(feature) is True
@@ -921,19 +1115,25 @@ class McpDispatcher:
         params: ListenParams,
     ) -> AsyncIterator[bytes]:
         """
-        Accept only supported changes and resource URIs authorized right now.
+        Create a subscription stream from supported, currently authorized filters.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Request context used for resource-subscription access checks.
         params : orionis.mcp.protocol.requests.ListenParams
-            Parameters decoded for the requested operation.
+            Requested change notifications and resource-subscription URIs.
 
         Returns
         -------
         collections.abc.AsyncIterator[bytes]
-            Result of the operation described above.
+            Owned byte stream carrying the accepted subscription filters and events.
+
+        Raises
+        ------
+        McpInvalidParams
+            If the resource-subscription count exceeds its limit or a checked URI
+            is invalid.
         """
         filters = params.notifications
         if len(filters.resourceSubscriptions) > self.config.max_resource_subscriptions:
@@ -959,19 +1159,27 @@ class McpDispatcher:
 
     async def _subscriptionResource(self, request: McpRequest, uri: str) -> bool:
         """
-        Give all admission dependencies the same resource-specific context.
+        Check subscription access with a temporary resource-specific context.
+
+        Restore the original request binding after access checks.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Original request context to restore after checking the resource.
         uri : str
-            Value supplied for ``uri``.
+            Resource URI whose existence and access hooks should be checked.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            ``True`` for a known resource passing its access hooks; ``False`` for
+            unknown, unavailable, or unauthorized resources.
+
+        Raises
+        ------
+        McpInvalidParams
+            If the resource URI is invalid.
         """
         primitive, resource_request = self._resource(replace(request, uri=uri), uri)
         if primitive is None:
@@ -990,23 +1198,31 @@ class McpDispatcher:
         source: AsyncIterator[tuple[str, str | None]],
     ) -> AsyncIterator[bytes]:
         """
-        Acknowledge before events; use SSE comments for idle keepalive.
+        Yield an acknowledgement, subscription events, and transport keepalives.
 
         Parameters
         ----------
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context supplying subscription identity and transport behavior.
         filters : orionis.mcp.protocol.requests.SubscriptionFilter
-            Value supplied for ``filters``.
+            Accepted notification flags and resource subscriptions.
         source : collections.abc.AsyncIterator[tuple[str, str | None]]
-            Source whose values or lifecycle are consumed by this operation.
+            Change events containing a notification method and optional resource URI.
 
         Yields
         ------
         bytes
-            Each item produced by the documented iteration.
+            Encoded acknowledgement, change notifications, and final completion.
+            HTTP keepalives are ``b""``; stdio also emits a cancellation notification
+            when the event source ends.
+
+        Raises
+        ------
+        BaseException
+            If event delivery or cleanup fails, or iteration is cancelled.
         """
         pending = None
+        original = None
         metadata: dict[str, object] = {SUBSCRIPTION_ID: request.id}
         try:
             yield msgspec.json.encode(
@@ -1043,11 +1259,61 @@ class McpDispatcher:
                     ),
                 )
             yield self._encode(request, CompleteResult(), internal_meta=metadata)
+        except BaseException as exc:
+            original = exc
+            await self._report(exc, request, phase="subscription")
+            raise
         finally:
+            await self._finishSubscription(request, pending, source, original)
+
+    async def _finishSubscription(
+        self, request: McpRequest, pending: asyncio.Future | None,
+        source: object, original: BaseException | None,
+    ) -> None:
+        """
+        Join pending subscription work and close the owned event source.
+
+        Parameters
+        ----------
+        request : orionis.mcp.McpRequest
+            Context attached to subscription cleanup failure observation.
+        pending : asyncio.Future or None
+            Pending source-advance operation to cancel and join, if any.
+        source : object
+            Event source whose optional asynchronous close hook should run.
+        original : BaseException or None
+            Escaping subscription failure to preserve if source cleanup also fails.
+
+        Returns
+        -------
+        None
+            Observe pending-operation failures and finish source cleanup.
+
+        Raises
+        ------
+        BaseException
+            If cleanup fails or caller cancellation must propagate. Keep
+            ``original`` primary when source closure also fails.
+        """
+        try:
             if pending is not None:
                 pending.cancel()
-                await asyncio.gather(pending, return_exceptions=True)
-            await _close(source)
+                results = await await_cleanup(
+                    asyncio.gather(pending, return_exceptions=True),
+                )
+                for failure in results:
+                    if isinstance(failure, BaseException) and not isinstance(
+                        failure, StopAsyncIteration,
+                    ):
+                        await self._report(failure, request, phase="cleanup")
+        finally:
+            try:
+                await _close(source)
+            except BaseException as exc:
+                await self._report(exc, request, phase="cleanup")
+                if original is not None:
+                    raise original from exc
+                raise
 
     async def _catalog(
         self,
@@ -1055,19 +1321,27 @@ class McpDispatcher:
         request: McpRequest,
     ) -> CallToolResult | InputRequiredResult:
         """
-        Bound lexical search and reuse the ordinary execution pipeline.
+        Run a synthetic catalog search or batch-execution operation.
+
+        Report tool-error outcomes and bound completed catalog responses by the
+        configured output-size limit.
 
         Parameters
         ----------
         primitive : orionis.mcp.server.compiler.CompiledPrimitive
-            Compiled tool, resource or prompt declaration.
+            Synthetic primitive identifying the catalog and operation.
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context supplying search arguments or catalog tool calls.
 
         Returns
         -------
-        orionis.mcp.protocol.results.CallToolResult | orionis.mcp.InputRequiredResult
-            Result of the operation described above.
+        CallToolResult or InputRequiredResult
+            Tool-search or batch result, or a single-tool input-required response.
+
+        Raises
+        ------
+        McpInvalidParams
+            If the primitive has no catalog or completed output exceeds its budget.
         """
         if primitive.catalog is None:
             raise McpInvalidParams
@@ -1085,6 +1359,12 @@ class McpDispatcher:
         ):
             message = "Catalog output limit exceeded"
             raise McpInvalidParams(message)
+        if response.is_error:
+            await capture_result(
+                "tool_error", app=self.app, flow="mcp", phase="catalog",
+                operation=request.method, correlation_id=str(request.id),
+                expected=True, metadata={"transport": request.transport},
+            )
         return CallToolResult(
             content=response.content, structuredContent=response.structured_content,
             isError=response.is_error,
@@ -1094,19 +1374,20 @@ class McpDispatcher:
         self, catalog: CompiledCatalog, request: McpRequest,
     ) -> McpResponse:
         """
-        Rank precompiled text deterministically after request-specific checks.
+        Rank catalog text and return only request-accessible tool matches.
 
         Parameters
         ----------
         catalog : orionis.mcp.server.compiler.CompiledCatalog
-            Value supplied for ``catalog``.
+            Compiled lexical index and tools available to this catalog.
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context supplying search terms, result limits, and access checks.
 
         Returns
         -------
         orionis.mcp.McpResponse
-            Result of the operation described above.
+            Structured ``tools`` matches ordered by descending term score, then
+            name, within the requested and configured result limits.
         """
         query = cast("str", request.arguments.get("query", ""))
         terms = query.casefold().split()
@@ -1136,19 +1417,28 @@ class McpDispatcher:
         self, catalog: CompiledCatalog, request: McpRequest,
     ) -> McpResponse | InputRequiredResult:
         """
-        Execute a bounded batch through the same policy and validation path.
+        Execute catalog tool calls sequentially with shared validation and access.
+
+        Stop after the first tool error. Return an error when a multi-call batch
+        requires additional input, preserving input-required results for single calls.
 
         Parameters
         ----------
         catalog : orionis.mcp.server.compiler.CompiledCatalog
-            Value supplied for ``catalog``.
+            Compiled tools that this catalog permits callers to execute.
         request : orionis.mcp.McpRequest
-            Current request and its trusted execution context.
+            Context containing the ordered tool-call batch.
 
         Returns
         -------
-        orionis.mcp.McpResponse | orionis.mcp.InputRequiredResult
-            Result of the operation described above.
+        McpResponse or InputRequiredResult
+            Completed call results, a batch input-required error, or a single-call
+            input-required protocol response.
+
+        Raises
+        ------
+        McpInvalidParams
+            If the call count, target name, or accumulated output size is invalid.
         """
         calls = cast("tuple[Mapping[str, object], ...]", request.arguments["calls"])
         if not 0 < len(calls) <= self.config.tool_search_max_calls:
@@ -1195,17 +1485,23 @@ class McpDispatcher:
     @staticmethod
     async def _catalogResult(result: object) -> dict[str, object]:
         """
-        Discard intermediate notifications without accumulating their bytes.
+        Extract a catalog result while discarding intermediate stream notifications.
 
         Parameters
         ----------
         result : object
-            Value supplied for ``result``.
+            Immediate tool result or asynchronous stream of encoded protocol messages.
 
         Returns
         -------
         dict[str, object]
-            Result of the operation described above.
+            Built-in immediate result, or the last result mapping received from
+            the stream.
+
+        Raises
+        ------
+        McpInvalidParams
+            If a stream emits a protocol error or finishes without a result.
         """
         if not isinstance(result, AsyncIterator):
             return msgspec.to_builtins(result)
@@ -1227,43 +1523,74 @@ class McpDispatcher:
             raise McpInvalidParams(error)
         return final
 
-    async def _report(self, exception: Exception) -> None:
+    async def _report(  # noqa: PLR0913 - Explicit error-only context fields.
+        self, exception: BaseException, request: McpRequest | None = None,
+        *, transport: str = "in-process", phase: str = "execution",
+        expected: bool = False, correlation_id: str | int | None = None,
+        operation_name: str | None = None,
+    ) -> None:
         """
-        Use the native reporting hook without invoking HTML/CLI presentation.
+        Observe a dispatch failure with normalized request and error context.
+
+        Reclassify JSON-RPC internal errors by status, treating 503 as expected.
+        If such an error wraps an ``Exception``, report its cause as unexpected.
 
         Parameters
         ----------
-        exception : Exception
-            Exception being inspected or reported.
+        exception : BaseException
+            Failure to observe, optionally unwrapped from an internal protocol error.
+        request : orionis.mcp.McpRequest or None, optional
+            Context whose transport, method, and identifier override fallbacks.
+        transport : str, optional
+            Transport name used when no request context is supplied.
+        phase : str, optional
+            Execution or lifecycle phase attached to the failure.
+        expected : bool, optional
+            Expected-failure flag, overridden for internal errors as described above.
+        correlation_id : str | int | None, optional
+            Request identifier used when ``request`` is absent.
+        operation_name : str or None, optional
+            Protocol method or operation name used without request context.
 
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            Await shared MCP failure observation without constructing a reply.
         """
-        try:
-            get_handler = getattr(self.app, "getExceptionHandler", None)
-            if get_handler is None:
-                return
-            handler = await get_handler()
-            await self.app.call(handler, "report", exception=exception)
-        except Exception:  # noqa: BLE001 - Do not mask the original failure.
-            # Reporting must not turn an internal error into a second public failure.
-            return
+        if (
+            isinstance(exception, McpProtocolException)
+            and exception.code == _INTERNAL_ERROR_CODE
+        ):
+            expected = exception.status == _UNAVAILABLE_STATUS
+            if isinstance(exception.__cause__, Exception):
+                exception = exception.__cause__
+                expected = False
+        await report(
+            exception, self.app,
+            transport=request.transport if request is not None else transport,
+            phase=phase, expected=expected,
+            operation=request.method if request is not None else operation_name,
+            correlation_id=request.id if request is not None else correlation_id,
+        )
 
 async def _close(source: object) -> None:
     """
-    Close an optionally closable async source without retaining it.
+    Await a source's asynchronous close hook when one is available.
 
     Parameters
     ----------
     source : object
-        Source whose values or lifecycle are consumed by this operation.
+        Object optionally exposing an awaitable ``aclose`` method.
 
     Returns
     -------
     None
-        Complete the documented operation without returning a value.
+        Finish the close hook, or do nothing when ``aclose`` is absent.
+
+    Raises
+    ------
+    BaseException
+        If the asynchronous close hook fails or is cancelled.
     """
     close = getattr(source, "aclose", None)
     if close is not None:

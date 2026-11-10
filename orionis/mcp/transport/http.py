@@ -4,6 +4,7 @@ from __future__ import annotations
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Self
 import msgspec
+from orionis.failure.runtime import capture
 from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.responses import EventStreamResponse, Response
 from orionis.http.sse import ServerSentEvent
@@ -11,6 +12,7 @@ from orionis.mcp.dispatcher import McpDispatcher
 from orionis.mcp.exceptions import McpProtocolException
 from orionis.mcp.protocol.codecs import decode_envelope, encode_error
 from orionis.mcp.protocol.requests import CallToolParams
+from orionis.mcp.reporting import report
 from orionis.mcp.streams import AsyncClosable
 from orionis.mcp.transport.headers import validate_headers
 from orionis.mcp.transport.policy import McpProtocolResponse, origin_allowed
@@ -159,7 +161,7 @@ def _accepts_both(headers: Headers) -> bool:
 class McpHttpTransport:
     """Serve a registered endpoint without owning routes, sessions or identities."""
 
-    __slots__ = ("_active", "_compiled", "_config", "_dispatcher", "_origins")
+    __slots__ = ("_active", "_app", "_compiled", "_config", "_dispatcher", "_origins")
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
@@ -188,6 +190,8 @@ class McpHttpTransport:
         None
             Complete the documented operation without returning a value.
         """
+        self._app = app
+        """Application owning runtime failure reporting."""
         self._compiled = compiled
         """Precompiled metadata shared by request executions."""
         self._config = config
@@ -331,29 +335,132 @@ class McpHttpTransport:
                     media_type=_JSON_MEDIA_TYPE,
                 )
             events = _EventFrames(result.body, self._release)
-            try:
-                response = EventStreamResponse(events, status_code=result.status)
-            except BaseException:
-                transferred = True
-                await events.aclose()
-                raise
             transferred = True
-            return response
+            return await self._streamResponse(events, result.status)
         except McpProtocolException as exc:
+            await self._reportRequestFailure(exc, request_id, expected=True)
             return self._error(exc, request_id)
-        except PayloadTooLargeException:
+        except PayloadTooLargeException as exc:
+            await self._reportRequestFailure(
+                exc, request_id, phase="body", expected=True,
+            )
             return self._error(
                 McpProtocolException(-32600, "Request body too large", status=413),
                 request_id,
             )
-        except Exception:  # noqa: BLE001 - Transport failures must not expose internals.
+        except Exception as exc:  # noqa: BLE001 - Preserve the public error envelope.
+            await self._reportRequestFailure(exc, request_id)
             return self._error(
                 McpProtocolException(-32603, "Internal error", status=500),
                 request_id,
             )
+        except BaseException as exc:
+            await self._reportRequestFailure(exc, request_id)
+            raise
         finally:
             if admitted and not transferred:
                 self._release()
+
+    async def _reportRequestFailure(
+        self, exception: BaseException,
+        request_id: str | int | msgspec.UnsetType,
+        *, phase: str = "request", expected: bool = False,
+    ) -> None:
+        """
+        Report an HTTP request failure without passing an unset identifier.
+
+        Parameters
+        ----------
+        exception : BaseException
+            Request failure passed to the shared MCP reporting policy.
+        request_id : str | int | ``msgspec.UnsetType``
+            Request identifier; convert ``msgspec.UNSET`` to ``None`` for reporting.
+        phase : str, optional
+            Reporting phase, defaulting to ``"request"``.
+        expected : bool, optional
+            Whether shared reporting should treat the failure as expected.
+
+        Returns
+        -------
+        None
+            Await shared failure reporting with HTTP transport metadata.
+        """
+        await report(
+            exception, self._app, transport="http", phase=phase, expected=expected,
+            correlation_id=None if request_id is msgspec.UNSET else request_id,
+        )
+
+    async def _streamResponse(
+        self, events: _EventFrames, status: int,
+    ) -> EventStreamResponse:
+        """
+        Transfer event-source ownership to a response or clean up on failure.
+
+        Parameters
+        ----------
+        events : orionis.mcp.transport.http._EventFrames
+            Event source owning the producer iterator and admission slot.
+        status : int
+            HTTP status code for the event-stream response.
+
+        Returns
+        -------
+        orionis.http.responses.EventStreamResponse
+            Response owning the event source and its admission slot.
+
+        Raises
+        ------
+        BaseException
+            If response creation fails, after attempted reporting and cleanup.
+            Reporting or cleanup interruptions may take precedence.
+        """
+        try:
+            return EventStreamResponse(events, status_code=status)
+        except BaseException as original:
+            primary = original
+            try:
+                await capture(
+                    original, app=self._app, flow="mcp", phase="response",
+                    metadata={"transport": "http"},
+                )
+            except BaseException as interruption:
+                primary = interruption
+                raise
+            finally:
+                await self._closeFailedResponse(events, primary)
+            raise
+
+    async def _closeFailedResponse(
+        self, events: _EventFrames, primary: BaseException,
+    ) -> None:
+        """
+        Close failed-response events without suppressing cleanup interruptions.
+
+        Parameters
+        ----------
+        events : orionis.mcp.transport.http._EventFrames
+            Event source to close after response construction fails.
+        primary : BaseException
+            Construction or reporting failure retained if ordinary cleanup fails.
+
+        Returns
+        -------
+        None
+            Close the producer and release its admission slot.
+
+        Raises
+        ------
+        BaseException
+            If cleanup fails. Re-raise ``primary`` from an ordinary cleanup error;
+            propagate cleanup cancellation or other non-``Exception`` failures.
+        """
+        try:
+            await events.aclose()
+        except BaseException as cleanup:
+            await report(cleanup, self._app, transport="http", phase="cleanup")
+            if not isinstance(cleanup, Exception):
+                raise
+            raise primary from cleanup
 
     def _error(
         self,

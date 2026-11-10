@@ -2,6 +2,9 @@ import gc
 import logging
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import AsyncMock, MagicMock, patch
+from orionis.failure.base.handler import BaseExceptionHandler
+from orionis.failure.runtime import FailureRuntime, operation
 from orionis.foundation.config.logging.enums.levels import Level
 from orionis.logging.contracts.logger import ILogger
 from orionis.logging.handlers.advanced_rotating_file_handler import (
@@ -9,6 +12,7 @@ from orionis.logging.handlers.advanced_rotating_file_handler import (
 )
 from orionis.logging.logger import Logger
 from orionis.test import TestCase
+from tests.support.failure_runtime import activate_runtime
 
 # Alias registered by the framework for the internal logging channel.
 _LOGGER_NAME = "__orionis__"
@@ -933,6 +937,36 @@ class TestLoggerSwitchChannel(TestCase):
         finally:
             logger.close()
 
+    def testSwitchClosesAnActiveCachedHandlerOnlyOnce(self) -> None:
+        """Avoid duplicate cleanup of a sink shared by the logger and cache."""
+        logger = self._makeLogger()
+        try:
+            logger.info("before switch")
+            handler = logger.getLogger().handlers[0]
+            with patch.object(handler, "close", wraps=handler.close) as close:
+                self.assertTrue(logger.switchChannel("daily"))
+                close.assert_called_once()
+        finally:
+            logger.close()
+
+    def testSwitchObservesRecoveredCachedHandlerCloseFailure(self) -> None:
+        """Keep switching while offering recovered cleanup errors to the runtime."""
+        logger = self._makeLogger()
+        original = OSError("cached sink close")
+        cached = MagicMock(spec=logging.Handler)
+        cached.close.side_effect = original
+        try:
+            logger.info("before switch")
+            logger._Logger__handlers_cache["unused"] = cached
+            logger._Logger__handlers_cache["unused_alias"] = cached
+            with patch("orionis.failure.runtime.capture_nowait") as capture:
+                self.assertTrue(logger.switchChannel("daily"))
+            cached.close.assert_called_once()
+            capture.assert_called_once()
+            self.assertIs(capture.call_args.args[0], original)
+        finally:
+            logger.close()
+
     def testSwitchWritesTheConfirmationToTheNewChannel(self) -> None:
         """Confirm the switch through the newly activated channel.
 
@@ -957,6 +991,59 @@ class TestLoggerSwitchChannel(TestCase):
                 produced[0].read_text(encoding="utf-8"),
             )
         finally:
+            logger.close()
+
+    async def testSwitchCloseFailureStillClosesRemainingHandlersOnce(self) -> None:
+        """Drain all previous sinks when one active handler cannot close.
+
+        Returns
+        -------
+        None
+            Reject the switch and retain one observation per failed close.
+        """
+        logger = self._makeLogger()
+        app, _, _ = activate_runtime()
+        app.config = logger._Logger__app.config
+        app.path = logger._Logger__app.path
+        app.make = AsyncMock(return_value=logger)
+        logger._Logger__app = app
+        failure_handler = BaseExceptionHandler(MagicMock(), app)
+        runtime = FailureRuntime(app, failure_handler)
+        app._failure_runtime = runtime
+        runtime.activate(object())
+        failure = OSError("active sink close")
+        first, second, cached = (MagicMock(spec=logging.Handler) for _ in range(3))
+        first.close.side_effect = failure
+        try:
+            internal = logger.getLogger()
+            for handler in internal.handlers[:]:
+                handler.close()
+                internal.removeHandler(handler)
+            internal.handlers[:] = [first, second]
+            logger._Logger__handlers_cache = {
+                "stack": first, "second": second, "unused": cached,
+            }
+            with (
+                operation(app),
+                patch.object(failure_handler, "handleFailure",
+                             wraps=failure_handler.handleFailure) as hook,
+            ):
+                self.assertFalse(logger.switchChannel("daily"))
+                await runtime.drain()
+            first.close.assert_called_once()
+            second.close.assert_called_once()
+            cached.close.assert_called_once()
+            self.assertEqual(len(internal.handlers), 1)
+            self.assertEqual(logger.getActiveChannels(), ["stack"])
+            hook.assert_awaited_once()
+            self.assertIs(hook.call_args.kwargs["exception"], failure)
+            logger.error("report after failed switch")
+            path = Path(self._tmp.name) / "storage" / "logs" / "stack.log"
+            contents = path.read_text(encoding="utf-8")
+            self.assertIn("report after failed switch", contents)
+            self.assertEqual(contents.count("[OSError] active sink close"), 1)
+        finally:
+            first.close.side_effect = None
             logger.close()
 
     def testSwitchBeforeInitialisationStartsTheLogger(self) -> None:
@@ -1279,6 +1366,32 @@ class TestLoggerClose(TestCase):
         self._logger.info("populate")
         self._logger.close()
         self.assertIsNone(self._logger._Logger__logger)
+
+    def testUnexpectedCloseFailureDoesNotPreventOtherCleanup(self) -> None:
+        """Release every sink before propagating an unexpected close failure.
+
+        Returns
+        -------
+        None
+            Retain the exact exception, observe it once, and close siblings once.
+        """
+        first, second = (MagicMock(spec=logging.Handler) for _ in range(2))
+        original = ZeroDivisionError("external handler")
+        first.close.side_effect = original
+        internal = self._logger.getLogger()
+        internal.handlers.extend((first, second))
+        with (
+            patch("orionis.failure.runtime.capture_nowait") as capture,
+            self.assertRaises(ZeroDivisionError) as caught,
+        ):
+            self._logger.close()
+        self.assertIs(caught.exception, original)
+        first.close.assert_called_once()
+        second.close.assert_called_once()
+        self.assertEqual(internal.handlers, [])
+        self.assertEqual(self._logger.getActiveChannels(), [])
+        capture.assert_called_once()
+        self.assertIs(capture.call_args.args[0], original)
 
     def testCloseClearsTheActiveChannels(self) -> None:
         """Forget every active channel once the logger is closed.

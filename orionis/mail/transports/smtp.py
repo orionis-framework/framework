@@ -2,7 +2,6 @@
 
 import smtplib
 import ssl
-from contextlib import suppress
 from itertools import islice
 from typing import TYPE_CHECKING, Self
 from orionis.aio import Loop
@@ -222,14 +221,11 @@ class SmtpTransport(IMailTransport):
                 results.append(self._result(message, mailer, driver, refused))
             return tuple(results)
         except (OSError, ValueError) as exc:
-            code = None
-            if isinstance(exc, smtplib.SMTPResponseException):
-                code = exc.smtp_code
-            detail = f"{type(exc).__name__}" + (f", code {code}" if code else "")
-            error_msg = (
-                f"SMTP failed during {stage} ({detail}). "
-                "The server may have accepted the message; no retry was attempted."
-            )
+            detail = type(exc).__name__
+            if isinstance(exc, smtplib.SMTPResponseException) and exc.smtp_code:
+                detail += f", code {exc.smtp_code}"
+            notice = "The server may have accepted the message; no retry was attempted."
+            error_msg = f"SMTP failed during {stage} ({detail}). {notice}"
 
             # The original exception is suppressed because its payload can
             # carry credentials or private server responses.
@@ -239,8 +235,16 @@ class SmtpTransport(IMailTransport):
             raise MailBatchException(error_msg, tuple(results), len(results)) from None
         finally:
             if client is not None:
-                with suppress(OSError):
+                try:
                     client.close()
+                except OSError as cleanup_error:
+                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                    capture_nowait(
+                        cleanup_error,
+                        flow="mail",
+                        phase="cleanup",
+                        operation="smtp.close",
+                    )
 
     def _result(
         self: Self,

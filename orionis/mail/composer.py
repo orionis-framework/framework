@@ -1,6 +1,5 @@
 """Prepare all bodies and attachments before any transport side effect."""
 
-import asyncio
 from contextlib import suppress
 from email import policy
 from email.message import EmailMessage
@@ -13,6 +12,7 @@ from orionis.mail.entities.prepared import PreparedMail
 from orionis.mail.exceptions import MailAttachmentException, MailCompositionException
 from orionis.mail.functions import attachment_name, media_type
 from orionis.storage.contracts.manager import IStorageManager
+from orionis.support.concurrency import complete_on_cancel
 from orionis.support.facades.datetime import DateTime
 from orionis.storage.exceptions import UnsupportedStorageOperationException
 from orionis.view.contracts.engine import IViewEngine
@@ -180,12 +180,8 @@ class MailComposer:
         asyncio.CancelledError
             After in-progress storage work finishes and releases its stream.
         """
-        task = asyncio.create_task(self._readAttachment(attachment))
         try:
-            return await asyncio.shield(task)
-        except asyncio.CancelledError:
-            await _drain_attachment(task)
-            raise
+            return await complete_on_cancel(self._readAttachment(attachment))
         except MailCompositionException:
             raise
         except Exception as exc:
@@ -228,8 +224,16 @@ class MailComposer:
             await stream.__aenter__()
             payload = await stream.read()
         except BaseException:
-            with suppress(Exception):
+            try:
                 await stream.close()
+            except Exception as cleanup_error:  # noqa: BLE001
+                from orionis.failure.runtime import capture  # noqa: PLC0415
+                await capture(
+                    cleanup_error,
+                    flow="mail",
+                    phase="cleanup",
+                    operation="attachment.close",
+                )
             raise
         else:
             await stream.close()
@@ -334,22 +338,3 @@ class MailComposer:
             mime=message.as_bytes(),
             smtp_utf8=smtp_utf8,
         )
-
-async def _drain_attachment(task: asyncio.Task[LoadedAttachment]) -> None:
-    """
-    Finish owned storage cleanup while retaining the caller's cancellation.
-
-    Parameters
-    ----------
-    task : asyncio.Task[orionis.mail.composer.LoadedAttachment]
-        Shielded attachment task, possibly still opening a worker-owned stream.
-
-    Returns
-    -------
-    None
-        Observe the final task outcome without replacing cancellation.
-    """
-    completion = asyncio.gather(task, return_exceptions=True)
-    while not completion.done():
-        with suppress(asyncio.CancelledError):
-            await asyncio.shield(completion)

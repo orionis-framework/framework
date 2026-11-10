@@ -5,11 +5,14 @@ import logging
 from contextlib import suppress
 from pathlib import Path
 from threading import Lock
+from functools import partial
 from typing import ClassVar, Self
 from orionis.foundation.config.logging.enums.levels import Level
 from orionis.foundation.contracts.application import IApplication
 from orionis.logging.contracts.logger import ILogger
-from orionis.logging.handlers.queued import BoundedQueueHandler, LoggingDeliveryError
+from orionis.logging.handlers.queued import (
+    BoundedQueueHandler, LoggingDeliveryError, observe_sink_error,
+)
 from orionis.logging.handlers.rotating_handler_factory import RotatingHandlerFactory
 from orionis.support.concurrency import complete_on_cancel
 
@@ -158,7 +161,15 @@ class Logger(ILogger):
             Queued wrapper when enabled, otherwise the original handler.
         """
         capacity = self.__config.get("queue_capacity", 0)
-        return BoundedQueueHandler(handler, capacity) if capacity else handler
+        handler._orionis_failure_app = self.__app  # noqa: SLF001
+        if capacity:
+            return BoundedQueueHandler(handler, capacity, app=self.__app)
+        handler.handleError = partial(
+            observe_sink_error,
+            app=self.__app,
+            original=handler.handleError,
+        )
+        return handler
 
     def __createFormatter(self: Self) -> logging.Formatter:
         """
@@ -217,7 +228,14 @@ class Logger(ILogger):
                 app_root=app_root,
             )
             return handler
-        except OSError, ValueError, RuntimeError:
+        except (OSError, ValueError, RuntimeError) as error:
+            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            capture_nowait(
+                error,
+                app=self.__app,
+                flow="logging",
+                phase="configuration",
+            )
             return None
 
     def __normalizeChannelConfig(self: Self, config: dict) -> dict:
@@ -455,14 +473,28 @@ class Logger(ILogger):
             with self.__init_lock:
                 # Close current handlers and remove from logger.
                 # Iterate over a copy: removeHandler mutates the same list.
-                for handler in self.__logger.handlers[:]:
+                active_handlers = dict.fromkeys(self.__logger.handlers)
+                for handler in active_handlers:
                     handler.close()
                     self.__logger.removeHandler(handler)
 
                 # Clear cached handlers
-                for handler in self.__handlers_cache.values():
-                    with suppress(OSError, RuntimeError, ValueError):
+                for handler in dict.fromkeys(self.__handlers_cache.values()):
+                    if handler in active_handlers:
+                        continue
+                    try:
                         handler.close()
+                    except (OSError, RuntimeError, ValueError) as error:
+                        from orionis.failure.runtime import (  # noqa: PLC0415
+                            capture_nowait,
+                        )
+                        capture_nowait(
+                            error,
+                            app=self.__app,
+                            flow="logging",
+                            phase="switch_channel",
+                            operation="close",
+                        )
                 self.__handlers_cache.clear()
 
                 # Create new handler for the specified channel
@@ -486,7 +518,14 @@ class Logger(ILogger):
 
                 return False
 
-        except OSError, RuntimeError, ValueError:
+        except (OSError, RuntimeError, ValueError) as error:
+            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            capture_nowait(
+                error,
+                app=self.__app,
+                flow="logging",
+                phase="switch_channel",
+            )
             return False
 
     def close(self: Self) -> None:
@@ -512,10 +551,23 @@ class Logger(ILogger):
                 try:
                     handler.close()
                 except LoggingDeliveryError as error:
+                    if not isinstance(handler, BoundedQueueHandler):
+                        from orionis.failure.runtime import (  # noqa: PLC0415
+                            capture_nowait,
+                        )
+                        capture_nowait(
+                            error,
+                            app=self.__app,
+                            flow="logging",
+                            phase="cleanup",
+                        )
                     errors.append(error)
-                except OSError, RuntimeError, ValueError:
+                except (OSError, RuntimeError, ValueError) as error:
                     # Preserve synchronous handler cleanup compatibility.
-                    pass
+                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                    capture_nowait(
+                        error, app=self.__app, flow="logging", phase="cleanup",
+                    )
             self.__handlers_cache.clear()
             self.__logger = None
         if errors:

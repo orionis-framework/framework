@@ -216,7 +216,8 @@ class AdvancedRotatingFileHandler(Handler):
                 shutil.copyfileobj(f_in, f_out)
             # Remove the original file after compression.
             src.unlink()
-        except OSError:
+        except OSError as error:
+            self._observeFailure(error, phase="compression")
             # If compression fails, remove the incomplete compressed file.
             if dst.exists():
                 dst.unlink()
@@ -261,13 +262,36 @@ class AdvancedRotatingFileHandler(Handler):
                     gz_path: Path = file_path.with_suffix(file_path.suffix + ".gz")
                     if gz_path.exists():
                         gz_path.unlink()
-                except OSError:
+                except OSError as error:
+                    self._observeFailure(error, phase="cleanup")
                     # Ignore errors during file removal
                     continue
 
-        except OSError:
+        except OSError as error:
+            self._observeFailure(error, phase="cleanup")
             # Ignore cleanup errors to avoid affecting logging
-            pass
+
+    def _observeFailure(self, error: BaseException, *, phase: str) -> None:
+        """
+        Observe a recovered sink error without changing rotation behavior.
+
+        Parameters
+        ----------
+        error : BaseException
+            Recovered error to submit to the failure runtime.
+        phase : str
+            Logging operation associated with the failure.
+
+        Returns
+        -------
+        None
+            Forward the failure with logging metadata and any bound application.
+        """
+        from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+        capture_nowait(
+            error, app=getattr(self, "_orionis_failure_app", None),
+            flow="logging", phase=phase,
+        )
 
     def _ensureStream(self) -> None:
         """

@@ -2,7 +2,6 @@
 
 import os
 import secrets
-from contextlib import suppress
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING
@@ -136,8 +135,16 @@ class FileTransport(IMailTransport):
             os.link(temporary, final)
         finally:
             if temporary is not None:
-                with suppress(OSError):
+                try:
                     temporary.unlink(missing_ok=True)
+                except OSError as cleanup_error:
+                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                    capture_nowait(
+                        cleanup_error,
+                        flow="mail",
+                        phase="cleanup",
+                        operation="file.publish",
+                    )
         return final
 
 def create_file_transport(

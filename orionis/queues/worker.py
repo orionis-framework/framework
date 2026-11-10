@@ -386,7 +386,8 @@ class Worker(IWorker):
         Raises
         ------
         asyncio.CancelledError
-            If execution is cancelled, after attempting to release unfinished work.
+            If execution or failure observation is cancelled, after draining the
+            release of unfinished work, including repeated cancellation.
         Exception
             If ``raise_errors`` requests error propagation, or reporting an expired
             reservation itself fails.
@@ -409,49 +410,50 @@ class Worker(IWorker):
             envelope = None
             context = JobContext(self._driver, reserved, self._connection, self._fail)
             try:
-                envelope = self._serializer.decodeEnvelope(reserved.payload)
-                self._validateReservation(reserved, envelope)
-                remaining = reserved.reserved_until - current_time()
-                if remaining <= 0:
-                    return
-                execution_timeout = min(envelope.timeout, remaining * 0.95)
-                async with (
-                    asyncio.timeout(execution_timeout),
-                    self._app.beginScope(),
-                ):
-                    self._app.instance(JobContext, context)
-                    job = self._serializer.decode(envelope.job, envelope.payload)
-                    await self._app.call(job, "handle")
-                await self._finish(context, raise_errors=raise_errors)
+                try:
+                    envelope = self._serializer.decodeEnvelope(reserved.payload)
+                    self._validateReservation(reserved, envelope)
+                    remaining = reserved.reserved_until - current_time()
+                    if remaining <= 0:
+                        return
+                    execution_timeout = min(envelope.timeout, remaining * 0.95)
+                    async with (
+                        asyncio.timeout(execution_timeout),
+                        self._app.beginScope(),
+                    ):
+                        self._app.instance(JobContext, context)
+                        job = self._serializer.decode(envelope.job, envelope.payload)
+                        await self._app.call(job, "handle")
+                    await self._finish(context, raise_errors=raise_errors)
+                except Exception as exception:
+                    # Reporting cannot bypass the owner's cancellation cleanup.
+                    await self._observe(
+                        exception,
+                        reserved,
+                        "execution",
+                        "Queue job %s failed on attempt %s",
+                        reserved.id,
+                        reserved.attempts,
+                    )
+                    if not context.finished:
+                        try:
+                            await self._handleFailure(reserved, envelope, exception,
+                                                      raise_errors=raise_errors)
+                        except Exception as recovery_error:  # noqa: BLE001
+                            # Retain an unacknowledged lease for crash recovery.
+                            await self._observe(
+                                recovery_error,
+                                reserved,
+                                "recovery",
+                                "Cannot complete failed queue job %s",
+                                reserved.id,
+                            )
+                    if raise_errors:
+                        raise
             except asyncio.CancelledError:
                 if not context.finished:
-                    await self._releaseCancelled(reserved)
+                    await complete_on_cancel(self._releaseCancelled(reserved))
                 raise
-            except Exception as exception:
-                # Reporting must never prevent the lease-aware recovery below.
-                await self._observe(
-                    exception,
-                    reserved,
-                    "execution",
-                    "Queue job %s failed on attempt %s",
-                    reserved.id,
-                    reserved.attempts,
-                )
-                if not context.finished:
-                    try:
-                        await self._handleFailure(reserved, envelope, exception,
-                                                  raise_errors=raise_errors)
-                    except Exception as recovery_error:  # noqa: BLE001
-                        # Retain an unacknowledged lease for crash recovery.
-                        await self._observe(
-                            recovery_error,
-                            reserved,
-                            "recovery",
-                            "Cannot complete failed queue job %s",
-                            reserved.id,
-                        )
-                if raise_errors:
-                    raise
 
     async def _releaseCancelled(self, reserved: ReservedJob) -> None:
         """

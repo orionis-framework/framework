@@ -2,6 +2,7 @@
 
 import asyncio
 from typing import TYPE_CHECKING
+from orionis.failure.runtime import capture, capture_result
 from orionis.foundation.config.realtime.entities.realtime import (
     RealtimeConfig,  # noqa: TC001 - Constructor injection.
 )
@@ -12,7 +13,6 @@ from orionis.realtime.hub import Hub
 
 if TYPE_CHECKING:
     from orionis.realtime.contracts.connection import RealtimeConnectionLike
-
 
 class _Broadcast:
     """Share one immutable encoded payload per codec among bounded workers."""
@@ -28,23 +28,23 @@ class _Broadcast:
         encoded: dict[str, str | bytes],
     ) -> None:
         """
-        Prepare a shared recipient iterator and delivery counters.
+        Share recipient iteration, encoded frames, and counters across workers.
 
         Parameters
         ----------
-        manager : orionis.realtime.contracts.IConnectionManager
-            Registry used to recheck availability immediately before sending.
+        manager : orionis.realtime.contracts.manager.IConnectionManager
+            Registry used to recheck recipient availability before each send.
         hub : type[orionis.realtime.Hub]
-            Hub namespace restricting all recipients.
+            Hub namespace that every recipient must belong to.
         recipients : tuple[str, ``...``]
-            Snapshot of recipient identifiers; no connections are retained.
+            Recipient identifier snapshot shared by all delivery workers.
         encoded : dict[str, str | bytes]
-            Immutable frame payloads, encoded once per selected codec.
+            Frame values shared across workers, encoded once per selected codec.
 
         Returns
         -------
         None
-            Store delivery inputs and initialize successful and failed counts.
+            Retain delivery inputs and initialize shared sent/failed counters.
         """
         self.manager = manager
         """Registry used to recheck availability immediately before sending."""
@@ -61,21 +61,37 @@ class _Broadcast:
 
     async def run(self) -> None:
         """
-        Drain recipients while respecting each connection's backpressure.
+        Drain the shared recipient iterator and count per-connection outcomes.
 
         Returns
         -------
         None
-            Count failures independently; task cancellation propagates.
+            Count completed sends and failed or unavailable recipients, continuing
+            after ordinary delivery exceptions.
+
+        Raises
+        ------
+        asyncio.CancelledError
+            If the worker is cancelled; retain counts for completed recipients.
         """
         for connection_id in self.recipients:
             connection = self.manager.get(connection_id, self.hub)
             if connection is None:
                 self.failed += 1
+                await capture_result(
+                    "recipient_unavailable", flow="realtime", phase="broadcast",
+                    operation=self.hub.__name__, correlation_id=connection_id,
+                    expected=True,
+                )
                 continue
             try:
                 await connection.sendEncoded(self.encoded[connection.protocol.name])
-            except Exception:  # noqa: BLE001 - One failed recipient cannot abort others.
+            except Exception as exc:  # noqa: BLE001 - Preserve partial delivery.
+                await capture(
+                    exc, flow="realtime", phase="broadcast",
+                    operation=self.hub.__name__, correlation_id=connection_id,
+                    runtime=getattr(connection, "_failure_runtime", None),
+                )
                 self.failed += 1
             else:
                 self.sent += 1
@@ -94,17 +110,17 @@ class ConnectionManager(IConnectionManager):
 
     def __init__(self, config: RealtimeConfig) -> None:
         """
-        Initialize an empty registry with validated structural limits.
+        Initialize connection and Hub-local group registries with validated limits.
 
         Parameters
         ----------
-        config : orionis.realtime.config.RealtimeConfig
-            Group and broadcast limits shared by this application.
+        config : orionis.foundation.config.realtime.entities.realtime.RealtimeConfig
+            Realtime limits shared by connections and broadcast workers.
 
         Returns
         -------
         None
-            Store limits and initialize empty connection and membership maps.
+            Retain configuration and create empty connection and membership indexes.
         """
         self._config = config
         """Group and broadcast limits shared by this application."""
@@ -120,57 +136,57 @@ class ConnectionManager(IConnectionManager):
     @property
     def config(self) -> RealtimeConfig:
         """
-        Return the immutable application limits used by Hub lifecycles.
+        Return the application-wide realtime configuration.
 
         Returns
         -------
-        orionis.realtime.config.RealtimeConfig
-            Application-wide invocation, group and broadcast limits.
+        orionis.foundation.config.realtime.entities.realtime.RealtimeConfig
+            Invocation, client-result, group, and broadcast limits used by the manager.
         """
         return self._config
 
     @property
     def connectionCount(self) -> int:
         """
-        Return the number of owned, including provisional, connections.
+        Count registered connections regardless of readiness or closing state.
 
         Returns
         -------
         int
-            Number of registered connections regardless of readiness.
+            Number of owned entries, including provisional and closing connections.
         """
         return len(self._connections)
 
     @property
     def groupCount(self) -> int:
         """
-        Return the number of nonempty Hub-local groups.
+        Count nonempty groups across all Hub namespaces.
 
         Returns
         -------
         int
-            Number of groups with at least one registered member.
+            Number of Hub/group entries with at least one registered member.
         """
         return len(self._groups)
 
     def register(self, connection: RealtimeConnectionLike) -> None:
         """
-        Own one provisional connection before its onConnect hook.
+        Register a connection and its initial Hub-local membership state.
 
         Parameters
         ----------
-        connection : orionis.realtime.contracts.RealtimeConnectionLike
-            Connection with a cryptographically generated unique identifier.
+        connection : orionis.realtime.contracts.connection.RealtimeConnectionLike
+            Connection with a valid identifier not already owned by this worker.
 
         Returns
         -------
         None
-            Register the connection, its Hub namespace and empty memberships.
+            Retain the connection and initialize its Hub and membership indexes.
 
         Raises
         ------
         ValueError
-            If its identifier is invalid or already belongs to a connection.
+            If the identifier is invalid or already belongs to a registered connection.
         """
         connection_id = connection.context.connection_id
         validate_identifier(connection_id, "Connection identifier")
@@ -183,17 +199,18 @@ class ConnectionManager(IConnectionManager):
 
     def unregister(self, connection: RealtimeConnectionLike) -> None:
         """
-        Release owned registry entries and every group reference.
+        Remove one owned connection and all of its group memberships.
 
         Parameters
         ----------
-        connection : orionis.realtime.contracts.RealtimeConnectionLike
-            Exact connection instance to release; repeated release is harmless.
+        connection : orionis.realtime.contracts.connection.RealtimeConnectionLike
+            Exact registered instance; ignore absent or replaced instances.
 
         Returns
         -------
         None
-            Remove ownership without touching an instance that reused an ID.
+            Remove its registry and Hub entries and discard empty groups without
+            affecting another instance that reused the identifier.
         """
         connection_id = connection.context.connection_id
         if self._connections.get(connection_id) is not connection:
@@ -214,19 +231,20 @@ class ConnectionManager(IConnectionManager):
         self, connection_id: str, hub: type[Hub] | None = None,
     ) -> RealtimeConnectionLike | None:
         """
-        Look up a ready recipient without crossing an optional Hub boundary.
+        Return a ready, nonclosing connection within an optional Hub namespace.
 
         Parameters
         ----------
         connection_id : str
-            Identifier of the requested connection.
-        hub : type[orionis.realtime.Hub] | None, optional
-            Required owning Hub class, or None to omit namespace filtering.
+            Registered connection identifier to resolve.
+        hub : type[orionis.realtime.Hub] or None, optional
+            Exact owning Hub class, or ``None`` to disable namespace filtering.
 
         Returns
         -------
-        orionis.realtime.contracts.RealtimeConnectionLike | None
-            Ready, nonclosing connection in the requested namespace, or None.
+        orionis.realtime.contracts.connection.RealtimeConnectionLike or None
+            Ready, nonclosing connection, or ``None`` for absent, unready, closing,
+            or differently namespaced entries.
         """
         connection = self._connections.get(connection_id)
         if connection is None or not connection.ready or connection.closing:
@@ -237,28 +255,30 @@ class ConnectionManager(IConnectionManager):
 
     def snapshot(self) -> tuple[RealtimeConnectionLike, ...]:
         """
-        Snapshot all owned connections for bounded lifecycle shutdown.
+        Return all currently owned connections for lifecycle coordination.
 
         Returns
         -------
-        tuple[orionis.realtime.contracts.RealtimeConnectionLike, ``...``]
-            Active and provisional connections owned at the time of the call.
+        tuple[orionis.realtime.contracts.connection.RealtimeConnectionLike, ``...``]
+            Registered connection references, including provisional and closing ones,
+            at the time of the call.
         """
         return tuple(self._connections.values())
 
     def connectionIds(self, hub: type[Hub]) -> tuple[str, ...]:
         """
-        Snapshot ready connection identifiers in one Hub namespace.
+        Snapshot ready, nonclosing connection identifiers in one Hub namespace.
 
         Parameters
         ----------
         hub : type[orionis.realtime.Hub]
-            Owning Hub class.
+            Exact owning Hub class whose recipients should be selected.
 
         Returns
         -------
         tuple[str, ``...``]
-            Current ready recipients; no connection objects are retained.
+            Ready recipient IDs at the time of the call; an unknown Hub produces
+            an empty tuple.
         """
         return tuple(
             identifier for identifier in self._hubs.get(hub, ())
@@ -267,19 +287,20 @@ class ConnectionManager(IConnectionManager):
 
     def groupIds(self, hub: type[Hub], group: str) -> tuple[str, ...]:
         """
-        Snapshot ready group members without crossing Hub namespaces.
+        Snapshot ready, nonclosing group members within one Hub namespace.
 
         Parameters
         ----------
         hub : type[orionis.realtime.Hub]
-            Owning Hub class.
+            Exact Hub class owning the requested group.
         group : str
-            Group name within that Hub.
+            Group name within the selected Hub namespace.
 
         Returns
         -------
         tuple[str, ``...``]
-            Current ready recipients of the named group.
+            Ready member IDs at the time of the call, or an empty tuple for an
+            unknown Hub or group.
 
         Raises
         ------
@@ -294,28 +315,28 @@ class ConnectionManager(IConnectionManager):
 
     def join(self, connection_id: str, group: str) -> None:
         """
-        Join an active or provisional connection to a bounded group set.
+        Join a nonclosing owned connection to a Hub-local group.
 
         Parameters
         ----------
         connection_id : str
-            Owned connection, including one in its onConnect hook.
+            Registered connection identifier, including provisional connections.
         group : str
-            Hub-local group name, at most 256 characters.
+            Group name within the connection's owning Hub namespace.
 
         Returns
         -------
         None
-            Add membership without consuming another slot for repeated joins.
+            Add membership, leaving repeated joins unchanged without using capacity.
 
         Raises
         ------
         ValueError
             If the group name is invalid.
         ConnectionError
-            If this connection is absent or closing.
+            If the connection is absent or closing.
         RuntimeError
-            If joining another group would exceed its configured limit.
+            If adding a membership would exceed the connection's configured limit.
         """
         validate_group(group)
         connection = self._connections.get(connection_id)
@@ -333,19 +354,19 @@ class ConnectionManager(IConnectionManager):
 
     def leave(self, connection_id: str, group: str) -> None:
         """
-        Remove membership idempotently and discard empty group entries.
+        Remove an owned membership and discard empty Hub-local groups.
 
         Parameters
         ----------
         connection_id : str
-            Connection whose membership is being released.
+            Connection whose membership should be removed, if still registered.
         group : str
-            Hub-local group name.
+            Valid group name in the connection's Hub namespace.
 
         Returns
         -------
         None
-            Remove the membership if still owned.
+            Discard owned membership; ignore absent IDs and repeated leaves.
 
         Raises
         ------
@@ -366,22 +387,22 @@ class ConnectionManager(IConnectionManager):
 
     def hub(self, hub: type[Hub]) -> HubClients:
         """
-        Return application-service client targets for a Hub namespace.
+        Create application-service client selectors for one Hub class.
 
         Parameters
         ----------
         hub : type[orionis.realtime.Hub]
-            Hub class whose clients should receive events or invocations.
+            Hub class defining the recipient namespace.
 
         Returns
         -------
         orionis.realtime.HubClients
-            Client selectors without a connection-specific caller.
+            Selectors without a connection-specific caller, suitable for services.
 
         Raises
         ------
         TypeError
-            If the supplied class is not a Hub subclass.
+            If the supplied value is not a Hub class.
         """
         if not isinstance(hub, type) or not issubclass(hub, Hub):
             error_msg = "Realtime targets require a Hub subclass"
@@ -392,26 +413,30 @@ class ConnectionManager(IConnectionManager):
         self, hub: type[Hub], connection_ids: tuple[str, ...], envelope: object,
     ) -> BroadcastResult:
         """
-        Encode once per codec and deliver through bounded concurrent workers.
+        Broadcast an envelope with per-codec encoding and bounded concurrency.
 
         Parameters
         ----------
         hub : type[orionis.realtime.Hub]
-            Hub namespace restricting every recipient.
+            Exact Hub namespace restricting every recipient.
         connection_ids : tuple[str, ``...``]
-            Recipient identifiers selected by the application.
+            Recipient identifier occurrences to attempt, without deduplication.
         envelope : object
-            Typed or mapping envelope accepted by the selected Hub codecs.
+            Protocol envelope accepted by the selected connection codecs.
 
         Returns
         -------
         orionis.realtime.BroadcastResult
-            Successful and failed recipient counts; cancellation propagates.
+            Aggregate ``sent`` and ``failed`` counts, including unavailable recipients
+            as failures. Empty input returns zero counts.
 
         Raises
         ------
         TypeError, ValueError
-            If the payload cannot be encoded before delivery begins.
+            If encoding fails before recipient delivery starts.
+        asyncio.CancelledError
+            If delivery is cancelled; admitted connection-owned writes may finish
+            independently.
         """
         if not connection_ids:
             return BroadcastResult()

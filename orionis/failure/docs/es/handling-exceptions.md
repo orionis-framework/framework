@@ -1,226 +1,132 @@
-# Reportar y gestionar excepciones
+# Gestionar excepciones
 
-## Inicio rápido
+## Puntos de entrada de la aplicación
+
+Registra una subclase de aplicación mediante `app.withExceptionHandler(ExceptionHandler)` antes de `create()`. Ambos métodos retornan el resultado heredado para que el runtime reciba el plan seleccionado:
 
 ```python
 from orionis.failure.base import BaseExceptionHandler
+from orionis.failure.entities import FailureContext, FailureHandling
 
-handler = BaseExceptionHandler(object(), object())
-error = ValueError("invalid value", 7)
-throwable = handler.toThrowable(error)
 
-assert throwable.classtype is ValueError
-assert throwable.message == "invalid value"
-assert throwable.args == ("invalid value", "7")
-print(throwable.classtype.__name__, throwable.message)
+class ExceptionHandler(BaseExceptionHandler):
+    async def handleFailure(
+        self, exception: BaseException, context: FailureContext,
+    ) -> FailureHandling | None:
+        return await super().handleFailure(exception, context)
+
+    async def handleResult(
+        self, value: object, context: FailureContext,
+    ) -> FailureHandling | None:
+        return await super().handleResult(value, context)
 ```
 
-## Conceptos principales
+`IBaseExceptionHandler` declara exactamente estos dos hooks abstractos. Extender `BaseExceptionHandler` aporta ambas implementaciones predeterminadas. Implementar directamente el contrato exige ambos métodos. La aplicación prepara y reutiliza un handler fuera del scope de solicitudes; sus dependencias de constructor deben ser compatibles con esa duración.
 
-### Reportar antes de renderizar
+Retornar `None` selecciona una recepción sin efectos diferidos. Esperar `super().handleFailure(...)` y descartar su retorno pierde el logging y la presentación predeterminados. No vuelvas a capturar desde un hook ni guardes estado de cada incidente en el handler compartido.
 
-`Catch.exception()` invoca `report` después de resolver kernel y luego el renderer correspondiente. `call()` del contenedor inyecta parámetros como `ILogger` y `Console` a los métodos predeterminados.
+## Un incidente, un plan diferido
 
-### Despacho por contexto
+1. Un límite de ejecución entrega la excepción original y su `FailureContext` inmutable al runtime.
+2. El runtime deduplica la propagación dentro de la operación e invoca `handleFailure` una vez para ese incidente.
+3. `BaseExceptionHandler` construye un plan `FailureHandling` sin registrar ni renderizar. El runtime llama a su `complete()` bajo las protecciones de recursión, timeout y fallback.
+4. Cuando un propietario HTTP o CLI necesita salida, `Catch.exception()` usa `present(flow=..., request=...)` del mismo plan. No vuelve a invocar un hook de aplicación. Los demás propietarios conservan su recuperación, respuesta de protocolo o propagación.
 
-`KernelContext.CONSOLE` renderiza en consola y retorna `None`. `KernelContext.HTTP` retorna `Response` o `None`. Otro valor reporta pero no renderiza. La ausencia de scope o `kernel` es error de configuración runtime.
+El plan pertenece al incidente, no al handler compartido. `complete()` ejecuta una vez su callback asíncrono opcional `logging()`. `present()` ejecuta una vez su callback asíncrono opcional `presentation(*, flow, request=None)` y conserva el resultado. Si un callback falla, se conserva ese fallo y las llamadas repetidas no lo reintentan. No ejecutes estos métodos dentro del hook de aplicación.
 
-### Política HTTP pública
+El logging predeterminado resuelve `ILogger` y escribe un registro de excepción usando `Throwable` y el traceback original. `context.expected=True` omite ese logging. Las clases exactas en `dont_catch` omiten logging y presentación, aunque el hook recibe la excepción original. Durante el cierre final, `context.reporting_allowed=False` también impide que el plan base programe logging; la política personalizada debe respetar ese indicador.
 
-Excepciones conocidas mapean a pares estables de estado/mensaje. Errores desconocidos muestran detalle solo con `app.debug`; producción retorna `500 Internal Server Error`. La negociación viene de `request.wantsJson()`.
+`handleResult` recibe un resultado declarado fallido sin construir una excepción ni un traceback. Su implementación base retorna `None`. Una implementación personalizada puede retornar un plan para logging diferido; capturar ese resultado no reemplaza el valor original ni presenta automáticamente una respuesta HTTP/CLI.
 
-## Flujos de trabajo comunes
+## Personalizar una respuesta HTTP
 
-### Personalizar excepciones ignoradas
-
-Define `dont_catch` de una subclase como `frozenset` de clases exactas. Las coincidentes omiten log y render. Subclases no se ignoran implícitamente, evitando silenciar familias más amplias.
-
-### Instalar un handler personalizado
-
-Subclasifica o implementa `IBaseExceptionHandler`, conserva firmas inyectables y regístralo mediante la API de handler de aplicación. `Catch` lo resuelve una vez y reutiliza.
-
-### Retornar fallos API seguros
-
-Lanza excepciones framework de autenticación, autorización, routing, payload, media type o CSRF. El handler las mapea sin importar debug y solicita a `DefaultResponses` JSON o HTML según request.
-
-## Ejemplos
-
-### Ignorar una clase exacta
+Este handler de aplicación convierte un conflicto de dominio en HTTP 409 y conserva el logging y la salida CLI heredados. Usa variables locales para que los incidentes concurrentes no se sobrescriban. Conserva el callback de presentación heredado antes de reemplazarlo; llamar a `present()` del propio plan dentro de ese callback produciría recursión.
 
 ```python
 from orionis.failure.base import BaseExceptionHandler
+from orionis.failure.entities import FailureContext, FailureHandling
+from orionis.http import JSONResponse
 
 
-class QuietError(Exception):
+class OrderConflict(Exception):
     pass
 
 
-class ChildError(QuietError):
-    pass
+class ExceptionHandler(BaseExceptionHandler):
+    async def handleFailure(
+        self, exception: BaseException, context: FailureContext,
+    ) -> FailureHandling | None:
+        plan = await super().handleFailure(exception, context)
+        if (
+            not isinstance(exception, OrderConflict)
+            or self.isExceptionIgnored(exception)
+        ):
+            return plan
 
+        inherited_presentation = plan.presentation
 
-handler = BaseExceptionHandler(object(), object())
-BaseExceptionHandler.dont_catch = frozenset({QuietError})
-assert handler.isExceptionIgnored(QuietError("quiet"))
-assert not handler.isExceptionIgnored(ChildError("child"))
-BaseExceptionHandler.dont_catch = frozenset()
-print("exact matching ok")
+        async def present(*, flow: str, request: object | None = None) -> object:
+            if flow == "http":
+                return JSONResponse(
+                    {"message": "Order already processed"}, status_code=409,
+                )
+            if inherited_presentation is not None:
+                return await inherited_presentation(flow=flow, request=request)
+            return None
+
+        plan.presentation = present
+        return plan
 ```
 
+Registra esta clase antes del inicio. No añadas `OrderConflict` a `dont_catch` si necesitas la respuesta 409, porque esa política también suprime la presentación. Para omitir solo logging de una excepción de negocio seleccionada, asigna `None` a `logging` del plan retornado. Para reemplazar logging, suministra un callback async que respete `context.reporting_allowed`; deja la ejecución al runtime.
 
-### Reportar mediante logger
+## Política HTTP y CLI predeterminada
 
-```python
-import asyncio
-from orionis.failure.base import BaseExceptionHandler
+`Catch.exception()` lee `kernel` del scope activo. `KernelContext.CONSOLE` solicita `flow="cli"` y el plan base llama a `Console.exception`. `KernelContext.HTTP` solicita `flow="http"` con el request o adaptador. Otros valores de kernel no solicitan presentación. La ausencia de scope o `kernel` produce `RuntimeError`.
 
+Las excepciones HTTP conocidas, incluidas sus subclases, se mapean a pares estables de estado y mensaje público. Los errores desconocidos muestran detalle solo con `app.debug` activo; producción retorna `500 Internal Server Error` genérico. JSON o HTML depende de `request.wantsJson()`. Los fallos de autenticación también reciben `WWW-Authenticate: Bearer` cuando el guard actual es `token`.
 
-class Log:
-    def __init__(self) -> None:
-        self.messages = []
-
-    def error(self, message: str) -> None:
-        self.messages.append(message)
-
-
-handler = BaseExceptionHandler(object(), object())
-log = Log()
-result = asyncio.run(handler.report(RuntimeError("boom"), log))
-assert result is not None
-assert log.messages == ["[RuntimeError] boom"]
-print(log.messages[0])
-```
-
-
-### Despachar un fallo de consola
-
-```python
-import asyncio
-from orionis.failure import Catch
-from orionis.failure.enums import KernelContext
-
-
-class Scope:
-    async def get(self, name: str):
-        assert name == "kernel"
-        return KernelContext.CONSOLE
-
-
-class Handler:
-    def __init__(self) -> None:
-        self.calls = []
-
-    async def report(self, exception: BaseException) -> None:
-        self.calls.append(("report", str(exception)))
-
-    async def handleCLI(self, exception: BaseException) -> None:
-        self.calls.append(("cli", str(exception)))
-
-
-class App:
-    def __init__(self) -> None:
-        self.handler = Handler()
-
-    async def getExceptionHandler(self):
-        return self.handler
-
-    def getCurrentScope(self):
-        return Scope()
-
-    async def call(self, target, method: str, **kwargs):
-        return await getattr(target, method)(**kwargs)
-
-
-app = App()
-assert asyncio.run(Catch(app).exception(RuntimeError("boom"))) is None
-assert app.handler.calls == [("report", "boom"), ("cli", "boom")]
-print(app.handler.calls)
-```
-
-
-### Mapear fallo de ruta a HTTP 404
-
-```python
-import asyncio
-from orionis.failure.base import BaseExceptionHandler
-from orionis.http.routes.exceptions.route_not_found import RouteNotFound
-
-
-class Responses:
-    async def error(self, **kwargs):
-        return kwargs
-
-    async def exception(self, **kwargs):
-        return kwargs
-
-
-class App:
-    def config(self, name: str):
-        assert name == "app.debug"
-        return False
-
-
-class Request:
-    path = "/missing"
-    method = "GET"
-
-    def wantsJson(self) -> bool:
-        return True
-
-
-handler = BaseExceptionHandler(Responses(), App())
-response = asyncio.run(handler.handleHTTP(RouteNotFound("missing"), Request()))
-assert response == {
-    "status_code": 404,
-    "content": "Route not found",
-    "expects_json": True,
-}
-print(response["status_code"], response["content"])
-```
-
-
-### Usar la fachada en aplicación iniciada
+Dentro de un límite HTTP existente de una aplicación iniciada, usa la fachada cuando ese límite sea dueño de la respuesta:
 
 ```python
 from orionis.support.facades import Catch
+
 
 async def handle_failure(exception: BaseException, request):
     return await Catch.exception(exception, request)
 ```
 
-## Integración con Orionis
+Un fallo del logging no impide por sí solo la presentación. El runtime contiene los fallos del hook y del logging, y escribe diagnósticos de emergencia acotados en stderr con identidad de incidente y tipos de excepción. Evita mensajes sensibles y el stdout del protocolo. La cancelación y las excepciones de control de proceso conservan su comportamiento.
 
-`CatchProvider` es core. Vincula `ICatch` al singleton `Catch` con alias `x-orionis-ICatch` y fija la fachada. Kernel HTTP, reactor console, scheduler y middleware de session inyectan `ICatch` para llevar fallos a una sola política.
+## Captura despues del inicio
 
-La aplicación resuelve su handler configurado, predeterminado `BaseExceptionHandler`. Las llamadas del contenedor inyectan logging, console y responses. Fallos de autenticación token reciben además `WWW-Authenticate: Bearer` si el guard actual es `token`.
-
-## Convertir un conflicto de dominio en una respuesta
-
-En una aplicación, guarda este módulo en `app/exceptions/handler.py` y registra `ExceptionHandler` mediante `app.withExceptionHandler(ExceptionHandler)` antes de `create()`. El handler conserva la política nativa para el resto de errores. El estado de cada error queda en variables locales, no en atributos del singleton.
-
-`Catch` llama a `report` antes de renderizar. Por tanto, este conflicto todavía se registra mediante la política heredada. No añadas `OrderConflict` a `dont_catch` si necesitas devolver la respuesta 409: esa colección suprime también el renderizado. Cuando ajustes la política de logging, sobrescribe `report` de forma explícita y conserva las dependencias inyectadas que necesites. Un fallo del logger interrumpe el flujo antes del renderer.
+HTTP y CLI activan la recepción después del inicio exitoso; HTTP sin lifespan la activa después de inicializar su kernel de forma diferida. `create()` por sí solo no activa esta garantía. Para ejecución headless, completa `await app.boot()` y delimita una ejecución propia:
 
 ```python
-from orionis.failure.base import BaseExceptionHandler
-from orionis.http import JSONResponse, Response, Request
-from orionis.http.adapters.request.contracts.transport import TransportAdapter
+from orionis.failure.runtime import capture, operation
 
-class OrderConflict(Exception):
-    pass
-
-class ExceptionHandler(BaseExceptionHandler):
-    async def handleHTTP(
-        self,
-        exception: BaseException,
-        request: Request | TransportAdapter,
-    ) -> Response | None:
-        if isinstance(exception, OrderConflict):
-            return JSONResponse({"message": "Order already processed"}, status_code=409)
-        return await super().handleHTTP(exception, request)
+await app.boot()
+try:
+    with operation(app, flow="worker", operation="import", isolated=True):
+        try:
+            await service.run()
+        except Exception as error:
+            await capture(error, phase="execution")
+            raise
+finally:
+    await app.aclose()
 ```
+
+`operation()` establece contexto y deduplicación; no captura errores automáticamente. Su propietario notifica y conserva propagación, respuesta o recuperación. Incluye el consumo de streams dentro del límite. Las tareas creadas allí con `Loop.createTask` quedan supervisadas; las llamadas externas arbitrarias a `asyncio.create_task` necesitan su propio propietario explícito.
+
+`aclose()` libera el propietario headless, cancela y drena las tareas supervisadas cuando finaliza el último propietario, y después cierra el logging. No ejecuta callbacks del lifecycle HTTP. La recepción sigue disponible durante la limpieza, con logging deshabilitado cuando se cierran sus recursos.
+
+El servicio inyectado también admite `await catch.capture(error, context=FailureContext(flow="worker", phase="execution"))`. `FailureReceipt` distingue entrega, reporte, duplicado y degradación; `None` indica que no hay runtime activo o que se trata de una excepción de control excluida. La propagación repetida dentro de una operación comparte el incidente; los intentos y las operaciones independientes permanecen separados.
+
+El contexto contiene origen, fase, correlación, `expected`, `reporting_allowed` y metadatos escalares acotados. No contiene request, socket ni scope. Mantén el request vivo en el propietario de la ejecución y pásalo solamente al solicitar presentación. No hay hooks globales de Python que observen código externo arbitrario; los fallos anteriores al inicio quedan fuera de la garantía del runtime.
 
 ## Fuentes y siguientes pasos
 
-[catch.py](../../catch.py) · [handler.py](../../base/handler.py) · [provider.py](../../provider.py)
+[Catch](../../catch.py) · [Handler base](../../base/handler.py) · [Plan de manejo](../../entities/handling.py) · [Runtime](../../runtime.py)
 
 [Volver al índice del módulo](README.md).

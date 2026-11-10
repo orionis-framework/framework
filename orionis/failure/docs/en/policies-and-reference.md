@@ -2,72 +2,105 @@
 
 ## Public API
 
-### `Catch(app)`
+### Application handler contract
 
-The only symbol exported by `orionis.failure`. Its async `exception(exception, request=None)` resolves and caches the application handler, reads the current scope's `kernel`, reports, and dispatches. Direct construction is primarily framework/testing infrastructure; applications normally use the support facade or receive `ICatch` through injection.
+`IBaseExceptionHandler`, available from `orionis.failure.contracts.handler`, declares two abstract async methods:
 
-### `BaseExceptionHandler`
+| Method | Return | Responsibility |
+|---|---|---|
+| `handleFailure(exception, context)` | `FailureHandling \| None` | Receive the original exception and select deferred effects once per incident. |
+| `handleResult(value, context)` | `FailureHandling \| None` | Receive a declared failed outcome without manufacturing an exception. |
 
-- `toThrowable(exception)` stringifies every exception argument and preserves the native traceback.
-- `isExceptionIgnored(exception)` tests exact exception-class membership in `dont_catch`.
-- `report(exception, log)` logs `[ClassName] message` and returns `Throwable`, or `None` when ignored.
-- `handleCLI(exception, console)` delegates display to `console.exception` unless ignored.
-- `handleHTTP(exception, request)` builds mapped, production, or debug responses.
+`BaseExceptionHandler` implements both. Its `handleFailure` returns a plan preserving default logging and HTTP/CLI presentation; its `handleResult` returns `None`. The helper `toThrowable(exception)` stringifies arguments and retains the native traceback. `isExceptionIgnored(exception)` tests exact exception-class membership in `dont_catch` and rejects non-exceptions with `TypeError`.
 
-### `Throwable`
+### `FailureHandling`
 
-A frozen, keyword-only, slotted dataclass with `classtype`, `message`, stringified `args`, and optional native `traceback`. It does not serialize or format itself.
+Import from `orionis.failure.entities`. This mutable, incident-local plan is separate from immutable context and receipts.
 
-### Contracts and facade
+| Member | Meaning |
+|---|---|
+| `logging` | Optional async callable with no arguments. The runtime owns execution. |
+| `presentation` | Optional async callable accepting keyword arguments `flow` and `request=None`. The protocol owner requests execution. |
+| `complete()` | Runs logging once; success marks `reported=True`. Repeated calls do not retry a failed callback. |
+| `present(*, flow, request=None)` | Runs presentation once and caches its result or failure. |
+| `reported`, `degraded` | Status of the plan's handling. Runtime receipts expose delivery status without retaining the plan or exception. |
 
-`ICatch` is exported from `orionis.failure.contracts`; `IBaseExceptionHandler` remains available from its defining module. The application facade is `orionis.support.facades.Catch`, distinct from the concrete package export.
+The handler selects callbacks and returns the plan. Runtime reporting protection wraps completion; `complete()` is not an independent emergency reporter. Presentation is deferred until the execution owner has its live request. Keep plans out of singleton attributes and never retain them across independent incidents.
 
-## Configuration
+### Context, receipt, and throwable
 
-This module has no dedicated config file. The default handler reads `app.debug`:
+`FailureContext`, `FailureReceipt`, and `Throwable` are exported from `orionis.failure.entities`.
+
+- `FailureContext` is immutable and contains flow, phase, operation, correlation/event identifiers, `expected`, `reporting_allowed`, and bounded scalar metadata. It does not retain transport objects. The runtime disables `reporting_allowed` when reporting resources begin closing.
+- `FailureReceipt` contains `event_id`, `delivered`, `reported`, `duplicate`, and `degraded`. Delivery does not imply logging: expected, ignored, or observation-only failures can be delivered without an ERROR record.
+- `Throwable` is frozen, keyword-only, and slotted, with `classtype`, `message`, stringified `args`, and optional native `traceback`. It does not serialize or format itself.
+
+### Catch, facade, and runtime helpers
+
+`Catch` is exported by `orionis.failure`; `ICatch` by `orionis.failure.contracts`. Applications normally receive `ICatch` by injection or use `orionis.support.facades.Catch`. `CatchProvider` binds the singleton service and pins the facade.
+
+`Catch.exception(exception, request=None)` reads the active scope's `kernel`, captures the incident, and asks its plan for HTTP/CLI presentation. Existing incident state is reused without a second application-hook call. `Catch.capture(exception, *, context)` requires no scope and requests no presentation.
+
+`capture`, `capture_result`, and `operation` are available from `orionis.failure.runtime`. Capture requires an active post-startup runtime. Owners explicitly notify failures and retain their response, retry, recovery, and propagation behavior. A custom result plan may log, but `capture_result` does not replace the original result or render automatically.
+
+## Configuration and defaults
+
+There is no dedicated configuration file. Register the handler class through `app.withExceptionHandler(...)` before `create()`. The base HTTP policy reads `app.debug`:
 
 | Value | Unknown HTTP exception behavior |
 |---|---|
 | `False` | Sanitized status 500 with `Internal Server Error`. |
-| `True` | Detailed exception response with request path/method. |
+| `True` | Detailed exception response with request path and method. |
 
-The exception handler class is registered through the application API. `dont_catch` is code-level handler policy, not an environment setting.
+Known exceptions map to 401 authentication, 403 authorization, 404 route not found, 405 method not allowed, 413 payload too large, 415 unsupported media type, and 419 CSRF mismatch. HTTP mapping walks the MRO and therefore includes subclasses. Content negotiation uses `request.wantsJson()`.
 
-## Errors and edge cases
+`dont_catch` is a class-level `frozenset` of exact classes. Matching suppresses both default logging and presentation. Subclasses are not implicitly ignored. `context.expected=True` suppresses default ERROR logging while retaining presentation. `context.reporting_allowed=False` suppresses default logger use during final shutdown; custom logging callbacks must honor this flag.
 
-- Missing active scope or missing `kernel` raises `RuntimeError`; reporting cannot proceed safely.
-- HTTP context with no usable request fails when the handler asks `wantsJson()`; always pass the request/adapter.
-- `isExceptionIgnored` requires a `BaseException` instance and rejects other objects with `TypeError`.
-- Ignore matching is exact by `type(exception)`, while HTTP mapping walks the exception MRO and therefore includes subclasses.
-- If reporting itself raises, renderer dispatch does not occur.
-- `KeyboardInterrupt`, `SystemExit`, and other `BaseException` subclasses can reach the API; ignore/handle them deliberately.
+## Failure and lifecycle boundaries
 
-Mapped statuses are 401 authentication, 403 authorization, 404 route not found, 405 method not allowed, 413 payload too large, 415 unsupported media type, and 419 CSRF mismatch.
+- Missing scope or `kernel` raises `RuntimeError` in `Catch.exception()`; use capture for observation without a scope.
+- Pass the live request or adapter for HTTP presentation. The base plan has no HTTP output without it.
+- The runtime protects hook execution and deferred logging with recursion checks, a cooperative timeout, and a bounded stderr fallback. Reporting failure can degrade delivery while allowing presentation.
+- Cancellation, `KeyboardInterrupt`, `SystemExit`, and `GeneratorExit` are not converted into server failures.
+- Before activation, capture returns `None`. `create()` alone does not activate the runtime, and failures before successful startup are outside the coverage guarantee.
+- External code that consumes exceptions must notify explicitly. Orionis installs no global Python exception hooks for arbitrary external execution.
+- A failed result must be explicitly declared by its execution owner; the runtime does not infer failure from every ordinary return value.
 
 ## Performance and concurrency
 
-The first concurrent call resolves the exception handler behind an `asyncio.Lock`; later calls reuse it without locking. Scope and kernel are still fetched for every exception because they are context-local. `Throwable` conversion and mapping are small in-memory operations; logging and response rendering dominate cost.
+The application reuses one prepared handler. Operation context, deduplication, and handling plans isolate incident state; completed operations release retained references. Independent operations and retry attempts are not one global incident. Constructor dependencies and custom policy must be safe for the shared handler lifetime.
 
-The singleton keeps only the resolved handler, while request and exception state stay local to each coroutine. Custom handlers must follow the same rule to remain safe under concurrent HTTP requests.
+Incident records and identifiers are allocated on failure paths. Execution boundaries and supervised tasks still perform context and lifecycle work during successful execution; this is not a zero-overhead guarantee. Deferred logging and presentation avoid doing protocol work where the execution owner does not request it.
 
-## Compatibility
+## Migrate a custom handler
 
-Orionis declares Python 3.14+. The module relies on Orionis HTTP, auth, logging, console, and container contracts and introduces no separate third-party dependency.
+This is a breaking contract change. `report`, `handleHTTP`, and `handleCLI` have been removed from the handler contract and the base handler. Runtime and Catch do not call old overrides, and there are no compatibility wrappers.
 
+1. Move exception policy into `handleFailure(exception, context)` and failed-result policy into `handleResult(value, context)`.
+2. Start from `plan = await super().handleFailure(exception, context)` to retain native behavior. Return that plan; awaiting and discarding it loses the deferred effects.
+3. Replace logging or presentation by assigning async callbacks to the plan. Preserve the inherited presentation callback when other flows still need it. Use `context.reporting_allowed` when adding logging.
+4. Keep callback state local to the incident. Let the runtime complete logging and the protocol owner request presentation. Do not call capture again from either hook.
+
+Direct implementations of `IBaseExceptionHandler` must implement both abstract methods and may return `None` for observation without effects. The base `handleResult` returns `None`, so delegating overrides should return its result too.
+
+Orionis requires Python 3.14+ and uses its HTTP, auth, logging, console, and container services without adding a separate third-party dependency for this module.
 
 ## Module structure
 
 | Path | Responsibility |
 |---|---|
-| `catch.py` | Handler resolution, reporting, and kernel-context dispatch. |
-| `base/handler.py` | Default reporting, CLI output, HTTP mapping, debug policy. |
-| `entities/throwable.py` | Frozen, slotted structured exception record. |
+| `catch.py` | Capture and presentation dispatch using the selected incident plan. |
+| `runtime.py` | Post-startup activation, protected completion, capture, supervision, and deduplication. |
+| `entities/context.py` | Immutable context and delivery receipt. |
+| `entities/handling.py` | Deferred logging and cached presentation for one incident. |
+| `base/handler.py` | Default policy selected through the two application hooks. |
+| `entities/throwable.py` | Structured exception record with native traceback. |
 | `enums/kernel_type.py` | `CONSOLE` and `HTTP` scope markers. |
-| `contracts/` | Catch and exception-handler abstract interfaces. |
+| `contracts/` | Catch and two-hook handler interfaces. |
 | `provider.py` | Singleton binding and facade pinning. |
 
-## Evidence and next steps
+## Sources and next steps
 
-[handler.py](../../base/handler.py) · [throwable.py](../../entities/throwable.py) · [handler.py](../../contracts/handler.py)
+[Handler contract](../../contracts/handler.py) · [Base handler](../../base/handler.py) · [Handling plan](../../entities/handling.py) · [Context](../../entities/context.py)
 
 [Return to the module index](README.md).

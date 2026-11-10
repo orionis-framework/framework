@@ -1,5 +1,6 @@
-"""Provide shared reporting and response hooks for exceptions."""
+"""Select default logging and deferred presentation for application failures."""
 
+from functools import partial
 from typing import ClassVar
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.exceptions import (
@@ -9,6 +10,8 @@ from orionis.auth.exceptions import (
 from orionis.console.output.console import Console
 from orionis.foundation.contracts.application import IApplication
 from orionis.failure.contracts.handler import IBaseExceptionHandler
+from orionis.failure.entities.context import FailureContext
+from orionis.failure.entities.handling import FailureHandling
 from orionis.failure.entities.throwable import Throwable
 from orionis.http.adapters.request.contracts.transport import TransportAdapter
 from orionis.http.default.responses import DefaultResponses
@@ -34,11 +37,9 @@ _HTTP_STATUS_MAP: dict[type[BaseException], tuple[int, str]] = {
 """Map handled exception types to their public HTTP status and message."""
 
 class BaseExceptionHandler(IBaseExceptionHandler):
+    """Select logging and protocol presentation through one failure hook."""
 
     # ruff: noqa: TC001
-
-    # Exceptions that should not be caught by the handler
-    """Provide shared reporting and response hooks for exceptions."""
 
     dont_catch: ClassVar[frozenset[type[BaseException]]] = frozenset()
     """Exceptions that should not be caught by the handler."""
@@ -68,6 +69,69 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         """Default responses for HTTP error handling."""
         self.__application = application
         """The application instance containing configuration and context."""
+
+    async def handleFailure(
+        self,
+        exception: BaseException,
+        context: FailureContext,
+    ) -> FailureHandling:
+        """
+        Select default effects without logging or rendering during observation.
+
+        Parameters
+        ----------
+        exception : BaseException
+            Original exception, including expected failures.
+        context : FailureContext
+            Immutable origin, phase and correlation of the failure.
+
+        Returns
+        -------
+        FailureHandling
+            Logging and presentation owned by this incident's execution.
+
+        Notes
+        -----
+        Return this plan from application overrides to preserve default effects.
+        Logging runs after the hook returns; presentation runs only when the
+        protocol owner requests it. Neither operation invokes this hook again.
+        """
+        if self.isExceptionIgnored(exception):
+            return FailureHandling()
+        return FailureHandling(
+            logging=(
+                partial(self.__log, exception)
+                if not context.expected and context.reporting_allowed else None
+            ),
+            presentation=partial(self.__present, exception),
+        )
+
+    async def handleResult(
+        self,
+        value: object,
+        context: FailureContext,
+    ) -> FailureHandling | None:
+        """
+        Observe a declared failed result without creating an exception.
+
+        Parameters
+        ----------
+        value : object
+            Failed outcome supplied by its execution owner.
+        context : FailureContext
+            Immutable origin, phase and correlation of the outcome.
+
+        Returns
+        -------
+        None
+            Preserve the original result and its protocol behavior.
+
+        Notes
+        -----
+        This default hook does not log or render. Application handlers may
+        override it to apply policy without observing the outcome a second time.
+        """
+        del value, context
 
     def toThrowable(
         self,
@@ -126,11 +190,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         # Check whether the exact exception class is configured to be ignored.
         return type(exception) in self.dont_catch
 
-    async def report(
-        self,
-        exception: BaseException,
-        log: ILogger,
-    ) -> Throwable | None:
+    async def __log(self, exception: BaseException) -> None:
         """
         Log an exception and its traceback as a single error record.
 
@@ -141,21 +201,15 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         ----------
         exception : BaseException
             The exception instance that was caught.
-        log : orionis.logging.contracts.ILogger
-            The logger instance for error reporting.
 
         Returns
         -------
-        orionis.failure.entities.Throwable or None
-            The structured Throwable object if reported, otherwise None.
+        None
+            Preserve the original traceback in one logging record.
         """
-        # Skip reporting if the exception should be ignored
-        if self.isExceptionIgnored(exception):
-            return None
-
         # Convert the exception into a structured Throwable object
         throwable = self.toThrowable(exception)
-
+        log = await self.__application.make(ILogger)
         log.getLogger().error(
             "[%s] %s",
             throwable.classtype.__name__,
@@ -163,48 +217,22 @@ class BaseExceptionHandler(IBaseExceptionHandler):
             exc_info=(type(exception), exception, throwable.traceback),
         )
 
-        # Return the structured exception
-        return throwable
-
-    async def handleCLI(
+    async def __present(
         self,
         exception: BaseException,
-        console: Console,
-    ) -> None:
-        """
-        Render the exception message for CLI output.
-
-        Parameters
-        ----------
-        exception : BaseException
-            The exception instance that was caught.
-        console : orionis.console.output.contracts.console.IConsole
-            The console instance for output.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        # Skip reporting if the exception should be ignored
-        if self.isExceptionIgnored(exception):
-            return
-
-        # Output the exception details to the console
-        console.exception(exception)
-
-    async def handleHTTP(
-        self,
-        exception: BaseException,
-        request: Request | TransportAdapter,
+        *,
+        flow: str,
+        request: Request | TransportAdapter | None = None,
     ) -> Response | None:
         """
-        Handle the exception for HTTP responses.
+        Present the exception only when its HTTP or CLI owner requests it.
 
         Parameters
         ----------
         exception : BaseException
             The exception instance that was caught.
+        flow : str
+            Protocol whose execution owner requested presentation.
         request
             The HTTP request instance or transport adapter that was being processed.
 
@@ -213,8 +241,11 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         orionis.http.Response | None
             The HTTP response if handled, otherwise None.
         """
-        # Skip reporting if the exception should be ignored
-        if self.isExceptionIgnored(exception):
+        if flow == "cli":
+            console = await self.__application.make(Console)
+            console.exception(exception)
+            return None
+        if flow != "http" or request is None:
             return None
 
         # Determine if the client expects a JSON response

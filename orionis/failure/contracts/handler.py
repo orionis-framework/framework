@@ -1,121 +1,64 @@
-"""Define the contract for base exception handler implementations."""
+"""Define the unified application failure handler contract."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from orionis.console.output.contracts.console import IConsole
-    from orionis.failure.entities.throwable import Throwable
-    from orionis.logging.contracts.logger import ILogger
-    from orionis.http.adapters.request.contracts.transport import TransportAdapter
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
+    from orionis.failure.entities.context import FailureContext
+    from orionis.failure.entities.handling import FailureHandling
+
 
 class IBaseExceptionHandler(ABC):
-    """Define the contract for base exception handler implementations."""
+    """Receive original failures and declared failed outcomes exactly once."""
 
     @abstractmethod
-    def toThrowable(
+    async def handleFailure(
         self,
         exception: BaseException,
-    ) -> Throwable:
+        context: FailureContext,
+    ) -> FailureHandling | None:
         """
-        Convert an exception to a structured Throwable object.
+        Select deferred effects for the original exception.
+
+        Defer logging to the runtime and presentation to the execution owner.
 
         Parameters
         ----------
         exception : BaseException
-            Exception instance to be converted.
+            Original exception instance supplied by the execution boundary.
+        context : orionis.failure.entities.context.FailureContext
+            Immutable execution metadata describing the failure.
 
         Returns
         -------
-        orionis.failure.entities.Throwable
-            Structured Throwable object containing class, message, arguments,
-            and traceback.
+        orionis.failure.entities.handling.FailureHandling or None
+            Deferred handling plan, or ``None`` to observe without logging or
+            presentation.
         """
 
     @abstractmethod
-    def isExceptionIgnored(
+    async def handleResult(
         self,
-        exception: BaseException,
-    ) -> bool:
+        value: object,
+        context: FailureContext,
+    ) -> FailureHandling | None:
         """
-        Determine whether the given exception should be ignored.
+        Select deferred effects for a declared failed result.
+
+        Preserve the original result without constructing an exception. Defer
+        logging to the runtime and presentation to the execution owner.
 
         Parameters
         ----------
-        exception : BaseException
-            The exception instance to check.
+        value : object
+            Original result classified as a failure by its execution owner.
+        context : orionis.failure.entities.context.FailureContext
+            Immutable execution metadata describing the failed result.
 
         Returns
         -------
-        bool
-            True if the exception should be ignored, otherwise False.
-        """
-
-    @abstractmethod
-    async def report(
-        self,
-        exception: BaseException,
-        log: ILogger,
-    ) -> Throwable | None:
-        """
-        Log an exception and its traceback as a single error record.
-
-        Parameters
-        ----------
-        exception : BaseException
-            The exception instance that was caught.
-        log : orionis.logging.contracts.ILogger
-            The logger instance for error reporting.
-
-        Returns
-        -------
-        orionis.failure.entities.Throwable or None
-            The structured Throwable object if reported, otherwise None.
-        """
-
-    @abstractmethod
-    async def handleCLI(
-        self,
-        exception: BaseException,
-        console: IConsole,
-    ) -> None:
-        """
-        Render the exception message for CLI output.
-
-        Parameters
-        ----------
-        exception : BaseException
-            The exception instance that was caught.
-        console : orionis.console.output.contracts.console.IConsole
-            The console instance for output.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-
-    @abstractmethod
-    async def handleHTTP(
-        self,
-        exception: BaseException,
-        request: Request | TransportAdapter,
-    ) -> Response | None:
-        """
-        Handle the exception for HTTP responses.
-
-        Parameters
-        ----------
-        exception : BaseException
-            The exception instance that was caught.
-        request : Request | TransportAdapter
-            The HTTP request instance or transport adapter that was being processed.
-
-        Returns
-        -------
-        orionis.http.Response | None
-            The HTTP response if handled, otherwise None.
+        orionis.failure.entities.handling.FailureHandling or None
+            Deferred handling plan, or ``None`` to observe without logging or
+            presentation.
         """

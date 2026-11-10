@@ -17,7 +17,7 @@ from dataclasses import replace
 from contextlib import contextmanager
 from concurrent.futures import Future as ThreadFuture
 from threading import Lock
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, cast
 from uuid import uuid4
 from orionis.failure.entities.context import FailureContext, FailureReceipt
 from orionis.failure.entities.handling import FailureHandling
@@ -30,10 +30,12 @@ _current: contextvars.ContextVar[_Operation | None] = contextvars.ContextVar(
     "orionis_failure_operation",
     default=None,
 )
+"""Current operation carrying the application-local incident ledger."""
 _reporting: contextvars.ContextVar[FailureRuntime | None] = contextvars.ContextVar(
     "orionis_failure_reporting",
     default=None,
 )
+"""Runtime executing reporting effects, used to prevent recursive delivery."""
 
 def _emergency(
     exception: BaseException | None,
@@ -70,6 +72,27 @@ def _emergency(
         )
     except Exception:  # noqa: BLE001, S110 - Last resort must not recurse.
         pass
+
+async def _cancellation_checkpoint() -> int:
+    """
+    Deliver pending caller cancellation before entering a protected reporter.
+
+    Returns
+    -------
+    int
+        Cancellation requests already consumed by the caller. A later internal
+        ``CancelledError`` must not be mistaken for one of these old requests.
+
+    Raises
+    ------
+    asyncio.CancelledError
+        If a cancellation request is still pending at the checkpoint.
+    """
+    task = asyncio.current_task()
+    if task is not None and task.cancelling():
+        await asyncio.sleep(0)
+    return task.cancelling() if task is not None else 0
+
 
 def _find_runtime(app: object | None = None) -> FailureRuntime | None:
     """
@@ -138,6 +161,7 @@ class _Incident:
     __slots__ = (
         "abandoned", "context", "exception", "handling", "ready", "receipt", "started",
     )
+    """Incident fields retained only for the owning operation's lifetime."""
 
     def __init__(self, exception: BaseException, receipt: FailureReceipt) -> None:
         """
@@ -156,12 +180,19 @@ class _Incident:
             Store the failure and prepare an unresolved completion signal.
         """
         self.exception = exception
+        """Original exception used for incident identity and native traceback."""
         self.receipt = receipt
+        """Immutable delivery status shared by duplicate notifications."""
         self.context: FailureContext | None = None
+        """Metadata supplied to the hook when delivery starts."""
         self.handling: FailureHandling | None = None
+        """Selected deferred effects shared by incident consumers."""
         self.ready: ThreadFuture = ThreadFuture()
+        """Thread-safe completion notice without an exception-valued result."""
         self.started = False
+        """Whether delivery has started and may already have performed effects."""
         self.abandoned = False
+        """Whether delivery was cancelled before starting and can be reclaimed."""
 
     def abandon(self) -> None:
         """
@@ -286,6 +317,7 @@ class _Operation:
         "runtime",
         "token",
     )
+    """Bounded operation state with lazy allocation of its incident ledger."""
 
     def __init__(
         self,
@@ -321,17 +353,26 @@ class _Operation:
             Store execution metadata and defer ledger allocation until an incident.
         """
         self.runtime = runtime
+        """Application coordinator associated with this execution boundary."""
         self.flow = flow
+        """Execution flow used to enrich incident metadata."""
         self.name = name
+        """Logical operation name supplied by its owner."""
         self.correlation_id = correlation_id
+        """Correlation identifier allocated lazily when an incident occurs."""
         self.parent = (
             parent if parent is not None and not parent.closed
             and parent.runtime is runtime else None
         )
+        """Live enclosing operation belonging to the same runtime, if any."""
         self.owns = isolated or self.parent is None
+        """Whether this boundary owns and releases an independent ledger."""
         self.ledger: dict[int, _Incident] | None = None
+        """Incident identity registry, allocated only after a failure."""
         self.token = None
+        """Context-variable token restored when this boundary exits."""
         self.closed = False
+        """Whether this boundary has released its incident references."""
 
     def __enter__(self) -> Self:
         """
@@ -489,9 +530,13 @@ class _InactiveOperation:
     """Allocation-free context when no application observation is active."""
 
     __slots__ = ()
+    """The shared inactive sentinel stores no per-operation state."""
     closed = True
+    """Inactive boundaries never expose a live operation."""
     ledger = None
+    """Inactive boundaries never allocate an incident ledger."""
     runtime = None
+    """Inactive boundaries have no application coordinator."""
 
     def __enter__(self) -> Self:
         """
@@ -521,11 +566,13 @@ class _InactiveOperation:
         return # NOSONAR
 
 _inactive_operation = _InactiveOperation()
+"""Shared no-op boundary used when observation is inactive."""
 
 class _BorrowedOperation:
     """Reuse identical nested metadata without replacing or closing its owner."""
 
     __slots__ = ()
+    """Borrowed boundaries retain no state beyond the current context."""
 
     def __enter__(self) -> _Operation:
         """
@@ -555,6 +602,7 @@ class _BorrowedOperation:
         return # NOSONAR
 
 _borrowed_operation = _BorrowedOperation()
+"""Shared context manager for an identical nested operation."""
 
 def operation(
     app: object | None = None,
@@ -688,7 +736,7 @@ def _parent_context(
     cause = exception.__cause__ or exception.__context__
     parent = current.lookup(cause) if cause is not None else None
     if parent is not None:
-        return replace(context, parent_event_id=parent.event_id)
+        return cast("FailureContext", replace(context, parent_event_id=parent.event_id))
     return context
 
 def handoff(
@@ -761,19 +809,33 @@ class FailureRuntime:
             Store configuration without activating observation.
         """
         self.app = app
+        """Application providing dependency resolution and hook invocation."""
         self.handler = handler
+        """Prepared shared application handler, resolved lazily when absent."""
         self.timeout = timeout
+        """Cooperative timeout in seconds for a reporting operation."""
         self._owners: set[object] = set()
+        """Active owners retaining the runtime's shared resources."""
         self._closing_owners: set[object] = set()
+        """Owners retaining observation while final resource closure completes."""
         self._loop: asyncio.AbstractEventLoop | None = None
+        """Serving loop used to schedule notification from native threads."""
         self._pending: set[asyncio.Task] = set()
+        """Outstanding loop-local failure notifications to drain."""
         self._tasks: set[asyncio.Task] = set()
+        """Supervised application tasks cancelled and drained at final shutdown."""
         self._thread_pending: set[Future] = set()
+        """Cross-thread notification futures retained until completion."""
         self._pending_lock = Lock()
+        """Serialize incident reservation and pending cross-thread registries."""
         self._prepare_lock = asyncio.Lock()
+        """Serialize preparation of the shared application handler."""
         self.lifecycle_lock = asyncio.Lock()
+        """Coordinate runtime activation with final shared-resource closure."""
         self._reporting_enabled = True
+        """Whether ordinary logging resources remain safe to use."""
         self._fallback_handler = None
+        """Scope-free native policy selected after custom handling fails."""
 
     @property
     def active(self) -> bool:
@@ -980,6 +1042,7 @@ class FailureRuntime:
         BaseException
             If caller cancellation or another control-flow exception must propagate.
         """
+        cancellations = await _cancellation_checkpoint()
         try:
             handling = await self._invoke(method, **kwargs)
             if handling is not None and not isinstance(handling, FailureHandling):
@@ -988,7 +1051,7 @@ class FailureRuntime:
         except BaseException as secondary:
             if isinstance(secondary, asyncio.CancelledError):
                 task = asyncio.current_task()
-                if task is not None and task.cancelling():
+                if task is not None and task.cancelling() > cancellations:
                     raise
             elif not isinstance(secondary, Exception):
                 raise
@@ -1020,6 +1083,7 @@ class FailureRuntime:
             If caller cancellation or another control-flow exception must propagate.
         """
         from orionis.failure.base.handler import BaseExceptionHandler  # noqa: PLC0415
+        cancellations = await _cancellation_checkpoint()
         try:
             async with asyncio.timeout(self.timeout):
                 handler = self.handler
@@ -1036,7 +1100,7 @@ class FailureRuntime:
         except BaseException as secondary:
             if isinstance(secondary, asyncio.CancelledError):
                 task = asyncio.current_task()
-                if task is not None and task.cancelling():
+                if task is not None and task.cancelling() > cancellations:
                     raise
             elif not isinstance(secondary, Exception):
                 raise
@@ -1067,9 +1131,9 @@ class FailureRuntime:
             owner = current._owner()
             if owner.correlation_id is None:
                 owner.correlation_id = uuid4().hex
-            return replace(
+            return cast("FailureContext", replace(
                 context, correlation_id=current.correlation_id or owner.correlation_id,
-            )
+            ))
         return context
 
     def _begin(
@@ -1186,13 +1250,14 @@ class FailureRuntime:
             return False, True
         if handling is None:
             return False, False
+        cancellations = await _cancellation_checkpoint()
         try:
             async with asyncio.timeout(self.timeout):
                 await handling.complete()
         except BaseException as secondary:
             if isinstance(secondary, asyncio.CancelledError):
                 task = asyncio.current_task()
-                if task is not None and task.cancelling():
+                if task is not None and task.cancelling() > cancellations:
                     raise
             elif not isinstance(secondary, Exception):
                 raise
@@ -1393,11 +1458,14 @@ class FailureRuntime:
         incident.started = True
         incident.context = context
         handling = None
+        token = _reporting.set(self)
         try:
             handling = await self._defaultHandling(
-                exception, replace(context, reporting_allowed=False),
+                exception,
+                cast("FailureContext", replace(context, reporting_allowed=False)),
             )
         finally:
+            _reporting.reset(token)
             incident.finish(handling)
         return handling
 
@@ -1434,29 +1502,90 @@ class FailureRuntime:
         receipt = FailureReceipt(event_id=context.event_id)
         if _reporting.get() is self:
             _emergency(None, context)
-            return replace(receipt, degraded=True)
+            return cast("FailureReceipt", replace(receipt, degraded=True))
         token = _reporting.set(self)
         try:
             delivered, handling = await self._attempt(
                 "handleResult", None, context, value=value, context=context,
             )
             reported, degraded = await self._completeHandling(handling, None, context)
-            return replace(
+            return cast("FailureReceipt", replace(
                 receipt, delivered=delivered, reported=reported,
                 degraded=not delivered or degraded,
-            )
+            ))
         except Exception as secondary:  # noqa: BLE001 - Preserve the outcome.
             _emergency(None, context, secondary)
-            return replace(receipt, degraded=True)
+            return cast("FailureReceipt", replace(receipt, degraded=True))
         finally:
             _reporting.reset(token)
+
+    async def presentHandling(
+        self, handling: FailureHandling, exception: BaseException, *,
+        context: FailureContext, request: object | None = None,
+    ) -> object:
+        """
+        Present a selected plan with bounded, nonrecursive failure handling.
+
+        Parameters
+        ----------
+        handling : FailureHandling
+            Shared incident plan whose presentation must never be retried.
+        exception : BaseException
+            Primary failure to preserve if presentation cannot complete.
+        context : FailureContext
+            Presentation flow and incident metadata for emergency diagnostics.
+        request : object or None, optional
+            Live transport state, retained only by the selected plan.
+
+        Returns
+        -------
+        object
+            Selected presentation result, or ``None`` on reporter reentry.
+
+        Raises
+        ------
+        BaseException
+            The primary failure if presentation fails or times out. Genuine
+            caller cancellation and process-control signals propagate unchanged.
+        """
+        reporter = _reporting.get()
+        if reporter is not None and reporter.app is self.app:
+            return None
+        current = _runtime_operation(self)
+        incident = current.incident(exception) if current is not None else None
+        diagnostic_context = (
+            incident.context
+            if incident is not None and incident.context is not None else context
+        )
+        cancellations = await _cancellation_checkpoint()
+        token = _reporting.set(self)
+        try:
+            async with asyncio.timeout(self.timeout):
+                return await handling.present(flow=context.flow, request=request)
+        except BaseException as secondary:
+            if isinstance(secondary, asyncio.CancelledError):
+                task = asyncio.current_task()
+                if task is not None and task.cancelling() > cancellations:
+                    raise
+            elif not isinstance(secondary, Exception):
+                raise
+            handling.degraded = True
+            if not handling._presentation_diagnosed:
+                handling._presentation_diagnosed = True
+                _emergency(exception, diagnostic_context, secondary)
+        finally:
+            _reporting.reset(token)
+        # Raise outside the secondary's except block so the primary keeps its
+        # existing cause and context, including its original traceback chain.
+        raise exception
 
     async def drain(self) -> None:
         """
         Await owned callback reports until no pending report remains.
 
         Include reports enqueued during draining. Return immediately from this
-        runtime's application reporter to avoid self-deadlock.
+        runtime's application reporter to avoid self-deadlock. Yield after joining
+        completed reports so their queued ownership callbacks can run.
 
         Returns
         -------
@@ -1477,6 +1606,9 @@ class FailureRuntime:
             if not pending:
                 return
             await asyncio.gather(*pending, return_exceptions=True)
+            # On Python 3.14 gather of completed tasks can finish inline. Their
+            # queued done callbacks must run before checking ownership again.
+            await asyncio.sleep(0)
 
     def createTask(
         self, coroutine: object, *, name: str | None = None,
@@ -1556,12 +1688,18 @@ class FailureRuntime:
         task.add_done_callback(finished)
         return task
 
-    async def shutdown(self) -> None:
+    async def shutdown(self, *, exclude: asyncio.Task | None = None) -> None:
         """
         Cancel owned application tasks and drain their failure reports.
 
         Exclude the current task and return immediately from a reporting callback
         to avoid waiting on the reporter itself.
+
+        Parameters
+        ----------
+        exclude : asyncio.Task or None, optional
+            Lifecycle owner awaiting this cleanup from another task. Exclude it
+            to avoid cancelling and waiting on the task that owns this shutdown.
 
         Returns
         -------
@@ -1571,7 +1709,8 @@ class FailureRuntime:
         if _reporting.get() is self:
             return
         tasks = tuple(
-            task for task in self._tasks if task is not asyncio.current_task()
+            task for task in self._tasks
+            if task is not asyncio.current_task() and task is not exclude
         )
         for task in tasks:
             task.cancel()
@@ -1616,6 +1755,7 @@ def _context(
     correlation_id: str | None,
     expected: bool,
     metadata: Mapping[str, object] | None,
+    parent_event_id: str | None = None,
 ) -> FailureContext:
     """
     Build failure metadata using compatible operation defaults.
@@ -1636,6 +1776,8 @@ def _context(
         Whether the execution owner classifies this as an expected failure.
     metadata : collections.abc.Mapping[str, object] or None
         Additional incident metadata to sanitize, or ``None`` for no metadata.
+    parent_event_id : str or None, optional
+        Explicit causal incident transferred across an asynchronous boundary.
 
     Returns
     -------
@@ -1657,6 +1799,7 @@ def _context(
         phase=phase,
         operation=operation,
         correlation_id=correlation_id,
+        parent_event_id=parent_event_id,
         expected=expected,
         metadata=metadata or {},
     )
@@ -1670,6 +1813,7 @@ async def capture(
     phase: str = "execution",
     operation: str | None = None,
     correlation_id: str | None = None,
+    parent_event_id: str | None = None,
     expected: bool = False,
     metadata: Mapping[str, object] | None = None,
 ) -> FailureReceipt | None:
@@ -1695,6 +1839,9 @@ async def capture(
         Logical operation name; inherit the current name when ``None``.
     correlation_id : str or None, optional
         Correlation identifier; inherit the current value when ``None``.
+    parent_event_id : str or None, optional
+        Causal incident identifier supplied by an owner transferring cleanup
+        across a task boundary without modifying the exception's Python chain.
     expected : bool, default False
         Mark the failure as expected for reporting policy.
     metadata : collections.abc.Mapping[str, object] or None, optional
@@ -1723,6 +1870,7 @@ async def capture(
             phase=phase,
             operation=operation,
             correlation_id=correlation_id,
+            parent_event_id=parent_event_id,
             expected=expected,
             metadata=metadata,
         ),

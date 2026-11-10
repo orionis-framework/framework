@@ -1,418 +1,403 @@
-from __future__ import annotations
+"""Exercise one failure hook followed by deferred transport presentation."""
+
 import asyncio
 import inspect
+import io
+from contextlib import redirect_stderr
 from typing import get_args
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
+from orionis.container.container import Container
 from orionis.failure.catch import Catch
 from orionis.failure.contracts.catch import ICatch
+from orionis.failure.entities.handling import FailureHandling
 from orionis.failure.enums.kernel_type import KernelContext
+from orionis.failure.runtime import FailureRuntime, capture, operation
 from orionis.http.adapters.request.contracts.transport import TransportAdapter
-from orionis.test import TestCase
+from tests.support.failure_runtime import IsolatedFailureTestCase
 
-# Minimum number of positional args expected in app.call(handler, method, ...)
-_CALL_MIN_POSITIONAL = 2
 
-def _make_catch(
-    scope: object | None = None,
-    kernel: object | None = None,
-    exception_handler: object | None = None,
-) -> Catch:
-    """
-    Build a Catch instance backed by a fully mocked IApplication.
+class _Handler:
+    """Select logging and presentation while recording their execution order."""
 
-    Parameters
-    ----------
-    scope : object or None
-        Value returned by app.getCurrentScope(); None simulates no scope.
-    kernel : object or None
-        Value returned by scope.get('kernel'); None simulates no kernel.
-    exception_handler : object or None
-        Value returned by app.getExceptionHandler().
+    def __init__(self) -> None:
+        self.effects = []
+        self.failures = []
+        self.presentations = []
 
-    Returns
-    -------
-    Catch
-        A Catch instance ready for testing.
-    """
-    mock_scope = AsyncMock()
-    mock_scope.get = AsyncMock(return_value=kernel)
+    async def handleFailure(self, exception, context):
+        self.effects.append("hook")
+        self.failures.append((exception, context))
 
-    mock_app = MagicMock()
-    mock_app.getCurrentScope.return_value = scope if scope is not None else mock_scope
-    mock_app.getExceptionHandler = AsyncMock(return_value=exception_handler)
-    mock_app.call = AsyncMock(return_value=None)
+        async def log():
+            self.effects.append("logging")
 
-    return Catch(app=mock_app)
+        async def present(*, flow, request=None):
+            self.effects.append("presentation")
+            self.presentations.append((exception, flow, request))
+            return request if flow == "http" else None
 
-class TestCatchIsICatch(TestCase):
+        return FailureHandling(logging=log, presentation=present)
 
-    def testIsSubclassOfICatch(self) -> None:
-        """Confirm that Catch is a subclass of ICatch.
+    async def handleResult(self, _value, _context):
+        return None
 
-        Validates the interface contract so that the dependency injection
-        container can resolve ICatch to Catch transparently.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
+def _application(*, active=False):
+    """Use real DI invocation without any application bootstrap or services."""
+    app = object.__new__(Container)
+    Container.__init__(app)
+    handler = _Handler()
+    app.getExceptionHandler = AsyncMock(return_value=handler)
+    if active:
+        app._failure_runtime = FailureRuntime(app, handler)
+        app._failure_runtime.activate(object())
+    return app, handler
+
+
+class TestCatch(IsolatedFailureTestCase):
+    """Verify native transport ownership and one observation per incident."""
+
+    def testContractAndTransportRequestAnnotation(self) -> None:
+        """Preserve transport adapter typing and the injectable Catch contract."""
         self.assertTrue(issubclass(Catch, ICatch))
-
-    def testExceptionMethodIsCoroutine(self) -> None:
-        """Confirm that the exception method is a coroutine function.
-
-        Validates that callers can safely await Catch.exception without
-        any additional async wrapping.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertTrue(inspect.iscoroutinefunction(Catch.exception))
-
-    def testRequestAnnotationIncludesTransportAdapter(self) -> None:
-        """Keep the transport request type available to runtime inspection.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
         annotation = inspect.signature(Catch.exception).parameters["request"].annotation
         self.assertIn(TransportAdapter, get_args(annotation))
 
-class TestCatchNoScope(TestCase):
-
-    async def testRaisesRuntimeErrorWhenNoScope(self) -> None:
-        """Raise RuntimeError when no active application scope is found.
-
-        Validates the guard that prevents exception handling from
-        continuing without a valid scope, signalling a misconfiguration.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = None
-        mock_app.getExceptionHandler = AsyncMock(return_value=MagicMock())
-        mock_app.call = AsyncMock(return_value=None)
-
-        catch = Catch(app=mock_app)
+    async def testNoActiveScopeRaises(self) -> None:
+        """Reject presentation without a scope that owns transport state."""
+        app, _ = _application()
         with self.assertRaises(RuntimeError):
-            await catch.exception(RuntimeError("no scope"))
+            await Catch(app).exception(RuntimeError("no scope"))
+        app.getExceptionHandler.assert_not_awaited()
 
-class TestCatchNoKernel(TestCase):
+    async def testNoKernelRaises(self) -> None:
+        """Reject presentation when the active scope has no transport kernel."""
+        app, _ = _application()
+        async with app.beginScope():
+            with self.assertRaises(RuntimeError):
+                await Catch(app).exception(RuntimeError("no kernel"))
+        app.getExceptionHandler.assert_not_awaited()
 
-    async def testRaisesRuntimeErrorWhenNoKernel(self) -> None:
-        """Raise RuntimeError when the scope contains no kernel entry.
+    async def testStandaloneConsoleCompletesPlanBeforeRendering(self) -> None:
+        """A standalone Catch preserves CLI output and logging order."""
+        app, handler = _application()
+        error = ValueError("console")
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.CONSOLE)
+            self.assertIsNone(await Catch(app).exception(error))
+        self.assertEqual(handler.effects, ["hook", "logging", "presentation"])
+        self.assertEqual(handler.presentations, [(error, "cli", None)])
+        self.assertEqual(handler.failures[0][1].flow, "cli")
 
-        Validates the guard that prevents exception handling from
-        continuing without an identified kernel context.
+    async def testStandaloneHttpPassesRequestAndReturnsResponse(self) -> None:
+        """A unified plan retains the caller's HTTP response and live request."""
+        app, handler = _application()
+        request = object()
+        error = ValueError("http")
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            response = await Catch(app).exception(error, request)
+        self.assertIs(response, request)
+        self.assertEqual(handler.effects, ["hook", "logging", "presentation"])
+        self.assertEqual(handler.presentations, [(error, "http", request)])
+        self.assertEqual(handler.failures[0][1].flow, "http")
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value=None)
+    async def testUnknownKernelHasNoPresentation(self) -> None:
+        """Unknown kernels may observe failures without formatting a response."""
+        app, handler = _application()
+        async with app.beginScope() as scope:
+            scope.set("kernel", "unknown")
+            self.assertIsNone(await Catch(app).exception(ValueError("unknown")))
+        self.assertEqual(handler.effects, ["hook", "logging"])
+        self.assertEqual(handler.presentations, [])
 
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(return_value=MagicMock())
-        mock_app.call = AsyncMock(return_value=None)
-
-        catch = Catch(app=mock_app)
-        with self.assertRaises(RuntimeError):
-            await catch.exception(RuntimeError("no kernel"))
-
-class TestCatchConsoleContext(TestCase):
-
-    async def testDelegatesHandleCLIInConsoleContext(self) -> None:
-        """Invoke the handler's handleCLI path in a CONSOLE kernel context.
-
-        Validates that when the current scope identifies the CONSOLE kernel
-        the app.call dispatcher is directed to handleCLI.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value=KernelContext.CONSOLE)
-
-        handler = MagicMock()
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(return_value=handler)
-        mock_app.call = AsyncMock(return_value=None)
-
-        catch = Catch(app=mock_app)
-        exc = RuntimeError("console error")
-        await catch.exception(exc)
-
-        calls = mock_app.call.call_args_list
-        method_names = [
-            c[0][1]
-            for c in calls
-            if len(c[0]) >= _CALL_MIN_POSITIONAL
-        ]
-        self.assertIn("handleCLI", method_names)
-
-    async def testCallsReportBeforeHandleCLI(self) -> None:
-        """Invoke report before handleCLI in the CONSOLE context.
-
-        Validates the expected call ordering so that exceptions are always
-        logged prior to being rendered in the CLI.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value=KernelContext.CONSOLE)
-
-        handler = MagicMock()
-        call_order: list[str] = []
-
-        async def _track_call(
-            _obj: object, method: str, **_kwargs: object,
-        ) -> None:
-            """Record the dispatched handler method.
-
-            Parameters
-            ----------
-            _obj : object
-                Value supplied for ``_obj``.
-            method : str
-                Value supplied for ``method``.
-            **_kwargs : object
-                Arguments passed to the wrapped callable.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            call_order.append(method)
-
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(return_value=handler)
-        mock_app.call = _track_call  # type: ignore[assignment]
-
-        catch = Catch(app=mock_app)
-        await catch.exception(RuntimeError("ordered"))
-
-        self.assertEqual(call_order[0], "report")
-        self.assertEqual(call_order[1], "handleCLI")
-
-class TestCatchHTTPContext(TestCase):
-
-    async def testDelegatesHandleHTTPInHTTPContext(self) -> None:
-        """Invoke the handler's handleHTTP path in an HTTP kernel context.
-
-        Validates that when the current scope identifies the HTTP kernel
-        the app.call dispatcher is directed to handleHTTP.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value=KernelContext.HTTP)
-
-        handler = MagicMock()
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(return_value=handler)
-        mock_app.call = AsyncMock(return_value=None)
-
-        catch = Catch(app=mock_app)
-        req = MagicMock()
-        exc = RuntimeError("http error")
-        await catch.exception(exc, request=req)
-
-        calls = mock_app.call.call_args_list
-        method_names = [
-            c[0][1]
-            for c in calls
-            if len(c[0]) >= _CALL_MIN_POSITIONAL
-        ]
-        self.assertIn("handleHTTP", method_names)
-
-    async def testCallsReportBeforeHandleHTTP(self) -> None:
-        """Invoke report before handleHTTP in the HTTP context.
-
-        Validates the expected call ordering so that exceptions are always
-        logged prior to being rendered as HTTP error responses.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value=KernelContext.HTTP)
-
-        handler = MagicMock()
-        call_order: list[str] = []
-
-        async def _track_call(
-            _obj: object, method: str, **_kwargs: object,
-        ) -> None:
-            """Record the dispatched handler method.
-
-            Parameters
-            ----------
-            _obj : object
-                Value supplied for ``_obj``.
-            method : str
-                Value supplied for ``method``.
-            **_kwargs : object
-                Arguments passed to the wrapped callable.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            call_order.append(method)
-
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(return_value=handler)
-        mock_app.call = _track_call  # type: ignore[assignment]
-
-        catch = Catch(app=mock_app)
-        await catch.exception(ValueError("ordered http"))
-
-        self.assertEqual(call_order[0], "report")
-        self.assertEqual(call_order[1], "handleHTTP")
-
-    async def testPassesRequestToHandleHTTP(self) -> None:
-        """Forward the request argument when dispatching handleHTTP.
-
-        Validates that the request object supplied to exception() is
-        propagated through app.call to the handler.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value=KernelContext.HTTP)
-
-        handler = MagicMock()
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(return_value=handler)
-        mock_app.call = AsyncMock(return_value=None)
-
-        catch = Catch(app=mock_app)
-        req = MagicMock()
-        await catch.exception(RuntimeError("with req"), request=req)
-
-        http_call = next(
-            c
-            for c in mock_app.call.call_args_list
-            if len(c[0]) >= _CALL_MIN_POSITIONAL and c[0][1] == "handleHTTP"
-        )
-        self.assertIs(http_call[1]["request"], req)
-
-class TestCatchUnknownContext(TestCase):
-
-    async def testReturnsNoneForUnknownContext(self) -> None:
-        """Return None when the kernel context is not CONSOLE or HTTP.
-
-        Validates the fallback path so that unrecognised kernel types do
-        not raise an unhandled exception.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value="UNKNOWN_CONTEXT")
-
-        handler = MagicMock()
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(return_value=handler)
-        mock_app.call = AsyncMock(return_value=None)
-
-        catch = Catch(app=mock_app)
-        result = await catch.exception(RuntimeError("unknown ctx"))
-        self.assertIsNone(result)
-
-    async def testHandlerCachedAcrossCalls(self) -> None:
-        """Resolve the exception handler only once across multiple calls.
-
-        Validates that the handler is cached so that getExceptionHandler
-        is not invoked on every exception dispatch.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value=KernelContext.CONSOLE)
-
-        handler = MagicMock()
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(return_value=handler)
-        mock_app.call = AsyncMock(return_value=None)
-
-        catch = Catch(app=mock_app)
-        await catch.exception(RuntimeError("first"))
-        await catch.exception(RuntimeError("second"))
-
-        self.assertEqual(mock_app.getExceptionHandler.call_count, 1)
+    async def testHandlerIsResolvedOnceForSequentialCalls(self) -> None:
+        """A standalone Catch shares the resolved handler across incidents."""
+        app, handler = _application()
+        catch = Catch(app)
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.CONSOLE)
+            await catch.exception(ValueError("first"))
+            await catch.exception(ValueError("second"))
+        app.getExceptionHandler.assert_awaited_once()
+        self.assertEqual(len(handler.failures), 2)
 
     async def testHandlerResolutionIsSharedAcrossConcurrentCalls(self) -> None:
-        """Resolve the shared handler once when first use overlaps.
+        """Overlapping first use resolves one handler and handles each incident."""
+        app, handler = _application()
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        mock_scope = AsyncMock()
-        mock_scope.get = AsyncMock(return_value=KernelContext.CONSOLE)
-
-        handler = MagicMock()
-
-        async def resolve_handler():
-            """Wait for overlapping calls before returning the handler.
-
-            Returns
-            -------
-            object
-                Value produced by the helper.
-            """
+        async def resolve():
             await asyncio.sleep(0)
             return handler
 
-        mock_app = MagicMock()
-        mock_app.getCurrentScope.return_value = mock_scope
-        mock_app.getExceptionHandler = AsyncMock(side_effect=resolve_handler)
-        mock_app.call = AsyncMock(return_value=None)
+        app.getExceptionHandler.side_effect = resolve
+        catch = Catch(app)
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.CONSOLE)
+            await asyncio.gather(*(catch.exception(ValueError()) for _ in range(8)))
+        app.getExceptionHandler.assert_awaited_once()
+        self.assertEqual(len(handler.failures), 8)
 
-        catch = Catch(app=mock_app)
-        await asyncio.gather(*(
-            catch.exception(RuntimeError("concurrent"))
-            for _ in range(8)
+    async def testStandaloneResolutionDoesNotRetainTheRequestScope(self) -> None:
+        """Standalone handling uses the same scope-free preparation as runtime."""
+        app, handler = _application()
+        resolved_scopes = []
+
+        async def resolve():
+            resolved_scopes.append(app.getCurrentScope())
+            return handler
+
+        app.getExceptionHandler.side_effect = resolve
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.CONSOLE)
+            await Catch(app).exception(ValueError("standalone"))
+            self.assertIs(app.getCurrentScope(), scope)
+        self.assertEqual(resolved_scopes, [None])
+
+    async def testCaptureThenCatchUsesOnePlan(self) -> None:
+        """An already observed error renders without a second hook or log."""
+        app, handler = _application(active=True)
+        error = ValueError("original")
+        request = object()
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"):
+                await capture(error, flow="http", phase="execution")
+                catch = Catch(app)
+                self.assertIs(await catch.exception(error, request), request)
+                self.assertIs(await catch.exception(error, request), request)
+        self.assertEqual(handler.effects, ["hook", "logging", "presentation"])
+        self.assertEqual(handler.failures[0][1].phase, "execution")
+
+    async def testDirectCatchRetainsTheOwningOperationContext(self) -> None:
+        """Pass the original operation name and correlation to direct handling."""
+        app, handler = _application(active=True)
+        error = ValueError("original")
+        request = object()
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(
+                app, flow="http", operation="orders.create",
+                correlation_id="request-17",
+            ):
+                self.assertIs(await Catch(app).exception(error, request), request)
+        self.assertEqual(len(handler.failures), 1)
+        self.assertIs(handler.failures[0][0], error)
+        context = handler.failures[0][1]
+        self.assertEqual(context.operation, "orders.create")
+        self.assertEqual(context.correlation_id, "request-17")
+        self.assertEqual(handler.effects, ["hook", "logging", "presentation"])
+
+    async def testConcurrentCaptureAndCatchWaitForOriginalPlan(self) -> None:
+        """Presentation waits for an in-flight hook and reuses its only plan."""
+        app, handler = _application(active=True)
+        entered = asyncio.Event()
+        release = asyncio.Event()
+        original_hook = handler.handleFailure
+
+        async def delayed(exception, context):
+            entered.set()
+            await release.wait()
+            return await original_hook(exception, context)
+
+        handler.handleFailure = delayed
+        error = ValueError("original")
+        request = object()
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"):
+                capturing = asyncio.create_task(capture(error))
+                await entered.wait()
+                presenting = asyncio.create_task(Catch(app).exception(error, request))
+                try:
+                    await asyncio.sleep(0)
+                    self.assertFalse(presenting.done())
+                    release.set()
+                    await capturing
+                    self.assertIs(await presenting, request)
+                finally:
+                    release.set()
+                    await asyncio.gather(capturing, presenting, return_exceptions=True)
+        self.assertEqual(handler.effects, ["hook", "logging", "presentation"])
+
+
+    async def testNestedPropagationKeepsTheOriginallySelectedPlan(self) -> None:
+        """An isolated child transfers its existing plan to the HTTP owner."""
+        app, handler = _application(active=True)
+        error = ValueError("original")
+        request = object()
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"):
+                try:
+                    with operation(isolated=True):
+                        await capture(error)
+                        raise error
+                except ValueError:
+                    self.assertIs(await Catch(app).exception(error, request), request)
+        self.assertEqual(handler.effects, ["hook", "logging", "presentation"])
+
+    async def testNonePlanSuppressesDefaultEffects(self) -> None:
+        """A deliberate policy result must not trigger a second default handler."""
+        app, handler = _application(active=True)
+        handler.handleFailure = AsyncMock(return_value=None)
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"):
+                result = await Catch(app).exception(ValueError("silent"), object())
+        self.assertIsNone(result)
+        handler.handleFailure.assert_awaited_once()
+        self.assertEqual(handler.effects, [])
+
+
+    async def testCancelledPresentationWaiterDoesNotCancelCapture(self) -> None:
+        """A cancelled HTTP waiter leaves the original delivery available."""
+        app, handler = _application(active=True)
+        entered = asyncio.Event()
+        release = asyncio.Event()
+        original_hook = handler.handleFailure
+
+        async def delayed(exception, context):
+            entered.set()
+            await release.wait()
+            return await original_hook(exception, context)
+
+        handler.handleFailure = delayed
+        error = ValueError("original")
+        request = object()
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"):
+                capturing = asyncio.create_task(capture(error))
+                await entered.wait()
+                presenting = asyncio.create_task(Catch(app).exception(error, request))
+                try:
+                    await asyncio.sleep(0)
+                    presenting.cancel()
+                    with self.assertRaises(asyncio.CancelledError):
+                        await presenting
+                    self.assertFalse(capturing.done())
+                    release.set()
+                    await capturing
+                    self.assertIs(await Catch(app).exception(error, request), request)
+                finally:
+                    release.set()
+                    await asyncio.gather(capturing, presenting, return_exceptions=True)
+        self.assertEqual(handler.effects, ["hook", "logging", "presentation"])
+
+    async def testPresentationFailurePreservesPrimaryAndDoesNotRetry(self) -> None:
+        """Retain the primary cause and diagnose a failing presenter once."""
+        app, handler = _application(active=True)
+        error = ValueError("private primary")
+        cause = LookupError("private cause")
+        error.__cause__ = cause
+        secondary = OSError("private presentation")
+        presentation = AsyncMock(side_effect=secondary)
+        handler.handleFailure = AsyncMock(return_value=FailureHandling(
+            presentation=presentation,
         ))
+        diagnostics = io.StringIO()
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"), redirect_stderr(diagnostics):
+                for _ in range(2):
+                    with self.assertRaises(ValueError) as raised:
+                        await Catch(app).exception(error, object())
+                    self.assertIs(raised.exception, error)
+        self.assertIs(error.__cause__, cause)
+        handler.handleFailure.assert_awaited_once()
+        presentation.assert_awaited_once()
+        self.assertEqual(diagnostics.getvalue().count("OSError"), 1)
+        self.assertNotIn("private", diagnostics.getvalue())
 
-        mock_app.getExceptionHandler.assert_awaited_once()
+    async def testPresentationTimeoutPreservesThePrimary(self) -> None:
+        """Bound a cooperative presenter and retain its failed plan."""
+        app, handler = _application(active=True)
+        app._failure_runtime.timeout = 0.01
+        entered = asyncio.Event()
+
+        async def present(**_kwargs: object):
+            entered.set()
+            await asyncio.Event().wait()
+
+        presentation = AsyncMock(side_effect=present)
+        handler.handleFailure = AsyncMock(return_value=FailureHandling(
+            presentation=presentation,
+        ))
+        error = ValueError("original")
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"), redirect_stderr(io.StringIO()):
+                async with asyncio.timeout(1):
+                    with self.assertRaises(ValueError) as raised:
+                        await Catch(app).exception(error, object())
+                self.assertIs(raised.exception, error)
+        self.assertTrue(entered.is_set())
+        presentation.assert_awaited_once()
+
+    async def testPresentationReentryDoesNotWaitForItsOwnPlan(self) -> None:
+        """A presenter can encounter Catch without deadlocking or reporting again."""
+        app, handler = _application(active=True)
+        error = ValueError("original")
+        request = object()
+        nested = []
+
+        async def present(**_kwargs: object):
+            nested.append(await Catch(app).exception(error, request))
+            return request
+
+        presentation = AsyncMock(side_effect=present)
+        handler.handleFailure = AsyncMock(return_value=FailureHandling(
+            presentation=presentation,
+        ))
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"):
+                async with asyncio.timeout(1):
+                    self.assertIs(await Catch(app).exception(error, request), request)
+        self.assertEqual(nested, [None])
+        handler.handleFailure.assert_awaited_once()
+        presentation.assert_awaited_once()
+
+    async def testInternalPresentationCancellationPreservesThePrimary(self) -> None:
+        """An internally cancelled presenter does not cancel the HTTP owner."""
+        app, handler = _application(active=True)
+        handler.handleFailure = AsyncMock(return_value=FailureHandling(
+            presentation=AsyncMock(side_effect=asyncio.CancelledError()),
+        ))
+        error = ValueError("original")
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with (
+                redirect_stderr(io.StringIO()),
+                self.assertRaises(ValueError) as raised,
+            ):
+                await Catch(app).exception(error, object())
+        self.assertIs(raised.exception, error)
+
+    async def testCallerCancellationDuringPresentationStillPropagates(self) -> None:
+        """Keep genuine cancellation and never retry partially executed output."""
+        app, handler = _application(active=True)
+        entered = asyncio.Event()
+
+        async def present(**_kwargs: object):
+            entered.set()
+            await asyncio.Event().wait()
+
+        presentation = AsyncMock(side_effect=present)
+        handler.handleFailure = AsyncMock(return_value=FailureHandling(
+            presentation=presentation,
+        ))
+        error = ValueError("original")
+        async with app.beginScope() as scope:
+            scope.set("kernel", KernelContext.HTTP)
+            with operation(app, flow="http"), redirect_stderr(io.StringIO()):
+                task = asyncio.create_task(Catch(app).exception(error, object()))
+                await entered.wait()
+                task.cancel()
+                with self.assertRaises(asyncio.CancelledError):
+                    await task
+                with self.assertRaises(ValueError) as raised:
+                    await Catch(app).exception(error, object())
+        self.assertIs(raised.exception, error)
+        presentation.assert_awaited_once()

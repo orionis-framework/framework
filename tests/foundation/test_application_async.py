@@ -1082,7 +1082,7 @@ class TestApplicationAsync(TestCase):
         )
         self.assertEqual(
             application._Application__onShutdown.calls,
-            [((), {"runtime": Runtime.HTTP})],
+            [((), {"runtime": Runtime.HTTP, "owner_task": asyncio.current_task()})],
         )
         self.assertEqual(receive.awaitCount, 4)
         self.assertEqual(

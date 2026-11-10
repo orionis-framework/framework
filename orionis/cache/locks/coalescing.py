@@ -129,9 +129,26 @@ class RedisResolverLease:
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            Release ownership and preserve an existing protected-operation error.
+
+        Raises
+        ------
+        Exception
+            If release fails and the protected operation succeeded.
         """
-        await complete_on_cancel(self._release())
+        try:
+            await complete_on_cancel(self._release())
+        except Exception as cleanup_error:
+            if _value is None:
+                raise
+            from orionis.failure.runtime import capture
+            await capture(_value, flow="cache", phase="execution")
+            await capture(
+                cleanup_error,
+                flow="cache",
+                phase="cleanup",
+                operation="lock.release",
+            )
 
 def resolver_lease(
     backend: Any,

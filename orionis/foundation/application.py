@@ -24,7 +24,9 @@ from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.failure.contracts.handler import IBaseExceptionHandler
-from orionis.failure.runtime import capture, operation, prepare
+from orionis.failure.runtime import (
+    _handler_dependencies, _reporting, capture, operation, prepare,
+)
 from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.core_config import get_core_config_mapping
 from orionis.foundation.core_exception_handler import CORE_EXCEPTION_HANDLER
@@ -40,6 +42,7 @@ from orionis.http.routes.functions import normalize_request_path
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.metadata.framework import PYTHON_REQUIRES
 from orionis.support.structures.freezer import FreezeThaw
+from orionis.support.concurrency import complete_on_cancel
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Coroutine, Mapping
@@ -221,10 +224,12 @@ async def _await_http_tasks(
         If the handler or disconnect monitor fails.
     """
     parent_task = asyncio.current_task()
+    primary_error = None
     try:
         try:
             return await handler_task
         except Exception as error:
+            primary_error = error
             await capture(
                 error,
                 flow="http",
@@ -254,7 +259,8 @@ async def _await_http_tasks(
                 phase="disconnect",
                 metadata={"transport": transport},
             )
-            raise
+            if primary_error is None and not parent_task.cancelling():
+                raise
 
 def _retire_shared_runtime(
     runtime: FailureRuntime | None,
@@ -471,7 +477,8 @@ class Application(Container, IApplication):
                 await self.__runLifespanEvent(event, send)
                 return event is Lifespan.STARTUP
             except Exception as error:
-                await self.__sendLifespanFailure(event, send, error)
+                if not await self.__sendLifespanFailure(event, send, error):
+                    raise
                 return False
             finally:
                 if event is Lifespan.SHUTDOWN and self._failure_runtime is not None:
@@ -506,13 +513,15 @@ class Application(Container, IApplication):
                     failure_runtime.activate(_HTTP_FAILURE_OWNER)
                 return
         else:
-            await self.__onShutdown(runtime=Runtime.HTTP)
+            await complete_on_cancel(self.__onShutdown(
+                runtime=Runtime.HTTP, owner_task=asyncio.current_task(),
+            ))
         await send({"type": f"{event.value}.complete"})
 
     async def __sendLifespanFailure(
         self: Self, event: Lifespan, send: Callable[[dict], Awaitable[None]],
         error: Exception,
-    ) -> None:
+    ) -> bool:
         """
         Report a lifespan failure and send the ASGI failure response.
 
@@ -527,13 +536,9 @@ class Application(Container, IApplication):
 
         Returns
         -------
-        None
-            Send the failed-event message without activating startup reporting.
-
-        Raises
-        ------
-        Exception
-            If the failure response cannot be sent.
+        bool
+            Whether the failure response was sent. A failed send is observed
+            separately so the caller can propagate the original lifecycle error.
         """
         await capture(
             error, app=self, flow="lifecycle",
@@ -543,7 +548,8 @@ class Application(Container, IApplication):
             await send({"type": f"{event.value}.failed", "message": str(error)})
         except Exception as send_error:
             await capture(send_error, app=self, flow="lifecycle", phase="send")
-            raise
+            return False
+        return True
 
     async def __handleHttpAsgi(
         self: Self,
@@ -708,7 +714,9 @@ class Application(Container, IApplication):
         """
         try:
             with operation(self, flow="lifecycle", operation="http.shutdown"):
-                await self.__onShutdown(runtime=Runtime.HTTP)
+                await complete_on_cancel(self.__onShutdown(
+                    runtime=Runtime.HTTP, owner_task=asyncio.current_task(),
+                ))
         finally:
             if self._failure_runtime is not None:
                 self._failure_runtime.deactivate(_HTTP_FAILURE_OWNER)
@@ -924,18 +932,34 @@ class Application(Container, IApplication):
                 await failure_runtime.start(failure_owner)
             try:
                 with operation(self, flow="cli", isolated=True):
+                    primary_error = None
+                    primary_receipt = None
                     try:
                         response = await self.__kernel_cli(args or [])
-                    except Exception as error:
-                        await capture(error, app=self, flow="cli", phase="execution")
+                    except BaseException as error:
+                        primary_error = error
+                        if isinstance(error, Exception):
+                            primary_receipt = await capture(
+                                error, app=self, flow="cli", phase="execution",
+                            )
                         raise
                     finally:
-                        if failure_runtime is None:
-                            await self.__onShutdown(runtime=Runtime.CLI)
-                        else:
-                            await self.__onShutdown(
+                        try:
+                            shutdown = self.__onShutdown(
                                 runtime=Runtime.CLI, failure_owner=failure_owner,
+                                owner_task=asyncio.current_task(),
+                                parent_event_id=(
+                                    primary_receipt.event_id
+                                    if primary_receipt is not None else None
+                                ),
                             )
+                            await complete_on_cancel(shutdown)
+                        except Exception as error:
+                            await capture(
+                                error, app=self, flow="lifecycle", phase="shutdown",
+                            )
+                            if primary_error is None:
+                                raise
             finally:
                 if failure_runtime is not None:
                     failure_runtime.deactivate(failure_owner)
@@ -1212,9 +1236,13 @@ class Application(Container, IApplication):
             self.__scheduler_resolved: type[IBaseScheduler] | None = None
             self.__exception_handler_resolved: type[IBaseExceptionHandler] | None = None
             self.__exception_handler_instance: IBaseExceptionHandler | None = None
+            """Shared handler constructed outside request and operation scopes."""
             self.__exception_handler_lock = asyncio.Lock()
+            """Serialize construction of the application exception handler."""
             self.__headless_close_lock = asyncio.Lock()
+            """Coordinate explicit headless startup and final resource closure."""
             self._failure_runtime = None
+            """Prepared coordinator activated by successful runtime owners."""
 
             # Initialize application state flags.
             self.__booted: bool = False
@@ -1479,6 +1507,8 @@ class Application(Container, IApplication):
         runtime: Runtime,
         *,
         failure_owner: object | None = None,
+        owner_task: asyncio.Task | None = None,
+        parent_event_id: str | None = None,
     ) -> None:
         """
         Run shutdown hooks before draining runtime resources.
@@ -1489,6 +1519,10 @@ class Application(Container, IApplication):
             HTTP or CLI runtime whose shutdown hooks should run.
         failure_owner : object | None, optional
             Reporting ownership token; HTTP uses its shared owner when omitted.
+        owner_task : asyncio.Task or None, optional
+            Lifecycle owner awaiting protected cleanup from another task.
+        parent_event_id : str or None, optional
+            Primary incident from the lifecycle owner before cleanup started.
 
         Returns
         -------
@@ -1501,30 +1535,85 @@ class Application(Container, IApplication):
             | self.__hook_events[runtime][Lifespan.SHUTDOWN]
         )
 
-        try:
-            # Run application hooks before draining queued logging sinks.
-            if runtime == Runtime.HTTP:
-                shutdown_gen = import_module(
-                    "orionis.foundation.lifespan.shutdown",
-                ).shutdown_orionis_generator(self)
-                next(shutdown_gen)
-                for func in callbacks:
-                    await self.invoke(func)
-                with suppress(StopIteration):
+        with operation(self, flow="lifecycle"):
+            primary_error = None
+            try:
+                # Run application hooks before draining queued logging sinks.
+                if runtime == Runtime.HTTP:
+                    shutdown_gen = import_module(
+                        "orionis.foundation.lifespan.shutdown",
+                    ).shutdown_orionis_generator(self)
                     next(shutdown_gen)
-            elif runtime == Runtime.CLI:
-                for func in callbacks:
-                    await self.invoke(func)
-        except Exception as error:
-            await capture(error, app=self, flow="lifecycle", phase="shutdown")
-            raise
-        finally:
-            if failure_owner is None and runtime is Runtime.HTTP:
-                failure_owner = _HTTP_FAILURE_OWNER
-            await Application.__closeRuntimeResources(self, failure_owner)
+                    await Application.__runShutdownCallbacks(
+                        self, callbacks, parent_event_id,
+                    )
+                    with suppress(StopIteration):
+                        next(shutdown_gen)
+                elif runtime == Runtime.CLI:
+                    await Application.__runShutdownCallbacks(
+                        self, callbacks, parent_event_id,
+                    )
+            except BaseException as error:
+                primary_error = error
+                if isinstance(error, Exception):
+                    await capture(
+                        error, app=self, flow="lifecycle", phase="shutdown",
+                        parent_event_id=parent_event_id,
+                    )
+                raise
+            finally:
+                if failure_owner is None and runtime is Runtime.HTTP:
+                    failure_owner = _HTTP_FAILURE_OWNER
+                try:
+                    await Application.__closeRuntimeResources(
+                        self, failure_owner, owner_task=owner_task,
+                        parent_event_id=parent_event_id,
+                    )
+                except Exception:
+                    if primary_error is None:
+                        raise
+
+    async def __runShutdownCallbacks(
+        self: Self, callbacks: set[Callable], parent_event_id: str | None,
+    ) -> None:
+        """
+        Attempt every shutdown callback and propagate its first failure.
+
+        Parameters
+        ----------
+        callbacks : set of collections.abc.Callable
+            Independent resource cleanup hooks in unspecified execution order.
+        parent_event_id : str or None
+            Primary execution incident linked to subsequent cleanup failures.
+
+        Returns
+        -------
+        None
+            Complete every callback, observing each operational failure once.
+
+        Raises
+        ------
+        Exception
+            The first callback failure, after attempting the remaining hooks.
+        """
+        primary_error = None
+        for callback in callbacks:
+            try:
+                await self.invoke(callback)
+            except Exception as error:
+                await capture(
+                    error, app=self, flow="lifecycle", phase="shutdown",
+                    parent_event_id=parent_event_id,
+                )
+                if primary_error is None:
+                    primary_error = error
+        if primary_error is not None:
+            raise primary_error
 
     async def __closeRuntimeResources(
         self: Self, owner: object | None = None,
+        *, owner_task: asyncio.Task | None = None,
+        parent_event_id: str | None = None,
     ) -> None:
         """
         Drain runtime tasks and close the logging sink for its final owner.
@@ -1534,6 +1623,10 @@ class Application(Container, IApplication):
         owner : object | None, optional
             Ownership token to retire, or ``None`` to check shared ownership
             without releasing a token.
+        owner_task : asyncio.Task or None, optional
+            Lifecycle task to exclude from the shutdown it is awaiting.
+        parent_event_id : str or None, optional
+            Primary execution incident linked to resource cleanup failures.
 
         Returns
         -------
@@ -1547,9 +1640,12 @@ class Application(Container, IApplication):
                 async with failure_runtime.lifecycle_lock:
                     if _retire_shared_runtime(failure_runtime, owner):
                         return
-                await failure_runtime.shutdown()
+                await failure_runtime.shutdown(exclude=owner_task)
             except Exception as error:
-                await capture(error, app=self, flow="lifecycle", phase="cleanup")
+                await capture(
+                    error, app=self, flow="lifecycle", phase="cleanup",
+                    parent_event_id=parent_event_id,
+                )
                 raise
         lifecycle_lock = (
             failure_runtime.lifecycle_lock if failure_runtime is not None
@@ -1563,7 +1659,10 @@ class Application(Container, IApplication):
                     failure_runtime.beginClosing(owner)
                 await Application.__closeRuntimeLogger(self, failure_runtime)
         except Exception as error:
-            await capture(error, app=self, flow="logging", phase="shutdown")
+            await capture(
+                error, app=self, flow="logging", phase="shutdown",
+                parent_event_id=parent_event_id,
+            )
             raise
         finally:
             if failure_runtime is not None:
@@ -2436,6 +2535,8 @@ class Application(Container, IApplication):
         """
         Resolve and cache the configured exception handler instance.
 
+        Construct shared dependencies outside request and operation scopes.
+
         Returns
         -------
         orionis.failure.contracts.handler.IBaseExceptionHandler
@@ -2463,7 +2564,8 @@ class Application(Container, IApplication):
                         self.__exception_handler_resolved = ModuleInspector.loadClass(
                             metadata=metadata,
                         )
-                    handler = await self.build(self.__exception_handler_resolved)
+                    with _handler_dependencies():
+                        handler = await self.build(self.__exception_handler_resolved)
                     self.__exception_handler_instance = handler
         return handler
 
@@ -3313,11 +3415,19 @@ class Application(Container, IApplication):
         Do not run HTTP or CLI hooks. Preserve shared tasks and the logging
         sink while another owner remains active.
 
+        Ignore reentrant calls from reporting hooks; the external lifecycle
+        owner performs closure after those hooks finish.
+
         Returns
         -------
         None
             Drain final resources and release headless ownership when present.
         """
+        if (
+            self._failure_runtime is not None
+            and _reporting.get() is self._failure_runtime
+        ):
+            return
         async with self.__headless_close_lock:
             failure_runtime = self._failure_runtime
             if failure_runtime is None or not failure_runtime.hasOwner(
@@ -3327,7 +3437,12 @@ class Application(Container, IApplication):
             try:
                 if failure_runtime.ownerCount == 1:
                     with operation(self, flow="lifecycle", operation="headless.close"):
-                        await self.__closeRuntimeResources(_HEADLESS_FAILURE_OWNER)
+                        await complete_on_cancel(
+                            self.__closeRuntimeResources(
+                                _HEADLESS_FAILURE_OWNER,
+                                owner_task=asyncio.current_task(),
+                            ),
+                        )
             finally:
                 failure_runtime.deactivate(_HEADLESS_FAILURE_OWNER)
 

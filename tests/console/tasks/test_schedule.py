@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, Self
+from typing import Self
 from unittest.mock import AsyncMock, MagicMock, patch
 import orionis.console.tasks.schedule as schedule_module
 from orionis.console.contracts.schedule import ISchedule
@@ -8,9 +8,6 @@ from orionis.console.enums.states import ScheduleStates
 from orionis.console.fluent.contracts.task import ITask
 from orionis.console.tasks.schedule import Schedule
 from orionis.test import TestCase
-
-if TYPE_CHECKING:
-    from collections.abc import Coroutine
 
 class TestSchedule(TestCase):
     def testLegacyScheduledCallableRemainsImportable(self: Self) -> None:
@@ -955,23 +952,11 @@ class TestSchedule(TestCase):
         """
         schedule = self._make()
 
-        def _close(coro: Coroutine[Any, Any, None]) -> None:
-            """Close the supplied coroutine.
-
-            Parameters
-            ----------
-            coro : object
-                Value supplied for ``coro``.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            coro.close()
-
-        with patch.object(schedule, "_Schedule__createManagedTask", side_effect=_close):
+        with patch.object(
+            schedule, "_Schedule__finishShutdown", new_callable=AsyncMock,
+        ):
             schedule.shutdown(None)
+            await schedule.wait()
         self.assertEqual(schedule._Schedule__wait_to_shutdown, 0.5)
 
     async def testShutdownSetsWaitForValidInteger(self: Self) -> None:
@@ -987,23 +972,11 @@ class TestSchedule(TestCase):
         """
         schedule = self._make()
 
-        def _close(coro: Coroutine[Any, Any, None]) -> None:
-            """Close the supplied coroutine.
-
-            Parameters
-            ----------
-            coro : object
-                Value supplied for ``coro``.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            coro.close()
-
-        with patch.object(schedule, "_Schedule__createManagedTask", side_effect=_close):
+        with patch.object(
+            schedule, "_Schedule__finishShutdown", new_callable=AsyncMock,
+        ):
             schedule.shutdown(5)
+            await schedule.wait()
         self.assertEqual(schedule._Schedule__wait_to_shutdown, 5)
 
     async def testShutdownRaisesTypeErrorForNegativeInt(self: Self) -> None:
@@ -1019,25 +992,7 @@ class TestSchedule(TestCase):
         """
         schedule = self._make()
 
-        def _close(coro: Coroutine[Any, Any, None]) -> None:
-            """Close the supplied coroutine.
-
-            Parameters
-            ----------
-            coro : object
-                Value supplied for ``coro``.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            coro.close()
-
-        with (
-            patch.object(schedule, "_Schedule__createManagedTask", side_effect=_close),
-            self.assertRaises(TypeError),
-        ):
+        with self.assertRaises(TypeError):
             schedule.shutdown(-1)
 
     async def testShutdownRaisesTypeErrorForBool(self: Self) -> None:
@@ -1053,23 +1008,5 @@ class TestSchedule(TestCase):
         """
         schedule = self._make()
 
-        def _close(coro: Coroutine[Any, Any, None]) -> None:
-            """Close the supplied coroutine.
-
-            Parameters
-            ----------
-            coro : object
-                Value supplied for ``coro``.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            coro.close()
-
-        with (
-            patch.object(schedule, "_Schedule__createManagedTask", side_effect=_close),
-            self.assertRaises(TypeError),
-        ):
+        with self.assertRaises(TypeError):
             schedule.shutdown(True)

@@ -18,16 +18,29 @@ class FailureHandling:
     """
 
     logging: Callable[[], Awaitable[object]] | None = None
+    """Deferred asynchronous logging action owned by the coordinator."""
     presentation: Callable[..., Awaitable[object]] | None = None
+    """Deferred presentation accepting the owner's flow and live request."""
     reported: bool = False
+    """Whether the logging action completed successfully."""
     degraded: bool = False
+    """Whether an effect required fallback or failed during handling."""
     _completion_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False)
+    """Coordinate consumers of the single logging effect."""
     _presentation_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False)
+    """Coordinate consumers of the single presentation effect."""
     _completed: bool = field(default=False, init=False)
+    """Whether logging execution has already been claimed."""
     _presented: bool = field(default=False, init=False)
+    """Whether presentation execution has already been claimed."""
     _completion_error: BaseException | None = field(default=None, init=False)
+    """Retained logging failure preventing automatic effect retries."""
     _presentation_error: BaseException | None = field(default=None, init=False)
+    """Retained presentation failure preventing automatic effect retries."""
+    _presentation_diagnosed: bool = field(default=False, init=False)
+    """Whether the coordinator already emitted the presentation diagnostic."""
     _result: object = field(default=None, init=False)
+    """Cached presentation outcome shared with concurrent consumers."""
 
     async def complete(self) -> None:
         """

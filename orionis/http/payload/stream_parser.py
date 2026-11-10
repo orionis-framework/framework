@@ -1,16 +1,18 @@
 """Parse a multipart byte stream into form fields and uploaded files."""
 
 from __future__ import annotations
-from asyncio import CancelledError, create_task, shield, to_thread
+from asyncio import CancelledError, create_task, to_thread
 from contextlib import suppress
 from dataclasses import fields
 from sys import getsizeof
 from typing import TYPE_CHECKING
+from orionis.failure.runtime import capture, capture_nowait
 from orionis.foundation.config.http.entitites.body import HTTPBodyLimits
 from orionis.http.payload.body import PayloadTooLargeException
 from orionis.http.payload.contracts.stream_parser import IMultipartStreamParser
 from orionis.http.payload.form_data import FormData
 from orionis.http.payload.part import MultipartPart
+from orionis.support.concurrency import wait_for_completion
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterable, AsyncIterator, Callable
@@ -39,6 +41,8 @@ _MAX_BOUNDARY_SIZE = 70
 """Max boundary size value used by ``stream_parser``."""
 _CHUNK_SIZE = 64 * 1024
 """Chunk size used by ``stream_parser``."""
+_CLEANUP_PHASE = "payload.cleanup"
+"""Failure phase shared by multipart upload cleanup operations."""
 
 async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
     """
@@ -64,17 +68,19 @@ async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
     """
     task = create_task(to_thread(function, *args))
     try:
-        return await shield(task)
+        return await wait_for_completion(task)
     except CancelledError:
         while not task.done():
             # Worker errors cannot replace an already pending cancellation.
             with suppress(CancelledError, Exception):
-                await shield(task)
+                await wait_for_completion(task)
         # Retrieve worker failures without replacing the original cancellation.
-        with suppress(Exception, CancelledError):
-            task.result()
+        with suppress(CancelledError):
+            try:
+                task.result()
+            except Exception as error:  # noqa: BLE001 - Retain caller cancellation.
+                await capture(error, flow="http", phase=_CLEANUP_PHASE)
         raise
-
 
 class MultipartStreamParser(IMultipartStreamParser):
     """
@@ -385,6 +391,44 @@ class MultipartStreamParser(IMultipartStreamParser):
         self._memorySize = memory_size
         self._partMemorySize = part_memory
 
+    def _closeRejectedPart(self, part: MultipartPart, failure: BaseException) -> None:
+        """
+        Close a rejected upload and report cleanup failures.
+
+        Parameters
+        ----------
+        part : orionis.http.payload.part.MultipartPart
+            Rejected multipart part; leave non-file parts untouched.
+        failure : BaseException
+            Rejection error to report if cleanup fails and it is an ``Exception``.
+
+        Returns
+        -------
+        None
+            Close the file data when the part represents an upload.
+
+        Raises
+        ------
+        Exception
+            If file closure fails, after reporting the cleanup error.
+        """
+        if not part.is_file:
+            return
+        try:
+            part.data.close()
+        except Exception as close_error:
+            if isinstance(failure, Exception):
+                capture_nowait(
+                    failure,
+                    flow="http",
+                    phase="payload.parse",
+                    expected=isinstance(
+                        failure, (ValueError, PayloadTooLargeException),
+                    ),
+                )
+            capture_nowait(close_error, flow="http", phase=_CLEANUP_PHASE)
+            raise
+
     def _newPart(self, header_end: int) -> MultipartPart:
         """
         Create a multipart part from the parsed MIME headers.
@@ -419,9 +463,8 @@ class MultipartStreamParser(IMultipartStreamParser):
                     error_msg = "Too many fields"
                     raise PayloadTooLargeException(error_msg)
                 self.fields_count += 1
-        except BaseException:
-            if part.is_file:
-                part.data.close()
+        except BaseException as failure:
+            self._closeRejectedPart(part, failure)
             raise
         self.current_part_size = 0
         self._partMemorySize = 0
@@ -697,6 +740,34 @@ class MultipartStreamParser(IMultipartStreamParser):
         error_msg = "Incomplete multipart body"
         raise ValueError(error_msg)
 
+    def _closeFailedParts(
+        self, form_items: list[tuple[str, object]],
+    ) -> list[Exception]:
+        """
+        Close every failed upload before error reporting can be cancelled.
+
+        Parameters
+        ----------
+        form_items : list[tuple[str, object]]
+            Completed fields and uploads accumulated before the parse failure.
+
+        Returns
+        -------
+        list[Exception]
+            Cleanup errors in closure order, after attempting every owned file.
+        """
+        files = [value for _, value in form_items if not isinstance(value, str)]
+        current_part = self._currentPart
+        if current_part is not None and current_part.is_file:
+            files.insert(0, current_part.data)
+        failures = []
+        for file in files:
+            try:
+                file.close()
+            except Exception as error:  # noqa: BLE001 - Observed after all closures.
+                failures.append(error)
+        return failures
+
     async def parse(self) -> FormData:
         """
         Parse the multipart stream and return the collected form data.
@@ -709,11 +780,21 @@ class MultipartStreamParser(IMultipartStreamParser):
         form_items: list[tuple[str, object]] = []
         try:
             return await self._parseParts(form_items)
-        except BaseException:
-            current_part = self._currentPart
-            if current_part is not None and current_part.is_file:
-                current_part.data.close()
-            for _, value in form_items:
-                if not isinstance(value, str):
-                    value.close()
+        except BaseException as failure:
+            cleanup_errors = self._closeFailedParts(form_items)
+            try:
+                if isinstance(failure, Exception):
+                    await capture(
+                        failure,
+                        flow="http",
+                        phase="payload.parse",
+                        expected=isinstance(
+                            failure, (ValueError, PayloadTooLargeException),
+                        ),
+                    )
+            finally:
+                for error in cleanup_errors:
+                    await capture(error, flow="http", phase=_CLEANUP_PHASE)
+            if cleanup_errors and isinstance(failure, Exception):
+                raise cleanup_errors[0] from failure
             raise

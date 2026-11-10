@@ -5,6 +5,7 @@ from app.models.user import User
 from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.hashing.contracts.hash_manager import IHashManager
+from orionis.failure.runtime import capture
 from orionis.http import HTMLResponse, RedirectResponse, response
 from orionis.http.base import BaseController
 from orionis.http.default.schemas.change_password import ChangePasswordSchema
@@ -95,8 +96,9 @@ class ProfileController(BaseController):
             user.password = await hashing.make(payload.password)
             user.remember_token = None
             saved: bool = await user.save()
-        except Exception:
+        except Exception as error:
             # Never send ORM parameters, password hashes or backend errors back.
+            await capture(error, flow="http", phase="password.update")
             saved = False
 
         # Report a generic failure when the new hash could not be stored.

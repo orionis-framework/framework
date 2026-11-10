@@ -22,6 +22,7 @@ from orionis.metadata import VERSION
 from orionis.view.contracts.engine import IViewEngine
 from orionis.support.facades.datetime import DateTime
 from orionis.support.formatter.exceptions.parser import ExceptionParser
+from orionis.failure.runtime import capture_nowait
 
 # Human-readable labels for validated HTTP status codes.
 _STATUS_MESSAGES: dict[int, str] = {}
@@ -440,7 +441,15 @@ class DefaultResponses(IDefaultResponses):
             return FileResponse(
                 path=path, headers=headers, media_type=headers["content-type"],
             )
-        except (OSError, ValueError):
+        except (OSError, ValueError) as error:
+            capture_nowait(
+                error,
+                flow="http",
+                phase="static.file",
+                expected=isinstance(
+                    error, (FileNotFoundError, NotADirectoryError, ValueError),
+                ),
+            )
             return None
 
     async def health(self, request: Request) -> HTMLResponse | JSONResponse:

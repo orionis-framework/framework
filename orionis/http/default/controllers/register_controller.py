@@ -4,6 +4,7 @@ from typing import cast
 from app.models.user import User
 from orionis.auth import MustVerifyEmail
 from orionis.background.task import BackgroundTask
+from orionis.failure.runtime import capture
 from orionis.http import HttpResponse, response
 from orionis.http.base import BaseController
 from orionis.http.default.schemas.register import RegisterSchema
@@ -81,15 +82,11 @@ class RegisterController(BaseController):
             await DB.commit()
 
         except Exception as e:
-
+            await capture(e, flow="http", phase="registration")
             await DB.rollback()
-            return await (
-                response.view(self.REGISTER_VIEW_NAME)
-                        .withErrors({
-                            "registration": str(e),
-                        })
-                        .withInput(payload.toDict())
-            )
+            return await response.view(self.REGISTER_VIEW_NAME).withErrors({
+                "registration": str(e),
+            }).withInput(payload.toDict())
 
         # Runs after commit: a delivery failure must never trigger a rollback.
         if isinstance(user, MustVerifyEmail):
@@ -209,7 +206,8 @@ class RegisterController(BaseController):
         # Only the application key can produce a payload this call accepts.
         try:
             identifier = int(Crypt.decrypt(encrypted_id))
-        except (TypeError, ValueError, RuntimeError):
+        except (TypeError, ValueError, RuntimeError) as error:
+            await capture(error, flow="http", phase="email.verification", expected=True)
             return None
 
         return cast("User | None", await User.find(identifier))

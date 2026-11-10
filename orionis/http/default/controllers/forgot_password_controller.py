@@ -3,6 +3,7 @@
 from urllib.parse import urlencode
 from orionis.auth.passwords.broker import PasswordBroker
 from orionis.background.task import BackgroundTask
+from orionis.failure.runtime import capture
 from orionis.http import HTMLResponse, HttpResponse, response
 from orionis.http.base import BaseController
 from orionis.http.default.schemas.forgot_password import ForgotPasswordSchema
@@ -197,12 +198,14 @@ class ForgotPasswordController(BaseController):
         try:
             payload = await Validator.validate(data, ResetPasswordSchema)
         except ValidationException as exc:
+            await capture(exc, flow="http", phase="password.validation", expected=True)
             return await self._form(email, token, valid=True, errors=exc)
 
         # Attempt to reset the password using the broker.
         try:
             user = await broker.reset(email, token, payload.password)
-        except Exception:
+        except Exception as error:
+            await capture(error, flow="http", phase="password.reset")
             return await self._form(email, token, valid=True, errors={
                 "password": "The password could not be updated. Please try again.",
             })

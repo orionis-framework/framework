@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 from orionis.console.debug.dumper import HttpDump
 from orionis.failure.contracts.catch import ICatch
+from orionis.failure.runtime import capture
 from orionis.http.middleware import BaseMiddleware
 from orionis.session.flash import apply_flash
 from orionis.session.manager import SessionManager
@@ -90,8 +91,14 @@ class StartSessionMiddleware(BaseMiddleware):
                 self.__storeCurrentUrl(request, response, session)
             await self._manager.save(response, session)
             return response
-        except BaseException:
-            await self._manager.abort(session)
+        except BaseException as error:
+            if isinstance(error, Exception) and not isinstance(error, HttpDump):
+                await capture(error, flow="http", phase="session")
+            try:
+                await self._manager.abort(session)
+            except Exception as cleanup_error:
+                await capture(cleanup_error, flow="http", phase="session.cleanup")
+                raise
             raise
 
     async def __response(

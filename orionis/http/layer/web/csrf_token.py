@@ -2,13 +2,13 @@
 
 import secrets
 from typing import TYPE_CHECKING
+from orionis.failure.runtime import capture
 from orionis.foundation.config.http.entitites.csrf import HTTPCsrf
 from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
 from orionis.http.middleware import BaseMiddleware
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
-
     from orionis.http.request import Request
     from orionis.http.responses import Response
 
@@ -290,8 +290,9 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
         try:
             body: dict = await request.data()
-        except Exception:  # noqa: BLE001
+        except Exception as error:  # noqa: BLE001
             # Malformed body: treat as missing token — let comparison fail.
+            await capture(error, flow="http", phase="csrf.input", expected=True)
             return None
 
         value = body.get(_FIELD_CSRF)

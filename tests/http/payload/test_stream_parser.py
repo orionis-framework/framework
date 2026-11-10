@@ -590,5 +590,4 @@ class TestMultipartStreaming(TestCase):
                 await task
         self.assertEqual(caught.exception.args, ("first cancellation",))
         self.assertTrue(finished.is_set())
-        for failure in failures:
-            self.assertIsInstance(failure["exception"], RuntimeError)
+        self.assertEqual(failures, [])

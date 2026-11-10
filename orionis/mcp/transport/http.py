@@ -456,11 +456,12 @@ class McpHttpTransport:
         """
         try:
             await events.aclose()
+            return
         except BaseException as cleanup:
             await report(cleanup, self._app, transport="http", phase="cleanup")
             if not isinstance(cleanup, Exception):
                 raise
-            raise primary from cleanup
+        raise primary
 
     def _error(
         self,

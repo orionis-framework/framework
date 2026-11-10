@@ -72,12 +72,11 @@ async def open_file(path: Path, start: int = 0) -> BinaryIO:
         try:
             if start:
                 file.seek(start)
-        except OSError as error:
+        except OSError:
             try:
                 file.close()
-            except Exception as secondary:
+            except Exception as secondary:  # noqa: BLE001 - Re-raise the seek failure.
                 cleanup_error = secondary
-                raise error from secondary
             raise
         return file
 

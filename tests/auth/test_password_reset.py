@@ -15,6 +15,7 @@ from orionis.auth.passwords.broker import PasswordBroker
 from orionis.auth.passwords.schema import build_password_reset_table
 from orionis.auth.tokens.functions import hash_token_secret
 from orionis.background.task import BackgroundTask
+from orionis.failure.runtime import operation
 from orionis.database.connection_manager import ConnectionManager
 from orionis.foundation.config.auth import Auth, PasswordReset
 from orionis.hashing.hash_manager import HashManager
@@ -40,6 +41,7 @@ from tests.auth.test_identity_and_session import (
     fake_request,
 )
 from tests.auth.test_tokens import tokens_table
+from tests.support.failure_runtime import activate_runtime
 from tests.http.routes.test_nested_routing import compile_router, make_router
 from tests.http.test_kernel import (
     _IdentityMiddlewareDouble,
@@ -447,18 +449,18 @@ class TestPasswordResetController(TestCase):
         self.assertEqual(parse_qs(parsed.query)["email"], [email])
         self.assertEqual(content.data["expires_minutes"], 60)
 
-    async def testMailFailureUsesTheBackgroundTaskLogger(self) -> None:
-        """BackgroundTask logs delivery errors through the framework facade.
+    async def testMailFailureUsesTheCentralHandlerOnce(self) -> None:
+        """BackgroundTask observes delivery errors without duplicate local logs.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            Retain the exact exception, execution context, and failed task outcome.
         """
+        app, _, handler = activate_runtime()
+        failure = RuntimeError("secret-bearing-backend-error")
         broker = SimpleNamespace(
-            issue=AsyncMock(
-                side_effect=RuntimeError("secret-bearing-backend-error"),
-            ),
+            issue=AsyncMock(side_effect=failure),
         )
         task = BackgroundTask(
             ForgotPasswordController()._sendLink,
@@ -467,16 +469,21 @@ class TestPasswordResetController(TestCase):
             broker,
         )
         with (
+            operation(app),
             patch("orionis.background.task.Log") as log,
             self.assertRaisesRegex(
                 RuntimeError,
                 "secret-bearing-backend-error",
-            ),
+            ) as caught,
         ):
             await task()
 
-        log.error.assert_called_once()
-        self.assertIn("Background task", log.error.call_args.args[0])
+        self.assertIs(caught.exception, failure)
+        self.assertEqual(handler.reports, [failure])
+        self.assertEqual(len(handler.failures), 1)
+        self.assertEqual(handler.failures[0][1].flow, "background")
+        self.assertIn("_sendLink", handler.failures[0][1].operation)
+        log.error.assert_not_called()
         log.info.assert_not_called()
 
     async def testSuccessRedirectsToLoginAndQueuesNotification(self) -> None:

@@ -377,6 +377,8 @@ class IApplication(IContainer, ABC):
         """
         Resolve and cache the configured exception handler instance.
 
+        Construct shared dependencies outside request and operation scopes.
+
         Returns
         -------
         orionis.failure.contracts.handler.IBaseExceptionHandler

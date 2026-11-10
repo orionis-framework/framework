@@ -54,7 +54,9 @@ class ErrorBag:
         """
         try:
             session: ISession = await self._app.make(ISession)
-        except Exception:
+        except Exception as error:
+            from orionis.view._failures import capture_service_failure  # noqa: PLC0415
+            await capture_service_failure(error, ISession, app=self._app)
             return _EMPTY
         return session.getErrors()
 

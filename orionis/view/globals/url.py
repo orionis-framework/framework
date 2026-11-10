@@ -43,7 +43,9 @@ async def _request_base_url(app: IApplication) -> str:
     """
     try:
         request: IRequest = await app.make(IRequest)
-    except Exception:
+    except Exception as error:
+        from orionis.view._failures import capture_service_failure  # noqa: PLC0415
+        await capture_service_failure(error, IRequest, app=app)
         return ""
     return request.baseUrl.rstrip("/")
 

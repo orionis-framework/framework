@@ -35,7 +35,9 @@ def _global_session(app: IApplication) -> Any:
         """
         try:
             return await app.make(ISession)
-        except Exception:
+        except Exception as error:
+            from orionis.view._failures import capture_service_failure  # noqa: PLC0415
+            await capture_service_failure(error, ISession, app=app)
             return None
 
     return session

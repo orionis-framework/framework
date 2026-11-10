@@ -193,7 +193,10 @@ class PendingView(_FlashData):
         """
         try:
             session: ISession = await Session.resolve()
-        except Exception:
+        except Exception as error:
+            from orionis.session.contracts.session import ISession  # noqa: PLC0415
+            from orionis.view._failures import capture_service_failure  # noqa: PLC0415
+            await capture_service_failure(error, ISession)
             return
 
         apply_flash(session, self._flash)

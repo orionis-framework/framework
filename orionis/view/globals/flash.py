@@ -45,7 +45,9 @@ def _global_flash(app: IApplication) -> Any:
         """
         try:
             session: ISession = await app.make(ISession)
-        except Exception:
+        except Exception as error:
+            from orionis.view._failures import capture_service_failure  # noqa: PLC0415
+            await capture_service_failure(error, ISession, app=app)
             return default
 
         return session.getFlash(key, default)

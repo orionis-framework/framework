@@ -17,6 +17,7 @@ from orionis.container.container import Container
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
 from orionis.failure.base.handler import BaseExceptionHandler
+from orionis.failure.entities.context import FailureContext
 from orionis.http.adapters.response.asgi import ASGIResponseAdapter
 from orionis.http.adapters.response.rsgi import RSGIResponseAdapter
 from orionis.http.default.responses import DefaultResponses
@@ -291,7 +292,8 @@ class _HttpCatch:
         Response
             Value produced by the helper.
         """
-        return await self.handler.handleHTTP(exc, request)
+        handling = await self.handler.handleFailure(exc, FailureContext(flow="http"))
+        return await handling.present(flow="http", request=request)
 
 class _RsgiProtocol:
     """Record bytes emitted by the real RSGI response adapter."""

@@ -54,7 +54,7 @@ class RealtimeConnection:
             Hub class defining this connection's namespace.
         protocol : orionis.realtime.HubProtocol
             Route-selected codec used for connection messages.
-        config : orionis.foundation.config.realtime.entities.realtime.RealtimeConfig
+        config : orionis.realtime.config.RealtimeConfig
             Invocation, client-result, and delivery limits.
         runtime : orionis.failure.runtime.FailureRuntime or None, optional
             Runtime for failure delivery; ``None`` retains the current runtime.

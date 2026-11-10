@@ -858,11 +858,12 @@ class McpDispatcher:
         """
         try:
             await _close(source)
+            return
         except BaseException as exc:
             await self._report(exc, request, phase="cleanup")
-            if original is not None:
-                raise original from exc
-            raise
+            if original is None:
+                raise
+        raise original
 
     async def _list(self, request: McpRequest, params: PaginatedParams) -> object:
         """
@@ -1311,9 +1312,9 @@ class McpDispatcher:
                 await _close(source)
             except BaseException as exc:
                 await self._report(exc, request, phase="cleanup")
-                if original is not None:
-                    raise original from exc
-                raise
+                if original is None:
+                    raise
+                # The enclosing subscription owner keeps propagating its failure.
 
     async def _catalog(
         self,

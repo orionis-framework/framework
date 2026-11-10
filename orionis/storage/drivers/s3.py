@@ -985,8 +985,15 @@ class S3StorageDriver(IStorageDriver):
             head = self.__headSync(normalized)
             try:
                 visibility = self.__visibilitySync(normalized)
-            except self._client_error:
+            except self._client_error as error:
                 # ACL access may be disabled on the bucket.
+                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                capture_nowait(
+                    error,
+                    flow="storage",
+                    phase="metadata",
+                    operation="s3.info",
+                )
                 visibility = Visibility.PRIVATE.value
 
             stamp = head.get("LastModified") or datetime.now(tz=UTC)

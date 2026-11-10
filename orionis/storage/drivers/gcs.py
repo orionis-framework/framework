@@ -300,7 +300,14 @@ class GoogleStorageDriver(IStorageDriver):
         """
         try:
             entries = list(blob.acl)
-        except self._cloud_error:
+        except self._cloud_error as error:
+            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            capture_nowait(
+                error,
+                flow="storage",
+                phase="metadata",
+                operation="gcs.visibility",
+            )
             return False
         return any(
             entry.get("entity") == "allUsers"

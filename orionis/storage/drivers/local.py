@@ -303,7 +303,16 @@ class LocalStorageDriver(IStorageDriver):
             tmp.write_bytes(data)
             tmp.replace(absolute)
         except OSError:
-            tmp.unlink(missing_ok=True)
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError as cleanup_error:
+                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                capture_nowait(
+                    cleanup_error,
+                    flow="storage",
+                    phase="cleanup",
+                    operation="local.write",
+                )
             raise
 
         if visibility is not None:
@@ -388,8 +397,17 @@ class LocalStorageDriver(IStorageDriver):
         destination.parent.mkdir(parents=True, exist_ok=True)
         try:
             origin.replace(destination)
-        except OSError:
+        except OSError as error:
             # Fall back for cross-device moves where rename cannot work.
+            from errno import EXDEV  # noqa: PLC0415
+            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            capture_nowait(
+                error,
+                flow="storage",
+                phase="fallback",
+                operation="local.move",
+                expected=error.errno == EXDEV,
+            )
             shutil.move(origin, destination)
 
     @staticmethod

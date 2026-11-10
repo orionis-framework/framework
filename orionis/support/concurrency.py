@@ -1,7 +1,7 @@
 """Provide support operations.
 
-Includes ``WorkQueueFullError``, ``complete_on_cancel``, ``BoundedExecutor``,
-``threaded``.
+Includes ``WorkQueueFullError``, ``wait_for_completion``, ``complete_on_cancel``,
+``BoundedExecutor``, ``threaded``.
 """
 
 from __future__ import annotations
@@ -9,6 +9,7 @@ import asyncio
 import contextvars
 import inspect
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import suppress
 from functools import partial, wraps
 from threading import BoundedSemaphore, Lock
 from typing import TYPE_CHECKING, Self
@@ -18,6 +19,42 @@ if TYPE_CHECKING:
 
 class WorkQueueFullError(RuntimeError):
     """Signal that a bounded worker pool cannot admit another operation."""
+
+async def wait_for_completion[T](pending: asyncio.Future[T]) -> T:
+    """
+    Await completion without cancelling work or copying its exception.
+
+    Parameters
+    ----------
+    pending : asyncio.Future[T]
+        Owned operation whose result is collected after a successful notice.
+
+    Returns
+    -------
+    T
+        The operation's result, preserving its original exception on failure.
+
+    Notes
+    -----
+    Cancellation only interrupts this wait. The caller remains responsible for
+    draining ``pending`` before releasing resources used by its operation.
+    """
+    if pending.done():
+        return pending.result()
+    notification = pending.get_loop().create_future()
+
+    def completed(_pending: asyncio.Future[T]) -> None:
+        """Wake the owner without copying an exception into another future."""
+        if not notification.done():
+            notification.set_result(None)
+
+    pending.add_done_callback(completed)
+    try:
+        await notification
+    except BaseException:
+        pending.remove_done_callback(completed)
+        raise
+    return pending.result()
 
 async def complete_on_cancel[T](
     awaitable: Awaitable[T],
@@ -40,20 +77,27 @@ async def complete_on_cancel[T](
         Operation result unless the caller was cancelled.
     """
     task = asyncio.ensure_future(awaitable)
+    if task.done():
+        return task.result()
     try:
-        return await asyncio.shield(task)
+        return await wait_for_completion(task)
     except asyncio.CancelledError:
+        from orionis.failure.runtime import capture  # noqa: PLC0415
+
         if on_cancel is not None:
-            on_cancel()
-        while not task.done():
             try:
-                await asyncio.shield(task)
-            except asyncio.CancelledError: # NOSONAR
-                continue
-            except Exception:  # noqa: BLE001
-                break
+                on_cancel()
+            except Exception as error:  # noqa: BLE001
+                # Repeated cancellation cannot abandon the owned operation.
+                with suppress(asyncio.CancelledError):
+                    await capture(error, flow="background", phase="cancel")
+        while not task.done():
+            with suppress(asyncio.CancelledError, Exception):
+                await wait_for_completion(task)
         if not task.cancelled():
-            task.exception()
+            error = task.exception()
+            if error is not None:
+                await capture(error, flow="background", phase="cancelled_work")
         raise
 
 class BoundedExecutor:

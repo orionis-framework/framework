@@ -764,7 +764,14 @@ class AzureStorageDriver(IStorageDriver):
             container = self.__containerClient()
             try:
                 policy = container.get_container_access_policy()
-            except self._http_error:
+            except self._http_error as error:
+                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                capture_nowait(
+                    error,
+                    flow="storage",
+                    phase="metadata",
+                    operation="azure.visibility",
+                )
                 return Visibility.PRIVATE.value
             return (
                 Visibility.PUBLIC.value
@@ -900,7 +907,14 @@ class AzureStorageDriver(IStorageDriver):
             try:
                 policy = container.get_container_access_policy()
                 is_public = bool(policy.get("public_access"))
-            except self._http_error:
+            except self._http_error as error:
+                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                capture_nowait(
+                    error,
+                    flow="storage",
+                    phase="metadata",
+                    operation="azure.info",
+                )
                 is_public = False
 
             stored_md5 = getattr(props.content_settings, "content_md5", None)

@@ -447,8 +447,9 @@ class Logger(ILogger):
         Switch to a different logging channel.
 
         Initialize the logger when needed, close current handlers, clear
-        caches, and create a new handler for the specified channel. Only one
-        channel is active at a time.
+        caches, and create a new handler for the specified channel. Attempt every
+        old handler once; reject the switch if an active handler fails to close.
+        Only one channel is active at a time.
 
         Parameters
         ----------
@@ -471,31 +472,35 @@ class Logger(ILogger):
                 self.__ensureLoggerReady()
 
             with self.__init_lock:
-                # Close current handlers and remove from logger.
-                # Iterate over a copy: removeHandler mutates the same list.
                 active_handlers = dict.fromkeys(self.__logger.handlers)
+                handlers = dict.fromkeys(self.__handlers_cache.values())
+                handlers.update(active_handlers)
+                # Detach first so a failed close cannot leave a partial sink active.
                 for handler in active_handlers:
-                    handler.close()
                     self.__logger.removeHandler(handler)
-
-                # Clear cached handlers
-                for handler in dict.fromkeys(self.__handlers_cache.values()):
-                    if handler in active_handlers:
-                        continue
+                failed = False
+                for handler in handlers:
                     try:
                         handler.close()
-                    except (OSError, RuntimeError, ValueError) as error:
+                    except Exception as error:  # noqa: BLE001
                         from orionis.failure.runtime import (  # noqa: PLC0415
                             capture_nowait,
                         )
-                        capture_nowait(
-                            error,
-                            app=self.__app,
-                            flow="logging",
-                            phase="switch_channel",
-                            operation="close",
-                        )
+                        failed |= handler in active_handlers
+                        queued = isinstance(handler, BoundedQueueHandler)
+                        observed = queued and isinstance(error, LoggingDeliveryError)
+                        if not observed:
+                            capture_nowait(
+                                error,
+                                app=self.__app,
+                                flow="logging",
+                                phase="switch_channel",
+                                operation="close",
+                            )
                 self.__handlers_cache.clear()
+                if failed:
+                    self.__logger = None
+                    return False
 
                 # Create new handler for the specified channel
                 app_root: str = self.__app.path("root")
@@ -533,12 +538,21 @@ class Logger(ILogger):
         Close all handlers and release logger resources.
 
         This method should be called when the logger is no longer needed to
-        ensure that all file handles and resources are properly released.
+        ensure that all file handles and resources are properly released. Attempt
+        every handler before propagating an unexpected or queued delivery failure.
 
         Returns
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        LoggingDeliveryError
+            If the first retained failure belongs to queued log delivery.
+        Exception
+            If another close error is outside the historically recovered
+            ``OSError``, ``RuntimeError``, and ``ValueError`` types.
         """
         errors = []
         with self.__init_lock:
@@ -568,11 +582,20 @@ class Logger(ILogger):
                     capture_nowait(
                         error, app=self.__app, flow="logging", phase="cleanup",
                     )
+                except Exception as error:  # noqa: BLE001
+                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                    capture_nowait(
+                        error, app=self.__app, flow="logging", phase="cleanup",
+                    )
+                    errors.append(error)
             self.__handlers_cache.clear()
             self.__logger = None
-        if errors:
-            error_msg = "One or more background logging sinks failed during shutdown."
-            raise LoggingDeliveryError(error_msg) from errors[0]
+        if not errors:
+            return
+        if not isinstance(errors[0], LoggingDeliveryError):
+            raise errors[0]
+        error_msg = "One or more background logging sinks failed during shutdown."
+        raise LoggingDeliveryError(error_msg) from errors[0]
 
     async def aclose(self: Self) -> None:
         """

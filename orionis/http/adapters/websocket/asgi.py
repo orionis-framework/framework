@@ -2,6 +2,7 @@
 
 from typing import TYPE_CHECKING
 from orionis.http.adapters.websocket.contracts.transport import IWebSocketTransport
+from orionis.http.adapters.websocket.failure import disconnected
 from orionis.http.exceptions.websocket import WebSocketDisconnected
 from orionis.http.websocket_message import WebSocketMessage, WebSocketMessageType
 
@@ -167,7 +168,11 @@ class ASGIWebSocketTransport(IWebSocketTransport):
             await self._connectEvent()
             await self._send(event)
         except OSError as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="asgi",
+                phase="accept",
+            ) from exc
 
     async def receive(self) -> WebSocketMessage:
         """
@@ -188,7 +193,11 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         try:
             event = await self._receive()
         except OSError as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="asgi",
+                phase="receive",
+            ) from exc
         if event.get("type") == "websocket.disconnect":
             return WebSocketMessage(
                 type=WebSocketMessageType.DISCONNECT,
@@ -225,7 +234,11 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         try:
             await self._send({"type": "websocket.send", "text": data})
         except OSError as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="asgi",
+                phase="send",
+            ) from exc
 
     async def sendBytes(self, data: bytes) -> None:
         """
@@ -249,7 +262,11 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         try:
             await self._send({"type": "websocket.send", "bytes": data})
         except OSError as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="asgi",
+                phase="send",
+            ) from exc
 
     async def reject(self, status_code: int = 403) -> None:
         """
@@ -283,7 +300,11 @@ class ASGIWebSocketTransport(IWebSocketTransport):
             else:
                 await self._send({"type": "websocket.close", "code": 1008})
         except OSError as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="asgi",
+                phase="reject",
+            ) from exc
 
     async def close(self, code: int = 1000, reason: str = "") -> None:
         """
@@ -312,4 +333,8 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         try:
             await self._send(event)
         except OSError as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="asgi",
+                phase="close",
+            ) from exc

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from granian._granian import RSGIProtocolClosed
 from granian.rsgi import WebsocketMessageType
 from orionis.http.adapters.websocket.contracts.transport import IWebSocketTransport
-from orionis.http.exceptions.websocket import WebSocketDisconnected
+from orionis.http.adapters.websocket.failure import disconnected
 from orionis.http.websocket_message import WebSocketMessage, WebSocketMessageType
 
 if TYPE_CHECKING:
@@ -83,7 +83,12 @@ class RSGIWebSocketTransport(IWebSocketTransport):
         try:
             self._transport = await self._protocol.accept()
         except (OSError, RSGIProtocolClosed) as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="rsgi",
+                phase="accept",
+                expected=isinstance(exc, RSGIProtocolClosed),
+            ) from exc
 
     def _acceptedTransport(self) -> RSGIWebsocketTransport:
         """
@@ -123,7 +128,12 @@ class RSGIWebSocketTransport(IWebSocketTransport):
         try:
             event = await self._acceptedTransport().receive()
         except (OSError, RSGIProtocolClosed) as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="rsgi",
+                phase="receive",
+                expected=isinstance(exc, RSGIProtocolClosed),
+            ) from exc
         if event.kind == WebsocketMessageType.close:
             return WebSocketMessage(type=WebSocketMessageType.DISCONNECT, code=1006)
         if event.kind == WebsocketMessageType.bytes and isinstance(event.data, bytes):
@@ -155,7 +165,12 @@ class RSGIWebSocketTransport(IWebSocketTransport):
         try:
             await self._acceptedTransport().send_str(data)
         except (OSError, RSGIProtocolClosed) as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="rsgi",
+                phase="send",
+                expected=isinstance(exc, RSGIProtocolClosed),
+            ) from exc
 
     async def sendBytes(self, data: bytes) -> None:
         """
@@ -179,7 +194,12 @@ class RSGIWebSocketTransport(IWebSocketTransport):
         try:
             await self._acceptedTransport().send_bytes(data)
         except (OSError, RSGIProtocolClosed) as exc:
-            raise WebSocketDisconnected from exc
+            raise await disconnected(
+                exc,
+                transport="rsgi",
+                phase="send",
+                expected=isinstance(exc, RSGIProtocolClosed),
+            ) from exc
 
     async def reject(self, status_code: int = 403) -> None:
         """

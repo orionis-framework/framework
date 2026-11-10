@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from orionis.failure.runtime import capture
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
 from orionis.http.adapters.response.ranges import parse_range
 from orionis.http.adapters.response.streams import close_stream, send_until_disconnect
@@ -195,12 +196,21 @@ class RSGIResponseAdapter(ResponseAdapter):
             Return after all bytes have been sent and cleanup succeeds.
         """
         failure = None
+        started = False
         try:
             transport = protocol.response_stream(status, headers)
+            started = True
             async for chunk in iterator:
                 await transport.send_bytes(chunk)
         except BaseException as exc:
             failure = exc
+            if isinstance(exc, Exception):
+                await capture(
+                    exc,
+                    flow="http",
+                    phase="stream",
+                    metadata={"transport": "rsgi", "response_started": started},
+                )
             raise
         finally:
             await close_stream(iterator, failure)

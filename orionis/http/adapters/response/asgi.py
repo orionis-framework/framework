@@ -3,6 +3,7 @@
 from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
+from orionis.failure.runtime import capture
 from orionis.http.adapters.response.contracts.response import ResponseAdapter
 from orionis.http.adapters.response.files import complete_file_read, open_file
 from orionis.http.adapters.response.ranges import parse_range
@@ -25,7 +26,7 @@ class ASGIResponseAdapter(ResponseAdapter):
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    async def send( # NOSONAR
+    async def send(  # noqa: C901  # NOSONAR
         self,
         adapter: TransportAdapter,
         response: Response,
@@ -87,16 +88,24 @@ class ASGIResponseAdapter(ResponseAdapter):
                 headers = [
                     pair for pair in headers
                     if pair[0] not in {
-                        b"content-length", b"content-range", b"accept-ranges",
+                        b"content-length",
+                        b"content-range",
+                        b"accept-ranges",
                     }
                 ]
                 headers.extend((
-                    (b"content-length", str(end - start).encode("ascii")),
+                    (
+                        b"content-length",
+                        str(end - start).encode("ascii"),
+                    ),
                     (
                         b"content-range",
                         f"bytes {start}-{end - 1}/{file_size}".encode("ascii"),
                     ),
-                    (b"accept-ranges", b"bytes"),
+                    (
+                        b"accept-ranges",
+                        b"bytes",
+                    ),
                 ))
                 status = 206
                 stream = self.__fileRangeIterator(response.getPath(), start, end)
@@ -128,8 +137,21 @@ class ASGIResponseAdapter(ResponseAdapter):
         # Fall back to a regular buffered body response.
         body: bytes = response.getBody() or b""
 
-        await send({"type": self.RESPONSE_START, "status": status, "headers": headers})
-        await send({"type": self.RESPONSE_BODY, "body": body, "more_body": False})
+        started = False
+        try:
+            await send({
+                "type": self.RESPONSE_START, "status": status, "headers": headers,
+            })
+            started = True
+            await send({"type": self.RESPONSE_BODY, "body": body, "more_body": False})
+        except Exception as error:
+            await capture(
+                error,
+                flow="http",
+                phase="send",
+                metadata={"transport": "asgi", "response_started": started},
+            )
+            raise
         if (
             response.background is not None
             or type(response).runBackground is not Response.runBackground
@@ -163,17 +185,27 @@ class ASGIResponseAdapter(ResponseAdapter):
             Close an unstarted event stream, then run successful background work.
         """
         self.__ensureContentLength(headers, response)
+        started = False
         try:
             await send({
                 "type": self.RESPONSE_START,
                 "status": status,
                 "headers": headers,
             })
+            started = True
             await send({
                 "type": self.RESPONSE_BODY,
                 "body": b"",
                 "more_body": False,
             })
+        except Exception as error:
+            await capture(
+                error,
+                flow="http",
+                phase="send",
+                metadata={"transport": "asgi", "response_started": started},
+            )
+            raise
         finally:
             if isinstance(response, EventStreamResponse):
                 await response.getStream().aclose()
@@ -239,16 +271,25 @@ class ASGIResponseAdapter(ResponseAdapter):
             Finish the body only after iteration and cleanup succeed.
         """
         failure = None
+        started = False
         try:
             await send({
                 "type": self.RESPONSE_START, "status": status, "headers": headers,
             })
+            started = True
             async for chunk in iterator:
                 await send({
                     "type": self.RESPONSE_BODY, "body": chunk, "more_body": True,
                 })
         except BaseException as exc:
             failure = exc
+            if isinstance(exc, Exception):
+                await capture(
+                    exc,
+                    flow="http",
+                    phase="stream",
+                    metadata={"transport": "asgi", "response_started": started},
+                )
             raise
         finally:
             await close_stream(iterator, failure)

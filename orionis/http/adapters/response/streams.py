@@ -1,4 +1,5 @@
-"""Provide http adapters response operations.
+"""
+Provide http adapters response operations.
 
 Includes ``close_stream``, ``await_cleanup``, ``send_until_disconnect``.
 """
@@ -8,6 +9,7 @@ import asyncio
 from contextlib import suppress
 from functools import partial
 from typing import TYPE_CHECKING
+from orionis.failure.runtime import capture
 
 if TYPE_CHECKING:
     from asyncio import Future, Task
@@ -36,6 +38,10 @@ async def close_stream(
         try:
             await close()
         except BaseException as close_error:
+            if isinstance(failure, Exception):
+                await capture(failure, flow="http", phase="stream")
+            if isinstance(close_error, Exception):
+                await capture(close_error, flow="http", phase="stream.cleanup")
             if failure is not None and isinstance(close_error, asyncio.CancelledError):
                 raise failure from close_error
             raise
@@ -73,6 +79,7 @@ async def _finish_cancelled_cleanup[T](
     if not pending.cancelled():
         failure = pending.exception()
         if failure is not None:
+            await capture(failure, flow="http", phase="stream.cleanup")
             raise failure from cancellation
 
 async def await_cleanup[T](pending: Future[T]) -> T:

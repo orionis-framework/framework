@@ -3,6 +3,7 @@
 import asyncio
 import importlib
 import logging
+import sys
 from operator import attrgetter
 from threading import BoundedSemaphore
 from typing import TYPE_CHECKING, cast
@@ -1381,6 +1382,7 @@ class KernelHTTP(IKernelHTTP):
                     )
                     raise
                 finally:
+                    primary = sys.exception()
                     request = request_context[Request]
                     if isinstance(request, Request):
                         try:
@@ -1392,7 +1394,8 @@ class KernelHTTP(IKernelHTTP):
                                 flow="http",
                                 phase="cleanup",
                             )
-                            raise
+                            if primary is None:
+                                raise
         finally:
             self.__request_slots += 1
 
@@ -1472,6 +1475,7 @@ class KernelHTTP(IKernelHTTP):
                     )
                     raise
                 finally:
+                    primary = sys.exception()
                     request = request_context[Request]
                     if isinstance(request, Request):
                         try:
@@ -1483,7 +1487,8 @@ class KernelHTTP(IKernelHTTP):
                                 flow="http",
                                 phase="cleanup",
                             )
-                            raise
+                            if primary is None:
+                                raise
         finally:
             self.__request_slots += 1
 
@@ -1619,7 +1624,23 @@ class KernelHTTP(IKernelHTTP):
     async def __runWebSocket(
         self, adapter: TransportAdapter, socket: WebSocket, interface: Interface,
     ) -> None:
-        """Run an admitted connection and observe errors before transport cleanup."""
+        """
+        Run an admitted connection and observe errors before transport cleanup.
+
+        Parameters
+        ----------
+        adapter : TransportAdapter
+            Adapter used to resolve the connection endpoint.
+        socket : WebSocket
+            Admitted socket whose closure this boundary owns.
+        interface : Interface
+            Server protocol attached to failure metadata.
+
+        Returns
+        -------
+        None
+            Finish handling and attempt closure without replacing an escaping error.
+        """
         try:
             await self.__processWebSocket(adapter, socket)
         except WebSocketDisconnected:
@@ -1640,31 +1661,44 @@ class KernelHTTP(IKernelHTTP):
             if delivered is None:
                 _LOGGER.error("WebSocket handler failed")
             if socket.accepted:
-                # Cleanup failure must not replace the handler's error.
-                try:
-                    await socket.close(
-                        code=1011 if socket.supportsCloseDetails else 1000,
-                    )
-                except Exception as close_error:
-                    await capture(
-                        close_error,
-                        app=self.__app,
-                        flow="websocket",
-                        phase="cleanup",
-                    )
+                await self.__closeWebSocket(
+                    socket, code=1011 if socket.supportsCloseDetails else 1000,
+                )
             raise
         finally:
             if not socket.closed:
-                try:
-                    await socket.close()
-                except Exception as close_error:
-                    await capture(
-                        close_error,
-                        app=self.__app,
-                        flow="websocket",
-                        phase="cleanup",
-                    )
-                    raise
+                await self.__closeWebSocket(socket)
+
+    async def __closeWebSocket(self, socket: WebSocket, *, code: int = 1000) -> None:
+        """
+        Close a connection while retaining the failure already escaping its owner.
+
+        Parameters
+        ----------
+        socket : WebSocket
+            Accepted connection or pending handshake owned by the HTTP kernel.
+        code : int, optional
+            Protocol close status selected by the connection owner.
+
+        Returns
+        -------
+        None
+            Complete closure and observe any secondary operational error.
+
+        Raises
+        ------
+        Exception
+            If closing fails without an existing primary error or cancellation.
+        """
+        primary = sys.exception()
+        try:
+            await socket.close(code=code)
+        except Exception as close_error:
+            await capture(
+                close_error, app=self.__app, flow="websocket", phase="cleanup",
+            )
+            if primary is None:
+                raise
 
     async def __shutdownWebSockets(self) -> None:
         """Cancel connection lifetimes within the existing shutdown lifecycle.

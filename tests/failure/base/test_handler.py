@@ -1,8 +1,10 @@
 from __future__ import annotations
 import logging
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 from orionis.failure.base.handler import BaseExceptionHandler
 from orionis.failure.entities.throwable import Throwable
+from orionis.failure.entities.context import FailureContext
+from orionis.failure.entities.handling import FailureHandling
 from orionis.http.default.contracts.responses import IDefaultResponses
 from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
 from orionis.http.payload.body import PayloadTooLargeException
@@ -49,6 +51,24 @@ def _make_handler(
     if dont_catch is not None:
         type(handler).dont_catch = dont_catch  # type: ignore[assignment]
     return handler
+
+
+async def _complete(handler, exception, logger):
+    """Execute default logging with an explicit isolated logger dependency."""
+    handler._BaseExceptionHandler__application.make = AsyncMock(return_value=logger)
+    handling = await handler.handleFailure(exception, FailureContext())
+    await handling.complete()
+    return handling
+
+
+async def _present(handler, exception, *, flow, request=None, console=None):
+    """Request protocol presentation from the unified hook's deferred plan."""
+    if console is not None:
+        handler._BaseExceptionHandler__application.make = AsyncMock(
+            return_value=console,
+        )
+    handling = await handler.handleFailure(exception, FailureContext(flow=flow))
+    return await handling.present(flow=flow, request=request)
 
 class TestBaseExceptionHandlerToThrowable(TestCase):
 
@@ -258,7 +278,7 @@ class TestBaseExceptionHandlerIsExceptionIgnored(TestCase):
         self.assertTrue(handler.isExceptionIgnored(KeyError("k")))
         self.assertFalse(handler.isExceptionIgnored(RuntimeError("r")))
 
-class TestBaseExceptionHandlerReport(TestCase):
+class TestBaseExceptionHandlerLogging(TestCase):
 
     def tearDown(self) -> None:
         """Reset dont_catch to the original frozenset after each test.
@@ -273,11 +293,10 @@ class TestBaseExceptionHandlerReport(TestCase):
         """
         BaseExceptionHandler.dont_catch = frozenset()
 
-    async def testReturnsThrowableWhenNotIgnored(self) -> None:
-        """Return a Throwable when the exception is not on the ignore list.
+    async def testReturnsCompletedPlanWhenNotIgnored(self) -> None:
+        """Return a completed plan when the exception is not on the ignore list.
 
-        Validates that report converts and returns the exception details
-        after logging them through the supplied logger.
+        Validates that the plan records completed logging through the supplied logger.
 
         Returns
         -------
@@ -287,8 +306,9 @@ class TestBaseExceptionHandlerReport(TestCase):
         handler = _make_handler(dont_catch=frozenset())
         log = MagicMock()
         exc = RuntimeError("boom")
-        result = await handler.report(exc, log)
-        self.assertIsInstance(result, Throwable)
+        result = await _complete(handler, exc, log)
+        self.assertIsInstance(result, FailureHandling)
+        self.assertTrue(result.reported)
 
     async def testCallsLogErrorWhenNotIgnored(self) -> None:
         """Invoke the native logger once when the exception is not ignored.
@@ -304,7 +324,7 @@ class TestBaseExceptionHandlerReport(TestCase):
         handler = _make_handler(dont_catch=frozenset())
         log = MagicMock(spec=ILogger)
         exc = RuntimeError("test error")
-        await handler.report(exc, log)
+        await _complete(handler, exc, log)
         log.getLogger.assert_called_once_with()
         log.getLogger.return_value.error.assert_called_once_with(
             "[%s] %s",
@@ -339,9 +359,9 @@ class TestBaseExceptionHandlerReport(TestCase):
             pass
 
         with self.assertLogs(logger, level="ERROR") as captured:
-            result = await handler.report(exc, log)
+            result = await _complete(handler, exc, log)
 
-        self.assertEqual(result, handler.toThrowable(exc))
+        self.assertTrue(result.reported)
         self.assertEqual(len(captured.records), 1)
         self.assertEqual(
             captured.records[0].exc_info,
@@ -392,7 +412,7 @@ class TestBaseExceptionHandlerReport(TestCase):
                     pass
 
                 with self.assertLogs(logger, level="ERROR") as captured:
-                    await handler.report(exc, log)
+                    await _complete(handler, exc, log)
 
                 self.assertEqual(len(captured.records), 1)
                 output = captured.output[0]
@@ -427,7 +447,7 @@ class TestBaseExceptionHandlerReport(TestCase):
         )
 
         with self.assertLogs(logger, level="ERROR") as captured:
-            await handler.report(exc, log)
+            await _complete(handler, exc, log)
 
         self.assertEqual(len(captured.records), 1)
         output = captured.output[0]
@@ -460,7 +480,7 @@ class TestBaseExceptionHandlerReport(TestCase):
             raise active
         except ValueError:
             with self.assertLogs(logger, level="ERROR") as captured:
-                await handler.report(exc, log)
+                await _complete(handler, exc, log)
 
         self.assertEqual(len(captured.records), 1)
         self.assertEqual(
@@ -473,10 +493,10 @@ class TestBaseExceptionHandlerReport(TestCase):
         self.assertNotIn("NoneType: None", output)
         self.assertNotIn("No traceback available.", output)
 
-    async def testReturnsNoneWhenIgnored(self) -> None:
-        """Return None without logging when the exception type is ignored.
+    async def testIgnoredPlanDoesNotLog(self) -> None:
+        """Return an empty plan when the exception type is ignored.
 
-        Validates that report short-circuits and produces no side effects
+        Validates that the selected plan produces no side effects
         for exceptions listed in dont_catch.
 
         Returns
@@ -487,8 +507,10 @@ class TestBaseExceptionHandlerReport(TestCase):
         handler = _make_handler(dont_catch=frozenset({ValueError}))
         log = MagicMock()
         exc = ValueError("ignored")
-        result = await handler.report(exc, log)
-        self.assertIsNone(result)
+        result = await _complete(handler, exc, log)
+        self.assertFalse(result.reported)
+        self.assertIsNone(result.logging)
+        self.assertIsNone(result.presentation)
 
     async def testDoesNotCallLogWhenIgnored(self) -> None:
         """Skip logging when the exception is on the ignore list.
@@ -504,11 +526,11 @@ class TestBaseExceptionHandlerReport(TestCase):
         handler = _make_handler(dont_catch=frozenset({ValueError}))
         log = MagicMock(spec=ILogger)
         exc = ValueError("silent")
-        await handler.report(exc, log)
+        await _complete(handler, exc, log)
         log.error.assert_not_called()
         log.getLogger.assert_not_called()
 
-class TestBaseExceptionHandlerHandleCLI(TestCase):
+class TestBaseExceptionHandlerCLIPresentation(TestCase):
 
     def tearDown(self) -> None:
         """Reset dont_catch to the original frozenset after each test.
@@ -526,7 +548,7 @@ class TestBaseExceptionHandlerHandleCLI(TestCase):
     async def testCallsConsoleExceptionWhenNotIgnored(self) -> None:
         """Forward the exception to console.exception when not ignored.
 
-        Validates that handleCLI delegates output to the console so the
+        Validates that CLI presentation delegates output to the console so the
         error is visible in CLI sessions.
 
         Returns
@@ -537,13 +559,13 @@ class TestBaseExceptionHandlerHandleCLI(TestCase):
         handler = _make_handler(dont_catch=frozenset())
         console = MagicMock()
         exc = RuntimeError("cli error")
-        await handler.handleCLI(exc, console)
+        await _present(handler, exc, flow="cli", console=console)
         console.exception.assert_called_once_with(exc)
 
     async def testDoesNotCallConsoleWhenIgnored(self) -> None:
         """Skip console.exception when the exception type is ignored.
 
-        Validates that handleCLI produces no output for silenced
+        Validates that CLI presentation produces no output for silenced
         exception types.
 
         Returns
@@ -554,11 +576,11 @@ class TestBaseExceptionHandlerHandleCLI(TestCase):
         handler = _make_handler(dont_catch=frozenset({KeyError}))
         console = MagicMock()
         exc = KeyError("silent")
-        await handler.handleCLI(exc, console)
+        await _present(handler, exc, flow="cli", console=console)
         console.exception.assert_not_called()
 
     async def testReturnsNone(self) -> None:
-        """Return None from handleCLI regardless of the exception.
+        """Return None from CLI presentation regardless of the exception.
 
         Validates that the method is purely a side-effect producer and
         never returns a meaningful value.
@@ -570,10 +592,10 @@ class TestBaseExceptionHandlerHandleCLI(TestCase):
         """
         handler = _make_handler()
         console = MagicMock()
-        result = await handler.handleCLI(RuntimeError("x"), console)
+        result = await _present(handler, RuntimeError("x"), flow="cli", console=console)
         self.assertIsNone(result)
 
-class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
+class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
 
     def tearDown(self) -> None:
         """Reset dont_catch to the original frozenset after each test.
@@ -630,7 +652,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
 
         exc = RouteNotFound("not found")
         req = self._makeRequestMock()
-        await handler.handleHTTP(exc, req)
+        await _present(handler, exc, flow="http", request=req)
 
         mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
@@ -656,7 +678,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
 
         exc = MethodNotAllowed("not allowed")
         req = self._makeRequestMock()
-        await handler.handleHTTP(exc, req)
+        await _present(handler, exc, flow="http", request=req)
 
         mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
@@ -682,7 +704,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
 
         exc = PayloadTooLargeException("too large")
         req = self._makeRequestMock()
-        await handler.handleHTTP(exc, req)
+        await _present(handler, exc, flow="http", request=req)
 
         mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
@@ -708,7 +730,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
 
         exc = UnsupportedMediaTypeException("unsupported")
         req = self._makeRequestMock()
-        await handler.handleHTTP(exc, req)
+        await _present(handler, exc, flow="http", request=req)
 
         mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
@@ -734,7 +756,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
 
         exc = CSRFTokenMismatchException("token mismatch")
         req = self._makeRequestMock()
-        await handler.handleHTTP(exc, req)
+        await _present(handler, exc, flow="http", request=req)
 
         mock_responses.error.assert_awaited_once()
         call_kwargs = mock_responses.error.call_args[1]
@@ -743,7 +765,7 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
     async def testReturnsNoneForIgnoredException(self) -> None:
         """Return None without calling default_responses for ignored exceptions.
 
-        Validates that handleHTTP short-circuits and produces no response
+        Validates that HTTP presentation short-circuits and produces no response
         for exception types listed in dont_catch.
 
         Returns
@@ -760,13 +782,13 @@ class TestBaseExceptionHandlerHandleHTTPKnownExceptions(TestCase):
 
         exc = RouteNotFound("ignored")
         req = self._makeRequestMock()
-        result = await handler.handleHTTP(exc, req)
+        result = await _present(handler, exc, flow="http", request=req)
 
         self.assertIsNone(result)
         mock_responses.error.assert_not_called()
         mock_responses.exception.assert_not_called()
 
-class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
+class TestBaseExceptionHandlerHTTPPresentationGenericException(TestCase):
 
     def tearDown(self) -> None:
         """Reset dont_catch to the original frozenset after each test.
@@ -806,7 +828,7 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         req.method = "POST"
         req.__class__ = MagicMock
 
-        await handler.handleHTTP(exc, req)
+        await _present(handler, exc, flow="http", request=req)
 
         mock_responses.exception.assert_awaited_once()
         call_kwargs = mock_responses.exception.call_args[1]
@@ -836,7 +858,7 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         req.method = "GET"
         req.__class__ = MagicMock
 
-        await handler.handleHTTP(exc, req)
+        await _present(handler, exc, flow="http", request=req)
 
         call_kwargs = mock_responses.exception.call_args[1]
         self.assertIs(call_kwargs["exception"], exc)
@@ -865,7 +887,7 @@ class TestBaseExceptionHandlerHandleHTTPGenericException(TestCase):
         req.method = "GET"
         req.__class__ = MagicMock
 
-        await handler.handleHTTP(exc, req)
+        await _present(handler, exc, flow="http", request=req)
 
         call_kwargs = mock_responses.error.call_args[1]
         self.assertTrue(call_kwargs["expects_json"])
@@ -923,3 +945,47 @@ class TestBaseExceptionHandlerDontCatch(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertIsInstance(BaseExceptionHandler.dont_catch, frozenset)
+
+
+class TestBaseExceptionHandlerPolicy(TestCase):
+    """Select effects once without executing them inside the observation hook."""
+
+    async def testObservationDefersLoggingAndPresentation(self) -> None:
+        """Returning the default plan cannot log before custom policy finishes."""
+        application = _make_application()
+        logger = MagicMock(spec=ILogger)
+        application.make = AsyncMock(return_value=logger)
+        responses = MagicMock(spec=IDefaultResponses)
+        handler = BaseExceptionHandler(responses, application)
+        handling = await handler.handleFailure(ValueError("original"), FailureContext())
+        application.make.assert_not_called()
+        responses.exception.assert_not_called()
+        await handling.complete()
+        logger.getLogger.return_value.error.assert_called_once()
+        responses.exception.assert_not_called()
+
+    async def testExpectedAndClosedLoggerContextsDoNotResolveLogger(self) -> None:
+        """Both policy gates keep deferred presentation available without logging."""
+        for context in (
+            FailureContext(expected=True),
+            FailureContext(reporting_allowed=False),
+        ):
+            with self.subTest(context=context):
+                application = _make_application()
+                application.make = AsyncMock()
+                responses = MagicMock(spec=IDefaultResponses)
+                handler = BaseExceptionHandler(responses, application)
+                plan = await handler.handleFailure(ValueError("expected"), context)
+                await plan.complete()
+                self.assertFalse(plan.reported)
+                self.assertIsNotNone(plan.presentation)
+                application.make.assert_not_called()
+
+    async def testDefaultFailedResultHasNoLoggingOrPresentation(self) -> None:
+        """A declared result keeps protocol ownership and gains no fake exception."""
+        application = _make_application()
+        responses = MagicMock(spec=IDefaultResponses)
+        handler = BaseExceptionHandler(responses, application)
+        self.assertIsNone(await handler.handleResult(7, FailureContext(flow="cli")))
+        application.make.assert_not_called()
+        responses.exception.assert_not_called()

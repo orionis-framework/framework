@@ -142,7 +142,6 @@ sqlserver = [
 redshift = [
     "redshift-connector>=2.1.17,<3.0",
     "sqlalchemy-redshift>=1.0.0,<2.0",
-    # Secure the transitive selector dependency (GHSA-mmhr-3c5m-f64f).
     "soupsieve>=4.0.0",
 ]
 # Aggregate extra for all supported optional database backends.

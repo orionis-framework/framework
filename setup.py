@@ -4,6 +4,7 @@ from setuptools.command.build_py import build_py
 
 
 class BuildPy(build_py):
+
     def run(self) -> None:
         """
         Build Python modules and include the framework's project manifest.

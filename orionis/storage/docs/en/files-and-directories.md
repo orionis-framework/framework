@@ -66,6 +66,25 @@ A disk is a named driver boundary. `disk.file(path)` and `disk.directory(path)` 
 
 Paths use `/`, ignore empty/`.` components, resolve internal `..`, and reject traversal above the disk root, null bytes, colons, and an empty file target. Local drivers resolve paths beneath their configured root inside the native operation and reject escapes through symbolic links or Windows junctions. Recursive listings do not enter junctions. Ordinary user files ending in `.tmp` remain visible; only the framework's reserved `.<16 hexadecimal digits>.tmp` staging names are hidden.
 
+### Read filesystem paths
+
+`file.path()` keeps returning the normalized path relative to the disk root. For local disks, `file.absolutePath()` returns the absolute operating-system path, and `file.relativePath()` returns that path relative to the application's `base_path` (`app.basePath`). Both methods are synchronous and work before the file exists.
+
+For an application rooted at `/var/www/orionis` with the `local` disk configured at `storage`:
+
+```python
+from orionis.support.facades import Storage
+
+file = Storage.disk("local").file("logs/app.log")
+file.path()  # logs/app.log
+file.absolutePath()  # /var/www/orionis/storage/logs/app.log
+file.relativePath()  # storage/logs/app.log
+```
+
+`absolutePath()` uses native separators on Windows; `relativePath()` uses `/`. Both retain the local driver's protection against escapes from the disk root. A disk configured outside the project can produce leading `..` segments in `relativePath()`; paths on another Windows drive raise `StoragePathException` because no relative path exists.
+
+The manager supplies the application base path automatically. When constructing a local driver directly, pass `LocalStorageDriver(root, base_path=project_root)` to enable `relativePath()`; without it, that method raises `UnsupportedStorageOperationException`. Memory and cloud drivers raise the same exception for both methods because their files have no local filesystem path.
+
 ### Work with directory listings
 
 ```python

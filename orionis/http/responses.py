@@ -34,6 +34,8 @@ from orionis.session.flash import _FlashData
 if TYPE_CHECKING:
     from orionis.http.enums.status import HTTPStatus
 
+_STATUS_CODE_TYPE_ERROR = "status_code must be an integer"
+
 
 class Response(_FlashData, IResponse):
     """Represent an HTTP response with status, headers, cookies and body."""
@@ -84,7 +86,7 @@ class Response(_FlashData, IResponse):
             This method does not return a value.
         """
         if not isinstance(status_code, int):
-            error_msg = "status_code must be an integer"
+            error_msg = _STATUS_CODE_TYPE_ERROR
             raise TypeError(error_msg)
 
         if not 100 <= status_code <= 599:
@@ -139,6 +141,94 @@ class Response(_FlashData, IResponse):
 
         self.background = background
         """The background task to run after response."""
+
+    def withStatusCode(self: Self, status_code: HTTPStatus | int) -> Self:
+        """
+        Set the HTTP status code and return the response.
+
+        Parameters
+        ----------
+        status_code : orionis.http.enums.HTTPStatus | int
+            HTTP status code between ``100`` and ``599``.
+
+        Returns
+        -------
+        Self
+            The same response, enabling fluent chaining.
+
+        Raises
+        ------
+        TypeError
+            If *status_code* is not an integer.
+        ValueError
+            If *status_code* is outside the accepted HTTP range.
+        """
+        if not isinstance(status_code, int):
+            error_msg = _STATUS_CODE_TYPE_ERROR
+            raise TypeError(error_msg)
+
+        if not 100 <= status_code <= 599:
+            error_msg = "status_code must be between 100 and 599"
+            raise ValueError(error_msg)
+
+        self.status_code = status_code
+        return self
+
+    def withHeaders(self: Self, headers: Mapping[str, str]) -> Self:
+        """
+        Merge response headers and return the response.
+
+        Replace existing values for each supplied name without changing
+        unrelated headers. Header names are compared without regard to case.
+
+        Parameters
+        ----------
+        headers : collections.abc.Mapping[str, str]
+            Header names and values to apply through ``setHeader()``.
+
+        Returns
+        -------
+        Self
+            The same response, enabling fluent chaining.
+
+        Raises
+        ------
+        TypeError
+            If *headers* is not a mapping.
+        """
+        if type(headers) is not dict and not isinstance(headers, Mapping):
+            error_msg = "headers must be a mapping"
+            raise TypeError(error_msg)
+
+        for key, value in headers.items():
+            self.setHeader(key, value)
+        return self
+
+    def withBackground(self: Self, background: BackgroundTask | None) -> Self:
+        """
+        Set the background task and return the response.
+
+        Parameters
+        ----------
+        background : orionis.background.BackgroundTask | None
+            Task to run after the response is sent, or ``None`` to clear it.
+
+        Returns
+        -------
+        Self
+            The same response, enabling fluent chaining.
+
+        Raises
+        ------
+        TypeError
+            If *background* is neither a background task nor ``None``.
+        """
+        if background is not None and not isinstance(background, BackgroundTask):
+            error_msg = "background must be a BackgroundTask or None"
+            raise TypeError(error_msg)
+
+        self.background = background
+        return self
 
     def render(self: Self, content: Any) -> bytes:
         """
@@ -1074,6 +1164,37 @@ class RedirectResponse(Response):
             self.setHeader("location", url)
             if not self.hasHeader("content-type"):
                 self.setHeader("content-type", self._CONTENT_TYPE)
+
+    def withStatusCode(self: Self, status_code: HTTPStatus | int) -> Self:
+        """
+        Set a redirect status code and return the response.
+
+        Parameters
+        ----------
+        status_code : orionis.http.enums.HTTPStatus | int
+            Redirect status code between ``300`` and ``399``.
+
+        Returns
+        -------
+        Self
+            The same response, enabling fluent chaining.
+
+        Raises
+        ------
+        TypeError
+            If *status_code* is not an integer.
+        ValueError
+            If *status_code* is outside the redirect status range.
+        """
+        if not isinstance(status_code, int):
+            error_msg = _STATUS_CODE_TYPE_ERROR
+            raise TypeError(error_msg)
+
+        if not 300 <= status_code <= 399:
+            error_msg = "Redirect status_code must be 3xx"
+            raise ValueError(error_msg)
+
+        return super().withStatusCode(status_code)
 
 
 class StreamingResponse(Response):

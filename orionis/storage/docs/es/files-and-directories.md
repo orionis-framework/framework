@@ -66,6 +66,25 @@ Un disco es un límite de driver nombrado. `file`/`directory` normalizan de inme
 
 Las rutas usan `/`, ignoran vacío/`.` y resuelven `..` internos; rechazan escape de raíz, null, dos puntos y target file vacío. Local resuelve las rutas dentro de su raíz durante la operación nativa y rechaza escapes por enlaces simbólicos o junctions de Windows. Los listados recursivos no entran en junctions. Los archivos del usuario terminados en `.tmp` siguen visibles; solo se ocultan los nombres reservados `.<16 dígitos hexadecimales>.tmp` del staging interno.
 
+### Obtener rutas del filesystem
+
+`file.path()` conserva la ruta normalizada relativa a la raíz del disco. En discos locales, `file.absolutePath()` devuelve la ruta absoluta del sistema operativo y `file.relativePath()` devuelve esa ruta relativa al `base_path` de la aplicación (`app.basePath`). Ambos métodos son síncronos y funcionan aunque el archivo todavía no exista.
+
+Para una aplicación ubicada en `/var/www/orionis` con el disco `local` configurado en `storage`:
+
+```python
+from orionis.support.facades import Storage
+
+file = Storage.disk("local").file("logs/app.log")
+file.path()  # logs/app.log
+file.absolutePath()  # /var/www/orionis/storage/logs/app.log
+file.relativePath()  # storage/logs/app.log
+```
+
+`absolutePath()` usa los separadores nativos en Windows; `relativePath()` usa `/`. Ambos conservan la protección del driver local contra escapes de la raíz del disco. Un disco configurado fuera del proyecto puede producir segmentos `..` iniciales en `relativePath()`; una ruta en otra unidad de Windows lanza `StoragePathException` porque no existe una ruta relativa entre ambas unidades.
+
+El manager proporciona automáticamente la raíz de la aplicación. Al construir un driver local directamente, pasa `LocalStorageDriver(root, base_path=project_root)` para habilitar `relativePath()`; sin ese dato, el método lanza `UnsupportedStorageOperationException`. Los drivers memory y cloud lanzan esa misma excepción para ambos métodos porque sus archivos no tienen una ruta local del filesystem.
+
 ### Listar directorios
 
 ```python

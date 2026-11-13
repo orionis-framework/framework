@@ -3,7 +3,8 @@
 from __future__ import annotations
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
+from orionis.background.task import BackgroundTask
 from orionis.http import factory as factory_module
 from orionis.http.enums.status import HTTPStatus
 from orionis.http.factory import ResponseFactory, response
@@ -17,6 +18,9 @@ from orionis.http.responses import (
     StreamingResponse,
 )
 from orionis.test import TestCase
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 class _Money:
@@ -43,7 +47,7 @@ class _Money:
 class _StubPendingView:
     """Stand-in for the pending view returned by the view facade."""
 
-    __slots__ = ("context", "template")
+    __slots__ = ("context", "options", "template")
 
     def __init__(self, template: str, context: dict[str, object]) -> None:
         """Record the rendering intent without touching the engine.
@@ -62,6 +66,7 @@ class _StubPendingView:
         """
         self.template = template
         self.context = context
+        self.options: dict[str, object] = {}
 
 
 class _StubViewFacade:
@@ -70,7 +75,16 @@ class _StubViewFacade:
     calls: ClassVar[list[tuple[str, dict[str, object]]]] = []
 
     @classmethod
-    def make(cls, template: str, **context: object) -> _StubPendingView:
+    def make(
+        cls,
+        template: str,
+        *,
+        status_code: HTTPStatus | int = 200,
+        headers: Mapping[str, str] | None = None,
+        background: BackgroundTask | None = None,
+        context: Mapping[str, object] | None = None,
+        **variables: object,
+    ) -> _StubPendingView:
         """
         Return a pending view double and record the call.
 
@@ -78,7 +92,15 @@ class _StubViewFacade:
         ----------
         template : str
             Template name requested by the factory.
-        **context : object
+        status_code : HTTPStatus | int
+            HTTP status forwarded by the response factory.
+        headers : Mapping[str, str] | None
+            Headers forwarded by the response factory.
+        background : BackgroundTask | None
+            Background task forwarded by the response factory.
+        context : Mapping[str, object] | None
+            Explicit template variables, including reserved names.
+        **variables : object
             Template variables forwarded by the factory.
 
         Returns
@@ -86,8 +108,15 @@ class _StubViewFacade:
         _StubPendingView
             Double carrying the recorded rendering intent.
         """
-        cls.calls.append((template, context))
-        return _StubPendingView(template, context)
+        merged = {**(context or {}), **variables}
+        cls.calls.append((template, merged))
+        pending = _StubPendingView(template, merged)
+        pending.options = {
+            "status_code": status_code,
+            "headers": headers,
+            "background": background,
+        }
+        return pending
 
 
 class TestResponseFactoryView(TestCase):
@@ -147,6 +176,33 @@ class TestResponseFactoryView(TestCase):
         result = response.view("auth.login")
         self.assertEqual(result.template, "auth.login")
         self.assertEqual(result.context, {})
+
+    def testViewForwardsOptionsSeparatelyFromTemplateContext(self) -> None:
+        """Forward HTTP settings without inserting them into template variables.
+
+        Returns
+        -------
+        None
+            Assertions verify the behavior described above.
+        """
+        headers = {"Cache-Control": "no-store"}
+        task = BackgroundTask(str, "completed")
+        result = response.view(
+            "errors.401",
+            status_code=HTTPStatus.UNAUTHORIZED,
+            headers=headers,
+            background=task,
+            context={"status_code": "template value"},
+            ip="127.0.0.1",
+        )
+
+        self.assertEqual(result.options["status_code"], HTTPStatus.UNAUTHORIZED)
+        self.assertIs(result.options["headers"], headers)
+        self.assertIs(result.options["background"], task)
+        self.assertEqual(
+            result.context,
+            {"status_code": "template value", "ip": "127.0.0.1"},
+        )
 
 
 class TestResponseFactoryHtml(TestCase):

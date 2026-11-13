@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from orionis.storage.contracts.stream import IStorageStream
 from orionis.storage.entities.file_info import FileInfo
+from orionis.storage.exceptions import UnsupportedStorageOperationException
 
 
 class IStorageDriver(ABC):
@@ -25,6 +26,68 @@ class IStorageDriver(ABC):
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
+
+    def absolutePath(self, path: str) -> str:
+        """
+        Return the absolute filesystem path of the file at *path*.
+
+        Drivers with a local filesystem representation may override this
+        operation. The file does not need to exist.
+
+        Parameters
+        ----------
+        path : str
+            Root-relative file path.
+
+        Returns
+        -------
+        str
+            Absolute path using the operating system's separators.
+
+        Raises
+        ------
+        orionis.storage.exceptions.UnsupportedStorageOperationException
+            If the driver does not expose local filesystem paths.
+        orionis.storage.exceptions.StoragePathException
+            If *path* is invalid or escapes the disk root.
+        """
+        error_msg = (
+            f"Driver [{type(self).__name__}] does not expose an absolute "
+            f"filesystem path for [{path}]."
+        )
+        raise UnsupportedStorageOperationException(error_msg)
+
+    def relativePath(self, path: str) -> str:
+        """
+        Return the filesystem path relative to the application base path.
+
+        Drivers with a local filesystem representation and an application
+        base path may override this operation. The file need not exist.
+
+        Parameters
+        ----------
+        path : str
+            Root-relative file path.
+
+        Returns
+        -------
+        str
+            Path from the application base path using ``/`` as separator.
+            Roots outside the project may require leading ``..`` segments.
+
+        Raises
+        ------
+        orionis.storage.exceptions.UnsupportedStorageOperationException
+            If local filesystem paths or the application base are unavailable.
+        orionis.storage.exceptions.StoragePathException
+            If *path* is invalid, escapes the disk root, or cannot be expressed
+            relative to the application base path.
+        """
+        error_msg = (
+            f"Driver [{type(self).__name__}] does not expose an application-relative "
+            f"filesystem path for [{path}]."
+        )
+        raise UnsupportedStorageOperationException(error_msg)
 
     @abstractmethod
     async def read(self, path: str) -> bytes:

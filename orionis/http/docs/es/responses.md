@@ -19,13 +19,33 @@ assert result.getHeader("x-request-id") == ["docs-example"]
 
 Para una plantilla usa `return await response.view("catalog/index", products=products)` dentro de tu handler; `products` debe ser el resultado obtenido por tu servicio. `view()` devuelve un `PendingView`, por lo que no es intercambiable con un `Response` ya construido sin esperar su render. Consulta [vistas](../../../view/docs/es/README.md).
 
+`response.view()` y `View.make()` también aceptan opciones HTTP exclusivamente por nombre: `status_code=200`, `headers=None` y `background=None`. El valor de background debe ser una `BackgroundTask`; se ejecuta después del envío, no durante el render. Por ejemplo, con una plantilla `errors/401.html` existente:
+
+```python
+from orionis.http import response
+
+
+async def unauthorized(ip: str):
+    return await response.view(
+        "errors.401",
+        status_code=401,
+        headers={"Cache-Control": "no-store"},
+        ip=ip,
+    )
+```
+
+El equivalente por encadenamiento es `await response.view("errors.401", ip=ip).withStatusCode(401).withHeaders({"Cache-Control": "no-store"})`. Usa `.withBackground(task)` para añadir una tarea o `.withBackground(None)` para eliminarla. Primero se aplican las opciones y luego las mutaciones encadenadas en orden, con validación al esperar la vista pendiente. Estos mismos métodos funcionan sobre respuestas construidas y devuelven `self`, con validación inmediata.
+
+Las opciones HTTP no son variables de plantilla. Para pasar una variable llamada `status_code`, `headers`, `background` o `context`, usa `context={...}`. Las variables adicionales por nombre prevalecen sobre las entradas de ese mapping. Las cabeceras personalizadas conservan el valor predeterminado `X-Orionis-Render: SSR` salvo que lo reemplacen explícitamente, sin distinguir mayúsculas.
+
 ## Redirigir con estado de formulario
 
 ```python
 from orionis.http import response
 
 result = (
-    response.redirect("/settings", status_code=303)
+    response
+    .redirect("/settings", status_code=303)
     .withFlash("notice", "Preferences saved")
     .withInput({"theme": "dark"})
 )
@@ -36,7 +56,7 @@ La aplicación web aplica estos datos a la sesión. `withErrors()` admite errore
 
 ## Encabezados y cookies
 
-`setHeader()` reemplaza todos los valores de una cabecera; `addHeader()` añade otro. `getHeader()` devuelve una lista o `None`; las búsquedas ignoran mayúsculas. No añadas saltos de línea en nombres o valores. `withCookie()` permite encadenamiento; `setCookie()` devuelve `None`.
+`setHeader()` reemplaza todos los valores de una cabecera; `addHeader()` añade otro. `withHeaders(mapping)` reemplaza los nombres proporcionados, conserva las demás cabeceras y devuelve la respuesta para encadenar. `getHeader()` devuelve una lista o `None`; las búsquedas ignoran mayúsculas. No añadas saltos de línea en nombres o valores. `withCookie()` permite encadenamiento; `setCookie()` devuelve `None`.
 
 Las cabeceras salientes rechazan nombres que no sean tokens válidos y caracteres de control inseguros antes del envío, incluidas las mutaciones mediante listas devueltas y copias de plantillas. Se conservan las tabulaciones horizontales y los valores Latin-1.
 

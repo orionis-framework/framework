@@ -35,6 +35,48 @@ class IFile(ABC):
         """
 
     @abstractmethod
+    def absolutePath(self) -> str:
+        """
+        Return the absolute filesystem path of the file.
+
+        The file does not need to exist.
+
+        Returns
+        -------
+        str
+            Absolute path using the operating system's separators.
+
+        Raises
+        ------
+        orionis.storage.exceptions.UnsupportedStorageOperationException
+            If the driver does not expose local filesystem paths.
+        orionis.storage.exceptions.StoragePathException
+            If the file path escapes the disk root.
+        """
+
+    @abstractmethod
+    def relativePath(self) -> str:
+        """
+        Return the filesystem path relative to the application base path.
+
+        The file does not need to exist.
+
+        Returns
+        -------
+        str
+            Path from ``app.basePath`` using ``/`` as separator. Roots outside
+            the project may require leading ``..`` segments.
+
+        Raises
+        ------
+        orionis.storage.exceptions.UnsupportedStorageOperationException
+            If local filesystem paths or the application base are unavailable.
+        orionis.storage.exceptions.StoragePathException
+            If the file path escapes the disk root or cannot be expressed
+            relative to the application base path.
+        """
+
+    @abstractmethod
     async def read(self) -> bytes:
         """
         Read the full contents of the file.

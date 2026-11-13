@@ -19,13 +19,33 @@ assert result.getHeader("x-request-id") == ["docs-example"]
 
 For a template, use `return await response.view("catalog/index", products=products)` inside your handler; `products` must come from your service. `view()` returns a `PendingView`, so it is not interchangeable with a constructed `Response` until rendering is awaited. See [views](../../../view/docs/en/README.md).
 
+`response.view()` and `View.make()` also accept keyword-only HTTP options: `status_code=200`, `headers=None`, and `background=None`. The background value must be a `BackgroundTask`; it runs after delivery, not during rendering. For example, with an existing `errors/401.html` template:
+
+```python
+from orionis.http import response
+
+
+async def unauthorized(ip: str):
+    return await response.view(
+        "errors.401",
+        status_code=401,
+        headers={"Cache-Control": "no-store"},
+        ip=ip,
+    )
+```
+
+The fluent equivalent is `await response.view("errors.401", ip=ip).withStatusCode(401).withHeaders({"Cache-Control": "no-store"})`. Use `.withBackground(task)` to attach a task, or `.withBackground(None)` to clear it. Options apply first; chained mutations apply afterward in order, with validation when the pending view is awaited. These same methods work on constructed responses and return `self`, validating immediately.
+
+HTTP options are not template variables. To pass a variable named `status_code`, `headers`, `background`, or `context`, use `context={...}`. Additional keyword template variables override that mapping's entries. Custom headers retain the default `X-Orionis-Render: SSR` unless they explicitly replace it, ignoring case.
+
 ## Redirecting with form state
 
 ```python
 from orionis.http import response
 
 result = (
-    response.redirect("/settings", status_code=303)
+    response
+    .redirect("/settings", status_code=303)
     .withFlash("notice", "Preferences saved")
     .withInput({"theme": "dark"})
 )
@@ -36,7 +56,7 @@ The web application applies this data to its session. `withErrors()` accepts nor
 
 ## Headers and cookies
 
-`setHeader()` replaces a header's values; `addHeader()` appends one. `getHeader()` returns a list or `None`; lookups ignore case. Do not insert newlines in names or values. `withCookie()` supports chaining; `setCookie()` returns `None`.
+`setHeader()` replaces a header's values; `addHeader()` appends one. `withHeaders(mapping)` replaces the supplied names while preserving unrelated headers and returns the response for chaining. `getHeader()` returns a list or `None`; lookups ignore case. Do not insert newlines in names or values. `withCookie()` supports chaining; `setCookie()` returns `None`.
 
 Outgoing headers reject invalid field-name tokens and unsafe control characters before transport emission, including mutations through returned header lists and template copies. Horizontal tabs and Latin-1 field values remain accepted.
 

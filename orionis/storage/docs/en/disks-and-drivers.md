@@ -115,7 +115,7 @@ There are no multi-file transactions, business locks, or common compare-and-swap
 
 ## Compatibility
 
-All built-in drivers implement `IStorageDriver`, but provider capabilities differ: public ACLs, signed URLs, creation times, ETags, checksums, and directory semantics are not universally equivalent. Paths are always canonical POSIX-style relative strings at the Orionis API boundary, including on Windows.
+All built-in drivers implement `IStorageDriver`, but provider capabilities differ: public ACLs, signed URLs, creation times, ETags, checksums, and directory semantics are not universally equivalent. Storage input paths and `file.path()` use canonical POSIX-style strings relative to the disk root, including on Windows. Local files also expose `absolutePath()` with native filesystem separators and `relativePath()` relative to `app.basePath` with `/` separators. Custom drivers inherit unsupported-operation errors for these optional methods until they provide an implementation.
 
 Legacy `normalizePath` and `normalizeFilePath` remain lazy aliases; new code should use snake_case names.
 

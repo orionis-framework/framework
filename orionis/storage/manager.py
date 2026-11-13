@@ -300,4 +300,5 @@ class StorageManager(IStorageManager):
         return LocalStorageDriver(
             root=root,
             base_url=getattr(config, "url", None),
+            base_path=self._base_path,
         )

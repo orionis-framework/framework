@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, Any, Literal, Self
 if TYPE_CHECKING:
     from collections.abc import AsyncIterable, Mapping
     from datetime import datetime
+    from orionis.background.task import BackgroundTask
+    from orionis.http.enums.status import HTTPStatus
 
 
 class IResponse(ABC):
@@ -16,6 +18,74 @@ class IResponse(ABC):
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
+
+    @abstractmethod
+    def withStatusCode(self, status_code: HTTPStatus | int) -> Self:
+        """
+        Set the HTTP status code and return the response.
+
+        Parameters
+        ----------
+        status_code : orionis.http.enums.HTTPStatus | int
+            HTTP status code between ``100`` and ``599``.
+
+        Returns
+        -------
+        Self
+            The same response, enabling fluent chaining.
+
+        Raises
+        ------
+        TypeError
+            If *status_code* is not an integer.
+        ValueError
+            If *status_code* is outside the accepted HTTP range.
+        """
+
+    @abstractmethod
+    def withHeaders(self, headers: Mapping[str, str]) -> Self:
+        """
+        Merge response headers and return the response.
+
+        Replace existing values for each supplied name without changing
+        unrelated headers. Header names are compared without regard to case.
+
+        Parameters
+        ----------
+        headers : collections.abc.Mapping[str, str]
+            Header names and values to apply through ``setHeader()``.
+
+        Returns
+        -------
+        Self
+            The same response, enabling fluent chaining.
+
+        Raises
+        ------
+        TypeError
+            If *headers* is not a mapping.
+        """
+
+    @abstractmethod
+    def withBackground(self, background: BackgroundTask | None) -> Self:
+        """
+        Set the background task and return the response.
+
+        Parameters
+        ----------
+        background : orionis.background.BackgroundTask | None
+            Task to run after the response is sent, or ``None`` to clear it.
+
+        Returns
+        -------
+        Self
+            The same response, enabling fluent chaining.
+
+        Raises
+        ------
+        TypeError
+            If *background* is neither a background task nor ``None``.
+        """
 
     @abstractmethod
     def render(self, content: Any) -> bytes:

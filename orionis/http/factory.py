@@ -40,7 +40,16 @@ class ResponseFactory:
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    def view(self, template: str, **context: Any) -> PendingView:
+    def view(
+        self,
+        template: str,
+        *,
+        status_code: HTTPStatus | int = 200,
+        headers: Mapping[str, str] | None = None,
+        background: BackgroundTask | None = None,
+        context: Mapping[str, Any] | None = None,
+        **variables: Any,
+    ) -> PendingView:
         """
         Render a template as an awaitable, chainable HTML response.
 
@@ -49,16 +58,42 @@ class ResponseFactory:
         template : str
             Template name using dot notation (e.g. ``'users.index'``) or a
             relative path (e.g. ``'users/index.html'``).
-        **context : typing.Any
-            Keyword arguments forwarded as template variables.
+        status_code : orionis.http.enums.HTTPStatus | int, optional
+            HTTP status code for the rendered response.
+        headers : collections.abc.Mapping[str, str] | None, optional
+            Response headers. The SSR marker is added when not supplied.
+        background : orionis.background.BackgroundTask | None, optional
+            Task to run after the response is sent.
+        context : collections.abc.Mapping[str, typing.Any] | None, optional
+            Template variables, including names reserved for response options.
+        **variables : typing.Any
+            Additional template variables, overriding matching context entries.
 
         Returns
         -------
         orionis.view.pending.PendingView
             Awaitable proxy that resolves to an :class:`orionis.http.HTMLResponse` and
-            accepts chained mutators such as ``withErrors()``.
+            accepts chained mutators such as ``withStatusCode()`` and
+            ``withErrors()``.
+
+        Raises
+        ------
+        TypeError
+            If *context* is neither a mapping nor ``None``.
+
+        Notes
+        -----
+        Response options are validated when the pending view is awaited.
+        Chained mutations are applied after the initial options, in call order.
         """
-        return View.make(template, **context)
+        return View.make(
+            template,
+            status_code=status_code,
+            headers=headers,
+            background=background,
+            context=context,
+            **variables,
+        )
 
     def html(
         self,

@@ -115,7 +115,7 @@ No hay transacciones entre múltiples archivos, lock de negocio ni compare-and-s
 
 ## Compatibilidad
 
-Todos implementan `IStorageDriver`, pero ACL, URL firmada, timestamps, ETag, checksum y directorios no son equivalentes. La API usa rutas POSIX relativas incluso en Windows.
+Todos implementan `IStorageDriver`, pero ACL, URL firmada, timestamps, ETag, checksum y directorios no son equivalentes. Las rutas de entrada y `file.path()` usan rutas POSIX relativas a la raíz del disco incluso en Windows. Los archivos locales también exponen `absolutePath()` con separadores nativos del filesystem y `relativePath()` relativa a `app.basePath` con separadores `/`. Los drivers personalizados heredan errores de operación no soportada para estos métodos opcionales hasta que proporcionen una implementación.
 
 `normalizePath`/`normalizeFilePath` siguen como aliases legacy; código nuevo debe usar snake_case.
 

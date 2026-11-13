@@ -1,12 +1,14 @@
-# ruff: noqa: ANN401, BLE001, PLC0415, TC001, TC003, TRY004
+# ruff: noqa: ANN401, BLE001, PLC0415, PLR0913, TC001, TC003, TRY004
 # Preserve dynamic response arguments, runtime types and attribute protocol errors.
 # Observe resolution failures through the lazily imported central failure service.
 """Provide awaitable, chainable results of template rendering."""
 
 from __future__ import annotations
 import re
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Generator, Mapping
 from typing import Any, Self
+from orionis.background.task import BackgroundTask
+from orionis.http.enums.status import HTTPStatus
 from orionis.http.responses import HTMLResponse
 from orionis.session.contracts.session import ISession
 from orionis.session.flash import _FlashData, apply_flash
@@ -38,11 +40,21 @@ class PendingView(_FlashData):
 
         return await View.make("auth.login").withErrors(errors)
 
-    Every attribute that exists on :class:`orionis.http.HTMLResponse` is accepted and
-    replayed on the real response once the template has been rendered.
+    Callable attributes on :class:`orionis.http.HTMLResponse` are accepted and
+    replayed on the real response once the template has been rendered. Initial
+    response options are applied before queued mutations, in call order.
     """
 
-    __slots__ = ("_context", "_engine", "_flash", "_mutations", "_template")
+    __slots__ = (
+        "_background",
+        "_context",
+        "_engine",
+        "_flash",
+        "_headers",
+        "_mutations",
+        "_status_code",
+        "_template",
+    )
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
@@ -50,6 +62,10 @@ class PendingView(_FlashData):
         engine: IViewEngine,
         template: str,
         context: dict[str, Any],
+        *,
+        status_code: HTTPStatus | int = 200,
+        headers: Mapping[str, str] | None = None,
+        background: BackgroundTask | None = None,
     ) -> None:
         """
         Store the rendering intent without performing any work.
@@ -62,6 +78,12 @@ class PendingView(_FlashData):
             Template name using dot notation or a relative path.
         context : dict[str, typing.Any]
             Template variables forwarded to the engine.
+        status_code : orionis.http.enums.HTTPStatus | int, optional
+            HTTP status code for the rendered response.
+        headers : collections.abc.Mapping[str, str] | None, optional
+            Response headers. The SSR marker is added when not supplied.
+        background : orionis.background.BackgroundTask | None, optional
+            Task to run after the response is sent.
 
         Returns
         -------
@@ -74,10 +96,96 @@ class PendingView(_FlashData):
         """Template name using dot notation or a relative path."""
         self._context: dict[str, Any] = context
         """Template variables forwarded to the engine."""
+        self._status_code: HTTPStatus | int = status_code
+        """Initial HTTP status code, validated when the view is rendered."""
+        self._headers: Mapping[str, str] | None = headers
+        """Initial response headers, separate from template variables."""
+        self._background: BackgroundTask | None = background
+        """Initial background task, executed only after response delivery."""
         self._mutations: list[tuple[str, tuple, dict]] | None = None
         """Response changes queued while configuring the pending view."""
         self._flash: dict[str, Any] | None = None
         """Session values scheduled for availability during the next request."""
+
+    def withStatusCode(self: Self, status_code: HTTPStatus | int) -> Self:
+        """
+        Queue an HTTP status change and return the pending view.
+
+        Parameters
+        ----------
+        status_code : orionis.http.enums.HTTPStatus | int
+            HTTP status code, validated when the view is awaited.
+
+        Returns
+        -------
+        Self
+            The same pending view for fluent chaining.
+        """
+        return self.__queueMutation("withStatusCode", status_code)
+
+    def withHeaders(self: Self, headers: Mapping[str, str]) -> Self:
+        """
+        Queue response headers and return the pending view.
+
+        Parameters
+        ----------
+        headers : collections.abc.Mapping[str, str]
+            Headers to merge, replacing matching names without regard to case.
+            Unrelated headers remain unchanged.
+
+        Returns
+        -------
+        Self
+            The same pending view for fluent chaining.
+        """
+        return self.__queueMutation("withHeaders", headers)
+
+    def withBackground(self: Self, background: BackgroundTask | None) -> Self:
+        """
+        Queue a background task change and return the pending view.
+
+        Parameters
+        ----------
+        background : orionis.background.BackgroundTask | None
+            Task to run after delivery, or ``None`` to clear the current task.
+            Validated when the view is awaited.
+
+        Returns
+        -------
+        Self
+            The same pending view for fluent chaining.
+        """
+        return self.__queueMutation("withBackground", background)
+
+    def __queueMutation(
+        self: Self,
+        name: str,
+        /,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Self:
+        """
+        Retain a response mutation in call order without rendering.
+
+        Parameters
+        ----------
+        name : str
+            Name of the response method to invoke after rendering.
+        *args : typing.Any
+            Positional arguments for the response method.
+        **kwargs : typing.Any
+            Keyword arguments for the response method.
+
+        Returns
+        -------
+        Self
+            The same pending view for fluent chaining.
+        """
+        mutations = self._mutations
+        if mutations is None:
+            mutations = self._mutations = []
+        mutations.append((name, args, kwargs))
+        return self
 
     def __getattr__(self: Self, name: str) -> Callable[..., PendingView]:
         """
@@ -118,11 +226,7 @@ class PendingView(_FlashData):
             orionis.view.pending.PendingView
                 The same pending view for fluent chaining.
             """
-            mutations = self._mutations
-            if mutations is None:
-                mutations = self._mutations = []
-            mutations.append((name, args, kwargs))
-            return self
+            return self.__queueMutation(name, *args, **kwargs)
 
         return queue
 
@@ -154,6 +258,10 @@ class PendingView(_FlashData):
             When rendering fails for any reason.
         orionis.support.concurrency.WorkQueueFullError
             When the engine's template loading workers are saturated.
+        TypeError
+            When response options have incompatible types.
+        ValueError
+            When a response status code is outside the supported range.
         """
         if self._flash:
             await self.__flashToSession()
@@ -163,12 +271,6 @@ class PendingView(_FlashData):
                 self._template,
                 self._context,
             )
-            response = HTMLResponse(
-                content=response_html,
-                headers={
-                    "X-Orionis-Render": "SSR",
-                },
-            )
         except ViewTemplateNotFoundException, ViewRenderException, WorkQueueFullError:
             # Preserve the engine's classified failure and original cause.
             raise
@@ -177,6 +279,16 @@ class PendingView(_FlashData):
             exc_msg: str = f"Failed to render view '{self._template}': {detail}"
             error_msg = exc_msg
             raise ViewRenderException(error_msg) from e
+
+        # Keep response validation separate from template rendering failures.
+        response = HTMLResponse(
+            content=response_html,
+            status_code=self._status_code,
+            headers=self._headers,
+            background=self._background,
+        )
+        if not response.hasHeader("x-orionis-render"):
+            response.setHeader("X-Orionis-Render", "SSR")
 
         if self._mutations:
             for name, args, kwargs in self._mutations:

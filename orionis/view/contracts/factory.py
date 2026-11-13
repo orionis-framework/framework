@@ -1,10 +1,13 @@
-# ruff: noqa: ANN401, TC001
+# ruff: noqa: ANN401, TC001, TC003
 # Retain arbitrary template context and the public deferred-result runtime type.
 """Contract for the view factory."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from typing import Any
+from orionis.background.task import BackgroundTask
+from orionis.http.enums.status import HTTPStatus
 from orionis.view.pending import PendingView
 
 
@@ -21,7 +24,16 @@ class IViewFactory(ABC):
     """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
-    def make(self, template: str, **context: Any) -> PendingView:
+    def make(
+        self,
+        template: str,
+        *,
+        status_code: HTTPStatus | int = 200,
+        headers: Mapping[str, str] | None = None,
+        background: BackgroundTask | None = None,
+        context: Mapping[str, Any] | None = None,
+        **variables: Any,
+    ) -> PendingView:
         """
         Prepare a template render as an awaitable, chainable response.
 
@@ -30,17 +42,33 @@ class IViewFactory(ABC):
         template : str
             Template name using dot notation (e.g. ``'users.index'``) or a
             direct path relative to a configured template directory.
-        **context : typing.Any
-            Keyword arguments are forwarded as template variables.
+        status_code : orionis.http.enums.HTTPStatus | int, optional
+            HTTP status code for the rendered response.
+        headers : collections.abc.Mapping[str, str] | None, optional
+            Response headers. The SSR marker is added when not supplied.
+        background : orionis.background.BackgroundTask | None, optional
+            Task to run after the response is sent.
+        context : collections.abc.Mapping[str, typing.Any] | None, optional
+            Template variables, including names reserved for response options.
+        **variables : typing.Any
+            Additional template variables, overriding matching context entries.
 
         Returns
         -------
         orionis.view.pending.PendingView
             Awaitable proxy that resolves to an :class:`orionis.http.HTMLResponse` and
-            accepts chained response mutators such as ``withFlash()``.
+            accepts chained response mutators such as ``withStatusCode()`` and
+            ``withFlash()``.
+
+        Raises
+        ------
+        TypeError
+            If *context* is neither a mapping nor ``None``.
 
         Notes
         -----
         Template lookup and rendering errors are raised when the returned value
         is awaited, rather than when this method prepares it.
+        Response options are also validated on await; chained mutations are
+        applied after the initial options, in call order.
         """

@@ -101,9 +101,10 @@ class LocalStorageDriver(IStorageDriver):
     """
     Storage driver backed by the local filesystem.
 
-    Every path is resolved inside the configured *root* directory and
-    all blocking I/O runs on worker threads via
-    :func:`asyncio.to_thread`, keeping the event loop responsive.
+    Every path is resolved inside the configured *root* directory. Content
+    and metadata I/O runs on worker threads via :func:`asyncio.to_thread`,
+    keeping the event loop responsive. Path accessors are synchronous and
+    validate filesystem boundaries without requiring the file to exist.
     Visibility is mapped onto POSIX permission bits (``0o644``/``0o600``
     for files), which degrades gracefully on platforms without a full
     POSIX mode implementation.
@@ -112,10 +113,16 @@ class LocalStorageDriver(IStorageDriver):
     Missing paths retain the normal missing-file or empty existence results.
     """
 
-    __slots__ = ("_base_url", "_root")
+    __slots__ = ("_base_path", "_base_url", "_root")
     """Declare the instance attribute slots reserved by this class."""
 
-    def __init__(self: Self, root: Path, base_url: str | None = None) -> None:
+    def __init__(
+        self: Self,
+        root: Path,
+        base_url: str | None = None,
+        *,
+        base_path: Path | None = None,
+    ) -> None:
         """
         Initialize the driver rooted at *root*.
 
@@ -127,6 +134,9 @@ class LocalStorageDriver(IStorageDriver):
         base_url : str | None
             Base URL used to build public file URLs, or ``None`` when
             the disk does not expose URLs.
+        base_path : pathlib.Path | None
+            Application base path used by ``relativePath()``, or ``None``
+            when the driver is constructed without application context.
 
         Returns
         -------
@@ -136,6 +146,10 @@ class LocalStorageDriver(IStorageDriver):
         """
         self._root: Path = root.resolve()
         """Directory acting as the disk root. It is created when missing."""
+        self._base_path: Path | None = (
+            base_path.resolve() if base_path is not None else None
+        )
+        """Application base path used for project-relative file paths."""
         self._base_url: str | None = base_url.rstrip("/") if base_url else None
         """
         Base URL used to build public file URLs, or ``None`` when the disk does not
@@ -144,6 +158,71 @@ class LocalStorageDriver(IStorageDriver):
 
         # Guarantee the disk root exists before any operation runs.
         self._root.mkdir(parents=True, exist_ok=True)
+
+    # ── Path accessors ───────────────────────────────────────────────────────
+
+    def absolutePath(self: Self, path: str) -> str:
+        """
+        Return the absolute filesystem path of the file at *path*.
+
+        The file does not need to exist. Apply the same disk boundary
+        validation used by content operations, including symbolic links.
+
+        Parameters
+        ----------
+        path : str
+            Root-relative file path.
+
+        Returns
+        -------
+        str
+            Absolute path using the operating system's separators.
+
+        Raises
+        ------
+        orionis.storage.exceptions.StoragePathException
+            If *path* is invalid or escapes the disk root.
+        """
+        return str(self.__absolute(normalizeFilePath(path)))
+
+    def relativePath(self: Self, path: str) -> str:
+        """
+        Return the filesystem path relative to the application base path.
+
+        The file does not need to exist. Roots outside the project may
+        require leading ``..`` segments in the returned path.
+
+        Parameters
+        ----------
+        path : str
+            Root-relative file path.
+
+        Returns
+        -------
+        str
+            Path from the application base path using ``/`` as separator.
+
+        Raises
+        ------
+        orionis.storage.exceptions.UnsupportedStorageOperationException
+            If no application base path was supplied to the driver.
+        orionis.storage.exceptions.StoragePathException
+            If *path* is invalid, escapes the disk root, or is on a different
+            filesystem drive from the application base path.
+        """
+        if self._base_path is None:
+            error_msg = "An application base path is required for relativePath()."
+            raise UnsupportedStorageOperationException(error_msg)
+
+        absolute = self.absolutePath(path)
+        try:
+            return Path(os.path.relpath(absolute, self._base_path)).as_posix()
+        except ValueError as exc:
+            error_msg = (
+                f"Storage path [{path}] cannot be expressed relative to "
+                f"application base path [{self._base_path}]."
+            )
+            raise StoragePathException(error_msg) from exc
 
     # ── Internal helpers (synchronous, executed on worker threads) ──────────
 

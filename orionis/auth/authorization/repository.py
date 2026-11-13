@@ -1,14 +1,15 @@
+# ruff: noqa: TC001
+# Keep public repository annotations available to runtime introspection.
+
 """Load permissions and roles from the framework authorization tables."""
 
-from typing import TYPE_CHECKING
 from orionis.auth.concerns.functions import authorizable_key
 from orionis.auth.contracts.permission_repository import IPermissionRepository
 from orionis.auth.exceptions import AuthException
 from orionis.orm.contracts.query_builder import IQueryBuilder
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.authorizable import IAuthorizable
-    from orionis.orm.contracts.raw_builder import IRawQueryBuilder
+from orionis.auth.contracts.authorizable import IAuthorizable
+from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 
 # Tables shipped by the framework migrations. They follow the polymorphic
 # layout so any model can own permissions and roles.
@@ -36,6 +37,7 @@ _ROLE_ID: str = "role_id"
 _PERMISSION_ID: str = "permission_id"
 """Permission id identifier: ``permission_id``."""
 
+
 class DatabasePermissionRepository(IPermissionRepository):
     """
     Load permissions and roles from the framework authorization tables.
@@ -49,8 +51,6 @@ class DatabasePermissionRepository(IPermissionRepository):
     The repository is stateless and safe to register as a singleton. It
     only issues read queries, so concurrent calls never interfere.
     """
-
-    # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("__db",)
     """Declare the instance attribute slots reserved by this class."""
@@ -67,7 +67,7 @@ class DatabasePermissionRepository(IPermissionRepository):
         Returns
         -------
         None
-            The repository keeps only the injected gateway.
+            No return value.
         """
         self.__db = db
         """Gateway used to build queries over the authorization tables."""

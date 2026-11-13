@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.schemas.constraints import (
     GreaterThan,
     GreaterThanOrEqual,
@@ -15,8 +17,8 @@ from orionis.schemas.meta.constraint import ConstraintMetadata
 from orionis.schemas.meta.validation import ValidationMetadata
 from orionis.test import TestCase
 
-class TestConstraints(TestCase):
 
+class TestConstraints(TestCase):
     # ------------------------------------------------------------------ GreaterThan
 
     def testGreaterThanStoresValue(self) -> None:
@@ -28,7 +30,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = GreaterThan(10)
         self.assertEqual(c.value, 10)
@@ -42,7 +44,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = GreaterThan(5)
         self.assertIsNone(c.message)
@@ -56,7 +58,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = GreaterThan(0, message="Must be positive.")
         self.assertEqual(c.message, "Must be positive.")
@@ -70,7 +72,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(GreaterThan(1), ConstraintMetadata)
         self.assertIsInstance(GreaterThan(1), ValidationMetadata)
@@ -83,7 +85,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = GreaterThan(3.14)
         self.assertAlmostEqual(c.value, 3.14)
@@ -98,7 +100,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = GreaterThanOrEqual(0)
         self.assertEqual(c.value, 0)
@@ -111,7 +113,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(GreaterThanOrEqual(0), ConstraintMetadata)
 
@@ -125,7 +127,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = LessThan(100)
         self.assertEqual(c.value, 100)
@@ -138,7 +140,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(LessThan(100), ConstraintMetadata)
 
@@ -152,7 +154,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = LessThanOrEqual(99)
         self.assertEqual(c.value, 99)
@@ -165,7 +167,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(LessThanOrEqual(99), ConstraintMetadata)
 
@@ -179,7 +181,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = MultipleOf(5)
         self.assertEqual(c.value, 5)
@@ -192,7 +194,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = MultipleOf(0.5)
         self.assertAlmostEqual(c.value, 0.5)
@@ -205,7 +207,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(MultipleOf(5), ConstraintMetadata)
 
@@ -219,7 +221,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = Pattern(r"^\d{3}-\d{2}-\d{4}$")
         self.assertEqual(c.regex, r"^\d{3}-\d{2}-\d{4}$")
@@ -233,7 +235,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = Pattern(r".*")
         self.assertIsNone(c.message)
@@ -246,7 +248,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Pattern(r".*"), ConstraintMetadata)
 
@@ -260,7 +262,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = MinLength(3)
         self.assertEqual(c.value, 3)
@@ -273,7 +275,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(MinLength(1), ConstraintMetadata)
 
@@ -287,7 +289,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = MaxLength(255)
         self.assertEqual(c.value, 255)
@@ -300,7 +302,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(MaxLength(255), ConstraintMetadata)
 
@@ -315,7 +317,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = TimezoneAware()
         self.assertIsNone(c.message)
@@ -328,7 +330,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(TimezoneAware(), ConstraintMetadata)
 
@@ -343,7 +345,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = TimezoneNaive()
         self.assertIsNone(c.message)
@@ -356,7 +358,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(TimezoneNaive(), ConstraintMetadata)
 
@@ -370,7 +372,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(callable(StrongPassword))
 
@@ -385,7 +387,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         c = GreaterThan(5)
         with self.assertRaises(AttributeError):
@@ -400,7 +402,7 @@ class TestConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(GreaterThan(10), GreaterThan(10))
         self.assertNotEqual(GreaterThan(10), GreaterThan(20))

@@ -1,15 +1,17 @@
+# ruff: noqa: SLF001, TC001
+# Retain runtime annotations and dynamic attribute values.
 """Entry point of the model-less query API, backing the ``DB`` facade."""
 
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.contracts.transaction import ITransaction
 from orionis.database.migrations.context import current_migration_connection
 from orionis.orm.contracts.query_builder import IQueryBuilder
 from orionis.orm.query.raw_builder import RawQueryBuilder
 
-if TYPE_CHECKING:
-    from orionis.database.contracts.connection import IConnection
-    from orionis.orm.contracts.raw_builder import IRawQueryBuilder
+from orionis.database.contracts.connection import IConnection
+from orionis.orm.contracts.raw_builder import IRawQueryBuilder
+
 
 class QueryBuilder(IQueryBuilder):
     """
@@ -20,8 +22,6 @@ class QueryBuilder(IQueryBuilder):
     by value. Sharing mutable state here would leak one caller's target
     connection into every other concurrent request.
     """
-
-    # ruff: noqa: TC001
 
     __slots__ = ("_connection_name", "_db_manager")
     """Declare the instance attribute slots reserved by this class."""
@@ -45,7 +45,7 @@ class QueryBuilder(IQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self._db_manager: IConnectionManager = db_manager
         """Manager resolving named database connections."""
@@ -110,13 +110,16 @@ class QueryBuilder(IQueryBuilder):
         """
         builder = RawQueryBuilder()
         target = connection or self._connection_name
+        migration = None
         if target is None:
             migration = current_migration_connection()
             target = (
-                migration.getName() if migration is not None
+                migration.getName()
+                if migration is not None
                 else self._db_manager.getDefaultName()
             )
         builder.connection(target)
+        builder._bindConnectionManager(self._db_manager, connection=migration)
         return builder.table(name, alias=alias)
 
     def getDefaultName(self) -> str:
@@ -142,7 +145,7 @@ class QueryBuilder(IQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -260,7 +263,7 @@ class QueryBuilder(IQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -285,7 +288,7 @@ class QueryBuilder(IQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -310,7 +313,7 @@ class QueryBuilder(IQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -366,6 +369,3 @@ class QueryBuilder(IQueryBuilder):
             if scoped is not None:
                 return scoped
         return self._db_manager.connection(target)
-
-
-

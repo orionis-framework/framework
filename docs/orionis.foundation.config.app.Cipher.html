@@ -229,11 +229,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6884"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6926"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId6884">
+                <label class="lbl-toggle" for="expandableItemId6926">
                     
                     
                 </label>
@@ -288,11 +288,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6885"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6927"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId6885">
+                <label class="lbl-toggle" for="expandableItemId6927">
                     
                     
                 </label>
@@ -363,11 +363,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6886"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6928"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId6886">
+                <label class="lbl-toggle" for="expandableItemId6928">
                     
                     
                 </label>
@@ -581,7 +581,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6887"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6929"> 
                     
                 </input>
 
@@ -670,11 +670,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6888"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId6930"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId6888">
+                <label class="lbl-toggle" for="expandableItemId6930">
                     
                     
                 </label>
@@ -848,25 +848,25 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Cipher</span>(Enum): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/foundation/config/app/enums/ciphers.py#L5" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.app.Cipher">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Cipher</span>(Enum): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/foundation/config/app/enums/ciphers.py#L6" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.app.Cipher">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Enumerate supported AES cipher modes.</p>
-<p>This enum defines various Advanced Encryption Standard (AES) cipher modes and
-key sizes commonly used for encryption and decryption operations.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This class is an enumeration and does not return a value.</td></tr></table></div>
+          <div><p>Enumerate authenticated AES modes and retained legacy identifiers.</p>
+<p>Retain CBC identifiers for compatibility with key-generation utilities.
+Application encryption accepts only the authenticated GCM modes.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id670">
+          <table class="children sortable" id="id680">
   
   
   <tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#AES_128_CBC" class="internal-link" title="orionis.foundation.config.app.Cipher.AES_128_CBC">AES<wbr></wbr>_128<wbr></wbr>_CBC</a></code></td>
-    <td>AES with a 128-bit key in Cipher Block Chaining (CBC) mode.</td>
+    <td>Legacy AES-128-CBC identifier; rejected by application encryption.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
@@ -876,7 +876,7 @@ key sizes commonly used for encryption and decryption operations.</p>
     
     <td>Constant</td>
     <td><code><a href="#AES_256_CBC" class="internal-link" title="orionis.foundation.config.app.Cipher.AES_256_CBC">AES<wbr></wbr>_256<wbr></wbr>_CBC</a></code></td>
-    <td>AES with a 256-bit key in Cipher Block Chaining (CBC) mode.</td>
+    <td>Legacy AES-256-CBC identifier; rejected by application encryption.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
@@ -902,7 +902,7 @@ key sizes commonly used for encryption and decryption operations.</p>
   <div class="functionHeader">
     
     <span class="py-defname">AES_128_CBC</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/foundation/config/app/enums/ciphers.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/foundation/config/app/enums/ciphers.py#L26">
       
       (source)
     </a>
@@ -914,7 +914,7 @@ key sizes commonly used for encryption and decryption operations.</p>
   </div>
   <div class="functionBody">
     
-    <div><p>AES with a 128-bit key in Cipher Block Chaining (CBC) mode.</p></div>
+    <div><p>Legacy AES-128-CBC identifier; rejected by application encryption.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">AES-128-CBC</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -929,7 +929,7 @@ key sizes commonly used for encryption and decryption operations.</p>
   <div class="functionHeader">
     
     <span class="py-defname">AES_128_GCM</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/foundation/config/app/enums/ciphers.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/foundation/config/app/enums/ciphers.py#L28">
       
       (source)
     </a>
@@ -956,7 +956,7 @@ key sizes commonly used for encryption and decryption operations.</p>
   <div class="functionHeader">
     
     <span class="py-defname">AES_256_CBC</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/foundation/config/app/enums/ciphers.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/foundation/config/app/enums/ciphers.py#L27">
       
       (source)
     </a>
@@ -968,7 +968,7 @@ key sizes commonly used for encryption and decryption operations.</p>
   </div>
   <div class="functionBody">
     
-    <div><p>AES with a 256-bit key in Cipher Block Chaining (CBC) mode.</p></div>
+    <div><p>Legacy AES-256-CBC identifier; rejected by application encryption.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">AES-256-CBC</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -983,7 +983,7 @@ key sizes commonly used for encryption and decryption operations.</p>
   <div class="functionHeader">
     
     <span class="py-defname">AES_256_GCM</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/foundation/config/app/enums/ciphers.py#L32">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/foundation/config/app/enums/ciphers.py#L29">
       
       (source)
     </a>
@@ -1009,7 +1009,7 @@ key sizes commonly used for encryption and decryption operations.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

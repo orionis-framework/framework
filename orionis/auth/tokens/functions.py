@@ -6,6 +6,7 @@ Includes ``generate_token_secret``, ``hash_token_secret``.
 import hashlib
 import secrets
 
+
 def generate_token_secret(size: int) -> str:
     """
     Generate the plain text secret of a personal access token.
@@ -23,6 +24,7 @@ def generate_token_secret(size: int) -> str:
         purpose: ``random`` is not suitable for credentials.
     """
     return secrets.token_urlsafe(size)
+
 
 def hash_token_secret(secret: str) -> str:
     """

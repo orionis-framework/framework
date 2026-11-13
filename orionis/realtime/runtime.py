@@ -1,34 +1,34 @@
+# ruff: noqa: BLE001, SLF001, TC001, TRY400
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
+# Keep runtime constructor, scope and stream annotations resolvable.
 """Execute a precompiled Hub using the existing application and scopes."""
 
 import asyncio
 import logging
 import secrets
-from collections.abc import AsyncIterable
+from collections.abc import AsyncIterable, AsyncIterator
 from functools import partial
-from typing import TYPE_CHECKING, cast
+from typing import cast
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import bind_auth_context, current_auth_context
 from orionis.auth.exceptions import AuthenticationException, AuthorizationException
+from orionis.container.context.manager import ScopeManager
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.failure.runtime import capture, capture_result, get_runtime, operation
+from orionis.foundation.contracts.application import IApplication
 from orionis.http import WebSocket, WebSocketDisconnected
 from orionis.realtime.clients import HubClients
 from orionis.realtime.connection import RealtimeConnection
+from orionis.realtime.contracts.manager import IConnectionManager
 from orionis.realtime.errors import ProtocolError, RPCError
 from orionis.realtime.groups import HubGroups
 from orionis.realtime.hub import Hub, HubContext
-from orionis.realtime.metadata import compile_hub
+from orionis.realtime.metadata import RemoteMethod, compile_hub
 from orionis.realtime.protocol import Cancel, Completion, HubProtocol, Invoke, Ping
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from orionis.container.context.manager import ScopeManager
-    from orionis.foundation.contracts.application import IApplication
-    from orionis.realtime.contracts.manager import IConnectionManager
-    from orionis.realtime.metadata import RemoteMethod
 
 _LOGGER = logging.getLogger(__name__)
 """Logger used by ``runtime``."""
+
 
 class HubRuntime:
     """Execute a precompiled Hub using the existing application and scopes."""
@@ -37,8 +37,11 @@ class HubRuntime:
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, app: IApplication, manager: IConnectionManager,
-        hub: type[Hub], protocol: str = "json",
+        self,
+        app: IApplication,
+        manager: IConnectionManager,
+        hub: type[Hub],
+        protocol: str = "json",
     ) -> None:
         """
         Bind application services and compile a Hub's remote dispatch metadata.
@@ -75,12 +78,15 @@ class HubRuntime:
         self._dispatch = compile_hub(hub)
         """Dispatch produced by ``compile_hub``."""
         self._protocol = HubProtocol(
-            protocol, max_message_size=manager.config.max_message_size,
+            protocol,
+            max_message_size=manager.config.max_message_size,
         )
         """JSON or MessagePack selected by the route."""
 
     def _bindContext(
-        self, scope: ScopeManager, connection: RealtimeConnection,
+        self,
+        scope: ScopeManager,
+        connection: RealtimeConnection,
     ) -> None:
         """
         Bind connection state and targeting helpers into the supplied scope.
@@ -102,7 +108,9 @@ class HubRuntime:
         scope[HubContext] = connection.context
         scope[RealtimeConnection] = connection
         scope[HubClients] = HubClients(
-            self._manager, self._hub, connection.context.connection_id,
+            self._manager,
+            self._hub,
+            connection.context.connection_id,
         )
         scope[HubGroups] = HubGroups(self._manager, connection.context.connection_id)
         scope.set("kernel", KernelContext.HTTP)
@@ -157,17 +165,23 @@ class HubRuntime:
             raise RuntimeError(message)
         auth = current_auth_context()
         context = HubContext(
-            connection_id=secrets.token_urlsafe(24), socket=socket,
+            connection_id=secrets.token_urlsafe(24),
+            socket=socket,
             user=auth.identity,
         )
         connection = RealtimeConnection(
-            context, self._hub, self._protocol, self._manager.config,
+            context,
+            self._hub,
+            self._protocol,
+            self._manager.config,
             runtime=get_runtime(self._app),
         )
         self._bindContext(scope, connection)
         self._manager.register(connection)
         with operation(
-            self._app, flow="realtime", operation=self._hub.__name__,
+            self._app,
+            flow="realtime",
+            operation=self._hub.__name__,
             correlation_id=context.connection_id,
         ):
             connection.bindFailureOperation()
@@ -182,29 +196,39 @@ class HubRuntime:
                     await socket.accept()
                 # The ready write acquires ownership before the next scheduling point.
                 connection.ready = True
-                await connection.send({
-                    "type": "ready", "version": 1,
-                    "connection_id": context.connection_id,
-                })
+                await connection.send(
+                    {
+                        "type": "ready",
+                        "version": 1,
+                        "connection_id": context.connection_id,
+                    },
+                )
                 code, reason = await self._receive(connection)
             except ProtocolError as exc:
                 await capture(
-                    exc, app=self._app, flow="realtime", phase="protocol",
-                    correlation_id=context.connection_id, expected=True,
+                    exc,
+                    app=self._app,
+                    flow="realtime",
+                    phase="protocol",
+                    correlation_id=context.connection_id,
+                    expected=True,
                 )
                 code = exc.close_code
                 reason = "Invalid realtime message"
             except WebSocketDisconnected as exc:
                 code, reason = exc.code, exc.reason
-            except asyncio.CancelledError as exc: # NOSONAR
+            except asyncio.CancelledError as exc:  # NOSONAR
                 code = 1001
                 original = exc
                 if connection.failure is not None:
                     code = 1011
                     original = connection.failure
                     await capture(
-                        connection.failure, app=self._app, flow="realtime",
-                        phase="connection", correlation_id=context.connection_id,
+                        connection.failure,
+                        app=self._app,
+                        flow="realtime",
+                        phase="connection",
+                        correlation_id=context.connection_id,
                     )
                     # Keep the original transport cause across owner cancellation.
                     raise connection.failure from connection.failure.__cause__
@@ -212,7 +236,10 @@ class HubRuntime:
             except BaseException as exc:
                 original = exc
                 await capture(
-                    exc, app=self._app, flow="realtime", phase="connection",
+                    exc,
+                    app=self._app,
+                    flow="realtime",
+                    phase="connection",
                     correlation_id=context.connection_id,
                 )
                 code = 1011
@@ -221,7 +248,10 @@ class HubRuntime:
                 await self._finishConnection(connection, code, reason, original)
 
     async def _finishConnection(
-        self, connection: RealtimeConnection, code: int, reason: str,
+        self,
+        connection: RealtimeConnection,
+        code: int,
+        reason: str,
         original: BaseException | None,
     ) -> None:
         """
@@ -253,20 +283,26 @@ class HubRuntime:
         close_error = None
         try:
             await connection.cleanup()
-        except Exception as exc:  # noqa: BLE001 - Propagate after finalization.
+        except Exception as exc:  # Propagate after finalization.
             cleanup_error = exc
             await capture(
-                exc, app=self._app, flow="realtime", phase="cleanup",
+                exc,
+                app=self._app,
+                flow="realtime",
+                phase="cleanup",
                 correlation_id=connection.context.connection_id,
             )
         finally:
             try:
                 self._manager.unregister(connection)
                 await self._disconnect(connection, code, reason)
-            except Exception as exc:  # noqa: BLE001 - Propagate after finalization.
+            except Exception as exc:  # Propagate after finalization.
                 close_error = exc
                 await capture(
-                    exc, app=self._app, flow="realtime", phase="close",
+                    exc,
+                    app=self._app,
+                    flow="realtime",
+                    phase="close",
                     correlation_id=connection.context.connection_id,
                 )
         if cleanup_error is not None or close_error is not None:
@@ -277,7 +313,10 @@ class HubRuntime:
             raise close_error
 
     async def _disconnect(
-        self, connection: RealtimeConnection, code: int, reason: str,
+        self,
+        connection: RealtimeConnection,
+        code: int,
+        reason: str,
     ) -> None:
         """
         Run the disconnect hook with a deadline, then close any open socket.
@@ -308,13 +347,16 @@ class HubRuntime:
             async with asyncio.timeout(5):
                 hook = await self._buildHub(connection)
                 await hook.onDisconnect(code, reason)
-        except Exception as exc:  # noqa: BLE001 - Preserve socket cleanup.
+        except Exception as exc:  # Preserve socket cleanup.
             receipt = await capture(
-                exc, app=self._app, flow="realtime", phase="disconnect_hook",
+                exc,
+                app=self._app,
+                flow="realtime",
+                phase="disconnect_hook",
                 correlation_id=connection.context.connection_id,
             )
             if receipt is None:
-                _LOGGER.error("Hub disconnect hook failed")  # noqa: TRY400
+                _LOGGER.error("Hub disconnect hook failed")
         finally:
             socket = connection.socket
             if not socket.closed:
@@ -326,7 +368,10 @@ class HubRuntime:
                     await socket.close(code=wire_code)
                 except BaseException as exc:
                     await capture(
-                        exc, app=self._app, flow="realtime", phase="close",
+                        exc,
+                        app=self._app,
+                        flow="realtime",
+                        phase="close",
                         correlation_id=connection.context.connection_id,
                     )
                     raise
@@ -370,7 +415,9 @@ class HubRuntime:
         return 1000, ""
 
     async def _startInvocation(
-        self, connection: RealtimeConnection, envelope: Invoke,
+        self,
+        connection: RealtimeConnection,
+        envelope: Invoke,
     ) -> None:
         """
         Admit a validated client invocation or send a controlled rejection.
@@ -417,16 +464,22 @@ class HubRuntime:
             await self._error(connection, envelope.id, "internal_error")
             return
         # Fork while the connection's identity still owns the current scope.
-        auth = source._fork()  # noqa: SLF001 - Internal Auth scope handoff.
-        task = asyncio.create_task(
-            self._invoke(connection, method, envelope, auth),
-        )
+        auth = source._fork()  # Internal Auth scope handoff.
+        invocation = self._invoke(connection, method, envelope, auth)
+        try:
+            task = asyncio.create_task(invocation)
+        except BaseException:
+            invocation.close()
+            raise
         connection.active[envelope.id] = task
         task.add_done_callback(partial(connection.invocationDone, envelope.id))
 
     async def _invoke(
-        self, connection: RealtimeConnection, method: RemoteMethod,
-        envelope: Invoke, auth: AuthenticationContext,
+        self,
+        connection: RealtimeConnection,
+        method: RemoteMethod,
+        envelope: Invoke,
+        auth: AuthenticationContext,
     ) -> None:
         """
         Execute one remote method with isolated dependencies and authentication.
@@ -460,12 +513,16 @@ class HubRuntime:
             invocation boundary.
         """
         with operation(
-            self._app, flow="realtime", operation=envelope.target,
-            correlation_id=envelope.id, isolated=True,
+            self._app,
+            flow="realtime",
+            operation=envelope.target,
+            correlation_id=envelope.id,
+            isolated=True,
         ):
             streaming = method.is_stream
             timeout = (
-                envelope.timeout if envelope.timeout is not None or streaming
+                envelope.timeout
+                if envelope.timeout is not None or streaming
                 else connection.config.invocation_timeout
             )
             try:
@@ -480,7 +537,9 @@ class HubRuntime:
                         kwargs[name] = await self._app.make(dependency)
                     instance = await self._buildHub(connection)
                     result = await self._app.call(
-                        instance, method.method_name, **kwargs,
+                        instance,
+                        method.method_name,
+                        **kwargs,
                     )
                     if isinstance(result, AsyncIterable):
                         streaming = True
@@ -491,67 +550,108 @@ class HubRuntime:
                 # by the method deadline. Its task stays owned and budgeted until sent.
                 connection.finish(envelope.id)
                 await connection.send(
-                    {"type": "stream_complete", "id": envelope.id} if streaming else
-                    {"type": "completion", "id": envelope.id, "result": result},
+                    {"type": "stream_complete", "id": envelope.id}
+                    if streaming
+                    else {"type": "completion", "id": envelope.id, "result": result},
                 )
             except asyncio.CancelledError:
                 await self._error(
-                    connection, envelope.id, "cancelled",
-                    streaming=streaming, observed=True,
+                    connection,
+                    envelope.id,
+                    "cancelled",
+                    streaming=streaming,
+                    observed=True,
                 )
                 raise
             except RPCError as exc:
                 await capture(
-                    exc, app=self._app, flow="realtime", phase="invocation",
-                    operation=envelope.target, correlation_id=envelope.id,
+                    exc,
+                    app=self._app,
+                    flow="realtime",
+                    phase="invocation",
+                    operation=envelope.target,
+                    correlation_id=envelope.id,
                     expected=True,
                 )
                 await self._error(
-                    connection, envelope.id, exc.code,
-                    streaming=streaming, observed=True,
+                    connection,
+                    envelope.id,
+                    exc.code,
+                    streaming=streaming,
+                    observed=True,
                 )
             except AuthenticationException as exc:
                 await capture(
-                    exc, app=self._app, flow="realtime", phase="authentication",
-                    operation=envelope.target, correlation_id=envelope.id,
+                    exc,
+                    app=self._app,
+                    flow="realtime",
+                    phase="authentication",
+                    operation=envelope.target,
+                    correlation_id=envelope.id,
                     expected=True,
                 )
                 await self._error(
-                    connection, envelope.id, "unauthorized",
-                    streaming=streaming, observed=True,
+                    connection,
+                    envelope.id,
+                    "unauthorized",
+                    streaming=streaming,
+                    observed=True,
                 )
             except AuthorizationException as exc:
                 await capture(
-                    exc, app=self._app, flow="realtime", phase="authorization",
-                    operation=envelope.target, correlation_id=envelope.id,
+                    exc,
+                    app=self._app,
+                    flow="realtime",
+                    phase="authorization",
+                    operation=envelope.target,
+                    correlation_id=envelope.id,
                     expected=True,
                 )
                 await self._error(
-                    connection, envelope.id, "forbidden",
-                    streaming=streaming, observed=True,
+                    connection,
+                    envelope.id,
+                    "forbidden",
+                    streaming=streaming,
+                    observed=True,
                 )
             except TimeoutError as exc:
                 await capture(
-                    exc, app=self._app, flow="realtime", phase="timeout",
-                    operation=envelope.target, correlation_id=envelope.id,
+                    exc,
+                    app=self._app,
+                    flow="realtime",
+                    phase="timeout",
+                    operation=envelope.target,
+                    correlation_id=envelope.id,
                     expected=True,
                 )
                 await self._error(
-                    connection, envelope.id, "timeout",
-                    streaming=streaming, observed=True,
+                    connection,
+                    envelope.id,
+                    "timeout",
+                    streaming=streaming,
+                    observed=True,
                 )
-            except Exception as exc:  # noqa: BLE001 - Sanitize application failures.
+            except Exception as exc:  # Sanitize application failures.
                 await capture(
-                    exc, app=self._app, flow="realtime", phase="invocation",
-                    operation=envelope.target, correlation_id=envelope.id,
+                    exc,
+                    app=self._app,
+                    flow="realtime",
+                    phase="invocation",
+                    operation=envelope.target,
+                    correlation_id=envelope.id,
                 )
                 await self._error(
-                    connection, envelope.id, "internal_error",
-                    streaming=streaming, observed=True,
+                    connection,
+                    envelope.id,
+                    "internal_error",
+                    streaming=streaming,
+                    observed=True,
                 )
 
     async def _stream(
-        self, connection: RealtimeConnection, invocation_id: str,
+        self,
+        connection: RealtimeConnection,
+        invocation_id: str,
         source: AsyncIterable[object],
     ) -> None:
         """
@@ -582,18 +682,30 @@ class HubRuntime:
         original = None
         try:
             async for item in iterator:
-                await connection.send({
-                    "type": "stream_item", "id": invocation_id, "item": item,
-                })
+                await connection.send(
+                    {
+                        "type": "stream_item",
+                        "id": invocation_id,
+                        "item": item,
+                    },
+                )
         except BaseException as exc:
             original = exc
             await capture(
-                exc, app=self._app, flow="realtime", phase="stream",
+                exc,
+                app=self._app,
+                flow="realtime",
+                phase="stream",
                 correlation_id=invocation_id,
-                expected=isinstance(exc, (
-                    RPCError, AuthenticationException, AuthorizationException,
-                    TimeoutError,
-                )),
+                expected=isinstance(
+                    exc,
+                    (
+                        RPCError,
+                        AuthenticationException,
+                        AuthorizationException,
+                        TimeoutError,
+                    ),
+                ),
             )
             raise
         finally:
@@ -603,7 +715,10 @@ class HubRuntime:
                     await close()
                 except BaseException as exc:
                     await capture(
-                        exc, app=self._app, flow="realtime", phase="cleanup",
+                        exc,
+                        app=self._app,
+                        flow="realtime",
+                        phase="cleanup",
                         correlation_id=invocation_id,
                     )
                     if original is None:
@@ -611,8 +726,12 @@ class HubRuntime:
 
     @staticmethod
     async def _error(
-        connection: RealtimeConnection, invocation_id: str, code: str,
-        *, streaming: bool = False, observed: bool = False,
+        connection: RealtimeConnection,
+        invocation_id: str,
+        code: str,
+        *,
+        streaming: bool = False,
+        observed: bool = False,
     ) -> None:
         """
         Send a sanitized terminal error with optional admission observation.
@@ -645,21 +764,27 @@ class HubRuntime:
         """
         if not observed and code != "cancelled":
             await capture_result(
-                code, runtime=connection.failureRuntime, flow="realtime",
-                phase="admission", correlation_id=invocation_id,
+                code,
+                runtime=connection.failureRuntime,
+                flow="realtime",
+                phase="admission",
+                correlation_id=invocation_id,
                 expected=code != "internal_error",
             )
         if connection.closing or connection.socket.closed:
             return
         connection.finish(invocation_id)
-        await connection.send({
-            "type": "stream_complete" if streaming else "completion",
-            "id": invocation_id,
-            "error": {
-                "code": code,
-                "message": (
-                    "Internal server error" if code == "internal_error"
-                    else "Invocation failed"
-                ),
+        await connection.send(
+            {
+                "type": "stream_complete" if streaming else "completion",
+                "id": invocation_id,
+                "error": {
+                    "code": code,
+                    "message": (
+                        "Internal server error"
+                        if code == "internal_error"
+                        else "Invocation failed"
+                    ),
+                },
             },
-        })
+        )

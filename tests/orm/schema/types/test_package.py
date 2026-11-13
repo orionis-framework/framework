@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema package behavior."""
+
 from __future__ import annotations
 from importlib import import_module
 from orionis.orm.schema import types as types_module
@@ -9,6 +13,7 @@ from orionis.orm.schema.types import (
     String,
 )
 from orionis.test import TestCase
+
 
 def assert_column_options(
     test_case: TestCase,
@@ -32,7 +37,7 @@ def assert_column_options(
     Returns
     -------
     None
-        Verify metadata, initial constraint state, and declared option values.
+        No return value.
     """
     test_case.assertIsInstance(column, ColumnDefinition)
     test_case.assertIs(column.column_type, expected_type)
@@ -43,6 +48,7 @@ def assert_column_options(
     for name, expected in expected_options.items():
         test_case.assertEqual(getattr(column, name), expected, name)
 
+
 class TestColumnTypePackage(TestCase):
     """Verify public schema type exports resolve to their owning modules."""
 
@@ -52,7 +58,7 @@ class TestColumnTypePackage(TestCase):
         Returns
         -------
         None
-            Verify unique exports and identity with each defining module.
+            No return value.
         """
         names = types_module.__all__
         self.assertEqual(len(names), len(set(names)))
@@ -61,14 +67,17 @@ class TestColumnTypePackage(TestCase):
             defining = import_module(exported.__module__)
             self.assertIs(exported, getattr(defining, name), name)
 
+
 class TestTypedColumnLayout(TestCase):
+    """Verify typed column layout declarations and public behavior."""
+
     def testTypedColumnsHaveNoInstanceDictionary(self) -> None:
         """Keep typed column declarations inside their declared slots.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for column in (Integer(), String(), Enum("active", "inactive")):
             with self.subTest(column=type(column).__name__):

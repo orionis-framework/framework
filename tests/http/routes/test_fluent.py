@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.http.middleware import BaseMiddleware
@@ -13,6 +15,7 @@ if TYPE_CHECKING:
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 def _view_handler() -> None:
     """Provide a standalone route action fixture.
 
@@ -21,6 +24,7 @@ def _view_handler() -> None:
     None
         Completes the operation described above.
     """
+
 
 class _InvokableController:
     def __call__(self) -> None:
@@ -31,6 +35,7 @@ class _InvokableController:
         None
             Completes the operation described above.
         """
+
 
 class _RegularController:
     def show(self) -> None:
@@ -50,6 +55,7 @@ class _RegularController:
         None
             Completes the operation described above.
         """
+
 
 class _MW1(BaseMiddleware):
     async def handle(
@@ -73,6 +79,7 @@ class _MW1(BaseMiddleware):
         """
         return await call_next()
 
+
 class _MW2(BaseMiddleware):
     async def handle(
         self,
@@ -95,9 +102,11 @@ class _MW2(BaseMiddleware):
         """
         return await call_next()
 
+
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 class TestFluentRouteInit(TestCase):
     """Unit tests for FluentRoute initialisation."""
@@ -241,6 +250,7 @@ class TestFluentRouteInit(TestCase):
         r2 = FluentRoute("GET", "/items", _view_handler)
         self.assertNotEqual(r1.id, r2.id)
 
+
 class TestFluentRouteName(TestCase):
     """Unit tests for FluentRoute.name()."""
 
@@ -298,6 +308,7 @@ class TestFluentRouteName(TestCase):
         route = FluentRoute("GET", "/users", _view_handler)
         result = route.name("users.index")
         self.assertIs(result, route)
+
 
 class TestFluentRoutePrefix(TestCase):
     """Unit tests for FluentRoute.prefix()."""
@@ -357,6 +368,7 @@ class TestFluentRoutePrefix(TestCase):
         route = FluentRoute("GET", "/x", _view_handler)
         result = route.prefix("/v2")
         self.assertIs(result, route)
+
 
 class TestFluentRouteMiddleware(TestCase):
     """Unit tests for FluentRoute.middleware() and .withOutMiddleware()."""
@@ -447,6 +459,7 @@ class TestFluentRouteMiddleware(TestCase):
         with self.assertRaises(TypeError):
             route.middleware(object)  # type: ignore[arg-type]
 
+
 class TestFluentRouteKind(TestCase):
     """Unit tests for FluentRoute._kind()."""
 
@@ -505,6 +518,7 @@ class TestFluentRouteKind(TestCase):
         route = FluentRoute("GET", "/x", _view_handler)
         with self.assertRaises(TypeError):
             route._kind(1)  # type: ignore[arg-type]
+
 
 class TestFluentRouteExport(TestCase):
     """Unit tests for FluentRoute.export()."""

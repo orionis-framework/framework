@@ -1,6 +1,7 @@
-"""Provide framework operations through ``resolve_export``."""
+"""Resolve public package exports lazily and retain their original identities."""
 
 from importlib import import_module
+
 
 def resolve_export(
     namespace: dict[str, object],

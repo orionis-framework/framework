@@ -1,9 +1,14 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM collections collection behavior."""
+
 from typing import ClassVar
 from orionis.orm.collections.collection import Collection, ModelCollection
 from orionis.orm.model import Model
 from orionis.orm.schema.types import Integer, String
 from orionis.support.types.collection import Collection as FrameworkCollection
 from orionis.test import TestCase
+
 
 class _CollectionRecord(Model):
     """Provide a serializable model with a hidden column."""
@@ -12,6 +17,7 @@ class _CollectionRecord(Model):
     name = String()
     hidden: ClassVar[list[str]] = ["name"]
     timestamps = False
+
 
 class TestModelCollection(TestCase):
     """Verify ORM collections reuse the framework's collection implementation."""
@@ -22,7 +28,7 @@ class TestModelCollection(TestCase):
         Returns
         -------
         None
-            Verify both ORM aliases retain the framework collection identity.
+            No return value.
         """
         self.assertIs(Collection, FrameworkCollection)
         self.assertIs(ModelCollection, FrameworkCollection)
@@ -33,7 +39,7 @@ class TestModelCollection(TestCase):
         Returns
         -------
         None
-            Verify collection serialization calls the model's serializer.
+            No return value.
         """
         record = _CollectionRecord({"id": 7, "name": "hidden"})
         collection = ModelCollection([record])

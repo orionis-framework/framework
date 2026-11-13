@@ -4,23 +4,103 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import Any
 
-# Define container types handled by the freezer.
-# Avoids re-creating the type-tuple on every call and enables JIT specialization.
 _CONTAINER_TYPES: tuple[type, ...] = (dict, list, tuple, MappingProxyType)
-"""
-Define container types handled by the freezer. Avoids re-creating the type-tuple on
-every call and enables JIT specialization.
-"""
+"""Container types traversed when constructing a mutable snapshot."""
 _MUTABLE_TYPES: tuple[type, ...] = (dict, list, tuple)
 """Mutable types definitions used by ``freezer``."""
 
-class FreezeThaw:
 
-    # ruff: noqa: PLR0912, C901
+def _mutable_graph(
+    obj: object,
+) -> tuple[dict[int, Any], list[tuple[Any, Any]]]:
+    """Copy graph containers and record edges that require reference updates.
+
+    Parameters
+    ----------
+    obj : object
+        Root container to traverse without recursion.
+
+    Returns
+    -------
+    tuple[dict[int, typing.Any], list[tuple[typing.Any, typing.Any]]]
+        Mutable copies indexed by original identity and their pending edges.
+    """
+    stack = [obj]
+    cache: dict[int, Any] = {}
+    fixups: list[tuple[Any, Any]] = []
+    while stack:
+        current = stack.pop()
+        current_id = id(current)
+        if current_id in cache:
+            continue
+        new_obj = (
+            dict(current)
+            if isinstance(current, (MappingProxyType, dict))
+            else list(current)
+        )
+        cache[current_id] = new_obj
+        entries = new_obj.items() if isinstance(new_obj, dict) else enumerate(new_obj)
+        for key, value in entries:
+            if isinstance(value, _CONTAINER_TYPES):
+                stack.append(value)
+                fixups.append((new_obj, key))
+    return cache, fixups
+
+
+def _freeze_sequences(
+    sequences: dict[int, list | tuple],
+    cache: dict[int, Any],
+) -> None:
+    """Resolve sequence dependencies and cache their immutable tuple snapshots.
+
+    Parameters
+    ----------
+    sequences : dict[int, list | tuple]
+        Original sequences indexed by identity.
+    cache : dict[int, typing.Any]
+        Completed snapshots, including preallocated mapping proxies.
+
+    Returns
+    -------
+    None
+        No return value.
+
+    Raises
+    ------
+    ValueError
+        If a cycle consists entirely of sequences.
+    """
+    active: set[int] = set()
+    for sequence_id in sequences:
+        stack = [(sequence_id, False)]
+        while stack:
+            current_id, expanded = stack.pop()
+            if current_id in cache:
+                continue
+            current = sequences[current_id]
+            if expanded:
+                cache[current_id] = tuple(
+                    cache.get(id(value), value) for value in current
+                )
+                active.remove(current_id)
+                continue
+            if current_id in active:
+                error_msg = "Cannot freeze a cycle containing only sequences."
+                raise ValueError(error_msg)
+            active.add(current_id)
+            stack.append((current_id, True))
+            stack.extend(
+                (id(value), False)
+                for value in current
+                if id(value) in sequences and id(value) not in cache
+            )
+
+
+class FreezeThaw:
     """Convert nested mutable structures to immutable snapshots and back."""
 
     @staticmethod
-    def thaw(obj: object) -> object:  # NOSONAR
+    def thaw(obj: object) -> object:
         """
         Recursively convert frozen containers to mutable equivalents.
 
@@ -42,52 +122,13 @@ class FreezeThaw:
         if not obj:
             return {} if isinstance(obj, (MappingProxyType, dict)) else []
 
-        obj_id = id(obj)
-        # Traverse nested values with a last-in-first-out stack.
-        stack: list[object] = [obj]
-        cache: dict[int, Any] = {}
-        # Track container entries that need references fixed after traversal.
-        fixups: list[tuple[Any, Any]] = []
-
-        while stack:
-            current = stack.pop()
-            c_id = id(current)
-            if c_id in cache:
-                continue
-
-            if isinstance(current, (MappingProxyType, dict)):
-                new_obj: dict[Any, Any] = {}
-                cache[c_id] = new_obj
-                for k, v in current.items():
-                    new_obj[k] = v
-                    if isinstance(v, _CONTAINER_TYPES):
-                        if id(v) not in cache:
-                            stack.append(v)
-                        fixups.append((new_obj, k))
-
-            else:  # list or tuple
-                # Copy the sequence before replacing nested values.
-                new_seq: list[Any] = list(current)
-                cache[c_id] = new_seq
-                for i, v in enumerate(current):
-                    if isinstance(v, _CONTAINER_TYPES):
-                        if id(v) not in cache:
-                            stack.append(v)
-                        fixups.append((new_seq, i))
-
-        # Resolve cached references while applying container fixups.
-        cache_get = cache.get
+        cache, fixups = _mutable_graph(obj)
         for container, key in fixups:
-            v = container[key]
-            cached = cache_get(id(v))
-            if cached is not None:
-                container[key] = cached
-
-        # Return the copied root container from the traversal cache.
-        return cache.get(obj_id, obj)
+            container[key] = cache[id(container[key])]
+        return cache[id(obj)]
 
     @staticmethod
-    def freeze(obj: object) -> object:  # NOSONAR
+    def freeze(obj: object) -> object:
         """
         Convert mutable containers to immutable equivalents recursively.
 
@@ -101,6 +142,13 @@ class FreezeThaw:
         object
             A fully immutable object with preserved references. Non-container
             objects or MappingProxyType are returned unchanged.
+
+        Raises
+        ------
+        ValueError
+            If a cycle consists entirely of lists or tuples, which cannot be
+            represented by immutable tuples. Cycles through dictionaries retain
+            their references through mapping proxies.
         """
         # MappingProxyType is already immutable; not in _MUTABLE_TYPES -> return as-is
         if not isinstance(obj, _MUTABLE_TYPES):
@@ -110,52 +158,30 @@ class FreezeThaw:
         if not obj:
             return MappingProxyType({}) if isinstance(obj, dict) else ()
 
-        obj_id = id(obj)
         stack: list[object] = [obj]
         cache: dict[int, Any] = {}
+        sequences: dict[int, list | tuple] = {}
+        mappings: list[tuple[dict, dict]] = []
 
         while stack:
             current = stack.pop()
             c_id = id(current)
-            if c_id in cache:
+            if c_id in cache or c_id in sequences:
                 continue
 
             if isinstance(current, dict):
-                new_obj_d: dict[Any, Any] = {}
-                cache[c_id] = new_obj_d
-                for k, v in current.items():
-                    new_obj_d[k] = v
-                    # Push only mutable containers; MappingProxyType is already
-                    # immutable and is left unchanged in the second pass
-                    if isinstance(v, _MUTABLE_TYPES) and id(v) not in cache:
-                        stack.append(v)
+                backing: dict[Any, Any] = {}
+                cache[c_id] = MappingProxyType(backing)
+                mappings.append((current, backing))
+                values = current.values()
+            else:
+                sequences[c_id] = current
+                values = current
+            stack.extend(value for value in values if isinstance(value, _MUTABLE_TYPES))
 
-            else:  # list or tuple
-                new_obj_l: list[Any] = list(current)
-                cache[c_id] = new_obj_l
-                stack.extend(
-                    v
-                    for v in current
-                    if isinstance(v, _MUTABLE_TYPES) and id(v) not in cache
-                )
-
-        # Bottom-up pass (leaves first) ensures correctness for nested structures.
-        # DFS with LIFO inserts parents before children -> reversed() = leaves first.
-        # When parent is processed, cache[id(child)] is already MappingProxyType/tuple.
-        # list(cache.keys()) is required for reversed(); it also eliminates the original
-        # list(cache.items()) snapshot, which was unnecessary: mutating existing-key
-        # values does not invalidate dict iterators in Python 3.3+.
-        for c_id in reversed(list(cache.keys())):
-            val = cache[c_id]
-            if isinstance(val, dict):
-                for k, v in val.items():
-                    if id(v) in cache:
-                        val[k] = cache[id(v)]
-                cache[c_id] = MappingProxyType(val)
-            else:  # list
-                for i, v in enumerate(val):
-                    if id(v) in cache:
-                        val[i] = cache[id(v)]
-                cache[c_id] = tuple(val)
-
-        return cache.get(obj_id, obj)
+        _freeze_sequences(sequences, cache)
+        for original, backing in mappings:
+            backing.update(
+                (key, cache.get(id(value), value)) for key, value in original.items()
+            )
+        return cache[id(obj)]

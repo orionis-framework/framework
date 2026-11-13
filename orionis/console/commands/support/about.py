@@ -1,3 +1,5 @@
+# ruff: noqa: TC002
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Display the installed framework and runtime version information."""
 
 from rich.console import Console
@@ -26,10 +28,8 @@ _PANEL_BODY: str = (
 )
 """Show framework details, author contact information, and project links."""
 
+
 class VersionCommand(BaseCommand):
-
-    # ruff: noqa: TC002
-
     # Control whether this command includes timestamps in its output.
     """Display the installed framework and runtime version information."""
 

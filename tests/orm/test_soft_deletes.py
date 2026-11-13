@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import tests.orm.test_events as feature_fixtures
+
 
 class TestSoftDeletes(feature_fixtures._ModelFeatureTestCase):
     """Soft delete behavior on instances and on the query builder."""
@@ -12,7 +15,7 @@ class TestSoftDeletes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         account = await feature_fixtures.Account.query().firstOrFail()
@@ -28,7 +31,7 @@ class TestSoftDeletes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         account = await feature_fixtures.Account.query().firstOrFail()
@@ -43,7 +46,7 @@ class TestSoftDeletes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         account = await feature_fixtures.Account.query().firstOrFail()
@@ -59,7 +62,7 @@ class TestSoftDeletes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         account = await feature_fixtures.Account.query().firstOrFail()
@@ -76,7 +79,7 @@ class TestSoftDeletes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         account = await feature_fixtures.Account.query().firstOrFail()
@@ -91,7 +94,7 @@ class TestSoftDeletes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         self.assertEqual(await feature_fixtures.Account.query().delete(), 2)
@@ -106,7 +109,7 @@ class TestSoftDeletes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         await feature_fixtures.Account.query().delete()

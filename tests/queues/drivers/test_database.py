@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import tempfile
 import asyncio
 from pathlib import Path
@@ -9,6 +11,7 @@ from orionis.queues.drivers.database import DatabaseQueueDriver
 from orionis.queues.entities.envelope import JobEnvelope
 from orionis.queues.exceptions import QueueConfigurationError, QueueStorageError
 from orionis.test import TestCase
+
 
 def make_envelope(queue: str = "default") -> JobEnvelope:
     """Build a valid envelope for driver contract tests.
@@ -24,10 +27,16 @@ def make_envelope(queue: str = "default") -> JobEnvelope:
         Unique envelope independent of application job registration.
     """
     return JobEnvelope(
-        id=str(uuid4()), job="tests.queues.drivers.test_database:ContractJob",
-        payload=b"{}", connection="database", queue=queue,
-        max_tries=3, timeout=1.0, backoff=(0.0,),
+        id=str(uuid4()),
+        job="tests.queues.drivers.test_database:ContractJob",
+        payload=b"{}",
+        connection="database",
+        queue=queue,
+        max_tries=3,
+        timeout=1.0,
+        backoff=(0.0,),
     )
+
 
 class DurableDriverContract:
     """Exercise identical persistence and lease behavior for durable drivers."""
@@ -64,7 +73,8 @@ class DurableDriverContract:
         self.assertEqual(reserved.id, envelope.id)
         self.assertEqual(reserved.attempts, 1)
         self.assertEqual(
-            msgspec.json.decode(reserved.payload, type=JobEnvelope), envelope,
+            msgspec.json.decode(reserved.payload, type=JobEnvelope),
+            envelope,
         )
         self.assertEqual(await self._driver.size("default"), 1)
         self.assertIsNone(await self._driver.reserve(("default",), 60.0))
@@ -86,7 +96,8 @@ class DurableDriverContract:
         self.assertEqual(await self._driver.size("default"), 1)
         await self._advanceTime(0.12)
         self.assertEqual(
-            (await self._driver.reserve(("default",), 60.0)).id, envelope.id,
+            (await self._driver.reserve(("default",), 60.0)).id,
+            envelope.id,
         )
 
     async def testReleaseDelayAndAttempts(self) -> None:
@@ -179,9 +190,10 @@ class DurableDriverContract:
         for _ in range(3):
             envelope = make_envelope()
             await self._driver.push(envelope)
-            reservations = await asyncio.gather(*(
-                self._driver.reserve(("default",), 60.0) for _ in range(100)
-            ), return_exceptions=True)
+            reservations = await asyncio.gather(
+                *(self._driver.reserve(("default",), 60.0) for _ in range(100)),
+                return_exceptions=True,
+            )
             errors = [item for item in reservations if isinstance(item, BaseException)]
             self.assertEqual(errors, [])
             winners = [item for item in reservations if item is not None]
@@ -199,7 +211,7 @@ class DurableDriverContract:
             Identifiers processed by this consumer.
         """
         processed = []
-        while (reserved := await self._driver.reserve(("default",), 60.0)):
+        while reserved := await self._driver.reserve(("default",), 60.0):
             processed.append(reserved.id)
             self.assertTrue(await self._driver.delete(reserved))
         return processed
@@ -237,6 +249,7 @@ class DurableDriverContract:
             await self._driver.reserve(("default",), 0)
         self.assertEqual(await self._driver.size("default"), 0)
 
+
 class _Clock:
     """Expose a controlled wall clock without assuming SQLite operation speed."""
 
@@ -262,11 +275,17 @@ class _Clock:
         """
         return self.now
 
+
 class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
     """Run the durable driver contract against a prefixed SQLite file."""
 
     __slots__ = (
-        "_clock", "_connection", "_driver", "_original_time", "_path", "_temporary",
+        "_clock",
+        "_connection",
+        "_driver",
+        "_original_time",
+        "_path",
+        "_temporary",
     )
 
     async def asyncSetUp(self) -> None:
@@ -283,10 +302,16 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         database_module.current_time = self._clock
         self._temporary = tempfile.TemporaryDirectory()
         self._path = str(Path(self._temporary.name) / "queues.sqlite")
-        self._connection = Connection("queues", {
-            "driver": "sqlite", "database": self._path, "prefix": "q_",
-            "journal_mode": "WAL", "busy_timeout": 30000,
-        })
+        self._connection = Connection(
+            "queues",
+            {
+                "driver": "sqlite",
+                "database": self._path,
+                "prefix": "q_",
+                "journal_mode": "WAL",
+                "busy_timeout": 30000,
+            },
+        )
         self._driver = DatabaseQueueDriver(self._connection)
         await self._driver.size("default")
 
@@ -334,10 +359,16 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         await self._driver.release(reserved)
         await self._driver.close()
         await self._connection.disconnect()
-        self._connection = Connection("queues", {
-            "driver": "sqlite", "database": self._path, "prefix": "q_",
-            "journal_mode": "WAL", "busy_timeout": 30000,
-        })
+        self._connection = Connection(
+            "queues",
+            {
+                "driver": "sqlite",
+                "database": self._path,
+                "prefix": "q_",
+                "journal_mode": "WAL",
+                "busy_timeout": 30000,
+            },
+        )
         self._driver = DatabaseQueueDriver(self._connection)
         next_reservation = await self._driver.reserve(("default",), 60.0)
         self.assertEqual(next_reservation.id, envelope.id)
@@ -373,7 +404,8 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         )
         self.assertIsInstance(rows[0]["available_at"], float)
         self.assertAlmostEqual(
-            rows[0]["available_at"] - rows[0]["created_at"], 0.125,
+            rows[0]["available_at"] - rows[0]["created_at"],
+            0.125,
         )
         indexes = await self._connection.select("PRAGMA index_list(q_jobs)")
         self.assertTrue(any("available_at" in item["name"] for item in indexes))
@@ -445,10 +477,16 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         None
             Assert independent consumers cannot reserve uncommitted queue rows.
         """
-        independent = Connection("consumer", {
-            "driver": "sqlite", "database": self._path, "prefix": "q_",
-            "journal_mode": "WAL", "busy_timeout": 30000,
-        })
+        independent = Connection(
+            "consumer",
+            {
+                "driver": "sqlite",
+                "database": self._path,
+                "prefix": "q_",
+                "journal_mode": "WAL",
+                "busy_timeout": 30000,
+            },
+        )
         consumer = DatabaseQueueDriver(independent)
         try:
             await consumer.size("default")
@@ -469,10 +507,16 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         None
             Assert a concurrent creator cannot expose an uncommitted table.
         """
-        independent = Connection("bootstrap", {
-            "driver": "sqlite", "database": self._path, "prefix": "q_",
-            "journal_mode": "WAL", "busy_timeout": 30000,
-        })
+        independent = Connection(
+            "bootstrap",
+            {
+                "driver": "sqlite",
+                "database": self._path,
+                "prefix": "q_",
+                "journal_mode": "WAL",
+                "busy_timeout": 30000,
+            },
+        )
         producer = DatabaseQueueDriver(self._connection, "pending_jobs")
         consumer = DatabaseQueueDriver(independent, "pending_jobs")
         bootstrap = None
@@ -499,32 +543,47 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
         None
             Assert one owner across one hundred calls using twenty connections.
         """
-        connections = tuple(Connection(f"worker_{index}", {
-            "driver": "sqlite", "database": self._path, "prefix": "q_",
-            "journal_mode": "WAL", "busy_timeout": 30000,
-        }) for index in range(20))
+        connections = tuple(
+            Connection(
+                f"worker_{index}",
+                {
+                    "driver": "sqlite",
+                    "database": self._path,
+                    "prefix": "q_",
+                    "journal_mode": "WAL",
+                    "busy_timeout": 30000,
+                },
+            )
+            for index in range(20)
+        )
         drivers = tuple(
             DatabaseQueueDriver(connection, "independent_jobs")
             for connection in connections
         )
         try:
-            sizes = await asyncio.gather(*(
-                driver.size("default") for driver in drivers
-            ), return_exceptions=True)
+            sizes = await asyncio.gather(
+                *(driver.size("default") for driver in drivers),
+                return_exceptions=True,
+            )
             self.assertEqual(
-                sizes, [0] * len(drivers),
+                sizes,
+                [0] * len(drivers),
                 "\n".join(
                     str(size.__context__ or size)
-                    for size in sizes if isinstance(size, BaseException)
+                    for size in sizes
+                    if isinstance(size, BaseException)
                 ),
             )
             for _ in range(3):
                 envelope = make_envelope()
                 await drivers[0].push(envelope)
-                reserved = await asyncio.gather(*(
-                    drivers[index % len(drivers)].reserve(("default",), 60.0)
-                    for index in range(100)
-                ), return_exceptions=True)
+                reserved = await asyncio.gather(
+                    *(
+                        drivers[index % len(drivers)].reserve(("default",), 60.0)
+                        for index in range(100)
+                    ),
+                    return_exceptions=True,
+                )
                 errors = [item for item in reserved if isinstance(item, BaseException)]
                 self.assertEqual(errors, [])
                 winners = [item for item in reserved if item is not None]
@@ -532,6 +591,6 @@ class TestDatabaseQueueDriver(DurableDriverContract, TestCase):
                 self.assertEqual(winners[0].id, envelope.id)
                 self.assertTrue(await drivers[0].delete(winners[0]))
         finally:
-            await asyncio.gather(*(
-                connection.disconnect() for connection in connections
-            ))
+            await asyncio.gather(
+                *(connection.disconnect() for connection in connections),
+            )

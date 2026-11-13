@@ -1,3 +1,6 @@
+# ruff: noqa: PLR2004, PT009, PT027, S102, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use explicit process arguments or locally constructed execution fixtures.
 from __future__ import annotations
 import ast
 import codecs
@@ -11,6 +14,7 @@ from orionis.console.commands.bootstrap._editor import (
     BootstrapEditError,
     BootstrapEditor,
 )
+
 
 class TestBootstrapEditor(TestCase):
     def setUp(self) -> None:
@@ -135,7 +139,8 @@ class TestBootstrapEditor(TestCase):
                 )
                 result = editor.routing(context, self.base / f"routes/{context}.py")
                 calls = [
-                    node for node in ast.walk(ast.parse(result))
+                    node
+                    for node in ast.walk(ast.parse(result))
                     if isinstance(node, ast.Call)
                     and isinstance(node.func, ast.Attribute)
                     and node.func.attr == "withRouting"
@@ -207,7 +212,7 @@ class TestBootstrapEditor(TestCase):
         )
         result = editor.routing("api", self.base / "routes/api.py")
         self.assertIn(
-            'withRouting("routes/api.py", \'custom/web.py\', health=\'/up\')',
+            "withRouting(\"routes/api.py\", 'custom/web.py', health='/up')",
             result,
         )
 
@@ -266,9 +271,13 @@ class TestBootstrapEditor(TestCase):
         # Exercise the bootstrap edit and verify the expected source.
         editor = self.editor("app = Application()\napp.withRouting(**ROUTES)\n")
         self.assertIsNone(editor.routePaths("api"))
-        self.assertIsNone(editor.routing(
-            "api", self.base / "custom/api.py", registered=True,
-        ))
+        self.assertIsNone(
+            editor.routing(
+                "api",
+                self.base / "custom/api.py",
+                registered=True,
+            ),
+        )
         with self.assertRaises(BootstrapEditError):
             editor.routing("api", self.base / "custom/api.py")
 
@@ -331,7 +340,8 @@ class TestBootstrapEditor(TestCase):
                     result = editor.routing("api", paths if multiple else paths[0])
                     tokens = tokenize.generate_tokens(io.StringIO(result).readline)
                     literals = [
-                        token.string for token in tokens
+                        token.string
+                        for token in tokens
                         if token.type == tokenize.STRING
                     ]
                     self.assertTrue(literals)
@@ -356,7 +366,7 @@ class TestBootstrapEditor(TestCase):
         """
         # Escape Unicode separators, quotes, and control characters safely.
         paths = [
-            self.base / "routes" / "café's \"route\"\n\t\u2028.py",
+            self.base / "routes" / 'café\'s "route"\n\t\u2028.py',
             self.base / "routes" / "back\\slash.py",
         ]
         source = "app = Application()\napp.create()\n"
@@ -465,7 +475,7 @@ class TestBootstrapEditor(TestCase):
         )
         result = editor.routing("api", self.base / "routes/new.py")
         self.assertIn("app.withRouting(api='old.py')", result)
-        self.assertIn('app.withRouting(health=\'/up\', api="routes/new.py")', result)
+        self.assertIn("app.withRouting(health='/up', api=\"routes/new.py\")", result)
 
     def testAliasApplicationAndFactoryReturnAreSupported(self) -> None:
         """
@@ -600,11 +610,12 @@ class TestBootstrapEditor(TestCase):
         result = editor.lifespan(self.base / "bootstrap/lifespan.py")
         imported = "from bootstrap.lifespan import register_lifespan_callbacks\n"
         self.assertIn(
-            ")  # Provider registration.\n" + imported
+            ")  # Provider registration.\n"
+            + imported
             + "\n# Construct the configured application.\n",
             result,
         )
-        self.assertTrue(result.startswith(source[:source.index("# Keep local")]))
+        self.assertTrue(result.startswith(source[: source.index("# Keep local")]))
         self.assertValid(result)
 
     def testFactoryLifespanImportExtendsLocalImportGroup(self) -> None:
@@ -677,15 +688,15 @@ class TestBootstrapEditor(TestCase):
             Complete future-import ordering and valid-syntax assertions.
         """
         # Preserve Python's required future-import location.
-        header = (
-            '"""Bootstrap documentation."""\n'
-            "from __future__ import annotations\n"
-        )
+        header = '"""Bootstrap documentation."""\nfrom __future__ import annotations\n'
         editor = self.editor(header + "\napp = Application()\napp.create()\n")
         result = editor.lifespan(self.base / "bootstrap/lifespan.py")
-        self.assertTrue(result.startswith(
-            header + "\nfrom bootstrap.lifespan import register_lifespan_callbacks\n",
-        ))
+        self.assertTrue(
+            result.startswith(
+                header
+                + "\nfrom bootstrap.lifespan import register_lifespan_callbacks\n",
+            ),
+        )
         self.assertValid(result)
 
     def testLifespanSplitsTerminalChainedCreatePreservingBuilder(self) -> None:
@@ -820,7 +831,8 @@ class TestBootstrapEditor(TestCase):
         result = editor.lifespan(self.base / "bootstrap/lifespan.py")
         self.assertIn("_orionis_lifespan_1(app)", result)
         self.assertLess(
-            result.index("_orionis_lifespan_1(app)"), result.index("app.create()"),
+            result.index("_orionis_lifespan_1(app)"),
+            result.index("app.create()"),
         )
 
     def testLifespanUsesExistingImportAliasWhenCallIsMissing(self) -> None:
@@ -938,7 +950,7 @@ class TestBootstrapEditor(TestCase):
             "app = Application()\napp.withRouting(health='/salud/ñ')  # español\n",
         )
         result = editor.routing("api", self.base / "routes/api.py")
-        self.assertIn('health=\'/salud/ñ\', api="routes/api.py")  # español', result)
+        self.assertIn("health='/salud/ñ', api=\"routes/api.py\")  # español", result)
         self.assertValid(result)
 
     def testEncodingBomAndCrlfArePreservedOnCommit(self) -> None:
@@ -1245,6 +1257,39 @@ class TestBootstrapEditor(TestCase):
         with self.assertRaisesRegex(BootstrapEditError, "Helper configure"):
             editor.routing("api", self.base / "routes/api.py")
 
+    def testHelperAliasesCannotHideRoutingReplacement(self) -> None:
+        """
+        Reject later helper routing through aliases of the application.
+
+        Returns
+        -------
+        None
+            Preserve the original source when an alias can replace routing.
+        """
+        for binding in (
+            "    alias = application\n",
+            "    alias: object = application\n",
+            "    saved = application\n    alias = saved\n    application = other\n",
+            (
+                "    saved = other\n"
+                "    for item in items:\n"
+                "        alias = saved\n"
+                "        saved = application\n"
+            ),
+        ):
+            with self.subTest(binding=binding):
+                source = (
+                    "def configure(application):\n"
+                    f"{binding}"
+                    "    alias.withRouting(web='routes/web.py')\n"
+                    "app = Application()\napp.withRouting(health='/up')\n"
+                    "configure(app)\napp.create()\n"
+                )
+                editor = self.editor(source)
+                with self.assertRaisesRegex(BootstrapEditError, "Helper configure"):
+                    editor.routing("api", self.base / "routes/api.py")
+                self.assertEqual(self.path.read_text(), source)
+
     def testRegisteredExpansionDoesNotBypassHelperGuard(self) -> None:
         """
         Run source safety checks even when runtime confirms an expanded route.
@@ -1538,8 +1583,9 @@ class TestBootstrapEditor(TestCase):
         editor = self.editor("app = Application().create()\n")
         result = editor.routing("api", self.base / "routes/api.py")
         namespace = {"Application": Application}
-        exec(  # noqa: S102 - Verify generated application code.
-            compile(result, str(self.path), "exec"), namespace,
+        exec(  # Verify generated application code.
+            compile(result, str(self.path), "exec"),
+            namespace,
         )
         self.assertEqual(
             namespace["app"].events,

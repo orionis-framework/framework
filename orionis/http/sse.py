@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from asyncio import Future
     from collections.abc import AsyncIterator, Iterator
 
+
 def _encode_data(data: str) -> bytes:
     """
     Encode a text payload as one UTF-8 server-sent event.
@@ -29,6 +30,7 @@ def _encode_data(data: str) -> bytes:
     return ("data: " + normalized.replace("\n", "\ndata: ") + "\n\n").encode(
         "utf-8",
     )
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ServerSentEvent:
@@ -134,6 +136,7 @@ class ServerSentEvent:
             data = self.data.replace("\r\n", "\n").replace("\r", "\n")
             lines.append("data: " + data.replace("\n", "\ndata: "))
         return ("\n".join(lines) + "\n\n").encode("utf-8")
+
 
 class _EventStreamIterator:
     """Encode an owned event source without prefetching or buffering events."""

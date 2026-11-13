@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Cold-import probes execute fixed source with the current Python interpreter.
 import json
 import subprocess
 import sys
@@ -6,7 +9,6 @@ from orionis.test import TestCase
 
 _ROOT = Path(__file__).resolve().parents[2]
 
-# ruff: noqa: S603
 
 def _probe(source: str) -> dict[str, object]:
     """Run an import probe with a fresh module cache.
@@ -22,10 +24,16 @@ def _probe(source: str) -> dict[str, object]:
         Decoded result from the child interpreter.
     """
     result = subprocess.run(
-        [sys.executable, "-B", "-c", source], cwd=_ROOT,
-        capture_output=True, check=True, text=True, encoding="utf-8", timeout=60,
+        [sys.executable, "-B", "-c", source],
+        cwd=_ROOT,
+        capture_output=True,
+        check=True,
+        text=True,
+        encoding="utf-8",
+        timeout=60,
     )
     return json.loads(result.stdout)
+
 
 class TestContainerLazyImports(TestCase):
     """Exercise cold imports and runtime annotations used by the container."""
@@ -36,7 +44,7 @@ class TestContainerLazyImports(TestCase):
         Returns
         -------
         None
-            Assert that unrelated implementations remain unloaded.
+            No return value.
         """
         result = _probe(
             "import json, sys\n"
@@ -55,7 +63,7 @@ class TestContainerLazyImports(TestCase):
         Returns
         -------
         None
-            Assert contract identity and application injection.
+            No return value.
         """
         result = _probe(
             "from __future__ import annotations\n"
@@ -106,7 +114,7 @@ class TestContainerLazyImports(TestCase):
         Returns
         -------
         None
-            Assert rule identity, validation results and unloaded backends.
+            No return value.
         """
         result = _probe(
             "import asyncio, json, sys\n"

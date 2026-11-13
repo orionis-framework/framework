@@ -1,3 +1,5 @@
+# ruff: noqa: SLF001
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Resolve compiled routes using static maps and ordered dynamic buckets."""
 
 from __future__ import annotations
@@ -45,6 +47,7 @@ Extractor = tuple[str, int, ParamConverter]
 BucketEntry = tuple[list[Extractor], "CompiledRoute"]
 """Type alias for ``tuple[list[Extractor], 'CompiledRoute']``."""
 
+
 class _DepthBucket:
     """Group compiled route candidates by their path segment structure."""
 
@@ -85,6 +88,7 @@ class _DepthBucket:
         single-route bucket. Defaults to None.
         """
 
+
 @dataclass(frozen=True, slots=True)
 class _PrefixIndex:
     """Select the first distinct segment after a shared static path prefix."""
@@ -96,8 +100,10 @@ class _PrefixIndex:
     fallback: _DepthBucket | None = None
     """Handler or route selected when no ordinary route matches."""
 
+
 type DepthTable = dict[int, _DepthBucket | _PrefixIndex]
 """Type alias for ``dict[int, _DepthBucket | _PrefixIndex]``."""
+
 
 def _select_bucket(
     table: DepthTable,
@@ -130,6 +136,7 @@ def _select_bucket(
         bucket = bucket.branches.get(segment, bucket.fallback)
     return bucket
 
+
 def _path_allowed_for_method(
     static_table: dict[str, ResolvedRoute],
     dynamic_table: DepthTable,
@@ -160,7 +167,17 @@ def _path_allowed_for_method(
     if path in static_table:
         return True
     bucket = _select_bucket(dynamic_table, path, depth)
-    return bucket is not None and bucket.pattern.fullmatch(path) is not None
+    if bucket is None:
+        return False
+    match = bucket.pattern.fullmatch(path)
+    if match is None:
+        return False
+    try:
+        _extract_result(match, bucket)
+    except ValueError, OverflowError:
+        return _extract_converter_fallback(path, bucket, match) is not None
+    return True
+
 
 def _build_extractors(
     converters: dict[str, ParamConverter],
@@ -190,9 +207,9 @@ def _build_extractors(
         If a prefixed parameter name is absent from ``groupindex``.
     """
     return [
-        (name, groupindex[prefix + name], conv)
-        for name, conv in converters.items()
+        (name, groupindex[prefix + name], conv) for name, conv in converters.items()
     ]
+
 
 def _build_matching_bucket(routes: list[CompiledRoute]) -> _DepthBucket:
     """
@@ -261,13 +278,17 @@ def _build_matching_bucket(routes: list[CompiledRoute]) -> _DepthBucket:
         marker_to_entry=marker_to_entry,
     )
 
+
 def _partition_route_segments(
     routes: list[CompiledRoute],
     start: int,
-) -> tuple[
-    dict[str, list[tuple[int, CompiledRoute]]],
-    list[tuple[int, CompiledRoute]],
-] | None:
+) -> (
+    tuple[
+        dict[str, list[tuple[int, CompiledRoute]]],
+        list[tuple[int, CompiledRoute]],
+    ]
+    | None
+):
     """
     Partition literal and wildcard path segments in candidate order.
 
@@ -296,6 +317,7 @@ def _partition_route_segments(
         else:
             return None
     return branches, wildcards
+
 
 def _build_depth_bucket(
     routes: list[CompiledRoute],
@@ -339,6 +361,7 @@ def _build_depth_bucket(
             )
         start += len(next(iter(branches))) + 1
 
+
 def _build_overlapping_index(
     routes: list[CompiledRoute],
     start: int,
@@ -374,13 +397,14 @@ def _build_overlapping_index(
     return _PrefixIndex(
         start,
         {
-            prefix: _build_matching_bucket([
-                route for _, route in merge(members, wildcards)
-            ])
+            prefix: _build_matching_bucket(
+                [route for _, route in merge(members, wildcards)],
+            )
             for prefix, members in branches.items()
         },
         _build_matching_bucket([route for _, route in wildcards]),
     )
+
 
 def _extract_result(match: re.Match[str], bucket: _DepthBucket) -> ResolvedRoute:
     """
@@ -416,13 +440,14 @@ def _extract_result(match: re.Match[str], bucket: _DepthBucket) -> ResolvedRoute
 
     extractors, route = bucket.entries[entry_index]
     group = match.group
-    return ResolvedRoute._fromOwnedParams(  # noqa: SLF001
+    return ResolvedRoute._fromOwnedParams(
         route,
         {
             name: converter(group(group_index))
             for name, group_index, converter in extractors
         },
     )
+
 
 def _extract_converter_fallback(
     path: str,
@@ -449,11 +474,8 @@ def _extract_converter_fallback(
         First later route whose parameters convert successfully, or None.
     """
     marker_to_entry = bucket.marker_to_entry
-    first_index = (
-        marker_to_entry[match.lastindex]
-        if marker_to_entry is not None else 0
-    )
-    for _, route in bucket.entries[first_index + 1:]:
+    first_index = marker_to_entry[match.lastindex] if marker_to_entry is not None else 0
+    for _, route in bucket.entries[first_index + 1 :]:
         candidate = route.regex.fullmatch(path)
         if candidate is None:
             continue
@@ -462,17 +484,22 @@ def _extract_converter_fallback(
                 name: converter(candidate.group(name))
                 for name, converter in route.converters.items()
             }
-        except (ValueError, OverflowError):
+        except ValueError, OverflowError:
             continue
-        return ResolvedRoute._fromOwnedParams(route, params)  # noqa: SLF001
+        return ResolvedRoute._fromOwnedParams(route, params)
     return None
+
 
 class RouteResolver(IRouteResolver):
     """Resolve compiled routes using static maps and ordered dynamic buckets."""
 
     __slots__ = (
-        "_cache_max", "_cache_order", "_fallback", "_global_static",
-        "_routes", "_tables",
+        "_cache_max",
+        "_cache_order",
+        "_fallback",
+        "_global_static",
+        "_routes",
+        "_tables",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -596,7 +623,11 @@ class RouteResolver(IRouteResolver):
         depth = path.count("/") if path != "/" else 0
         if tables is not None and tables[1]:
             resolved = self.__resolveDynamic(
-                path, depth, tables[1], method, method_cache,
+                path,
+                depth,
+                tables[1],
+                method,
+                method_cache,
             )
             if resolved is not None:
                 return resolved
@@ -680,7 +711,7 @@ class RouteResolver(IRouteResolver):
             return None
         try:
             result = _extract_result(match, bucket)
-        except (ValueError, OverflowError):
+        except ValueError, OverflowError:
             # A converter can reject a regex match, such as an oversized integer.
             result = _extract_converter_fallback(path, bucket, match)
             if result is None:
@@ -710,7 +741,8 @@ class RouteResolver(IRouteResolver):
         path = normalize_request_path(path)
         depth = path.count("/") if path != "/" else 0
         allowed = [
-            method for method, tables in self._tables.items()
+            method
+            for method, tables in self._tables.items()
             if method != "WEBSOCKET"
             and _path_allowed_for_method(tables[0], tables[1], path, depth)
         ]

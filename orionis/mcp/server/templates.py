@@ -1,15 +1,14 @@
+# ruff: noqa: TC001
+# Keep the public URI compiler's resource annotation resolvable at runtime.
 """Compile expansion once and verify every inverse result by expansion."""
 
 import inspect
 import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 from urllib.parse import quote, unquote
 from uritemplate import URITemplate
-
-if TYPE_CHECKING:
-    from orionis.mcp.server.primitives import Resource
+from orionis.mcp.server.primitives import Resource
 
 _VARNAME = r"(?:\w|%[0-9A-Fa-f]{2})++(?:\.(?:\w|%[0-9A-Fa-f]{2})++)*+"
 """
@@ -35,6 +34,7 @@ _SCHEME = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*:")
 _ESCAPE = re.compile(r"%[0-9a-fA-F]{2}")
 """Compiled pattern used to recognize escape."""
 
+
 def _uppercase_escape(match: re.Match[str]) -> str:
     """
     Normalize the hexadecimal digits of one percent escape.
@@ -51,8 +51,10 @@ def _uppercase_escape(match: re.Match[str]) -> str:
     """
     return match[0].upper()
 
+
 def _decode_captures(
-    captures: tuple[str, ...], groups: tuple[str, ...],
+    captures: tuple[str, ...],
+    groups: tuple[str, ...],
 ) -> dict[str, object] | None:
     """
     Decode URI variables while checking repeated variable consistency.
@@ -77,6 +79,7 @@ def _decode_captures(
         values[name] = decoded
     return values
 
+
 def validate_uri(uri: str) -> None:
     """
     Require an absolute URI without malformed escapes or literal controls.
@@ -98,6 +101,7 @@ def validate_uri(uri: str) -> None:
     ):
         message = "MCP resource URIs must be valid absolute URIs."
         raise ValueError(message)
+
 
 def _validate_template(template: str) -> None:
     """
@@ -124,6 +128,7 @@ def _validate_template(template: str) -> None:
     if _INVALID_LITERAL.search(template[position:]) or not _SCHEME.match(template):
         message = f"Invalid absolute RFC 6570 URI template {template!r}."
         raise ValueError(message)
+
 
 def _simple_pattern(template: str) -> tuple[re.Pattern[str], tuple[str, ...]] | None:
     """
@@ -154,6 +159,7 @@ def _simple_pattern(template: str) -> tuple[re.Pattern[str], tuple[str, ...]] | 
     pieces.append(re.escape(template[position:]))
     return re.compile("".join(pieces)), tuple(names)
 
+
 def _expansion_value(value: object) -> object:
     """
     Preserve Orionis scalar formatting and mapping order during RFC expansion.
@@ -175,6 +181,7 @@ def _expansion_value(value: object) -> object:
     if isinstance(value, Sequence) and not isinstance(value, str):
         return [_expansion_value(item) for item in value]
     return value if value is None or isinstance(value, str) else str(value)
+
 
 @dataclass(frozen=True, slots=True)
 class UriMatcher:
@@ -243,6 +250,36 @@ class UriMatcher:
             custom,
         )
 
+    def _customVariables(
+        self,
+        uri: str,
+        custom: Callable[[str], Mapping[str, object] | None],
+    ) -> dict[str, object] | None:
+        """
+        Validate the result of a configured custom inverse matcher.
+
+        Parameters
+        ----------
+        uri : str
+            URI already validated by the public matching entry point.
+        custom : collections.abc.Callable
+            Configured inverse matcher, already narrowed to a callable.
+
+        Returns
+        -------
+        dict[str, object] or None
+            Copied declared variables, or None when the custom matcher declines.
+        """
+        values = custom(uri)
+        if values is None:
+            return None
+        if not isinstance(values, Mapping) or not set(
+            self.variable_names,
+        ).issuperset(values):
+            message = "Resource.match must return only declared URI variables."
+            raise ValueError(message)
+        return dict(values)
+
     def match(self, uri: str) -> dict[str, object] | None:
         """
         Return validated URI variables without loading any resource or file.
@@ -259,15 +296,9 @@ class UriMatcher:
         """
         validate_uri(uri)
         if self.custom is not None:
-            values = self.custom(uri)
+            values = self._customVariables(uri, self.custom)
             if values is None:
                 return None
-            if not isinstance(values, Mapping) or not set(
-                self.variable_names,
-            ).issuperset(values):
-                message = "Resource.match must return only declared URI variables."
-                raise ValueError(message)
-            values = dict(values)
         else:
             pattern = self.pattern
             if pattern is None:
@@ -292,11 +323,12 @@ class UriMatcher:
         ):
             message = "URI template prefix modifiers require scalar values."
             raise ValueError(message)
-        expanded = self.expander.expand({
-            name: _expansion_value(value) for name, value in values.items()
-        })
+        expanded = self.expander.expand(
+            {name: _expansion_value(value) for name, value in values.items()},
+        )
         if _ESCAPE.sub(_uppercase_escape, expanded) != _ESCAPE.sub(
-            _uppercase_escape, uri,
+            _uppercase_escape,
+            uri,
         ):
             return None
         return values

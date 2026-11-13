@@ -14,6 +14,7 @@ _SAME_SITE_VALUES: frozenset[str] = frozenset(p.value for p in SameSitePolicy)
 _DRIVER_VALUES: frozenset[str] = frozenset(d.value for d in SessionDriver)
 """Driver values used by ``session``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Session(BaseEntity):
     """

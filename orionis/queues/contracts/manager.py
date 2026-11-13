@@ -1,14 +1,14 @@
+# ruff: noqa: TC001
+# Keep public contract annotations available for runtime inspection.
 """Declare the canonical dispatch and queue administration API."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.queues.contracts.driver import IQueueDriver
+from orionis.queues.contracts.failed_repository import IFailedJobRepository
+from orionis.queues.contracts.worker import IWorker
+from orionis.queues.job import BaseJob
+from orionis.queues.pending import PendingDispatch
 
-if TYPE_CHECKING:
-    from orionis.queues.contracts.driver import IQueueDriver
-    from orionis.queues.contracts.failed_repository import IFailedJobRepository
-    from orionis.queues.contracts.worker import IWorker
-    from orionis.queues.job import BaseJob
-    from orionis.queues.pending import PendingDispatch
 
 class IQueueManager(ABC):
     """Declare the canonical dispatch and queue administration API."""

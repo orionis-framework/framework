@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 import logging
 from abc import ABC
@@ -6,21 +8,24 @@ from orionis.logging.logger import Logger
 from orionis.test import TestCase
 
 # Complete abstract surface published by the logging contract.
-_ABSTRACT_MEMBERS = frozenset({
-    "close",
-    "critical",
-    "debug",
-    "error",
-    "getActiveChannel",
-    "getActiveChannels",
-    "getAvailableChannels",
-    "getLogger",
-    "info",
-    "name",
-    "reloadConfiguration",
-    "switchChannel",
-    "warning",
-})
+_ABSTRACT_MEMBERS = frozenset(
+    {
+        "close",
+        "critical",
+        "debug",
+        "error",
+        "getActiveChannel",
+        "getActiveChannels",
+        "getAvailableChannels",
+        "getLogger",
+        "info",
+        "name",
+        "reloadConfiguration",
+        "switchChannel",
+        "warning",
+    },
+)
+
 
 class _CompleteLogger(ILogger):
     """Fully implemented logger used to verify the contract surface."""
@@ -47,7 +52,7 @@ class _CompleteLogger(ILogger):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     def error(self, _message: str) -> None:
@@ -61,7 +66,7 @@ class _CompleteLogger(ILogger):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     def warning(self, _message: str) -> None:
@@ -75,7 +80,7 @@ class _CompleteLogger(ILogger):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     def debug(self, _message: str) -> None:
@@ -89,7 +94,7 @@ class _CompleteLogger(ILogger):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     def critical(self, _message: str) -> None:
@@ -103,7 +108,7 @@ class _CompleteLogger(ILogger):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     def getLogger(self) -> logging.Logger:
@@ -122,7 +127,7 @@ class _CompleteLogger(ILogger):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     def switchChannel(self, _channel_name: str) -> bool:
@@ -146,7 +151,7 @@ class _CompleteLogger(ILogger):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     def getAvailableChannels(self) -> list[str]:
@@ -179,6 +184,7 @@ class _CompleteLogger(ILogger):
         """
         return []
 
+
 class _IncompleteLogger(ILogger):
     """Logger implementing a single member of the contract on purpose."""
 
@@ -193,8 +199,8 @@ class _IncompleteLogger(ILogger):
         """
         return "incomplete"
 
-class TestILoggerContract(TestCase):
 
+class TestILoggerContract(TestCase):
     def testIsAnAbstractContract(self) -> None:
         """Expose the logger contract as a non instantiable abstraction.
 
@@ -204,7 +210,7 @@ class TestILoggerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(ILogger, ABC))
         self.assertTrue(inspect.isabstract(ILogger))
@@ -220,7 +226,7 @@ class TestILoggerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ILogger.__abstractmethods__, _ABSTRACT_MEMBERS)
 
@@ -233,7 +239,7 @@ class TestILoggerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(ILogger.__dict__["name"], property)
 
@@ -246,7 +252,7 @@ class TestILoggerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for member in sorted(_ABSTRACT_MEMBERS):
             self.assertTrue(inspect.getdoc(getattr(ILogger, member)))
@@ -259,7 +265,7 @@ class TestILoggerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             _IncompleteLogger()
@@ -273,7 +279,7 @@ class TestILoggerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(_CompleteLogger(), ILogger)
 
@@ -286,13 +292,14 @@ class TestILoggerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        for member in sorted(_ABSTRACT_MEMBERS - {"name"}):
-            expected = inspect.signature(getattr(ILogger, member))
-            actual = inspect.signature(getattr(Logger, member))
-            self.assertEqual(
-                list(actual.parameters),
-                list(expected.parameters),
-                msg=f"Signature drift detected on '{member}'.",
-            )
+        for member in sorted((_ABSTRACT_MEMBERS - {"name"}) | {"aclose"}):
+            with self.subTest(member=member):
+                expected = inspect.signature(getattr(ILogger, member), eval_str=True)
+                actual = inspect.signature(getattr(Logger, member), eval_str=True)
+                self.assertEqual(
+                    list(actual.parameters.values())[1:],
+                    list(expected.parameters.values())[1:],
+                )
+                self.assertEqual(actual.return_annotation, expected.return_annotation)

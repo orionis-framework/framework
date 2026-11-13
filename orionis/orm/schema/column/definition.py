@@ -1,15 +1,16 @@
+# Resolve public annotations at runtime and accept arbitrary column defaults.
+# ruff: noqa: ANN401, TC001, TC003
 """Framework-agnostic description of a database column."""
 
 from __future__ import annotations
 import operator
+from collections.abc import Callable
 from dataclasses import fields
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.constraints.foreign_reference import ForeignReference
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.orm.schema.types.column_type import ColumnType
+from orionis.orm.schema.types.column_type import ColumnType
 
 # Sentinel used to distinguish "no default" from a legitimate ``None`` default.
 _NO_DEFAULT: object = object()
@@ -28,6 +29,7 @@ _OPTION_GETTER: Callable[[ColumnOptions], tuple[Any, ...]] = operator.attrgetter
 # Store the values used by columns with no type-specific options.
 _DEFAULT_OPTION_VALUES: tuple[Any, ...] = _OPTION_GETTER(ColumnOptions())
 """Store the values used by columns with no type-specific options."""
+
 
 class ColumnDefinition:
     """
@@ -108,11 +110,11 @@ class ColumnDefinition:
         """Attribute name is attached later by the model metaclass."""
         self.column_type = column_type
         """Logical column type used by the SQL compiler."""
-        values = (
-            _DEFAULT_OPTION_VALUES if options is None else _OPTION_GETTER(options)
-        )
+        values = _DEFAULT_OPTION_VALUES if options is None else _OPTION_GETTER(options)
         for field_name, value in zip(
-            _OPTION_FIELDS, values, strict=True,
+            _OPTION_FIELDS,
+            values,
+            strict=True,
         ):
             setattr(self, field_name, value)
         self.is_primary: bool = False
@@ -158,7 +160,7 @@ class ColumnDefinition:
         self.is_nullable = True
         return self
 
-    def default(self, value: Any) -> ColumnDefinition:  # noqa: ANN401
+    def default(self, value: Any) -> ColumnDefinition:
         """
         Assign a default value applied when no value is provided on insert.
 
@@ -272,7 +274,4 @@ class ColumnDefinition:
         str
             Representation including name and logical type.
         """
-        return (
-            f"<{type(self).__name__} name={self.name!r} "
-            f"type={self.column_type!s}>"
-        )
+        return f"<{type(self).__name__} name={self.name!r} type={self.column_type!s}>"

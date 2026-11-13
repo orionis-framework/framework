@@ -43,7 +43,7 @@ async def recruit(team_id: int):
 
 `hasMany` resolves to a collection; `hasOne` and `belongsTo` resolve to a model or `None` through `getResults()`. Relationship `first()` returns the first model. `hasOne` does not impose database uniqueness: a true one-to-one relationship needs a unique constraint on its FK.
 
-Conventions use `team_id` on `Player` for both `Team.hasMany(Player)` and `Player.belongsTo(Team)`, with the primary key as local/owner key. Customize through `hasMany(Player, foreign_key="owner_id", local_key="id")`, `hasOne(...)`, or `belongsTo(Team, foreign_key="owner_id", owner_key="id")`. Relationship builders retain these constraints when adding filters.
+Conventions use `team_id` on `Player` for both `Team.hasMany(Player)` and `Player.belongsTo(Team)`, with the primary key as local/owner key. Customize through `hasMany(Player, foreign_key="owner_id", local_key="id")`, `hasOne(...)`, or `belongsTo(Team, foreign_key="owner_id", owner_key="id")`. Relationship builders retain these constraints when adding filters. When the related class has no explicit connection, its relation and pivot queries inherit the parent's read connection. An explicit connection on the related class takes priority, even when it names the application default. `hasOne`/`hasMany.create()` uses the same selected connection, applies normal construction and save events, and returns the model even if an event vetoes persistence.
 
 ## Load a list without N+1 queries
 
@@ -51,7 +51,10 @@ Conventions use `team_id` on `Player` for both `Team.hasMany(Player)` and `Playe
 async def roster():
     teams = await Team.withRelations("players").orderBy("id").get()
     return [
-        {"team": team.name, "players": [p.toDict() for p in team.getRelation("players")]}
+        {
+            "team": team.name,
+            "players": [p.toDict() for p in team.getRelation("players")],
+        }
         for team in teams
     ]
 ```
@@ -71,6 +74,6 @@ async def replace_roles(user, role_ids: list[int]):
     return await user.roles().sync(role_ids)
 ```
 
-This fragment requires an application model with a `roles()` method and a migrated pivot table. `attach(ids, attributes=None)` inserts links and returns a count; it accepts one identity, models, iterables, or an identity-to-pivot-attributes mapping. `detach(ids=None)` removes links; without arguments it removes all links for the parent. `sync(ids)` retains exactly those identities and returns `attached` and `detached` lists; `toggle(ids)` reverses links. `wherePivot(column, value)` or `(column, operator, value)` filters pivot reads.
+This fragment requires an application model with a `roles()` method and a migrated pivot table. `attach(ids, attributes=None)` inserts links and returns a count; it accepts one identity, models, iterables, or an identity-to-pivot-attributes mapping. Extra pivot attributes cannot override the parent or related identity supplied to `attach`. Eager loading preserves the related query's result order and does not multiply a related row merely because duplicate pivot links exist. `detach(ids=None)` removes links; without arguments it removes all links for the parent. `sync(ids)` retains exactly those identities and returns `attached` and `detached` lists; `toggle(ids)` reverses links. `wherePivot(column, value)` or `(column, operator, value)` filters pivot reads.
 
 The current implementation has no `updateExistingPivot` method or implicit atomic synchronization: `sync` reads, deletes, and inserts in separate steps. Wrap critical workflows in a [transaction](../../../database/docs/en/transactions.md) on the same connection and define a composite unique constraint to prevent duplicates. `detach` removes links; relationship `delete()` deletes related rows. Choose according to the intended business effect.

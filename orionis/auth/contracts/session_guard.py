@@ -1,13 +1,14 @@
+# ruff: noqa: TC001, TC003
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Define the stateful operations supported by session authentication."""
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING
 from orionis.auth.contracts.guard import IGuard
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
-    from orionis.http.request import Request
+import orionis.http as _http
+from collections.abc import Mapping
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+
 
 class ISessionGuard(IGuard):
     """Define the stateful operations supported by session authentication."""
@@ -18,9 +19,10 @@ class ISessionGuard(IGuard):
     @abstractmethod
     async def attempt(
         self,
-        request: Request,
+        request: _http.Request,
         credentials: Mapping[str, object],
-        *, remember: bool = False,
+        *,
+        remember: bool = False,
     ) -> IAuthenticatable | None:
         """
         Validate credentials and start an authenticated session.
@@ -42,7 +44,7 @@ class ISessionGuard(IGuard):
         """
 
     @abstractmethod
-    def login(self, request: Request, identity: IAuthenticatable) -> None:
+    def login(self, request: _http.Request, identity: IAuthenticatable) -> None:
         """
         Persist an identity in the session of the current request.
 
@@ -59,11 +61,11 @@ class ISessionGuard(IGuard):
         Returns
         -------
         None
-            The session is mutated as a side effect.
+            No return value.
         """
 
     @abstractmethod
-    async def logout(self, request: Request) -> None:
+    async def logout(self, request: _http.Request) -> None:
         """
         Drop the authenticated state from the session.
 
@@ -75,5 +77,5 @@ class ISessionGuard(IGuard):
         Returns
         -------
         None
-            The session is invalidated as a side effect.
+            No return value.
         """

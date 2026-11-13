@@ -19,5 +19,3 @@ El paquete público exporta `Reflection`, las clases especializadas, `ReflectDep
 - [Inspeccionar clases, funciones e instancias](reflection.md)
 
 Continúa por: [container](../../../container/docs/es/README.md) · [console](../../../console/docs/es/README.md).
-
-Los ejemplos que requieren bootstrap, una solicitud o servicios externos indican su contexto. Los resultados de comprobación de esta reconstrucción se distinguen de las notas históricas; no se presupone que se haya ejecutado una integración de producción.

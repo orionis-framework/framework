@@ -19,6 +19,7 @@ _EXPORTS = {
 }
 """Public export names mapped to their defining modules and attributes."""
 
+
 def __getattr__(name: str) -> object:
     """
     Resolve and cache a declared public queue export.

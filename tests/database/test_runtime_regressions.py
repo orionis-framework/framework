@@ -1,3 +1,6 @@
+# ruff: noqa: FBT001, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Preserve SQLAlchemy's positional boolean in the before_cursor_execute listener.
 from __future__ import annotations
 import asyncio
 from types import MappingProxyType
@@ -21,6 +24,7 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer
 from orionis.test import TestCase
 
+
 class TestRuntimeRegressions(TestCase):
     """Exercise connection isolation and compiler behavior without application DI."""
 
@@ -30,11 +34,13 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.connection = Connection(
-            "runtime", {"driver": "sqlite", "database": ":memory:"},
+            "runtime",
+            {"driver": "sqlite", "database": ":memory:"},
         )
+        self.addAsyncCleanup(self.connection.disconnect)
         await self.connection.statement(
             "CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT)",
         )
@@ -45,11 +51,10 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         if self.connection.inTransaction():
             await self.connection.rollback()
-        await self.connection.disconnect()
 
     async def testChildCannotUseInheritedTransaction(self) -> None:
         """Reject transaction use from a child without changing the owner state.
@@ -57,7 +62,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.begin()
         operations = (
@@ -66,11 +71,11 @@ class TestRuntimeRegressions(TestCase):
             self.connection.rollback,
         )
         for operation in operations:
-            with self.assertRaisesRegex(TransactionException, "child task"): # NOSONAR
+            with self.assertRaisesRegex(TransactionException, "child task"):
                 await asyncio.create_task(operation())
             self.assertTrue(self.connection.inTransaction())
 
-        with self.assertRaisesRegex(TransactionException, "child task"): # NOSONAR
+        with self.assertRaisesRegex(TransactionException, "child task"):
             await asyncio.create_task(self.connection.select("SELECT 1"))
         self.assertFalse(await asyncio.create_task(self._childInTransaction()))
         await self.connection.rollback()
@@ -91,7 +96,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ready = asyncio.Event()
 
@@ -118,10 +123,10 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.begin()
-        self.assertIs(self.connection._acquire(), self.connection._acquire()) # NOSONAR
+        self.assertIs(self.connection._acquire(), self.connection._acquire())
         await self.connection.rollback()
 
     async def testRootRollbackIncludesFirstSavepoint(self) -> None:
@@ -130,7 +135,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.begin()
         await self.connection.begin()
@@ -145,7 +150,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.begin()
         await self.connection.statement("CREATE TABLE rolled_back (id INTEGER)")
@@ -161,7 +166,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         started = asyncio.Event()
         release = asyncio.Event()
@@ -172,7 +177,7 @@ class TestRuntimeRegressions(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             await self.connection.begin()
             await self.connection.execute(
@@ -185,11 +190,13 @@ class TestRuntimeRegressions(TestCase):
         async with asyncio.TaskGroup() as group:
             owner = group.create_task(rollback_owner())
             await started.wait()
-            writer = group.create_task(self.connection.execute(
-                "INSERT INTO items (name) VALUES ('committed')",
-            ))
+            writer = group.create_task(
+                self.connection.execute(
+                    "INSERT INTO items (name) VALUES ('committed')",
+                ),
+            )
             try:
-                with self.assertRaises(TimeoutError): # NOSONAR
+                with self.assertRaises(TimeoutError):
                     await asyncio.wait_for(asyncio.shield(writer), 0.05)
             finally:
                 release.set()
@@ -203,7 +210,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         query = "SELECT :value AS value"
         first = MappingProxyType({"value": 1})
@@ -218,17 +225,17 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         executions = []
 
         def capture_insert(
-            _connection,
-            _cursor,
-            statement,
-            _parameters,
-            _context,
-            executemany,
+            _connection: object,
+            _cursor: object,
+            statement: str,
+            _parameters: object,
+            _context: object,
+            executemany: bool,
         ) -> None:
             """Record executions of INSERT statements.
 
@@ -250,7 +257,7 @@ class TestRuntimeRegressions(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             if statement.startswith("INSERT"):
                 executions.append((statement, executemany))
@@ -260,10 +267,19 @@ class TestRuntimeRegressions(TestCase):
             "before_cursor_execute",
             capture_insert,
         )
+        self.addCleanup(
+            event.remove,
+            self.connection._getEngine().sync_engine,
+            "before_cursor_execute",
+            capture_insert,
+        )
         rows = [{"name": str(value)} for value in range(1000)]
-        result = await self.connection.insert(InsertPlan(
-            table=TableDefinition("items"), values=rows,
-        ))
+        result = await self.connection.insert(
+            InsertPlan(
+                table=TableDefinition("items"),
+                values=rows,
+            ),
+        )
         self.assertEqual(result.row_count, 1000)
         self.assertIsNone(result.last_insert_id)
         self.assertEqual(executions, [("INSERT INTO items (name) VALUES (?)", True)])
@@ -276,7 +292,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = InsertPlan(
             table=TableDefinition("items"),
@@ -292,16 +308,22 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        definition = TableDefinition("defaults", {
-            "id": Integer().primary().autoIncrement(),
-            "value": Integer().default(7),
-        })
+        definition = TableDefinition(
+            "defaults",
+            {
+                "id": Integer().primary().autoIncrement(),
+                "value": Integer().default(7),
+            },
+        )
         await self.connection.createTable(definition)
-        result = await self.connection.insert(InsertPlan(
-            table=definition, values=[{}, {}, {}],
-        ))
+        result = await self.connection.insert(
+            InsertPlan(
+                table=definition,
+                values=[{}, {}, {}],
+            ),
+        )
         self.assertEqual(result.row_count, 3)
         rows = await self.connection.select(SelectPlan(table=definition))
         self.assertEqual([row["value"] for row in rows], [7, 7, 7])
@@ -312,12 +334,14 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        result = await self.connection.insert(InsertPlan(
-            table=TableDefinition("items"),
-            values=[{"name": literal("one")}, {"name": literal("two")}],
-        ))
+        result = await self.connection.insert(
+            InsertPlan(
+                table=TableDefinition("items"),
+                values=[{"name": literal("one")}, {"name": literal("two")}],
+            ),
+        )
         self.assertEqual(result.row_count, 2)
         rows = await self.connection.select("SELECT name FROM items ORDER BY id")
         self.assertEqual(rows, [{"name": "one"}, {"name": "two"}])
@@ -328,7 +352,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.execute("INSERT INTO items (name) VALUES ('sample')")
         value = "x'); DROP TABLE items; --"
@@ -346,7 +370,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.statement(
             "CREATE TABLE metrics (category INTEGER, amount INTEGER)",
@@ -364,7 +388,8 @@ class TestRuntimeRegressions(TestCase):
         )
         rows = await self.connection.select(plan)
         self.assertEqual(
-            rows, [{"category": 1, "total": 15}, {"category": 2, "total": 23}],
+            rows,
+            [{"category": 1, "total": 15}, {"category": 2, "total": 23}],
         )
 
     async def testAliasedBoundFragmentPreservesCorrelation(self) -> None:
@@ -373,23 +398,27 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.execute("INSERT INTO items (name) VALUES ('a'), ('b')")
         table = TableDefinition("items")
         nested = SelectPlan(
             table=table,
             alias="inner_items",
-            columns=(RawExpression(
-                "inner_items.id + outer_items.id + :offset",
-                {"offset": 10},
-                "computed",
-            ),),
-            wheres=[WhereClause(
-                column="inner_items.id",
-                where_type=WhereType.COLUMN,
-                value="outer_items.id",
-            )],
+            columns=(
+                RawExpression(
+                    "inner_items.id + outer_items.id + :offset",
+                    {"offset": 10},
+                    "computed",
+                ),
+            ),
+            wheres=[
+                WhereClause(
+                    column="inner_items.id",
+                    where_type=WhereType.COLUMN,
+                    value="outer_items.id",
+                ),
+            ],
         )
         plan = SelectPlan(
             table=table,
@@ -398,7 +427,8 @@ class TestRuntimeRegressions(TestCase):
         )
         rows = await self.connection.select(plan)
         self.assertEqual(
-            rows, [{"id": 1, "calculated": 12}, {"id": 2, "calculated": 14}],
+            rows,
+            [{"id": 1, "calculated": 12}, {"id": 2, "calculated": 14}],
         )
 
     async def testMixedBooleanConnectorsPreserveGrouping(self) -> None:
@@ -407,7 +437,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.statement(
             "CREATE TABLE flags (id INTEGER, a INTEGER, b INTEGER, c INTEGER)",
@@ -436,12 +466,15 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         compiler = SQLCompiler()
-        compiler.compileSelect(SelectPlan(
-            table=TableDefinition("entries"), columns=("id",),
-        ))
+        compiler.compileSelect(
+            SelectPlan(
+                table=TableDefinition("entries"),
+                columns=("id",),
+            ),
+        )
         column = Integer().primary()
         column.name = "id"
         definition = TableDefinition("entries", {"id": column})
@@ -455,7 +488,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         config = {"driver": "sqlite", "database": ":memory:"}
         options = engine_options(config)
@@ -470,7 +503,7 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         column = Integer().primary()
         definition = TableDefinition("named", {"key": column})
@@ -484,9 +517,10 @@ class TestRuntimeRegressions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(self.connection, "__dict__"))
+
 
 class TestTransactionStartFailures(TestCase):
     """Verify acquired resources are released when a transaction cannot begin."""
@@ -497,7 +531,7 @@ class TestTransactionStartFailures(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         raw = MagicMock()
         raw.begin = AsyncMock(side_effect=SQLAlchemyError("failed"))
@@ -517,7 +551,7 @@ class TestTransactionStartFailures(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         raw = MagicMock()
         raw.begin = AsyncMock(side_effect=asyncio.CancelledError)

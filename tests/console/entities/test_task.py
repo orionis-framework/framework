@@ -1,11 +1,13 @@
+# ruff: noqa: E731, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import fields, is_dataclass
 from orionis.console.entities.task import Task
 from orionis.support.entities.base import BaseEntity
 from orionis.test import TestCase
 
-class TestTaskEntity(TestCase):
 
+class TestTaskEntity(TestCase):
     def _make(self, **kwargs: object) -> Task:
         """
         Build a minimal valid Task instance.
@@ -283,7 +285,7 @@ class TestTaskEntity(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        listener = lambda _event: None  # noqa: E731
+        listener = lambda _event: None
         task = self._make(listeners=[listener])
         self.assertIn(listener, task.listeners)
 

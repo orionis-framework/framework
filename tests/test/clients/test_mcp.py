@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from contextlib import aclosing
 from orionis.container.container import Container
 from orionis.container.context.scope import ScopedContext
@@ -5,6 +7,7 @@ from orionis.mcp import McpConfig, McpRequest, McpResponse, Server, Tool
 from orionis.mcp.protocol.constants import PROTOCOL_VERSION, SUBSCRIPTION_ID
 from orionis.mcp.server.compiler import compile_server
 from orionis.test import McpTestClient, McpTestResponse, TestCase
+
 
 class _EchoTool(Tool):
     """Expose a deterministic tool through the native dispatcher."""
@@ -21,12 +24,14 @@ class _EchoTool(Tool):
         """
         return McpResponse.text("native test response")
 
+
 class _Server(Server):
     """Declare a tool and list-change support for native client tests."""
 
     name = "Native test client"
     tools = (_EchoTool,)
     list_changed = True
+
 
 class TestMcpTestClient(TestCase):
     """Exercise MCP clients through the standard Orionis test case."""
@@ -39,6 +44,7 @@ class TestMcpTestClient(TestCase):
         None
             Register cleanup for the temporary container's singleton entry.
         """
+
         class _Container(Container):
             """Keep service bindings local to one client test."""
 
@@ -101,11 +107,13 @@ class TestMcpTestClient(TestCase):
         second = await self.mcp(_Server, app=self.app)
         parent_scope = ScopedContext.getCurrentScope()
         self.assertIsNot(first.dispatcher.bus, second.dispatcher.bus)
-        async with aclosing(first.stream(
-            "subscriptions/listen",
-            {"notifications": {"toolsListChanged": True}},
-            request_id="subscription",
-        )) as stream:
+        async with aclosing(
+            first.stream(
+                "subscriptions/listen",
+                {"notifications": {"toolsListChanged": True}},
+                request_id="subscription",
+            ),
+        ) as stream:
             acknowledgement = await anext(stream)
             self.assertEqual(
                 acknowledgement["params"]["_meta"][SUBSCRIPTION_ID],
@@ -119,8 +127,31 @@ class TestMcpTestClient(TestCase):
         self.assertIs(ScopedContext.getCurrentScope(), parent_scope)
         self.assertEqual(first.dispatcher.bus.listenerCount, 0)
 
+
 class TestMcpTestResponse(TestCase):
     """Check assertion failures exposed by the native MCP response."""
+
+    def testAssertOkRejectsMissingOrMalformedResults(self) -> None:
+        """Reject absent and non-object results instead of reporting success."""
+        for message in (
+            {},
+            {"method": "notifications/progress", "params": {}},
+            {"result": None},
+            {"result": []},
+            {"result": "complete"},
+        ):
+            with (
+                self.subTest(message=message),
+                self.assertRaisesRegex(
+                    AssertionError,
+                    "Expected a successful MCP result",
+                ),
+            ):
+                McpTestResponse(message).assertOk()
+
+    def testAssertOkAcceptsAnEmptyResultObject(self) -> None:
+        """Accept a valid result object without requiring tool content."""
+        McpTestResponse({"result": {}}).assertOk()
 
     def testAssertOkRejectsProtocolAndToolErrors(self) -> None:
         """Fail the success assertion for either protocol or tool errors.
@@ -135,8 +166,12 @@ class TestMcpTestResponse(TestCase):
             {"result": {"isError": True}},
         ):
             response = McpTestResponse(message)
-            with self.subTest(message=message), self.assertRaisesRegex(
-                AssertionError, "Expected a successful MCP result",
+            with (
+                self.subTest(message=message),
+                self.assertRaisesRegex(
+                    AssertionError,
+                    "Expected a successful MCP result",
+                ),
             ):
                 response.assertOk()
 
@@ -150,7 +185,31 @@ class TestMcpTestResponse(TestCase):
         """
         for content in ((), ({"type": "text", "text": "different"},)):
             response = McpTestResponse({"result": {"content": content}})
-            with self.subTest(content=content), self.assertRaisesRegex(
-                AssertionError, "Expected MCP text to contain",
+            with (
+                self.subTest(content=content),
+                self.assertRaisesRegex(
+                    AssertionError,
+                    "Expected MCP text to contain",
+                ),
             ):
                 response.assertTextContains("missing")
+
+    def testAssertTextContainsRequiresTextContent(self) -> None:
+        """Reject malformed content and text attached to a non-text block."""
+        for result in (
+            None,
+            [],
+            {"content": None},
+            {"content": "missing"},
+            {"content": [None]},
+            {"content": [{"type": "text", "text": None}]},
+            {"content": [{"type": "image", "text": "missing"}]},
+        ):
+            with (
+                self.subTest(result=result),
+                self.assertRaisesRegex(
+                    AssertionError,
+                    "Expected MCP text to contain",
+                ),
+            ):
+                McpTestResponse({"result": result}).assertTextContains("missing")

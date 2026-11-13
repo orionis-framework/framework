@@ -1,13 +1,15 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import tempfile
-import time
 from pathlib import Path
+from unittest.mock import patch
 from orionis.cache.file_based_cache import FileBasedCache
 from orionis.cache.serializer import Serializer
 from orionis.test import TestCase
 
-class TestFileBasedCache(TestCase):
 
+class TestFileBasedCache(TestCase):
     def setUp(self) -> None:
         """Create an isolated temporary directory before each test.
 
@@ -17,23 +19,11 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._cache_path = Path(self._tmpdir.name)
-
-    def tearDown(self) -> None:
-        """Remove the temporary directory after each test.
-
-        Ensures all files created during the test are cleaned up
-        regardless of whether the test passed or failed.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     def _make(
         self,
@@ -74,7 +64,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             FileBasedCache(
@@ -91,7 +81,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         nested = self._cache_path / "deep" / "nested"
         FileBasedCache(path=nested, filename="cache.bin")
@@ -106,7 +96,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         with self.assertRaises(TypeError):
@@ -120,7 +110,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         with self.assertRaises(TypeError):
@@ -135,7 +125,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         self.assertIsNone(cache.get())
@@ -149,7 +139,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         data = {"key": "value", "count": 42, "flag": True}
@@ -166,13 +156,13 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
-        version, sourceshash = cache.save({"a": 1})
+        version, sources_hash = cache.save({"a": 1})
         self.assertEqual(version, FileBasedCache.CACHE_VERSION)
-        self.assertIsInstance(sourceshash, str)
-        self.assertGreater(len(sourceshash), 0)
+        self.assertIsInstance(sources_hash, str)
+        self.assertGreater(len(sources_hash), 0)
 
     def testSaveAndGetNestedData(self) -> None:
         """Preserve nested structures through a save/get cycle.
@@ -183,7 +173,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         data = {"routes": [{"path": "/", "handler": "index"}], "meta": {"v": 2}}
@@ -199,7 +189,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         cache.save({})
@@ -214,7 +204,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         cache.save({"v": 1})
@@ -230,12 +220,18 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         data = {"stable": True, "count": 7}
-        v1, h1 = cache.save(data)
-        v2, h2 = cache.save(data)
+        with patch.object(
+            Serializer,
+            "dumpToFile",
+            wraps=Serializer.dumpToFile,
+        ) as publish:
+            v1, h1 = cache.save(data)
+            v2, h2 = cache.save(data)
+        publish.assert_called_once()
         self.assertEqual(v1, v2)
         self.assertEqual(h1, h2)
         self.assertEqual(cache.get(), data)
@@ -248,7 +244,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         cache.save({"x": 1})
@@ -264,7 +260,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         self.assertFalse(cache.clear())
@@ -277,7 +273,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = self._make()
         cache.save({"x": 1})
@@ -293,7 +289,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         filename = "v_cache.bin"
         cache = self._make(filename=filename)
@@ -322,7 +318,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         filename = "meta_cache.bin"
         cache_file = self._cache_path / filename
@@ -340,7 +336,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         monitored = self._cache_path / "source.py"
         monitored.write_text("x = 1\n", encoding="utf-8")
@@ -353,9 +349,7 @@ class TestFileBasedCache(TestCase):
         )
         cache.save({"payload": True})
 
-        # Small sleep then write different-length content to guarantee
-        # both mtime_ns and st_size differ from the original.
-        time.sleep(0.02)
+        # Different sizes guarantee a changed fingerprint without clock delays.
         monitored.write_text("x = 100\n", encoding="utf-8")
 
         # A fresh instance starts with __lasthashcheck = 0 so the hash
@@ -376,7 +370,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         monitored = self._cache_path / "stable.py"
         monitored.write_text("y = 42\n", encoding="utf-8")
@@ -399,7 +393,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         subdir = self._cache_path / "pkg"
         subdir.mkdir()
@@ -423,7 +417,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         subdir = self._cache_path / "src"
         subdir.mkdir()
@@ -438,7 +432,6 @@ class TestFileBasedCache(TestCase):
         cache.save({"v": 1})
 
         # Add a new Python file to invalidate the hash
-        time.sleep(0.02)
         (subdir / "b.py").write_text("b = 2\n", encoding="utf-8")
 
         fresh = FileBasedCache(
@@ -457,7 +450,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ghost = self._cache_path / "ghost.py"
         cache = FileBasedCache(
@@ -478,15 +471,17 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         writer = FileBasedCache(
-            path=self._cache_path, filename="shared.bin",
+            path=self._cache_path,
+            filename="shared.bin",
         )
         writer.save({"shared": "yes"})
 
         reader = FileBasedCache(
-            path=self._cache_path, filename="shared.bin",
+            path=self._cache_path,
+            filename="shared.bin",
         )
         self.assertEqual(reader.get(), {"shared": "yes"})
 
@@ -499,7 +494,7 @@ class TestFileBasedCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         a = self._make(filename="a.bin")
         b = self._make(filename="b.bin")

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from abc import ABC
@@ -5,16 +7,34 @@ from orionis.container.container import Container
 from orionis.container.contracts.container import IContainer
 from orionis.test import TestCase
 
-_ABSTRACT_METHODS = frozenset({
-    "instance", "transient", "singleton", "scoped",
-    "bound", "beginScope", "getCurrentScope",
-    "make", "build", "invoke", "call",
-})
+_ABSTRACT_METHODS = frozenset(
+    {
+        "instance",
+        "transient",
+        "singleton",
+        "scoped",
+        "bound",
+        "beginScope",
+        "getCurrentScope",
+        "make",
+        "build",
+        "invoke",
+        "call",
+    },
+)
+
 
 class _ConcreteContainer(IContainer):
     """Minimal IContainer implementation used for structural tests."""
 
-    def instance(self, _abstract, _instance, *, _alias=None, _override=False):
+    def instance(
+        self,
+        _abstract: object,
+        _instance: object,
+        *,
+        _alias: str | None = None,
+        _override: bool = False,
+    ) -> bool:
         """Register an instance in the container test double.
 
         Parameters
@@ -23,19 +43,26 @@ class _ConcreteContainer(IContainer):
             Value supplied for ``_abstract``.
         _instance : object
             Value supplied for ``_instance``.
-        _alias : object
+        _alias : str | None
             Value supplied for ``_alias``.
-        _override : object
+        _override : bool
             Value supplied for ``_override``.
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        bool
+            Fixed result supplied by this structural fixture.
         """
         return True
 
-    def transient(self, _abstract, _concrete, *, _alias=None, _override=False):
+    def transient(
+        self,
+        _abstract: object,
+        _concrete: object,
+        *,
+        _alias: str | None = None,
+        _override: bool = False,
+    ) -> bool:
         """Register a transient service in the container test double.
 
         Parameters
@@ -44,19 +71,26 @@ class _ConcreteContainer(IContainer):
             Value supplied for ``_abstract``.
         _concrete : object
             Value supplied for ``_concrete``.
-        _alias : object
+        _alias : str | None
             Value supplied for ``_alias``.
-        _override : object
+        _override : bool
             Value supplied for ``_override``.
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        bool
+            Fixed result supplied by this structural fixture.
         """
         return True
 
-    def singleton(self, _abstract, _concrete, *, _alias=None, _override=False):
+    def singleton(
+        self,
+        _abstract: object,
+        _concrete: object,
+        *,
+        _alias: str | None = None,
+        _override: bool = False,
+    ) -> bool:
         """Register a singleton in the container test double.
 
         Parameters
@@ -65,19 +99,26 @@ class _ConcreteContainer(IContainer):
             Value supplied for ``_abstract``.
         _concrete : object
             Value supplied for ``_concrete``.
-        _alias : object
+        _alias : str | None
             Value supplied for ``_alias``.
-        _override : object
+        _override : bool
             Value supplied for ``_override``.
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        bool
+            Fixed result supplied by this structural fixture.
         """
         return True
 
-    def scoped(self, _abstract, _concrete, *, _alias=None, _override=False):
+    def scoped(
+        self,
+        _abstract: object,
+        _concrete: object,
+        *,
+        _alias: str | None = None,
+        _override: bool = False,
+    ) -> bool:
         """Register a scoped service in the container test double.
 
         Parameters
@@ -86,19 +127,19 @@ class _ConcreteContainer(IContainer):
             Value supplied for ``_abstract``.
         _concrete : object
             Value supplied for ``_concrete``.
-        _alias : object
+        _alias : str | None
             Value supplied for ``_alias``.
-        _override : object
+        _override : bool
             Value supplied for ``_override``.
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        bool
+            Fixed result supplied by this structural fixture.
         """
         return True
 
-    def bound(self, _key):
+    def bound(self, _key: object) -> bool:
         """Check whether a service key is bound.
 
         Parameters
@@ -108,32 +149,32 @@ class _ConcreteContainer(IContainer):
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        bool
+            Fixed result supplied by this structural fixture.
         """
         return False
 
-    def beginScope(self):
-        """Start a scope in the container test double.
+    def beginScope(self) -> None:
+        """Provide the required scope hook for structural inspection.
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        None
+            No return value.
         """
         return
 
-    def getCurrentScope(self):
-        """Return the active scope from the container test double.
+    def getCurrentScope(self) -> None:
+        """Report no active scope in the structural container fixture.
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        None
+            No return value.
         """
         return
 
-    async def make(self, _key, *_args: object, **_kwargs: object):
+    async def make(self, _key: object, *_args: object, **_kwargs: object) -> None:
         """Resolve a service through the container test double.
 
         Parameters
@@ -147,12 +188,12 @@ class _ConcreteContainer(IContainer):
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        None
+            No return value.
         """
         return
 
-    async def build(self, _target, *_args: object, **_kwargs: object):
+    async def build(self, _target: object, *_args: object, **_kwargs: object) -> None:
         """Build a service through the container test double.
 
         Parameters
@@ -166,12 +207,12 @@ class _ConcreteContainer(IContainer):
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        None
+            No return value.
         """
         return
 
-    async def invoke(self, _fn, *_args: object, **_kwargs: object):
+    async def invoke(self, _fn: object, *_args: object, **_kwargs: object) -> None:
         """Invoke a callable through the container test double.
 
         Parameters
@@ -185,19 +226,25 @@ class _ConcreteContainer(IContainer):
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        None
+            No return value.
         """
         return
 
-    async def call(self, _instance, _name, *_args: object, **_kwargs: object):
+    async def call(
+        self,
+        _instance: object,
+        _name: str,
+        *_args: object,
+        **_kwargs: object,
+    ) -> None:
         """Call a named method through the container test double.
 
         Parameters
         ----------
         _instance : object
             Value supplied for ``_instance``.
-        _name : object
+        _name : str
             Value supplied for ``_name``.
         *_args : object
             Arguments passed to the wrapped callable.
@@ -206,13 +253,13 @@ class _ConcreteContainer(IContainer):
 
         Returns
         -------
-        object
-            Value produced by the helper.
+        None
+            No return value.
         """
         return
 
-class TestIContainer(TestCase):
 
+class TestIContainer(TestCase):
     def testContractIsAnAbstractBaseClass(self) -> None:
         """
         Declare IContainer as an ABC that cannot be instantiated directly.
@@ -220,7 +267,7 @@ class TestIContainer(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertTrue(issubclass(IContainer, ABC))
         with self.assertRaises(TypeError):
@@ -236,7 +283,7 @@ class TestIContainer(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(IContainer.__abstractmethods__, _ABSTRACT_METHODS)
 
@@ -247,31 +294,25 @@ class TestIContainer(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsInstance(_ConcreteContainer(), IContainer)
 
     def testContainerImplementationMatchesTheContractSignatures(self) -> None:
-        """
-        Keep the Container parameter names aligned with the contract.
-
-        Only parameter names are compared: the contract module defers its
-        annotations while the implementation does not, so the resolved
-        annotation objects can never be equal.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
+        """Match runtime parameter kinds, defaults, annotations, and return types."""
         for name in sorted(_ABSTRACT_METHODS):
-            expected = list(
-                inspect.signature(getattr(IContainer, name)).parameters,
-            )
-            actual = list(
-                inspect.signature(getattr(Container, name)).parameters,
-            )
-            self.assertEqual(actual, expected, f"signature drift on {name!r}")
+            with self.subTest(method=name):
+                expected = inspect.signature(getattr(IContainer, name), eval_str=True)
+                actual = inspect.signature(getattr(Container, name), eval_str=True)
+                self.assertEqual(
+                    [item for key, item in actual.parameters.items() if key != "self"],
+                    [
+                        item
+                        for key, item in expected.parameters.items()
+                        if key != "self"
+                    ],
+                )
+                self.assertEqual(actual.return_annotation, expected.return_annotation)
 
     def testAsynchronousContractMethodsStayAsynchronous(self) -> None:
         """
@@ -280,7 +321,7 @@ class TestIContainer(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         for name in ("make", "build", "invoke", "call"):
             self.assertTrue(

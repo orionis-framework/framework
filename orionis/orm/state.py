@@ -1,12 +1,11 @@
+# ruff: noqa: ANN401
+# Retain runtime annotations and dynamic attribute values.
 """Attribute state tracking behavior shared by every model."""
 
 from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
-# Distinguish an absent original attribute from stored values, including None.
-_UNSET: Any = object()
-"""Distinguish an absent original attribute from stored values, including None."""
 
 class StateMixin:
     """
@@ -33,7 +32,7 @@ class StateMixin:
         return {
             key: value
             for key, value in self._attributes.items()
-            if original.get(key, _UNSET) != value
+            if key not in original or original[key] != value
         }
 
     def isDirty(self, *attributes: str) -> bool:
@@ -54,11 +53,12 @@ class StateMixin:
         original = self._original
         if attributes:
             return any(
-                key in current and original.get(key, _UNSET) != current[key]
+                key in current
+                and (key not in original or original[key] != current[key])
                 for key in attributes
             )
         return any(
-            original.get(key, _UNSET) != value
+            key not in original or original[key] != value
             for key, value in current.items()
         )
 
@@ -111,8 +111,8 @@ class StateMixin:
     def getOriginal(
         self,
         key: str | None = None,
-        default: Any = None,  # noqa: ANN401
-    ) -> Any:  # noqa: ANN401
+        default: Any = None,
+    ) -> Any:
         """
         Return the original attribute snapshot or a single original value.
 
@@ -133,7 +133,7 @@ class StateMixin:
             return deepcopy(self._original)
         return deepcopy(self._original[key]) if key in self._original else default
 
-    def syncOriginal(self) -> Any:  # noqa: ANN401
+    def syncOriginal(self) -> Any:
         """
         Snapshot the current attributes as the new original state.
 
@@ -144,6 +144,7 @@ class StateMixin:
         """
         # Mutate the snapshot in place: the mixin declares no slots,
         # so rebinding the attribute is left to the owning model.
+        snapshot = deepcopy(self._attributes)
         self._original.clear()
-        self._original.update(deepcopy(self._attributes))
+        self._original.update(snapshot)
         return self

@@ -1,9 +1,11 @@
+# ruff: noqa: ARG002, TC001
+# Preserve the middleware request parameter and runtime injection types.
 """Provide auth middleware operations.
 
 Includes ``RequirePermissionMiddleware``, ``RequireRoleMiddleware``.
 """
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.contracts.authorizer import IAuthorizer
 from orionis.auth.exceptions import (
@@ -13,10 +15,10 @@ from orionis.auth.exceptions import (
 )
 from orionis.http.middleware import BaseMiddleware
 
-if TYPE_CHECKING:
-    from orionis.http.layer.contracts.middleware import NextCallable
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
+from orionis.http.layer.contracts.middleware import NextCallable
+from orionis.http.request import Request
+from orionis.http.responses import Response
+
 
 class RequirePermissionMiddleware(BaseMiddleware):
     """
@@ -33,8 +35,6 @@ class RequirePermissionMiddleware(BaseMiddleware):
     Declaring the requirement as a real class keeps the compiled route
     cache valid, which a dynamically generated class could not do.
     """
-
-    # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_authorizer",)
     """Declare the instance attribute slots reserved by this class."""
@@ -59,14 +59,14 @@ class RequirePermissionMiddleware(BaseMiddleware):
         Returns
         -------
         None
-            The middleware keeps no per request state.
+            No return value.
         """
         self._authorizer = authorizer
         """Component evaluating the permissions of the request context."""
 
     async def handle(
         self,
-        request: Request,  # noqa: ARG002
+        request: Request,
         call_next: NextCallable,
     ) -> Response:
         """
@@ -119,6 +119,7 @@ class RequirePermissionMiddleware(BaseMiddleware):
 
         return await call_next()
 
+
 class RequireRoleMiddleware(BaseMiddleware):
     """
     Require one or more roles before reaching the controller.
@@ -155,14 +156,14 @@ class RequireRoleMiddleware(BaseMiddleware):
         Returns
         -------
         None
-            The middleware keeps no per request state.
+            No return value.
         """
         self._authorizer = authorizer
         """Component evaluating the roles of the request context."""
 
     async def handle(
         self,
-        request: Request,  # noqa: ARG002
+        request: Request,
         call_next: NextCallable,
     ) -> Response:
         """

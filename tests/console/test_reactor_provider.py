@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.console import reactor_provider as provider_module
 from orionis.console.core.contracts.reactor import IReactor
@@ -11,6 +13,7 @@ from orionis.test import TestCase
 
 # Alias shared by the container binding and the facade accessor.
 _REACTOR_ALIAS = "x-orionis-IReactor"
+
 
 class _StubApp:
     """Application double capturing every binding it receives."""
@@ -51,6 +54,7 @@ class _StubApp:
         """
         self.singletons.append((abstract, concrete, alias))
 
+
 class _StubReactorFacade:
     """Facade double counting how many times it was pinned."""
 
@@ -76,8 +80,8 @@ class _StubReactorFacade:
         """
         self.pinned += 1
 
-class TestReactorProviderDefinition(TestCase):
 
+class TestReactorProviderDefinition(TestCase):
     def testInheritsTheServiceProviderBase(self) -> None:
         """Extend the base ServiceProvider class.
 
@@ -141,8 +145,8 @@ class TestReactorProviderDefinition(TestCase):
         """
         self.assertTrue(inspect.iscoroutinefunction(ReactorProvider.boot))
 
-class TestReactorProviderRegister(TestCase):
 
+class TestReactorProviderRegister(TestCase):
     def testBindsTheReactorContractAsASingleton(self) -> None:
         """Bind IReactor to the concrete Reactor implementation.
 
@@ -172,8 +176,8 @@ class TestReactorProviderRegister(TestCase):
         """
         self.assertEqual(ReactorFacade.getFacadeAccessor(), _REACTOR_ALIAS)
 
-class TestReactorProviderBoot(TestCase):
 
+class TestReactorProviderBoot(TestCase):
     def setUp(self) -> None:
         """Replace the Reactor facade with a double before each test.
 

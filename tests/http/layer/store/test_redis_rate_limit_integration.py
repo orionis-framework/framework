@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import multiprocessing
 import os
@@ -7,6 +9,7 @@ from redis.exceptions import ResponseError
 from orionis.foundation.config.http import HTTPRateLimit, Redis
 from orionis.http.layer.store.redis_rate_limit import RedisRateLimitStore
 from orionis.test import TestCase
+
 
 def _process_hits(connection: Redis, prefix: str, output: object) -> None:
     """Count accepted requests from an independent process.
@@ -25,6 +28,7 @@ def _process_hits(connection: Redis, prefix: str, output: object) -> None:
     None
         Place the worker's accepted-request count on the output queue.
     """
+
     async def run() -> int:
         """Use and close an independent Redis connection pool.
 
@@ -33,16 +37,19 @@ def _process_hits(connection: Redis, prefix: str, output: object) -> None:
         int
             Number of requests accepted by this worker.
         """
-        store = RedisRateLimitStore(HTTPRateLimit(
-            rate_limit_redis=connection, rate_limit_redis_prefix=prefix,
-        ))
+        store = RedisRateLimitStore(
+            HTTPRateLimit(
+                rate_limit_redis=connection,
+                rate_limit_redis_prefix=prefix,
+            ),
+        )
         try:
-            return sum([await store.hit("process-client", 17, 60)
-                        for _ in range(50)])
+            return sum([await store.hit("process-client", 17, 60) for _ in range(50)])
         finally:
             await store.close()
 
     output.put(asyncio.run(run()))
+
 
 def _run_processes(connection: Redis, prefix: str) -> list[int]:
     """Spawn isolated workers and collect their accepted-request counts.
@@ -61,10 +68,13 @@ def _run_processes(connection: Redis, prefix: str) -> list[int]:
     """
     context = multiprocessing.get_context("spawn")
     output = context.Queue()
-    processes = [context.Process(
-        target=_process_hits, args=(connection, prefix, output),
-    )
-                 for _ in range(3)]
+    processes = [
+        context.Process(
+            target=_process_hits,
+            args=(connection, prefix, output),
+        )
+        for _ in range(3)
+    ]
     try:
         for process in processes:
             process.start()
@@ -83,6 +93,7 @@ def _run_processes(connection: Redis, prefix: str) -> list[int]:
             process.close()
         output.close()
         output.join_thread()
+
 
 class TestRedisRateLimitIntegration(TestCase):
     """Opt in to real Lua, expiration and independent-process quota checks."""
@@ -124,9 +135,12 @@ class TestRedisRateLimitIntegration(TestCase):
         None
             Remove the isolated namespace and close the store.
         """
-        keys = [key async for key in self.client.scan_iter(
-            match=f"{self.settings.rate_limit_redis_prefix}:*",
-        )]
+        keys = [
+            key
+            async for key in self.client.scan_iter(
+                match=f"{self.settings.rate_limit_redis_prefix}:*",
+            )
+        ]
         if keys:
             await self.client.delete(*keys)
         await self.store.close()
@@ -141,13 +155,17 @@ class TestRedisRateLimitIntegration(TestCase):
         """
         other = RedisRateLimitStore(self.settings)
         try:
-            results = await asyncio.gather(*(
-                (self.store if index % 2 else other).hit("client", 13, 60)
-                for index in range(100)
-            ))
+            results = await asyncio.gather(
+                *(
+                    (self.store if index % 2 else other).hit("client", 13, 60)
+                    for index in range(100)
+                ),
+            )
             self.assertEqual(sum(results), 13)
-            redis_key = (f"{self.settings.rate_limit_redis_prefix}:"
-                         f"{sha256(b'client').hexdigest()}")
+            redis_key = (
+                f"{self.settings.rate_limit_redis_prefix}:"
+                f"{sha256(b'client').hexdigest()}"
+            )
             self.assertEqual(await self.client.zcard(redis_key), 13)
             self.assertGreater(await self.client.pttl(redis_key), 0)
         finally:
@@ -192,8 +210,9 @@ class TestRedisRateLimitIntegration(TestCase):
         None
             Verify a Redis type error leaves the existing key unchanged.
         """
-        redis_key = (f"{self.settings.rate_limit_redis_prefix}:"
-                     f"{sha256(b'client').hexdigest()}")
+        redis_key = (
+            f"{self.settings.rate_limit_redis_prefix}:{sha256(b'client').hexdigest()}"
+        )
         await self.client.set(redis_key, "unexpected-data")
         with self.assertRaises(ResponseError):
             await self.store.hit("client", 1, 60)

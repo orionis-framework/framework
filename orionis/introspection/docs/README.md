@@ -1,6 +1,6 @@
 # Introspection and metaprogramming
 
-The official manual is organized into bilingual chapters. Technical material from the previous manual has been redistributed by topic; historical execution notes are not presented as current verification results.
+Reflect Python callables, classes, instances and modules, and inspect dependency signatures. Choose a language to open the complete manual.
 
 - [English manual](en/README.md)
 - [Manual en español](es/README.md)

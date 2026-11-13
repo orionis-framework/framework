@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import gc
 import weakref
 from typing import Self
@@ -5,6 +7,7 @@ from unittest.mock import patch
 import msgspec
 from orionis.schemas import rules_executor
 from orionis.test import TestCase
+
 
 class TestPlanCapacity(TestCase):
     """Bound class retention even when rules can reference schema types."""
@@ -16,7 +19,7 @@ class TestPlanCapacity(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         references = []
         original = rules_executor._PLAN_CACHE.copy()

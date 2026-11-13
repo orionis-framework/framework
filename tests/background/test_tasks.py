@@ -1,17 +1,14 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.background.contracts.task import IBackgroundTask
 from orionis.background.task import BackgroundTask
 from orionis.background.tasks import BackgroundTasks
 from orionis.test import TestCase
 
-def noop() -> None:
-    """
-    Do nothing.
 
-    Returns
-    -------
-    None
-        This function does not return a value.
-    """
+def noop() -> None:
+    """Do nothing."""
+
 
 class TestBackgroundTasksInitialization(TestCase):
     """Validate how a collection stores the tasks it is seeded with."""
@@ -22,10 +19,6 @@ class TestBackgroundTasksInitialization(TestCase):
         Validates that a collection built without arguments exposes an
         empty task list ready to be filled.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(BackgroundTasks().tasks, [])
 
@@ -35,10 +28,6 @@ class TestBackgroundTasksInitialization(TestCase):
         Validates that an explicit None behaves exactly like omitting the
         argument altogether.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(BackgroundTasks(None).tasks, [])
 
@@ -48,10 +37,6 @@ class TestBackgroundTasksInitialization(TestCase):
         Validates that a falsy sequence takes the same branch as None and
         yields an independent empty list.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(BackgroundTasks([]).tasks, [])
 
@@ -61,10 +46,6 @@ class TestBackgroundTasksInitialization(TestCase):
         Validates that every task supplied at construction is stored
         verbatim, without wrapping or reordering.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         first = BackgroundTask(noop)
         second = BackgroundTask(noop)
@@ -78,10 +59,6 @@ class TestBackgroundTasksInitialization(TestCase):
         Validates that immutable inputs such as tuples are converted so
         further tasks can still be appended.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         collection = BackgroundTasks((BackgroundTask(noop),))
 
@@ -93,10 +70,6 @@ class TestBackgroundTasksInitialization(TestCase):
         Validates that mutating the original container after construction
         cannot alter the collection.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         provided = [BackgroundTask(noop)]
 
@@ -110,10 +83,6 @@ class TestBackgroundTasksInitialization(TestCase):
         Validates that a collection never populates the callable and
         argument slots used by an individual task.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         collection = BackgroundTasks()
 
@@ -126,12 +95,9 @@ class TestBackgroundTasksInitialization(TestCase):
         Validates that extending the task class does not reintroduce an
         instance dictionary.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertFalse(hasattr(BackgroundTasks(), "__dict__"))
+
 
 class TestBackgroundTasksAddTask(TestCase):
     """Validate the incremental registration of callables."""
@@ -142,10 +108,6 @@ class TestBackgroundTasksAddTask(TestCase):
         Validates that the collection grows by a single entry each time a
         callable is registered.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         collection = BackgroundTasks()
 
@@ -159,10 +121,6 @@ class TestBackgroundTasksAddTask(TestCase):
         Validates that callers may register raw callables and still obtain
         a uniform collection of task objects.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         collection = BackgroundTasks()
 
@@ -175,10 +133,6 @@ class TestBackgroundTasksAddTask(TestCase):
         Validates that registration is a pure side effect on the internal
         list, matching the declared None return type.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         collection = BackgroundTasks()
 
@@ -190,10 +144,6 @@ class TestBackgroundTasksAddTask(TestCase):
         Validates that arguments captured during registration reach the
         callable when the collection runs.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[int, int]] = []
 
@@ -207,10 +157,6 @@ class TestBackgroundTasksAddTask(TestCase):
             second : int
                 Value supplied for ``second``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((first, second))
 
@@ -225,10 +171,6 @@ class TestBackgroundTasksAddTask(TestCase):
         Validates that keyword arguments captured during registration are
         applied when the collection runs.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[str, int]] = []
 
@@ -242,10 +184,6 @@ class TestBackgroundTasksAddTask(TestCase):
             value : int
                 Value supplied for ``value``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((name, value))
 
@@ -260,27 +198,18 @@ class TestBackgroundTasksAddTask(TestCase):
         Validates that asynchronous callables are wrapped with the same
         API and awaited when the collection runs.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         async def async_func() -> None:
-            """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run an asynchronous test callable."""
             calls.append(1)
 
         collection = BackgroundTasks()
         collection.addTask(async_func)
         await collection()
         self.assertEqual(calls, [1])
+
 
 class TestBackgroundTasksExecution(TestCase):
     """Validate the sequential execution of a task collection."""
@@ -291,41 +220,19 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that the collection preserves the order callers relied
         on when registering their side effects.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         results: list[int] = []
 
         def first() -> None:
-            """Record the first task marker.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the first task marker."""
             results.append(1)
 
         def second() -> None:
-            """Record the second task marker.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the second task marker."""
             results.append(2)
 
         def third() -> None:
-            """Record the third task marker.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the third task marker."""
             results.append(3)
 
         collection = BackgroundTasks()
@@ -341,21 +248,11 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that invoking the collection directly and calling its
         run method execute the very same work.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         results: list[str] = []
 
         def append_entry() -> None:
-            """Append a marker to the execution log.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Append a marker to the execution log."""
             results.append("entry")
 
         collection = BackgroundTasks()
@@ -370,10 +267,6 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that an empty collection is a harmless no-op rather than
         an error condition.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertIsNone(await BackgroundTasks().run())
 
@@ -383,21 +276,11 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that seeded tasks are treated exactly like tasks added
         afterwards.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         results: list[int] = []
 
         def append_entry() -> None:
-            """Append a marker to the execution log.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Append a marker to the execution log."""
             results.append(1)
 
         await BackgroundTasks([BackgroundTask(append_entry)]).run()
@@ -409,31 +292,15 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that synchronous and asynchronous callables can be
         combined while keeping the declared order.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         results: list[str] = []
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
             results.append("sync")
 
         async def async_func() -> None:
-            """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run an asynchronous test callable."""
             results.append("async")
 
         collection = BackgroundTasks()
@@ -448,31 +315,15 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that a collection is itself a valid task, so groups of
         side effects can be composed.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         results: list[str] = []
 
         def inner_func() -> None:
-            """Record the inner task execution.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the inner task execution."""
             results.append("inner")
 
         def outer_func() -> None:
-            """Record the outer task execution.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the outer task execution."""
             results.append("outer")
 
         inner = BackgroundTasks()
@@ -487,21 +338,11 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that nesting through the registration API awaits the
         inner collection instead of dropping its coroutine in a thread.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         results: list[str] = []
 
         def inner_func() -> None:
-            """Record the inner task execution.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the inner task execution."""
             results.append("inner")
 
         inner = BackgroundTasks()
@@ -517,30 +358,15 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that the failure is propagated and that tasks queued
         after the failing one are never executed.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         results: list[int] = []
 
         def first() -> None:
-            """Record the first task marker.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the first task marker."""
             results.append(1)
 
         def failing() -> None:
             """Raise an error during task execution.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
 
             Raises
             ------
@@ -551,13 +377,7 @@ class TestBackgroundTasksExecution(TestCase):
             raise RuntimeError(error_msg)
 
         def third() -> None:
-            """Record the third task marker.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the third task marker."""
             results.append(3)
 
         collection = BackgroundTasks()
@@ -576,21 +396,11 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that running the collection does not consume or clear
         the registered tasks.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         def append_entry() -> None:
-            """Append a marker to the execution log.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Append a marker to the execution log."""
             calls.append(1)
 
         collection = BackgroundTasks()
@@ -605,31 +415,15 @@ class TestBackgroundTasksExecution(TestCase):
         Validates that the collection reads its task list on every
         invocation instead of caching it.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         results: list[str] = []
 
         def first() -> None:
-            """Record the first task marker.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the first task marker."""
             results.append("first")
 
         def second() -> None:
-            """Record the second task marker.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Record the second task marker."""
             results.append("second")
 
         collection = BackgroundTasks()
@@ -638,6 +432,7 @@ class TestBackgroundTasksExecution(TestCase):
         collection.addTask(second)
         await collection.run()
         self.assertEqual(results, ["first", "first", "second"])
+
 
 class TestBackgroundTasksSubstitutability(TestCase):
     """Validate that a collection can replace a single task."""
@@ -648,10 +443,6 @@ class TestBackgroundTasksSubstitutability(TestCase):
         Validates that isinstance checks expecting a single task, such as
         the one guarding HTTP responses, also accept a collection.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(BackgroundTasks, BackgroundTask))
         self.assertIsInstance(BackgroundTasks(), BackgroundTask)
@@ -662,10 +453,6 @@ class TestBackgroundTasksSubstitutability(TestCase):
         Validates that a collection is usable wherever the abstract
         contract is required.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertIsInstance(BackgroundTasks(), IBackgroundTask)
 
@@ -675,9 +462,5 @@ class TestBackgroundTasksSubstitutability(TestCase):
         Validates that the collection does not duplicate the delegation
         already implemented for a single task.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertIs(BackgroundTasks.run, BackgroundTask.run)

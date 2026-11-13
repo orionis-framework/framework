@@ -1,19 +1,20 @@
+# ruff: noqa: TC001, TC003
+# Preserve public contract annotations for runtime dependency inspection.
 """Expose independent composition and centrally configured mail delivery."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, overload
+from collections.abc import Mapping
+from typing import overload
+from orionis.mail.entities.address import Address
+from orionis.mail.entities.attachment import Attachment
+from orionis.mail.entities.content import Content
+from orionis.mail.entities.result import MailResult
+from orionis.mail.mailable import Mailable
+from orionis.mail.pending import PendingMail
+from orionis.mail.types import MessageCallback, Recipients, TransportFactory
 from orionis.support.types.sentinel import MISSING
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from orionis.mail.entities.address import Address
-    from orionis.mail.entities.attachment import Attachment
-    from orionis.mail.entities.content import Content
-    from orionis.mail.entities.result import MailResult
-    from orionis.mail.mailable import Mailable
-    from orionis.mail.pending import PendingMail
-    from orionis.mail.types import MessageCallback, Recipients, TransportFactory
 
 class IMailManager(ABC):
     """
@@ -210,8 +211,7 @@ class IMailManager(ABC):
         """
 
     @overload
-    async def send(self, mailable: Mailable | type[Mailable], /) -> MailResult:
-        ...
+    async def send(self, mailable: Mailable | type[Mailable], /) -> MailResult: ...
 
     @overload
     async def send(
@@ -220,8 +220,7 @@ class IMailManager(ABC):
         /,
         data: Mapping[str, object] | None = None,
         callback: MessageCallback | None = None,
-    ) -> MailResult:
-        ...
+    ) -> MailResult: ...
 
     @overload
     async def send(
@@ -230,8 +229,7 @@ class IMailManager(ABC):
         /,
         *,
         callback: MessageCallback | None = None,
-    ) -> MailResult:
-        ...
+    ) -> MailResult: ...
 
     @abstractmethod
     async def send(

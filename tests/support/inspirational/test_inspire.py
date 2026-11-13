@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.support.inspirational.inspire import Inspire
 from orionis.support.inspirational.quotes import INSPIRATIONAL_QUOTES
 from orionis.test import TestCase
@@ -12,8 +14,8 @@ _VALID_CUSTOM_QUOTES = [
 # TestInspireInit
 # ===========================================================================
 
-class TestInspireInit(TestCase):
 
+class TestInspireInit(TestCase):
     def testDefaultConstructionSucceeds(self) -> None:
         """
         Test that Inspire can be instantiated with no arguments.
@@ -154,9 +156,11 @@ class TestInspireInit(TestCase):
         with self.assertRaises(ValueError):
             Inspire(quotes=mixed)
 
+
 # ===========================================================================
 # TestInspireRandom
 # ===========================================================================
+
 
 class TestInspireRandom(TestCase):
     """Tests for the Inspire.random method."""
@@ -173,32 +177,6 @@ class TestInspireRandom(TestCase):
         inspire = Inspire()
         result = inspire.random()
         self.assertIsInstance(result, dict)
-
-    def testRandomResultHasQuoteKey(self) -> None:
-        """
-        Test that the dict returned by random() contains a 'quote' key.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        inspire = Inspire()
-        result = inspire.random()
-        self.assertIn("quote", result)
-
-    def testRandomResultHasAuthorKey(self) -> None:
-        """
-        Test that the dict returned by random() contains an 'author' key.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        inspire = Inspire()
-        result = inspire.random()
-        self.assertIn("author", result)
 
     def testRandomQuoteValueIsNonEmptyString(self) -> None:
         """

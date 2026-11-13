@@ -1,9 +1,9 @@
 """Prepare explicitly coercible values without changing the source payload."""
 
-from collections.abc import Collection, Mapping
+from collections.abc import Collection, Iterable, Mapping
 from functools import lru_cache
 import types
-from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
+from typing import Annotated, Union, get_args, get_origin
 import msgspec
 from orionis.schemas.constraint_plan import constraint_plan
 from orionis.schemas.instance_payload import (
@@ -14,54 +14,45 @@ from orionis.schemas.instance_payload import (
 from orionis.schemas.metadata import Coerce
 from orionis.schemas.rules_executor import _collection_item_type
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-
 _convert = msgspec.convert
 _ValidationError = msgspec.ValidationError
 
-def _contains_coercion(annotation: object, seen: set[type]) -> bool:
+
+def _requires_preparation(annotation: object) -> bool:
     """
-    Find coercion metadata in an annotation or its nested schema graph.
+    Find coercion markers or struct types requiring instance revalidation.
 
     Parameters
     ----------
     annotation : object
         Field, collection item or union annotation to inspect.
-    seen : set[type]
-        Schema classes already visited on this branch.
 
     Returns
     -------
     bool
-        Whether the annotation contains an applicable coercion marker.
+        Whether conversion requires coercion or expansion of existing structs.
     """
     origin = get_origin(annotation)
     args = get_args(annotation)
     if origin is Annotated:
-        return (
-            any(isinstance(item, Coerce) for item in args[1:])
-            or _contains_coercion(args[0], seen)
-        )
-    if (
-        isinstance(annotation, type)
-        and issubclass(annotation, msgspec.Struct)
-        and annotation not in seen
-    ):
         return any(
-            _contains_coercion(field.type, seen | {annotation})
-            for field in msgspec.structs.fields(annotation)
-        )
+            isinstance(item, Coerce) for item in args[1:]
+        ) or _requires_preparation(args[0])
+    if isinstance(annotation, type) and issubclass(annotation, msgspec.Struct):
+        return True
     if isinstance(origin, type) and issubclass(origin, Mapping):
         args = args[1:]
-    return any(_contains_coercion(arg, seen) for arg in args)
+    return any(_requires_preparation(arg) for arg in args)
+
 
 @lru_cache(maxsize=1024)
 def _field_plan(
-    schema: type[msgspec.Struct], *, enabled: bool,
+    schema: type[msgspec.Struct],
+    *,
+    enabled: bool,
 ) -> tuple[tuple[str, int, object], ...]:
     """
-    Cache the fields requiring coercion, including their encoded positions.
+    Cache fields requiring coercion or struct expansion and their wire positions.
 
     Parameters
     ----------
@@ -79,14 +70,22 @@ def _field_plan(
     return tuple(
         (field.encode_name, index, field.type)
         for index, field in enumerate(msgspec.structs.fields(schema), offset)
-        if enabled or _contains_coercion(field.type, set())
+        if enabled or _requires_preparation(field.type)
     )
 
+
 def coerce_payload(
-    payload: object, schema: type[msgspec.Struct], *, enabled: bool = False,
+    payload: object,
+    schema: type[msgspec.Struct],
+    *,
+    enabled: bool = False,
 ) -> object:
     """
-    Normalize marked schema fields using copy-on-write input containers.
+    Prepare marked values and existing structs using copy-on-write containers.
+
+    Existing struct constructors and mutations bypass native validation, so
+    expand those instances before the final conversion. Unmarked scalar fields
+    remain strict and schemas without preparation retain their original inputs.
 
     Parameters
     ----------
@@ -102,11 +101,11 @@ def coerce_payload(
     object
         Prepared payload, or the original value when no changes are needed.
     """
+    if isinstance(payload, schema):
+        payload = instance_payload(payload)
     plan = _field_plan(schema, enabled=enabled)
     if not plan:
         return payload
-    if isinstance(payload, schema):
-        payload = instance_payload(payload)
     if matching_schema(schema, payload) is None:
         return payload
     if isinstance(payload, Mapping):
@@ -114,7 +113,8 @@ def coerce_payload(
             payload,
             (
                 (name, payload[name], annotation)
-                for name, _, annotation in plan if name in payload
+                for name, _, annotation in plan
+                if name in payload
             ),
             enabled=enabled,
         )
@@ -122,9 +122,11 @@ def coerce_payload(
         return _coerce_array(payload, plan, enabled=enabled)
     return payload
 
+
 def _coerce_mapping(
     payload: Mapping[object, object],
-    entries: Iterable[tuple[object, object, object]], *,
+    entries: Iterable[tuple[object, object, object]],
+    *,
     enabled: bool,
 ) -> object:
     """
@@ -153,8 +155,11 @@ def _coerce_mapping(
             mapping[key] = converted
     return payload if mapping is None else mapping
 
+
 def _coerce_array(
-    payload: list | tuple, plan: tuple[tuple[str, int, object], ...], *,
+    payload: list | tuple,
+    plan: tuple[tuple[str, int, object], ...],
+    *,
     enabled: bool,
 ) -> object:
     """
@@ -186,8 +191,12 @@ def _coerce_array(
             sequence[index] = converted
     return payload if sequence is None else sequence
 
+
 def _coerce_collection(
-    value: object, annotation: object, *, enabled: bool,
+    value: object,
+    annotation: object,
+    *,
+    enabled: bool,
 ) -> object:
     """
     Prepare collection values while preserving keys and fixed tuple positions.
@@ -220,22 +229,90 @@ def _coerce_collection(
         )
     if not isinstance(value, list | tuple | set | frozenset):
         return value
+    if not enabled:
+        schema = _plain_struct_item(origin, args)
+        if schema is not None:
+            return _expand_struct_sequence(value, schema)
     sequence = []
     changed = False
     for index, item in enumerate(value):
         item_type = _collection_item_type(annotation, str(index))
         converted = (
             _coerce_value(item, item_type, enabled=enabled)
-            if item_type is not None else item
+            if item_type is not None
+            else item
         )
         sequence.append(converted)
         changed |= converted is not item
-    if not changed:
+    if changed:
+        value = tuple(sequence) if isinstance(value, tuple) else sequence
+    return value
+
+
+def _plain_struct_item(
+    origin: type,
+    args: tuple[object, ...],
+) -> type[msgspec.Struct] | None:
+    """
+    Select uniform struct items whose fields need no further preparation.
+
+    Parameters
+    ----------
+    origin : type
+        Collection origin used to distinguish fixed and variadic tuples.
+    args : tuple[object, ``...``]
+        Collection type arguments, already extracted by the caller.
+
+    Returns
+    -------
+    type[``msgspec.Struct``] | None
+        Uniform struct type with an empty preparation plan, if applicable.
+    """
+    uniform = len(args) == 1 and origin is not tuple
+    variadic = origin is tuple and args[1:] == (Ellipsis,)
+    if not (uniform or variadic):
+        return None
+    schema = args[0]
+    if not isinstance(schema, type) or not issubclass(schema, msgspec.Struct):
+        return None
+    return None if _field_plan(schema, enabled=False) else schema
+
+
+def _expand_struct_sequence(
+    value: list | tuple | set | frozenset,
+    schema: type[msgspec.Struct],
+) -> object:
+    """
+    Expand existing struct items and leave native input representations intact.
+
+    Parameters
+    ----------
+    value : list | tuple | set | frozenset
+        Homogeneous collection copied only when an instance needs expansion.
+    schema : type[``msgspec.Struct``]
+        Item type with no descendant coercion or struct preparation.
+
+    Returns
+    -------
+    object
+        Original collection or a copy containing expanded instance payloads.
+    """
+    sequence = None
+    for index, item in enumerate(value):
+        if isinstance(item, schema):
+            if sequence is None:
+                sequence = list(value)
+            sequence[index] = instance_payload(item)
+    if sequence is None:
         return value
     return tuple(sequence) if isinstance(value, tuple) else sequence
 
+
 def _coerce_union(
-    value: object, annotation: object, *, enabled: bool,
+    value: object,
+    annotation: object,
+    *,
+    enabled: bool,
 ) -> object:
     """
     Preserve compatible union branches and normalize only matching structures.
@@ -269,8 +346,12 @@ def _coerce_union(
                 return converted
     return value
 
+
 def _coerce_value(
-    value: object, annotation: object, *, enabled: bool,
+    value: object,
+    annotation: object,
+    *,
+    enabled: bool,
 ) -> object:
     """
     Normalize a selected annotation before applying any value constraints.
@@ -293,7 +374,8 @@ def _coerce_value(
     args = get_args(annotation)
     if origin is Annotated:
         return _coerce_value(
-            value, args[0],
+            value,
+            args[0],
             enabled=enabled or any(isinstance(item, Coerce) for item in args[1:]),
         )
     if origin is Union or origin is types.UnionType:

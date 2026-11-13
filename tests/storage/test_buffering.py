@@ -1,7 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import io
 import threading
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, get_type_hints
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 from orionis.failure.runtime import capture, operation
@@ -11,10 +13,33 @@ from orionis.test import TestCase
 from tests.support.failure_runtime import activate_runtime
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import AsyncGenerator, AsyncIterator, Callable, Iterator
+
+
+async def close_chunks(chunks: AsyncGenerator[bytes]) -> None:
+    """Close a chunk generator through a coroutine recognized by unittest.
+
+    Parameters
+    ----------
+    chunks : AsyncGenerator[bytes]
+        Generator whose asynchronous cleanup must finish before teardown.
+
+    Returns
+    -------
+    None
+        No return value.
+    """
+    await chunks.aclose()
+
 
 class TestBufferedStreams(TestCase):
     """Validate read budgets, backpressure and resource ownership under cancellation."""
+
+    def testPublicBufferAnnotationsResolveAtRuntime(self) -> None:
+        """Resolve the public buffered streaming signatures at runtime."""
+        for function in (read_chunks, iterate_chunks, spool_stream):
+            with self.subTest(function=function.__name__):
+                self.assertIn("return", get_type_hints(function))
 
     async def testBoundedReadsAndEarlyClose(self: Self) -> None:
         """
@@ -23,7 +48,7 @@ class TestBufferedStreams(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         sizes = []
 
@@ -46,10 +71,14 @@ class TestBufferedStreams(TestCase):
                 return super().read(size)
 
         handle = Handle(b"abcdef" * 100)
+        self.addCleanup(handle.close)
         chunks = read_chunks(lambda: handle, 10, buffer_size=100)
+        self.addAsyncCleanup(close_chunks, chunks)
         self.assertEqual(await anext(chunks), b"abcdefabcd")
         self.assertEqual(sizes, [10])
-        await asyncio.sleep(0.01)
+        marker = asyncio.Event()
+        asyncio.get_running_loop().call_soon(marker.set)
+        await marker.wait()
         self.assertEqual(sizes, [10])
         await anext(chunks)
         self.assertEqual(sizes, [10, 100])
@@ -63,7 +92,7 @@ class TestBufferedStreams(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         entered, released = threading.Event(), threading.Event()
         events = []
@@ -84,7 +113,9 @@ class TestBufferedStreams(TestCase):
                     Bytes read from the underlying in-memory buffer.
                 """
                 entered.set()
-                released.wait(5)
+                if not released.wait(5):
+                    error_msg = "The test did not release the native read."
+                    raise TimeoutError(error_msg)
                 events.append("read")
                 return super().read(size)
 
@@ -95,23 +126,29 @@ class TestBufferedStreams(TestCase):
                 Returns
                 -------
                 None
-                    Complete the operation without returning a value.
+                    No return value.
                 """
                 events.append("close")
                 super().close()
 
         handle = Handle(b"bytes")
+        self.addCleanup(handle.close)
         chunks = read_chunks(lambda: handle, 2)
+        self.addAsyncCleanup(close_chunks, chunks)
         reading = asyncio.create_task(anext(chunks))
         try:
-            await asyncio.to_thread(entered.wait, 5)
+            self.assertTrue(await asyncio.to_thread(entered.wait, 5))
             reading.cancel()
-            await asyncio.sleep(0.01)
+            marker = asyncio.Event()
+            asyncio.get_running_loop().call_soon(marker.set)
+            await marker.wait()
             self.assertEqual(events, [])
         finally:
             released.set()
-            with self.assertRaises(asyncio.CancelledError):
-                await reading
+            if not reading.done() and not reading.cancelling():
+                reading.cancel()
+            outcome = await asyncio.gather(reading, return_exceptions=True)
+        self.assertIsInstance(outcome[0], asyncio.CancelledError)
         self.assertEqual(events, ["read", "close"])
 
     async def testAsyncStreamBytesAndSdkIteratorClose(self: Self) -> None:
@@ -121,7 +158,7 @@ class TestBufferedStreams(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         handle = io.BytesIO(bytes(range(256)) * 100)
         async with AsyncStream(lambda: handle) as stream:
@@ -155,11 +192,12 @@ class TestBufferedStreams(TestCase):
         Returns
         -------
         None
-            Keep the primary identity, original traceback, and one cleanup report.
+            No return value.
         """
         for iterator in (False, True):
             with self.subTest(iterator=iterator):
                 app, runtime, handler = activate_runtime()
+                self.addAsyncCleanup(runtime.shutdown)
                 primary, secondary = OSError("read"), OSError("close")
                 handle = MagicMock()
                 handle.read.side_effect = primary
@@ -167,8 +205,7 @@ class TestBufferedStreams(TestCase):
                 handle.__next__.side_effect = primary
                 handle.close.side_effect = secondary
                 opener = MagicMock(return_value=handle)
-                chunks = (iterate_chunks(opener) if iterator
-                          else read_chunks(opener, 2))
+                chunks = iterate_chunks(opener) if iterator else read_chunks(opener, 2)
                 with operation(app):
                     try:
                         await anext(chunks)
@@ -183,14 +220,18 @@ class TestBufferedStreams(TestCase):
                         self.fail("The storage read unexpectedly succeeded.")
                 self.assertCountEqual(handler.reports, [primary, secondary])
                 self.assertEqual(len(handler.failures), 2)
-                cleanup_context = next(ctx for error, ctx in handler.failures
-                                       if error is secondary)
-                primary_context = next(ctx for error, ctx in handler.failures
-                                       if error is primary)
+                cleanup_context = next(
+                    ctx for error, ctx in handler.failures if error is secondary
+                )
+                primary_context = next(
+                    ctx for error, ctx in handler.failures if error is primary
+                )
                 self.assertEqual(cleanup_context.flow, "storage")
                 self.assertEqual(cleanup_context.phase, "cleanup")
-                self.assertEqual(cleanup_context.parent_event_id,
-                                 primary_context.event_id)
+                self.assertEqual(
+                    cleanup_context.parent_event_id,
+                    primary_context.event_id,
+                )
                 self.assertIs(secondary.__context__, primary)
                 handle.close.assert_called_once()
 
@@ -200,49 +241,65 @@ class TestBufferedStreams(TestCase):
         Returns
         -------
         None
-            Close after writing finishes, without losing caller cancellation.
+            No return value.
         """
         entered, closing = asyncio.Event(), asyncio.Event()
         release = threading.Event()
         events = []
         loop = asyncio.get_running_loop()
 
-        def write(_chunk):
+        def write(_chunk: bytes) -> None:
+            """Block the native write until the test releases its worker."""
             loop.call_soon_threadsafe(entered.set)
-            release.wait(5)
+            if not release.wait(5):
+                error_msg = "The test did not release the spool writer."
+                raise TimeoutError(error_msg)
             events.append("write")
 
-        def close():
+        def close() -> None:
+            """Record spool disposal and notify the owning event loop."""
             events.append("close")
             loop.call_soon_threadsafe(closing.set)
 
-        async def source():
+        async def source() -> AsyncIterator[bytes]:
+            """Yield one upload chunk for the blocked write."""
             yield b"payload"
 
         buffer = SimpleNamespace(write=write, close=close, seek=MagicMock())
         to_thread = asyncio.to_thread
 
-        async def run_thread(callback, *args: object, **kwargs: object):
+        async def run_thread(
+            callback: Callable[..., object],
+            *args: object,
+            **kwargs: object,
+        ) -> object:
+            """Expose premature close synchronously and offload other callbacks."""
             if callback is close:
                 return callback()
             return await to_thread(callback, *args, **kwargs)
 
         with (
-            patch("orionis.storage.buffering.tempfile.SpooledTemporaryFile",
-                  return_value=buffer),
+            patch(
+                "orionis.storage.buffering.tempfile.SpooledTemporaryFile",
+                return_value=buffer,
+            ),
             patch("orionis.storage.buffering.asyncio.to_thread", run_thread),
         ):
             task = asyncio.create_task(spool_stream(source(), max_size=100))
-            await asyncio.wait_for(entered.wait(), 2)
-            task.cancel()
-            # Give cancellation a deterministic opportunity to reach cleanup.
-            marker = asyncio.Event()
-            loop.call_soon(marker.set)
-            await marker.wait()
-            was_closing = closing.is_set()
-            release.set()
-            with self.assertRaises(asyncio.CancelledError):
-                await task
+            try:
+                await asyncio.wait_for(entered.wait(), 2)
+                task.cancel()
+                # Give cancellation a deterministic opportunity to reach cleanup.
+                marker = asyncio.Event()
+                loop.call_soon(marker.set)
+                await marker.wait()
+                was_closing = closing.is_set()
+            finally:
+                release.set()
+                if not task.done() and not task.cancelling():
+                    task.cancel()
+                outcome = await asyncio.gather(task, return_exceptions=True)
+        self.assertIsInstance(outcome[0], asyncio.CancelledError)
         self.assertFalse(was_closing)
         self.assertEqual(events, ["write", "close"])
 
@@ -252,20 +309,26 @@ class TestBufferedStreams(TestCase):
         Returns
         -------
         None
-            Propagate the exact producer error and record cleanup once.
+            No return value.
         """
         app, runtime, handler = activate_runtime()
+        self.addAsyncCleanup(runtime.shutdown)
         primary, secondary = OSError("producer"), OSError("spool close")
         buffer = MagicMock()
         buffer.close.side_effect = secondary
 
-        async def source():
+        async def source() -> AsyncIterator[bytes]:
+            """Yield a chunk and then propagate the original producer error."""
             yield b"payload"
             raise primary
 
-        with (operation(app),
-              patch("orionis.storage.buffering.tempfile.SpooledTemporaryFile",
-                    return_value=buffer)):
+        with (
+            operation(app),
+            patch(
+                "orionis.storage.buffering.tempfile.SpooledTemporaryFile",
+                return_value=buffer,
+            ),
+        ):
             with self.assertRaises(OSError) as caught:
                 await spool_stream(source(), max_size=100)
             await runtime.drain()
@@ -279,11 +342,12 @@ class TestBufferedStreams(TestCase):
         Returns
         -------
         None
-            Observe cleanup once and retain the body or persistence callback error.
+            No return value.
         """
         for persist in (False, True):
             with self.subTest(persist=persist):
                 app, runtime, handler = activate_runtime()
+                self.addAsyncCleanup(runtime.shutdown)
                 primary, secondary = OSError("primary"), OSError("close")
                 handle = MagicMock()
                 handle.close.side_effect = secondary
@@ -297,8 +361,10 @@ class TestBufferedStreams(TestCase):
                 self.assertIs(caught.exception, primary)
                 self.assertEqual(handler.reports, [primary, secondary])
                 self.assertEqual(handler.failures[1][1].phase, "cleanup")
-                self.assertEqual(handler.failures[1][1].parent_event_id,
-                                 handler.failures[0][1].event_id)
+                self.assertEqual(
+                    handler.failures[1][1].parent_event_id,
+                    handler.failures[0][1].event_id,
+                )
                 handle.close.assert_called_once()
                 if callback is not None:
                     callback.assert_called_once_with(handle)
@@ -311,11 +377,12 @@ class TestBufferedStreams(TestCase):
         Returns
         -------
         None
-            Preserve cancellation and observe the cleanup exception once.
+            No return value.
         """
         for spool in (False, True):
             with self.subTest(spool=spool):
                 app, runtime, handler = activate_runtime()
+                self.addAsyncCleanup(runtime.shutdown)
                 entered, release = asyncio.Event(), threading.Event()
                 loop = asyncio.get_running_loop()
                 failure = OSError("late close")
@@ -323,29 +390,45 @@ class TestBufferedStreams(TestCase):
                 handle.close.side_effect = failure
 
                 def open_handle(
-                    owner_loop=loop, started=entered, gate=release, result=handle,
+                    owner_loop: asyncio.AbstractEventLoop = loop,
+                    started: asyncio.Event = entered,
+                    gate: threading.Event = release,
+                    result: MagicMock = handle,
                     **_kwargs: object,
-                ):
+                ) -> MagicMock:
+                    """Return the late handle after the test releases the worker."""
                     owner_loop.call_soon_threadsafe(started.set)
-                    gate.wait(5)
+                    if not gate.wait(5):
+                        error_msg = "The test did not release the handle opener."
+                        raise TimeoutError(error_msg)
                     return result
 
-                async def source():
+                async def source() -> AsyncIterator[bytes]:
+                    """Yield a payload for the spool opened by the worker."""
                     yield b"payload"
 
                 with (
                     operation(app),
-                    patch("orionis.storage.buffering.tempfile.SpooledTemporaryFile",
-                          side_effect=open_handle),
+                    patch(
+                        "orionis.storage.buffering.tempfile.SpooledTemporaryFile",
+                        side_effect=open_handle,
+                    ),
                 ):
-                    pending = (spool_stream(source(), max_size=100) if spool
-                               else AsyncStream(open_handle).__aenter__())
+                    pending = (
+                        spool_stream(source(), max_size=100)
+                        if spool
+                        else AsyncStream(open_handle).__aenter__()
+                    )
                     task = asyncio.create_task(pending)
-                    await asyncio.wait_for(entered.wait(), 2)
-                    task.cancel()
-                    release.set()
-                    with self.assertRaises(asyncio.CancelledError):
-                        await task
+                    try:
+                        await asyncio.wait_for(entered.wait(), 2)
+                        task.cancel()
+                    finally:
+                        release.set()
+                        if not task.done() and not task.cancelling():
+                            task.cancel()
+                        outcome = await asyncio.gather(task, return_exceptions=True)
+                    self.assertIsInstance(outcome[0], asyncio.CancelledError)
                     await runtime.drain()
                 handle.close.assert_called_once()
                 self.assertEqual(handler.reports, [failure])

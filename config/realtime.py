@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.realtime import RealtimeConfig
 
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BootstrapRealtime(RealtimeConfig):
-
     # ----------------------------------------------------------------------------------
     # max_message_size : int, optional
     # --- Maximum incoming message size in bytes. Defaults to the value of the
@@ -30,7 +30,8 @@ class BootstrapRealtime(RealtimeConfig):
     # ----------------------------------------------------------------------------------
     max_pending_client_invocations: int = field(
         default_factory=lambda: Env.get(
-            "REALTIME_MAX_PENDING_CLIENT_INVOCATIONS", 32,
+            "REALTIME_MAX_PENDING_CLIENT_INVOCATIONS",
+            32,
         ),
     )
 

@@ -13,11 +13,9 @@ from orionis.console.contracts import ISchedule
 
 class Scheduler(BaseScheduler):
     def tasks(self, schedule: ISchedule) -> None:
-        schedule.command("reports:build", purpose="Daily reports")\
-            .coalesce()\
-            .misfireGraceTime(60)\
-            .maxInstances(1)\
-            .dailyAt(2, 30)
+        schedule.command(
+            "reports:build", purpose="Daily reports"
+        ).coalesce().misfireGraceTime(60).maxInstances(1).dailyAt(2, 30)
 ```
 
 ```shell
@@ -44,6 +42,8 @@ Existen helpers de minutos, horas, días y semanas, además de `startDate` y `en
 
 La agenda fluida guarda tareas por **firma de comando**. Registrar otra vez la misma firma reemplaza esa definición pendiente; no es una API para crear dos horarios independientes para una firma. Usa comandos con identidades distintas que deleguen al mismo servicio si necesitas agendas separadas.
 
+`TASKS_JITTER` se aplica a los triggers que admiten jitter, no solo a la metadata mostrada. Un `randomDelay(0)` de la tarea prevalece sobre ese default. `onceAt`, `everySeconds`, `everyMinuteAt`, `everyMinutesAt`, `hourlyAt` y `everyHoursAt` conservan horarios exactos y no heredan jitter; sus atajos conservan la misma política. Un retraso positivo explícito entra en conflicto con esos horarios y produce `ValueError`.
+
 ## Persistencia y valores predeterminados
 
 La sección `scheduler` de `config/scheduler.py` usa:
@@ -66,5 +66,11 @@ Redis utiliza `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD`, `REDIS_T
 `BaseScheduler` ofrece `onStarted`, `onPaused`, `onResumed` y `onShutdown`. Para eventos de tarea usa `.on(event, callback)` o `registerListener` con `BaseTaskListener`; los tipos `TaskEvent` y `SchedulerEvent` de enums seleccionan eventos, mientras entidades del mismo nombre transportan datos. No confundas ambos imports.
 
 El servicio expone `boot()` e `info()` async; `state`, `isRunning`, `isPaused`, `isStopped`, `pauseTask`, `resumeTask`, `removeTask`, `removeAllTasks`, `pause` y `resume` permiten control. `shutdown()` solicita la parada y `await wait()` espera su finalización; las coroutines de listeners se gestionan y drenan durante el apagado. No se permiten nuevas tareas después de iniciar: `command()` produce `RuntimeError`.
+
+Los listeners del ciclo de vida observan el estado ya actualizado. Un inicio fallido restaura `STOPPED`; un apagado completado limpia el seguimiento de tareas activas y pausadas. Si falla la admisión de una tarea de listener, se cierran ambas coroutines no programadas y se propaga el error de admisión.
+
+Las llamadas concurrentes o repetidas a `boot()` comparten el scheduler activo, sin iniciar agendas duplicadas. Un inicio parcial libera sus stores y executor propios. Espera `wait()` antes de reiniciar tras el apagado; iniciar mientras el apagado está pendiente produce `RuntimeError`.
+
+El apagado espera el callback nativo de cierre real, los finalizadores de jobs cancelados y los listeners admitidos durante ese callback. Los fallos del store nativo llegan a `wait()`; programar el callback de cierre de APScheduler no equivale a completarlo.
 
 Una interrupción/misfire no genera automáticamente un retry de negocio. Diseña comandos idempotentes, observa sus códigos de salida y utiliza jobs cuando necesites leases y reintentos explícitos.

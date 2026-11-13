@@ -1,6 +1,9 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure an integer is written with at most a given number of digits."""
 
 from orionis.schemas.rule import Rule
+
 
 class MaxDigits(Rule):
     """
@@ -8,8 +11,6 @@ class MaxDigits(Rule):
 
     The sign is ignored, so ``-1234`` counts as four digits.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_maximum",)
     """Declare the instance attribute slots reserved by this class."""
@@ -35,7 +36,7 @@ class MaxDigits(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------
@@ -81,11 +82,15 @@ class MaxDigits(Rule):
             return False
 
         if isinstance(value, int):
-            digits = len(str(abs(value)))
-        elif isinstance(value, str):
-            digits = len(value.removeprefix("-").removeprefix("+"))
-            if not value or digits == 0:
+            magnitude = abs(value)
+            if self._maximum >= magnitude.bit_length():
+                return True
+            return magnitude < 10**self._maximum
+        if isinstance(value, str):
+            text = value[1:] if value.startswith(("-", "+")) else value
+            if not text.isdecimal():
                 return False
+            digits = len(text)
         else:
             return False
 

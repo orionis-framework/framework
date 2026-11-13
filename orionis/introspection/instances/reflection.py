@@ -1,24 +1,29 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Public annotations remain available to runtime inspection.
 """Inspect the class and members of an existing object."""
 
 from __future__ import annotations
 import inspect
 import keyword
 import types
-from typing import TYPE_CHECKING, Any
-from orionis.introspection.dependencies.reflection import ReflectDependencies
+from typing import Any
+from orionis.introspection.dependencies.reflection import (
+    ReflectDependencies,
+    _clear_dependency_caches,
+    _inspect_annotations,
+    _inspect_signature,
+)
 from orionis.introspection.instances.contracts.reflection import (
     IReflectionInstance,
 )
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
+from collections.abc import Callable
+from orionis.introspection.dependencies.entities.signature import (
+    Signature,
+)
+
 
 class ReflectionInstance(IReflectionInstance):
-
-    # ruff: noqa : ANN401
     """Inspect the class and members of an existing object."""
 
     def __init__(self, instance: Any) -> None:
@@ -41,13 +46,11 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Ensure input is an object instance, not a class
         if isinstance(instance, type):
-            error_msg = (
-                "The provided instance must be an object instance, not a class."
-            )
+            error_msg = "The provided instance must be an object instance, not a class."
             raise TypeError(error_msg)
 
         # Read the reflected instance's class metadata.
@@ -77,7 +80,8 @@ class ReflectionInstance(IReflectionInstance):
         """Module name supplied through ``module``."""
         # Python strips the leading underscores of the class name when it
         # mangles private members, so the prefix must be built the same way.
-        self._private_prefix: str = f"_{self._class_name.lstrip('_')}"
+        class_name = self._class_name.lstrip("_")
+        self._private_prefix: str = f"_{class_name}" if class_name else ""
         """
         Python strips the leading underscores of the class name when it mangles
         private members, so the prefix must be built the same way.
@@ -116,7 +120,7 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Set the value in the memory cache for the given key
         self._memory_cache[key] = value
@@ -150,10 +154,34 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Remove the key from the cache if present
         self._memory_cache.pop(key, None)
+
+    def _storedAttributes(self) -> dict[str, object]:
+        """Read populated dictionary and slot fields without evaluating properties.
+
+        Returns
+        -------
+        dict[str, object]
+            Stored values, including inherited slots and excluding unset slots.
+        """
+        values = dict(getattr(self._instance, "__dict__", {}))
+        for cls in self._cls.__mro__:
+            if "__slots__" not in vars(cls):
+                continue
+            for name, descriptor in vars(cls).items():
+                if name in values or not isinstance(
+                    descriptor,
+                    types.MemberDescriptorType,
+                ):
+                    continue
+                try:
+                    values[name] = descriptor.__get__(self._instance, self._cls)
+                except AttributeError:
+                    continue
+        return values
 
     def _scanInstanceVars(self) -> None:
         """
@@ -165,7 +193,7 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         private_prefix = self._private_prefix
         prefix_len = len(private_prefix)
@@ -176,10 +204,12 @@ class ReflectionInstance(IReflectionInstance):
         dunder: dict[str, Any] = {}
 
         # Classify each instance variable by its name prefix in a single pass
-        for attr, value in vars(self._instance).items():
+        for attr, value in self._storedAttributes().items():
+            if callable(value):
+                continue
             if attr.startswith("__") and attr.endswith("__"):
                 dunder[attr] = value
-            elif attr.startswith(private_prefix):
+            elif attr.startswith(private_prefix + "__") and not attr.endswith("__"):
                 private[attr[prefix_len:]] = value
             elif attr.startswith("_"):
                 protected[attr] = value
@@ -221,7 +251,7 @@ class ReflectionInstance(IReflectionInstance):
         for pname, pattr in cls.__dict__.items():
             if not isinstance(pattr, property):
                 continue
-            if pname.startswith(private_prefix):
+            if pname.startswith(private_prefix + "__") and not pname.endswith("__"):
                 unmangled = pname[prefix_len:]
                 all_props.append(unmangled)
                 priv_props.append(unmangled)
@@ -239,7 +269,7 @@ class ReflectionInstance(IReflectionInstance):
     def _classifyStaticEntry(
         self,
         name: str,
-        attr: Any,
+        attr: object,
         acc: dict[str, list[str]],
     ) -> None:
         """
@@ -249,7 +279,7 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             The member name as returned by dir().
-        attr : typing.Any
+        attr : object
             The staticmethod descriptor.
         acc : dict[str, list[str]]
             Shared accumulator dict keyed by category name.
@@ -257,14 +287,14 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         private_prefix = self._private_prefix
         is_async = inspect.iscoroutinefunction(attr.__func__)
 
         # Append to the matching visibility bucket for static methods
-        if name.startswith(private_prefix):
-            unmangled = name[len(private_prefix):]
+        if name.startswith(private_prefix + "__") and not name.endswith("__"):
+            unmangled = name[len(private_prefix) :]
             acc["priv_sta_m"].append(unmangled)
             if is_async:
                 acc["priv_sta_m_async"].append(unmangled)
@@ -283,7 +313,7 @@ class ReflectionInstance(IReflectionInstance):
     def _classifyClassEntry(
         self,
         name: str,
-        attr: Any,
+        attr: object,
         acc: dict[str, list[str]],
     ) -> None:
         """
@@ -293,7 +323,7 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             The member name as returned by dir().
-        attr : typing.Any
+        attr : object
             The classmethod descriptor.
         acc : dict[str, list[str]]
             Shared accumulator dict keyed by category name.
@@ -301,14 +331,14 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         private_prefix = self._private_prefix
         is_async = inspect.iscoroutinefunction(attr.__func__)
 
         # Append to the matching visibility bucket for class methods
-        if name.startswith(private_prefix):
-            unmangled = name[len(private_prefix):]
+        if name.startswith(private_prefix + "__") and not name.endswith("__"):
+            unmangled = name[len(private_prefix) :]
             acc["priv_cls_m"].append(unmangled)
             if is_async:
                 acc["priv_cls_m_async"].append(unmangled)
@@ -327,7 +357,7 @@ class ReflectionInstance(IReflectionInstance):
     def _classifyFunctionEntry(
         self,
         name: str,
-        attr: Any,
+        attr: object,
         acc: dict[str, list[str]],
     ) -> None:
         """
@@ -337,7 +367,7 @@ class ReflectionInstance(IReflectionInstance):
         ----------
         name : str
             The member name as returned by dir().
-        attr : typing.Any
+        attr : object
             The function object.
         acc : dict[str, list[str]]
             Shared accumulator dict keyed by category name.
@@ -345,14 +375,14 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         private_prefix = self._private_prefix
         is_async = inspect.iscoroutinefunction(attr)
 
         # Append to the matching visibility bucket for instance methods
-        if name.startswith(private_prefix):
-            unmangled = name[len(private_prefix):]
+        if name.startswith(private_prefix + "__") and not name.endswith("__"):
+            unmangled = name[len(private_prefix) :]
             acc["priv_m"].append(unmangled)
             (acc["priv_m_async"] if is_async else acc["priv_m_sync"]).append(unmangled)
         elif name.startswith("_"):
@@ -362,7 +392,43 @@ class ReflectionInstance(IReflectionInstance):
             acc["pub_m"].append(name)
             (acc["pub_m_async"] if is_async else acc["pub_m_sync"]).append(name)
 
-    def _scanClassMembers(self) -> None:  # noqa: PLR0915
+    def _classifyCallableMember(
+        self,
+        name: str,
+        attr: object,
+        acc: dict[str, list[str]],
+        *,
+        instance_owned: bool,
+    ) -> None:
+        """Route a non-special member according to its actual binding owner.
+
+        Parameters
+        ----------
+        name : str
+            Attribute name as stored by Python.
+        attr : object
+            Instance value or class descriptor retrieved without evaluation.
+        acc : dict[str, list[str]]
+            Mutable classification buckets receiving callable names.
+        instance_owned : bool
+            Whether the value overrides the class declaration on this instance.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if instance_owned:
+            if callable(attr):
+                self._classifyFunctionEntry(name, attr, acc)
+        elif isinstance(attr, staticmethod):
+            self._classifyStaticEntry(name, attr, acc)
+        elif isinstance(attr, classmethod):
+            self._classifyClassEntry(name, attr, acc)
+        elif isinstance(attr, types.FunctionType):
+            self._classifyFunctionEntry(name, attr, acc)
+
+    def _scanClassMembers(self) -> None:
         """
         Discover and categorize all class members in a single traversal.
 
@@ -372,22 +438,40 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         cls = self._cls
         cache = self._memory_cache
 
         # Initialize accumulators for each method visibility and type category
         acc: dict[str, list[str]] = {
-            "pub_m": [], "pub_m_sync": [], "pub_m_async": [],
-            "prot_m": [], "prot_m_sync": [], "prot_m_async": [],
-            "priv_m": [], "priv_m_sync": [], "priv_m_async": [],
-            "pub_cls_m": [], "pub_cls_m_sync": [], "pub_cls_m_async": [],
-            "prot_cls_m": [], "prot_cls_m_sync": [], "prot_cls_m_async": [],
-            "priv_cls_m": [], "priv_cls_m_sync": [], "priv_cls_m_async": [],
-            "pub_sta_m": [], "pub_sta_m_sync": [], "pub_sta_m_async": [],
-            "prot_sta_m": [], "prot_sta_m_sync": [], "prot_sta_m_async": [],
-            "priv_sta_m": [], "priv_sta_m_sync": [], "priv_sta_m_async": [],
+            "pub_m": [],
+            "pub_m_sync": [],
+            "pub_m_async": [],
+            "prot_m": [],
+            "prot_m_sync": [],
+            "prot_m_async": [],
+            "priv_m": [],
+            "priv_m_sync": [],
+            "priv_m_async": [],
+            "pub_cls_m": [],
+            "pub_cls_m_sync": [],
+            "pub_cls_m_async": [],
+            "prot_cls_m": [],
+            "prot_cls_m_sync": [],
+            "prot_cls_m_async": [],
+            "priv_cls_m": [],
+            "priv_cls_m_sync": [],
+            "priv_cls_m_async": [],
+            "pub_sta_m": [],
+            "pub_sta_m_sync": [],
+            "pub_sta_m_async": [],
+            "prot_sta_m": [],
+            "prot_sta_m_sync": [],
+            "prot_sta_m_async": [],
+            "priv_sta_m": [],
+            "priv_sta_m_sync": [],
+            "priv_sta_m_async": [],
         }
         dunder_m: list[str] = []
 
@@ -395,60 +479,75 @@ class ReflectionInstance(IReflectionInstance):
         all_props, pub_props, prot_props, priv_props = self._scanPropertyEntries(cls)
 
         # Walk all accessible names (including inherited) to categorize methods
-        for name in dir(cls):
-            attr = inspect.getattr_static(cls, name)
+        instance_members = getattr(self._instance, "__dict__", {})
+        for name in sorted(set(dir(cls)).union(instance_members)):
+            if name in instance_members:
+                attr = instance_members[name]
+            else:
+                attr = inspect.getattr_static(cls, name)
             if name.startswith("__") and name.endswith("__"):
-                dunder_m.append(name)
+                if callable(attr):
+                    dunder_m.append(name)
                 continue
-            if isinstance(attr, staticmethod):
-                self._classifyStaticEntry(name, attr, acc)
-            elif isinstance(attr, classmethod):
-                self._classifyClassEntry(name, attr, acc)
-            elif isinstance(attr, types.FunctionType):
-                self._classifyFunctionEntry(name, attr, acc)
+            self._classifyCallableMember(
+                name,
+                attr,
+                acc,
+                instance_owned=name in instance_members,
+            )
 
         # Combine all classified method names.
         all_methods: list[str] = [
-            *acc["pub_m"], *acc["prot_m"], *acc["priv_m"],
-            *acc["pub_cls_m"], *acc["prot_cls_m"], *acc["priv_cls_m"],
-            *acc["pub_sta_m"], *acc["prot_sta_m"], *acc["priv_sta_m"],
+            *acc["pub_m"],
+            *acc["prot_m"],
+            *acc["priv_m"],
+            *acc["pub_cls_m"],
+            *acc["prot_cls_m"],
+            *acc["priv_cls_m"],
+            *acc["pub_sta_m"],
+            *acc["prot_sta_m"],
+            *acc["priv_sta_m"],
         ]
 
         # Populate all method and property cache entries in a single operation
-        cache["public_methods"] = acc["pub_m"]
-        cache["public_sync_methods"] = acc["pub_m_sync"]
-        cache["public_async_methods"] = acc["pub_m_async"]
-        cache["protected_methods"] = acc["prot_m"]
-        cache["protected_sync_methods"] = acc["prot_m_sync"]
-        cache["protected_async_methods"] = acc["prot_m_async"]
-        cache["private_methods"] = acc["priv_m"]
-        cache["private_sync_methods"] = acc["priv_m_sync"]
-        cache["private_async_methods"] = acc["priv_m_async"]
-        cache["dunder_methods"] = dunder_m
-        cache["public_class_methods"] = acc["pub_cls_m"]
-        cache["public_class_sync_methods"] = acc["pub_cls_m_sync"]
-        cache["public_class_async_methods"] = acc["pub_cls_m_async"]
-        cache["protected_class_methods"] = acc["prot_cls_m"]
-        cache["protected_class_sync_methods"] = acc["prot_cls_m_sync"]
-        cache["protected_class_async_methods"] = acc["prot_cls_m_async"]
-        cache["private_class_methods"] = acc["priv_cls_m"]
-        cache["private_class_sync_methods"] = acc["priv_cls_m_sync"]
-        cache["private_class_async_methods"] = acc["priv_cls_m_async"]
-        cache["public_static_methods"] = acc["pub_sta_m"]
-        cache["public_static_sync_methods"] = acc["pub_sta_m_sync"]
-        cache["public_static_async_methods"] = acc["pub_sta_m_async"]
-        cache["protected_static_methods"] = acc["prot_sta_m"]
-        cache["protected_static_sync_methods"] = acc["prot_sta_m_sync"]
-        cache["protected_static_async_methods"] = acc["prot_sta_m_async"]
-        cache["private_static_methods"] = acc["priv_sta_m"]
-        cache["private_static_sync_methods"] = acc["priv_sta_m_sync"]
-        cache["private_static_async_methods"] = acc["priv_sta_m_async"]
-        cache["properties"] = all_props
-        cache["public_properties"] = pub_props
-        cache["protected_properties"] = prot_props
-        cache["private_properties"] = priv_props
-        cache["methods"] = all_methods
-        cache["_methods_set"] = frozenset(all_methods)
+        cache.update(
+            {
+                "public_methods": acc["pub_m"],
+                "public_sync_methods": acc["pub_m_sync"],
+                "public_async_methods": acc["pub_m_async"],
+                "protected_methods": acc["prot_m"],
+                "protected_sync_methods": acc["prot_m_sync"],
+                "protected_async_methods": acc["prot_m_async"],
+                "private_methods": acc["priv_m"],
+                "private_sync_methods": acc["priv_m_sync"],
+                "private_async_methods": acc["priv_m_async"],
+                "dunder_methods": dunder_m,
+                "public_class_methods": acc["pub_cls_m"],
+                "public_class_sync_methods": acc["pub_cls_m_sync"],
+                "public_class_async_methods": acc["pub_cls_m_async"],
+                "protected_class_methods": acc["prot_cls_m"],
+                "protected_class_sync_methods": acc["prot_cls_m_sync"],
+                "protected_class_async_methods": acc["prot_cls_m_async"],
+                "private_class_methods": acc["priv_cls_m"],
+                "private_class_sync_methods": acc["priv_cls_m_sync"],
+                "private_class_async_methods": acc["priv_cls_m_async"],
+                "public_static_methods": acc["pub_sta_m"],
+                "public_static_sync_methods": acc["pub_sta_m_sync"],
+                "public_static_async_methods": acc["pub_sta_m_async"],
+                "protected_static_methods": acc["prot_sta_m"],
+                "protected_static_sync_methods": acc["prot_sta_m_sync"],
+                "protected_static_async_methods": acc["prot_sta_m_async"],
+                "private_static_methods": acc["priv_sta_m"],
+                "private_static_sync_methods": acc["priv_sta_m_sync"],
+                "private_static_async_methods": acc["priv_sta_m_async"],
+                "properties": all_props,
+                "public_properties": pub_props,
+                "protected_properties": prot_props,
+                "private_properties": priv_props,
+                "methods": all_methods,
+                "_methods_set": frozenset(all_methods),
+            },
+        )
 
     def getInstance(self) -> Any:
         """
@@ -580,10 +679,10 @@ class ReflectionInstance(IReflectionInstance):
                 resolved = f"{self._private_prefix}{method}"
 
             # Retrieve and cache the source code of the specified method
-            cache[pre_key] = inspect.getsource(getattr(self._cls, resolved))
+            cache[pre_key] = inspect.getsource(self._methodTarget(resolved))
             return cache[pre_key]
 
-        except (TypeError, OSError):
+        except TypeError, OSError:
             # Return None if the source code cannot be retrieved
             return None
 
@@ -605,17 +704,17 @@ class ReflectionInstance(IReflectionInstance):
             # Retrieve and cache the file path of the class definition
             cache["file"] = inspect.getfile(self._cls)
             return cache["file"]
-        except (TypeError, OSError):
+        except TypeError, OSError:
             # Return None if the file path cannot be determined
             return None
 
-    def getAnnotations(self) -> dict[str, type]:
+    def getAnnotations(self) -> dict[str, object]:
         """
         Retrieve type annotations of the class.
 
         Returns
         -------
-        dict[str, type]
+        dict[str, object]
             Dictionary mapping attribute names to their type annotations.
         """
         cache = self._memory_cache
@@ -627,12 +726,12 @@ class ReflectionInstance(IReflectionInstance):
         # Collect and unmangle class annotations using the pre-computed prefix
         private_prefix = self._private_prefix
         prefix_len = len(private_prefix)
-        annotations: dict[str, type] = {}
-        class_annotations = getattr(self._cls, "__annotations__", {})
+        annotations: dict[str, object] = {}
+        class_annotations = _inspect_annotations(self._cls)
 
         # Unmangle private annotation names and build the annotations dict
         for k, v in class_annotations.items():
-            if k.startswith(private_prefix):
+            if k.startswith(private_prefix + "__") and not k.endswith("__"):
                 annotations[k[prefix_len:]] = v
             else:
                 annotations[k] = v
@@ -674,11 +773,6 @@ class ReflectionInstance(IReflectionInstance):
             Value of the specified attribute if it exists, otherwise the provided
             ``default`` value.
 
-        Raises
-        ------
-        AttributeError
-            If the attribute does not exist and no default value is provided.
-
         Notes
         -----
         This method first checks the instance's attributes dictionary for the
@@ -687,7 +781,10 @@ class ReflectionInstance(IReflectionInstance):
         the ``default`` value is returned.
         """
         # Retrieve all attributes and fall back to getattr for computed/property attrs
-        return self.getAttributes().get(name, getattr(self._instance, name, default))
+        attributes = self.getAttributes()
+        if name in attributes:
+            return attributes[name]
+        return getattr(self._instance, name, default)
 
     def setAttribute(self, name: str, value: Any) -> bool:
         """
@@ -708,7 +805,9 @@ class ReflectionInstance(IReflectionInstance):
         Raises
         ------
         AttributeError
-            If the attribute name is invalid, is a keyword, or the value is callable.
+            If the attribute name is invalid or is a keyword.
+        TypeError
+            If the value is callable.
         """
         # Validate attribute name: must be a valid identifier and not a keyword
         if (
@@ -737,7 +836,7 @@ class ReflectionInstance(IReflectionInstance):
         setattr(self._instance, name, value)
 
         # Invalidate the entire attribute cache after mutation
-        self._memory_cache.clear()
+        self.clearCache()
 
         # Return True to indicate the attribute was set successfully
         return True
@@ -766,10 +865,8 @@ class ReflectionInstance(IReflectionInstance):
         Clears the memory cache after removal.
         """
         # Check if the attribute exists before attempting removal
-        if self.getAttribute(name) is None:
-            error_msg = (
-                f"'{self._class_name}' object has no attribute '{name}'."
-            )
+        if not self.hasAttribute(name):
+            error_msg = f"'{self._class_name}' object has no attribute '{name}'."
             raise AttributeError(error_msg)
 
         # Apply name mangling for private attribute removal
@@ -780,7 +877,7 @@ class ReflectionInstance(IReflectionInstance):
         delattr(self._instance, name)
 
         # Invalidate the entire attribute cache after mutation
-        self._memory_cache.clear()
+        self.clearCache()
 
         # Return True to indicate the attribute was removed successfully
         return True
@@ -810,9 +907,7 @@ class ReflectionInstance(IReflectionInstance):
 
         # Verify the attribute exists on the instance
         if not self.hasAttribute(name):
-            error_msg = (
-                f"'{self._class_name}' object has no attribute '{name}'."
-            )
+            error_msg = f"'{self._class_name}' object has no attribute '{name}'."
             raise AttributeError(error_msg)
 
         # Return the docstring of the attribute value if one exists
@@ -968,8 +1063,9 @@ class ReflectionInstance(IReflectionInstance):
         Raises
         ------
         AttributeError
-            If the name is not a valid identifier, is a keyword, or the method
-            is not callable.
+            If the name is not a valid identifier or is a keyword.
+        TypeError
+            If the supplied method is not callable.
         """
         # Validate method name: must be a valid identifier and not a keyword
         if (
@@ -985,9 +1081,7 @@ class ReflectionInstance(IReflectionInstance):
 
         # Ensure the method is callable
         if not callable(method):
-            error_msg = (
-                f"Cannot set attribute '{name}' to a non-callable value."
-            )
+            error_msg = f"Cannot set attribute '{name}' to a non-callable value."
             raise TypeError(error_msg)
 
         # Apply name mangling for private method assignment
@@ -998,12 +1092,12 @@ class ReflectionInstance(IReflectionInstance):
         setattr(self._instance, name, method)
 
         # Invalidate the entire cache after mutating the instance
-        self._memory_cache.clear()
+        self.clearCache()
         return True
 
     def removeMethod(self, name: str) -> None:
         """
-        Remove a method from the instance.
+        Remove an instance override or a method declared on its class.
 
         Parameters
         ----------
@@ -1013,7 +1107,7 @@ class ReflectionInstance(IReflectionInstance):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -1022,16 +1116,36 @@ class ReflectionInstance(IReflectionInstance):
         """
         # Verify the method exists before attempting removal
         if not self.hasMethod(name):
-            error_msg = (
-                f"Method '{name}' does not exist on '{self._class_name}'."
-            )
+            error_msg = f"Method '{name}' does not exist on '{self._class_name}'."
             raise AttributeError(error_msg)
 
-        # Remove the method from the class definition
-        delattr(self._instance.__class__, name)
+        if name.startswith("__") and not name.endswith("__"):
+            name = f"{self._private_prefix}{name}"
+        if name in getattr(self._instance, "__dict__", {}):
+            delattr(self._instance, name)
+        else:
+            delattr(self._cls, name)
 
         # Invalidate the entire cache after mutating the class
-        self._memory_cache.clear()
+        self.clearCache()
+
+    def _methodTarget(self, name: str) -> object:
+        """Select an instance override before the unbound class declaration.
+
+        Parameters
+        ----------
+        name : str
+            Attribute name after any private-name mangling.
+
+        Returns
+        -------
+        object
+            Stored override, class method declaration, or None when absent.
+        """
+        members = getattr(self._instance, "__dict__", {})
+        if name in members:
+            return members[name]
+        return getattr(self._cls, name, None)
 
     def getMethodSignature(self, name: str) -> inspect.Signature:
         """
@@ -1065,14 +1179,12 @@ class ReflectionInstance(IReflectionInstance):
             lookup = f"{self._private_prefix}{name}"
 
         # Retrieve the method and inspect its signature
-        resolved = getattr(self._cls, lookup, None)
+        resolved = self._methodTarget(lookup)
         if callable(resolved):
-            cache[cache_key] = inspect.signature(resolved)
+            cache[cache_key] = _inspect_signature(resolved)
             return cache[cache_key]
 
-        error_msg = (
-            f"Method '{name}' is not callable on '{self._class_name}'."
-        )
+        error_msg = f"Method '{name}' is not callable on '{self._class_name}'."
         raise AttributeError(error_msg)
 
     def getMethodDocstring(self, name: str) -> str | None:
@@ -1107,14 +1219,12 @@ class ReflectionInstance(IReflectionInstance):
             lookup = f"{self._private_prefix}{name}"
 
         # Retrieve the method and cache its docstring
-        resolved = getattr(self._cls, lookup, None)
+        resolved = self._methodTarget(lookup)
         if callable(resolved):
             cache[cache_key] = resolved.__doc__
             return cache[cache_key]
 
-        error_msg = (
-            f"Method '{name}' does not exist on '{self._class_name}'."
-        )
+        error_msg = f"Method '{name}' does not exist on '{self._class_name}'."
         raise AttributeError(error_msg)
 
     def getMethods(self) -> list[str]:
@@ -1734,9 +1844,7 @@ class ReflectionInstance(IReflectionInstance):
                 name = f"{self._private_prefix}{name}"
             return getattr(self._instance, name, None)
 
-        error_msg = (
-            f"Property '{name}' does not exist on '{self._class_name}'."
-        )
+        error_msg = f"Property '{name}' does not exist on '{self._class_name}'."
         raise AttributeError(error_msg)
 
     def getPropertySignature(self, name: str) -> inspect.Signature:
@@ -1773,7 +1881,7 @@ class ReflectionInstance(IReflectionInstance):
         # Retrieve the property descriptor and inspect the getter signature
         prop = getattr(self._cls, name, None)
         if isinstance(prop, property):
-            cache[cache_key] = inspect.signature(prop.fget)
+            cache[cache_key] = _inspect_signature(prop.fget)
             return cache[cache_key]
 
         error_msg = (
@@ -1834,8 +1942,8 @@ class ReflectionInstance(IReflectionInstance):
             Structured representation of the constructor dependencies. Contains:
 
             - ``resolved``: dictionary of resolved dependencies with names and values.
-            - ``unresolved``: list of unresolved dependencies (parameter names
-              without default values or annotations).
+            - ``unresolved``: dictionary of dependencies without sufficient
+              type or default information.
         """
         cache = self._memory_cache
 
@@ -1864,8 +1972,8 @@ class ReflectionInstance(IReflectionInstance):
             Structured representation of the method dependencies, including:
 
             - ``resolved``: dictionary of resolved dependencies with names and values.
-            - ``unresolved``: list of unresolved dependencies (parameter names
-              without default values or annotations).
+            - ``unresolved``: dictionary of dependencies without sufficient
+              type or default information.
 
         Raises
         ------
@@ -1901,12 +2009,18 @@ class ReflectionInstance(IReflectionInstance):
         Clear the internal memory cache.
 
         Removes all cached entries stored in the reflection instance. Subsequent
-        method calls will recompute and cache results.
+        method calls will recompute and cache results. Shared dependency signatures
+        and registered invocation plans are also invalidated. Current class
+        identity is refreshed; the original private-name prefix is preserved
+        because Python does not remangle members when a class is renamed.
 
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Clear the internal memory cache for reflection results
         self._memory_cache.clear()
+        self._class_name = self._cls.__name__
+        self._module_name = self._cls.__module__
+        _clear_dependency_caches()

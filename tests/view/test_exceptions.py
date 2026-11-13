@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify the view exception hierarchy, messages, and explicit causes."""
+
 from orionis.test import TestCase
 from orionis.view.exceptions import (
     ViewException,
@@ -6,189 +10,124 @@ from orionis.view.exceptions import (
     ViewTemplateNotFoundException,
 )
 
+
 class TestViewExceptions(TestCase):
+    """Preserve specific errors and their common catch boundary."""
 
-    def testViewExceptionInheritsFromException(self) -> None:
-        """
-        Verify ViewException is a subclass of Exception.
+    def testExceptionHierarchy(self) -> None:
+        """Derive every specialized view error from the shared exception base.
 
-        Validates that ViewException fits the standard Python exception
-        hierarchy and can be caught with a generic except clause.
+        Returns
+        -------
+        None
+            No return value.
         """
         self.assertTrue(issubclass(ViewException, Exception))
+        for exception_type in (
+            ViewRenderException,
+            ViewTemplateNotFoundException,
+            ViewRouteException,
+        ):
+            with self.subTest(exception=exception_type.__name__):
+                self.assertTrue(issubclass(exception_type, ViewException))
+                self.assertTrue(issubclass(exception_type, Exception))
 
-    def testViewRenderExceptionInheritsFromViewException(self) -> None:
-        """
-        Verify ViewRenderException is a subclass of ViewException.
+    def testPreservesMessagesAtEachSpecificType(self) -> None:
+        """Keep each original message when catching its specific error type.
 
-        Validates the inheritance chain so callers can catch both the
-        specific render error and the base view error type.
+        Returns
+        -------
+        None
+            No return value.
         """
-        self.assertTrue(issubclass(ViewRenderException, ViewException))
+        cases = (
+            (ViewException, "base view error"),
+            (ViewRenderException, "render failed in template"),
+            (ViewTemplateNotFoundException, "template not found: users/index.html"),
+            (ViewRouteException, "route 'users.show' is not defined"),
+        )
+        for exception_type, message in cases:
+            with self.subTest(exception=exception_type.__name__):
+                with self.assertRaises(exception_type) as caught:
+                    raise exception_type(message)
+                self.assertEqual(str(caught.exception), message)
+                self.assertEqual(caught.exception.args, (message,))
 
-    def testViewTemplateNotFoundInheritsFromViewException(self) -> None:
-        """
-        Verify ViewTemplateNotFoundException is a subclass of ViewException.
+    def testCatchesEachSpecializedErrorAsViewException(self) -> None:
+        """Catch all specialized errors through their common view boundary.
 
-        Validates the inheritance chain so callers can catch both the
-        specific not-found error and the base view error type.
+        Returns
+        -------
+        None
+            No return value.
         """
-        self.assertTrue(issubclass(ViewTemplateNotFoundException, ViewException))
-
-    def testViewRenderExceptionInheritsFromException(self) -> None:
-        """
-        Verify ViewRenderException is a subclass of Exception.
-
-        Validates the full chain: ViewRenderException → ViewException
-        → Exception.
-        """
-        self.assertTrue(issubclass(ViewRenderException, Exception))
-
-    def testViewTemplateNotFoundInheritsFromException(self) -> None:
-        """
-        Verify ViewTemplateNotFoundException is a subclass of Exception.
-
-        Validates the full chain: ViewTemplateNotFoundException
-        → ViewException → Exception.
-        """
-        self.assertTrue(issubclass(ViewTemplateNotFoundException, Exception))
-
-    def testRaiseViewExceptionWithMessage(self) -> None:
-        """
-        Raise ViewException and verify the message is preserved.
-
-        Validates that the exception stores its message accessible via
-        the standard str() conversion.
-        """
-        msg = "base view error"
-        with self.assertRaises(ViewException) as ctx:
-            raise ViewException(msg)
-        self.assertEqual(str(ctx.exception), msg)
-
-    def testRaiseViewRenderExceptionWithMessage(self) -> None:
-        """
-        Raise ViewRenderException and verify the message is preserved.
-
-        Validates that ViewRenderException stores its message correctly
-        and is catchable at its own type level.
-        """
-        msg = "render failed in template"
-        with self.assertRaises(ViewRenderException) as ctx:
-            raise ViewRenderException(msg)
-        self.assertEqual(str(ctx.exception), msg)
-
-    def testRaiseViewTemplateNotFoundWithMessage(self) -> None:
-        """
-        Raise ViewTemplateNotFoundException and verify the message.
-
-        Validates that ViewTemplateNotFoundException stores its message
-        and is catchable at its own type level.
-        """
-        msg = "template not found: users/index.html"
-        with self.assertRaises(ViewTemplateNotFoundException) as ctx:
-            raise ViewTemplateNotFoundException(msg)
-        self.assertEqual(str(ctx.exception), msg)
-
-    def testCatchViewRenderExceptionAsViewException(self) -> None:
-        """
-        Catch ViewRenderException using the ViewException base class.
-
-        Validates polymorphic catching: callers handling ViewException
-        will also intercept ViewRenderException without code changes.
-        """
-        msg = "render error"
-        with self.assertRaises(ViewException):
-            raise ViewRenderException(msg)
-
-    def testCatchViewTemplateNotFoundAsViewException(self) -> None:
-        """
-        Catch ViewTemplateNotFoundException using the ViewException base.
-
-        Validates polymorphic catching: callers handling ViewException
-        will also intercept ViewTemplateNotFoundException.
-        """
-        msg = "missing template"
-        with self.assertRaises(ViewException):
-            raise ViewTemplateNotFoundException(msg)
+        cases = (
+            (ViewRenderException, "render error"),
+            (ViewTemplateNotFoundException, "missing template"),
+            (ViewRouteException, "missing route parameter"),
+        )
+        for exception_type, message in cases:
+            with self.subTest(exception=exception_type.__name__):
+                with self.assertRaises(ViewException) as caught:
+                    raise exception_type(message)
+                self.assertIs(type(caught.exception), exception_type)
+                self.assertEqual(str(caught.exception), message)
 
     def testViewExceptionWithNoArgs(self) -> None:
-        """
-        Raise ViewException with no arguments.
+        """Raise the base exception without constructing a message.
 
-        Validates that the exception can be raised without a message,
-        matching the pattern used in bare re-raise scenarios.
+        Returns
+        -------
+        None
+            No return value.
         """
-        with self.assertRaises(ViewException):
+        with self.assertRaises(ViewException) as caught:
             raise ViewException
+        self.assertEqual(caught.exception.args, ())
+        self.assertEqual(str(caught.exception), "")
 
-    def testViewRenderExceptionWithChainedCause(self) -> None:
-        """
-        Raise ViewRenderException chained from another exception.
+    def testPreservesChainedCauses(self) -> None:
+        """Preserve each original error as the explicitly chained cause.
 
-        Validates that the __cause__ attribute preserves the original
-        exception for debugging and logging purposes.
+        Returns
+        -------
+        None
+            No return value.
         """
-        original = RuntimeError("original cause")
-        msg = "wrapped render error"
-        with self.assertRaises(ViewRenderException) as ctx:
-            raise ViewRenderException(msg) from original
-        self.assertIs(ctx.exception.__cause__, original)
-
-    def testViewTemplateNotFoundWithChainedCause(self) -> None:
-        """
-        Raise ViewTemplateNotFoundException chained from another exception.
-
-        Validates that the __cause__ attribute preserves the original
-        exception when the not-found error wraps a Jinja2 cause.
-        """
-        original = KeyError("missing-template")
-        msg = "template missing"
-        with self.assertRaises(ViewTemplateNotFoundException) as ctx:
-            raise ViewTemplateNotFoundException(msg) from original
-        self.assertIs(ctx.exception.__cause__, original)
-
-    def testViewRouteExceptionInheritsFromViewException(self) -> None:
-        """
-        Verify ViewRouteException is a subclass of ViewException.
-
-        Validates the inheritance chain so callers can catch both the
-        specific route error and the base view error type.
-        """
-        self.assertTrue(issubclass(ViewRouteException, ViewException))
-
-    def testRaiseViewRouteExceptionWithMessage(self) -> None:
-        """
-        Raise ViewRouteException and verify the message is preserved.
-
-        Validates that ViewRouteException stores its message correctly
-        and is catchable at its own type level.
-        """
-        msg = "route 'users.show' is not defined"
-        with self.assertRaises(ViewRouteException) as ctx:
-            raise ViewRouteException(msg)
-        self.assertEqual(str(ctx.exception), msg)
-
-    def testCatchViewRouteExceptionAsViewException(self) -> None:
-        """
-        Catch ViewRouteException using the ViewException base class.
-
-        Validates polymorphic catching: callers handling ViewException
-        will also intercept ViewRouteException.
-        """
-        msg = "missing route parameter"
-        with self.assertRaises(ViewException):
-            raise ViewRouteException(msg)
+        cases = (
+            (
+                ViewRenderException,
+                "wrapped render error",
+                RuntimeError("original cause"),
+            ),
+            (
+                ViewTemplateNotFoundException,
+                "template missing",
+                KeyError("missing-template"),
+            ),
+        )
+        for exception_type, message, original in cases:
+            with self.subTest(exception=exception_type.__name__):
+                with self.assertRaises(exception_type) as caught:
+                    raise exception_type(message) from original
+                self.assertIs(caught.exception.__cause__, original)
+                self.assertEqual(str(caught.exception), message)
 
     def testExceptionTypesAreDistinct(self) -> None:
-        """
-        Verify the specialised view errors are unrelated to each other.
+        """Keep every specialized exception unrelated to its sibling types.
 
-        Validates that catching one specialised type never intercepts a
-        sibling error type.
+        Returns
+        -------
+        None
+            No return value.
         """
-        self.assertFalse(
-            issubclass(ViewRouteException, ViewRenderException),
+        exception_types = (
+            ViewRenderException,
+            ViewTemplateNotFoundException,
+            ViewRouteException,
         )
-        self.assertFalse(
-            issubclass(ViewTemplateNotFoundException, ViewRenderException),
-        )
+        for left in exception_types:
+            for right in exception_types:
+                if left is not right:
+                    with self.subTest(left=left.__name__, right=right.__name__):
+                        self.assertFalse(issubclass(left, right))

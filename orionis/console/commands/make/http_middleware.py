@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeHttpMiddleware(MakeStubCommand):
     """Generate an HTTP middleware class."""
 
@@ -19,4 +20,3 @@ class MakeHttpMiddleware(MakeStubCommand):
     """Success label identifier: ``HTTP middleware``."""
     postfix: str | None = "Middleware"
     """Postfix identifier: ``Middleware``."""
-

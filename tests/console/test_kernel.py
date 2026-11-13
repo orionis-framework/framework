@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.console.contracts.kernel import IKernelCLI
 from orionis.console.core.contracts.reactor import IReactor
@@ -12,6 +14,7 @@ _HELP_TOKENS: tuple[str, ...] = ("help", "--help", "-h")
 
 # Message reported when the argument list has the wrong type.
 _TYPE_ERROR_MESSAGE = "Arguments must be provided as a list."
+
 
 class _RecordingReactor:
     """Reactor double recording every dispatched signature."""
@@ -57,6 +60,7 @@ class _RecordingReactor:
         self.calls.append((signature, args))
         return self.exit_code
 
+
 class _StubApp:
     """Application double resolving the reactor contract."""
 
@@ -95,6 +99,7 @@ class _StubApp:
         self.requested.append(abstract)
         return self.reactor
 
+
 async def boot_kernel(exit_code: int = 0) -> tuple[KernelCLI, _RecordingReactor]:
     """
     Build a kernel already booted against a recording reactor.
@@ -114,8 +119,8 @@ async def boot_kernel(exit_code: int = 0) -> tuple[KernelCLI, _RecordingReactor]
     await kernel.boot(_StubApp(reactor))  # type: ignore[arg-type]
     return kernel, reactor
 
-class TestKernelCliDefinition(TestCase):
 
+class TestKernelCliDefinition(TestCase):
     def testImplementsTheKernelContract(self) -> None:
         """Implement the console kernel contract.
 
@@ -200,8 +205,8 @@ class TestKernelCliDefinition(TestCase):
         self.assertEqual(KernelCLI.__slots__, ("__reactor",))
         self.assertFalse(hasattr(KernelCLI(), "__dict__"))
 
-class TestKernelCliBoot(TestCase):
 
+class TestKernelCliBoot(TestCase):
     async def testResolvesTheReactorFromTheApplication(self) -> None:
         """Resolve the reactor contract through the application container.
 
@@ -238,8 +243,8 @@ class TestKernelCliBoot(TestCase):
 
         self.assertEqual(reactor.calls, [("migrate", [])])
 
-class TestKernelCliArgumentValidation(TestCase):
 
+class TestKernelCliArgumentValidation(TestCase):
     async def testRejectsArgumentsThatAreNotAList(self) -> None:
         """Reject any argument container that is not a list.
 
@@ -260,8 +265,8 @@ class TestKernelCliArgumentValidation(TestCase):
 
         self.assertEqual(reactor.calls, [])
 
-class TestKernelCliHelpFallback(TestCase):
 
+class TestKernelCliHelpFallback(TestCase):
     async def testTreatsMissingArgumentsAsTheListingRequest(self) -> None:
         """Fall back to the listing when no argument is supplied.
 
@@ -332,7 +337,21 @@ class TestKernelCliHelpFallback(TestCase):
 
         self.assertEqual(reactor.calls, [("list", None)])
 
+
 class TestKernelCliDispatch(TestCase):
+    async def testCommandNamesContainingReactorAreNotDiscarded(self) -> None:
+        """Distinguish a real command signature from the launcher filename.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for signature in ("reactorstatus", "app:reactor-status"):
+            with self.subTest(signature=signature):
+                kernel, reactor = await boot_kernel(exit_code=7)
+                self.assertEqual(await kernel.handle([signature, "--check"]), 7)
+                self.assertEqual(reactor.calls, [(signature, ["--check"])])
 
     async def testRoutesALoneCommandWithAnEmptyArgumentList(self) -> None:
         """Route a command that carries no trailing arguments.

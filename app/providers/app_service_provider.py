@@ -1,7 +1,7 @@
 from orionis.container.providers import ServiceProvider
 
-class AppServiceProvider(ServiceProvider):
 
+class AppServiceProvider(ServiceProvider):
     def register(self) -> None:
         """
         Register application services.

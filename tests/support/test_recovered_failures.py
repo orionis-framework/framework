@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Verify recovered storage, cache, session and mail errors remain observable."""
 
 import asyncio
@@ -36,10 +38,16 @@ class TestRecoveredServiceFailures(TestCase):
         driver._client_error = OSError
         with (
             operation(app),
-            patch.object(S3StorageDriver, "_S3StorageDriver__headSync",
-                         return_value={"ContentLength": 12}),
-            patch.object(S3StorageDriver, "_S3StorageDriver__visibilitySync",
-                         side_effect=error),
+            patch.object(
+                S3StorageDriver,
+                "_S3StorageDriver__headSync",
+                return_value={"ContentLength": 12},
+            ),
+            patch.object(
+                S3StorageDriver,
+                "_S3StorageDriver__visibilitySync",
+                side_effect=error,
+            ),
         ):
             info = await driver.info("asset.txt")
             await runtime.drain()
@@ -83,7 +91,9 @@ class TestRecoveredServiceFailures(TestCase):
         with operation(app):
             self.assertIsNone(cache._DatabaseCacheBackend__decode(b"invalid"))
             self.assertIsNone(file_session._deserialize(b"invalid"))
-            self.assertIsNone(database_session._DatabaseSessionStore__decode(b"invalid"))
+            self.assertIsNone(
+                database_session._DatabaseSessionStore__decode(b"invalid"),
+            )
             await runtime.drain()
         self.assertEqual(len(handler.failures), 3)
         self.assertEqual(
@@ -96,7 +106,8 @@ class TestRecoveredServiceFailures(TestCase):
         app, _, handler = activate_runtime()
         original, cleanup = OSError("read"), OSError("close")
         stream = SimpleNamespace(
-            __aenter__=AsyncMock(), read=AsyncMock(side_effect=original),
+            __aenter__=AsyncMock(),
+            read=AsyncMock(side_effect=original),
             close=AsyncMock(side_effect=cleanup),
         )
         storage = MagicMock()
@@ -115,16 +126,19 @@ class TestRecoveredServiceFailures(TestCase):
         started, release = asyncio.Event(), asyncio.Event()
         error = OSError("late storage failure")
 
-        async def read(*_args: object):
+        async def read(*_args: object) -> None:
+            """Raise the original read error after explicit release."""
             started.set()
             await release.wait()
             raise error
 
         composer = MailComposer(MagicMock(), MagicMock())
         with operation(app), patch.object(MailComposer, "_readAttachment", read):
-            task = asyncio.create_task(composer._resolveAttachment(
-                Attachment(path="asset.txt"),
-            ))
+            task = asyncio.create_task(
+                composer._resolveAttachment(
+                    Attachment(path="asset.txt"),
+                ),
+            )
             await started.wait()
             task.cancel()
             release.set()
@@ -184,17 +198,22 @@ class TestRecoveredServiceFailures(TestCase):
         session_error = PermissionError("session cleanup")
         with TemporaryDirectory() as directory:
             root = Path(directory)
-            temporary = root / "abandoned.tmp"
+            temporary = FileSessionStore._tempPath(root / "session.json")
             temporary.write_bytes(b"partial")
             os.utime(temporary, (0, 0))
             (root / "session.json").write_bytes(b"{}")
             store = FileSessionStore(root)
             with (
                 operation(app),
-                patch("orionis.session.stores.file.os.unlink",
-                      side_effect=temporary_error),
-                patch.object(FileSessionStore, "_readRecord",
-                             side_effect=session_error),
+                patch(
+                    "orionis.session.stores.file.os.unlink",
+                    side_effect=temporary_error,
+                ),
+                patch.object(
+                    FileSessionStore,
+                    "_readRecord",
+                    side_effect=session_error,
+                ),
             ):
                 await store.gc()
                 await runtime.drain()
@@ -207,10 +226,16 @@ class TestRecoveredServiceFailures(TestCase):
         lease = RedisResolverLease(MagicMock(), "key", 10, 1)
         with (
             operation(app),
-            patch.object(RedisResolverLease, "_acquire",
-                         AsyncMock(side_effect=original)),
-            patch.object(RedisResolverLease, "_release",
-                         AsyncMock(side_effect=cleanup)),
+            patch.object(
+                RedisResolverLease,
+                "_acquire",
+                AsyncMock(side_effect=original),
+            ),
+            patch.object(
+                RedisResolverLease,
+                "_release",
+                AsyncMock(side_effect=cleanup),
+            ),
             self.assertRaises(OSError) as caught,
         ):
             await lease.__aenter__()
@@ -246,8 +271,11 @@ class TestRecoveredServiceFailures(TestCase):
         with (
             operation(app),
             patch.object(RedisResolverLease, "_acquire", AsyncMock()),
-            patch.object(RedisResolverLease, "_release",
-                         AsyncMock(side_effect=cleanup)) as release,
+            patch.object(
+                RedisResolverLease,
+                "_release",
+                AsyncMock(side_effect=cleanup),
+            ) as release,
             self.assertRaises(OSError) as caught,
         ):
             async with lease:
@@ -256,8 +284,10 @@ class TestRecoveredServiceFailures(TestCase):
         self.assertEqual(handler.reports, [original, cleanup])
         self.assertIs(cleanup.__context__, original)
         self.assertEqual(handler.failures[1][1].phase, "cleanup")
-        self.assertEqual(handler.failures[1][1].parent_event_id,
-                         handler.failures[0][1].event_id)
+        self.assertEqual(
+            handler.failures[1][1].parent_event_id,
+            handler.failures[0][1].event_id,
+        )
         release.assert_awaited_once()
 
     async def testDatabaseCacheLockCleanupPreservesBodyFailure(self) -> None:
@@ -273,10 +303,16 @@ class TestRecoveredServiceFailures(TestCase):
         backend = DatabaseCacheBackend(MagicMock(), "cache", "locks")
         with (
             operation(app),
-            patch.object(DatabaseCacheBackend, "acquireLock",
-                         AsyncMock(return_value=True)),
-            patch.object(DatabaseCacheBackend, "releaseLock",
-                         AsyncMock(side_effect=cleanup)) as release,
+            patch.object(
+                DatabaseCacheBackend,
+                "acquireLock",
+                AsyncMock(return_value=True),
+            ),
+            patch.object(
+                DatabaseCacheBackend,
+                "releaseLock",
+                AsyncMock(side_effect=cleanup),
+            ) as release,
             self.assertRaises(OSError) as caught,
         ):
             async with CacheLock(backend, "key"):
@@ -284,6 +320,8 @@ class TestRecoveredServiceFailures(TestCase):
         await runtime.drain()
         self.assertIs(caught.exception, original)
         self.assertEqual(handler.reports, [original, cleanup])
-        self.assertEqual(handler.failures[1][1].parent_event_id,
-                         handler.failures[0][1].event_id)
+        self.assertEqual(
+            handler.failures[1][1].parent_event_id,
+            handler.failures[0][1].event_id,
+        )
         release.assert_awaited_once()

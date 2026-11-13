@@ -1,17 +1,20 @@
+# ruff: noqa: TC001, TC003
+# Resolve public path and mapping annotations during runtime introspection.
 """Load translation sources from the configured language path."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from pathlib import Path
 import msgspec
 from orionis.localization.contracts.loader import ITranslationLoader
 from orionis.localization.exceptions import (
+    InvalidLocaleException,
+    TranslationException,
     TranslationFileNotFoundException,
     TranslationSyntaxException,
 )
+from orionis.localization.types import TranslationMap
+from orionis.localization.validators import validate_locale
 
-if TYPE_CHECKING:
-    from pathlib import Path
-    from orionis.localization.types import TranslationMap
 
 class TranslationLoader(ITranslationLoader):
     """
@@ -21,7 +24,7 @@ class TranslationLoader(ITranslationLoader):
     keys are the literal source texts, and grouped JSON files
     (``{path}/{locale}/{group}.json``) flattened with dot notation such
     as ``validation.required``. Decoding is performed with ``msgspec``
-    for maximum throughput. The loader holds no cache: that concern
+    using its native JSON decoder. The loader holds no cache: that concern
     belongs to the repository.
 
     Notes
@@ -47,9 +50,9 @@ class TranslationLoader(ITranslationLoader):
         Returns
         -------
         None
-            Initialize the loader with the language directory.
+            No return value.
         """
-        self._path = path
+        self._path = path.resolve()
         """Absolute directory containing the translation sources."""
 
     def load(self, locale: str) -> TranslationMap:
@@ -72,20 +75,25 @@ class TranslationLoader(ITranslationLoader):
 
         Raises
         ------
+        orionis.localization.InvalidLocaleException
+            If the locale code is malformed or contains path components.
+        orionis.localization.TranslationException
+            If a source resolves outside the configured language directory.
         orionis.localization.TranslationSyntaxException
             If a translation file is not UTF-8 encoded, contains
             invalid JSON, or its root element is not an object.
         """
+        locale = validate_locale(locale)
         translations: TranslationMap = {}
 
         # Merge grouped files flattened as "group.nested.key" entries.
-        directory = self._path / locale
+        directory = self.__resolveSource(self._path / locale)
         if directory.is_dir():
             for file in sorted(directory.glob("*.json")):
                 self.__flatten(self.__readFile(file), file.stem, translations)
 
         # Merge the root JSON file whose keys are literal source texts.
-        root_file = self._path / f"{locale}.json"
+        root_file = self.__resolveSource(self._path / f"{locale}.json")
         if root_file.is_file():
             for key, value in self.__readFile(root_file).items():
                 if isinstance(value, dict):
@@ -102,8 +110,8 @@ class TranslationLoader(ITranslationLoader):
         Returns
         -------
         tuple[str, ``...``]
-            Sorted locale codes discovered from root JSON files and
-            grouped directories inside the language path.
+            Sorted valid locale codes from sources resolving within the
+            language directory. External links are omitted.
         """
         if not self._path.is_dir():
             return ()
@@ -111,10 +119,22 @@ class TranslationLoader(ITranslationLoader):
         # Collect locales from both root JSON files and grouped folders.
         locales: set[str] = set()
         for entry in self._path.iterdir():
-            if entry.is_file() and entry.suffix == ".json":
-                locales.add(entry.stem)
-            elif entry.is_dir() and any(entry.glob("*.json")):
-                locales.add(entry.name)
+            if not entry.resolve().is_relative_to(self._path):
+                continue
+            is_root_file = entry.is_file() and entry.suffix == ".json"
+            locale = entry.stem if is_root_file else entry.name
+            try:
+                validate_locale(locale)
+            except InvalidLocaleException:
+                continue
+            if is_root_file or (
+                entry.is_dir()
+                and any(
+                    file.resolve().is_relative_to(self._path) and file.is_file()
+                    for file in entry.glob("*.json")
+                )
+            ):
+                locales.add(locale)
 
         return tuple(sorted(locales))
 
@@ -140,14 +160,18 @@ class TranslationLoader(ITranslationLoader):
             If the payload is not UTF-8 encoded, is invalid JSON, or
             its root element is not an object.
         """
-        # Guard against files removed between discovery and read.
+        file = self.__resolveSource(file)
+        # Guard against missing entries and non-file sources.
         if not file.is_file():
             error_msg = f"Translation file not found: {file}"
             raise TranslationFileNotFoundException(error_msg)
 
-        # Decode the raw UTF-8 bytes with msgspec for maximum throughput.
+        # Decode the raw UTF-8 bytes with msgspec.
         try:
             decoded = msgspec.json.decode(file.read_bytes())
+        except FileNotFoundError as exc:
+            error_msg = f"Translation file not found: {file}"
+            raise TranslationFileNotFoundException(error_msg) from exc
         except (msgspec.DecodeError, UnicodeDecodeError) as exc:
             error_msg = f"Invalid JSON in translation file: {file} ({exc})"
             raise TranslationSyntaxException(error_msg) from exc
@@ -158,6 +182,32 @@ class TranslationLoader(ITranslationLoader):
             raise TranslationSyntaxException(error_msg)
 
         return decoded
+
+    def __resolveSource(self, source: Path) -> Path:
+        """Resolve a source inside the configured language directory.
+
+        Parameters
+        ----------
+        source : pathlib.Path
+            Candidate directory or JSON file, including symbolic links.
+
+        Returns
+        -------
+        pathlib.Path
+            Resolved source within the configured directory.
+
+        Raises
+        ------
+        orionis.localization.TranslationException
+            If the source resolves outside the language directory.
+        """
+        resolved = source.resolve()
+        if not resolved.is_relative_to(self._path):
+            error_msg = (
+                f"Translation source is outside the language directory: {source}"
+            )
+            raise TranslationException(error_msg)
+        return resolved
 
     def __flatten(
         self,
@@ -180,7 +230,7 @@ class TranslationLoader(ITranslationLoader):
         Returns
         -------
         None
-            Flatten a nested translation object into dot-notated keys.
+            No return value.
         """
         for key, value in payload.items():
             compound = f"{prefix}.{key}"

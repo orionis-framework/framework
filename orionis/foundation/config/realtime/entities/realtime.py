@@ -5,6 +5,7 @@ from orionis.environment import Env
 from orionis.foundation.config.validation import validate_integer, validate_seconds
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class RealtimeConfig(BaseEntity):
     """
@@ -35,7 +36,8 @@ class RealtimeConfig(BaseEntity):
 
     max_pending_client_invocations: int = field(
         default_factory=lambda: Env.get(
-            "REALTIME_MAX_PENDING_CLIENT_INVOCATIONS", 32,
+            "REALTIME_MAX_PENDING_CLIENT_INVOCATIONS",
+            32,
         ),
         metadata={
             "description": "Maximum pending client-result calls per connection.",
@@ -97,12 +99,16 @@ class RealtimeConfig(BaseEntity):
             If a count is nonpositive or a timeout is not finite and positive.
         """
         for name in (
-            "max_message_size", "max_concurrent_invocations",
-            "max_pending_client_invocations", "broadcast_concurrency",
+            "max_message_size",
+            "max_concurrent_invocations",
+            "max_pending_client_invocations",
+            "broadcast_concurrency",
             "max_groups_per_connection",
         ):
             validate_integer(getattr(self, name), name, minimum=1)
         validate_seconds(self.invocation_timeout, "invocation_timeout", positive=True)
         validate_seconds(
-            self.client_result_timeout, "client_result_timeout", positive=True,
+            self.client_result_timeout,
+            "client_result_timeout",
+            positive=True,
         )

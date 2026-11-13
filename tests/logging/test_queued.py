@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import logging
 import threading
@@ -14,6 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
     from orionis.logging.contracts.logger import ILogger
 
+
 class TestQueuedLogging(TestCase):
     """Verify explicit overload and draining of accepted log records."""
 
@@ -24,7 +27,7 @@ class TestQueuedLogging(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         entered, released = threading.Event(), threading.Event()
         seen = []
@@ -42,7 +45,7 @@ class TestQueuedLogging(TestCase):
                 Returns
                 -------
                 None
-                    Complete the operation without returning a value.
+                    No return value.
                 """
                 entered.set()
                 released.wait(5)
@@ -68,7 +71,7 @@ class TestQueuedLogging(TestCase):
 
         try:
             handler.handle(record("one"))
-            await asyncio.to_thread(entered.wait, 5)
+            self.assertTrue(await asyncio.to_thread(entered.wait, 5))
             handler.handle(record("two"))
             with self.assertRaises(Full):
                 handler.handle(record("three"))
@@ -84,7 +87,7 @@ class TestQueuedLogging(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
 
         class Sink(logging.Handler):
@@ -100,12 +103,13 @@ class TestQueuedLogging(TestCase):
                 Returns
                 -------
                 None
-                    Complete the operation without returning a value.
+                    No return value.
                 """
                 error_msg = "unavailable"
                 raise OSError(error_msg)
 
         handler = BoundedQueueHandler(Sink(), 2)
+        self.addAsyncCleanup(asyncio.to_thread, handler.close)
         handler.handle(logging.LogRecord("failure", 40, "", 1, "message", (), None))
         with self.assertRaises(LoggingDeliveryError):
             await asyncio.to_thread(handler.close)
@@ -118,7 +122,7 @@ class TestQueuedLogging(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         events = []
 
@@ -129,7 +133,7 @@ class TestQueuedLogging(TestCase):
             Returns
             -------
             None
-                Complete the operation without returning a value.
+                No return value.
             """
             events.append("drained")
 
@@ -174,7 +178,7 @@ class TestQueuedLogging(TestCase):
             Returns
             -------
             None
-                Complete the operation without returning a value.
+                No return value.
             """
             await callback()
 
@@ -195,7 +199,7 @@ class TestQueuedLogging(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         closed = []
 
@@ -207,7 +211,7 @@ class TestQueuedLogging(TestCase):
                 Returns
                 -------
                 None
-                    Complete the operation without returning a value.
+                    No return value.
                 """
                 if not closed:
                     error_msg = "flush unavailable"
@@ -220,12 +224,13 @@ class TestQueuedLogging(TestCase):
                 Returns
                 -------
                 None
-                    Complete the operation without returning a value.
+                    No return value.
                 """
                 closed.append(True)
                 super().close()
 
         handler = BoundedQueueHandler(Sink(), 1)
+        self.addAsyncCleanup(asyncio.to_thread, handler.close)
         with self.assertRaises(LoggingDeliveryError):
             await asyncio.to_thread(handler.close)
         self.assertTrue(closed)

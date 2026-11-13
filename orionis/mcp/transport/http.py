@@ -1,8 +1,11 @@
+# ruff: noqa: BLE001, TC001, TC003
+# Runtime types stay resolvable; the protocol boundary reports before sanitizing errors.
 """Serve a registered endpoint without owning routes, sessions or identities."""
 
 from __future__ import annotations
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Self
+from collections.abc import AsyncIterator, Callable
+from typing import Self
 import msgspec
 from orionis.failure.runtime import capture
 from orionis.http.payload.body import PayloadTooLargeException
@@ -16,21 +19,19 @@ from orionis.mcp.reporting import report
 from orionis.mcp.streams import AsyncClosable
 from orionis.mcp.transport.headers import validate_headers
 from orionis.mcp.transport.policy import McpProtocolResponse, origin_allowed
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator, Callable
-    from orionis.foundation.contracts.application import IApplication
-    from orionis.http.payload.estructures.headers import Headers
-    from orionis.http.request import Request
-    from orionis.mcp.config import McpConfig
-    from orionis.mcp.contracts.event_bus import IMcpEventBus
-    from orionis.mcp.protocol.requests import JsonRpcRequest, RequestParams
-    from orionis.mcp.server.compiler import CompiledMcpServer
+from orionis.foundation.contracts.application import IApplication
+from orionis.http.payload.estructures.headers import Headers
+from orionis.http.request import Request
+from orionis.mcp.config import McpConfig
+from orionis.mcp.contracts.event_bus import IMcpEventBus
+from orionis.mcp.protocol.requests import JsonRpcRequest, RequestParams
+from orionis.mcp.server.compiler import CompiledMcpServer
 
 _JSON_MEDIA_TYPE = "application/json"
 """Json media type identifier: ``application/json``."""
 _ACCEPT_MEDIA_TYPES = frozenset({_JSON_MEDIA_TYPE, "text/event-stream"})
 """Accept media types used by ``http``."""
+
 
 class _EventFrames(AsyncClosable):
     """Own an MCP byte iterator even if the HTTP stream is never started."""
@@ -39,7 +40,9 @@ class _EventFrames(AsyncClosable):
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, source: AsyncIterator[bytes], release: Callable[[], None],
+        self,
+        source: AsyncIterator[bytes],
+        release: Callable[[], None],
     ) -> None:
         """
         Transfer iterator and admission-slot ownership to the response.
@@ -109,6 +112,7 @@ class _EventFrames(AsyncClosable):
         finally:
             self._release()
 
+
 def _accept_quality(parameters: str) -> float | None:
     """
     Read the final quality parameter of one Accept representation.
@@ -132,6 +136,7 @@ def _accept_quality(parameters: str) -> float | None:
             except ValueError:
                 return None
     return quality
+
 
 def _accepts_both(headers: Headers) -> bool:
     """
@@ -157,6 +162,7 @@ def _accepts_both(headers: Headers) -> bool:
             if 0 < quality <= 1:
                 accepted.add(media.strip().lower())
     return _ACCEPT_MEDIA_TYPES.issubset(accepted)
+
 
 class McpHttpTransport:
     """Serve a registered endpoint without owning routes, sessions or identities."""
@@ -287,7 +293,10 @@ class McpHttpTransport:
             ) or self._compiled.catalog_tools.get(params.name)
             if tool is not None:
                 validate_headers(
-                    request.headers, envelope, params, tool.mirrored_headers,
+                    request.headers,
+                    envelope,
+                    params,
+                    tool.mirrored_headers,
                 )
         return params
 
@@ -312,7 +321,9 @@ class McpHttpTransport:
             self._validateHttp(request)
             if self._active >= self._config.max_concurrent_requests:
                 raise McpProtocolException(
-                    -32603, "Request capacity unavailable", status=503,
+                    -32603,
+                    "Request capacity unavailable",
+                    status=503,
                 )
             self._active += 1
             admitted = True
@@ -342,13 +353,16 @@ class McpHttpTransport:
             return self._error(exc, request_id)
         except PayloadTooLargeException as exc:
             await self._reportRequestFailure(
-                exc, request_id, phase="body", expected=True,
+                exc,
+                request_id,
+                phase="body",
+                expected=True,
             )
             return self._error(
                 McpProtocolException(-32600, "Request body too large", status=413),
                 request_id,
             )
-        except Exception as exc:  # noqa: BLE001 - Preserve the public error envelope.
+        except Exception as exc:
             await self._reportRequestFailure(exc, request_id)
             return self._error(
                 McpProtocolException(-32603, "Internal error", status=500),
@@ -362,9 +376,12 @@ class McpHttpTransport:
                 self._release()
 
     async def _reportRequestFailure(
-        self, exception: BaseException,
+        self,
+        exception: BaseException,
         request_id: str | int | msgspec.UnsetType,
-        *, phase: str = "request", expected: bool = False,
+        *,
+        phase: str = "request",
+        expected: bool = False,
     ) -> None:
         """
         Report an HTTP request failure without passing an unset identifier.
@@ -386,12 +403,18 @@ class McpHttpTransport:
             Await shared failure reporting with HTTP transport metadata.
         """
         await report(
-            exception, self._app, transport="http", phase=phase, expected=expected,
+            exception,
+            self._app,
+            transport="http",
+            phase=phase,
+            expected=expected,
             correlation_id=None if request_id is msgspec.UNSET else request_id,
         )
 
     async def _streamResponse(
-        self, events: _EventFrames, status: int,
+        self,
+        events: _EventFrames,
+        status: int,
     ) -> EventStreamResponse:
         """
         Transfer event-source ownership to a response or clean up on failure.
@@ -420,7 +443,10 @@ class McpHttpTransport:
             primary = original
             try:
                 await capture(
-                    original, app=self._app, flow="mcp", phase="response",
+                    original,
+                    app=self._app,
+                    flow="mcp",
+                    phase="response",
                     metadata={"transport": "http"},
                 )
             except BaseException as interruption:
@@ -431,7 +457,9 @@ class McpHttpTransport:
             raise
 
     async def _closeFailedResponse(
-        self, events: _EventFrames, primary: BaseException,
+        self,
+        events: _EventFrames,
+        primary: BaseException,
     ) -> None:
         """
         Close failed-response events without suppressing cleanup interruptions.

@@ -14,6 +14,7 @@ from orionis.support.entities.base import BaseEntity
 _GUARD_NAMES: frozenset[str] = frozenset(Guards._member_names_)
 """Define the supported authentication guard names."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Auth(BaseEntity):
     """

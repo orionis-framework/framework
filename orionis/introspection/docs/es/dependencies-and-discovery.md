@@ -20,11 +20,13 @@ Ambas familias exponen identidad, módulo, docstring, bases, fuente, archivo, an
 
 ### `ReflectionModule`
 
-Importa un módulo dotted y expone clases, constantes, funciones, imports, fuente y archivo. Los getters dividen clases y constantes por visibilidad; los de funciones separan además sync de async. Su protocolo mapping lee o muta atributos del módulo.
+Importa un módulo dotted y expone clases, constantes, funciones, imports, fuente y archivo. Los getters dividen clases y constantes por visibilidad; los de funciones separan además sync de async. Su protocolo de items lee o modifica la caché en memoria del wrapper. `setClass()` y `removeClass()` modifican el módulo e invalidan todas las categorías de miembros almacenadas.
 
 ### `ReflectDependencies` y `Signature`
 
 `constructorSignature()`, `methodSignature(name)` y `callableSignature()` devuelven un `Signature`. La entidad ofrece predicados y selectores: `hasParameters`, `noArgumentsRequired`, `hasUnresolvedArguments`, `getResolved`, `getUnresolved`, `getAllOrdered`, `getPositionalOnly`, `getKeywordOnly`, conversiones y `arguments()`.
+
+`getPositionalOnly()` devuelve todos los argumentos que no son exclusivamente de palabra clave, incluidos los que admiten ambas formas. Use la firma inspect para distinguir parámetros exclusivamente posicionales (`/`) al construir una llamada.
 
 ### `ModuleInspector`
 
@@ -49,7 +51,7 @@ Elija el wrapper más específico y use sus getters clasificados. Recuperar fuen
 
 ### Modificar miembros reflejados
 
-`setAttribute`, `removeAttribute`, `setMethod`, la asignación de items de módulo y su borrado afectan la clase, instancia o módulo real. Limpie la caché tras mutación externa; los métodos de mutación del wrapper invalidan los datos afectados. Restrinja esta capacidad a bootstrap, pruebas y metaprogramación controlada.
+`setAttribute`, `removeAttribute`, `setMethod`, `removeMethod`, `setClass` y `removeClass` afectan la clase, instancia o módulo real. Limpie la caché tras mutación externa; los métodos de mutación del wrapper invalidan los datos afectados. La mutación de clases abstractas también actualiza su estado de métodos abstractos en Python. Los métodos propios de una instancia se inspeccionan antes que los de clase; eliminar un método propio vuelve a exponer el de clase. Sin un método propio, `ReflectionInstance.removeMethod()` elimina la definición de clase y afecta a sus otras instancias. Restrinja la mutación a bootstrap, pruebas y metaprogramación controlada.
 
 ## Configuración
 
@@ -67,15 +69,15 @@ Como la inspección está por debajo del contenedor, el paquete no depende de un
 - `ReflectionInstance` rechaza objetos de clase, instancias builtin/ABC e instancias cuya clase se define en `__main__`.
 - `ReflectionCallable` acepta funciones Python, métodos ligados, lambdas y callables con `__code__`; otros callables pueden rechazarse.
 - Buscar fuente y archivo puede producir `AttributeError`, `TypeError` o errores de inspección para objetos generados, interactivos o builtin.
-- Métodos/propiedades desconocidos producen `AttributeError`; nombres de mutación inválidos y métodos no callable fallan en validación.
+- Los métodos o propiedades desconocidos producen `ValueError` en wrappers de clase o `AttributeError` en wrappers de instancia. Un atributo de clase ausente devuelve `None`; nombres de mutación inválidos y métodos no callable fallan en validación.
 - Anotaciones builtin requeridas como `int` quedan sin resolver intencionalmente; un valor predeterminado resuelve el parámetro desde su tipo concreto.
 - Las referencias futuras se resuelven cuando es posible. Los nombres no disponibles permanecen como metadatos conservadores sin importarlos especulativamente.
-- `discoverModules` falla si el objetivo queda fuera de la base. El análisis AST devuelve `False` para archivos ausentes, inválidos o no decodificables.
-- Descubrir módulos y dataclasses frozen importa código cuando así se documenta; no lo ejecute sobre paquetes no confiables.
+- `discoverModules` falla si el objetivo queda fuera de la base o no puede leerse un directorio del recorrido. Un directorio opcional ausente produce un conjunto vacío. El análisis AST admite declaraciones de codificación Python y BOM UTF-8, y devuelve `False` para archivos ausentes, inválidos o no decodificables.
+- El descubrimiento de archivos y el análisis AST no ejecutan código de módulos. `loadClass()`, la reflexión de módulos y el descubrimiento de dataclasses frozen importan código; úselos con paquetes confiables.
 
 ## Rendimiento y concurrencia
 
-Los scans de clase/miembros recorren una vez y se guardan por wrapper. Las firmas inspect y de dependencias se memoizan, y la carga de módulos/clases combina la caché de importación de Python con una caché de clases de Orionis. Reutilice wrappers en hot paths y llame `clearCache()` solo tras mutación intencional.
+Los scans de clase/miembros recorren una vez y se guardan por wrapper. Las firmas inspect y de dependencias se memoizan, y la carga de módulos/clases usa la caché de importación de Python y lee el atributo de clase actual. Reutilice wrappers en hot paths y llame `clearCache()` solo tras mutación intencional.
 
 Las cachés son locales al proceso. Las lecturas sirven para concurrencia normal bajo las garantías del runtime, pero mutar objetos reflejados y limpiar cachés no es transaccional. No modifique una clase/módulo compartido mientras otros threads o tasks lo inspeccionan o invocan. El recorrido del filesystem es síncrono y corresponde a bootstrap/herramientas, no al hot path de solicitudes.
 

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from redis.exceptions import ConnectionError as RedisConnectionError
 from orionis.foundation.config.http import HTTP
 from orionis.foundation.enums.lifespan import Lifespan
@@ -7,7 +9,10 @@ from orionis.http.layer.shared.rate_limit import RateLimitMiddleware
 from orionis.http.layer.store.redis_rate_limit import RedisRateLimitStore
 from orionis.http.responses import Response
 from orionis.test import TestCase
+from orionis.failure.runtime import operation
+from tests.foundation.test_failure_lifecycle import reporting_application
 from tests.http.test_support import make_adapter
+
 
 class _DefaultResponses:
     """Render error status and headers for middleware assertions."""
@@ -16,7 +21,11 @@ class _DefaultResponses:
 
     @staticmethod
     async def error(
-        *, status_code: int, content: str, headers: dict, **_kwargs: object,
+        *,
+        status_code: int,
+        content: str,
+        headers: dict,
+        **_kwargs: object,
     ) -> Response:
         """Build an error response for middleware assertions.
 
@@ -37,6 +46,7 @@ class _DefaultResponses:
             The requested error response.
         """
         return Response(status_code=status_code, content=content, headers=headers)
+
 
 class _UnavailableStore:
     """Fail instead of silently admitting requests when storage is unavailable."""
@@ -62,6 +72,7 @@ class _UnavailableStore:
             Always, to simulate an unavailable backend.
         """
         raise RedisConnectionError
+
 
 class _Application:
     """Record the HTTP kernel's application shutdown callback."""
@@ -97,6 +108,7 @@ class _Application:
         """
         self.callbacks.append((event, callback, runtime))
 
+
 class _ClosingClient:
     """Report when an owned Redis pool is closed by application shutdown."""
 
@@ -122,6 +134,7 @@ class _ClosingClient:
         """
         self.closed = True
 
+
 class TestRateLimitMiddleware(TestCase):
     """Verify configured capacity and distributed failure behavior."""
 
@@ -133,11 +146,14 @@ class TestRateLimitMiddleware(TestCase):
         None
             Verify capacity rejection includes the retry interval.
         """
-        middleware = RateLimitMiddleware({
-            "rate_limit_enabled": True,
-            "rate_limit_max_keys": 1,
-            "rate_limit_requests": 2,
-        }, _DefaultResponses())
+        middleware = RateLimitMiddleware(
+            {
+                "rate_limit_enabled": True,
+                "rate_limit_max_keys": 1,
+                "rate_limit_requests": 2,
+            },
+            _DefaultResponses(),
+        )
         first = make_adapter([])
         first.setClient("192.0.2.1")
         second = make_adapter([])
@@ -157,14 +173,29 @@ class TestRateLimitMiddleware(TestCase):
         None
             Verify backend failure does not silently switch quota stores.
         """
-        middleware = RateLimitMiddleware({"rate_limit_enabled": True},
-                                         _DefaultResponses())
+        middleware = RateLimitMiddleware(
+            {"rate_limit_enabled": True},
+            _DefaultResponses(),
+        )
         middleware._RateLimitMiddleware__store = _UnavailableStore()
         adapter = make_adapter([])
         adapter.setClient("192.0.2.1")
-        result = await middleware.handle(adapter)
+        app, handler = reporting_application()
+        owner = object()
+        app._failure_runtime.activate(owner)
+        try:
+            with operation(app, flow="http", isolated=True):
+                result = await middleware.handle(adapter)
+            await app._failure_runtime.drain()
+        finally:
+            app._failure_runtime.deactivate(owner)
         self.assertEqual(result.getStatusCode(), 503)
         self.assertEqual(result.getHeader("Retry-After"), ["1"])
+        self.assertEqual(len(handler.events), 1)
+        error, context = handler.events[0]
+        self.assertIsInstance(error, RedisConnectionError)
+        self.assertEqual(context.phase, "rate_limit")
+        self.assertEqual(handler.reports, [error])
 
     async def testRedisBackendIsLazyAndDisabledLimiterNeedsNoStore(self) -> None:
         """Create the Redis store only for an enabled limiter.
@@ -174,14 +205,22 @@ class TestRateLimitMiddleware(TestCase):
         None
             Verify store construction is lazy and disabled limits need no store.
         """
-        middleware = RateLimitMiddleware({
-            "rate_limit_enabled": True, "rate_limit_store": "redis",
-        }, _DefaultResponses())
-        self.assertIsInstance(middleware._RateLimitMiddleware__store,
-                              RedisRateLimitStore)
+        middleware = RateLimitMiddleware(
+            {
+                "rate_limit_enabled": True,
+                "rate_limit_store": "redis",
+            },
+            _DefaultResponses(),
+        )
+        self.assertIsInstance(
+            middleware._RateLimitMiddleware__store,
+            RedisRateLimitStore,
+        )
         await middleware.close()
-        disabled = RateLimitMiddleware({"rate_limit_store": "redis"},
-                                       _DefaultResponses())
+        disabled = RateLimitMiddleware(
+            {"rate_limit_store": "redis"},
+            _DefaultResponses(),
+        )
         self.assertIsNone(disabled._RateLimitMiddleware__store)
         self.assertIsNone(await disabled.handle(make_adapter([])))
         await disabled.close()
@@ -196,9 +235,12 @@ class TestRateLimitMiddleware(TestCase):
         """
         app = _Application()
         kernel = KernelHTTP(app, None)
-        config = HTTP(rate_limit={
-            "rate_limit_enabled": True, "rate_limit_store": "redis",
-        }).toDict()
+        config = HTTP(
+            rate_limit={
+                "rate_limit_enabled": True,
+                "rate_limit_store": "redis",
+            },
+        ).toDict()
         kernel._KernelHTTP__defaultMiddleware(config, _DefaultResponses())
         self.assertEqual(len(app.callbacks), 1)
         event, callback, runtime = app.callbacks[0]

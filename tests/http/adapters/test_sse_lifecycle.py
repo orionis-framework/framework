@@ -1,4 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
+import inspect
 from contextlib import suppress
 from typing import TYPE_CHECKING
 from orionis.background.task import BackgroundTask
@@ -11,7 +14,7 @@ from orionis.test import TestCase
 from tests.http.adapters.test_sse_transport import _Producer, _Wire
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import AsyncIterator, Coroutine
 
 
 async def deliver(name: str, wire: _Wire, response: EventStreamResponse) -> None:
@@ -42,8 +45,12 @@ class _GeneratorState:
     """Expose an actual async generator with interruptible asynchronous cleanup."""
 
     __slots__ = (
-        "cleanup_done", "cleanup_interrupted", "cleanup_started", "idle",
-        "release_cleanup", "waiting",
+        "cleanup_done",
+        "cleanup_interrupted",
+        "cleanup_started",
+        "idle",
+        "release_cleanup",
+        "waiting",
     )
 
     def __init__(self) -> None:
@@ -166,10 +173,113 @@ class TestSSELifecycle(TestCase):
         None
             Assert that no named SSE tasks remain active.
         """
-        self.assertEqual([
-            task.get_name() for task in asyncio.all_tasks()
-            if task.get_name().startswith("orionis.sse.")
-        ], [])
+        self.assertEqual(
+            [
+                task.get_name()
+                for task in asyncio.all_tasks()
+                if task.get_name().startswith("orionis.sse.")
+            ],
+            [],
+        )
+
+    async def testRejectedTaskAdmissionClosesBothOperationsAndJoinsTheSender(
+        self,
+    ) -> None:
+        """Roll back partial sender/watcher admission without leaking coroutines.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+
+        async def check(reject_at: int) -> None:
+            """Own one admission failure and its coroutine/task observations.
+
+            Parameters
+            ----------
+            reject_at : int
+                Admission position rejected by the factory.
+
+            Returns
+            -------
+            None
+                No return value.
+            """
+            with self.subTest(reject_at=reject_at):
+                loop = asyncio.get_running_loop()
+                previous = loop.get_task_factory()
+                admitted = []
+                calls = []
+                error = TypeError("SSE task rejected")
+
+                async def wait() -> None:
+                    """Wait until the owned task is cancelled.
+
+                    Returns
+                    -------
+                    None
+                        No return value.
+                    """
+                    await asyncio.Event().wait()
+
+                def factory(
+                    loop: asyncio.AbstractEventLoop,
+                    coroutine: Coroutine[object, object, None],
+                    **kwargs: object,
+                ) -> asyncio.Task[None]:
+                    """Reject one controlled admission and retain accepted tasks.
+
+                    Parameters
+                    ----------
+                    loop : asyncio.AbstractEventLoop
+                        Current event loop.
+                    coroutine : collections.abc.Coroutine[object, object, None]
+                        Owned coroutine submitted by the helper.
+                    **kwargs : object
+                        Task creation options.
+
+                    Returns
+                    -------
+                    asyncio.Task[None]
+                        Admitted task.
+                    """
+                    calls.append(coroutine)
+                    if len(calls) == reject_at:
+                        raise error
+                    task = asyncio.Task(coroutine, loop=loop, **kwargs)
+                    admitted.append(task)
+                    return task
+
+                sending, disconnected = wait(), wait()
+                loop.set_task_factory(factory)
+                try:
+                    with self.assertRaises(TypeError) as caught:
+                        await send_until_disconnect(sending, disconnected)
+                finally:
+                    loop.set_task_factory(previous)
+                try:
+                    self.assertIs(caught.exception, error)
+                    self.assertTrue(all(task.done() for task in admitted))
+                    self.assertEqual(
+                        [
+                            inspect.getcoroutinestate(item)
+                            for item in (sending, disconnected)
+                        ],
+                        [inspect.CORO_CLOSED, inspect.CORO_CLOSED],
+                    )
+                    self.assertNoTasks()
+                finally:
+                    for task in admitted:
+                        if not task.done():
+                            task.cancel()
+                    if admitted:
+                        await asyncio.gather(*admitted, return_exceptions=True)
+                    sending.close()
+                    disconnected.close()
+
+        for reject_at in (1, 2):
+            await check(reject_at)
 
     async def testDisconnectWinsWhenBothTasksFinishInTheSameTurn(self) -> None:
         """Do not report successful delivery after an earlier disconnect.
@@ -260,7 +370,8 @@ class TestSSELifecycle(TestCase):
                 wire = _Wire()
                 state = _GeneratorState()
                 response = EventStreamResponse(
-                    state.events(hold=True), background=BackgroundTask(wire.background),
+                    state.events(hold=True),
+                    background=BackgroundTask(wire.background),
                 )
                 task = asyncio.create_task(deliver(name, wire, response))
                 try:
@@ -295,7 +406,8 @@ class TestSSELifecycle(TestCase):
                 wire = _Wire()
                 state = _GeneratorState()
                 response = EventStreamResponse(
-                    state.events(hold=True), background=BackgroundTask(wire.background),
+                    state.events(hold=True),
+                    background=BackgroundTask(wire.background),
                 )
                 task = asyncio.create_task(deliver(name, wire, response))
                 try:
@@ -368,7 +480,8 @@ class TestSSELifecycle(TestCase):
                 source = _Producer(wire.history)
                 source.error = asyncio.CancelledError("producer cancelled")
                 response = EventStreamResponse(
-                    source, background=BackgroundTask(wire.background),
+                    source,
+                    background=BackgroundTask(wire.background),
                 )
                 with self.assertRaises(asyncio.CancelledError):
                     await deliver(name, wire, response)
@@ -391,7 +504,8 @@ class TestSSELifecycle(TestCase):
                 source = _Producer(wire.history)
                 source.gate = asyncio.Event()
                 response = EventStreamResponse(
-                    source, background=BackgroundTask(wire.background),
+                    source,
+                    background=BackgroundTask(wire.background),
                 )
                 with self.assertRaises(asyncio.CancelledError):
                     await deliver(name, wire, response)
@@ -412,7 +526,8 @@ class TestSSELifecycle(TestCase):
                 wire = _Wire()
                 wire.receive_error = asyncio.CancelledError("watcher cancelled")
                 response = EventStreamResponse(
-                    ("first",), background=BackgroundTask(wire.background),
+                    ("first",),
+                    background=BackgroundTask(wire.background),
                 )
                 with self.assertRaises(asyncio.CancelledError):
                     await deliver(name, wire, response)
@@ -434,7 +549,8 @@ class TestSSELifecycle(TestCase):
                 source = _Producer(wire.history)
                 source.error = RuntimeError("producer failed")
                 response = EventStreamResponse(
-                    source, background=BackgroundTask(wire.background),
+                    source,
+                    background=BackgroundTask(wire.background),
                 )
                 with self.assertRaises(BaseExceptionGroup) as caught:
                     await deliver(name, wire, response)
@@ -457,7 +573,8 @@ class TestSSELifecycle(TestCase):
         source = _Producer(wire.history)
         source.gate = asyncio.Event()
         response = EventStreamResponse(
-            source, background=BackgroundTask(wire.background),
+            source,
+            background=BackgroundTask(wire.background),
         )
         with self.assertRaisesRegex(RuntimeError, "Unexpected ASGI message"):
             await deliver("asgi", wire, response)
@@ -478,7 +595,8 @@ class TestSSELifecycle(TestCase):
         wire = _BlockingStartWire()
         source = _Producer(wire.history)
         response = EventStreamResponse(
-            source, background=BackgroundTask(wire.background),
+            source,
+            background=BackgroundTask(wire.background),
         )
         task = asyncio.create_task(deliver("asgi", wire, response))
         try:
@@ -495,4 +613,3 @@ class TestSSELifecycle(TestCase):
         self.assertEqual(source.closed, 1)
         self.assertNotIn("background", wire.history)
         self.assertNoTasks()
-

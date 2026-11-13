@@ -10,8 +10,8 @@ Los valores pueden usar prefijos explícitos como `int:`, `bool:`, `list:`, `pat
 
 - Python 3.14 o posterior.
 - `python-dotenv>=1.2.3,<2.0`, instalado por Orionis.
-- Acceso de lectura/escritura al `.env` elegido para `set`, `unset` y `reload` persistentes.
-- Nombres en mayúscula que coincidan con `[A-Z][A-Z0-9_]*`.
+- Acceso de lectura al `.env` elegido para la carga inicial y `reload`; acceso de escritura para crear el archivo y ejecutar `set` o `unset` persistentes.
+- Claves de consulta y modificación públicas que coincidan con `[A-Z][A-Z0-9_]*`.
 
 ## Recorrido del módulo
 
@@ -20,4 +20,4 @@ Los valores pueden usar prefijos explícitos como `int:`, `bool:`, `list:`, `pat
 
 Continúa por: [foundation](../../../foundation/docs/es/README.md) · [encrypter](../../../encrypter/docs/es/README.md).
 
-Los ejemplos que requieren bootstrap, una solicitud o servicios externos indican su contexto. Los resultados de comprobación de esta reconstrucción se distinguen de las notas históricas; no se presupone que se haya ejecutado una integración de producción.
+Los ejemplos funcionan sin iniciar la aplicación ni usar servicios externos. Ejecútalos desde un directorio temporal: incluso la primera operación limitada al proceso inicializa el singleton y carga el `.env` elegido.

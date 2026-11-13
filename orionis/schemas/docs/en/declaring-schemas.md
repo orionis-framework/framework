@@ -28,11 +28,37 @@ assert profile.toDict() == {"name": "Ada", "age": 36, "newsletter": False}
 
 `Schema` supplies compact typed storage and `toDict()`. `Field` is `typing.Annotated`, not a runtime descriptor: `Field[str, MinLength(2)]` preserves the underlying `str` annotation while attaching metadata. `Choice`, `Nullable`, `AnyOf`, `Constant`, `Alias`, and `Static` are readable aliases for standard typing forms.
 
+| Alias | Equivalent | Purpose |
+| --- | --- | --- |
+| `Field` | `Annotated` | Attach constraints, rules, and metadata to a field type. |
+| `Choice` | `Literal` | Accept only the listed literal values. |
+| `Nullable` | `Optional` | Permit `None`; omission still requires a default. |
+| `AnyOf` | `Union` | Accept alternative types supported by `msgspec`. |
+| `Constant` | `Final` | Express intent to type checkers; it does not validate values or prevent runtime assignment. |
+| `Alias` | `TypeAlias` | Declare reusable type aliases. |
+| `Static` | `ClassVar` | Declare a class attribute excluded from the payload. |
+
+Use `Choice` for concrete allowed values. Declare `Constant` at module level, not
+as a schema field type. `Nullable[T] = None` permits omission. Union conversion
+must be supported by `msgspec`: `AnyOf[int, str]` works, while `AnyOf[str, bytes]`
+is not a compatible alternative.
+
+Declarations support Python 3.14 deferred annotations, string annotations from
+`from __future__ import annotations`, and explicit `__annotations__` mappings.
+Referenced names must be available when those annotations are evaluated.
+
 `toDict()` recursively converts nested `Schema` and plain `msgspec.Struct` instances into dictionaries, including instances inside dictionary values, lists, and tuples. Python field names, dictionary keys, and list/tuple types are preserved; other leaf values such as `datetime` and `Decimal` objects remain unchanged. The conversion does not mutate the source instance or its containers.
 
 ### Structural constraints
 
 `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`, `MultipleOf`, `Pattern`, `MinLength`, `MaxLength`, `TimezoneAware`, and `TimezoneNaive` compile into the low-level conversion descriptor. Conflicting, duplicate, impossible, or invalid combinations fail when the schema class is created.
+
+`Pattern` searches for a match; it does not add anchors. Supply an anchored
+expression when the entire input must match. Constraints also apply inside
+supported collection and union annotations. For a nullable constrained number,
+use `Nullable[Field[int, GreaterThanOrEqual(1)]]`. Executable rules inside a
+collection item or union branch are rejected at declaration; use a child schema
+with a ruled field, or attach a rule to the outer collection field.
 
 ### Opt-in coercion
 
@@ -80,6 +106,11 @@ Rules implement domain checks after conversion. They include strings, dates, num
 ### Validate an HTTP/controller payload
 
 Type-hint a container-invoked parameter with a concrete `Schema`. Orionis converts the appropriate request input and awaits validation before calling the handler. A failure becomes the framework's normal validation response.
+
+A `Schema` instance returned directly by a controller is validated before JSON
+output. Invalid output is a server failure (`500`). A return annotation alone
+does not validate a returned dictionary, and wrapping a schema in `JSONResponse`
+does not invoke this automatic instance validation.
 
 ### Validate manually
 

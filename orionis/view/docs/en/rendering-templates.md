@@ -26,6 +26,7 @@ Return it from an async controller:
 ```python
 from orionis.support.facades import View
 
+
 async def profile(user):
     return await View.make("users.profile", user=user)
 ```
@@ -74,6 +75,8 @@ async def invalid_form():
 
 `HTMLResponse` mutations such as `addHeader()` or `withCookie()` are queued and replayed after rendering. The response validates their arguments when each call is applied, not when queued. A noncallable or unknown attribute raises `AttributeError`. The final response carries `X-Orionis-Render: SSR` unless a mutation changes it.
 
+Template errors retain their underlying cause through the pending response. A saturated template worker queue raises `WorkQueueFullError`, so callers can distinguish overload from an invalid template.
+
 
 ### Render directly with an isolated engine
 
@@ -83,6 +86,7 @@ import asyncio
 import jinja2
 
 from orionis.view.engine import Jinja2Engine
+
 
 class Environment:
     def __init__(self) -> None:
@@ -95,6 +99,7 @@ class Environment:
     def getJinjaEnvironment(self) -> jinja2.Environment:
         return self.jinja
 
+
 html = asyncio.run(Jinja2Engine(Environment()).render("hello", {"name": "Ada"}))
 assert html == "Hello Ada!"
 ```
@@ -106,9 +111,11 @@ import asyncio
 
 from orionis.view.factory import ViewFactory
 
+
 class Engine:
     async def render(self, template: str, context: dict) -> str:
         return f"<h1>{context['title']}</h1>"
+
 
 pending = ViewFactory(Engine()).make("pages.home", title="Welcome")
 pending.addHeader("X-Page", "home").withCookie("theme", "dark")

@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, PT027, SLF001, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Resolve constructor injection annotations at runtime in migration fixtures.
 import sys
 import tempfile
 from asyncio import gather
@@ -7,7 +10,7 @@ from typing import ClassVar
 from unittest.mock import patch
 from orionis.container.container import Container
 from orionis.database.connection_manager import ConnectionManager
-from orionis.database.contracts.connection import IConnection  # noqa: TC001
+from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.migration import Migration
 from orionis.database.exceptions import (
     ConnectionNotFoundException,
@@ -27,6 +30,7 @@ from orionis.test import TestCase
 # stray file in the working directory.
 _DATABASE_FILE: str = "migrator.sqlite"
 
+
 class _StubApp:
     """Application stub exposing the paths and configuration used."""
 
@@ -41,7 +45,7 @@ class _StubApp:
         Returns
         -------
         None
-            Store the working directory and database path.
+            No return value.
         """
         self.basePath = Path.cwd()
         self._database = database
@@ -66,7 +70,7 @@ class _StubApp:
         """
         return await self._container.build(target)
 
-    def path(self, key: str) -> Path:  # noqa: ARG002
+    def path(self, key: str) -> Path:
         """Resolve the requested application path.
 
         Parameters
@@ -79,9 +83,11 @@ class _StubApp:
         Path
             Database migrations directory.
         """
+        if key != "database_migrations":
+            raise KeyError(key)
         return Path.cwd() / "database"
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Return the requested database configuration.
 
         Parameters
@@ -94,6 +100,8 @@ class _StubApp:
         dict
             Default connection name and SQLite connection settings.
         """
+        if key != "database":
+            raise KeyError(key)
         return {
             "default": "sqlite",
             "connections": {
@@ -110,9 +118,10 @@ class _StubApp:
             },
         }
 
+
 def _definition(name: str) -> TableDefinition:
     """
-    Build a one-column table definition.
+    Build a two-column table definition.
 
     Parameters
     ----------
@@ -122,7 +131,7 @@ def _definition(name: str) -> TableDefinition:
     Returns
     -------
     TableDefinition
-        Definition with a single primary key column.
+        Definition with an identity key and a label column.
     """
     column = Integer().primary().autoIncrement()
     column.name = "id"
@@ -134,6 +143,7 @@ def _definition(name: str) -> TableDefinition:
         primary_key="id",
     )
 
+
 class _CreateAlpha(Migration):
     """Migration creating and dropping the ``alpha`` table."""
 
@@ -143,7 +153,7 @@ class _CreateAlpha(Migration):
         Returns
         -------
         None
-            Create the alpha table on the selected connection.
+            No return value.
         """
         await ConnectionResolver.connection().createTable(_definition("alpha"))
 
@@ -153,9 +163,10 @@ class _CreateAlpha(Migration):
         Returns
         -------
         None
-            Drop the alpha table from the selected connection.
+            No return value.
         """
         await ConnectionResolver.connection().dropTable("alpha")
+
 
 class _CreateBeta(Migration):
     """Migration creating and dropping the ``beta`` table."""
@@ -166,7 +177,7 @@ class _CreateBeta(Migration):
         Returns
         -------
         None
-            Create the beta table on the selected connection.
+            No return value.
         """
         await ConnectionResolver.connection().createTable(_definition("beta"))
 
@@ -176,9 +187,34 @@ class _CreateBeta(Migration):
         Returns
         -------
         None
-            Drop the beta table from the selected connection.
+            No return value.
         """
         await ConnectionResolver.connection().dropTable("beta")
+
+
+class _CreateGamma(Migration):
+    """Migration creating and dropping the ``gamma`` table."""
+
+    async def up(self) -> None:
+        """Apply the test migration.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        await ConnectionResolver.connection().createTable(_definition("gamma"))
+
+    async def down(self) -> None:
+        """Revert the test migration.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        await ConnectionResolver.connection().dropTable("gamma")
+
 
 class _Broken(Migration):
     """Migration whose ``up`` always fails."""
@@ -189,7 +225,7 @@ class _Broken(Migration):
         Returns
         -------
         None
-            Raise the configured failure during migration execution.
+            No return value.
 
         Raises
         ------
@@ -205,8 +241,9 @@ class _Broken(Migration):
         Returns
         -------
         None
-            Leave the database unchanged because this migration never applies.
+            No return value.
         """
+
 
 class _MigrationDependency:
     """Capture the connection and transaction active during DI resolution."""
@@ -219,14 +256,13 @@ class _MigrationDependency:
         Returns
         -------
         None
-            Capture the migration context available during construction.
+            No return value.
         """
         self.connection: IConnection | None = current_migration_connection()
         self.transaction_active = (
-            self.connection.inTransaction()
-            if self.connection is not None
-            else False
+            self.connection.inTransaction() if self.connection is not None else False
         )
+
 
 class _InjectedMigration(Migration):
     """Require constructor injection for both apply and rollback."""
@@ -244,7 +280,7 @@ class _InjectedMigration(Migration):
         Returns
         -------
         None
-            Store the dependency for the migration steps.
+            No return value.
         """
         self._dependency = dependency
 
@@ -254,12 +290,15 @@ class _InjectedMigration(Migration):
         Returns
         -------
         None
-            Record the active transaction and create the injected table.
+            No return value.
         """
-        type(self).observations.append((
-            "up", self._dependency.connection,
-            self._dependency.transaction_active,
-        ))
+        type(self).observations.append(
+            (
+                "up",
+                self._dependency.connection,
+                self._dependency.transaction_active,
+            ),
+        )
         await ConnectionResolver.connection().createTable(_definition("injected"))
 
     async def down(self) -> None:
@@ -268,13 +307,17 @@ class _InjectedMigration(Migration):
         Returns
         -------
         None
-            Record the active transaction and drop the injected table.
+            No return value.
         """
-        type(self).observations.append((
-            "down", self._dependency.connection,
-            self._dependency.transaction_active,
-        ))
+        type(self).observations.append(
+            (
+                "down",
+                self._dependency.connection,
+                self._dependency.transaction_active,
+            ),
+        )
         await ConnectionResolver.connection().dropTable("injected")
+
 
 class TestMigrator(TestCase):
     """Behaviour of the migration runner against a real sqlite database."""
@@ -285,27 +328,17 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Prepare the manager and runners with fixed migration mappings.
+            No return value.
         """
         self._workspace = tempfile.TemporaryDirectory()
+        self.addCleanup(self._workspace.cleanup)
         app = _StubApp(str(Path(self._workspace.name) / _DATABASE_FILE))
         self._app = app
         self._manager = ConnectionManager(app)
-        ConnectionResolver.setManager(self._manager)
+        self.enterContext(patch.object(ConnectionResolver, "_manager", self._manager))
+        self.addAsyncCleanup(self._manager.disconnect)
         self._migrator = Migrator(app, self._manager)
         self.useMigrations({"m01_alpha": _CreateAlpha, "m02_beta": _CreateBeta})
-
-    async def asyncTearDown(self) -> None:
-        """Release the manager and drop the temporary database.
-
-        Returns
-        -------
-        None
-            Disconnect the databases and remove temporary files.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
-        self._workspace.cleanup()
 
     def useMigrations(self, migrations: dict) -> None:
         """
@@ -319,7 +352,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Replace the runner's cached migration mapping.
+            No return value.
         """
         # Discovery is filesystem-based; seeding its cache keeps the test
         # focused on the runner instead of on module importing.
@@ -351,10 +384,12 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify both migrations run and create their tables.
+            No return value.
         """
         applied = await self._migrator.migrate()
         self.assertEqual(applied, ["m01_alpha", "m02_beta"])
+        rows = await self._migrator.status()
+        self.assertEqual([row["batch"] for row in rows], [1, 1])
         self.assertTrue(await self.tableExists("alpha"))
         self.assertTrue(await self.tableExists("beta"))
 
@@ -364,22 +399,10 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify a repeated migration run returns no applied migrations.
+            No return value.
         """
         await self._migrator.migrate()
         self.assertEqual(await self._migrator.migrate(), [])
-
-    async def testMigrationsShareASingleBatch(self) -> None:
-        """Record every migration of one run under the same batch.
-
-        Returns
-        -------
-        None
-            Verify migrations from one run share a batch number.
-        """
-        await self._migrator.migrate()
-        rows = await self._migrator.status()
-        self.assertEqual([row["batch"] for row in rows], [1, 1])
 
     async def testStatusReportsPendingMigrations(self) -> None:
         """Report applied and pending migrations separately.
@@ -387,7 +410,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify status changes from pending to applied after migration.
+            No return value.
         """
         rows = await self._migrator.status()
         self.assertEqual([row["ran"] for row in rows], [False, False])
@@ -401,18 +424,22 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify older batches remain applied after rollback.
+            No return value.
         """
         await self._migrator.migrate()
-        self.useMigrations({
-            "m01_alpha": _CreateAlpha,
-            "m02_beta": _CreateBeta,
-            "m03_gamma": _CreateAlpha,
-        })
+        self.useMigrations(
+            {
+                "m01_alpha": _CreateAlpha,
+                "m02_beta": _CreateBeta,
+                "m03_gamma": _CreateGamma,
+            },
+        )
         # The third migration lands in its own batch.
         await self._migrator.migrate()
         reverted = await self._migrator.rollback()
         self.assertEqual(reverted, ["m03_gamma"])
+        self.assertTrue(await self.tableExists("alpha"))
+        self.assertFalse(await self.tableExists("gamma"))
         self.assertTrue(await self.tableExists("beta"))
 
     async def testRollbackRevertsInReverseOrder(self) -> None:
@@ -421,7 +448,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify rollback removes the batch in reverse migration order.
+            No return value.
         """
         await self._migrator.migrate()
         self.assertEqual(
@@ -436,7 +463,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify zero steps raise the validation error.
+            No return value.
         """
         with self.assertRaises(ValueError):
             await self._migrator.rollback(0)
@@ -447,15 +474,18 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify reset reverts all migrations and clears their status.
+            No return value.
         """
         await self._migrator.migrate()
         reverted = await self._migrator.reset()
         self.assertEqual(reverted, ["m02_beta", "m01_alpha"])
-        self.assertEqual(await self._migrator.status(), [
-            {"migration": "m01_alpha", "ran": False, "batch": None},
-            {"migration": "m02_beta", "ran": False, "batch": None},
-        ])
+        self.assertEqual(
+            await self._migrator.status(),
+            [
+                {"migration": "m01_alpha", "ran": False, "batch": None},
+                {"migration": "m02_beta", "ran": False, "batch": None},
+            ],
+        )
 
     async def testRefreshRollsBackAndMigratesAgain(self) -> None:
         """Rebuild the schema in a single operation.
@@ -463,7 +493,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify refresh reapplies the migrations after rollback.
+            No return value.
         """
         await self._migrator.migrate()
         applied = await self._migrator.refresh()
@@ -476,7 +506,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify fresh restarts migration history at batch one.
+            No return value.
         """
         await self._migrator.migrate()
         await self._migrator.rollback()
@@ -491,7 +521,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify a failed migration remains unapplied in status.
+            No return value.
         """
         self.useMigrations({"m01_alpha": _CreateAlpha, "m02_broken": _Broken})
         with self.assertRaises(RuntimeError):
@@ -505,7 +535,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify reset raises when a recorded migration cannot be discovered.
+            No return value.
         """
         await self._migrator.migrate()
         self.useMigrations({"m01_alpha": _CreateAlpha})
@@ -518,7 +548,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Every operation leaves the schema and history intact.
+            No return value.
         """
         await self._migrator.migrate()
         self.useMigrations({"m02_beta": _CreateBeta})
@@ -546,12 +576,14 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Imported and reexported migration classes are ignored.
+            No return value.
         """
         module_name = "migration_fixture.m01_alpha"
         init_name = "migration_fixture.__init__"
         own_migration = type(
-            "OwnMigration", (_CreateAlpha,), {"__module__": module_name},
+            "OwnMigration",
+            (_CreateAlpha,),
+            {"__module__": module_name},
         )
         source_module = ModuleType(module_name)
         source_module.OwnMigration = own_migration
@@ -563,7 +595,7 @@ class TestMigrator(TestCase):
         with (
             patch.object(self._app, "path", return_value=Path.cwd()),
             patch(
-                "orionis.database.migrations.migrator.ModuleInspector.discoverModules",
+                "orionis.database.migrations.discovery.ModuleInspector.discoverModules",
                 return_value={module_name, init_name},
             ),
             patch.dict(
@@ -583,24 +615,28 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            The ambiguous migrations do not run.
+            No return value.
         """
         first_name = "migration_fixture.alpha.m01_create"
         second_name = "migration_fixture.beta.m01_create"
         first_module = ModuleType(first_name)
         second_module = ModuleType(second_name)
         first_module.AlphaMigration = type(
-            "AlphaMigration", (_CreateAlpha,), {"__module__": first_name},
+            "AlphaMigration",
+            (_CreateAlpha,),
+            {"__module__": first_name},
         )
         second_module.BetaMigration = type(
-            "BetaMigration", (_CreateBeta,), {"__module__": second_name},
+            "BetaMigration",
+            (_CreateBeta,),
+            {"__module__": second_name},
         )
         self._migrator._Migrator__discovered_cache = None
 
         with (
             patch.object(self._app, "path", return_value=Path.cwd()),
             patch(
-                "orionis.database.migrations.migrator.ModuleInspector.discoverModules",
+                "orionis.database.migrations.discovery.ModuleInspector.discoverModules",
                 return_value={first_name, second_name},
             ),
             patch.dict(
@@ -620,7 +656,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify callbacks receive each migration in execution order.
+            No return value.
         """
         started: list[str] = []
         finished: list[str] = []
@@ -639,7 +675,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify migration execution raises for an unknown connection.
+            No return value.
         """
         with self.assertRaises(ConnectionNotFoundException):
             await self._migrator.migrate(connection="ghost")
@@ -650,7 +686,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify schema changes and resolver scope stay on the named connection.
+            No return value.
         """
         await self._migrator.migrate(connection="secondary")
         self.assertFalse(await self.tableExists("alpha"))
@@ -678,11 +714,11 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify apply and rollback resolve dependencies in the target transaction.
+            No return value.
         """
         self._app._container.transient(None, _MigrationDependency)
         self.useMigrations({"m01_injected": _InjectedMigration})
-        _InjectedMigration.observations.clear()
+        self.enterContext(patch.object(_InjectedMigration, "observations", []))
         target = self._manager.connection("secondary")
 
         self.assertEqual(
@@ -690,7 +726,8 @@ class TestMigrator(TestCase):
             ["m01_injected"],
         )
         self.assertEqual(
-            _InjectedMigration.observations, [("up", target, True)],
+            _InjectedMigration.observations,
+            [("up", target, True)],
         )
         self.assertFalse(await self.tableExists("injected"))
         rows = await target.select(
@@ -702,9 +739,13 @@ class TestMigrator(TestCase):
             await self._migrator.rollback(connection="secondary"),
             ["m01_injected"],
         )
-        self.assertEqual(_InjectedMigration.observations, [
-            ("up", target, True), ("down", target, True),
-        ])
+        self.assertEqual(
+            _InjectedMigration.observations,
+            [
+                ("up", target, True),
+                ("down", target, True),
+            ],
+        )
         self.assertIsNone(current_migration_connection())
         rows = await target.select(
             "SELECT name FROM sqlite_master WHERE name = 'injected'",
@@ -717,16 +758,19 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify concurrent runs create separate schemas without leaking scope.
+            No return value.
         """
         results = await gather(
             self._migrator.migrate(),
             self._migrator.migrate(connection="secondary"),
         )
-        self.assertEqual(results, [
-            ["m01_alpha", "m02_beta"],
-            ["m01_alpha", "m02_beta"],
-        ])
+        self.assertEqual(
+            results,
+            [
+                ["m01_alpha", "m02_beta"],
+                ["m01_alpha", "m02_beta"],
+            ],
+        )
         for name in (None, "secondary"):
             rows = await self._manager.connection(name).select(
                 "SELECT name FROM sqlite_master WHERE name = 'alpha'",
@@ -740,7 +784,7 @@ class TestMigrator(TestCase):
         Returns
         -------
         None
-            Verify the previous connection scope is restored after failure.
+            No return value.
         """
         self.useMigrations({"m01_broken": _Broken})
         with self.assertRaises(RuntimeError):

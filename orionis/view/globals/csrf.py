@@ -1,17 +1,19 @@
+# ruff: noqa: TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
 """Provide view globals operations.
 
 Includes ``_global_csrf_token``, ``_global_csrf_field``.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from collections.abc import Awaitable, Callable
+
 from markupsafe import Markup
+
+from orionis.foundation.contracts.application import IApplication
 from orionis.session.contracts.session import ISession
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
-
-# ruff: noqa: ANN401
 _CSRF_SESSION_KEY = "_csrf_token"
 """Csrf session key identifier: ``_csrf_token``."""
 
@@ -25,7 +27,8 @@ _CSRF_FIELD_TEMPLATE = Markup(
 )
 """Template of the hidden input; ``Markup.format`` escapes the token."""
 
-def _global_csrf_token(app: IApplication) -> Any:
+
+def _global_csrf_token(app: IApplication) -> Callable[[], Awaitable[str]]:
     """
     Build the async ``csrf_token`` template global bound to the application.
 
@@ -36,7 +39,7 @@ def _global_csrf_token(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that reads the CSRF token from the session.
     """
     # Resolve the session key once: configuration is frozen after boot.
@@ -52,15 +55,16 @@ def _global_csrf_token(app: IApplication) -> Any:
         Returns
         -------
         str
-            The CSRF token, or an empty string when no session is active
-            or no token has been issued yet.
+            The token from the active session, or an empty string when no
+            token has been issued. Service-resolution errors propagate.
         """
         session: ISession = await app.make(ISession)
         return session.get(key) or ""
 
     return csrf_token
 
-def _global_csrf_field(app: IApplication) -> Any:
+
+def _global_csrf_field(app: IApplication) -> Callable[[], Awaitable[Markup]]:
     """
     Build the async ``csrf_field`` template global bound to the application.
 
@@ -71,7 +75,7 @@ def _global_csrf_field(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that returns a hidden input field with the CSRF token.
     """
     read_token = _global_csrf_token(app)

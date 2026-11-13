@@ -1,3 +1,7 @@
+# ruff: noqa: ANN201, ANN202, PT009, TC003
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Compiling tool handlers evaluates their return annotations at runtime.
+from collections.abc import AsyncIterator
 import msgspec
 from orionis.container.container import Container
 from orionis.mcp import (
@@ -21,11 +25,14 @@ from orionis.mcp.protocol.results import CallToolResult, CompleteResult
 from orionis.test import TestCase
 from tests.mcp.test_dispatcher import _Elicit, _Prompt, _Weather
 
+
 class _Params(RequestParams, frozen=True):
     value: int
 
+
 class _Result(CompleteResult, frozen=True):
     value: int
+
 
 def _extension(request: McpRequest, params: _Params) -> _Result:
     """Exercise an explicitly negotiated, independently typed extension.
@@ -44,6 +51,7 @@ def _extension(request: McpRequest, params: _Params) -> _Result:
     """
     return _Result(value=params.value + int(request.meta.get("offset", 0)))
 
+
 class _BadOutput(Tool):
     name = "bad-output"
     output = int
@@ -57,6 +65,7 @@ class _BadOutput(Tool):
             Return the result produced by ``handle``.
         """
         return CallToolResult(content=(), structuredContent="not an integer")
+
 
 class _CacheResource(Resource):
     name = "cache"
@@ -73,6 +82,101 @@ class _CacheResource(Resource):
         """
         return McpResponse.text("data")
 
+
+class _SubscriptionAccess:
+    """Keep revocable policy state independently of the subscription snapshot."""
+
+    def __init__(self) -> None:
+        """Enable availability and authorization for the initial subscription.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self.available = True
+        self.authorized = True
+
+
+class _GuardedResource(_CacheResource):
+    """Recheck independently mutable policies before announcing resource updates."""
+
+    name = "guarded"
+    uri = "data://guarded"
+
+    def shouldRegister(self, access: _SubscriptionAccess) -> bool:
+        """Read the current resource availability.
+
+        Parameters
+        ----------
+        access : _SubscriptionAccess
+            Mutable policy fixture.
+
+        Returns
+        -------
+        bool
+            Whether the resource remains visible.
+        """
+        return access.available
+
+    def authorize(self, access: _SubscriptionAccess) -> bool:
+        """Read the current resource authorization.
+
+        Parameters
+        ----------
+        access : _SubscriptionAccess
+            Mutable policy fixture.
+
+        Returns
+        -------
+        bool
+            Whether the caller may still access the resource.
+        """
+        return access.authorized
+
+
+class _LargeResult(Tool):
+    """Return a structured value large enough to expose duplicate accounting."""
+
+    name = "large-result"
+
+    def handle(self) -> McpResponse:
+        """Build the same final payload as the streaming fixture.
+
+        Returns
+        -------
+        McpResponse
+            Independently generated JSON response.
+        """
+        return McpResponse.structured({"value": "x" * 2048})
+
+
+class _LargeStream(_LargeResult):
+    """Yield the identical result through the streaming path."""
+
+    name = "large-stream"
+
+    async def handle(self) -> AsyncIterator[McpResponse]:
+        """Yield one final structured response.
+
+        Yields
+        ------
+        McpResponse
+            Final response without progress notifications.
+        """
+        yield super().handle()
+
+
+class _BoundaryServer(Server):
+    """Expose policy and response-budget boundaries through real dispatch."""
+
+    name = "Boundary"
+    tools = (_LargeResult, _LargeStream)
+    resources = (_GuardedResource,)
+    list_changed = True
+    resource_subscriptions = True
+
+
 class _Server(Server):
     name = "Dispatcher edges"
     tools = (_BadOutput, ToolCatalog(_Elicit, _Weather))
@@ -85,6 +189,7 @@ class _Server(Server):
             decoders={"example.com/add": msgspec.json.Decoder(_Params)},
         ),
     )
+
 
 class TestDispatcherEdges(TestCase):
     """Test behavior that crosses compiler, protocol and execution boundaries."""
@@ -103,6 +208,121 @@ class TestDispatcherEdges(TestCase):
 
         self.app = _Container()
         self.client = await self.mcp(_Server, app=self.app)
+
+    async def testResourceSubscriptionsRecheckRevokedPolicies(self) -> None:
+        """Drop denied updates without closing unrelated subscription filters.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for policy in ("available", "authorized"):
+            with self.subTest(policy=policy):
+                access = _SubscriptionAccess()
+                client = await self.mcp(_BoundaryServer, app=self.app)
+                stream = client.stream(
+                    "subscriptions/listen",
+                    {
+                        "notifications": {
+                            "resourceSubscriptions": [_GuardedResource.uri],
+                            "toolsListChanged": True,
+                        },
+                    },
+                )
+                try:
+                    ack = await anext(stream)
+                    self.assertEqual(
+                        ack["params"]["notifications"]["resourceSubscriptions"],
+                        [_GuardedResource.uri],
+                    )
+                    self.app.instance(_SubscriptionAccess, access, override=True)
+                    self.assertIs(await self.app.make(_SubscriptionAccess), access)
+                    setattr(access, policy, False)
+                    await client.dispatcher.bus.publish(
+                        _BoundaryServer,
+                        "notifications/resources/updated",
+                        _GuardedResource.uri,
+                    )
+                    await client.dispatcher.bus.publish(
+                        _BoundaryServer,
+                        "notifications/tools/list_changed",
+                    )
+                    event = await anext(stream)
+                    self.assertEqual(
+                        event["method"],
+                        "notifications/tools/list_changed",
+                    )
+                    setattr(access, policy, True)
+                    await client.dispatcher.bus.publish(
+                        _BoundaryServer,
+                        "notifications/resources/updated",
+                        _GuardedResource.uri,
+                    )
+                    event = await anext(stream)
+                    self.assertEqual(event["method"], "notifications/resources/updated")
+                    self.assertEqual(event["params"]["uri"], _GuardedResource.uri)
+                finally:
+                    await stream.aclose()
+                self.assertEqual(client.dispatcher.bus.listenerCount, 0)
+
+    async def testStructuredStreamingUsesTheFinalWireBudget(self) -> None:
+        """Accept the exact wire-size boundary without counting private provenance.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        client = await self.mcp(_BoundaryServer, app=self.app)
+        expected = await client.tool("large-result")
+        expected.assertOk()
+        limit = len(msgspec.json.encode(expected.message))
+        for tool in ("large-result", "large-stream"):
+            with self.subTest(tool=tool):
+                bounded = await self.mcp(
+                    _BoundaryServer,
+                    McpConfig(max_response_size=limit),
+                    app=self.app,
+                )
+                result = await bounded.tool(tool)
+                result.assertOk()
+                self.assertEqual(result.message, expected.message)
+                rejected = await self.mcp(
+                    _BoundaryServer,
+                    McpConfig(max_response_size=limit - 1),
+                    app=self.app,
+                )
+                result = await rejected.tool(tool)
+                self.assertEqual(result.message["error"]["code"], -32603)
+
+    async def testCatalogLimitCountsProtocolContentNotBuilderProvenance(self) -> None:
+        """Apply the catalog output budget to the actual normalized result.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        expected = await self.client.tool("search_tools", {"query": "weather"})
+        expected.assertOk()
+        payload = {**expected.message["result"], "_meta": {}}
+        limit = len(msgspec.json.encode(payload))
+        accepted = await self.mcp(
+            _Server,
+            McpConfig(tool_search_max_output_bytes=limit),
+            app=self.app,
+        )
+        result = await accepted.tool("search_tools", {"query": "weather"})
+        result.assertOk()
+        self.assertEqual(result.message, expected.message)
+        rejected = await self.mcp(
+            _Server,
+            McpConfig(tool_search_max_output_bytes=limit - 1),
+            app=self.app,
+        )
+        result = await rejected.tool("search_tools", {"query": "weather"})
+        self.assertEqual(result.message["error"]["code"], -32602)
 
     async def testExtensionNegotiationAndTypedParams(self):
         """Extensions require this request's capability and their own decoder.
@@ -189,7 +409,9 @@ class TestDispatcherEdges(TestCase):
         nested = invalid.message["result"]["structuredContent"]["results"][0]
         self.assertTrue(nested["result"]["isError"])
         limited = await self.mcp(
-            _Server, McpConfig(tool_search_max_calls=1), app=self.app,
+            _Server,
+            McpConfig(tool_search_max_calls=1),
+            app=self.app,
         )
         response = await limited.tool(
             "execute_tools",

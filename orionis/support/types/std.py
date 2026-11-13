@@ -5,6 +5,7 @@ from orionis.support.types.contracts.std import IStdClass
 _DUNDER = "__"
 """Dunder identifier: ``__``."""
 
+
 class StdClass(IStdClass):
     """Represent dynamically assigned attributes as a simple data object."""
 
@@ -24,12 +25,10 @@ class StdClass(IStdClass):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         super().__init_subclass__(**kwargs)
-        cls.RESERVED = (
-            frozenset(k for c in cls.__mro__ for k in vars(c)) | {"RESERVED"}
-        )
+        cls.RESERVED = frozenset(k for c in cls.__mro__ for k in vars(c)) | {"RESERVED"}
 
     def __hash__(self) -> int:
         """
@@ -39,6 +38,12 @@ class StdClass(IStdClass):
         -------
         int
             Hash value computed from the object's attributes.
+
+        Notes
+        -----
+        Do not mutate attributes while the object is a dictionary key or set
+        member: attribute changes can change its hash. Every stored value must
+        itself be hashable.
         """
         # Combine attribute hashes independently of their order.
         h = 0
@@ -58,7 +63,7 @@ class StdClass(IStdClass):
         Returns
         -------
         None
-            This method does not return a value. The object is initialized in-place.
+            No return value.
         """
         # Skip dispatch entirely when no arguments are provided (cold path)
         if kwargs:
@@ -131,7 +136,7 @@ class StdClass(IStdClass):
         Returns
         -------
         None
-            This method does not return a value. Attributes are updated in-place.
+            No return value.
 
         Raises
         ------
@@ -147,8 +152,7 @@ class StdClass(IStdClass):
             # Reject names reserved by the object protocol.
             if key in reserved:
                 msg = (
-                    f"Cannot set attribute '{key}'"
-                    " as it conflicts with a class method"
+                    f"Cannot set attribute '{key}' as it conflicts with a class method"
                 )
                 raise ValueError(msg)
             # Direct __dict__ write bypasses descriptor dispatch
@@ -166,7 +170,7 @@ class StdClass(IStdClass):
         Returns
         -------
         None
-            This method does not return a value. Attributes are removed in-place.
+            No return value.
 
         Raises
         ------
@@ -207,8 +211,7 @@ class StdClass(IStdClass):
                 raise ValueError(msg)
             if key in reserved:
                 msg = (
-                    f"Cannot set attribute '{key}'"
-                    " as it conflicts with a class method"
+                    f"Cannot set attribute '{key}' as it conflicts with a class method"
                 )
                 raise ValueError(msg)
             obj_dict[key] = value
@@ -217,6 +220,6 @@ class StdClass(IStdClass):
 
 # Build the reserved-names frozenset from the complete MRO.
 # Must be evaluated after the class body is fully defined.
-StdClass.RESERVED = (
-    frozenset(k for c in StdClass.__mro__ for k in vars(c)) | {"RESERVED"}
-)
+StdClass.RESERVED = frozenset(k for c in StdClass.__mro__ for k in vars(c)) | {
+    "RESERVED",
+}

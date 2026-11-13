@@ -1,8 +1,11 @@
+# ruff: noqa: ANN401, PLC0415, TC001, TC002, TC003
+# Preserve heterogeneous bound values and defer the optional Oracle type import.
+# Keep compiler annotations resolvable for runtime dependency reflection.
 """Translate Orionis query plans into engine-executable statements."""
 
 from __future__ import annotations
 import operator
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import Any, ClassVar
 import sqlalchemy
 from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_
@@ -25,39 +28,38 @@ from orionis.orm.query.expressions import (
 )
 from orionis.orm.schema.types import ColumnType
 
-if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
-    from sqlalchemy.sql import Delete, Insert, Select, Update
-    from sqlalchemy.sql.elements import ColumnElement
-    from sqlalchemy.sql.expression import Executable
-    from sqlalchemy.types import TypeEngine
-    from orionis.orm.query.expressions import (
-        AggregateClause,
-        DeletePlan,
-        InsertPlan,
-        JoinCondition,
-        JoinExpression,
-        UpdatePlan,
-        WhereClause,
-    )
-    from orionis.orm.schema.column import ColumnDefinition
-    from orionis.orm.schema.constraints import ForeignReference
-    from orionis.orm.schema.table import TableDefinition
+from collections.abc import Callable, Sequence
+from sqlalchemy.sql import Delete, Insert, Select, Update
+from sqlalchemy.sql.elements import ColumnElement
+from sqlalchemy.sql.expression import Executable
+from sqlalchemy.types import TypeEngine
+from orionis.orm.query.expressions import (
+    AggregateClause,
+    DeletePlan,
+    InsertPlan,
+    JoinCondition,
+    JoinExpression,
+    UpdatePlan,
+    WhereClause,
+)
+from orionis.orm.schema.column import ColumnDefinition
+from orionis.orm.schema.constraints import ForeignReference
+from orionis.orm.schema.table import TableDefinition
 
-    # A resolvable FROM/JOIN source: either the raw engine Table or an
-    # aliased projection of it (``Table.alias(name)``).
-    type SqlSource = Any
-    """
-    A resolvable FROM/JOIN source: either the raw engine Table or an aliased
-    projection of it (``Table.alias(name)``).
-    """
-    # Table sources reachable by qualified column references, keyed by
-    # alias when present or by logical table name otherwise.
-    type SourceMap = dict[str, SqlSource]
-    """
-    Table sources reachable by qualified column references, keyed by alias when
-    present or by logical table name otherwise.
-    """
+# A resolvable FROM/JOIN source: either the raw engine Table or an
+# aliased projection of it (``Table.alias(name)``).
+type SqlSource = Any
+"""
+A resolvable FROM/JOIN source: either the raw engine Table or an aliased
+projection of it (``Table.alias(name)``).
+"""
+# Table sources reachable by qualified column references, keyed by
+# alias when present or by logical table name otherwise.
+type SourceMap = dict[str, SqlSource]
+"""
+Table sources reachable by qualified column references, keyed by alias when
+present or by logical table name otherwise.
+"""
 
 # Comparison operators for basic where clauses.
 _COMPARATORS: dict[str, Callable[[Any, Any], Any]] = {
@@ -108,6 +110,7 @@ _SIMPLE_CLAUSES: dict[WhereType, Callable[[Any, Any], Any]] = {
 }
 """Handlers for where clause kinds with a single-expression translation."""
 
+
 class SQLCompiler:
     """
     Translate Orionis query plans into engine-executable statements.
@@ -124,8 +127,6 @@ class SQLCompiler:
         Factories translating logical column definitions into SQLAlchemy types.
     """
 
-    # ruff: noqa: ANN401, PLC0415
-
     __slots__ = ("_definitions", "_driver", "_metadata", "_prefix", "_tables")
     """Declare the instance attribute slots reserved by this class."""
 
@@ -141,22 +142,28 @@ class SQLCompiler:
         ColumnType.TEXT: lambda c: sqlalchemy.Text(c.length, c.collation),
         ColumnType.UNICODE: lambda c: sqlalchemy.Unicode(c.length, c.collation),
         ColumnType.UNICODE_TEXT: lambda c: sqlalchemy.UnicodeText(
-            c.length, c.collation,
+            c.length,
+            c.collation,
         ),
         ColumnType.BOOLEAN: lambda c: sqlalchemy.Boolean(
             create_constraint=c.create_constraint,
             name=c.constraint_name,
         ),
         ColumnType.FLOAT: lambda c: sqlalchemy.Float(
-            c.precision, asdecimal=c.as_decimal,
+            c.precision,
+            asdecimal=c.as_decimal,
             decimal_return_scale=c.decimal_return_scale,
         ),
         ColumnType.DOUBLE: lambda c: sqlalchemy.Double(
-            c.precision, asdecimal=c.as_decimal,
+            c.precision,
+            asdecimal=c.as_decimal,
             decimal_return_scale=c.decimal_return_scale,
         ),
         ColumnType.NUMERIC: lambda c: sqlalchemy.Numeric(
-            c.precision, c.scale, c.decimal_return_scale, asdecimal=c.as_decimal,
+            c.precision,
+            c.scale,
+            c.decimal_return_scale,
+            asdecimal=c.as_decimal,
         ),
         ColumnType.DATE: lambda _c: sqlalchemy.Date(),
         ColumnType.TIME: lambda _c: sqlalchemy.Time(),
@@ -168,7 +175,8 @@ class SQLCompiler:
         ),
         ColumnType.LARGE_BINARY: lambda c: sqlalchemy.LargeBinary(c.length),
         ColumnType.UUID: lambda c: sqlalchemy.Uuid(
-            as_uuid=c.as_uuid, native_uuid=c.native_uuid,
+            as_uuid=c.as_uuid,
+            native_uuid=c.native_uuid,
         ),
         ColumnType.PICKLE_TYPE: lambda c: sqlalchemy.PickleType(
             protocol=c.protocol,
@@ -179,12 +187,12 @@ class SQLCompiler:
             native_enum=c.native_enum,
             create_constraint=c.create_constraint,
             length=(
-                c.length if c.length is not None
+                c.length
+                if c.length is not None
                 else max(len(value) for value in c.enum_values)
             ),
             validate_strings=c.validate_strings,
         ),
-
         # SQL standard and multiple vendor "UPPERCASE" types.
         ColumnType.BIGINT: lambda _c: sqlalchemy.BIGINT(),
         ColumnType.SMALLINT: lambda _c: sqlalchemy.SMALLINT(),
@@ -195,15 +203,20 @@ class SQLCompiler:
         ColumnType.NVARCHAR: lambda c: sqlalchemy.NVARCHAR(c.length, c.collation),
         ColumnType.CLOB: lambda c: sqlalchemy.CLOB(c.length, c.collation),
         ColumnType.REAL: lambda c: sqlalchemy.REAL(
-            c.precision, asdecimal=c.as_decimal,
+            c.precision,
+            asdecimal=c.as_decimal,
             decimal_return_scale=c.decimal_return_scale,
         ),
         ColumnType.DOUBLE_PRECISION: lambda c: sqlalchemy.DOUBLE_PRECISION(
-            c.precision, asdecimal=c.as_decimal,
+            c.precision,
+            asdecimal=c.as_decimal,
             decimal_return_scale=c.decimal_return_scale,
         ),
         ColumnType.DECIMAL: lambda c: sqlalchemy.DECIMAL(
-            c.precision, c.scale, c.decimal_return_scale, asdecimal=c.as_decimal,
+            c.precision,
+            c.scale,
+            c.decimal_return_scale,
+            asdecimal=c.as_decimal,
         ),
         ColumnType.TIMESTAMP: lambda c: sqlalchemy.TIMESTAMP(timezone=c.timezone),
         ColumnType.BINARY: lambda c: sqlalchemy.BINARY(c.length),
@@ -226,7 +239,7 @@ class SQLCompiler:
         Returns
         -------
         None
-            Store the settings and create empty metadata and table caches.
+            No return value.
         """
         self._prefix = prefix or ""
         """Text prepended to logical table names; empty by default."""
@@ -245,8 +258,8 @@ class SQLCompiler:
         """
         Compile a SELECT plan, including aggregates and union branches.
 
-        Use a derived query for ``COUNT(*)`` over distinct, grouped, or unioned
-        results.
+        Use a derived query for aggregates over unions and ``COUNT(*)`` over
+        distinct or grouped results.
 
         Parameters
         ----------
@@ -264,38 +277,84 @@ class SQLCompiler:
             If sources or columns are unknown, clauses are invalid, or a Redshift
             row lock is requested.
         """
+        return self._compileSelect(plan, {})
+
+    def _compileSelect(
+        self,
+        plan: SelectPlan,
+        outer_sources: SourceMap,
+    ) -> Select[Any] | CompoundSelect:
+        """Compile every branch while retaining enclosing correlation sources.
+
+        Parameters
+        ----------
+        plan : orionis.orm.query.SelectPlan
+            Query description, including aggregation and union branches.
+        outer_sources : orionis.database.compiler.SourceMap
+            Enclosing sources available to every nested branch.
+
+        Returns
+        -------
+        ``sqlalchemy.sql.Select`` or ``sqlalchemy.sql.CompoundSelect``
+            Complete query with its requested branches and global bounds.
+        """
         self._validateSelectLock(plan)
-        if (
-            plan.aggregate is not None
-            and plan.aggregate.function is AggregateFunction.COUNT
-            and plan.aggregate.column == "*"
-            and (plan.distinct or plan.groups or plan.havings or plan.unions)
-        ):
-            probe = plan.clone()
-            probe.aggregate = None
-            probe.orders = []
-            probe.limit_value = None
-            probe.offset_value = None
-            probe.lock = None
-            if probe.groups and not probe.columns:
-                probe.columns = tuple(probe.groups)
-            return sqlalchemy.select(func.count()).select_from(
-                self.compileSelect(probe).subquery(),
+        if plan.aggregate is not None and (
+            plan.unions
+            or (
+                plan.aggregate.function is AggregateFunction.COUNT
+                and plan.aggregate.column == "*"
+                and (plan.distinct or plan.groups or plan.havings)
             )
+        ):
+            return self._aggregateDerived(plan, outer_sources)
         if not plan.unions:
-            return self._buildSelect(plan, {})
+            return self._buildSelect(plan, outer_sources)
         base = plan.clone()
         base.unions = []
         base.orders = []
         base.limit_value = None
         base.offset_value = None
-        statement = self._buildSelect(base, {})
-        return self._applyUnions(statement, plan)
+        statement = self._buildSelect(base, outer_sources)
+        return self._applyUnions(statement, plan, outer_sources)
+
+    def _aggregateDerived(
+        self,
+        plan: SelectPlan,
+        outer_sources: SourceMap,
+    ) -> Select[Any]:
+        """Aggregate the complete compound or grouped query through a derived table.
+
+        Parameters
+        ----------
+        plan : orionis.orm.query.SelectPlan
+            Query whose aggregate must consume its complete projected row set.
+        outer_sources : orionis.database.compiler.SourceMap
+            Enclosing sources retained while compiling correlated branches.
+
+        Returns
+        -------
+        ``sqlalchemy.sql.Select``
+            Aggregate over the original rows without read ordering or pagination.
+        """
+        probe = plan.clone()
+        probe.aggregate = None
+        probe.orders = []
+        probe.limit_value = None
+        probe.offset_value = None
+        probe.lock = None
+        if probe.groups and not probe.columns:
+            probe.columns = tuple(probe.groups)
+        derived = self._compileSelect(probe, outer_sources).subquery()
+        sources = {plan.alias or plan.table.name: derived}
+        expression = self._aggregateExpression(sources, derived, plan.aggregate)
+        return sqlalchemy.select(expression).select_from(derived)
 
     def _applyUnions(
         self,
         statement: Select[Any],
         plan: SelectPlan,
+        outer_sources: SourceMap,
     ) -> Select[Any]:
         """
         Combine union branches and apply global ordering and pagination.
@@ -309,6 +368,8 @@ class SQLCompiler:
             Base SELECT without the owning plan's unions, ordering, or paging.
         plan : orionis.orm.query.SelectPlan
             SELECT plan containing at least one union branch.
+        outer_sources : orionis.database.compiler.SourceMap
+            Enclosing sources retained by each branch.
 
         Returns
         -------
@@ -322,7 +383,7 @@ class SQLCompiler:
                 combine = sqlalchemy.union_all if all_rows else sqlalchemy.union
                 branches = [sqlalchemy.select(combine(*branches).subquery())]
                 all_rows = union.all_rows
-            branch = self.compileSelect(union.plan)
+            branch = self._compileSelect(union.plan, outer_sources)
             if isinstance(branch, CompoundSelect):
                 branch = sqlalchemy.select(branch.subquery())
             branches.append(branch)
@@ -330,7 +391,10 @@ class SQLCompiler:
         derived = combine(*branches).subquery()
         sources = {plan.alias or plan.table.name: derived}
         return self._applyOrderingAndPaging(
-            sources, derived, sqlalchemy.select(derived), plan,
+            sources,
+            derived,
+            sqlalchemy.select(derived),
+            plan,
         )
 
     def _buildSelect(
@@ -378,8 +442,7 @@ class SQLCompiler:
         # Apply grouping and post-grouping conditions.
         if plan.groups:
             groups = [
-                self._resolveColumn(sources, default, name)
-                for name in plan.groups
+                self._resolveColumn(sources, default, name) for name in plan.groups
             ]
             statement = statement.group_by(*groups)
         having = self._whereExpression(sources, default, plan.havings)
@@ -389,15 +452,53 @@ class SQLCompiler:
         # Ordering and pagination are meaningless for aggregates.
         if plan.aggregate is None:
             statement = self._applyOrderingAndPaging(
-                sources, default, statement, plan,
+                sources,
+                default,
+                statement,
+                plan,
             )
 
+        statement = self._applySelectLock(statement, default, plan)
+
+        if outer_sources:
+            statement = statement.correlate(
+                *(
+                    source
+                    for name, source in outer_sources.items()
+                    if name not in own_sources
+                ),
+            )
+        return statement
+
+    def _applySelectLock(
+        self,
+        statement: Select[Any],
+        default: SqlSource,
+        plan: SelectPlan,
+    ) -> Select[Any]:
+        """Apply the backend's supported row-lock syntax to a SELECT.
+
+        Parameters
+        ----------
+        statement : ``sqlalchemy.sql.Select``
+            Query whose projection and conditions are already compiled.
+        default : orionis.database.compiler.SqlSource
+            Main source receiving SQL Server table hints.
+        plan : orionis.orm.query.SelectPlan
+            Validated plan containing the optional lock mode.
+
+        Returns
+        -------
+        ``sqlalchemy.sql.Select``
+            Original statement or its backend-specific locked variant.
+        """
         if plan.lock is not None:
             if self._driver == "sqlserver":
                 # SQL Server ignores Core's FOR UPDATE clause. Retain physical
                 # row locks until transaction end with native table hints.
                 hints = (
-                    "WITH (HOLDLOCK, ROWLOCK)" if plan.lock is LockMode.SHARE
+                    "WITH (HOLDLOCK, ROWLOCK)"
+                    if plan.lock is LockMode.SHARE
                     else "WITH (UPDLOCK, ROWLOCK)"
                 )
                 statement = statement.with_hint(default, hints, dialect_name="mssql")
@@ -420,7 +521,7 @@ class SQLCompiler:
         Returns
         -------
         None
-            Continue compilation without modifying the plan.
+            No return value.
 
         Raises
         ------
@@ -472,7 +573,7 @@ class SQLCompiler:
         Returns
         -------
         None
-            Update ``names`` in place; skip raw SQL and EXISTS subqueries.
+            No return value.
         """
         for clause in clauses:
             if clause.where_type is WhereType.NESTED:
@@ -501,9 +602,7 @@ class SQLCompiler:
         set of str
             Qualified and unqualified names used by the current plan's clauses.
         """
-        names: set[str] = {
-            column for column in plan.columns if isinstance(column, str)
-        }
+        names: set[str] = {column for column in plan.columns if isinstance(column, str)}
         self._collectClauseColumnNames(plan.wheres, names)
         self._collectClauseColumnNames(plan.havings, names)
         names.update(order.column for order in plan.orders)
@@ -540,7 +639,7 @@ class SQLCompiler:
         Returns
         -------
         None
-            Append matching names to cached table metadata without assigning types.
+            No return value.
         """
         if table.columns:
             return
@@ -571,7 +670,7 @@ class SQLCompiler:
         Returns
         -------
         None
-            Update raw table metadata before alias creation; skip subquery joins.
+            No return value.
         """
         # Collect references only when a source has no declared columns.
         if plan.table.columns and all(
@@ -617,7 +716,9 @@ class SQLCompiler:
         from_clause = default
         for join in plan.joins:
             from_clause, joined_name, joined_source = self._applyJoin(
-                from_clause, sources, join,
+                from_clause,
+                sources,
+                join,
             )
             sources[joined_name] = joined_source
 
@@ -646,7 +747,7 @@ class SQLCompiler:
             if not join.alias:
                 error_msg = "A subquery join requires an alias."
                 raise QueryException(error_msg)
-            return join.alias, self._buildSelect(join.table, {}).subquery(join.alias)
+            return join.alias, self.compileSelect(join.table).subquery(join.alias)
 
         joined_table = self._sqlTable(join.table)
         source = joined_table.alias(join.alias) if join.alias else joined_table
@@ -685,8 +786,11 @@ class SQLCompiler:
         joined_name, joined_source = self._joinSource(join)
 
         if join.join_type is JoinType.CROSS:
-            return from_clause.join(joined_source, sqlalchemy.true()), \
-                joined_name, joined_source
+            return (
+                from_clause.join(joined_source, sqlalchemy.true()),
+                joined_name,
+                joined_source,
+            )
 
         condition = self._joinCondition(sources, joined_name, joined_source, join)
         if join.join_type is JoinType.INNER:
@@ -734,9 +838,7 @@ class SQLCompiler:
             unsupported.
         """
         if not join.conditions:
-            error_msg = (
-                f"Join on '{joined_name}' requires at least one ON condition."
-            )
+            error_msg = f"Join on '{joined_name}' requires at least one ON condition."
             raise QueryException(error_msg)
 
         local_sources: SourceMap = {**sources, joined_name: joined_source}
@@ -852,10 +954,12 @@ class SQLCompiler:
             return sqlalchemy.literal_column(raw.sql).label(raw.alias)
         element = sqlalchemy.text(raw.sql)
         if raw.bindings:
-            element = element.bindparams(*(
-                sqlalchemy.bindparam(name, value, unique=True)
-                for name, value in raw.bindings.items()
-            ))
+            element = element.bindparams(
+                *(
+                    sqlalchemy.bindparam(name, value, unique=True)
+                    for name, value in raw.bindings.items()
+                ),
+            )
         if raw.alias:
             # Group the bound fragment and expose its projection name.
             return (
@@ -889,7 +993,7 @@ class SQLCompiler:
             Resolved column, labeled scalar subquery, or compiled raw expression.
         """
         if isinstance(entry, SubQueryColumn):
-            subquery = self._buildSelect(entry.plan, sources)
+            subquery = self._compileSelect(entry.plan, sources)
             return subquery.scalar_subquery().label(entry.alias)
         if isinstance(entry, RawExpression):
             return self._rawElement(entry)
@@ -930,7 +1034,8 @@ class SQLCompiler:
             order = plan.orders[0]
             column = self._resolveColumn(sources, default, order.column)
             statement = statement.order_by(
-                column.desc() if order.direction is SortDirection.DESC
+                column.desc()
+                if order.direction is SortDirection.DESC
                 else column.asc(),
             )
         elif plan.orders:
@@ -971,7 +1076,7 @@ class SQLCompiler:
         if len(rows) <= 1:
             return False
         keys = rows[0].keys()
-        if plan.table.columns and keys > plan.table.columns.keys():
+        if plan.table.columns and any(key not in plan.table.columns for key in keys):
             return False
         for row in rows:
             if row.keys() != keys or any(
@@ -1200,6 +1305,8 @@ class SQLCompiler:
 
         Reuse metadata for raw definitions or the same declared definition
         instance; rebuild it for a different definition with declared columns.
+        Treat a declared definition and its columns as stable after compilation.
+        In-place edits are not tracked; use a new definition for a schema version.
 
         Parameters
         ----------
@@ -1235,12 +1342,12 @@ class SQLCompiler:
                 self._ensureReferencedTable(column.foreign_ref)
         for foreign_key in definition.foreign_keys:
             self._ensureReferencedColumns(
-                foreign_key.ref_table, foreign_key.ref_columns,
+                foreign_key.ref_table,
+                foreign_key.ref_columns,
             )
 
         columns = [
-            self._sqlColumn(column, name)
-            for name, column in definition.columns.items()
+            self._sqlColumn(column, name) for name, column in definition.columns.items()
         ]
         table = Table(
             physical,
@@ -1286,12 +1393,13 @@ class SQLCompiler:
                 table_name = foreign_key.ref_table
             ref_table = self._cacheKey(self._physicalName(table_name), schema or None)
             ref_columns = [
-                f"{ref_table}.{column}"
-                for column in foreign_key.ref_columns
+                f"{ref_table}.{column}" for column in foreign_key.ref_columns
             ]
             constraints.append(
                 sqlalchemy.ForeignKeyConstraint(
-                    foreign_key.columns, ref_columns, name=foreign_key.name,
+                    foreign_key.columns,
+                    ref_columns,
+                    name=foreign_key.name,
                 ),
             )
         for index in definition.indexes:
@@ -1313,8 +1421,7 @@ class SQLCompiler:
         Returns
         -------
         None
-            Create an integer primary-key placeholder only when target metadata
-            is absent.
+            No return value.
         """
         self._ensureReferencedColumns(reference.table, (reference.column,))
 
@@ -1324,38 +1431,42 @@ class SQLCompiler:
         columns: Sequence[str],
     ) -> None:
         """
-        Register missing table metadata for foreign-key target columns.
+        Extend undeclared target metadata with missing foreign-key columns.
+
+        Keep declared schemas authoritative while extending temporary targets.
 
         Parameters
         ----------
         table_name : str
             Logical table name, optionally qualified as ``schema.table``.
         columns : collections.abc.Sequence of str
-            Target columns to declare as integer primary-key placeholders.
+            Target columns to declare with temporary integer types.
 
         Returns
         -------
         None
-            Add a prefixed metadata table if absent; leave existing metadata
-            unchanged.
+            No return value.
         """
         schema, separator, logical = table_name.rpartition(".")
         if not separator:
             logical = table_name
         physical = self._physicalName(logical)
-        if self._cacheKey(physical, schema or None) in self._metadata.tables:
+        cache_key = self._cacheKey(physical, schema or None)
+        existing = self._metadata.tables.get(cache_key)
+        if existing is not None:
+            if cache_key not in self._definitions:
+                for column in columns:
+                    if column not in existing.c:
+                        existing.append_column(SqlColumn(column, sqlalchemy.Integer()))
             return
         Table(
             physical,
             self._metadata,
-            *(
-                SqlColumn(column, sqlalchemy.Integer(), primary_key=True)
-                for column in columns
-            ),
+            *(SqlColumn(column, sqlalchemy.Integer()) for column in columns),
             schema=schema or None,
         )
 
-    def _sqlColumn( # NOSONAR
+    def _sqlColumn(
         self,
         definition: ColumnDefinition,
         name: str | None = None,
@@ -1375,7 +1486,7 @@ class SQLCompiler:
 
         Returns
         -------
-        orionis.database.schema.Column
+        ``sqlalchemy.Column``
             Column with resolved type, constraints, defaults, and backend options.
 
         Raises
@@ -1401,6 +1512,34 @@ class SQLCompiler:
                 ForeignKey(f"{target}.{reference.column}"),
             )
 
+        options = self._columnOptions(definition, args[1])
+
+        try:
+            return SqlColumn(*args, **options)
+        except (ImportError, NoSuchModuleError) as error:
+            if self._driver == "redshift":
+                raise missing_dependency_error(self._driver, error) from error
+            raise
+
+    def _columnOptions(
+        self,
+        definition: ColumnDefinition,
+        column_type: TypeEngine[Any],
+    ) -> dict[str, Any]:
+        """Build column constraints, identity options and static defaults.
+
+        Parameters
+        ----------
+        definition : orionis.orm.schema.column.ColumnDefinition
+            Logical column flags and client default value.
+        column_type : ``sqlalchemy.types.TypeEngine``
+            Resolved type used to render a static server default.
+
+        Returns
+        -------
+        dict[str, typing.Any]
+            Keyword arguments passed to the SQLAlchemy column constructor.
+        """
         options: dict[str, Any] = {
             "primary_key": definition.is_primary,
             "nullable": definition.is_nullable and not definition.is_primary,
@@ -1421,14 +1560,9 @@ class SQLCompiler:
             # Static defaults are also emitted in the DDL, so rows written
             # without the column still receive the declared value.
             if value is not None and not callable(value):
-                options["server_default"] = sqlalchemy.literal(value, args[1])
+                options["server_default"] = sqlalchemy.literal(value, column_type)
 
-        try:
-            return SqlColumn(*args, **options)
-        except (ImportError, NoSuchModuleError) as error:
-            if self._driver == "redshift":
-                raise missing_dependency_error(self._driver, error) from error
-            raise
+        return options
 
     def _sqlType(self, definition: ColumnDefinition) -> TypeEngine[Any]:
         """
@@ -1453,8 +1587,7 @@ class SQLCompiler:
         builder = self._TYPE_BUILDERS.get(definition.column_type)
         if builder is None:
             error_msg = (
-                f"No SQL type registered for column type "
-                f"'{definition.column_type}'."
+                f"No SQL type registered for column type '{definition.column_type}'."
             )
             raise QueryException(error_msg)
 
@@ -1593,7 +1726,10 @@ class SQLCompiler:
         if len(clauses) == 1:
             return self._clauseExpression(sources, default, clauses[0])
         return self._combineExpressions(
-            self._clauseExpression, sources, default, clauses,
+            self._clauseExpression,
+            sources,
+            default,
+            clauses,
         )
 
     @staticmethod
@@ -1678,7 +1814,7 @@ class SQLCompiler:
         if kind is WhereType.RAW:
             return self._rawElement(clause.value)
         if kind in (WhereType.EXISTS, WhereType.NOT_EXISTS):
-            subquery = self._buildSelect(clause.value, sources).exists()
+            subquery = self._compileSelect(clause.value, sources).exists()
             return ~subquery if kind is WhereType.NOT_EXISTS else subquery
         return None
 
@@ -1752,7 +1888,7 @@ class SQLCompiler:
             If a nested SELECT contains invalid clauses or unresolved references.
         """
         if isinstance(value, SelectPlan):
-            return self._buildSelect(value, sources)
+            return self._compileSelect(value, sources)
         return value
 
     @staticmethod
@@ -1872,7 +2008,8 @@ class SQLCompiler:
             # Oracle CLOB values cannot use ordinary SQL equality. Typed text
             # predicates also back the cache store's compare-and-swap update.
             comparison = func.dbms_lob.compare(
-                column, sqlalchemy.literal(clause.value, type_=column.type),
+                column,
+                sqlalchemy.literal(clause.value, type_=column.type),
             )
             return comparison == 0 if op in _EQUALITY_OPERATORS else comparison != 0
 
@@ -1922,9 +2059,7 @@ class SQLCompiler:
             )
 
         if aggregate.column == "*":
-            error_msg = (
-                f"Aggregate '{aggregate.function}' requires a column name."
-            )
+            error_msg = f"Aggregate '{aggregate.function}' requires a column name."
             raise QueryException(error_msg)
 
         column = self._resolveColumn(sources, default, aggregate.column)

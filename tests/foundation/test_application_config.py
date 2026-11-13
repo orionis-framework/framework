@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 import tempfile
 from pathlib import Path
@@ -10,6 +13,7 @@ from orionis.foundation.application import Application
 from orionis.foundation.core_paths import CORE_APP_PATHS
 from orionis.support.structures.freezer import FreezeThaw
 from orionis.test import TestCase
+
 
 def make_application(config: dict[str, object] | None = None) -> Application:
     """
@@ -32,11 +36,14 @@ def make_application(config: dict[str, object] | None = None) -> Application:
         app._Application__commitConfig()
     return app
 
+
 class FirstProvider(ServiceProvider):
     """Identify the first provider in registration-order assertions."""
 
+
 class SecondProvider(ServiceProvider):
     """Identify the second provider in registration-order assertions."""
+
 
 class TestApplicationConfiguration(TestCase):
     """Exercise mutable configuration access and immutable bootstrap snapshots."""
@@ -113,9 +120,13 @@ class TestApplicationConfiguration(TestCase):
         app.config("", "empty")
         self.assertEqual(app.config(""), "empty")
         app.config("root..leaf", None)
-        self.assertEqual(app.config("root"), {
-            "child": {"value": 7}, "": {"leaf": None},
-        })
+        self.assertEqual(
+            app.config("root"),
+            {
+                "child": {"value": 7},
+                "": {"leaf": None},
+            },
+        )
 
     def testResetRestoresBootstrapAfterNestedMutations(self) -> None:
         """
@@ -146,12 +157,14 @@ class TestApplicationConfiguration(TestCase):
         for index in range(600):
             self.assertEqual(app.config(f"dynamic.item{index}", index), index)
         self.assertLessEqual(
-            application_module._parse_config_key.cache_info().currsize, 256,
+            application_module._parse_config_key.cache_info().currsize,
+            256,
         )
         for index in range(600):
             self.assertEqual(app.config(f"dynamic.item{index}"), index)
         self.assertLessEqual(
-            application_module._parse_config_key.cache_info().currsize, 256,
+            application_module._parse_config_key.cache_info().currsize,
+            256,
         )
 
     def testCacheOverflowPreservesFrequentlyReadPaths(self) -> None:
@@ -227,10 +240,30 @@ class TestApplicationConfiguration(TestCase):
         app = make_application()
         app.withProviders(FirstProvider, SecondProvider, FirstProvider)
         eager = app._Application__bootstrap["providers"]["eager"]
-        self.assertEqual(list(eager), [
-            f"{FirstProvider.__module__}.{FirstProvider.__name__}",
-            f"{SecondProvider.__module__}.{SecondProvider.__name__}",
-        ])
+        self.assertEqual(
+            list(eager),
+            [
+                f"{FirstProvider.__module__}.{FirstProvider.__name__}",
+                f"{SecondProvider.__module__}.{SecondProvider.__name__}",
+            ],
+        )
+
+    def testInvalidKnownPathDoesNotReplaceConfiguredDirectories(self) -> None:
+        """
+        Reject invalid path values instead of silently selecting default locations.
+
+        Returns
+        -------
+        None
+            Preserve the previous directory mapping after failed validation.
+        """
+        app = make_application()
+        app.withConfigPaths(storage="private-state")
+        before = app._Application__bootstrap["paths"]
+        for value in (False, 0, []):
+            with self.subTest(value=value), self.assertRaises(TypeError):
+                app.withConfigPaths(storage=value)
+            self.assertIs(app._Application__bootstrap["paths"], before)
 
     def testCompiledSnapshotRoundTripsWithoutMutatingBootstrap(self) -> None:
         """
@@ -350,7 +383,9 @@ class TestApplicationConfiguration(TestCase):
             Assert invalidation adds new paths and warm caches remain reusable.
         """
         realtime_keys = (
-            "app_realtime", "app_realtime_sockets", "app_realtime_hubs",
+            "app_realtime",
+            "app_realtime_sockets",
+            "app_realtime_hubs",
         )
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -371,7 +406,8 @@ class TestApplicationConfiguration(TestCase):
                 self.assertIsNone(warm.path("app_realtime_sockets"))
 
                 definitions.write_text(
-                    f"paths = ('app', {realtime_keys!r})\n", encoding="utf-8",
+                    f"paths = ('app', {realtime_keys!r})\n",
+                    encoding="utf-8",
                 )
                 updated = make_application()
                 updated.compile(path=cache_path)
@@ -381,7 +417,8 @@ class TestApplicationConfiguration(TestCase):
                 updated._Application__commitConfig()
                 for key in realtime_keys:
                     self.assertEqual(
-                        updated.path(key), updated.basePath / CORE_APP_PATHS[key],
+                        updated.path(key),
+                        updated.basePath / CORE_APP_PATHS[key],
                     )
                 self.assertEqual(
                     updated.path("app_services"),

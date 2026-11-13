@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeModel(MakeStubCommand):
     """Generate an ORM model class."""
 
@@ -17,4 +18,3 @@ class MakeModel(MakeStubCommand):
     """Path key identifier: ``app_models``."""
     success_label: str = "Model"
     """Success label identifier: ``Model``."""
-

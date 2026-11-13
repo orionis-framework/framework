@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import argparse
 import ast
 import importlib.util
@@ -14,6 +16,7 @@ from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
+
 
 class _Application:
     """Resolve the generator's configured directories without application boot."""
@@ -46,10 +49,9 @@ class _Application:
         Path
             Directory within the temporary application root.
         """
-        relative = (
-            self._models_path if key == "app_models" else CORE_APP_PATHS[key]
-        )
+        relative = self._models_path if key == "app_models" else CORE_APP_PATHS[key]
         return self.basePath / relative
+
 
 class _RecordedFactory(MakeFactory):
     """Capture command output with an explicit console test double."""
@@ -103,6 +105,7 @@ class _RecordedFactory(MakeFactory):
         self.errors.append(str(message))
         self.timestamps.append(timestamp)
 
+
 class _ThreadRecordedFactory(_RecordedFactory):
     """Record the thread that owns stub rendering and file creation."""
 
@@ -127,6 +130,7 @@ class _ThreadRecordedFactory(_RecordedFactory):
         """
         self.creation_thread = get_ident()
         return super().createFiles(app, name)
+
 
 class TestMakeFactory(TestCase):
     """Verify factory generation, import conventions, and CLI registration."""
@@ -182,7 +186,7 @@ class TestMakeFactory(TestCase):
             root = Path(temporary)
             command = _RecordedFactory()
             command.setArguments({"name": "UserFactory"})
-            await command.handle(_Application(root))
+            self.assertIsNone(await command.handle(_Application(root)))
 
             target = root / "database/factories/user_factory.py"
             content = target.read_text(encoding="utf-8")
@@ -197,7 +201,8 @@ class TestMakeFactory(TestCase):
                 node for node in module.body if isinstance(node, ast.ClassDef)
             )
             definition = next(
-                node for node in generated_class.body
+                node
+                for node in generated_class.body
                 if isinstance(node, ast.FunctionDef)
             )
             self.assertIsNotNone(ast.get_docstring(generated_class))
@@ -286,9 +291,9 @@ class TestMakeFactory(TestCase):
             command = MakeFactory()
             command.setArguments({"model": "billing/Invoice"})
             command.createFiles(_Application(root, "domain/models"), "PaidInvoice")
-            content = (
-                root / "database/factories/paid_invoice_factory.py"
-            ).read_text(encoding="utf-8")
+            content = (root / "database/factories/paid_invoice_factory.py").read_text(
+                encoding="utf-8",
+            )
             self.assertIn(
                 "from domain.models.billing.invoice import Invoice",
                 content,
@@ -329,7 +334,7 @@ class TestMakeFactory(TestCase):
             target.write_text("# User-owned factory\n", encoding="utf-8")
             command = _RecordedFactory()
             command.setArguments({"name": "UserFactory"})
-            await command.handle(_Application(root))
+            self.assertEqual(await command.handle(_Application(root)), 1)
             self.assertEqual(
                 target.read_text(encoding="utf-8"),
                 "# User-owned factory\n",
@@ -348,8 +353,14 @@ class TestMakeFactory(TestCase):
             Assert rejection of unsafe names before any file is written.
         """
         for name in (
-            "../User", "/User", "C:/User", "a//User", "Factory", "class",
-            "Us\u00e9r", "User\u0661",
+            "../User",
+            "/User",
+            "C:/User",
+            "a//User",
+            "Factory",
+            "class",
+            "Us\u00e9r",
+            "User\u0661",
         ):
             with self.subTest(name=name), TemporaryDirectory() as temporary:
                 root = Path(temporary)
@@ -367,8 +378,15 @@ class TestMakeFactory(TestCase):
             Assert rejection of model names that would produce invalid imports.
         """
         for model in (
-            "", "../User", "User; pass", "user\nimport os", "class", "False", 1,
-            "Us\u00e9r", "User\u0661",
+            "",
+            "../User",
+            "User; pass",
+            "user\nimport os",
+            "class",
+            "False",
+            1,
+            "Us\u00e9r",
+            "User\u0661",
         ):
             with self.subTest(model=model), TemporaryDirectory() as temporary:
                 root = Path(temporary)
@@ -389,6 +407,9 @@ class TestMakeFactory(TestCase):
         """
         with TemporaryDirectory() as temporary:
             command = _RecordedFactory()
-            await command.handle(_Application(Path(temporary)))
+            self.assertEqual(
+                await command.handle(_Application(Path(temporary))),
+                1,
+            )
             self.assertEqual(command.errors, ["The 'name' argument is required."])
             self.assertEqual(command.successes, [])

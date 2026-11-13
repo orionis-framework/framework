@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from orionis.console.fluent.contracts.command import ICommand
 
+
 class IReactor(ABC):
     """Define the contract for reactor implementations."""
 

@@ -1,3 +1,7 @@
+# ruff: noqa: FBT003, PT009, PT027, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
+# Schema annotations resolve metadata imports at runtime.
 from array import array
 from collections import deque
 from decimal import Decimal
@@ -8,9 +12,9 @@ from orionis.schemas import Schema
 from orionis.schemas import constraints as constraints_module
 from orionis.schemas import rules as rules_module
 from orionis.schemas.exceptions import ValidationException
-# Schema annotations resolve these imports at runtime.
-from orionis.schemas.fields import Field  # noqa: TC001
-from orionis.schemas.metadata import Coerce  # noqa: TC001
+
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
 from orionis.schemas.rules.empty import Empty
 from orionis.schemas.rules.measure import is_empty
 from orionis.schemas.rules.no_empty import NoEmpty
@@ -18,6 +22,7 @@ from orionis.schemas.validator import Schema as Validator
 from orionis.test import TestCase
 
 _OWNER = object()
+
 
 def _empty_values() -> tuple[object, ...]:
     """
@@ -29,11 +34,33 @@ def _empty_values() -> tuple[object, ...]:
         Empty scalar, binary, numeric and collection values.
     """
     return (
-        None, "", " ", "\t\r\n", "\u00a0",
-        False, 0, 0.0, -0.0, 0j, Decimal(0), Decimal("-0.000"), Fraction(0),
-        b"", bytearray(), memoryview(b""), [], (), {}, set(), frozenset(),
-        range(0), deque(), array("i"), {}.keys(),
+        None,
+        "",
+        " ",
+        "\t\r\n",
+        "\u00a0",
+        False,
+        0,
+        0.0,
+        -0.0,
+        0j,
+        Decimal(0),
+        Decimal("-0.000"),
+        Fraction(0),
+        b"",
+        bytearray(),
+        memoryview(b""),
+        [],
+        (),
+        {},
+        set(),
+        frozenset(),
+        range(0),
+        deque(),
+        array("i"),
+        {}.keys(),
     )
+
 
 def _present_values() -> tuple[object, ...]:
     """
@@ -45,21 +72,46 @@ def _present_values() -> tuple[object, ...]:
         Present scalar, binary, numeric and collection values.
     """
     return (
-        "text", " text ", "0", "false", True, 1, -1, 0.5, 1j,
-        Decimal("0.0001"), Decimal("1e-10000"),
-        Decimal("NaN"), Decimal("sNaN"), Decimal("Infinity"),
-        Fraction(1, 10**1000), float("nan"), float("inf"),
-        b" ", bytearray(b"0"), memoryview(b"0"),
-        [None], ("",), {"key": None}, {0}, frozenset({False}),
-        range(1), deque([None]), array("i", [0]), {"key": None}.keys(),
+        "text",
+        " text ",
+        "0",
+        "false",
+        True,
+        1,
+        -1,
+        0.5,
+        1j,
+        Decimal("0.0001"),
+        Decimal("1e-10000"),
+        Decimal("NaN"),
+        Decimal("sNaN"),
+        Decimal("Infinity"),
+        Fraction(1, 10**1000),
+        float("nan"),
+        float("inf"),
+        b" ",
+        bytearray(b"0"),
+        memoryview(b"0"),
+        [None],
+        ("",),
+        {"key": None},
+        {0},
+        frozenset({False}),
+        range(1),
+        deque([None]),
+        array("i", [0]),
+        {"key": None}.keys(),
         object(),
     )
+
 
 class _EmptyValue(Schema):
     value: Field[object, Empty()]
 
+
 class _PresentValue(Schema):
     value: Field[object, NoEmpty()]
+
 
 class TestEmptyRules(TestCase):
     """Keep emptiness predicates complementary and independent of truthiness."""
@@ -88,11 +140,13 @@ class TestEmptyRules(TestCase):
             with self.subTest(value=value):
                 result = await empty.enforce("value", value, _OWNER)
                 self.assertIs(
-                    await no_empty.enforce("value", value, _OWNER), not result,
+                    await no_empty.enforce("value", value, _OWNER),
+                    not result,
                 )
 
     async def testSizedValuesDoNotEvaluateAmbiguousTruthiness(self) -> None:
         """Check array-like lengths without coercing the container to bool."""
+
         class AmbiguousList(list[object]):
             def __bool__(self) -> bool:
                 """Reject attempts to evaluate container truthiness."""
@@ -100,11 +154,13 @@ class TestEmptyRules(TestCase):
                 raise AssertionError(error_msg)
 
         for value, expected in (
-            (AmbiguousList(), True), (AmbiguousList([0]), False),
+            (AmbiguousList(), True),
+            (AmbiguousList([0]), False),
         ):
             self.assertIs(await Empty().enforce("value", value, _OWNER), expected)
             self.assertIs(
-                await NoEmpty().enforce("value", value, _OWNER), not expected,
+                await NoEmpty().enforce("value", value, _OWNER),
+                not expected,
             )
 
     async def testIteratorsAreNotConsumed(self) -> None:
@@ -118,7 +174,9 @@ class TestEmptyRules(TestCase):
     async def testUploadedFilesUseTheirByteSize(self) -> None:
         """Recognize empty and disk-backed uploads without changing the file."""
         upload = UploadedFile(
-            "payload.bin", "application/octet-stream", memory_threshold=1,
+            "payload.bin",
+            "application/octet-stream",
+            memory_threshold=1,
         )
         try:
             self.assertTrue(await Empty().enforce("file", upload, _OWNER))
@@ -133,6 +191,7 @@ class TestEmptyRules(TestCase):
 
     async def testFileContentsAreNeverRead(self) -> None:
         """Use upload metadata without invoking even a failing file reader."""
+
         def read() -> bytes:
             """Reject unexpected reads while checking upload emptiness."""
             error_msg = "Emptiness checks must not read uploaded files."
@@ -140,13 +199,17 @@ class TestEmptyRules(TestCase):
 
         for size in (0, 1):
             upload = SimpleNamespace(
-                read=read, size=size, filename="payload.bin",
+                read=read,
+                size=size,
+                filename="payload.bin",
             )
             self.assertIs(
-                await Empty().enforce("file", upload, _OWNER), size == 0,
+                await Empty().enforce("file", upload, _OWNER),
+                size == 0,
             )
             self.assertIs(
-                await NoEmpty().enforce("file", upload, _OWNER), size != 0,
+                await NoEmpty().enforce("file", upload, _OWNER),
+                size != 0,
             )
 
     async def testDefaultFailureCodesAndMessages(self) -> None:
@@ -167,12 +230,20 @@ class TestEmptyRules(TestCase):
         """Keep message overrides and the public enforcement signature."""
         empty = Empty(message="Leave this blank.")
         no_empty = NoEmpty(message="Provide a value.")
-        self.assertTrue(await empty.enforce(
-            field="value", value=None, instance=_OWNER,
-        ))
-        self.assertTrue(await no_empty.enforce(
-            field="value", value="text", instance=_OWNER,
-        ))
+        self.assertTrue(
+            await empty.enforce(
+                field="value",
+                value=None,
+                instance=_OWNER,
+            ),
+        )
+        self.assertTrue(
+            await no_empty.enforce(
+                field="value",
+                value="text",
+                instance=_OWNER,
+            ),
+        )
         empty_failure = await empty.validate("value", "text", _OWNER)
         present_failure = await no_empty.validate("value", False, _OWNER)
         self.assertEqual(empty_failure.message, "Leave this blank.")
@@ -196,11 +267,17 @@ class TestEmptyRules(TestCase):
                 self.assertEqual(result.value, value)
                 with self.assertRaises(ValidationException) as caught:
                     await Validator.validate({"value": value}, _PresentValue)
-                self.assertEqual(caught.exception.errors, {
-                    "value": [{
-                        "rule": "no_empty", "message": "Value must not be empty.",
-                    }],
-                })
+                self.assertEqual(
+                    caught.exception.errors,
+                    {
+                        "value": [
+                            {
+                                "rule": "no_empty",
+                                "message": "Value must not be empty.",
+                            },
+                        ],
+                    },
+                )
         for value in ("0", "text", [None], {"key": None}, True, 1):
             with self.subTest(value=value):
                 result = await Validator.validate({"value": value}, _PresentValue)
@@ -211,6 +288,7 @@ class TestEmptyRules(TestCase):
 
     async def testNullableFieldsStillRunTheRules(self) -> None:
         """Reject None with NoEmpty even when its declared type allows null."""
+
         class NullableValue(Schema):
             value: Field[str | None, NoEmpty()]
 
@@ -236,6 +314,7 @@ class TestEmptyRules(TestCase):
 
     async def testNestedAndSiblingFailuresKeepTheirMessagesAndPaths(self) -> None:
         """Run both rules on normal and partial conversion error paths."""
+
         class Child(Schema, rename="camel"):
             display_name: Field[str, NoEmpty(message="Name required.")]
 
@@ -247,29 +326,48 @@ class TestEmptyRules(TestCase):
         for other in (1, "bad"):
             payload = {
                 "children": [{"displayName": " "}, {"displayName": ""}],
-                "reserved": [0], "other": other,
+                "reserved": [0],
+                "other": other,
             }
             with self.assertRaises(ValidationException) as caught:
                 await Validator.validate(payload, Batch)
             errors = caught.exception.errors
             for index in range(2):
-                self.assertEqual(errors[f"children[{index}].displayName"], [{
-                    "rule": "no_empty", "message": "Name required.",
-                }])
-            self.assertEqual(errors["reserved"], [{
-                "rule": "empty", "message": "Leave empty.",
-            }])
+                self.assertEqual(
+                    errors[f"children[{index}].displayName"],
+                    [
+                        {
+                            "rule": "no_empty",
+                            "message": "Name required.",
+                        },
+                    ],
+                )
+            self.assertEqual(
+                errors["reserved"],
+                [
+                    {
+                        "rule": "empty",
+                        "message": "Leave empty.",
+                    },
+                ],
+            )
             self.assertEqual("other" in errors, other == "bad")
             self.assertEqual(payload["reserved"], [0])
             self.assertEqual(payload["children"][0]["displayName"], " ")
 
-        result = await Validator.validate({
-            "children": [{"displayName": " Ada "}], "reserved": [], "other": 1,
-        }, Batch)
+        result = await Validator.validate(
+            {
+                "children": [{"displayName": " Ada "}],
+                "reserved": [],
+                "other": 1,
+            },
+            Batch,
+        )
         self.assertEqual(result.children[0].display_name, " Ada ")
 
     async def testCoercionPrecedesEmptinessRules(self) -> None:
         """Check numeric zero after casting without treating the string as zero."""
+
         class EmptyCount(Schema):
             quantity: Field[int, Coerce(), Empty()]
 
@@ -288,11 +386,13 @@ class TestEmptyRules(TestCase):
             2,
         )
         self.assertEqual(
-            (await Validator.validate({"value": "0"}, _PresentValue)).value, "0",
+            (await Validator.validate({"value": "0"}, _PresentValue)).value,
+            "0",
         )
 
     async def testCombiningBothRulesFailsExactlyOneCheck(self) -> None:
         """Keep the rules exact opposites when declared on the same field."""
+
         class OppositeRules(Schema):
             value: Field[object, Empty(), NoEmpty()]
 
@@ -300,5 +400,6 @@ class TestEmptyRules(TestCase):
             with self.assertRaises(ValidationException) as caught:
                 await Validator.validate({"value": value}, OppositeRules)
             self.assertEqual(
-                [failure.rule for failure in caught.exception.failures], [code],
+                [failure.rule for failure in caught.exception.failures],
+                [code],
             )

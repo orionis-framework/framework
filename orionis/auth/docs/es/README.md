@@ -2,6 +2,10 @@
 
 Orionis resuelve la identidad actual mediante sesión de navegador o token personal y aplica permisos, roles y políticas. El contexto pertenece a la petición; los servicios compartidos no guardan un usuario global.
 
+Una referencia conservada al contexto pasa a ser invitada cuando se reemplaza o se cierra el scope de su petición. Los lectores de permisos vuelven a comprobar esa pertenencia después de esperar a otro lector. Las operaciones de sesión en espera de otra transición de autenticación también requieren una petición activa antes de invocar el guard.
+
+Los contratos públicos se resuelven de forma diferida desde `orionis.auth.contracts`. Los imports directos y las reexportaciones conservan la identidad de los tipos sin inicialización circular entre guards y entidades.
+
 1. [Identidad y login de sesión](identity-and-session.md): modelo, guards, login y logout.
 2. [Permisos, roles y políticas](authorization.md): proteger capacidades y recursos.
 3. [Tokens personales](personal-access-tokens.md): emitir, limitar y revocar credenciales.

@@ -1,28 +1,37 @@
+# ruff: noqa: BLE001
+# Reader/writer boundaries deliver or report all ordinary failures to their owners.
 """Provide mcp transport operations through ``StandardReader``, ``StandardWriter``."""
 
 from __future__ import annotations
 import asyncio
-from concurrent.futures import CancelledError
+from concurrent.futures import CancelledError, Future
 import threading
-from typing import TYPE_CHECKING
-from orionis.failure.runtime import capture_nowait, get_runtime
+from typing import BinaryIO
+from orionis.failure.runtime import FailureRuntime, capture_nowait, get_runtime
 
-if TYPE_CHECKING:
-    from concurrent.futures import Future
-    from orionis.failure.runtime import FailureRuntime
-    from typing import BinaryIO
 
 class StandardReader:
     """Read at most one queued frame using an interruptible async queue boundary."""
 
     __slots__ = (
-        "_closed", "_failure", "_failure_lock", "_limit", "_loop", "_pending",
-        "_queue", "_runtime", "_stream",
+        "_closed",
+        "_failure",
+        "_failure_lock",
+        "_limit",
+        "_loop",
+        "_pending",
+        "_queue",
+        "_runtime",
+        "_stream",
     )
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, stream: BinaryIO, limit: int, *, runtime: FailureRuntime | None = None,
+        self,
+        stream: BinaryIO,
+        limit: int,
+        *,
+        runtime: FailureRuntime | None = None,
     ) -> None:
         """
         Start a daemon reader with bounded delivery to the running event loop.
@@ -66,7 +75,9 @@ class StandardReader:
         self._pending: Future[None] | None = None
         """Work that has been admitted and is awaiting completion."""
         threading.Thread(
-            target=self._read, name="orionis.mcp.stdin", daemon=True,
+            target=self._read,
+            name="orionis.mcp.stdin",
+            daemon=True,
         ).start()
 
     def _offer(self, item: bytes | Exception) -> bool:
@@ -121,7 +132,7 @@ class StandardReader:
                     and not self._drainOversizedFrame()
                 ):
                     return
-        except Exception as exc:  # noqa: BLE001 - A dead reader cannot wake its owner.
+        except Exception as exc:
             with self._failure_lock:
                 self._failure = exc
             if not self._offer(exc):
@@ -173,7 +184,10 @@ class StandardReader:
         failure = self._takeFailure()
         if failure is not None:
             capture_nowait(
-                failure, runtime=self._runtime, flow="mcp", phase="read",
+                failure,
+                runtime=self._runtime,
+                flow="mcp",
+                phase="read",
                 metadata={"transport": "stdio"},
             )
 
@@ -216,8 +230,10 @@ class StandardReader:
         if self._pending is not None:
             self._pending.cancel()
 
+
 def _finish_write(
-    future: asyncio.Future[None], error: Exception | None,
+    future: asyncio.Future[None],
+    error: Exception | None,
     runtime: FailureRuntime | None = None,
 ) -> None:
     """
@@ -244,9 +260,13 @@ def _finish_write(
             future.set_exception(error)
     elif error is not None:
         capture_nowait(
-            error, runtime=runtime, flow="mcp", phase="write",
+            error,
+            runtime=runtime,
+            flow="mcp",
+            phase="write",
             metadata={"transport": "stdio"},
         )
+
 
 class StandardWriter:
     """Serialize bounded queued output without blocking async cancellation."""
@@ -255,7 +275,10 @@ class StandardWriter:
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, stream: BinaryIO, *, runtime: FailureRuntime | None = None,
+        self,
+        stream: BinaryIO,
+        *,
+        runtime: FailureRuntime | None = None,
     ) -> None:
         """
         Start a daemon writer with a single-slot queue on the running loop.
@@ -293,7 +316,9 @@ class StandardWriter:
         self._pending: Future[tuple[bytes, asyncio.Future[None]]] | None = None
         """Work that has been admitted and is awaiting completion."""
         threading.Thread(
-            target=self._write, name="orionis.mcp.stdout", daemon=True,
+            target=self._write,
+            name="orionis.mcp.stdout",
+            daemon=True,
         ).start()
 
     def _write(self) -> None:
@@ -323,21 +348,53 @@ class StandardWriter:
                 continue
             error = None
             try:
-                self._stream.write(data)
-                self._stream.flush()
-            except Exception as exc:  # noqa: BLE001 - Complete the waiting future.
+                self._writeFrame(data)
+            except Exception as exc:
                 error = exc
             try:
                 self._loop.call_soon_threadsafe(
-                    _finish_write, completed, error, self._runtime,
+                    _finish_write,
+                    completed,
+                    error,
+                    self._runtime,
                 )
             except RuntimeError:
                 if error is not None:
                     capture_nowait(
-                        error, runtime=self._runtime, flow="mcp", phase="write",
+                        error,
+                        runtime=self._runtime,
+                        flow="mcp",
+                        phase="write",
                         metadata={"transport": "stdio"},
                     )
                 return
+
+    def _writeFrame(self, data: bytes) -> None:
+        """Complete partial raw-stream writes before flushing one frame.
+
+        Parameters
+        ----------
+        data : bytes
+            Entire frame owned by the writer daemon.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        OSError
+            If the stream makes no progress or returns an invalid byte count.
+        """
+        remaining = memoryview(data)
+        while remaining:
+            written = self._stream.write(remaining)
+            if type(written) is not int or not 0 < written <= len(remaining):
+                message = "STDIO output did not accept the remaining frame bytes"
+                raise OSError(message)
+            remaining = remaining[written:]
+        self._stream.flush()
 
     async def write(self, data: bytes) -> None:
         """

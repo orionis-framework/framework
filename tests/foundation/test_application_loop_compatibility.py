@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import contextvars
 import gc
@@ -12,6 +14,7 @@ from tests.foundation.test_application_async import (
     _new_application,
     _ReceiveChannel,
 )
+
 
 class _TaskRecorder:
     """Implement a task factory that does not accept an eager-start argument."""
@@ -48,6 +51,7 @@ class _TaskRecorder:
         task = asyncio.Task(coroutine, loop=loop, name=name, context=context)
         self.tasks.append(task)
         return task
+
 
 class _AlternateLoop:
     """Expose the task-creation signature used by alternate event loops."""
@@ -92,11 +96,123 @@ class _AlternateLoop:
     # Expose the event-loop protocol name through the camelCase implementation.
     create_task = createTask
 
+
+class _RejectingFactory:
+    """Reject one admission after optionally starting the request handler."""
+
+    def __init__(self, fail_at: int) -> None:
+        """
+        Retain admitted tasks and all submitted coroutines.
+
+        Parameters
+        ----------
+        fail_at : int
+            One-based admission number to reject.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self.failAt = fail_at
+        self.error = RuntimeError("request task admission rejected")
+        self.coroutines = []
+        self.tasks = []
+
+    def __call__(self, loop, coroutine, *, name=None, context=None) -> asyncio.Task:
+        """
+        Start the handler eagerly or reject the configured admission.
+
+        Parameters
+        ----------
+        loop : asyncio.AbstractEventLoop
+            Owning event loop.
+        coroutine : Coroutine
+            Submitted operation.
+        name : str or None, optional
+            Native task name.
+        context : contextvars.Context or None, optional
+            Supplied execution context.
+
+        Returns
+        -------
+        asyncio.Task
+            Admitted task.
+
+        Raises
+        ------
+        RuntimeError
+            If the configured admission is rejected.
+        """
+        self.coroutines.append(coroutine)
+        if len(self.coroutines) == self.failAt:
+            raise self.error
+        task = asyncio.Task(
+            coroutine,
+            loop=loop,
+            name=name,
+            context=context,
+            eager_start=True,
+        )
+        self.tasks.append(task)
+        return task
+
+
 class TestApplicationLoopCompatibility(TestCase):
     """Check monitored request lifetimes without requiring native eager support."""
 
+    async def testRejectedRequestTasksReleaseEveryOwnedCoroutine(self) -> None:
+        """
+        Roll back handler and monitor admission without leaking request work.
+
+        Returns
+        -------
+        None
+            Preserve the admission error after owned cleanup has completed.
+        """
+        loop = asyncio.get_running_loop()
+        for interface in ("asgi", "rsgi"):
+            for fail_at in (1, 2):
+                with self.subTest(interface=interface, fail_at=fail_at):
+                    application = _new_application()
+                    gate, channel = _AsyncGate(), _ReceiveChannel()
+                    application._Application__kernel_http_asgi = gate.run
+                    application._Application__kernel_http_rsgi = gate.run
+                    factory = _RejectingFactory(fail_at)
+                    previous = loop.get_task_factory()
+                    try:
+                        loop.set_task_factory(factory)
+                        with self.assertRaises(RuntimeError) as caught:
+                            if interface == "asgi":
+                                await application(
+                                    {"type": "http"},
+                                    channel.receive,
+                                    _AsyncCall(),
+                                )
+                            else:
+                                await application.__rsgi__(
+                                    SimpleNamespace(proto="http"),
+                                    SimpleNamespace(client_disconnect=channel.receive),
+                                )
+                        self.assertIs(caught.exception, factory.error)
+                        for coroutine in factory.coroutines:
+                            self.assertIsNone(coroutine.cr_frame)
+                        self.assertTrue(all(task.done() for task in factory.tasks))
+                        if factory.tasks:
+                            self.assertTrue(gate.cleaned.is_set())
+                    finally:
+                        loop.set_task_factory(previous)
+                        for task in factory.tasks:
+                            task.cancel()
+                        await asyncio.gather(*factory.tasks, return_exceptions=True)
+                        for coroutine in factory.coroutines:
+                            coroutine.close()
+
     async def _exerciseLifecycle(
-        self, mode: str, interface: str, outcome: str,
+        self,
+        mode: str,
+        interface: str,
+        outcome: str,
     ) -> None:
         """Run one monitored request through a selected scheduler and outcome.
 
@@ -142,8 +258,8 @@ class TestApplicationLoopCompatibility(TestCase):
         setattr(application, f"_Application__kernel_http_{interface}", handle)
         request = (
             application({"type": "http"}, channel.receive, _AsyncCall())
-            if interface == "asgi" else
-            application.__rsgi__(
+            if interface == "asgi"
+            else application.__rsgi__(
                 SimpleNamespace(proto="http"),
                 SimpleNamespace(client_disconnect=channel.receive),
             )
@@ -153,10 +269,12 @@ class TestApplicationLoopCompatibility(TestCase):
             if mode == "factory":
                 loop.set_task_factory(scheduler)
             else:
-                stack.enter_context(patch(
-                    "orionis.foundation.application.asyncio.get_running_loop",
-                    return_value=scheduler,
-                ))
+                stack.enter_context(
+                    patch(
+                        "orionis.foundation.application.asyncio.get_running_loop",
+                        return_value=scheduler,
+                    ),
+                )
             task = asyncio.Task(request, loop=loop)
             try:
                 async with asyncio.timeout(2):
@@ -185,13 +303,16 @@ class TestApplicationLoopCompatibility(TestCase):
             self.assertTrue(channel.cleaned.is_set())
         self.assertEqual(len(scheduler.tasks), 2)
         self.assertTrue(all(child.done() for child in scheduler.tasks))
-        self.assertTrue(all(
-            child.get_coro().cr_frame is None for child in scheduler.tasks
-        ))
-        self.assertFalse([
-            warning for warning in recorded
-            if "was never awaited" in str(warning.message)
-        ])
+        self.assertTrue(
+            all(child.get_coro().cr_frame is None for child in scheduler.tasks),
+        )
+        self.assertFalse(
+            [
+                warning
+                for warning in recorded
+                if "was never awaited" in str(warning.message)
+            ],
+        )
 
     async def testCustomFactoryAsgiLifecycle(self) -> None:
         """Preserve ASGI lifetime behavior with a factory lacking eager support.

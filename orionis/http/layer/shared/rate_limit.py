@@ -1,8 +1,11 @@
+# ruff: noqa: PLC0415
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Apply configured request-rate limits before dispatch."""
 
 from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
+from orionis.failure.runtime import capture
 from orionis.foundation.config.http.entitites.rate_limit import HTTPRateLimit
 from orionis.http.layer.store.memory_rate_limit import MemoryRateLimitStore
 
@@ -11,9 +14,8 @@ if TYPE_CHECKING:
     from orionis.http.default.contracts.responses import IDefaultResponses
     from orionis.http.responses import Response
 
-class RateLimitMiddleware:
 
-    # ruff: noqa: PLC0415
+class RateLimitMiddleware:
     """Apply configured request-rate limits before dispatch."""
 
     __slots__ = (
@@ -143,9 +145,11 @@ class RateLimitMiddleware:
             # A Redis exception can only originate from an already loaded SDK.
             redis_exceptions = sys.modules.get("redis.exceptions")
             if redis_exceptions is None or not isinstance(
-                exc, redis_exceptions.RedisError,
+                exc,
+                redis_exceptions.RedisError,
             ):
                 raise
+            await capture(exc, flow="http", phase="rate_limit")
             return await self.__default_responses.error(
                 status_code=503,
                 content="Rate limit service unavailable",

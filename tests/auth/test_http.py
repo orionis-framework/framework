@@ -1,3 +1,8 @@
+# ruff: noqa: PT009, PT027, SLF001, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep real handler and application-double annotations available for injection.
+"""Verify authentication through real isolated HTTP kernels and request scopes."""
+
 import asyncio
 from pathlib import Path
 from types import SimpleNamespace
@@ -12,6 +17,7 @@ from orionis.auth.middleware.authenticate import (
     AuthenticateTokenMiddleware,
 )
 from orionis.auth.middleware.authorize import RequirePermissionMiddleware
+from orionis.auth.tokens.functions import hash_token_secret
 from orionis.console.output.http_request import HTTPRequestPrinter
 from orionis.container.container import Container
 from orionis.container.context.manager import ScopeManager
@@ -34,7 +40,6 @@ from tests.auth import test_manager as auth_fixtures
 from tests.http import test_kernel as http_fixtures
 from tests.session import test_manager as session_fixtures
 
-# ruff: noqa: TC001
 
 class _CanView(RequirePermissionMiddleware):
     """Require the capability exercised by protected integration routes."""
@@ -42,11 +47,14 @@ class _CanView(RequirePermissionMiddleware):
     __slots__ = ()
     permissions: ClassVar[tuple[str, ...]] = ("users.view",)
 
+
 class _ExpiredIdentity(AuthenticationException):
     """Represent an application-specific authentication failure."""
 
+
 class _DeniedOperation(AuthorizationException):
     """Represent an application-specific authorization denial."""
+
 
 class _Rendezvous:
     """Force two requests to interleave inside their real controller."""
@@ -59,9 +67,10 @@ class _Rendezvous:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.barrier = asyncio.Barrier(2)
+
 
 async def identity_handler(
     auth: IAuthManager,
@@ -88,6 +97,7 @@ async def identity_handler(
         "credential": context.credentialId,
         "allowed": await auth.can("users.view"),
     }
+
 
 async def concurrent_handler(
     auth: IAuthManager,
@@ -118,6 +128,7 @@ async def concurrent_handler(
     payload["after"] = auth.identifier()
     return payload
 
+
 async def logout_handler(auth: IAuthManager) -> Response:
     """Invalidate the current web session from a kernel-dispatched handler.
 
@@ -133,6 +144,7 @@ async def logout_handler(auth: IAuthManager) -> Response:
     """
     await auth.logout()
     return Response(status_code=204)
+
 
 class _HttpApp(auth_fixtures._StubApp):
     """Supply isolated services while delegating invocation to the real container."""
@@ -150,7 +162,7 @@ class _HttpApp(auth_fixtures._StubApp):
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         super().__init__(str(directory / "unused.sqlite"))
         self.basePath = directory
@@ -255,6 +267,7 @@ class _HttpApp(auth_fixtures._StubApp):
         """
         return "/health"
 
+
 class _HttpCatch:
     """Use the real exception status mapping without writing application logs."""
 
@@ -273,7 +286,7 @@ class _HttpCatch:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.handler = BaseExceptionHandler(responses, application)
 
@@ -295,6 +308,7 @@ class _HttpCatch:
         handling = await self.handler.handleFailure(exc, FailureContext(flow="http"))
         return await handling.present(flow="http", request=request)
 
+
 class _RsgiProtocol:
     """Record bytes emitted by the real RSGI response adapter."""
 
@@ -306,14 +320,17 @@ class _RsgiProtocol:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.status = 0
         self.headers: list[tuple[str, str]] = []
         self.body = b""
 
     def responseBytes(
-        self, status: int, headers: list[tuple[str, str]], body: bytes,
+        self,
+        status: int,
+        headers: list[tuple[str, str]],
+        body: bytes,
     ) -> None:
         """Record the protocol response supplied by the adapter.
 
@@ -329,12 +346,13 @@ class _RsgiProtocol:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.status, self.headers, self.body = status, headers, body
 
     # Preserve the Granian RSGI protocol name.
     response_bytes = responseBytes
+
 
 def route(path: str, function: str, *, web: bool = False) -> CompiledRoute:
     """Build a route descriptor using native middleware classes.
@@ -369,6 +387,7 @@ def route(path: str, function: str, *, web: bool = False) -> CompiledRoute:
         compiled_middlewares=middleware,
     )
 
+
 class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
     """Exercise request identity through the actual HTTP kernel and transports."""
 
@@ -378,19 +397,10 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         Returns
         -------
         None
-            Prepares isolated state for the test.
+            No return value.
         """
-        self._scope_token = ScopedContext.setCurrentScope(None)
-
-    def tearDown(self) -> None:
-        """Restore the runner's context after the isolated HTTP runtime.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        ScopedContext.reset(self._scope_token)
+        token = ScopedContext.setCurrentScope(None)
+        self.addCleanup(ScopedContext.reset, token)
 
     async def asyncSetUp(self) -> None:
         """Boot a real kernel over the existing temporary Auth database fixtures.
@@ -398,12 +408,14 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         Returns
         -------
         None
-            Prepares isolated state for the test.
+            No return value.
         """
         await super().asyncSetUp()
         self.http_app = _HttpApp(Path(self._tmp.name))
         self.addCleanup(
-            Container._instances.pop, type(self.http_app.container), None,
+            Container._instances.pop,
+            type(self.http_app.container),
+            None,
         )
         self.http_app.instance(IAuthManager, self.auth)
         self.http_app.instance(IPermissionRepository, self.permissions)
@@ -412,15 +424,21 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         self.catch = _HttpCatch(self.responses, self.http_app)
         self.sessions = SessionManager(self.http_app, object())
         routes = {
-            "GET": {"static": {
-                "/api": route("/api", "identity_handler"),
-                "/concurrent": route("/concurrent", "concurrent_handler"),
-                "/web": route("/web", "identity_handler", web=True),
-                "/public": route("/public", "identity_handler", web=True),
-            }, "dynamic": []},
-            "POST": {"static": {
-                "/logout": route("/logout", "logout_handler", web=True),
-            }, "dynamic": []},
+            "GET": {
+                "static": {
+                    "/api": route("/api", "identity_handler"),
+                    "/concurrent": route("/concurrent", "concurrent_handler"),
+                    "/web": route("/web", "identity_handler", web=True),
+                    "/public": route("/public", "identity_handler", web=True),
+                },
+                "dynamic": [],
+            },
+            "POST": {
+                "static": {
+                    "/logout": route("/logout", "logout_handler", web=True),
+                },
+                "dynamic": [],
+            },
         }
         self.http_app.builds = {
             RouteLoader: http_fixtures._StubRouteLoader(routes, None),
@@ -430,10 +448,14 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
             ASGIResponseAdapter: ASGIResponseAdapter(),
             RSGIResponseAdapter: RSGIResponseAdapter(),
             AuthenticateSessionMiddleware: AuthenticateSessionMiddleware(
-                self.app, self.auth, self.permissions,
+                self.app,
+                self.auth,
+                self.permissions,
             ),
             AuthenticateTokenMiddleware: AuthenticateTokenMiddleware(
-                self.app, self.auth, self.permissions,
+                self.app,
+                self.auth,
+                self.permissions,
             ),
             _CanView: _CanView(self.authorizer),
         }
@@ -441,7 +463,9 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         await self.kernel.boot()
 
     async def asgi(
-        self, path: str, headers: list[tuple[bytes, bytes]] | None = None,
+        self,
+        path: str,
+        headers: list[tuple[bytes, bytes]] | None = None,
         method: str = "GET",
     ) -> tuple[int, dict[str, object], list[tuple[bytes, bytes]]]:
         """Send one ASGI request through the kernel and collect its real response.
@@ -483,7 +507,7 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             messages.append(message)
 
@@ -501,7 +525,7 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         status, _, headers = await self.asgi("/api")
         self.assertEqual(status, 401)
@@ -523,17 +547,25 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         await self.registrar.givePermissionTo(self.bob, "users.view")
         first = await self.tokens.create(self.ada, "first")
         second = await self.tokens.create(self.bob, "second")
-        responses = await asyncio.gather(*(
-            self.asgi("/concurrent", [
-                (b"authorization", f"Bearer {issued.plain_text}".encode()),
-            ]) for issued in (first, second)
-        ))
+        async with asyncio.TaskGroup() as group:
+            requests = [
+                group.create_task(
+                    self.asgi(
+                        "/concurrent",
+                        [
+                            (b"authorization", f"Bearer {issued.plain_text}".encode()),
+                        ],
+                    ),
+                )
+                for issued in (first, second)
+            ]
+        responses = [request.result() for request in requests]
         self.assertTrue(all(not scope.isActive for scope in self.http_app.scopes))
         for response, identity in zip(responses, (self.ada, self.bob), strict=True):
             status, payload, _ = response
@@ -549,12 +581,11 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         session = Session()
         session.put("_auth_identifier", str(self.ada.id))
-        from orionis.auth.tokens.functions import hash_token_secret
         session.put("_auth_identifier_password", hash_token_secret(self.ada.password))
         csrf = "existing-csrf-value"
         session.put("_csrf_token", csrf)
@@ -566,7 +597,9 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         status, _, _ = await self.asgi("/logout", headers, "POST")
         self.assertEqual(status, 419)
         status, _, _ = await self.asgi(
-            "/logout", [*headers, (b"x-csrf-token", csrf.encode())], "POST",
+            "/logout",
+            [*headers, (b"x-csrf-token", csrf.encode())],
+            "POST",
         )
         self.assertEqual(status, 204)
         self.assertIsNone(await self.sessions._store.read(session.id))
@@ -581,15 +614,17 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         issued = await self.tokens.create(self.ada, "rsgi")
         scope = http_fixtures._StubRsgiScope("/api")
-        scope.headers = http_fixtures._StubRsgiHeaders({
-            "host": ["orionis.test"],
-            "authorization": [f"Bearer {issued.plain_text}"],
-        })
+        scope.headers = http_fixtures._StubRsgiHeaders(
+            {
+                "host": ["orionis.test"],
+                "authorization": [f"Bearer {issued.plain_text}"],
+            },
+        )
         protocol = _RsgiProtocol()
         await self.kernel.handleRSGI(scope, protocol)
         self.assertEqual(protocol.status, 200)
@@ -603,7 +638,7 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         request = SimpleNamespace(wantsJson=lambda: True)
         for exception, expected in (
@@ -619,15 +654,18 @@ class TestAuthHttpIntegration(auth_fixtures._ManagerCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.registrar.givePermissionTo(self.ada, "users.view")
         issued = await self.tokens.create(self.ada, "header-check")
         value = f"bEaReR {issued.plain_text}".encode()
         status, _, _ = await self.asgi("/api", [(b"authorization", value)])
         self.assertEqual(status, 200)
-        status, _, _ = await self.asgi("/api", [
-            (b"authorization", b"Basic ignored"),
-            (b"authorization", value),
-        ])
+        status, _, _ = await self.asgi(
+            "/api",
+            [
+                (b"authorization", b"Basic ignored"),
+                (b"authorization", value),
+            ],
+        )
         self.assertEqual(status, 401)

@@ -1,13 +1,13 @@
+# ruff: noqa: TC003
+# Keep the public configuration factory annotation resolvable at runtime.
 """Store effective SMTP settings without exposing credentials in repr."""
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from urllib.parse import unquote, urlsplit
 from orionis.mail.enums.encryption import MailEncryption
 from orionis.mail.exceptions import MailConfigurationException
-
-if TYPE_CHECKING:
-    from collections.abc import Mapping
 
 _MAX_PORT = 65535
 """Max port value used by ``smtp_settings``."""
@@ -15,9 +15,6 @@ _DEFAULT_PORT = 587
 """Default port value used by ``smtp_settings``."""
 _SMTPS_PORT = 465
 """Smtps port value used by ``smtp_settings``."""
-_FIRST_PRINTABLE = 32
-"""First printable value used by ``smtp_settings``."""
-
 # Accepted encryption names, including the empty string that a configuration
 # uses to request an explicit plaintext connection.
 _ENCRYPTIONS: dict[str, MailEncryption] = {
@@ -30,6 +27,7 @@ _ENCRYPTIONS: dict[str, MailEncryption] = {
 Accepted encryption names, including the empty string that a configuration uses to
 request an explicit plaintext connection.
 """
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class SmtpSettings:
@@ -121,6 +119,7 @@ class SmtpSettings:
             sensitive=tuple(value for value in sensitive if isinstance(value, str)),
         )
 
+
 def _text(config: Mapping[str, object], key: str, default: str) -> str:
     """
     Read a string setting without including its value in errors.
@@ -150,6 +149,7 @@ def _text(config: Mapping[str, object], key: str, default: str) -> str:
         raise MailConfigurationException(error_msg)
     return value
 
+
 def _port(value: object) -> int:
     """
     Validate the effective SMTP TCP port.
@@ -177,6 +177,7 @@ def _port(value: object) -> int:
         error_msg = "SMTP port must be an integer between 1 and 65535."
         raise MailConfigurationException(error_msg)
     return value
+
 
 def _timeout(value: object) -> int | None:
     """
@@ -206,6 +207,7 @@ def _timeout(value: object) -> int | None:
         error_msg = "SMTP timeout must be a positive integer or None."
         raise MailConfigurationException(error_msg)
     return value
+
 
 def _url_overrides(url: str) -> dict[str, object]:
     """
@@ -259,9 +261,10 @@ def _url_overrides(url: str) -> dict[str, object]:
         error_msg = "MAIL_URL contains an invalid host, port, or encoded credential."
         raise MailConfigurationException(error_msg) from None
 
+
 def _has_controls(value: str) -> bool:
     """
-    Detect forbidden whitespace and ASCII controls in an endpoint.
+    Detect whitespace and non-printable characters in an endpoint.
 
     Parameters
     ----------
@@ -273,4 +276,4 @@ def _has_controls(value: str) -> bool:
     bool
         Whether the endpoint contains forbidden characters.
     """
-    return any(char.isspace() or ord(char) < _FIRST_PRINTABLE for char in value)
+    return any(char.isspace() or not char.isprintable() for char in value)

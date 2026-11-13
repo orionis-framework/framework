@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from io import StringIO
 from unittest.mock import patch
@@ -8,6 +10,7 @@ from orionis.console.contracts.schedule import ISchedule
 from orionis.console.enums.events import SchedulerEvent
 from orionis.database.exceptions import MissingDatabaseDependencyException
 from orionis.test import TestCase
+
 
 class _ScheduleService:
     """Provide schedule information and lifecycle operations for command tests."""
@@ -132,6 +135,7 @@ class _ScheduleService:
         """
         self.shutdownCalls += 1
 
+
 class _Scheduler:
     """Expose the task registrar and one optional lifecycle callback."""
 
@@ -176,6 +180,7 @@ class _Scheduler:
         None
             This callback has no test-side effect.
         """
+
 
 class _Application:
     """Provide scheduler services required by the commands under test."""
@@ -271,8 +276,10 @@ class _Application:
         """
         return self.debug
 
+
 class _SchedulerWithoutTasks:
     """Represent an invalid scheduler with no task registration method."""
+
 
 class TestScheduleListCommand(TestCase):
     """Verify schedule:list output for empty and configured task sets."""
@@ -306,21 +313,23 @@ class TestScheduleListCommand(TestCase):
             Assertions verify schedule columns and untruncated task details.
         """
         purpose = "Send the complete daily billing summary to customers"
-        schedule = _ScheduleService([
-            {
-                "signature": "billing:send",
-                "args": ["--region", "west"],
-                "kwargs": {"limit": 20, "locale": "es"},
-                "purpose": purpose,
-                "random_delay": None,
-                "coalesce": False,
-                "max_instances": 3,
-                "misfire_grace_time": None,
-                "start_date": None,
-                "end_date": "2030-01-01 00:00:00",
-                "details": "Every day at 08:30",
-            },
-        ])
+        schedule = _ScheduleService(
+            [
+                {
+                    "signature": "billing:send",
+                    "args": ["--region", "west"],
+                    "kwargs": {"limit": 20, "locale": "es"},
+                    "purpose": purpose,
+                    "random_delay": None,
+                    "coalesce": False,
+                    "max_instances": 3,
+                    "misfire_grace_time": None,
+                    "start_date": None,
+                    "end_date": "2030-01-01 00:00:00",
+                    "details": "Every day at 08:30",
+                },
+            ],
+        )
         application = _Application(_Scheduler(), schedule)
         output = StringIO()
         console = Console(file=output, width=220, color_system=None)
@@ -336,6 +345,7 @@ class TestScheduleListCommand(TestCase):
         self.assertIn("False", rendered)
         self.assertIn("Every day at 08:30", rendered)
         self.assertIn("-", rendered)
+
 
 class TestScheduleWorkCommand(TestCase):
     """Verify schedule:work registration and graceful shutdown behavior."""

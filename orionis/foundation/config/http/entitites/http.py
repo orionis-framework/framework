@@ -17,6 +17,7 @@ from orionis.foundation.config.http.entitites.security import (
 from orionis.foundation.config.http.entitites.websocket import HTTPWebSocket
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class HTTP(BaseEntity):
     """

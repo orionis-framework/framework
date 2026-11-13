@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN202, PLR2004, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Verify failure delivery without changing queue recovery decisions."""
 
 import asyncio
@@ -47,7 +49,8 @@ class TestQueueFailureObservation(IsolatedFailureTestCase):
         self.assertEqual(len(self.handler.failures), 2)
         self.assertEqual(len(self.handler.reports), 2)
         self.assertEqual(
-            [ctx.metadata["attempt"] for _, ctx in self.handler.failures], [1, 2],
+            [ctx.metadata["attempt"] for _, ctx in self.handler.failures],
+            [1, 2],
         )
         self.assertEqual(self.driver.releases, [0.0])
         self.assertEqual(len(await self.failed.all()), 1)

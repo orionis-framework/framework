@@ -1,12 +1,16 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.orm import Integer, Model, String
 from orionis.test import TestCase
+
 
 class _Note(Model):
     id = Integer().primary()
     title = String()
     body = String().nullable()
     timestamps = False
+
 
 class TestModelState(TestCase):
     def _hydrated(self) -> _Note:
@@ -27,7 +31,7 @@ class TestModelState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         note = _Note({"title": "draft"})
         self.assertTrue(note.isDirty())
@@ -41,7 +45,7 @@ class TestModelState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         note = self._hydrated()
         self.assertTrue(note.isClean())
@@ -55,7 +59,7 @@ class TestModelState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         note = self._hydrated()
         note.title = "b"
@@ -72,7 +76,7 @@ class TestModelState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         note = self._hydrated()
         note.title = "changed"
@@ -87,7 +91,7 @@ class TestModelState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         note = self._hydrated()
         note.title = "b"
@@ -104,7 +108,7 @@ class TestModelState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         note = self._hydrated()
         note.title = "b"
@@ -121,7 +125,7 @@ class TestModelState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         note = self._hydrated()
         self.assertFalse(note.wasChanged())
@@ -133,10 +137,12 @@ class TestModelState(TestCase):
         self.assertFalse(note.wasChanged("body"))
         self.assertEqual(note.getChanges(), {"title": "b"})
 
+
 class _Record(Model):
     id = Integer().primary()
     name = String()
     timestamps = False
+
 
 class _ComparisonGuard:
     """Reject comparisons to an attribute outside the requested selection."""
@@ -162,6 +168,7 @@ class _ComparisonGuard:
         error_msg = f"Unexpected comparison with {type(other).__name__}."
         raise AssertionError(error_msg)
 
+
 class TestModelHotPaths(TestCase):
     """Exercise attribute state and serialization without database access."""
 
@@ -171,7 +178,7 @@ class TestModelHotPaths(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = _Record._newFromDatabase({"id": 1, "name": "before"})
         record.setAttribute("unrelated", _ComparisonGuard())
@@ -185,7 +192,7 @@ class TestModelHotPaths(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = _Record({"name": "changed"})
         record.setAttribute("unrelated", _ComparisonGuard())
@@ -197,7 +204,7 @@ class TestModelHotPaths(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = _Record()
         self.assertFalse(record.isDirty("name"))

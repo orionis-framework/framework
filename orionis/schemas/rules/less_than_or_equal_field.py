@@ -1,7 +1,10 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value is less than or equal to a sibling field."""
 
 from orionis.schemas.rules.measure import measure
 from orionis.schemas.rule import Rule
+
 
 class LessThanOrEqualField(Rule):
     """
@@ -11,8 +14,6 @@ class LessThanOrEqualField(Rule):
     magnitude, strings and collections by length, and uploaded files by
     their size in kilobytes.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_other_field",)
     """Declare the instance attribute slots reserved by this class."""
@@ -39,7 +40,7 @@ class LessThanOrEqualField(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
         """
         super().__init__(message=message)
         self._other_field: str = other_field

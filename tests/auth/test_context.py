@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from typing import TYPE_CHECKING, cast
 from orionis.auth.context.context import GUEST_CONTEXT, AuthenticationContext
@@ -15,6 +17,7 @@ if TYPE_CHECKING:
     from orionis.auth.contracts.authenticatable import IAuthenticatable
     from orionis.auth.contracts.permission_repository import IPermissionRepository
 
+
 class _ScopelessTestCase(TestCase):
     """Base case running without the ambient scope of the test runner.
 
@@ -29,19 +32,11 @@ class _ScopelessTestCase(TestCase):
         Returns
         -------
         None
-            Prepares isolated state for the test.
+            No return value.
         """
         self._scope_token = ScopedContext.setCurrentScope(None)
+        self.addCleanup(ScopedContext.reset, self._scope_token)
 
-    def tearDown(self) -> None:
-        """Restore the ambient scope of the runner.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        ScopedContext.reset(self._scope_token)
 
 class _Identity:
     """Identity double exposing only what the context needs."""
@@ -59,7 +54,7 @@ class _Identity:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.identifier = identifier
 
@@ -93,18 +88,20 @@ class _Identity:
         """
         return ""
 
+
 class _CountingRepository:
     """Permission repository double counting how often it is queried."""
 
-    __slots__ = ("calls", "delay", "permissions", "roles")
+    __slots__ = ("calls", "entered", "gate", "permissions", "roles")
 
     def __init__(
         self,
         permissions: tuple[str, ...] = (),
         roles: tuple[str, ...] = (),
-        delay: float = 0.0,
+        *,
+        gate: asyncio.Event | None = None,
     ) -> None:
-        """Configure the answer and the number of suspension points.
+        """Configure the answer and an optional completion gate.
 
         Parameters
         ----------
@@ -112,24 +109,25 @@ class _CountingRepository:
             Value supplied for ``permissions``.
         roles : tuple[str, ...]
             Value supplied for ``roles``.
-        delay : float
-            Value supplied for ``delay``.
+        gate : asyncio.Event | None
+            Event that releases a pending lookup, or no suspension when absent.
 
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.permissions = permissions
         self.roles = roles
-        self.delay = delay
+        self.gate = gate
+        self.entered = asyncio.Event()
         self.calls = 0
 
     async def loadFor(
         self,
-        authorizable: object,  # noqa: ARG002
+        authorizable: object,
     ) -> tuple[frozenset[str], frozenset[str]]:
-        """Return the configured authorization after an optional delay.
+        """Return the configured authorization once the completion gate opens.
 
         Parameters
         ----------
@@ -142,46 +140,48 @@ class _CountingRepository:
             Value produced by the helper.
         """
         self.calls += 1
-        if self.delay:
-            await asyncio.sleep(self.delay)
+        self.entered.set()
+        if self.gate is not None:
+            await self.gate.wait()
         return frozenset(self.permissions), frozenset(self.roles)
+
 
 class TestAuthenticationContext(_ScopelessTestCase):
     """Validate the per request authenticated state."""
 
     def testImplementsTheContract(self) -> None:
-        """Validates the declared contract of the context.
+        """Validate the declared contract of the context.
 
         Consumers depend on the interface, never on the concrete class.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(AuthenticationContext(), IAuthenticationContext)
 
     def testDoesNotExposeAnInstanceDictionary(self) -> None:
-        """Validates that the context stays dictionary free.
+        """Validate that the context stays dictionary free.
 
         One context is built per request, so it must stay small.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(AuthenticationContext(), "__dict__"))
 
     def testAContextWithoutIdentityIsAGuest(self) -> None:
-        """Validates the anonymous state.
+        """Validate the anonymous state.
 
         Every accessor must answer consistently for a guest.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = AuthenticationContext()
         self.assertTrue(context.isGuest)
@@ -193,14 +193,14 @@ class TestAuthenticationContext(_ScopelessTestCase):
         self.assertIsNone(context.credentialId)
 
     def testAContextWithIdentityIsAuthenticated(self) -> None:
-        """Validates the authenticated state.
+        """Validate the authenticated state.
 
         The guard name and the credential identifier travel with it.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = AuthenticationContext(
             identity=_Identity(7),
@@ -216,14 +216,14 @@ class TestAuthenticationContext(_ScopelessTestCase):
         self.assertEqual(context.credentialId, 42)
 
     async def testAGuestResolvesToTheSharedEmptySnapshot(self) -> None:
-        """Validates that guests never hit the database.
+        """Validate that guests never hit the database.
 
         Resolving permissions for nobody would be pure overhead.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         repository = _CountingRepository(permissions=("users.view",))
         context = AuthenticationContext(repository=repository)
@@ -241,13 +241,16 @@ class TestAuthenticationContext(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         repository = _CountingRepository(
-            permissions=("users.view",), roles=("admin",),
+            permissions=("users.view",),
+            roles=("admin",),
         )
         context = AuthenticationContext(
-            identity=_Identity(1), guard="session", repository=repository,
+            identity=_Identity(1),
+            guard="session",
+            repository=repository,
         )
 
         self.assertIsNone(context._AuthenticationContext__lock)
@@ -261,14 +264,14 @@ class TestAuthenticationContext(_ScopelessTestCase):
         self.assertTrue(first.hasRole("admin"))
 
     async def testTheSnapshotCarriesTheCredentialAbilities(self) -> None:
-        """Validates that the token restriction reaches the snapshot.
+        """Validate that the token restriction reaches the snapshot.
 
         Otherwise abilities would silently be ignored.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         repository = _CountingRepository(
             permissions=("users.view", "users.delete"),
@@ -286,7 +289,7 @@ class TestAuthenticationContext(_ScopelessTestCase):
         self.assertFalse(snapshot.can("users.delete"))
 
     async def testConcurrentResolutionsShareASingleQuery(self) -> None:
-        """Validates that the lazy snapshot is race free.
+        """Validate that the lazy snapshot is race free.
 
         Several coroutines of the same request may ask at once; only one
         of them may reach the database.
@@ -294,33 +297,42 @@ class TestAuthenticationContext(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        repository = _CountingRepository(
-            permissions=("users.view",), delay=0.01,
-        )
+        gate = asyncio.Event()
+        repository = _CountingRepository(permissions=("users.view",), gate=gate)
         context = AuthenticationContext(
-            identity=_Identity(1), guard="session", repository=repository,
+            identity=_Identity(1),
+            guard="session",
+            repository=repository,
         )
 
-        snapshots = await asyncio.gather(
-            *(context.authorization() for _ in range(8)),
-        )
-
-        self.assertEqual(repository.calls, 1)
-        self.assertEqual(len({id(item) for item in snapshots}), 1)
+        tasks = [asyncio.create_task(context.authorization()) for _ in range(8)]
+        try:
+            await repository.entered.wait()
+            self.assertEqual(repository.calls, 1)
+            self.assertTrue(all(not task.done() for task in tasks))
+            gate.set()
+            snapshots = await asyncio.gather(*tasks)
+            self.assertEqual(repository.calls, 1)
+            self.assertEqual(len({id(item) for item in snapshots}), 1)
+        finally:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
 
     async def testAnAuthenticatedContextWithoutRepositoryStaysEmpty(
         self,
     ) -> None:
-        """Validates the defensive path when no source is wired.
+        """Validate the defensive path when no source is wired.
 
         The context must degrade to "no permissions" instead of failing.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
 
@@ -329,25 +341,28 @@ class TestAuthenticationContext(_ScopelessTestCase):
         self.assertEqual(snapshot.permissions, frozenset())
 
     def testRepresentationNeverLeaksCredentials(self) -> None:
-        """Validates that debugging output is safe to log.
+        """Validate that debugging output is safe to log.
 
         Only the guard and the identifier are exposed.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guest = AuthenticationContext()
         self.assertEqual(repr(guest), "AuthenticationContext(guest)")
 
         context = AuthenticationContext(
-            identity=_Identity(7), guard="session", abilities=("secret.thing",),
+            identity=_Identity(7),
+            guard="session",
+            abilities=("secret.thing",),
         )
         text = repr(context)
         self.assertIn("session", text)
         self.assertIn("7", text)
         self.assertNotIn("secret.thing", text)
+
 
 class TestAuthenticationContextBinding(_ScopelessTestCase):
     """Validate how the context is stored in the container scope."""
@@ -358,7 +373,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Concurrent forks do not retain their parent scope or snapshot.
+            No return value.
         """
         identity = _Identity(7)
         repository = _CountingRepository(permissions=("users.view", "users.edit"))
@@ -413,10 +428,11 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Forking never bypasses the source context ownership check.
+            No return value.
         """
         context = AuthenticationContext(
-            identity=cast("IAuthenticatable", _Identity(7)), guard="session",
+            identity=cast("IAuthenticatable", _Identity(7)),
+            guard="session",
         )
         async with ScopeManager():
             bind_auth_context(context)
@@ -430,10 +446,11 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Cancellation releases the fork without clearing the parent identity.
+            No return value.
         """
         context = AuthenticationContext(
-            identity=cast("IAuthenticatable", _Identity(7)), guard="session",
+            identity=cast("IAuthenticatable", _Identity(7)),
+            guard="session",
         )
         entered = asyncio.Event()
 
@@ -448,7 +465,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
             Returns
             -------
             None
-                The scope is released during cancellation.
+                No return value.
             """
             async with ScopeManager():
                 bind_auth_context(fork)
@@ -468,40 +485,40 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
             self.assertEqual(context.identifier(), 7)
 
     def testWithoutAScopeTheGuestContextIsReturned(self) -> None:
-        """Validates the answer outside an HTTP request.
+        """Validate the answer outside an HTTP request.
 
         Console commands and background tasks are anonymous by default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(current_auth_context(), GUEST_CONTEXT)
 
     def testBindingRequiresAnActiveScope(self) -> None:
-        """Validates that a context cannot be bound out of a request.
+        """Validate that a context cannot be bound out of a request.
 
         Storing it globally would leak between concurrent requests.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
         with self.assertRaises(AuthException):
             bind_auth_context(context)
 
     async def testBindingInsideAScopeIsVisibleToTheWholeRequest(self) -> None:
-        """Validates the normal binding path.
+        """Validate the normal binding path.
 
         Everything running inside the scope must observe the identity.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
 
@@ -512,20 +529,20 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         self.assertIs(current_auth_context(), GUEST_CONTEXT)
 
     async def testAnEmptyScopeStillReportsAGuest(self) -> None:
-        """Validates the state before the middleware runs.
+        """Validate the state before the middleware runs.
 
         A scope without a bound context is not authenticated.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         async with ScopeManager():
             self.assertIs(current_auth_context(), GUEST_CONTEXT)
 
     async def testConcurrentScopesNeverObserveEachOther(self) -> None:
-        """Validates the isolation guarantee between concurrent requests.
+        """Validate the isolation guarantee between concurrent requests.
 
         Two tasks binding different identities must keep seeing their
         own one across every suspension point.
@@ -533,7 +550,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         observed: dict[str, list[object]] = {}
 
@@ -550,12 +567,13 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             async with ScopeManager():
                 bind_auth_context(
                     AuthenticationContext(
-                        identity=_Identity(identifier), guard="session",
+                        identity=_Identity(identifier),
+                        guard="session",
                     ),
                 )
                 seen = []
@@ -575,7 +593,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         finished = asyncio.Event()
 
@@ -585,7 +603,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             await finished.wait()
             self.assertIs(current_auth_context(), GUEST_CONTEXT)
@@ -606,7 +624,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         barrier = asyncio.Barrier(2)
 
@@ -621,7 +639,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             async with ScopeManager() as scope:
                 session = Session()
@@ -647,12 +665,8 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        ValueError
-            Raised when the helper reaches this failure path.
         """
         finished = asyncio.Event()
 
@@ -662,7 +676,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             await finished.wait()
             with self.assertRaises(RuntimeError):
@@ -684,10 +698,11 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = AuthenticationContext(
-            identity=_Identity(1), guard="session",
+            identity=_Identity(1),
+            guard="session",
             repository=_CountingRepository(permissions=("users.view",)),
         )
         async with ScopeManager():
@@ -704,7 +719,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
         async with ScopeManager():
@@ -719,7 +734,7 @@ class TestAuthenticationContextBinding(_ScopelessTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = AuthenticationContext(identity=_Identity(1), guard="session")
         async with ScopeManager():

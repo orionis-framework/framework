@@ -28,6 +28,10 @@ assert profile.toDict() == {"name": "Ada", "age": 36, "newsletter": False}
 
 `Schema` ofrece almacenamiento compacto y `toDict()`. `Field` es `typing.Annotated`, no descriptor runtime: `Field[str, MinLength(2)]` conserva `str` y adjunta metadata. `Choice`, `Nullable`, `AnyOf`, `Constant`, `Alias` y `Static` son aliases legibles de typing estándar.
 
+Se admiten las anotaciones diferidas de Python 3.14, las anotaciones de texto de
+`from __future__ import annotations` y los mapas explícitos `__annotations__`.
+Los nombres referenciados deben estar disponibles al evaluar las anotaciones.
+
 | Alias | Equivalente | Uso |
 | --- | --- | --- |
 | `Field` | `Annotated` | Adjuntar constraints, reglas y metadatos al tipo de un campo. |
@@ -45,11 +49,20 @@ import asyncio
 from orionis.schemas import Schema
 from orionis.schemas.constraints import MinLength
 from orionis.schemas.exceptions import ValidationException
-from orionis.schemas.fields import Alias, AnyOf, Choice, Constant, Field, Nullable, Static
+from orionis.schemas.fields import (
+    Alias,
+    AnyOf,
+    Choice,
+    Constant,
+    Field,
+    Nullable,
+    Static,
+)
 from orionis.schemas.validator import Schema as Validator
 
 DisplayName: Alias = Field[str, MinLength(2)]
 DEFAULT_PAGE_SIZE: Constant[int] = 20
+
 
 class Search(Schema):
     name: DisplayName
@@ -59,13 +72,21 @@ class Search(Schema):
     page_size: int = DEFAULT_PAGE_SIZE
     source: Static[str] = "web"
 
+
 class OptionalNote(Schema):
     note: Nullable[str] = None
 
+
 async def main() -> None:
-    search = await Validator.validate({
-        "name": "Ada", "reference": 42, "note": None, "page_size": 50,
-    }, Search)
+    search = await Validator.validate(
+        {
+            "name": "Ada",
+            "reference": 42,
+            "note": None,
+            "page_size": 50,
+        },
+        Search,
+    )
     assert search.reference == 42
     assert search.note is None
     assert search.priority == "normal"
@@ -74,9 +95,14 @@ async def main() -> None:
     assert "source" not in search.toDict()
     assert (await Validator.validate({}, OptionalNote)).note is None
 
-    alternate = await Validator.validate({
-        "name": "Ada", "reference": "INV-42", "note": "Urgent",
-    }, Search)
+    alternate = await Validator.validate(
+        {
+            "name": "Ada",
+            "reference": "INV-42",
+            "note": "Urgent",
+        },
+        Search,
+    )
     assert alternate.reference == "INV-42"
 
     for invalid in (
@@ -92,6 +118,7 @@ async def main() -> None:
         else:
             raise AssertionError("invalid search accepted")
 
+
 asyncio.run(main())
 ```
 
@@ -102,6 +129,9 @@ asyncio.run(main())
 ### Constraints estructurales
 
 `GreaterThan`, `GreaterThanOrEqual`, `LessThan`, `LessThanOrEqual`, `MultipleOf`, `Pattern`, `MinLength`, `MaxLength`, `TimezoneAware` y `TimezoneNaive` compilan al descriptor de conversión. Combinaciones duplicadas, incompatibles, imposibles o inválidas fallan al crear la clase.
+
+`Pattern` busca una coincidencia y no añade anclas. Especifica una expresión
+anclada cuando deba coincidir la entrada completa.
 
 También se compilan dentro de anotaciones de colecciones y uniones compatibles. `list[Field[int, GreaterThanOrEqual(1)]]` restringe cada elemento; `Field[list[int], MinLength(1)]` restringe el tamaño de la lista. Para un número nullable, coloque `Nullable` alrededor del tipo restringido: `Nullable[Field[int, GreaterThanOrEqual(1)]]`, no `Field[Nullable[int], GreaterThanOrEqual(1)]`.
 

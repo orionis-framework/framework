@@ -1,12 +1,129 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import io
+from contextvars import copy_context
 from unittest.mock import MagicMock, patch
 from orionis.console.output.contracts.http_request import IHTTPRequestPrinter
 from orionis.console.output.http_request import HTTPRequestPrinter
 from orionis.test import TestCase
 
+
 class TestHTTPRequestPrinter(TestCase):
+    def testOverlappingRequestContextsKeepIndependentTimers(self) -> None:
+        """
+        Measure each request from its own timer rather than the newest request.
+
+        Returns
+        -------
+        None
+            Render the correct elapsed time for both interleaved contexts.
+        """
+        output = io.StringIO()
+        with patch("sys.stdout", output):
+            printer = self._make()
+            first, second = copy_context(), copy_context()
+            with patch(
+                "orionis.console.output.http_request.time.perf_counter",
+                side_effect=(1.0, 2.0, 4.0, 6.0),
+            ):
+                first.run(printer.startTimer)
+                second.run(printer.startTimer)
+                first.run(
+                    printer.printRequest,
+                    self._makeAdapter(path="/first"),
+                    self._makeResponse(),
+                )
+                second.run(
+                    printer.printRequest,
+                    self._makeAdapter(path="/second"),
+                    self._makeResponse(),
+                )
+        lines = output.getvalue().splitlines()
+        self.assertIn("~ 3.00s", lines[0])
+        self.assertIn("~ 4.00s", lines[1])
+
+    async def testRepeatedStartRetainsOneWorkerAndQueue(self) -> None:
+        """
+        Retain the active worker and its queue on repeated startup.
+
+        Returns
+        -------
+        None
+            Avoid orphaning an already admitted consumer.
+        """
+        printer = self._make()
+        await printer.start()
+        first = printer._HTTPRequestPrinter__worker_task
+        queue = printer._HTTPRequestPrinter__queue
+        workers = {first}
+        try:
+            await asyncio.sleep(0)
+            await printer.start()
+            workers.add(printer._HTTPRequestPrinter__worker_task)
+            self.assertIs(printer._HTTPRequestPrinter__worker_task, first)
+            self.assertIs(printer._HTTPRequestPrinter__queue, queue)
+        finally:
+            for worker in workers:
+                worker.cancel()
+            await asyncio.gather(*workers, return_exceptions=True)
+
+    async def testWorkerFailureCannotStrandShutdownBehindQueuedLines(self) -> None:
+        """
+        Surface a failed output stream without waiting forever for queue drain.
+
+        Returns
+        -------
+        None
+            Propagate the original write failure and release worker ownership.
+        """
+        error = OSError("printer output failed")
+        stream = MagicMock()
+        stream.write.side_effect = error
+        with patch("sys.stdout", stream):
+            printer = self._make()
+            await printer.start()
+            worker = printer._HTTPRequestPrinter__worker_task
+            queue = printer._HTTPRequestPrinter__queue
+            queue.put_nowait("first")
+            queue.put_nowait("second")
+            try:
+                await asyncio.sleep(0)
+                with self.assertRaisesRegex(OSError, "printer output failed") as caught:
+                    await asyncio.wait_for(printer.stop(), 1)
+                self.assertIs(caught.exception, error)
+                self.assertIsNone(printer._HTTPRequestPrinter__queue)
+                self.assertIsNone(printer._HTTPRequestPrinter__worker_task)
+            finally:
+                worker.cancel()
+                await asyncio.gather(worker, return_exceptions=True)
+
+    async def testRejectedStartupDoesNotRetainAQueueOrCoroutine(self) -> None:
+        """
+        Roll back printer startup if the event loop rejects its worker.
+
+        Returns
+        -------
+        None
+            Preserve the admission error without publishing incomplete state.
+        """
+        printer = self._make()
+        error = RuntimeError("printer admission rejected")
+        with patch(
+            "orionis.console.output.http_request.asyncio.create_task",
+            side_effect=error,
+        ) as create_task:
+            try:
+                with self.assertRaises(RuntimeError) as caught:
+                    await printer.start()
+                self.assertIs(caught.exception, error)
+                self.assertIsNone(create_task.call_args.args[0].cr_frame)
+                self.assertIsNone(printer._HTTPRequestPrinter__queue)
+                self.assertIsNone(printer._HTTPRequestPrinter__worker_task)
+            finally:
+                if create_task.call_args is not None:
+                    create_task.call_args.args[0].close()
 
     def _makeAdapter(
         self,
@@ -719,18 +836,21 @@ class TestHTTPRequestPrinter(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        printer = self._make()
-        await printer.start()
-        queue = printer._HTTPRequestPrinter__queue
-        for _ in range(1000):
+        output = io.StringIO()
+        with patch("sys.stdout", output):
+            printer = self._make()
+            await printer.start()
             try:
-                queue.put_nowait("x")
-            except asyncio.QueueFull:
-                break
-        with patch("sys.stdout", io.StringIO()):
-            printer.startTimer()
-            printer.printRequest(
-                self._makeAdapter("GET", "/overflow"),
-                self._makeResponse(200),
-            )
-        await printer.stop()
+                queue = printer._HTTPRequestPrinter__queue
+                for _ in range(queue.maxsize):
+                    queue.put_nowait("x")
+                self.assertTrue(queue.full())
+                printer.startTimer()
+                printer.printRequest(
+                    self._makeAdapter("GET", "/overflow"),
+                    self._makeResponse(200),
+                )
+                self.assertEqual(queue.qsize(), queue.maxsize)
+            finally:
+                await printer.stop()
+        self.assertNotIn("/overflow", output.getvalue())

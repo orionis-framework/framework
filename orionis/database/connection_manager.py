@@ -1,6 +1,10 @@
+# ruff: noqa: BLE001, PLC0415, TC001
+# Keep runtime contracts and observe secondary lifecycle failures centrally.
 """Resolve named database connections and manage their lifecycle."""
 
 from typing import Any
+from asyncio import CancelledError
+from threading import RLock
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.exceptions import ConnectionNotFoundException
@@ -9,12 +13,11 @@ from orionis.foundation.config.database.entities.database import (
     Database as ConfigDatabase,
 )
 
-class ConnectionManager(IConnectionManager):
 
-    # ruff: noqa: PLC0415, TC001
+class ConnectionManager(IConnectionManager):
     """Resolve named database connections and manage their lifecycle."""
 
-    __slots__ = ("_cached_connections", "_connections", "_default")
+    __slots__ = ("_cached_connections", "_connections", "_default", "_lock")
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
@@ -32,7 +35,7 @@ class ConnectionManager(IConnectionManager):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         raw_config: ConfigDatabase | dict[str, Any] = app.config("database")
         payload: dict[str, Any] = (
@@ -40,14 +43,21 @@ class ConnectionManager(IConnectionManager):
             if isinstance(raw_config, ConfigDatabase)
             else raw_config
         )
-        self._default: str = str(payload["default"]).lower()
-        """Value used when the client omits this argument."""
         self._connections: dict[str, dict[str, Any]] = dict(
             payload.get("connections") or {},
         )
-        """Active realtime connections indexed by identifier."""
+        """Database configurations indexed by their case-sensitive registered name."""
+        configured_default = str(payload["default"])
+        self._default: str = (
+            configured_default
+            if configured_default in self._connections
+            else configured_default.lower()
+        )
+        """Exact registered default name, with the legacy lowercase fallback."""
         self._cached_connections: dict[str, IConnection] = {}
         """Cached connections value, computed on first access."""
+        self._lock = RLock()
+        """Serialize publication and registry mutation without holding async cleanup."""
 
     def connection(
         self,
@@ -79,17 +89,19 @@ class ConnectionManager(IConnectionManager):
         if cached is not None:
             return cached
 
-        config: dict[str, Any] | None = self._connections.get(resolved_name)
-        if config is None:
-            raise ConnectionNotFoundException(self.__unknownConnectionMessage(
-                resolved_name,
-            ))
+        with self._lock:
+            cached = self._cached_connections.get(resolved_name)
+            if cached is None:
+                config = self._connections.get(resolved_name)
+                if config is None:
+                    raise ConnectionNotFoundException(
+                        self.__unknownConnectionMessage(resolved_name),
+                    )
+                from orionis.database.connection import Connection
 
-        from orionis.database.connection import Connection
-
-        instance = Connection(resolved_name, config)
-        self._cached_connections[resolved_name] = instance
-        return instance
+                cached = Connection(resolved_name, config)
+                self._cached_connections[resolved_name] = cached
+        return cached
 
     def addConnection(self, name: str, config: dict[str, Any]) -> None:
         """
@@ -109,7 +121,7 @@ class ConnectionManager(IConnectionManager):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -125,7 +137,8 @@ class ConnectionManager(IConnectionManager):
             error_msg = "Connection configuration must be a dict."
             raise TypeError(error_msg)
 
-        self._connections[name] = config
+        with self._lock:
+            self._connections[name] = config
 
     def hasConnection(self, name: str) -> bool:
         """
@@ -167,20 +180,25 @@ class ConnectionManager(IConnectionManager):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
         orionis.database.ConnectionNotFoundException
             If the connection is not declared in the configuration.
         """
-        if name not in self._connections:
-            raise ConnectionNotFoundException(self.__unknownConnectionMessage(name))
-        self._default = name
+        with self._lock:
+            if name not in self._connections:
+                raise ConnectionNotFoundException(self.__unknownConnectionMessage(name))
+            self._default = name
 
     async def disconnect(self, name: str | None = None) -> None:
         """
         Dispose one or all cached connections.
+
+        Attempt every cached connection even if an earlier disconnect fails.
+        Propagate cancellation in preference to ordinary errors; otherwise
+        preserve the first failure and report additional errors centrally.
 
         Parameters
         ----------
@@ -191,18 +209,42 @@ class ConnectionManager(IConnectionManager):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
+
+        Raises
+        ------
+        Exception
+            The first ordinary failure after all selected connections settle.
+        asyncio.CancelledError
+            If cancellation interrupts a disconnect, after remaining attempts.
         """
         if name is not None:
-            instance: IConnection | None = self._cached_connections.pop(name, None)
+            with self._lock:
+                instance = self._cached_connections.pop(name, None)
             if instance is not None:
                 await instance.disconnect()
             return
 
-        instances: list[IConnection] = list(self._cached_connections.values())
-        self._cached_connections.clear()
+        with self._lock:
+            instances = list(self._cached_connections.values())
+            self._cached_connections.clear()
+        errors: list[BaseException] = []
         for instance in instances:
-            await instance.disconnect()
+            try:
+                await instance.disconnect()
+            except (Exception, CancelledError) as error:
+                errors.append(error)
+        if errors:
+            from orionis.failure.runtime import capture
+
+            primary = next(
+                (error for error in errors if isinstance(error, CancelledError)),
+                errors[0],
+            )
+            for error in errors:
+                if error is not primary:
+                    await capture(error, flow="database", phase="disconnect")
+            raise primary
 
     def configFor(self, name: str | None = None) -> dict[str, Any]:
         """
@@ -226,9 +268,11 @@ class ConnectionManager(IConnectionManager):
         resolved_name: str = name or self._default
         config: dict[str, Any] | None = self._connections.get(resolved_name)
         if config is None:
-            raise ConnectionNotFoundException(self.__unknownConnectionMessage(
-                resolved_name,
-            ))
+            raise ConnectionNotFoundException(
+                self.__unknownConnectionMessage(
+                    resolved_name,
+                ),
+            )
         return config
 
     def __unknownConnectionMessage(self, name: str) -> str:
@@ -247,6 +291,5 @@ class ConnectionManager(IConnectionManager):
         """
         declared = ", ".join(sorted(self._connections)) or "none"
         return (
-            f"Unknown database connection '{name}'. "
-            f"Declared connections: {declared}."
+            f"Unknown database connection '{name}'. Declared connections: {declared}."
         )

@@ -2,6 +2,7 @@
 
 from orionis.orm.schema.constraints import CompositeForeignKey
 
+
 class ForeignKey:
     """Describe a foreign-key constraint and its referential actions."""
 
@@ -29,7 +30,7 @@ class ForeignKey:
         Returns
         -------
         None
-            Initialize a foreign key constraint.
+            No return value.
         """
         # Create a composite foreign key wrapper for single column
         self.foreign = CompositeForeignKey(

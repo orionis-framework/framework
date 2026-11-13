@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from abc import ABC
 from inspect import isabstract, signature
 from orionis.foundation.contracts.directory import IDirectory
 from orionis.foundation.core_paths import CORE_APP_PATHS
 from orionis.test import TestCase
+
 
 def _method_name(key: str) -> str:
     """Convert a configured snake_case key to a camelCase method name.
@@ -19,6 +22,7 @@ def _method_name(key: str) -> str:
     """
     head, *tail = key.split("_")
     return head + "".join(part.capitalize() for part in tail)
+
 
 class TestIDirectoryContract(TestCase):
     """Test the application directory contract."""

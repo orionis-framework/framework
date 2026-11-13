@@ -5,6 +5,7 @@ from datetime import datetime, time, timedelta
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.support.facades.datetime import DateTime
 
+
 class DailySuffixResolver(SuffixResolver):
     """Resolve log suffixes for daily rotation windows."""
 
@@ -57,20 +58,24 @@ class DailySuffixResolver(SuffixResolver):
         Parameters
         ----------
         current_time : datetime.datetime
-            The current datetime.
+            The current instant. Naive values use the resolver timezone.
 
         Returns
         -------
         datetime.datetime
             The datetime when the next log rotation should occur.
         """
-        # Combine current date with rotation time
+        local_time = (
+            current_time.replace(tzinfo=self.tz)
+            if current_time.tzinfo is None
+            else current_time.astimezone(self.tz)
+        )
         next_rotation = datetime.combine(
-            current_time.date(),
+            local_time.date(),
             self.at_time,
             tzinfo=self.tz,
         )
         # If the calculated rotation time is not in the future, move to next day
-        if next_rotation <= current_time:
+        if next_rotation <= local_time:
             next_rotation += timedelta(days=1)
         return next_rotation

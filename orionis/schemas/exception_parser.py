@@ -10,7 +10,7 @@ from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.rules_executor import _collection_item_type
 
 # Regular expressions for parsing msgspec error messages.
-MISSING_FIELD_RE = re.compile(r"missing required field `(?P<field>[^`]+)`")
+MISSING_FIELD_RE = re.compile(r"^Object missing required field `(?P<field>[^`]+)`")
 """Regular expressions for parsing msgspec error messages."""
 
 # Keep quoted dictionary keys intact even when they contain dots or brackets.
@@ -28,9 +28,9 @@ _PATH_MARKER_LEN = len(_PATH_MARKER)
 
 # Ordered patterns for identifying constraint types from msgspec error messages.
 _CONSTRAINT_PATTERNS: tuple[tuple[str, str], ...] = (
+    ("matching regex", "pattern"),
     ("of length >=", "min_length"),
     ("of length <=", "max_length"),
-    ("matching regex", "pattern"),
     ("multiple of", "multiple_of"),
     ("no timezone", "tz_naive"),
     ("timezone", "tz_aware"),
@@ -46,21 +46,13 @@ _CONSTRAINT_PATTERNS: tuple[tuple[str, str], ...] = (
 _MISSING: object = object()
 """Sentinel for distinguishing "not in cache" from "cached result is None"."""
 
-# Cache: schema_type → {field_name: field_type} built from msgspec.structs.fields().
-# Avoids repeated C-level calls to fields() on the error path.
-_STRUCT_FIELDS_MAP: dict[type, dict[str, object]] = {}
-"""
-Cache: schema_type → {field_name: field_type} built from msgspec.structs.fields().
-Avoids repeated C-level calls to fields() on the error path.
-"""
-
-# Cache: (schema_type, field_name) → nested schema type or None.
-_NESTED_TYPE_CACHE: dict[tuple[type, str], type | None] = {}
-"""Cache: (schema_type, field_name) → nested schema type or None."""
 
 def _get_fields_map(schema: type) -> dict[str, object]:
     """
-    Return a cached mapping from encoded field names to declared types.
+    Return a class-owned mapping from encoded field names to declared types.
+
+    Keep recursive annotations with their owning class so discarded schema
+    types remain collectable. Inspect the exact class to avoid inherited plans.
 
     Parameters
     ----------
@@ -72,15 +64,15 @@ def _get_fields_map(schema: type) -> dict[str, object]:
     dict[str, object]
         Encoded field names mapped to their declared types.
     """
-    cached = _STRUCT_FIELDS_MAP.get(schema)
+    cached = schema.__dict__.get("__orionis_error_fields__")
     if cached is not None:
         return cached
     m = {f.encode_name: f.type for f in msgspec.structs.fields(schema)}
-    _STRUCT_FIELDS_MAP[schema] = m
+    schema.__orionis_error_fields__ = m
     return m
 
-class ValidationErrorParser:
 
+class ValidationErrorParser:
     # Prevent per-instance dictionaries; the class is used statically.
     """Translate validation exceptions into structured field errors."""
 
@@ -145,21 +137,20 @@ class ValidationErrorParser:
             and "`" not in (path := text[marker + _PATH_MARKER_LEN : -1])
         ):
             raw_message = text[:marker]
-            field = cls._joinPath(base, path.lstrip("."))
+            field = cls._joinPath(base, path.removeprefix("."))
         else:
-            missing = MISSING_FIELD_RE.search(text)
-
-            # Missing fields carry their own name instead of a path suffix.
-            if missing is not None:
-                return ValidationFailure(
-                    field=cls._joinPath(base, missing.group("field")),
-                    rule="missing",
-                    message=text,
-                )
-
             # Errors on the converted value itself report no path at all.
             raw_message = text
             field = base
+
+        # A nested missing field carries its parent in the path suffix.
+        missing = MISSING_FIELD_RE.search(raw_message)
+        if missing is not None:
+            return ValidationFailure(
+                field=cls._joinPath(field, missing.group("field")),
+                rule="missing",
+                message=raw_message,
+            )
 
         constraint_key = cls._matchConstraintKey(raw_message)
         rule = constraint_key if constraint_key is not None else "type"
@@ -231,7 +222,9 @@ class ValidationErrorParser:
         """
         leaf_schema, leaf_field = cls._resolveSchema(schema, field_path)
         constraints: dict[str, dict[str, str]] = getattr(
-            leaf_schema, "__orionis_constraints__", {},
+            leaf_schema,
+            "__orionis_constraints__",
+            {},
         )
         field_constraints = constraints.get(leaf_field)
         if not field_constraints:
@@ -262,7 +255,7 @@ class ValidationErrorParser:
             ``(leaf_schema_class, leaf_field_name)`` pair.
         """
         # Handle field names without nested segments.
-        if "." not in field_path:
+        if "." not in field_path or field_path in _get_fields_map(schema):
             return schema, field_path
 
         parts: list[str] = []
@@ -271,6 +264,8 @@ class ValidationErrorParser:
                 parts.append(match.group("field"))
             elif parts:
                 parts[-1] += match.group(0)
+        if not parts:
+            return schema, field_path
         current: type = schema
 
         for part in parts[:-1]:
@@ -300,16 +295,21 @@ class ValidationErrorParser:
         """
         # Do not retain request-owned dictionary keys in the type cache.
         indexed = "[" in field_name
-        key = (schema, field_name)
-        if not indexed:
-            cached = _NESTED_TYPE_CACHE.get(key, _MISSING)
+        cache = schema.__dict__.get("__orionis_error_nested__")
+        if not indexed and cache is not None:
+            cached = cache.get(field_name, _MISSING)
             if cached is not _MISSING:
                 return cached
 
         # Get the declared type of the field from the schema's fields map.
-        field_type = _get_fields_map(schema).get(field_name.partition("[")[0])
+        fields = _get_fields_map(schema)
+        encoded_name = field_name.partition("[")[0]
+        if encoded_name not in fields:
+            return None
+        field_type = fields[encoded_name]
         selectors = tuple(
-            match.group("key") for match in _PATH_PART_RE.finditer(field_name)
+            match.group("key")
+            for match in _PATH_PART_RE.finditer(field_name)
             if match.group("key") is not None
         )
         result = ValidationErrorParser._nestedType(field_type, selectors)
@@ -317,7 +317,10 @@ class ValidationErrorParser:
         # Cache the result (including None)
         # to avoid redundant lookups on the error path.
         if not indexed:
-            _NESTED_TYPE_CACHE[key] = result
+            if cache is None:
+                cache = {}
+                schema.__orionis_error_nested__ = cache
+            cache[field_name] = result
         return result
 
     @staticmethod
@@ -335,23 +338,27 @@ class ValidationErrorParser:
         Returns
         -------
         type | None
-            Schema selected by the annotation and collection path.
+            The unambiguous schema selected by the annotation and collection
+            path, or ``None`` when multiple union branches remain possible.
         """
         origin = get_origin(tp)
         args = get_args(tp)
         if origin is Annotated:
             return ValidationErrorParser._nestedType(args[0], selectors)
         if origin is Union or origin is types.UnionType:
-            for arg in args:
-                result = ValidationErrorParser._nestedType(arg, selectors)
-                if result is not None:
-                    return result
-            return None
+            matches = {
+                result
+                for arg in args
+                if (result := ValidationErrorParser._nestedType(arg, selectors))
+                is not None
+            }
+            return matches.pop() if len(matches) == 1 else None
         if selectors:
             item_type = _collection_item_type(tp, selectors[0])
             return ValidationErrorParser._nestedType(item_type, selectors[1:])
         return (
-            tp if isinstance(tp, type) and hasattr(tp, "__orionis_constraints__")
+            tp
+            if isinstance(tp, type) and hasattr(tp, "__orionis_constraints__")
             else None
         )
 
@@ -371,8 +378,10 @@ class ValidationErrorParser:
             The constraint key (e.g. ``"min_length"``, ``"gt"``), or
             ``None`` when no known pattern matches.
         """
-        # Scan the ordered patterns and stop at the first phrase present in the
-        # message; the ordering encodes the precedence between constraints.
+        # Quoted unknown field names are data, not native constraint messages.
+        if not message.startswith("Expected "):
+            return None
+        # Recognize regex failures before inspecting the quoted pattern text.
         for substring, key in _CONSTRAINT_PATTERNS:
             if substring in message:
                 return key

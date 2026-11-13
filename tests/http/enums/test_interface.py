@@ -1,5 +1,8 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.enums.interfaces import Interface
 from orionis.test import TestCase
+
 
 class TestInterface(TestCase):
     """Unit tests for the Interface string enumeration."""

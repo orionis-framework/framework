@@ -1,3 +1,4 @@
+# ruff: noqa: TC001
 """Provide orm query operations.
 
 Includes ``WhereType``, ``LockMode``, ``SortDirection``, ``AggregateFunction``.
@@ -6,19 +7,28 @@ Includes ``WhereType``, ``LockMode``, ``SortDirection``, ``AggregateFunction``.
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    from orionis.orm.schema.table import TableDefinition
+from typing import Any
+from orionis.orm.schema.table import TableDefinition
 
 # Comparison operators accepted by basic where clauses.
 SUPPORTED_OPERATORS: frozenset[str] = frozenset(
     {
-        "=", "==", "!=", "<>", "<", "<=", ">", ">=",
-        "like", "not like", "ilike", "not ilike",
+        "=",
+        "==",
+        "!=",
+        "<>",
+        "<",
+        "<=",
+        ">",
+        ">=",
+        "like",
+        "not like",
+        "ilike",
+        "not ilike",
     },
 )
 """Comparison operators accepted by basic where clauses."""
+
 
 class WhereType(StrEnum):
     """Kinds of where clauses supported by the query language."""
@@ -64,14 +74,18 @@ class WhereType(StrEnum):
     NOT_EXISTS = "not_exists"
     """Not exists identifier: ``not_exists``."""
 
+
 # Clause kinds whose ``column`` field carries no column reference.
-COLUMNLESS_WHERE_TYPES: frozenset[WhereType] = frozenset({
-    WhereType.NESTED,
-    WhereType.RAW,
-    WhereType.EXISTS,
-    WhereType.NOT_EXISTS,
-})
+COLUMNLESS_WHERE_TYPES: frozenset[WhereType] = frozenset(
+    {
+        WhereType.NESTED,
+        WhereType.RAW,
+        WhereType.EXISTS,
+        WhereType.NOT_EXISTS,
+    },
+)
 """Clause kinds whose ``column`` field carries no column reference."""
+
 
 class LockMode(StrEnum):
     """Row locking modes supported by select plans."""
@@ -81,6 +95,7 @@ class LockMode(StrEnum):
     SHARE = "share"
     """Share identifier: ``share``."""
 
+
 class SortDirection(StrEnum):
     """Sort directions supported by order clauses."""
 
@@ -88,6 +103,7 @@ class SortDirection(StrEnum):
     """Asc identifier: ``asc``."""
     DESC = "desc"
     """Desc identifier: ``desc``."""
+
 
 class AggregateFunction(StrEnum):
     """Aggregate functions supported by the query language."""
@@ -103,6 +119,7 @@ class AggregateFunction(StrEnum):
     SUM = "sum"
     """Sum identifier: ``sum``."""
 
+
 class JoinType(StrEnum):
     """Join kinds supported by the query language."""
 
@@ -116,6 +133,7 @@ class JoinType(StrEnum):
     """Full identifier: ``full``."""
     CROSS = "cross"
     """Cross identifier: ``cross``."""
+
 
 @dataclass(slots=True, frozen=True)
 class RawExpression:
@@ -141,6 +159,7 @@ class RawExpression:
     bindings: dict[str, Any] = field(default_factory=dict)
     alias: str | None = None
 
+
 @dataclass(slots=True, frozen=True)
 class SubQueryColumn:
     """
@@ -156,6 +175,7 @@ class SubQueryColumn:
 
     plan: SelectPlan
     alias: str
+
 
 @dataclass(slots=True)
 class WhereClause:
@@ -188,6 +208,7 @@ class WhereClause:
     value: Any = None
     boolean: str = "and"
 
+
 @dataclass(slots=True)
 class OrderClause:
     """
@@ -204,6 +225,7 @@ class OrderClause:
     column: str
     direction: SortDirection = SortDirection.ASC
 
+
 @dataclass(slots=True)
 class AggregateClause:
     """
@@ -219,6 +241,7 @@ class AggregateClause:
 
     function: AggregateFunction
     column: str = "*"
+
 
 @dataclass(slots=True)
 class JoinCondition:
@@ -247,6 +270,7 @@ class JoinCondition:
     second: str = ""
     boolean: str = "and"
 
+
 @dataclass(slots=True)
 class JoinExpression:
     """
@@ -272,6 +296,7 @@ class JoinExpression:
     alias: str | None = None
     conditions: list[JoinCondition] = field(default_factory=list)
 
+
 @dataclass(slots=True)
 class UnionClause:
     """
@@ -287,6 +312,7 @@ class UnionClause:
 
     plan: SelectPlan
     all_rows: bool = False
+
 
 @dataclass(slots=True)
 class SelectPlan:
@@ -372,6 +398,7 @@ class SelectPlan:
             unions=self.unions.copy(),
         )
 
+
 @dataclass(slots=True)
 class InsertPlan:
     """
@@ -387,6 +414,7 @@ class InsertPlan:
 
     table: TableDefinition
     values: list[dict[str, Any]] = field(default_factory=list)
+
 
 @dataclass(slots=True)
 class UpdatePlan:
@@ -406,6 +434,7 @@ class UpdatePlan:
     table: TableDefinition
     values: dict[str, Any] = field(default_factory=dict)
     wheres: list[WhereClause] = field(default_factory=list)
+
 
 @dataclass(slots=True)
 class DeletePlan:

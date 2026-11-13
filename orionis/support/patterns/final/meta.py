@@ -1,5 +1,6 @@
 """Prevent subclassing of classes marked final by this metaclass."""
 
+
 class Final(type):
     """Prevent subclassing of classes marked final by this metaclass."""
 

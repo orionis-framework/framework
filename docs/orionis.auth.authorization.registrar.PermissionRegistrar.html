@@ -208,6 +208,16 @@
         
 
         
+            <div class="itemName"><code><a href="#__recover" class="internal-link" title="orionis.auth.authorization.registrar.PermissionRegistrar.__recover">__recover</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#assignRole" class="internal-link" title="orionis.auth.authorization.registrar.PermissionRegistrar.assignRole">assign<wbr></wbr>Role</a></code>
             </div>
         
@@ -404,6 +414,16 @@
 
         
             <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.auth.authorization.registrar.PermissionRegistrar.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__recover" class="internal-link" title="orionis.auth.authorization.registrar.PermissionRegistrar.__recover">__recover</a></code>
             </div>
         
 
@@ -661,7 +681,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">PermissionRegistrar</span>: <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L27" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.authorization.registrar.PermissionRegistrar.__init__">PermissionRegistrar(db)</a></code></p><p><a href="classIndex.html#orionis.auth.authorization.registrar.PermissionRegistrar">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">PermissionRegistrar</span>: <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L30" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.authorization.registrar.PermissionRegistrar.__init__">PermissionRegistrar(db)</a></code></p><p><a href="classIndex.html#orionis.auth.authorization.registrar.PermissionRegistrar">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -702,6 +722,11 @@ row that won.</p>
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="orionis.auth.authorization.registrar.PermissionRegistrar.__init__">__init__</a></code></td>
     <td>Initialise the registrar with the model-less query gateway.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__recover" class="internal-link" title="orionis.auth.authorization.registrar.PermissionRegistrar.__recover">__recover</a></code></td>
+    <td>Observe a failed recovery query while preserving the write failure.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
@@ -773,7 +798,7 @@ row that won.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__attach</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L374">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L410">
       
       (source)
     </a>
@@ -785,7 +810,7 @@ row that won.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Insert a pivot row, ignoring an already existing one.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Pivot table receiving the row.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Columns forming the composite primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The row is inserted, or silently skipped when present.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If insertion fails and no identical pivot row exists.</td></tr></table></div>
+    <div><p>Insert a pivot row, ignoring an already existing one.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Pivot table receiving the row.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Columns forming the composite primary key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.database.QueryException.html" class="internal-link">orionis.database.QueryException</a></code></td><td>If insertion fails and no identical pivot row exists.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -800,7 +825,7 @@ row that won.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__findId</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L281">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L282">
       
       (source)
     </a>
@@ -827,7 +852,7 @@ row that won.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__firstOrCreate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L300">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L334">
       
       (source)
     </a>
@@ -858,7 +883,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">db: <code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link" title="orionis.orm.contracts.query_builder.IQueryBuilder">IQueryBuilder</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L47">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L48">
       
       (source)
     </a>
@@ -870,7 +895,35 @@ aborting the caller's transaction.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the registrar with the model-less query gateway.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">db:</span><code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder</a></code></td><td class="fieldArgDesc">Gateway used to build queries over the authorization tables.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The registrar keeps only the injected gateway.</td></tr></table></div>
+    <div><p>Initialise the registrar with the model-less query gateway.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">db:</span><code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder</a></code></td><td class="fieldArgDesc">Gateway used to build queries over the authorization tables.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.auth.authorization.registrar.PermissionRegistrar.__recover">
+    
+  </a>
+  <a name="__recover">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__recover</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">lookup: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">Awaitable</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>, </span><span class="rst-sig-param">operation: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L301">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__recover" title="orionis.auth.authorization.registrar.PermissionRegistrar.__recover">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Observe a failed recovery query while preserving the write failure.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">lookup:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable" class="intersphinx-link">collections.abc.Awaitable</a>[<a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Read that determines whether a concurrent writer created the row.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">operation:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Authorization operation associated with the recovery attempt.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Lookup result, or None when an observed query failure prevents
+duplicate confirmation and the caller must re-raise its write error.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -885,7 +938,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">assignRole</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">authorizable: <code>IAuthorizable</code>, </span><span class="rst-sig-param">*roles: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L161">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L162">
       
       (source)
     </a>
@@ -897,7 +950,7 @@ aborting the caller's transaction.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Attach roles to an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity receiving the roles.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*roles:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role names. Missing roles are created.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The pivot table is updated as a side effect.</td></tr></table></div>
+    <div><p>Attach roles to an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity receiving the roles.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*roles:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role names. Missing roles are created.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -912,7 +965,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">createPermission</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L65">
       
       (source)
     </a>
@@ -939,7 +992,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">createRole</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L81">
       
       (source)
     </a>
@@ -966,7 +1019,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">givePermissionTo</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">authorizable: <code>IAuthorizable</code>, </span><span class="rst-sig-param">*permissions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L97">
       
       (source)
     </a>
@@ -978,7 +1031,7 @@ aborting the caller's transaction.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Attach direct permissions to an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity receiving the permissions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*permissions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission names. Missing permissions are created.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The pivot table is updated as a side effect.</td></tr></table></div>
+    <div><p>Attach direct permissions to an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity receiving the permissions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*permissions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission names. Missing permissions are created.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -993,7 +1046,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">grantToRole</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">role: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">*permissions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L226">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L227">
       
       (source)
     </a>
@@ -1005,7 +1058,7 @@ aborting the caller's transaction.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Attach permissions to a role.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">role:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role name. It is created when missing.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*permissions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission names. Missing permissions are created.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The pivot table is updated as a side effect.</td></tr></table></div>
+    <div><p>Attach permissions to a role.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">role:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role name. It is created when missing.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*permissions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission names. Missing permissions are created.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1020,7 +1073,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">removeRole</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">authorizable: <code>IAuthorizable</code>, </span><span class="rst-sig-param">*roles: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L193">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L194">
       
       (source)
     </a>
@@ -1032,7 +1085,7 @@ aborting the caller's transaction.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Detach roles from an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity losing the roles.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*roles:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role names. Unknown names are ignored.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The pivot table is updated as a side effect.</td></tr></table></div>
+    <div><p>Detach roles from an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity losing the roles.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*roles:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role names. Unknown names are ignored.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1047,7 +1100,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">revokeFromRole</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">role: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">*permissions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L250">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L251">
       
       (source)
     </a>
@@ -1059,7 +1112,7 @@ aborting the caller's transaction.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Detach permissions from a role.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">role:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role name. Unknown roles are ignored.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*permissions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission names. Unknown names are ignored.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The pivot table is updated as a side effect.</td></tr></table></div>
+    <div><p>Detach permissions from a role.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">role:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Role name. Unknown roles are ignored.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*permissions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission names. Unknown names are ignored.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1074,7 +1127,7 @@ aborting the caller's transaction.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">revokePermissionFrom</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">authorizable: <code>IAuthorizable</code>, </span><span class="rst-sig-param">*permissions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L128">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L129">
       
       (source)
     </a>
@@ -1086,7 +1139,7 @@ aborting the caller's transaction.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Detach direct permissions from an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity losing the permissions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*permissions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission names. Unknown names are ignored.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The pivot table is updated as a side effect.</td></tr></table></div>
+    <div><p>Detach direct permissions from an identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">authorizable:</span><code><a href="orionis.auth.contracts.IAuthorizable.html" class="internal-link">orionis.auth.contracts.IAuthorizable</a></code></td><td class="fieldArgDesc">Identity losing the permissions.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*permissions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Permission names. Unknown names are ignored.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1100,7 +1153,7 @@ aborting the caller's transaction.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L44">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L45">
       
       (source)
     </a>
@@ -1127,7 +1180,7 @@ aborting the caller's transaction.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__db</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/authorization/registrar.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/authorization/registrar.py#L62">
       
       (source)
     </a>
@@ -1153,7 +1206,7 @@ aborting the caller's transaction.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

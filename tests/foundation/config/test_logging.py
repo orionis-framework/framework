@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import time
 from typing import Self
 from config.logging import BootstrapLogging
@@ -14,8 +16,8 @@ from orionis.foundation.config.logging import (
 from orionis.foundation.config.logging.validators import IsValidLevel, IsValidPath
 from tests.foundation.config.test_environment import ConfigurationTestCase
 
-class TestLoggingConfiguration(ConfigurationTestCase):
 
+class TestLoggingConfiguration(ConfigurationTestCase):
     def testQueueCapacityIsExplicitAndValidatedInBothLayers(self: Self) -> None:
         """Read queue capacity lazily and reject invalid admission limits.
 

@@ -5,6 +5,7 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
+
 class Double(ColumnDefinition):
     """A type for double ``FLOAT``. Typically generates ``DOUBLE``."""
 

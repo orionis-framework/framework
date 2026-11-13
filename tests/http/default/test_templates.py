@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import json
@@ -24,6 +26,7 @@ from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     import os
+
 
 class _Page(HTMLParser):
     """Expose actual browser contexts in rendered pages for security checks."""
@@ -113,6 +116,7 @@ class _Page(HTMLParser):
     handle_endtag = handleEndTag
     handle_data = handleData
 
+
 class _SuspendedEngine:
     """Pause the first render while another request changes shared configuration."""
 
@@ -159,8 +163,11 @@ class _SuspendedEngine:
             await self.release.wait()
         return await self.engine.render(template, context)
 
+
 def local_defaults(
-    fixture: _DefaultFixture, engine: object, assets: Path,
+    fixture: _DefaultFixture,
+    engine: object,
+    assets: Path,
 ) -> DefaultResponses:
     """
     Create default responses with an isolated asset directory.
@@ -185,6 +192,7 @@ def local_defaults(
         _ASSETS_DIR = assets
 
     return LocalDefaults(fixture, fixture, engine)
+
 
 class TestDefaultTemplates(TestCase):
     """Exercise default pages through the public framework rendering engine."""
@@ -232,7 +240,8 @@ class TestDefaultTemplates(TestCase):
                     )
                     if wants_json:
                         self.assertEqual(
-                            json.loads(response.getBody()), {"message": label},
+                            json.loads(response.getBody()),
+                            {"message": label},
                         )
 
     async def testRetainedHealthServiceRefreshesLabelsAndLocale(self) -> None:
@@ -251,10 +260,13 @@ class TestDefaultTemplates(TestCase):
             ("Updated <application>", "pt-BR", True),
             ("Updated <application>", "pt-BR", False),
         ):
-            self.fixture.settings.update({
-                "app.name": name, "app.locale": locale,
-                "app.maintenance": maintenance,
-            })
+            self.fixture.settings.update(
+                {
+                    "app.name": name,
+                    "app.locale": locale,
+                    "app.maintenance": maintenance,
+                },
+            )
             response = await self.defaults.health(_Request(wants_json=False))
             page = _Page(response.getBody())
             self.assertIn(name, "".join(page.text))
@@ -334,7 +346,8 @@ class TestDefaultTemplates(TestCase):
 
         self.assertEqual(response.getStatusCode(), 200)
         self.assertEqual(
-            response.getHeader("content-type"), ["text/html; charset=utf-8"],
+            response.getHeader("content-type"),
+            ["text/html; charset=utf-8"],
         )
         self.assertEqual(response.getHeader("cache-control"), ["no-store"])
         self.assertTrue(body.startswith(b"<!DOCTYPE html>"))
@@ -386,16 +399,17 @@ class TestDefaultTemplates(TestCase):
         response = await self.defaults.dump("<pre>copy-value</pre>")
         page = _Page(response.getBody())
         templates = [
-            attrs for tag, attrs in page.elements
+            attrs
+            for tag, attrs in page.elements
             if tag == "template" and attrs.get("id") == "dump-copy-action"
         ]
         buttons = [
-            attrs for tag, attrs in page.elements
+            attrs
+            for tag, attrs in page.elements
             if tag == "button" and "data-copy-dump" in attrs
         ]
         statuses = [
-            attrs for tag, attrs in page.elements
-            if "data-dump-copy-status" in attrs
+            attrs for tag, attrs in page.elements if "data-dump-copy-status" in attrs
         ]
 
         self.assertEqual(len(templates), 1)
@@ -505,7 +519,9 @@ class TestDefaultTemplates(TestCase):
 
         with replace_attribute(ExceptionParser, "toDict", parse_data):
             response = await self.defaults.exception(
-                f"/request{payload}", f"GET{payload}", ValueError(payload),
+                f"/request{payload}",
+                f"GET{payload}",
+                ValueError(payload),
             )
         page = _Page(response.getBody())
         text = "".join(page.text)
@@ -541,7 +557,10 @@ class TestDefaultTemplates(TestCase):
         responses = await asyncio.gather(
             *[
                 self.defaults.error(
-                    500, value, expects_json=False, headers={"x-request": str(index)},
+                    500,
+                    value,
+                    expects_json=False,
+                    headers={"x-request": str(index)},
                 )
                 for index, value in enumerate(descriptions)
             ],
@@ -565,9 +584,12 @@ class TestDefaultTemplates(TestCase):
         """
         for page in ("error", "exception"):
             with self.subTest(page=page):
-                self.fixture.settings.update({
-                    "app.name": "First application", "app.locale": "en",
-                })
+                self.fixture.settings.update(
+                    {
+                        "app.name": "First application",
+                        "app.locale": "en",
+                    },
+                )
                 engine = _SuspendedEngine(self.engine)
                 defaults = DefaultResponses(self.fixture, self.fixture, engine)
 
@@ -596,27 +618,38 @@ class TestDefaultTemplates(TestCase):
                     if template_page == "error":
                         return await service.error(404, message, expects_json=False)
                     return await service.exception(
-                        f"/{message}", "POST", ValueError(message),
+                        f"/{message}",
+                        "POST",
+                        ValueError(message),
                     )
 
                 pending = asyncio.create_task(render_response("first-details"))
                 await asyncio.wait_for(engine.started.wait(), 2)
                 try:
-                    self.fixture.settings.update({
-                        "app.name": "Second application", "app.locale": "es",
-                    })
+                    self.fixture.settings.update(
+                        {
+                            "app.name": "Second application",
+                            "app.locale": "es",
+                        },
+                    )
                     second = await render_response("second-details")
                 finally:
                     engine.release.set()
                 first = await asyncio.wait_for(pending, 2)
                 for response, name, locale, own, other in (
                     (
-                        first, b"First application", b"en",
-                        b"first-details", b"second-details",
+                        first,
+                        b"First application",
+                        b"en",
+                        b"first-details",
+                        b"second-details",
                     ),
                     (
-                        second, b"Second application", b"es",
-                        b"second-details", b"first-details",
+                        second,
+                        b"Second application",
+                        b"es",
+                        b"second-details",
+                        b"first-details",
                     ),
                 ):
                     body = response.getBody()
@@ -676,7 +709,8 @@ class TestDefaultTemplates(TestCase):
                         self.assertFalse(urlsplit(value).netloc, value)
                         self.assertFalse(urlsplit(value).scheme, value)
                         self.assertTrue(
-                            value.startswith(DefaultResponses.ASSET_PREFIX), value,
+                            value.startswith(DefaultResponses.ASSET_PREFIX),
+                            value,
                         )
         self.assertEqual(stylesheets, [f"{DefaultResponses.ASSET_PREFIX}default.css"])
         self.assertEqual(scripts, [f"{DefaultResponses.ASSET_PREFIX}default.js"])
@@ -717,12 +751,14 @@ class TestDefaultTemplates(TestCase):
                 )
                 self.assertEqual(first.getHeader("x-content-type-options"), ["nosniff"])
                 self.assertEqual(
-                    first.getHeader("cache-control"), ["public, max-age=3600"],
+                    first.getHeader("cache-control"),
+                    ["public, max-age=3600"],
                 )
                 first.setHeader("x-private", "first")
                 self.assertFalse(second.hasHeader("x-private"))
                 contents = await asyncio.gather(
-                    self._consume(first), self._consume(second),
+                    self._consume(first),
+                    self._consume(second),
                 )
                 self.assertTrue(contents[0])
                 self.assertEqual(contents[0], contents[1])
@@ -923,7 +959,8 @@ class TestDefaultTemplates(TestCase):
         urls = [
             next(value for value in groups if value)
             for groups in re.findall(
-                r"""url\(\s*(?:"([^"]*)"|'([^']*)'|([^)]*))\s*\)""", css,
+                r"""url\(\s*(?:"([^"]*)"|'([^']*)'|([^)]*))\s*\)""",
+                css,
             )
         ]
         self.assertTrue(urls)

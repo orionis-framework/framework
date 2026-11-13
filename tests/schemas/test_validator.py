@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from inspect import iscoroutinefunction
 from typing import Annotated
@@ -25,46 +27,59 @@ from orionis.test import TestCase
 # Schema fixtures
 # ---------------------------------------------------------------------------
 
+
 class _PersonSchema(Schema):
     name: str
     age: int
+
 
 class _WithDefaultsSchema(Schema):
     label: str = "default"
     count: int = 0
 
+
 class _ConstrainedSchema(Schema):
     score: Annotated[int, GreaterThanOrEqual(0), LessThanOrEqual(100)]
     tag: Annotated[str, MinLength(2), MaxLength(20)]
 
+
 class _PatternSchema(Schema):
     code: Annotated[str, Pattern(r"^\d{4}$")]
+
 
 class _MultipleOfSchema(Schema):
     quantity: Annotated[int, MultipleOf(5)]
 
+
 class _NullableSchema(Schema):
     value: int | None
+
 
 class _PasswordSchema(Schema):
     password: Annotated[str, StrongPassword()]
 
+
 class _MessageSchema(Schema):
     name: Annotated[str, Message("Name must be a string.")]
 
+
 class _NestedAddress(Schema):
     zip_code: str
+
 
 class _NestedPersonSchema(Schema):
     address: _NestedAddress
     age: int
 
+
 class _CredentialsSchema(Schema):
     email: Annotated[str, MinLength(5), Email()]
     password: Annotated[str, MinLength(8)]
 
+
 class _PlainStruct(msgspec.Struct):
     label: str
+
 
 class _RejectAsyncRule(Rule):
     """Reject only after yielding to the current event loop."""
@@ -98,12 +113,13 @@ class _RejectAsyncRule(Rule):
         await asyncio.sleep(0)
         return False
 
+
 class _MixedRulesSchema(Schema):
     password: Annotated[str, StrongPassword(), _RejectAsyncRule()]
     count: int
 
-class TestValidatorBasic(TestCase):
 
+class TestValidatorBasic(TestCase):
     def testValidateIsAlwaysAsync(self) -> None:
         """
         Expose validation as a coroutine even for schemas without rules.
@@ -111,7 +127,7 @@ class TestValidatorBasic(TestCase):
         Returns
         -------
         None
-            Assert coroutine validation even when no custom rules exist.
+            No return value.
         """
         self.assertTrue(iscoroutinefunction(Validator.validate))
 
@@ -122,7 +138,7 @@ class TestValidatorBasic(TestCase):
         Returns
         -------
         None
-            Assert a single public validation entry point.
+            No return value.
         """
         self.assertFalse(hasattr(Validator, "validateAsync"))
 
@@ -135,7 +151,7 @@ class TestValidatorBasic(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({"name": "Alice", "age": 30}, _PersonSchema)
         self.assertIsInstance(result, _PersonSchema)
@@ -149,7 +165,7 @@ class TestValidatorBasic(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({"name": "Bob", "age": 25}, _PersonSchema)
         self.assertEqual(result.name, "Bob")
@@ -164,7 +180,7 @@ class TestValidatorBasic(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException):
             await Validator.validate({"name": "Alice", "age": "not_int"}, _PersonSchema)
@@ -177,7 +193,7 @@ class TestValidatorBasic(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException):
             await Validator.validate({"name": "Alice"}, _PersonSchema)
@@ -191,14 +207,14 @@ class TestValidatorBasic(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({}, _WithDefaultsSchema)
         self.assertEqual(result.label, "default")
         self.assertEqual(result.count, 0)
 
-class TestValidatorConstraints(TestCase):
 
+class TestValidatorConstraints(TestCase):
     async def testScoreWithinBoundsIsAccepted(self) -> None:
         """Accept a score value within the declared inclusive bounds.
 
@@ -208,10 +224,11 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate(
-            {"score": 50, "tag": "ok"}, _ConstrainedSchema,
+            {"score": 50, "tag": "ok"},
+            _ConstrainedSchema,
         )
         self.assertEqual(result.score, 50)
 
@@ -223,7 +240,7 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException):
             await Validator.validate({"score": -1, "tag": "ok"}, _ConstrainedSchema)
@@ -236,7 +253,7 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException):
             await Validator.validate({"score": 101, "tag": "ok"}, _ConstrainedSchema)
@@ -249,7 +266,7 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException):
             await Validator.validate({"score": 50, "tag": "x"}, _ConstrainedSchema)
@@ -262,11 +279,12 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException):
             await Validator.validate(
-                {"score": 50, "tag": "x" * 21}, _ConstrainedSchema,
+                {"score": 50, "tag": "x" * 21},
+                _ConstrainedSchema,
             )
 
     async def testPatternMatchingIsAccepted(self) -> None:
@@ -278,7 +296,7 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({"code": "1234"}, _PatternSchema)
         self.assertEqual(result.code, "1234")
@@ -291,7 +309,7 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException):
             await Validator.validate({"code": "abcd"}, _PatternSchema)
@@ -304,7 +322,7 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({"quantity": 15}, _MultipleOfSchema)
         self.assertEqual(result.quantity, 15)
@@ -317,13 +335,13 @@ class TestValidatorConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException):
             await Validator.validate({"quantity": 7}, _MultipleOfSchema)
 
-class TestValidatorCustomRules(TestCase):
 
+class TestValidatorCustomRules(TestCase):
     async def testMixedRulesKeepTheirOrderOnBothConversionPaths(self) -> None:
         """
         Collect sync and native async failures even after a sibling type error.
@@ -331,7 +349,7 @@ class TestValidatorCustomRules(TestCase):
         Returns
         -------
         None
-            Assert rule order and collected failures on both conversion paths.
+            No return value.
         """
         for count in (1, "invalid"):
             with (
@@ -339,24 +357,29 @@ class TestValidatorCustomRules(TestCase):
                 self.assertRaises(ValidationException) as caught,
             ):
                 await Validator.validate(
-                    {"password": "weakpass", "count": count}, _MixedRulesSchema,
+                    {"password": "weakpass", "count": count},
+                    _MixedRulesSchema,
                 )
             failures = [
                 (failure.field, failure.rule)
                 for failure in caught.exception.failures
                 if failure.field == "password"
             ]
-            self.assertEqual(failures, [
-                ("password", "strong_password"),
-                ("password", "reject_async"),
-            ])
+            self.assertEqual(
+                failures,
+                [
+                    ("password", "strong_password"),
+                    ("password", "reject_async"),
+                ],
+            )
             self.assertEqual(
                 set(caught.exception.errors),
                 {"password"} if count == 1 else {"password", "count"},
             )
             if count != 1:
                 self.assertIsInstance(
-                    caught.exception.__cause__, msgspec.ValidationError,
+                    caught.exception.__cause__,
+                    msgspec.ValidationError,
                 )
 
     async def testAsyncRulesSkipTheirOwnUnconvertedField(self) -> None:
@@ -366,16 +389,18 @@ class TestValidatorCustomRules(TestCase):
         Returns
         -------
         None
-            Assert skipped rules for a field that could not be converted.
+            No return value.
         """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate(
-                {"password": 123, "count": 1}, _MixedRulesSchema,
+                {"password": 123, "count": 1},
+                _MixedRulesSchema,
             )
         self.assertEqual(len(caught.exception.failures), 1)
         self.assertEqual(caught.exception.failure.field, "password")
         self.assertNotIn(
-            caught.exception.failure.rule, ("strong_password", "reject_async"),
+            caught.exception.failure.rule,
+            ("strong_password", "reject_async"),
         )
 
     async def testStrongPasswordIsAccepted(self) -> None:
@@ -387,24 +412,10 @@ class TestValidatorCustomRules(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({"password": "Secure1!"}, _PasswordSchema)
         self.assertEqual(result.password, "Secure1!")
-
-    async def testWeakPasswordRaisesValidationException(self) -> None:
-        """Raise ValidationException for a password that fails StrongPassword.
-
-        Validates that a weak password triggers the custom rule and causes
-        a ValidationException to be raised.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(ValidationException):
-            await Validator.validate({"password": "weakpass"}, _PasswordSchema)
 
     async def testValidationExceptionContainsFailure(self) -> None:
         """Confirm ValidationException.failure is populated on rule failure.
@@ -415,14 +426,14 @@ class TestValidatorCustomRules(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate({"password": "weakpass"}, _PasswordSchema)
         self.assertEqual(ctx.exception.failure.rule, "strong_password")
 
-class TestValidatorNullable(TestCase):
 
+class TestValidatorNullable(TestCase):
     async def testNullableFieldAcceptsNone(self) -> None:
         """Accept None for a field annotated as Nullable.
 
@@ -432,7 +443,7 @@ class TestValidatorNullable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({"value": None}, _NullableSchema)
         self.assertIsNone(result.value)
@@ -446,13 +457,13 @@ class TestValidatorNullable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({"value": 42}, _NullableSchema)
         self.assertEqual(result.value, 42)
 
-class TestValidatorCustomMessage(TestCase):
 
+class TestValidatorCustomMessage(TestCase):
     async def testCustomTypeMessageAppearsInException(self) -> None:
         """Surface a custom Message text in the ValidationException on type error.
 
@@ -462,14 +473,14 @@ class TestValidatorCustomMessage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate({"name": 123}, _MessageSchema)
         self.assertIn("Name must be a string.", ctx.exception.failure.message)
 
-class TestValidatorNestedSchema(TestCase):
 
+class TestValidatorNestedSchema(TestCase):
     async def testValidNestedPayloadIsAccepted(self) -> None:
         """Accept a valid nested schema payload.
 
@@ -479,7 +490,7 @@ class TestValidatorNestedSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"address": {"zip_code": "10001"}, "age": 30}
         result = await Validator.validate(payload, _NestedPersonSchema)
@@ -495,7 +506,7 @@ class TestValidatorNestedSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"address": {"zip_code": 12345}, "age": 30}
         with self.assertRaises(ValidationException):
@@ -510,7 +521,7 @@ class TestValidatorNestedSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"address": {"zip_code": 99}, "age": 1}
         with self.assertRaises(ValidationException) as ctx:
@@ -520,8 +531,8 @@ class TestValidatorNestedSchema(TestCase):
         self.assertIn("errors", err)
         self.assertIn("address.zip_code", err["errors"])
 
-class TestValidatorMultipleErrors(TestCase):
 
+class TestValidatorMultipleErrors(TestCase):
     async def testEveryInvalidFieldIsReported(self) -> None:
         """Report every invalid field instead of stopping at the first one.
 
@@ -531,7 +542,7 @@ class TestValidatorMultipleErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate({"score": 500, "tag": "x"}, _ConstrainedSchema)
@@ -549,7 +560,7 @@ class TestValidatorMultipleErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate({}, _PersonSchema)
@@ -564,7 +575,7 @@ class TestValidatorMultipleErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"address": {"zip_code": 99}, "age": "old"}
         with self.assertRaises(ValidationException) as ctx:
@@ -581,7 +592,7 @@ class TestValidatorMultipleErrors(TestCase):
         Returns
         -------
         None
-            Assert each field's error list, detail keys, and message type.
+            No return value.
         """
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate({"name": 1, "age": "x"}, _PersonSchema)
@@ -602,7 +613,7 @@ class TestValidatorMultipleErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"email": "not-an-email", "password": "123"}
         with self.assertRaises(ValidationException) as ctx:
@@ -619,18 +630,19 @@ class TestValidatorMultipleErrors(TestCase):
         Returns
         -------
         None
-            Assert both length and email failures for the same string value.
+            No return value.
         """
         payload = {"email": "a@b", "password": "12345678"}
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate(payload, _CredentialsSchema)
         details = ctx.exception.errors["email"]
         self.assertEqual(
-            [detail["rule"] for detail in details], ["min_length", "email"],
+            [detail["rule"] for detail in details],
+            ["min_length", "email"],
         )
 
-class TestValidatorGreaterThan(TestCase):
 
+class TestValidatorGreaterThan(TestCase):
     async def testGreaterThanIsEnforced(self) -> None:
         """Raise ValidationException when a GreaterThan constraint is violated.
 
@@ -640,7 +652,7 @@ class TestValidatorGreaterThan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _GtSchema(Schema):
@@ -657,7 +669,7 @@ class TestValidatorGreaterThan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _GtSchema(Schema):
@@ -675,7 +687,7 @@ class TestValidatorGreaterThan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _LtSchema(Schema):
@@ -684,8 +696,8 @@ class TestValidatorGreaterThan(TestCase):
         with self.assertRaises(ValidationException):
             await Validator.validate({"n": 10}, _LtSchema)
 
-class TestValidatorWithPlainStruct(TestCase):
 
+class TestValidatorWithPlainStruct(TestCase):
     async def testPlanIsBuiltForAStructWithoutAPrebuiltPlan(self) -> None:
         """Validate a struct that the schema metaclass never processed.
 
@@ -695,7 +707,7 @@ class TestValidatorWithPlainStruct(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Validator.validate({"label": "raw"}, _PlainStruct)
         self.assertIsInstance(result, _PlainStruct)
@@ -710,7 +722,7 @@ class TestValidatorWithPlainStruct(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValidationException) as ctx:
             await Validator.validate([1, 2], _PersonSchema)

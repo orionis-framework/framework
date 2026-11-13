@@ -1,10 +1,13 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Remove one failed job record."""
 
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
-from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
+from orionis.queues.contracts.manager import IQueueManager
 from orionis.queues.exceptions import QueueError
+
 
 class QueueForgetCommand(BaseCommand):
     """Remove one failed job record."""

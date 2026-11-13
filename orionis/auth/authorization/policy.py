@@ -1,6 +1,10 @@
+# ruff: noqa: ARG002
+# Preserve the shared policy hook signature in the default implementation.
+
 """Base class for resource policies."""
 
 from orionis.auth.contracts.policy import IPolicy
+
 
 class Policy(IPolicy):
     """
@@ -8,11 +12,7 @@ class Policy(IPolicy):
 
     Subclasses declare one method per ability. Every ability receives the
     authenticated identity first and the resource second. Methods may be
-    synchronous or asynchronous::
-
-        class PostPolicy(Policy):
-            async def update(self, identity, post) -> bool:
-                return post.user_id == identity.getAuthIdentifier()
+    synchronous or asynchronous and must explicitly return True to grant access.
 
     Policies are resolved through the container, so they may declare
     dependencies in their constructor. Each evaluation receives a fresh
@@ -22,7 +22,7 @@ class Policy(IPolicy):
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    async def before(self, identity: object, ability: str) -> bool | None:  # noqa: ARG002
+    async def before(self, identity: object, ability: str) -> bool | None:
         """
         Short circuit the policy before the ability method runs.
 

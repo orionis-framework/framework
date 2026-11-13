@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -14,6 +16,7 @@ from orionis.view.environment import ViewEnvironment
 from tests.http.default.test_response_cache import _DefaultFixture
 from tests.http.default.test_templates import _Page
 from tests.http.test_support import replace_attribute
+
 
 def make_trace(count: int = 3, source: str = "return missing_account") -> dict:
     """Build a captured traceback ordered from the failing frame to its callers.
@@ -49,6 +52,7 @@ def make_trace(count: int = 3, source: str = "return missing_account") -> dict:
         ],
     }
 
+
 class TestChatGPTHelp(TestCase):
     """Verify useful, bounded trace context and safe rendered assistance links."""
 
@@ -68,9 +72,14 @@ class TestChatGPTHelp(TestCase):
         self.assertTrue(url.isascii())
         self.assertLessEqual(len(url), CHATGPT_URL_MAX_LENGTH)
         parts = urlsplit(url)
-        self.assertEqual((parts.scheme, parts.netloc, parts.path), (
-            "https", "chatgpt.com", "/",
-        ))
+        self.assertEqual(
+            (parts.scheme, parts.netloc, parts.path),
+            (
+                "https",
+                "chatgpt.com",
+                "/",
+            ),
+        )
         self.assertFalse(parts.fragment)
         query = parse_qs(parts.query, strict_parsing=True, errors="strict")
         self.assertEqual(list(query), ["prompt"])
@@ -90,13 +99,18 @@ class TestChatGPTHelp(TestCase):
         prompt = self._prompt(url)
         self.assertFalse(truncated)
         for value in (
-            "Orionis", "Python", "es-CO", "GET", "/accounts/42",
-            data["error_type"], data["error_message"],
+            "Orionis",
+            "Python",
+            "es-CO",
+            "GET",
+            "/accounts/42",
+            data["error_type"],
+            data["error_message"],
         ):
             self.assertIn(value, prompt)
         positions = []
         for frame in data["stack_trace"]:
-            self.assertIn(f'{frame["filename"]}:{frame["lineno"]}', prompt)
+            self.assertIn(f"{frame['filename']}:{frame['lineno']}", prompt)
             self.assertIn(frame["name"], prompt)
             self.assertIn(frame["line_code"], prompt)
             positions.append(prompt.index(frame["filename"]))
@@ -113,7 +127,10 @@ class TestChatGPTHelp(TestCase):
         data = make_trace(1, 'raise ValueError("sí & también 東京 🔥")')
         data["error_message"] = 'España 東京 🔥 & next=evil? #fragment "quoted"'
         url, truncated = build_chatgpt_url(
-            data, "zh-Hans", "POST", "/café?region=東京&account=42#section",
+            data,
+            "zh-Hans",
+            "POST",
+            "/café?region=東京&account=42#section",
         )
         prompt = self._prompt(url)
         self.assertFalse(truncated)
@@ -136,7 +153,7 @@ class TestChatGPTHelp(TestCase):
         self.assertTrue(truncated)
         self.assertNotIn("source_detail_", prompt)
         for frame in data["stack_trace"]:
-            self.assertIn(f'{frame["filename"]}:{frame["lineno"]}', prompt)
+            self.assertIn(f"{frame['filename']}:{frame['lineno']}", prompt)
             self.assertIn(frame["name"], prompt)
         self.assertRegex(prompt.lower(), r"omitted|truncated|shortened")
 
@@ -169,7 +186,10 @@ class TestChatGPTHelp(TestCase):
         data["error_message"] = "missing account: " + "界🔥" * 10000
         data["stack_trace"][0]["filename"] = "long/" * 10000 + "failure.py"
         url, truncated = build_chatgpt_url(
-            data, "ja-JP", "PATCH", "/request/" + "界🔥" * 10000,
+            data,
+            "ja-JP",
+            "PATCH",
+            "/request/" + "界🔥" * 10000,
         )
         prompt = self._prompt(url)
         self.assertTrue(truncated)
@@ -241,21 +261,31 @@ class TestChatGPTHelp(TestCase):
         with TemporaryDirectory() as directory:
             fixture = _DefaultFixture(Path(directory))
             fixture.settings["app.locale"] = "es-CO"
-            defaults = DefaultResponses(fixture, fixture, Jinja2Engine(
-                ViewEnvironment(fixture),
-            ))
+            defaults = DefaultResponses(
+                fixture,
+                fixture,
+                Jinja2Engine(
+                    ViewEnvironment(fixture),
+                ),
+            )
             with replace_attribute(ExceptionParser, "toDict", parse_data):
                 response = await defaults.exception(
-                    "/account?one=1&two=2", "GET", LookupError("Missing account"),
+                    "/account?one=1&two=2",
+                    "GET",
+                    LookupError("Missing account"),
                 )
             body = response.getBody()
             page = _Page(body)
             help_links = [
                 (index, attrs)
                 for index, (tag, attrs) in enumerate(page.elements)
-                if tag == "a" and attrs.get("href", "").startswith((
-                    "https://chatgpt.com/", "https://www.google.com/search",
-                ))
+                if tag == "a"
+                and attrs.get("href", "").startswith(
+                    (
+                        "https://chatgpt.com/",
+                        "https://www.google.com/search",
+                    ),
+                )
             ]
             self.assertEqual(len(help_links), 2)
             for index, attrs in help_links:

@@ -1,3 +1,7 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify independent routing-controller overrides for authentication pages."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.http.default.controllers.forgot_password_controller import (
@@ -11,14 +15,18 @@ from tests.http.routes.test_nested_routing import make_router
 if TYPE_CHECKING:
     from orionis.http.routes.router import Router
 
+
 class CustomLoginController(LoginController):
     """Mark application-provided login route handlers."""
+
 
 class CustomRegisterController(RegisterController):
     """Mark application-provided registration route handlers."""
 
+
 class CustomForgotPasswordController(ForgotPasswordController):
     """Mark application-provided password recovery route handlers."""
+
 
 class TestAuthRouteControllers(TestCase):
     """Allow each controller family in the web auth routes to be replaced."""
@@ -48,7 +56,7 @@ class TestAuthRouteControllers(TestCase):
         Returns
         -------
         None
-            Assert each default authentication controller is retained.
+            No return value.
         """
         router = make_router()
 
@@ -68,7 +76,7 @@ class TestAuthRouteControllers(TestCase):
         Returns
         -------
         None
-            Assert exported routes preserve all configured overrides.
+            No return value.
         """
         router = make_router()
 
@@ -115,7 +123,7 @@ class TestAuthRouteControllers(TestCase):
         Returns
         -------
         None
-            Assert an override affects only its own controller family.
+            No return value.
         """
         router = make_router()
 

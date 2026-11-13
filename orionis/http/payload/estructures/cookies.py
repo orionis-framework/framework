@@ -1,13 +1,16 @@
+# ruff: noqa: TC003
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Parse request cookies and expose their decoded values."""
 
 # Keep public view annotations resolvable through runtime introspection.
-from collections.abc import ItemsView, KeysView, ValuesView  # noqa: TC003
+from collections.abc import ItemsView, KeysView, ValuesView
 from typing import TYPE_CHECKING
 from urllib.parse import unquote
 from orionis.support.patterns.final.meta import Final
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
 
 class Cookies(metaclass=Final):
     """Parse request cookies and expose their decoded values."""

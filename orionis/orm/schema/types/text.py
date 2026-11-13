@@ -5,6 +5,7 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
+
 class Text(ColumnDefinition):
     """A variably sized string type. In SQL, usually ``CLOB``/``TEXT``."""
 

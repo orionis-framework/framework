@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import os
 from typing import Self
@@ -13,6 +15,7 @@ from tests.queues.drivers.test_database import (
     _Clock,
     make_envelope,
 )
+
 
 class TestRedisQueueIntegration(DurableDriverContract, TestCase):
     """Run the durable contract explicitly against an isolated Redis server."""

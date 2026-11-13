@@ -1,7 +1,10 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value's size falls within an inclusive range."""
 
 from orionis.schemas.rules.measure import measure
 from orionis.schemas.rule import Rule
+
 
 class Between(Rule):
     """
@@ -10,8 +13,6 @@ class Between(Rule):
     Numbers are compared by magnitude, strings and collections by length,
     and uploaded files by their size in kilobytes.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_maximum", "_minimum")
     """Declare the instance attribute slots reserved by this class."""
@@ -43,7 +44,7 @@ class Between(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------

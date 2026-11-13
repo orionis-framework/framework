@@ -2198,14 +2198,50 @@
     </li>
 </ul>
 
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.html#__dir__" class="internal-link" title="orionis.auth.contracts.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.html#__getattr__" class="internal-link" title="orionis.auth.contracts.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
 
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.auth.contracts.html#_EXPORTS" class="internal-link" title="orionis.auth.contracts._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -2263,7 +2299,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IIdentityProvider</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/contracts/identity_provider.py#L10" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.auth.contracts.IIdentityProvider">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IIdentityProvider</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/contracts/identity_provider.py#L11" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.auth.contracts.IIdentityProvider">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2324,7 +2360,7 @@ only knows this contract, so no component depends on a class named
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">retrieveByCredentials</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">credentials: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link" title="orionis.auth.contracts.IAuthenticatable">IAuthenticatable</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/contracts/identity_provider.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/contracts/identity_provider.py#L68">
       
       (source)
     </a>
@@ -2354,7 +2390,7 @@ credential verification stay separate operations.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">retrieveById</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identifier: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link" title="orionis.auth.contracts.IAuthenticatable">IAuthenticatable</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/contracts/identity_provider.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/contracts/identity_provider.py#L52">
       
       (source)
     </a>
@@ -2381,7 +2417,7 @@ credential verification stay separate operations.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">updateRememberToken</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identity: <code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link" title="orionis.auth.contracts.IAuthenticatable">IAuthenticatable</a></code>, </span><span class="rst-sig-param">expected: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">token: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/contracts/identity_provider.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/contracts/identity_provider.py#L23">
       
       (source)
     </a>
@@ -2397,7 +2433,7 @@ credential verification stay separate operations.</p>
 <p>Providers supporting remember-me must also compare the current password
 and require an active identity when issuing a non-null token. Providers
 without persistent login support return False and issue no cookie.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link">orionis.auth.contracts.IAuthenticatable</a></code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">identity</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expected:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">expected</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">token:</span><code>str | None</code></td><td class="fieldArgDesc">Value supplied for <tt class="rst-docutils rst-literal">token</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link">orionis.auth.contracts.IAuthenticatable</a></code></td><td class="fieldArgDesc">Identity whose stored persistent credential may be changed.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">expected:</span><code>str | None</code></td><td class="fieldArgDesc">Stored token expected by the compare-and-replace operation.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">token:</span><code>str | None</code></td><td class="fieldArgDesc">Replacement token, or <tt class="rst-docutils rst-literal">None</tt> to revoke the stored credential.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">False when the provider does not implement persistent login support.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -2412,7 +2448,7 @@ without persistent login support return False and issue no cookie.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">validateCredentials</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">identity: <code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link" title="orionis.auth.contracts.IAuthenticatable">IAuthenticatable</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">credentials: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/contracts/identity_provider.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/contracts/identity_provider.py#L90">
       
       (source)
     </a>
@@ -2438,7 +2474,7 @@ without persistent login support return False and issue no cookie.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/contracts/identity_provider.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/contracts/identity_provider.py#L20">
       
       (source)
     </a>
@@ -2464,7 +2500,7 @@ without persistent login support return False and issue no cookie.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

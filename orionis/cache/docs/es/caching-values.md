@@ -53,7 +53,7 @@ Si una lectura de caché falla, decide en la aplicación si debes regenerar desd
 
 ### Resolución cache-aside
 
-`remember(key, ttl, resolver)` lee con un sentinel privado, por lo que un `None` almacenado cuenta como hit. En un miss invoca un resolver sync o async sin argumentos, guarda el resultado y lo devuelve. No agrupa misses concurrentes; usa `lock()` alrededor de regeneración costosa cuando sea necesario.
+`remember(key, ttl, resolver)` lee con un sentinel privado, por lo que un `None` almacenado cuenta como hit. En un miss invoca un resolver sync o async sin argumentos, guarda el resultado y lo devuelve. No agrupa misses concurrentes; usa `rememberOnce()` para compartir una resolución local en curso, o `lock()` con una segunda lectura antes de regenerar.
 
 ### Almacenar un resultado de resolver, incluido `None`
 
@@ -81,9 +81,9 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-El sentinel evita tratar el `None` almacenado como otro miss.
+Los stores JSON de Orionis distinguen un `None` almacenado de una clave ausente. Un backend propio que represente ambos como el mismo `None` sin codificar no puede ofrecer esa distinción atómica.
 
-### Usar add atómico y pull
+### Añadir condicionalmente y leer antes de borrar
 
 ```python
 import asyncio
@@ -96,8 +96,8 @@ async def main() -> None:
     cache = CacheRepository(build())
     print(await cache.add("ticket", "A"))  # True
     print(await cache.add("ticket", "B"))  # False
-    print(await cache.pull("ticket"))       # A
-    print(await cache.has("ticket"))        # False
+    print(await cache.pull("ticket"))  # A
+    print(await cache.has("ticket"))  # False
 
 
 asyncio.run(main())
@@ -120,6 +120,7 @@ CacheRepository(backend: Any, prefix: str = "")
 | `getMany(keys)` | Devuelve un mapping que conserva las claves pedidas sin prefijo. |
 | `setMany(values, ttl=None)` | Guarda un mapping con TTL compartido. |
 | `remember(key, ttl, resolver)` | Devuelve caché o calcula/guarda un resultado sync o async. |
+| `rememberOnce(key, ttl, resolver, *, wait_timeout=10, lease=None)` | Comparte una resolución concurrente para el mismo backend, prefijo, clave y loop. |
 | `rememberForever(key, resolver)` | `remember` sin expiración. |
 | `pull(key)` | Lee y después elimina; ausente devuelve `None`. |
 | `add(key, value, ttl=None)` | Guarda atómicamente solo si falta; conflictos devuelven `False`. |

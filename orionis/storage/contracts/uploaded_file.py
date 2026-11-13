@@ -1,11 +1,11 @@
+# ruff: noqa: TC001
+# Keep public storage annotations available for runtime reflection.
 """Define the contract for a file received through HTTP."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.storage.contracts.file import IFile
 
-if TYPE_CHECKING:
-    from orionis.storage.contracts.file import IFile
 
 class IUploadedFile(ABC):
     """
@@ -144,7 +144,7 @@ class IUploadedFile(ABC):
         Raises
         ------
         orionis.storage.exceptions.StoragePathException
-            If *name* is empty or contains a directory separator.
+            If *name* is empty, a dot segment, or contains a directory separator.
         """
 
     @abstractmethod

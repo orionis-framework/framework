@@ -26,12 +26,19 @@ _EXPORTS = {
     "Auth": ("orionis.foundation.config.auth.entities.auth", "Auth"),
     "Guards": ("orionis.foundation.config.auth.enums.guards", "Guards"),
     "Identity": ("orionis.foundation.config.auth.entities.identity", "Identity"),
-    "PasswordReset": ("orionis.foundation.config.auth.entities.password_reset", "PasswordReset"),
-    "RememberAuth": ("orionis.foundation.config.auth.entities.remember", "RememberAuth"),
+    "PasswordReset": (
+        "orionis.foundation.config.auth.entities.password_reset",
+        "PasswordReset",
+    ),
+    "RememberAuth": (
+        "orionis.foundation.config.auth.entities.remember",
+        "RememberAuth",
+    ),
     "SessionAuth": ("orionis.foundation.config.auth.entities.session", "SessionAuth"),
     "Tokens": ("orionis.foundation.config.auth.entities.tokens", "Tokens"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -53,6 +60,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

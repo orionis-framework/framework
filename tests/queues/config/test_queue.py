@@ -1,9 +1,18 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from dataclasses import FrozenInstanceError, asdict, fields, is_dataclass
 import msgspec
 
 from config.queue import BootstrapQueue
 from orionis.foundation.config.queue import (
-    Connections, Database, Drivers, Failed, Queue, Redis, Sync, Worker,
+    Connections,
+    Database,
+    Drivers,
+    Failed,
+    Queue,
+    Redis,
+    Sync,
+    Worker,
 )
 from tests.foundation.config.test_environment import ConfigurationTestCase
 
@@ -67,12 +76,17 @@ class TestQueueConfiguration(ConfigurationTestCase):
             Assert strict rejection of invalid environment values.
         """
         for name, value in (
-            ("QUEUE_SYNC_QUEUE", False), ("QUEUE_SYNC_RETRY_AFTER", True),
-            ("QUEUE_DB_QUEUE", "../escape"), ("QUEUE_DB_RETRY_AFTER", 0.0),
-            ("QUEUE_REDIS_PREFIX", " "), ("QUEUE_REDIS_QUEUE", None),
+            ("QUEUE_SYNC_QUEUE", False),
+            ("QUEUE_SYNC_RETRY_AFTER", True),
+            ("QUEUE_DB_QUEUE", "../escape"),
+            ("QUEUE_DB_RETRY_AFTER", 0.0),
+            ("QUEUE_REDIS_PREFIX", " "),
+            ("QUEUE_REDIS_QUEUE", None),
             ("QUEUE_REDIS_RETRY_AFTER", float("inf")),
-            ("QUEUE_WORKER_CONCURRENCY", True), ("QUEUE_WORKER_SLEEP", 0.0),
-            ("QUEUE_WORKER_TIMEOUT", None), ("QUEUE_WORKER_TRIES", False),
+            ("QUEUE_WORKER_CONCURRENCY", True),
+            ("QUEUE_WORKER_SLEEP", 0.0),
+            ("QUEUE_WORKER_TIMEOUT", None),
+            ("QUEUE_WORKER_TRIES", False),
             ("QUEUE_WORKER_BACKOFF", (True,)),
         ):
             self.environment.values.clear()
@@ -134,16 +148,26 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertEqual(
             {item.name for item in fields(Redis)},
             {
-                "driver", "endpoint", "port", "db", "password", "prefix",
-                "queue", "retry_after",
+                "driver",
+                "endpoint",
+                "port",
+                "db",
+                "password",
+                "prefix",
+                "queue",
+                "retry_after",
             },
         )
         self.environment.values.update(
-            REDIS_HOST="redis.example.test", REDIS_PORT=6380, REDIS_DB=2,
+            REDIS_HOST="redis.example.test",
+            REDIS_PORT=6380,
+            REDIS_DB=2,
             REDIS_PASSWORD=_CREDENTIAL,
         )
         for config in (
-            Redis(), Queue().connections.redis, BootstrapQueue().connections.redis,
+            Redis(),
+            Queue().connections.redis,
+            BootstrapQueue().connections.redis,
         ):
             self.assertEqual(config.endpoint, "redis.example.test")
             self.assertEqual(config.port, 6380)
@@ -180,10 +204,12 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertEqual(config.toDict(), BootstrapQueue().toDict())
         self.assertEqual(config.default, "sync")
         self.assertEqual(
-            set(config.connections.toDict()), {"sync", "database", "redis"},
+            set(config.connections.toDict()),
+            {"sync", "database", "redis"},
         )
         self.assertLess(
-            config.worker.timeout, config.connections.database.retry_after,
+            config.worker.timeout,
+            config.connections.database.retry_after,
         )
         with self.assertRaises(FrozenInstanceError):
             config.default = "redis"
@@ -199,7 +225,9 @@ class TestQueueConfiguration(ConfigurationTestCase):
         """
         self.environment.values.update(
             QUEUE_CONNECTION="redis",
-            REDIS_HOST="redis.example.test", REDIS_PORT=6380, REDIS_DB=2,
+            REDIS_HOST="redis.example.test",
+            REDIS_PORT=6380,
+            REDIS_DB=2,
             REDIS_PASSWORD=_CREDENTIAL,
             QUEUE_DB_CONNECTION="archive",
             QUEUE_FAILED_DB_CONNECTION="audit",
@@ -215,7 +243,8 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertEqual(config.connections.database.connection, "archive")
         self.assertEqual(config.connections.database.table, "pending_jobs")
         self.assertEqual(
-            config.failed.toDict(), {"connection": "audit", "table": "queue_failures"},
+            config.failed.toDict(),
+            {"connection": "audit", "table": "queue_failures"},
         )
 
     def testCustomConnectionsAndPartialDefaults(self) -> None:
@@ -253,10 +282,16 @@ class TestQueueConfiguration(ConfigurationTestCase):
         worker = {"backoff": [1.0]}
         failed = {"table": "failures"}
         first = Queue(
-            default="local", connections=connections, worker=worker, failed=failed,
+            default="local",
+            connections=connections,
+            worker=worker,
+            failed=failed,
         )
         second = Queue(
-            default="local", connections=connections, worker=worker, failed=failed,
+            default="local",
+            connections=connections,
+            worker=worker,
+            failed=failed,
         )
         connections["local"]["queue"] = "changed"
         worker["backoff"].append(2.0)
@@ -285,10 +320,16 @@ class TestQueueConfiguration(ConfigurationTestCase):
             {"connections": {"sync": {"strategy": "fifo"}}},
             {"connections": {"sync": {"retry_after": True}}},
             {"connections": {"sync": None}},
-            {"default": "database", "connections": {
-                "database": {"table": "jobs;DROP"},
-            }},
-            {"default": "redis", "connections": {"redis": {"url": "http://example.test"}}},
+            {
+                "default": "database",
+                "connections": {
+                    "database": {"table": "jobs;DROP"},
+                },
+            },
+            {
+                "default": "redis",
+                "connections": {"redis": {"url": "http://example.test"}},
+            },
             {"failed": {"table": "failed.jobs"}},
             {"failed": {"driver": "memory"}},
             {"failed": None},
@@ -365,13 +406,20 @@ class TestQueueConfiguration(ConfigurationTestCase):
         """
         for driver in ("database", "redis"):
             with self.subTest(driver=driver), self.assertRaises(ValueError):
-                Queue(default="first", connections={
-                    "first": {"driver": driver}, "second": {"driver": driver},
-                })
-        config = Queue(default="first", connections={
-            "first": {"driver": "database", "table": "first_jobs"},
-            "second": {"driver": "database", "table": "second_jobs"},
-        })
+                Queue(
+                    default="first",
+                    connections={
+                        "first": {"driver": driver},
+                        "second": {"driver": driver},
+                    },
+                )
+        config = Queue(
+            default="first",
+            connections={
+                "first": {"driver": "database", "table": "first_jobs"},
+                "second": {"driver": "database", "table": "second_jobs"},
+            },
+        )
         self.assertEqual(len(config.connections), 2)
 
     def testRejectsFailureStorageSharingJobsTable(self) -> None:
@@ -437,7 +485,9 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertEqual(connections.redis.port, 6380)
         self.assertEqual(connections.redis.db, 2)
         for name, value in (
-            ("sync", None), ("database", Redis()), ("redis", Database()),
+            ("sync", None),
+            ("database", Redis()),
+            ("redis", Database()),
         ):
             with self.assertRaises(TypeError):
                 Connections(**{name: value})
@@ -453,11 +503,13 @@ class TestQueueConfiguration(ConfigurationTestCase):
         """
         connection = Database(table="report_jobs", queue="high")
         config = Queue(
-            default="reports", connections={"reports": connection},
+            default="reports",
+            connections={"reports": connection},
         )
         self.assertIs(config.connections["reports"], connection)
         self.assertEqual(
-            config.toDict()["connections"]["reports"], connection.toDict(),
+            config.toDict()["connections"]["reports"],
+            connection.toDict(),
         )
         with self.assertRaises(ValueError):
             Queue(
@@ -476,10 +528,14 @@ class TestQueueConfiguration(ConfigurationTestCase):
         """
         for entity_type in (Sync, Database, Redis):
             for settings in (
-                {"driver": 1}, {"driver": "unsupported"},
-                {"queue": None}, {"queue": "../escape"},
-                {"retry_after": True}, {"retry_after": "90"},
-                {"retry_after": 0.0}, {"retry_after": float("nan")},
+                {"driver": 1},
+                {"driver": "unsupported"},
+                {"queue": None},
+                {"queue": "../escape"},
+                {"retry_after": True},
+                {"retry_after": "90"},
+                {"retry_after": 0.0},
+                {"retry_after": float("nan")},
                 {"retry_after": float("inf")},
             ):
                 with self.assertRaises((TypeError, ValueError)):
@@ -500,15 +556,19 @@ class TestQueueConfiguration(ConfigurationTestCase):
         """
         for entity_type in (Database, Failed):
             for settings in (
-                {"connection": 1}, {"connection": "../escape"},
-                {"table": "jobs.invalid"}, {"table": "j\u00f6bs"},
+                {"connection": 1},
+                {"connection": "../escape"},
+                {"table": "jobs.invalid"},
+                {"table": "j\u00f6bs"},
                 {"table": None},
             ):
                 with self.assertRaises((TypeError, ValueError)):
                     entity_type(**settings)
         for settings in (
-            {"endpoint": None}, {"endpoint": " "},
-            {"prefix": " "}, {"prefix": 1},
+            {"endpoint": None},
+            {"endpoint": " "},
+            {"prefix": " "},
+            {"prefix": 1},
         ):
             with self.assertRaises((TypeError, ValueError)):
                 Redis(**settings)
@@ -527,10 +587,16 @@ class TestQueueConfiguration(ConfigurationTestCase):
         delays.append(2.0)
         self.assertEqual(worker.backoff, (0.0, 1.0))
         for settings in (
-            {"concurrency": True}, {"concurrency": 1.5}, {"tries": 0},
-            {"sleep": False}, {"sleep": 0.0}, {"timeout": None},
-            {"timeout": float("inf")}, {"backoff": []},
-            {"backoff": (True,)}, {"backoff": (-1.0,)},
+            {"concurrency": True},
+            {"concurrency": 1.5},
+            {"tries": 0},
+            {"sleep": False},
+            {"sleep": 0.0},
+            {"timeout": None},
+            {"timeout": float("inf")},
+            {"backoff": []},
+            {"backoff": (True,)},
+            {"backoff": (-1.0,)},
         ):
             with self.assertRaises((TypeError, ValueError)):
                 Worker(**settings)
@@ -547,9 +613,13 @@ class TestQueueConfiguration(ConfigurationTestCase):
             Assert strict environment validation in both configuration layers.
         """
         for name, value in (
-            ("QUEUE_CONNECTION", False), ("QUEUE_TABLE", "jobs.invalid"),
-            ("REDIS_HOST", 1), ("QUEUE_DB_CONNECTION", False),
-            ("REDIS_PORT", True), ("REDIS_DB", -1), ("REDIS_PASSWORD", 1),
+            ("QUEUE_CONNECTION", False),
+            ("QUEUE_TABLE", "jobs.invalid"),
+            ("REDIS_HOST", 1),
+            ("QUEUE_DB_CONNECTION", False),
+            ("REDIS_PORT", True),
+            ("REDIS_DB", -1),
+            ("REDIS_PASSWORD", 1),
             ("QUEUE_FAILED_TABLE", "failures.invalid"),
         ):
             self.environment.values.clear()
@@ -568,10 +638,18 @@ class TestQueueConfiguration(ConfigurationTestCase):
             Assert type and value validation for structured Redis settings.
         """
         for settings in (
-            {"endpoint": 1}, {"endpoint": None}, {"endpoint": " "},
-            {"port": True}, {"port": "6379"}, {"port": 1.5},
-            {"port": 0}, {"port": 65536}, {"db": False},
-            {"db": "0"}, {"db": -1}, {"password": 1},
+            {"endpoint": 1},
+            {"endpoint": None},
+            {"endpoint": " "},
+            {"port": True},
+            {"port": "6379"},
+            {"port": 1.5},
+            {"port": 0},
+            {"port": 65536},
+            {"db": False},
+            {"db": "0"},
+            {"db": -1},
+            {"password": 1},
         ):
             with self.assertRaises((TypeError, ValueError)):
                 Redis(**settings)
@@ -593,14 +671,24 @@ class TestQueueConfiguration(ConfigurationTestCase):
         """
         first = Redis(password=_CREDENTIAL)
         with self.assertRaises(ValueError):
-            Queue(default="first", connections={
-                "first": first, "second": Redis(password=None),
-            })
+            Queue(
+                default="first",
+                connections={
+                    "first": first,
+                    "second": Redis(password=None),
+                },
+            )
         for settings in (
-            {"endpoint": "redis.example.test"}, {"port": 6380},
-            {"db": 1}, {"prefix": "queues:other"},
+            {"endpoint": "redis.example.test"},
+            {"port": 6380},
+            {"db": 1},
+            {"prefix": "queues:other"},
         ):
-            config = Queue(default="first", connections={
-                "first": first, "second": Redis(**settings),
-            })
+            config = Queue(
+                default="first",
+                connections={
+                    "first": first,
+                    "second": Redis(**settings),
+                },
+            )
             self.assertEqual(len(config.connections), 2)

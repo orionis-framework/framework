@@ -1,8 +1,7 @@
 """
-Add DDL support shared by schema-level column types.
+Describe the schema-level placeholder kind.
 
-Mixed into :class:`orionis.orm.schema.types.Boolean` and
-:class:`orionis.orm.schema.types.Enum`.
+The SQL compiler rejects this placeholder as a concrete column type.
 """
 
 from __future__ import annotations
@@ -10,12 +9,12 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
+
 class SchemaType(ColumnDefinition):
     """
-    Add DDL support shared by schema-level column types.
+    Describe the schema-level placeholder kind.
 
-    Mixed into :class:`orionis.orm.schema.types.Boolean` and
-    :class:`orionis.orm.schema.types.Enum`.
+    The SQL compiler rejects this placeholder as a concrete column type.
     """
 
     __slots__ = ()

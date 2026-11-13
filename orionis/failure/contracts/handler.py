@@ -1,12 +1,11 @@
+# ruff: noqa: TC001
+# Keep handler contract annotations available to dependency reflection.
 """Define the unified application failure handler contract."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from orionis.failure.entities.context import FailureContext
-    from orionis.failure.entities.handling import FailureHandling
+from orionis.failure.entities.context import FailureContext
+from orionis.failure.entities.handling import FailureHandling
 
 
 class IBaseExceptionHandler(ABC):

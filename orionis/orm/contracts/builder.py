@@ -1,14 +1,14 @@
+# ruff: noqa: ANN401, TC001
 """Contract for the query builder bound to a model class."""
 
 from __future__ import annotations
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
+import orionis.orm as _orm
+from orionis.orm.collections.paginator import Paginator
 from orionis.orm.contracts.base_builder import IQueryBuilderBase
+from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from orionis.orm.collections.paginator import Paginator
-    from orionis.orm.model import Model
-    from orionis.support.types.collection import Collection
 
 class IModelQueryBuilder(IQueryBuilderBase):
     """
@@ -19,8 +19,6 @@ class IModelQueryBuilder(IQueryBuilderBase):
     and only adds what model awareness brings: hydrated results,
     primary-key lookups, and relationship eager loading.
     """
-
-    # ruff: noqa: ANN401
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -69,7 +67,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def first(self) -> Model | None:
+    async def first(self) -> _orm.Model | None:
         """
         Execute the query and hydrate only the first matching row.
 
@@ -80,7 +78,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def firstOrFail(self) -> Model:
+    async def firstOrFail(self) -> _orm.Model:
         """
         Return the first matching row or raise when none exists.
 
@@ -96,7 +94,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def find(self, key: Any) -> Model | None:
+    async def find(self, key: Any) -> _orm.Model | None:
         """
         Retrieve a model by its primary key.
 
@@ -112,7 +110,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def findOrFail(self, key: Any) -> Model:
+    async def findOrFail(self, key: Any) -> _orm.Model:
         """
         Retrieve a model by primary key or raise when absent.
 

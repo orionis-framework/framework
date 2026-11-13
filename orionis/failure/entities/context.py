@@ -1,17 +1,17 @@
+# ruff: noqa: TC003
+# Keep public metadata annotations available to runtime reflection.
 """Describe failures without retaining a request, scope or transport."""
 
 from __future__ import annotations
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from collections.abc import Mapping
+from collections.abc import Mapping
 
 _SECRET_KEYS = ("password", "secret", "token", "authorization", "cookie")
 """Credential-like key fragments whose metadata values are redacted."""
 _MAX_METADATA_FIELDS = 32
 """Maximum scalar metadata entries retained by one failure context."""
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class FailureContext:
@@ -42,11 +42,12 @@ class FailureContext:
 
         Keep at most 32 entries with string keys and supported scalar values.
         Truncate keys to 128 characters and string values to 1024 characters.
+        Replace ``metadata`` with a read-only mapping of the sanitized entries.
 
         Returns
         -------
         None
-            Replace ``metadata`` with a read-only mapping of the sanitized entries.
+            No return value.
         """
         values = {}
         for key, value in self.metadata.items():

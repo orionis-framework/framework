@@ -10,8 +10,8 @@ Values may use explicit prefixes such as `int:`, `bool:`, `list:`, `path:`, or `
 
 - Python 3.14 or newer.
 - `python-dotenv>=1.2.3,<2.0`, installed by Orionis.
-- Read/write access to the selected `.env` file for persistent `set`, `unset`, and `reload` workflows.
-- Uppercase variable names matching `[A-Z][A-Z0-9_]*`.
+- Read access to the selected `.env` file for initial loading and `reload`; write access for file creation, persistent `set`, and persistent `unset`.
+- Public lookup and mutation keys matching `[A-Z][A-Z0-9_]*`.
 
 ## Module learning path
 
@@ -20,4 +20,4 @@ Values may use explicit prefixes such as `int:`, `bool:`, `list:`, `path:`, or `
 
 Continue with: [foundation](../../../foundation/docs/en/README.md) · [encrypter](../../../encrypter/docs/en/README.md).
 
-Examples that require bootstrap, a request, or external services state that context. Verification for this reconstruction is distinct from historical notes; a production integration is not assumed to have been executed.
+The examples run without application bootstrap or external services. Run them in a temporary working directory: even the first process-only operation initializes the singleton and loads its selected `.env`.

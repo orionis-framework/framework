@@ -1,4 +1,7 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
+from unittest.mock import patch
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.logging import provider as provider_module
 from orionis.logging.contracts.logger import ILogger
@@ -8,6 +11,7 @@ from orionis.test import TestCase
 
 # Alias under which the logger contract is published in the container.
 _LOGGER_ALIAS = "x-orionis-ILogger"
+
 
 class _StubApp:
     """Container double recording every binding requested by the provider."""
@@ -20,7 +24,7 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.singletons: list[tuple[object, object, str | None]] = []
 
@@ -44,9 +48,10 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.singletons.append((abstract, concrete, alias))
+
 
 class _StubFacade:
     """Logger facade double counting how many times it was pinned."""
@@ -59,7 +64,7 @@ class _StubFacade:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.pinned: int = 0
 
@@ -69,12 +74,12 @@ class _StubFacade:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.pinned += 1
 
-class TestLoggerProviderDefinition(TestCase):
 
+class TestLoggerProviderDefinition(TestCase):
     def testInheritsFromServiceProvider(self) -> None:
         """Declare the provider as a standard service provider.
 
@@ -84,7 +89,7 @@ class TestLoggerProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(LoggerProvider, ServiceProvider))
 
@@ -97,7 +102,7 @@ class TestLoggerProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         self.assertIs(LoggerProvider(app).app, app)
@@ -111,26 +116,12 @@ class TestLoggerProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(inspect.iscoroutinefunction(LoggerProvider.boot))
 
+
 class TestLoggerProviderRegister(TestCase):
-
-    def testRegisterBindsASingleService(self) -> None:
-        """Bind exactly one service during registration.
-
-        Validates that no additional binding leaks into the container.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        app = _StubApp()
-        LoggerProvider(app).register()
-        self.assertEqual(len(app.singletons), 1)
-
     def testRegisterBindsTheContractToTheImplementation(self) -> None:
         """Bind the logger contract to the concrete implementation.
 
@@ -140,36 +131,26 @@ class TestLoggerProviderRegister(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         LoggerProvider(app).register()
-        self.assertEqual(app.singletons[0], (ILogger, Logger, _LOGGER_ALIAS))
+        self.assertEqual(app.singletons, [(ILogger, Logger, _LOGGER_ALIAS)])
+
 
 class TestLoggerProviderBoot(TestCase):
-
     def setUp(self) -> None:
         """Replace the logger facade with a double before each test.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_facade = provider_module.LoggerFacade
+        super().setUp()
         self._facade = _StubFacade()
-        provider_module.LoggerFacade = self._facade
+        self.enterContext(patch.object(provider_module, "LoggerFacade", self._facade))
         self._app = _StubApp()
-
-    def tearDown(self) -> None:
-        """Restore the original logger facade after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        provider_module.LoggerFacade = self._original_facade
 
     async def testBootPinsTheLoggerFacade(self) -> None:
         """Pin the logger facade exactly once during boot.
@@ -180,7 +161,7 @@ class TestLoggerProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await LoggerProvider(self._app).boot()
         self.assertEqual(self._facade.pinned, 1)
@@ -194,7 +175,7 @@ class TestLoggerProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await LoggerProvider(self._app).boot()
         self.assertEqual(self._app.singletons, [])

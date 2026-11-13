@@ -1,14 +1,18 @@
+# ruff: noqa: PLR0911, TC001
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Resolve the identity of API requests from a personal access token."""
 
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from orionis.auth.contracts.guard import IGuard
+from orionis.auth.concerns.functions import authorizable_key
+from orionis.auth.exceptions import AuthException
 from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.contracts.token_repository import IAccessTokenRepository
 from orionis.auth.entities.guard_result import GuardResult
 from orionis.foundation.config.auth.enums.guards import Guards
 
-if TYPE_CHECKING:
-    from orionis.http.request import Request
+import orionis.http as _http
+
 
 class TokenGuard(IGuard):
     """
@@ -27,8 +31,6 @@ class TokenGuard(IGuard):
     performs is the ``last_used_at`` update, issued as a single statement
     where the last writer legitimately wins.
     """
-
-    # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("__identities", "__tokens")
     """Declare the instance attribute slots reserved by this class."""
@@ -51,7 +53,7 @@ class TokenGuard(IGuard):
         Returns
         -------
         None
-            Only the collaborators are retained.
+            No return value.
         """
         self.__tokens = tokens
         """Store used to look tokens up and mark them as used."""
@@ -70,9 +72,9 @@ class TokenGuard(IGuard):
         """
         return Guards.TOKEN.value
 
-    async def resolve(  # noqa: PLR0911
+    async def resolve(
         self: Self,
-        request: Request,
+        request: _http.Request,
     ) -> GuardResult | None:
         """
         Resolve the identity owning the presented access token.
@@ -108,18 +110,15 @@ class TokenGuard(IGuard):
             return None
         else:
             record, identity = result
-        if identity is None:
+        if identity is None or getattr(identity, "active", True) is not True:
             return None
 
         # Refuse a token issued for a different kind of owner.
-        describe = getattr(identity, "getAuthorizableType", None)
-        identify = getattr(identity, "getAuthorizableId", None)
-        if (
-            not callable(describe)
-            or not callable(identify)
-            or describe() != record.tokenable_type
-            or str(identify()) != str(record.tokenable_id)
-        ):
+        try:
+            owner_key = authorizable_key(identity)
+        except AuthException:
+            return None
+        if owner_key != (record.tokenable_type, record.tokenable_id):
             return None
 
         if not await self.__tokens.touch(record.id):

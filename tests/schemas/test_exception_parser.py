@@ -1,4 +1,7 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Annotated
+from unittest.mock import patch
 import msgspec
 from orionis.schemas.constraints import MaxLength, MinLength
 from orionis.schemas.entities.failure import ValidationFailure
@@ -11,26 +14,33 @@ from orionis.test import TestCase
 # Schema fixtures
 # ---------------------------------------------------------------------------
 
+
 class _SimpleSchema(Schema):
     name: str
     age: int
 
+
 class _NestedChild(Schema):
     code: str
+
 
 class _ParentSchema(Schema):
     child: _NestedChild
     value: int
 
+
 class _OptionalParentSchema(Schema):
     child: _NestedChild | None
     value: int
 
+
 class _LengthSchema(Schema):
     token: Annotated[str, MinLength(5)]
 
+
 class _TagSchema(Schema):
     tag: Annotated[str, MaxLength(3)]
+
 
 class _CustomMessageSchema(Schema):
     token: Annotated[
@@ -38,6 +48,7 @@ class _CustomMessageSchema(Schema):
         MinLength(4, message="Token is too short."),
         Message("Token must be text."),
     ]
+
 
 def _conversion_error(payload: object, schema: type) -> msgspec.ValidationError:
     """
@@ -67,8 +78,8 @@ def _conversion_error(payload: object, schema: type) -> msgspec.ValidationError:
     error_msg = "The payload converted without raising a validation error."
     raise AssertionError(error_msg)
 
-class TestValidationErrorParserParse(TestCase):
 
+class TestValidationErrorParserParse(TestCase):
     def testTypeErrorReportsTheOffendingField(self) -> None:
         """Report the field carried by the msgspec path suffix.
 
@@ -77,7 +88,7 @@ class TestValidationErrorParserParse(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({"name": "Alice", "age": "x"}, _SimpleSchema)
         failure = ValidationErrorParser.parse(error, _SimpleSchema)
@@ -93,7 +104,7 @@ class TestValidationErrorParserParse(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({}, _SimpleSchema)
         failure = ValidationErrorParser.parse(error, _SimpleSchema)
@@ -108,7 +119,7 @@ class TestValidationErrorParserParse(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({"child": {"code": 9}, "value": 1}, _ParentSchema)
         failure = ValidationErrorParser.parse(error, _ParentSchema)
@@ -122,7 +133,7 @@ class TestValidationErrorParserParse(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({"name": 1, "age": 30}, _SimpleSchema)
         failure = ValidationErrorParser.parse(error)
@@ -137,7 +148,7 @@ class TestValidationErrorParserParse(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({"token": "ab"}, _LengthSchema)
         failure = ValidationErrorParser.parse(error, _LengthSchema)
@@ -151,7 +162,7 @@ class TestValidationErrorParserParse(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({"tag": "toolong"}, _TagSchema)
         failure = ValidationErrorParser.parse(error, _TagSchema)
@@ -165,14 +176,14 @@ class TestValidationErrorParserParse(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({"token": "ab"}, _CustomMessageSchema)
         failure = ValidationErrorParser.parse(error, _CustomMessageSchema)
         self.assertEqual(failure.message, "Token is too short.")
 
-class TestValidationErrorParserParseAt(TestCase):
 
+class TestValidationErrorParserParseAt(TestCase):
     def testFieldPathIsPrefixedWithTheBase(self) -> None:
         """Prefix the reported field with the path of the converted value.
 
@@ -181,7 +192,7 @@ class TestValidationErrorParserParseAt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({"code": 9}, _NestedChild)
         failure = ValidationErrorParser.parseAt(error, _ParentSchema, "child")
@@ -195,7 +206,7 @@ class TestValidationErrorParserParseAt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({}, _NestedChild)
         failure = ValidationErrorParser.parseAt(error, _ParentSchema, "child")
@@ -210,14 +221,14 @@ class TestValidationErrorParserParseAt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error(5, _NestedChild)
         failure = ValidationErrorParser.parseAt(error, _ParentSchema, "child")
         self.assertEqual(failure.field, "child")
 
-class TestValidationErrorParserJoinPath(TestCase):
 
+class TestValidationErrorParserJoinPath(TestCase):
     def testRelativePathIsReturnedWithoutABase(self) -> None:
         """Return the relative path when no base is supplied.
 
@@ -226,7 +237,7 @@ class TestValidationErrorParserJoinPath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ValidationErrorParser._joinPath("", "code"), "code")
 
@@ -238,7 +249,7 @@ class TestValidationErrorParserJoinPath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ValidationErrorParser._joinPath("child", ""), "child")
 
@@ -250,7 +261,7 @@ class TestValidationErrorParserJoinPath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ValidationErrorParser._joinPath("tags", "[0]"), "tags[0]")
 
@@ -262,13 +273,13 @@ class TestValidationErrorParserJoinPath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         joined = ValidationErrorParser._joinPath("child", "code")
         self.assertEqual(joined, "child.code")
 
-class TestValidationErrorParserCustomMessage(TestCase):
 
+class TestValidationErrorParserCustomMessage(TestCase):
     def testDeclaredMessageIsReturned(self) -> None:
         """Return the message declared for the violated constraint.
 
@@ -277,11 +288,13 @@ class TestValidationErrorParserCustomMessage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         raw = "Expected `str` of length >= 4"
         result = ValidationErrorParser._customMessage(
-            _CustomMessageSchema, "token", raw,
+            _CustomMessageSchema,
+            "token",
+            raw,
         )
         self.assertEqual(result, "Token is too short.")
 
@@ -293,10 +306,12 @@ class TestValidationErrorParserCustomMessage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = ValidationErrorParser._customMessage(
-            _CustomMessageSchema, "token", "an entirely unrelated failure",
+            _CustomMessageSchema,
+            "token",
+            "an entirely unrelated failure",
         )
         self.assertIsNone(result)
 
@@ -308,15 +323,15 @@ class TestValidationErrorParserCustomMessage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         raw = "Expected `str` of length >= 4"
         self.assertIsNone(
             ValidationErrorParser._customMessage(_SimpleSchema, "name", raw),
         )
 
-class TestValidationErrorParserSchemaResolution(TestCase):
 
+class TestValidationErrorParserSchemaResolution(TestCase):
     def testPlainFieldResolvesToTheRootSchema(self) -> None:
         """Resolve a dot-less path against the root schema.
 
@@ -325,7 +340,7 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             ValidationErrorParser._resolveSchema(_ParentSchema, "value"),
@@ -340,7 +355,7 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             ValidationErrorParser._resolveSchema(_ParentSchema, "child.code"),
@@ -355,7 +370,7 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             ValidationErrorParser._resolveSchema(_ParentSchema, "value.deep"),
@@ -370,10 +385,11 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         resolved = ValidationErrorParser._resolveNestedType(
-            _OptionalParentSchema, "child",
+            _OptionalParentSchema,
+            "child",
         )
         self.assertIs(resolved, _NestedChild)
 
@@ -385,11 +401,21 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        first = ValidationErrorParser._resolveNestedType(_ParentSchema, "child")
-        second = ValidationErrorParser._resolveNestedType(_ParentSchema, "child")
+
+        class Parent(Schema):
+            child: _NestedChild
+
+        with patch(
+            "orionis.schemas.exception_parser._get_fields_map",
+            wraps=_get_fields_map,
+        ) as fields:
+            first = ValidationErrorParser._resolveNestedType(Parent, "child")
+            second = ValidationErrorParser._resolveNestedType(Parent, "child")
+        fields.assert_called_once_with(Parent)
         self.assertIs(first, second)
+        self.assertIs(first, _NestedChild)
 
     def testUnknownFieldResolvesToNone(self) -> None:
         """Return None when the schema declares no such field.
@@ -399,14 +425,14 @@ class TestValidationErrorParserSchemaResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(
             ValidationErrorParser._resolveNestedType(_ParentSchema, "absent"),
         )
 
-class TestValidationErrorParserConstraintKeys(TestCase):
 
+class TestValidationErrorParserConstraintKeys(TestCase):
     def testUnknownMessageReturnsNone(self) -> None:
         """Return None when the message matches no registered pattern.
 
@@ -415,7 +441,7 @@ class TestValidationErrorParserConstraintKeys(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(
             ValidationErrorParser._matchConstraintKey("unrecognised failure text"),
@@ -429,7 +455,7 @@ class TestValidationErrorParserConstraintKeys(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             ValidationErrorParser._matchConstraintKey("Expected `int` x > 0"),
@@ -444,15 +470,15 @@ class TestValidationErrorParserConstraintKeys(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             ValidationErrorParser._matchConstraintKey("Expected `int` x < 100"),
             "lt",
         )
 
-class TestFieldsMapCache(TestCase):
 
+class TestFieldsMapCache(TestCase):
     def testFieldsMapIsCachedPerSchema(self) -> None:
         """Return the very same mapping object on repeated calls.
 
@@ -461,7 +487,7 @@ class TestFieldsMapCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(_get_fields_map(_TagSchema), _get_fields_map(_TagSchema))
 
@@ -473,12 +499,12 @@ class TestFieldsMapCache(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(set(_get_fields_map(_ParentSchema)), {"child", "value"})
 
-class TestValidationErrorParserContract(TestCase):
 
+class TestValidationErrorParserContract(TestCase):
     def testParserDeclaresSlots(self) -> None:
         """Confirm the parser stores no per-instance state.
 
@@ -487,6 +513,9 @@ class TestValidationErrorParserContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(ValidationErrorParser.__slots__, ())
+        instance = ValidationErrorParser()
+        self.assertFalse(hasattr(instance, "__dict__"))
+        with self.assertRaises(AttributeError):
+            instance.undeclared = "unsupported"

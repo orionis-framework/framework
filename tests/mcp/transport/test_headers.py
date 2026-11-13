@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import base64
 import msgspec
 from orionis.http.payload.estructures.headers import Headers
@@ -6,6 +8,7 @@ from orionis.mcp.protocol.codecs import decode_envelope, decode_params
 from orionis.mcp.protocol.constants import CLIENT_CAPABILITIES, PROTOCOL_VERSION
 from orionis.mcp.transport.headers import compile_header_bindings, validate_headers
 from orionis.test import TestCase
+
 
 class TestHeaders(TestCase):
     """Cover header ambiguity, encoded names and compiled parameter extraction."""
@@ -200,7 +203,7 @@ class TestHeaders(TestCase):
                     },
                 ),
             )
-            with self.assertRaises(McpProtocolException) as caught: # NOSONAR
+            with self.assertRaises(McpProtocolException) as caught:  # NOSONAR
                 validate_headers(self.headers("server/discover", None), request)
             self.assertEqual(caught.exception.code, -32602)
 

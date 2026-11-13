@@ -1,12 +1,15 @@
+# ruff: noqa: PLR2004, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.support.types.stringable import Stringable
 from orionis.test import TestCase
+
 
 class TestStringableCase(TestCase):
     """Unit tests for Stringable case-conversion and formatting methods."""
 
     # ----------------------------------------------------------------- lower
 
-    def testLowerConvertsToLowercase(self):
+    def testLowerConvertsToLowercase(self) -> None:
         """Convert the string to lowercase.
 
         Validates that `lower` returns a new Stringable containing the
@@ -15,11 +18,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("HELLO World").lower(), Stringable("hello world"))
 
-    def testLowerOnAlreadyLowercase(self):
+    def testLowerOnAlreadyLowercase(self) -> None:
         """Return unchanged string when already lowercase.
 
         Ensures `lower` is idempotent when applied to a string that
@@ -28,13 +31,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").lower(), Stringable("hello"))
 
     # ----------------------------------------------------------------- upper
 
-    def testUpperConvertsToUppercase(self):
+    def testUpperConvertsToUppercase(self) -> None:
         """Convert the string to uppercase.
 
         Validates that `upper` returns a new Stringable containing the
@@ -43,11 +46,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello World").upper(), Stringable("HELLO WORLD"))
 
-    def testUpperOnAlreadyUppercase(self):
+    def testUpperOnAlreadyUppercase(self) -> None:
         """Return unchanged string when already uppercase.
 
         Ensures `upper` is idempotent when applied to a string that
@@ -56,13 +59,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("HELLO").upper(), Stringable("HELLO"))
 
     # ------------------------------------------------------------- swapCase
 
-    def testSwapCaseInvertsEachCharacter(self):
+    def testSwapCaseInvertsEachCharacter(self) -> None:
         """Swap the case of every cased character.
 
         Validates that `swapCase` converts lowercase to uppercase and
@@ -71,14 +74,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             Stringable("Hello World").swapCase(),
             Stringable("hELLO wORLD"),
         )
 
-    def testSwapCaseOnMixedContent(self):
+    def testSwapCaseOnMixedContent(self) -> None:
         """Swap case while preserving non-cased characters.
 
         Ensures that numeric digits and punctuation are left unchanged
@@ -87,14 +90,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("aB1!").swapCase()
         self.assertEqual(result, Stringable("Ab1!"))
 
     # ----------------------------------------------------------------- camel
 
-    def testCamelConvertsFromSnakeCase(self):
+    def testCamelConvertsFromSnakeCase(self) -> None:
         """Convert a snake_case string to camelCase.
 
         Validates that `camel` correctly transforms underscore-separated
@@ -103,11 +106,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello_world").camel(), Stringable("helloWorld"))
 
-    def testCamelConvertsFromKebabCase(self):
+    def testCamelConvertsFromKebabCase(self) -> None:
         """Convert a kebab-case string to camelCase.
 
         Validates that `camel` correctly handles hyphen-separated words
@@ -116,11 +119,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello-world").camel(), Stringable("helloWorld"))
 
-    def testCamelConvertsFromSpaceSeparated(self):
+    def testCamelConvertsFromSpaceSeparated(self) -> None:
         """Convert a space-separated string to camelCase.
 
         Ensures `camel` handles space-delimited input and produces the
@@ -129,11 +132,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").camel(), Stringable("helloWorld"))
 
-    def testCamelReturnsEmptyOnEmptyString(self):
+    def testCamelReturnsEmptyOnEmptyString(self) -> None:
         """Return empty Stringable from an empty input.
 
         Validates that `camel` returns an empty Stringable when called
@@ -142,13 +145,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("").camel(), Stringable(""))
 
     # ----------------------------------------------------------------- kebab
 
-    def testKebabConvertsFromCamelCase(self):
+    def testKebabConvertsFromCamelCase(self) -> None:
         """Convert a camelCase string to kebab-case.
 
         Validates that `kebab` inserts hyphens at camelCase boundaries
@@ -157,11 +160,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("helloWorld").kebab(), Stringable("hello-world"))
 
-    def testKebabConvertsFromSnakeCase(self):
+    def testKebabConvertsFromSnakeCase(self) -> None:
         """Convert a snake_case string to kebab-case.
 
         Ensures `kebab` replaces underscores with hyphens and returns a
@@ -170,11 +173,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello_world").kebab(), Stringable("hello-world"))
 
-    def testKebabCollapsesMultipleSeparators(self):
+    def testKebabCollapsesMultipleSeparators(self) -> None:
         """Collapse multiple consecutive separators into one hyphen.
 
         Validates that `kebab` removes duplicate separators and produces
@@ -183,15 +186,16 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
-            Stringable("hello  world").kebab(), Stringable("hello-world"),
+            Stringable("hello  world").kebab(),
+            Stringable("hello-world"),
         )
 
     # ----------------------------------------------------------------- snake
 
-    def testSnakeConvertsFromCamelCase(self):
+    def testSnakeConvertsFromCamelCase(self) -> None:
         """Convert a camelCase string to snake_case.
 
         Validates that `snake` inserts underscores at camelCase word
@@ -200,11 +204,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("helloWorld").snake(), Stringable("hello_world"))
 
-    def testSnakeConvertsFromSpaceSeparated(self):
+    def testSnakeConvertsFromSpaceSeparated(self) -> None:
         """Convert a space-separated string to snake_case.
 
         Ensures `snake` replaces spaces with underscores and lowercases
@@ -213,11 +217,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").snake(), Stringable("hello_world"))
 
-    def testSnakeWithCustomDelimiter(self):
+    def testSnakeWithCustomDelimiter(self) -> None:
         """Convert using a custom delimiter instead of an underscore.
 
         Validates that `snake` correctly uses the provided delimiter
@@ -226,13 +230,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("helloWorld").snake("."), Stringable("hello.world"))
 
     # ---------------------------------------------------------------- studly
 
-    def testStudlyConvertsToStudlyCase(self):
+    def testStudlyConvertsToStudlyCase(self) -> None:
         """Convert the string to StudlyCase.
 
         Validates that `studly` capitalises the first letter of each word
@@ -241,11 +245,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello_world").studly(), Stringable("HelloWorld"))
 
-    def testStudlyFromKebabCase(self):
+    def testStudlyFromKebabCase(self) -> None:
         """Convert a kebab-case string to StudlyCase.
 
         Ensures `studly` handles hyphen-separated input and produces
@@ -254,13 +258,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello-world").studly(), Stringable("HelloWorld"))
 
     # ---------------------------------------------------------------- pascal
 
-    def testPascalDelegatesToStudly(self):
+    def testPascalDelegatesToStudly(self) -> None:
         """Produce the same output as studly for PascalCase conversion.
 
         Validates that `pascal` is an alias for `studly` and yields
@@ -269,14 +273,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello_world")
         self.assertEqual(s.pascal(), s.studly())
 
     # ------------------------------------------------------------------ slug
 
-    def testSlugConvertsToUrlFriendlyString(self):
+    def testSlugConvertsToUrlFriendlyString(self) -> None:
         """Generate a URL-friendly slug from the string.
 
         Validates that `slug` lowercases, removes special characters, and
@@ -285,11 +289,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("Hello World!").slug(), Stringable("hello-world"))
 
-    def testSlugWithCustomSeparator(self):
+    def testSlugWithCustomSeparator(self) -> None:
         """Generate a slug using a custom separator.
 
         Ensures that `slug` respects the provided separator argument
@@ -298,13 +302,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
-            Stringable("Hello World").slug("_"), Stringable("hello_world"),
+            Stringable("Hello World").slug("_"),
+            Stringable("hello_world"),
         )
 
-    def testSlugReplacesAtSymbol(self):
+    def testSlugReplacesAtSymbol(self) -> None:
         """Replace the at-symbol using the default dictionary.
 
         Validates that the default dictionary mapping "@" to "at" is
@@ -313,12 +318,12 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("user@example").slug()
         self.assertIn("at", str(result))
 
-    def testSlugRaisesTypeErrorOnNonStringSeparator(self):
+    def testSlugRaisesTypeErrorOnNonStringSeparator(self) -> None:
         """Raise TypeError when separator is not a string.
 
         Ensures `slug` validates the separator type before processing the
@@ -327,12 +332,12 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").slug(separator=42)
 
-    def testSlugRaisesTypeErrorOnNonDictDictionary(self):
+    def testSlugRaisesTypeErrorOnNonDictDictionary(self) -> None:
         """Raise TypeError when dictionary argument is not a dict.
 
         Verifies `slug` enforces the dictionary type constraint on the
@@ -341,14 +346,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").slug(dictionary="not-a-dict")
 
     # ----------------------------------------------------------------- title
 
-    def testTitleCapitalisesEachWord(self):
+    def testTitleCapitalisesEachWord(self) -> None:
         """Convert the string to title case.
 
         Validates that `title` capitalises the first letter of every word
@@ -357,13 +362,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").title(), Stringable("Hello World"))
 
     # --------------------------------------------------------------- headline
 
-    def testHeadlineCapitalisesWords(self):
+    def testHeadlineCapitalisesWords(self) -> None:
         """Convert the string to headline case.
 
         Validates that `headline` capitalises the first letter of each
@@ -372,12 +377,12 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").headline()
         self.assertEqual(result, Stringable("Hello World"))
 
-    def testHeadlineHandlesEmptyString(self):
+    def testHeadlineHandlesEmptyString(self) -> None:
         """Return empty Stringable from an empty input.
 
         Ensures `headline` produces an empty Stringable when called on
@@ -386,13 +391,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("").headline(), Stringable(""))
 
     # --------------------------------------------------------------------- apa
 
-    def testApaCapitalisesFirstWord(self):
+    def testApaCapitalisesFirstWord(self) -> None:
         """Capitalise the first word in APA style.
 
         Validates that `apa` always capitalises the first word regardless
@@ -401,12 +406,12 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("the quick brown fox").apa()
         self.assertTrue(str(result).startswith("The"))
 
-    def testApaLowercasesShortWords(self):
+    def testApaLowercasesShortWords(self) -> None:
         """Lowercase short words in the middle per APA rules.
 
         Ensures `apa` lowercases small words (a, an, and, etc.) that
@@ -415,14 +420,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = str(Stringable("a tale of ice and fire").apa())
         words = result.split()
         # "of" and "and" are in the middle and should be lowercase
         self.assertEqual(words[2], "of")
 
-    def testApaCapitalisesLastWord(self):
+    def testApaCapitalisesLastWord(self) -> None:
         """Capitalise the last word in APA style.
 
         Validates that `apa` always capitalises the last word, even if it
@@ -431,7 +436,7 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = str(Stringable("to be or not to be").apa())
         words = result.split()
@@ -439,7 +444,7 @@ class TestStringableCase(TestCase):
 
     # --------------------------------------------------------------- ucfirst
 
-    def testUcfirstCapitalisesFirstCharacter(self):
+    def testUcfirstCapitalisesFirstCharacter(self) -> None:
         """Capitalise only the first character of the string.
 
         Validates that `ucfirst` uppercases the very first character
@@ -448,11 +453,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").ucfirst(), Stringable("Hello world"))
 
-    def testUcfirstOnEmptyString(self):
+    def testUcfirstOnEmptyString(self) -> None:
         """Return empty Stringable from an empty input.
 
         Ensures `ucfirst` returns an empty Stringable when invoked on
@@ -461,13 +466,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("").ucfirst(), Stringable(""))
 
     # --------------------------------------------------------------- lcfirst
 
-    def testLcfirstLowercasesFirstCharacter(self):
+    def testLcfirstLowercasesFirstCharacter(self) -> None:
         """Lowercase only the first character of the string.
 
         Validates that `lcfirst` lowercases the very first character
@@ -476,11 +481,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("Hello World").lcfirst(), Stringable("hello World"))
 
-    def testLcfirstOnEmptyString(self):
+    def testLcfirstOnEmptyString(self) -> None:
         """Return empty Stringable from an empty input.
 
         Ensures `lcfirst` returns an empty Stringable when invoked on
@@ -489,13 +494,13 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("").lcfirst(), Stringable(""))
 
     # ----------------------------------------------------------- convertCase
 
-    def testConvertCaseModeNoneAppliesCaseFold(self):
+    def testConvertCaseModeNoneAppliesCaseFold(self) -> None:
         """Apply casefold when mode is None.
 
         Validates that `convertCase` with no mode argument defaults to
@@ -504,12 +509,12 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("HELLO").convertCase(None)
         self.assertEqual(result, Stringable("hello"))
 
-    def testConvertCaseMode0AppliesCaseFold(self):
+    def testConvertCaseMode0AppliesCaseFold(self) -> None:
         """Apply casefold when mode is 0.
 
         Validates that `convertCase(0)` applies casefold transformation
@@ -518,11 +523,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("HELLO").convertCase(0), Stringable("hello"))
 
-    def testConvertCaseMode1AppliesUppercase(self):
+    def testConvertCaseMode1AppliesUppercase(self) -> None:
         """Convert to uppercase when mode is 1.
 
         Validates that `convertCase(1)` returns the fully uppercased
@@ -531,11 +536,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").convertCase(1), Stringable("HELLO"))
 
-    def testConvertCaseMode2AppliesLowercase(self):
+    def testConvertCaseMode2AppliesLowercase(self) -> None:
         """Convert to lowercase when mode is 2.
 
         Validates that `convertCase(2)` returns the fully lowercased
@@ -544,11 +549,11 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("HELLO").convertCase(2), Stringable("hello"))
 
-    def testConvertCaseMode3AppliesTitleCase(self):
+    def testConvertCaseMode3AppliesTitleCase(self) -> None:
         """Convert to titlecase when mode is 3.
 
         Validates that `convertCase(3)` returns the title-cased version
@@ -557,13 +562,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
-            Stringable("hello world").convertCase(3), Stringable("Hello World"),
+            Stringable("hello world").convertCase(3),
+            Stringable("Hello World"),
         )
 
-    def testConvertCaseRaisesTypeErrorOnNonIntegerMode(self):
+    def testConvertCaseRaisesTypeErrorOnNonIntegerMode(self) -> None:
         """Raise TypeError when mode is not an integer or None.
 
         Ensures `convertCase` validates its mode parameter type before
@@ -572,14 +578,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").convertCase("bad")
 
     # ---------------------------------------------------------- transliterate
 
-    def testTransliterateConvertsAccentedChars(self):
+    def testTransliterateConvertsAccentedChars(self) -> None:
         """Transliterate accented characters to ASCII equivalents.
 
         Validates that `transliterate` strips diacritics from accented
@@ -588,12 +594,12 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("café").transliterate()
         self.assertEqual(str(result), "cafe")
 
-    def testTransliterateStrictModeReplacesUnknown(self):
+    def testTransliterateStrictModeReplacesUnknown(self) -> None:
         """Replace non-ASCII characters with the unknown character in strict mode.
 
         Validates that `transliterate` with strict=True replaces any
@@ -602,12 +608,12 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("日本語").transliterate("?", strict=True)
         self.assertTrue(all(c == "?" or ord(c) < 128 for c in str(result)))
 
-    def testTransliterateRaisesTypeErrorOnMultiCharUnknown(self):
+    def testTransliterateRaisesTypeErrorOnMultiCharUnknown(self) -> None:
         """Raise TypeError when unknown is not a single character.
 
         Ensures `transliterate` enforces the single-character constraint
@@ -616,14 +622,14 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").transliterate("??")
 
     # ------------------------------------------------------------------ ascii
 
-    def testAsciiRemovesDiacritics(self):
+    def testAsciiRemovesDiacritics(self) -> None:
         """Remove diacritics and non-ASCII characters via normalization.
 
         Validates that `ascii` uses Unicode NFKD normalization to strip
@@ -632,12 +638,12 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("Héllo Wörld").ascii()
         self.assertEqual(str(result), "Hello World")
 
-    def testAsciiOnPureAsciiInput(self):
+    def testAsciiOnPureAsciiInput(self) -> None:
         """Return the original string when input is already ASCII.
 
         Ensures `ascii` is a no-op when the string contains only
@@ -646,6 +652,6 @@ class TestStringableCase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").ascii(), Stringable("hello"))

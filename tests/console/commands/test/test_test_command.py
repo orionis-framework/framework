@@ -1,4 +1,8 @@
+# ruff: noqa: FBT003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from typing import Self
+from unittest.mock import patch
 from orionis.console.commands.test.test import TestCommand
 from orionis.test import TestCase
 from orionis.test.entities.result import TestResult
@@ -7,6 +11,7 @@ from orionis.test.enums.status import TestStatus
 # Exit codes published by the command.
 _SUCCESS: int = 0
 _FAILURE: int = 1
+
 
 class _StubApp:
     """Application double exposing only the configuration reader."""
@@ -42,6 +47,7 @@ class _StubApp:
             Value produced by the helper.
         """
         return self._config.get(key)
+
 
 class _RecordingEngine:
     """Testing engine double recording every option applied to it."""
@@ -175,6 +181,7 @@ class _RecordingEngine:
         """
         return self.results
 
+
 def _make_result(status: TestStatus) -> TestResult:
     """Build a report carrying the given status.
 
@@ -195,6 +202,7 @@ def _make_result(status: TestStatus) -> TestResult:
         execution_time=0.0,
     )
 
+
 def _make_command(arguments: dict[str, object] | None = None) -> TestCommand:
     """Build a command instance holding the given parsed arguments.
 
@@ -212,6 +220,7 @@ def _make_command(arguments: dict[str, object] | None = None) -> TestCommand:
     command.setArguments(arguments or {})
     return command
 
+
 # Configuration equivalent to a fully declared testing section.
 _FULL_CONFIG: dict[str, object] = {
     "testing.verbosity": 2,
@@ -220,6 +229,7 @@ _FULL_CONFIG: dict[str, object] = {
     "testing.file_pattern": "test_*.py",
     "testing.method_pattern": "test*",
 }
+
 
 class TestTestCommandDefinition(TestCase):
     """Verify the command signature and exposed argument definitions."""
@@ -260,6 +270,7 @@ class TestTestCommandDefinition(TestCase):
             },
         )
 
+
 class TestTestCommandExitCode(TestCase):
     """Verify exit codes for passing, failing, and empty test runs."""
 
@@ -273,10 +284,12 @@ class TestTestCommandExitCode(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        engine = _RecordingEngine([
-            _make_result(TestStatus.PASSED),
-            _make_result(TestStatus.SKIPPED),
-        ])
+        engine = _RecordingEngine(
+            [
+                _make_result(TestStatus.PASSED),
+                _make_result(TestStatus.SKIPPED),
+            ],
+        )
         command = _make_command()
         code = await command.handle(_StubApp(_FULL_CONFIG), engine)
         self.assertEqual(code, _SUCCESS)
@@ -312,10 +325,8 @@ class TestTestCommandExitCode(TestCase):
         code = await command.handle(_StubApp(_FULL_CONFIG), engine)
         self.assertEqual(code, _FAILURE)
 
-    async def testEmptyReportReturnsSuccess(self) -> None:
-        """Report success when the run produced no test at all.
-
-        Validates that an empty suite is a supported outcome.
+    async def testEmptyReportReturnsFailureWithAnExplicitDiagnostic(self) -> None:
+        """Reject empty discovery instead of publishing an unvalidated success.
 
         Returns
         -------
@@ -323,8 +334,13 @@ class TestTestCommandExitCode(TestCase):
             Assertions verify the behavior described above.
         """
         command = _make_command()
-        code = await command.handle(_StubApp(_FULL_CONFIG), _RecordingEngine())
-        self.assertEqual(code, _SUCCESS)
+        with patch.object(TestCommand, "error") as error:
+            code = await command.handle(_StubApp(_FULL_CONFIG), _RecordingEngine())
+        self.assertEqual(code, _FAILURE)
+        error.assert_called_once_with(
+            "No tests were executed. Check the discovery path and filters.",
+        )
+
 
 class TestTestCommandOptionResolution(TestCase):
     """Verify precedence and forwarding of command option values."""
@@ -348,7 +364,7 @@ class TestTestCommandOptionResolution(TestCase):
         dict[str, object]
             Value produced by the helper.
         """
-        engine = _RecordingEngine()
+        engine = _RecordingEngine([_make_result(TestStatus.PASSED)])
         await _make_command(arguments).handle(_StubApp(config), engine)
         return engine.applied
 

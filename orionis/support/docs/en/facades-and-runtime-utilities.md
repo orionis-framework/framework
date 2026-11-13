@@ -56,10 +56,10 @@ Except for `DateTime`, these classes obtain their target from the container. Con
 ### Types and helpers
 
 - `Collection(items=None)`: fluent selection, mapping, grouping, aggregation, pagination, serialization, and list-like protocols.
-- `DotDict(mapping)`: key and attribute access; `export()` recursively restores dictionaries and `copy()` recursively copies nested mappings.
+- `DotDict(mapping)`: key and attribute access; `export()` recursively restores dictionaries and `copy()` deeply copies mutable contents.
 - `StdClass(**kwargs)`: dynamic attributes with reserved method and dunder names rejected; supports `fromDict`, `toDict`, `update`, and `remove`.
 - `Stringable(value)`: immutable fluent text wrapper with casing, matching, replacement, encoding, hashing, parsing, truncation, and validation helpers.
-- `MISSING`: falsey sentinel whose representation is `MISSING`.
+- `MISSING`: falsey sentinel whose representation is `<MISSING>`.
 - `BaseEntity`: `toDict()` and `getFields()` for dataclass entities.
 - `FreezeThaw.freeze()` / `thaw()`: recursive immutable/mutable conversions.
 - `PerformanceCounter`: `start`/`stop`, `astart`/`astop`, context-manager APIs, and duration conversions.
@@ -101,6 +101,7 @@ assert DateTime.diffInDays(instant, later) == 2
 ```python
 from orionis.support.facades import Cache, Log, Storage
 
+
 # Run after the Orionis application has booted and bound these services.
 async def completed_import() -> None:
     Log.info("Import completed")
@@ -114,6 +115,10 @@ Facade targets are configured by their owning modules and resolved from the curr
 
 `Workers` defaults to 0.5 GiB per worker. `setRamPerWorker()` changes a class-level process-wide budget. `Inspire` accepts a custom list of mappings with mandatory `quote` and `author` keys. The other helper types require no global configuration.
 
+`DateTime.formatLocal()` converts supplied timestamps, including Pendulum values, to the configured timezone and formats them using the configured locale. `today()`, `tomorrow()`, and `yesterday()` return Pendulum `DateTime` values at midnight. `isToday()` compares dates in the configured timezone, including when the input uses another offset.
+
+`Inspire` keeps the supplied nonempty quote list by reference. Later changes to that list affect selection; if it becomes empty, `random()` returns the fallback quote. Callers remain responsible for valid entries added after construction.
+
 ## Integration with Orionis
 
 Use facades at application boundaries—controllers, commands, jobs, listeners, and providers—where concise access to a configured service is useful. Prefer constructor injection inside reusable domain services when explicit dependencies and isolated tests matter.
@@ -126,17 +131,17 @@ The lazy facade package avoids importing all subsystems at startup. Service type
 - `DotDict.missing` returns `None`; use membership testing when `None` is a meaningful stored value.
 - `StdClass` rejects dunder names and names that collide with its class API.
 - `Collection.chunk()` and `forPage()` reject non-positive sizes; callback-based operations require callables.
-- `FreezeThaw` only transforms dictionaries, lists, tuples, and mapping proxies. Objects stored inside them are not deep-copied.
+- `FreezeThaw` transforms dictionaries, lists and tuples; existing mapping proxies are retained unchanged. Other objects stored inside containers are not deep-copied. Sequence-only cycles raise `ValueError`.
 - `PerformanceCounter` rejects reading before a completed measurement and rejects mixing synchronous and asynchronous start/stop methods.
 - `Final` rejects inheritance at class creation time. `Singleton` ignores constructor arguments after the first instance exists.
-- Invalid time zones and incompatible date inputs raise validation errors from `DateTime`/`pendulum`.
+- Invalid configured time zones raise `ValueError`. Rejecting a locale leaves the previous configured locale unchanged. Incompatible date inputs raise validation errors from `DateTime`/`pendulum`.
 - `Workers.setRamPerWorker()` requires a finite positive value large enough to represent at least one byte.
 
 ## Performance and concurrency
 
 Facade imports and root facade exports are lazy and cached. `BaseEntity` caches normalized field metadata per entity class. `ExceptionParser` parses once and returns its cached dictionary on subsequent calls. `DateTime` caches `ZoneInfo` instances until its timezone changes.
 
-`Singleton` protects first construction with a per-class `threading.Lock`; its async access method uses the same short critical section and performs no blocking I/O. `FreezeThaw` uses iterative traversal to avoid recursion depth limits. `Workers` caches CPU count and total RAM at module import, so later calculations are constant-time integer arithmetic.
+`Singleton` protects first construction with a per-class `threading.Lock`; its async access method uses the same construction path. Constructors execute synchronously, so keep their work short. Recursive construction of the same singleton raises `RuntimeError`; a failed construction can be retried. `FreezeThaw` uses iterative traversal to avoid recursion depth limits. `Workers` caches CPU count and total RAM at module import, so later calculations are constant-time integer arithmetic.
 
 `Collection` and the mutable helpers are not synchronized. Do not mutate one instance concurrently without application-level coordination.
 

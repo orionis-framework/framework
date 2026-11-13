@@ -13,10 +13,13 @@ Puedes reemplazar los GET de favicon, robots y sitemap declarando esos paths en 
 ```python
 from orionis.http.default.contracts.responses import IDefaultResponses
 
+
 async def unavailable(pages: IDefaultResponses):
     return await pages.error(
-        503, {"message": "Catalog temporarily unavailable"},
-        expects_json=True, headers={"Retry-After": "30"},
+        503,
+        {"message": "Catalog temporarily unavailable"},
+        expects_json=True,
+        headers={"Retry-After": "30"},
     )
 ```
 
@@ -35,6 +38,8 @@ Route.auth()
 ```
 
 Solo declara una vez desde rutas web. Puedes pasar `login_controller`, `register_controller` y `forgot_password_controller` para reemplazar cada controlador. Conserva los métodos que espera [el registro real](../../routes/auth.py). Los controladores predeterminados de registro/perfil dependen del modelo `app.models.user.User`, vistas, hashing y correo de la aplicación; no son un flujo genérico para cualquier modelo. Comprueba esos contratos antes de activarlos. Consulta [recuperación de cuentas](../../../auth/docs/es/account-recovery.md).
+
+El registro confirma mediante el contexto transaccional nativo antes de programar correo. Una cancelación, un fallo o un veto de persistencia no confirma cuentas parciales. Los errores ordinarios del backend llegan al reporter central y el formulario recibe un mensaje genérico; la verificación de correo no muestra éxito tras un veto de persistencia.
 
 ## Cachés y cambios de archivos
 

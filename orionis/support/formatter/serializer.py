@@ -2,6 +2,7 @@
 
 from orionis.support.formatter.exceptions.parser import ExceptionParser
 
+
 class Parser:
     """Convert supported Python values into serializable representations."""
 

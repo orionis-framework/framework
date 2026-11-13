@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class ConnectionName(StrEnum):
     """
     Enumerate the built-in database connection names supported by Orionis.
@@ -27,9 +28,9 @@ class ConnectionName(StrEnum):
         An enumeration member representing a database connection name.
     """
 
-    SQLITE = "sqlite"          # SQLite database connection
-    MYSQL = "mysql"            # MySQL database connection
-    PGSQL = "pgsql"            # PostgreSQL database connection
-    ORACLE = "oracle"          # Oracle database connection
-    SQLSERVER = "sqlserver"    # Microsoft SQL Server database connection
+    SQLITE = "sqlite"  # SQLite database connection
+    MYSQL = "mysql"  # MySQL database connection
+    PGSQL = "pgsql"  # PostgreSQL database connection
+    ORACLE = "oracle"  # Oracle database connection
+    SQLSERVER = "sqlserver"  # Microsoft SQL Server database connection
     REDSHIFT = "redshift"

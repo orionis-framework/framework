@@ -1,17 +1,17 @@
+# ruff: noqa: TC003
+# Keep callable, binary-handle and traceback annotations available at runtime.
 """Asynchronous wrapper around a lazily opened binary handle."""
 
 from __future__ import annotations
 import asyncio
-import sys
-from typing import TYPE_CHECKING, Self
+from collections.abc import AsyncIterator, Callable
+from functools import partial
+from types import TracebackType
+from typing import BinaryIO, Self
 from orionis.storage.buffering import READ_BUFFER_SIZE, _close_buffer
 from orionis.storage.contracts.stream import IStorageStream
 from orionis.support.concurrency import complete_on_cancel
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator, Callable
-    from types import TracebackType
-    from typing import BinaryIO
 
 class AsyncStream(IStorageStream):
     """
@@ -47,7 +47,7 @@ class AsyncStream(IStorageStream):
         Returns
         -------
         None
-            Initialize the stream with its handle factory.
+            No return value.
         """
         self._opener = opener
         """
@@ -85,16 +85,16 @@ class AsyncStream(IStorageStream):
                 Returns
                 -------
                 None
-                    Complete the operation without returning a value.
+                    No return value.
                 """
                 self._handle = self._opener()
 
             try:
                 await complete_on_cancel(asyncio.to_thread(open_handle))
-            except asyncio.CancelledError:
+            except asyncio.CancelledError as error:
                 handle, self._handle = self._handle, None
                 if handle is not None:
-                    await _close_buffer(handle.close, sys.exception())
+                    await _close_buffer(handle.close, error)
                 raise
         return self._handle
 
@@ -200,13 +200,29 @@ class AsyncStream(IStorageStream):
 
         Invokes the *on_close* callback (when provided) before closing
         the handle. Closing an unopened or already closed stream is a
-        no-op. A failed close does not replace a persistence or context-body
-        failure already propagating through the stream.
+        no-op. A failed close does not replace a persistence failure. Context
+        manager exit also preserves its own body failure; explicit ``close``
+        propagates its cleanup failure regardless of a caller's handled error.
 
         Returns
         -------
         None
-            Flush pending data and release the underlying handle.
+            No return value.
+        """
+        await self.__close(None)
+
+    async def __close(self, primary: BaseException | None) -> None:
+        """Persist and close the handle without replacing an existing failure.
+
+        Parameters
+        ----------
+        primary : BaseException | None
+            Failure already propagating from the owning operation or context.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         async with self._lock:
             handle = self._handle
@@ -216,9 +232,13 @@ class AsyncStream(IStorageStream):
 
             try:
                 if self._on_close is not None:
-                    await complete_on_cancel(asyncio.to_thread(self._on_close, handle))
+                    await _close_buffer(partial(self._on_close, handle), primary)
+            except BaseException as error:
+                if primary is None:
+                    primary = error
+                raise
             finally:
-                await _close_buffer(handle.close, sys.exception())
+                await _close_buffer(handle.close, primary)
 
     async def __aenter__(self: Self) -> IStorageStream:
         """
@@ -254,6 +274,6 @@ class AsyncStream(IStorageStream):
         Returns
         -------
         None
-            Close the stream when leaving the async context.
+            No return value.
         """
-        await self.close()
+        await self.__close(exc)

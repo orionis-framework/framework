@@ -56,9 +56,13 @@ A binding relates a contract to a compatible concrete class and a `Lifetime`. Th
 - `SCOPED`: construct once in the active scope and discard when the scope closes.
 - `instance`: publish an already initialized object globally, or into the active scope when called inside one.
 
+An explicit instance in the active scope takes precedence over a global singleton for that contract, including resolution through its global alias and parameter injection. Leaving the scope restores access to the global registration. Scoped instances of primitive types can supply annotated parameters without a matching global binding.
+
 ### Automatic resolution and invocation
 
-The container caches reflection plans, combines supplied positional/keyword values with annotated dependencies/defaults, recursively builds class parameters, and awaits returned awaitables. Orionis schema and HTTP request parameters receive specialized handling during callable injection.
+The container caches reflection plans, combines supplied positional/keyword values with annotated dependencies/defaults, recursively builds class parameters, and awaits functions declared with `async def`. A synchronous callable returns its result unchanged, including an awaitable result; await that result explicitly when needed. Orionis schema and HTTP request parameters receive specialized handling during callable injection.
+
+Explicit arguments take precedence over injection. Positional-only parameters retain Python's binding rules: a keyword with the same name is captured by `**kwargs` when present, or rejected; it does not replace the positional parameter.
 
 ### Scope propagation
 
@@ -149,10 +153,6 @@ class First:
 class Second:
     def __init__(self, first: First) -> None:
         self.first = first
-
-
-# Resolve the one forward reference after both classes exist.
-First.__init__.__annotations__["second"] = Second
 
 
 class CycleContainer(Container):

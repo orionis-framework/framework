@@ -1,6 +1,7 @@
+# ruff: noqa: PLR0911, SLF001, TC002, TC003
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Provide auth tokens operations through ``lookup_owner``."""
 
-from typing import TYPE_CHECKING
 from sqlalchemy import BigInteger, and_, case, cast, func, or_, select
 from orionis.auth.identity.provider import ModelIdentityProvider
 from orionis.database.connection import Connection
@@ -9,14 +10,13 @@ from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.orm.query.raw_builder import RawQueryBuilder
 from orionis.orm.schema.types.column_type import ColumnType
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from types import NotImplementedType
-    from sqlalchemy.sql.elements import ColumnElement
+from collections.abc import Callable
+from types import NotImplementedType
+from sqlalchemy.sql.elements import ColumnElement
+
 
 # This integration deliberately uses the native builder/connection hooks. Custom
 # providers, connections and nontrivial query shapes keep their original path.
-# ruff: noqa: SLF001
 _INTEGER_DIGITS = 19
 """Integer digits value used by ``lookup``."""
 _INTEGERS = frozenset(
@@ -54,6 +54,7 @@ _COLUMNS = (
 )
 """Columns definitions used by ``lookup``."""
 
+
 def _integer_key(value: ColumnElement, length: Callable) -> ColumnElement:
     """
     Cast only bounded decimal strings, including on strict SQL engines.
@@ -88,7 +89,8 @@ def _integer_key(value: ColumnElement, length: Callable) -> ColumnElement:
     # CAST applies to CASE's safe result, never to untrusted malformed text.
     return cast(case((valid, value), else_=None), BigInteger)
 
-async def lookup_owner(  # noqa: PLR0911
+
+async def lookup_owner(
     query: RawQueryBuilder,
     identities: object,
     validate: Callable[[dict], object | None],
@@ -180,6 +182,7 @@ async def lookup_owner(  # noqa: PLR0911
             return None
         owner = {column.key: row[column] for column in owners.c}
     instance = model._newFromDatabase(owner)
+    object.__setattr__(instance, "_read_connection", connection)
     await owner_query._fireRetrieved([instance])
     if owner_query._eager_loads:
         await owner_query._eagerLoad([instance])

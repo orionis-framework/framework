@@ -1,11 +1,17 @@
+# ruff: noqa: FBT003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import contextlib
 import ctypes
 import io
 import json
+import os
 import shutil
 import sys
 import tempfile
+from contextvars import ContextVar
 from pathlib import Path
+from unittest.mock import patch
 from orionis.test import TestCase
 from orionis.test.cases.case import _METHOD_PATTERN
 from orionis.test.contracts.engine import ITestingEngine
@@ -52,6 +58,32 @@ class GeneratedMixedCase(TestCase):
 
 # Generated module that cannot be imported.
 _BROKEN_SOURCE: str = "def broken(:\n"
+
+_RUN_CONTEXT: ContextVar[str] = ContextVar("orionis_engine_probe", default="unset")
+
+# A nonstandard method prefix must retain dependency injection and async execution.
+_CUSTOM_METHOD_SOURCE: str = '''from orionis.test import TestCase
+
+class CustomDependency:
+    """Supply a dependency constructed by the test application's container."""
+
+    def __init__(self) -> None:
+        """Store the value checked by the custom test method."""
+        self.value = "injected"
+
+class GeneratedCustomCase(TestCase):
+
+    async def checkGeneratedPasses(self, dependency: CustomDependency) -> None:
+        """Validate an asynchronously executed custom test method.
+
+        Parameters
+        ----------
+        dependency : CustomDependency
+            Dependency resolved by the application's container.
+        """
+        self.assertEqual(dependency.value, "injected")
+'''
+
 
 class _StubApp:
     """Application double exposing only the members read by the engine."""
@@ -122,6 +154,7 @@ class _StubApp:
             return self._storage / "framework"
         return self._storage
 
+
 class _BareApp:
     """Application double whose testing configuration is entirely absent."""
 
@@ -174,6 +207,7 @@ class _BareApp:
             return self._storage / "framework"
         return self._storage
 
+
 def _engine_state(engine: TestingEngine, name: str) -> object:
     """
     Read a private engine attribute to verify configuration handling.
@@ -191,6 +225,7 @@ def _engine_state(engine: TestingEngine, name: str) -> object:
         Value stored in the requested private engine attribute.
     """
     return getattr(engine, f"_TestingEngine__{name}")
+
 
 def _write_module(directory: Path, name: str, source: str) -> None:
     """
@@ -213,6 +248,7 @@ def _write_module(directory: Path, name: str, source: str) -> None:
     directory.mkdir(parents=True, exist_ok=True)
     (directory / f"{name}.py").write_text(source, encoding="utf-8")
 
+
 def _count_import_entries(entry: str) -> int:
     """
     Count how many times a directory is registered for imports.
@@ -228,6 +264,7 @@ def _count_import_entries(entry: str) -> int:
         Number of matching entries registered in sys.path.
     """
     return sys.path.count(entry)
+
 
 def _project_alias(directory: Path) -> Path:
     """Create an alternative spelling for an existing project directory.
@@ -263,6 +300,7 @@ def _project_alias(directory: Path) -> Path:
     alias = directory / "project-alias"
     alias.symlink_to(resolved, target_is_directory=True)
     return alias
+
 
 class _EngineTestCase(TestCase):
     """Base scenario creating an isolated project tree for every test."""
@@ -320,8 +358,8 @@ class _EngineTestCase(TestCase):
         """
         return self._storage / "framework" / "cache" / "testing"
 
-class TestTestingEngineConfiguration(_EngineTestCase):
 
+class TestTestingEngineConfiguration(_EngineTestCase):
     def testEngineSatisfiesTheContract(self) -> None:
         """
         Build an engine that honours the testing contract.
@@ -338,11 +376,13 @@ class TestTestingEngineConfiguration(_EngineTestCase):
         Validates that the engine is fully driven by configuration
         instead of hard coded defaults.
         """
-        engine = self._makeEngine({
-            "testing.verbosity": 2,
-            "testing.file_pattern": "check_*.py",
-            "testing.method_pattern": "check*",
-        })
+        engine = self._makeEngine(
+            {
+                "testing.verbosity": 2,
+                "testing.file_pattern": "check_*.py",
+                "testing.method_pattern": "check*",
+            },
+        )
         self.assertEqual(_engine_state(engine, "verbosity"), 2)
         self.assertEqual(_engine_state(engine, "file_pattern"), "check_*.py")
         self.assertEqual(_engine_state(engine, "method_pattern"), "check*")
@@ -389,8 +429,8 @@ class TestTestingEngineConfiguration(_EngineTestCase):
         """
         self.assertIs(_engine_state(self._makeEngine(), "with_panel"), True)
 
-class TestTestingEngineConfigurationFallbacks(_EngineTestCase):
 
+class TestTestingEngineConfigurationFallbacks(_EngineTestCase):
     def _makeBareEngine(self) -> TestingEngine:
         """
         Build an engine bound to an application without configuration.
@@ -464,8 +504,8 @@ class TestTestingEngineConfigurationFallbacks(_EngineTestCase):
         self.assertEqual(results[0].status, TestStatus.PASSED)
         self.assertEqual(results[0].module, f"{_PACKAGE}.test_passing")
 
-class TestTestingEngineSetters(_EngineTestCase):
 
+class TestTestingEngineSetters(_EngineTestCase):
     def testSetVerbosityStoresValueAndReturnsSelf(self) -> None:
         """
         Store the requested verbosity and allow further chaining.
@@ -520,16 +560,15 @@ class TestTestingEngineSetters(_EngineTestCase):
         self.assertIs(engine.setMethodPattern("check*"), engine)
         self.assertEqual(_engine_state(engine, "method_pattern"), "check*")
 
-    def testSetMethodPatternPropagatesToTheTestCase(self) -> None:
+    def testSetMethodPatternPreservesTheCallingContext(self) -> None:
         """
-        Propagate the method pattern to the shared test case class.
+        Preserve the caller's pattern while configuring an engine.
 
-        Validates that wrapping and discovery always agree on which
-        methods are considered tests.
+        Apply the configured pattern only while constructing discovered cases.
         """
+        original = _METHOD_PATTERN.get()
         self._makeEngine().setMethodPattern("check*")
-        self.assertIsNotNone(_METHOD_PATTERN.get().match("checkSomething"))
-        self.assertIsNone(_METHOD_PATTERN.get().match("testSomething"))
+        self.assertIs(_METHOD_PATTERN.get(), original)
 
     def testWithoutPanelDisablesTheStartPanelAndReturnsSelf(self) -> None:
         """
@@ -550,8 +589,7 @@ class TestTestingEngineSetters(_EngineTestCase):
         """
         engine = self._makeEngine()
         configured = (
-            engine
-            .setVerbosity(1)
+            engine.setVerbosity(1)
             .setFailFast(fail_fast=True)
             .setStartDir("tests")
             .setFilePattern("test_*.py")
@@ -560,7 +598,101 @@ class TestTestingEngineSetters(_EngineTestCase):
         )
         self.assertIs(configured, engine)
 
+
 class TestTestingEngineDiscovery(_EngineTestCase):
+    def testDiscoverResolvesRelativePathsAgainstTheApplication(self) -> None:
+        """Resolve relative discovery paths from the application root."""
+        _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
+        engine = self._makeEngine({"testing.start_dir": _PACKAGE})
+        self.assertEqual(engine.discover().countTestCases(), 1)
+
+    async def testCustomMethodPatternRunsAsyncCases(self) -> None:
+        """Execute custom-prefix async methods selected by configuration."""
+        _write_module(self._suite_dir, "test_custom", _CUSTOM_METHOD_SOURCE)
+        original = _METHOD_PATTERN.get()
+        engine = self._makeEngine({"testing.method_pattern": "check*"})
+        results = await engine.withoutPanel().run()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].method, "checkGeneratedPasses")
+        self.assertEqual(results[0].status, TestStatus.PASSED)
+        self.assertIs(_METHOD_PATTERN.get(), original)
+
+    def testDiscoverRejectsAnAbsentDirectory(self) -> None:
+        """Raise a discovery error when the configured directory is absent."""
+        engine = self._makeEngine().setStartDir(str(self._root / "absent"))
+        with self.assertRaises(FileNotFoundError):
+            engine.discover()
+
+    def testDiscoverSelectsOneExplicitPythonFile(self) -> None:
+        """Import only the selected file without inspecting sibling modules."""
+        _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
+        _write_module(self._suite_dir, "test_broken", _BROKEN_SOURCE)
+        engine = self._makeEngine().setStartDir(
+            str(self._suite_dir / "test_passing.py"),
+        )
+        self.assertEqual(engine.discover().countTestCases(), 1)
+
+    def testDiscoverRejectsANonPythonFile(self) -> None:
+        """Reject an explicit discovery file with a non-Python extension."""
+        path = self._suite_dir / "notes.txt"
+        path.write_text("not a test module", encoding="utf-8")
+        engine = self._makeEngine().setStartDir(str(path))
+        with self.assertRaises(ValueError):
+            engine.discover()
+
+    def testDiscoveryFailureRestoresTheCallingPattern(self) -> None:
+        """Restore the caller's method matcher after a failed module import."""
+        _write_module(self._suite_dir, "test_broken", _BROKEN_SOURCE)
+        original = _METHOD_PATTERN.get()
+        engine = self._makeEngine({"testing.method_pattern": "check*"})
+        with self.assertRaises(SyntaxError):
+            engine.discover()
+        self.assertIs(_METHOD_PATTERN.get(), original)
+
+    def testDiscoverRejectsAnUnreadableSubdirectory(self) -> None:
+        """Propagate traversal errors instead of dropping an unreadable branch."""
+        blocked = self._suite_dir / "blocked"
+        blocked.mkdir()
+        original = os.scandir
+
+        def scandir(path: str) -> object:
+            """Raise only for the controlled unreadable discovery directory.
+
+            Parameters
+            ----------
+            path : str
+                Directory requested by the native tree walker.
+
+            Returns
+            -------
+            object
+                Native directory iterator for accessible paths.
+
+            Raises
+            ------
+            PermissionError
+                If the walker reaches the controlled blocked branch.
+            """
+            if Path(path) == blocked:
+                message = "Controlled discovery permission error."
+                raise PermissionError(message)
+            return original(path)
+
+        with (
+            patch("os.scandir", side_effect=scandir),
+            self.assertRaises(PermissionError),
+        ):
+            self._makeEngine().discover()
+
+    def testDiscoverRejectsModulesCachedFromAnotherProject(self) -> None:
+        """Reject cached test modules originating in a different application."""
+        _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
+        self._makeEngine().discover()
+        other_root = self._root / "other"
+        _write_module(other_root / _PACKAGE, "test_passing", _FAILING_SOURCE)
+        engine = TestingEngine(_StubApp(other_root, self._storage))
+        with self.assertRaises(ImportError):
+            engine.discover()
 
     async def testDiscoverResolvesProjectAliases(self) -> None:
         """
@@ -650,7 +782,9 @@ class TestTestingEngineDiscovery(_EngineTestCase):
             Assert import failure reporting despite an unmatched method filter.
         """
         _write_module(
-            self._suite_dir, "test_broken", "import _orionis_missing_test_dependency\n",
+            self._suite_dir,
+            "test_broken",
+            "import _orionis_missing_test_dependency\n",
         )
         engine = self._makeEngine({"testing.method_pattern": "testOnlySelected*"})
         results = await engine.withoutPanel().run()
@@ -693,7 +827,40 @@ class TestTestingEngineDiscovery(_EngineTestCase):
         self.assertIsNot(first, second)
         self.assertEqual(first.countTestCases(), second.countTestCases())
 
+
 class TestTestingEngineExecution(_EngineTestCase):
+    async def testRunPropagatesContextToNativeCases(self) -> None:
+        """Preserve context variables while running native synchronous cases."""
+        source = '''import unittest
+from tests.test.core.test_engine import _RUN_CONTEXT
+
+class GeneratedContextCase(unittest.TestCase):
+
+    def testReadsContext(self) -> None:
+        """Read the context inherited from the engine caller."""
+        self.assertEqual(_RUN_CONTEXT.get(), "caller")
+'''
+        _write_module(self._suite_dir, "test_context", source)
+        token = _RUN_CONTEXT.set("caller")
+        try:
+            results = await self._makeEngine().withoutPanel().run()
+        finally:
+            _RUN_CONTEXT.reset(token)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].status, TestStatus.PASSED)
+
+    async def testCachedRunsInTheSameSecondRemainDistinct(self) -> None:
+        """Retain both cached reports when runs share a clock timestamp."""
+        _write_module(self._suite_dir, "test_passing", _PASSING_SOURCE)
+        engine = self._makeEngine({"testing.cache_results": True}).withoutPanel()
+        with patch("orionis.test.core.engine.time.time", return_value=1):
+            await engine.run()
+            await engine.run()
+        reports = list(self._cacheFolder().glob("*.json"))
+        self.assertEqual(len(reports), 2)
+        for path in reports:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(payload[0]["status"], TestStatus.PASSED)
 
     async def testRunReturnsResultsForPassingTests(self) -> None:
         """

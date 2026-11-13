@@ -1,9 +1,13 @@
+# ruff: noqa: PLR2004, S603, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Use explicit process arguments or locally constructed execution fixtures.
 import asyncio
 import base64
+from contextlib import suppress
 import hashlib
 import os
 import secrets
-import shutil
 import socket
 import struct
 import subprocess
@@ -13,11 +17,12 @@ from pathlib import Path
 import msgspec
 import psutil
 from orionis.foundation.application import Application
-from orionis.http import WebSocket  # noqa: TC001
+from orionis.http import WebSocket
 from orionis.realtime import Hub, remote
 from orionis.test import TestCase
 
 _ROOT = Path(__file__).resolve().parents[2]
+
 
 async def echo(connection: WebSocket) -> None:
     """Echo text and binary frames through the real server adapter.
@@ -38,6 +43,7 @@ async def echo(connection: WebSocket) -> None:
             await connection.sendText(message.text)
         elif message.isBytes():
             await connection.sendBytes(message.bytes)
+
 
 class SmokeHub(Hub):
     """Expose arithmetic and bidirectional invocation over real TCP sockets."""
@@ -78,6 +84,7 @@ class SmokeHub(Hub):
         """
         return await self.clients.caller.invoke("getState", timeout=3)
 
+
 def create_application() -> Application:
     """Build the test server inside its temporary working directory.
 
@@ -103,6 +110,7 @@ def create_application() -> Application:
         .create()
     )
 
+
 def _require(condition: object, message: str) -> None:
     """Raise a clear test failure when a wire assertion fails.
 
@@ -126,6 +134,7 @@ def _require(condition: object, message: str) -> None:
     if not condition:
         raise AssertionError(message)
 
+
 def _available_port() -> int:
     """Reserve and release an ephemeral loopback port for the server process.
 
@@ -138,8 +147,12 @@ def _available_port() -> int:
         candidate.bind(("127.0.0.1", 0))
         return candidate.getsockname()[1]
 
+
 def _start_server(
-    interface: str, port: int, log: int, directory: str,
+    interface: str,
+    port: int,
+    log: int,
+    directory: str,
 ) -> subprocess.Popen:
     """Start an isolated server through this test module's application factory.
 
@@ -160,17 +173,34 @@ def _start_server(
         Owned server process with isolated configuration and storage.
     """
     command = [
-        sys.executable, "-B", "-m", "granian", "--interface", interface,
-        "--host", "127.0.0.1", "--port", str(port), "--workers", "1",
-        "--loop", "asyncio", "--log-level", "warning", "--factory",
+        sys.executable,
+        "-B",
+        "-m",
+        "granian",
+        "--interface",
+        interface,
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(port),
+        "--workers",
+        "1",
+        "--loop",
+        "asyncio",
+        "--log-level",
+        "warning",
+        "--factory",
         "tests.realtime.test_integration:create_application",
     ]
     paths = [directory, str(_ROOT)]
     inherited = os.environ.get("PYTHONPATH")
     if inherited:
         paths.append(inherited)
-    return subprocess.Popen(  # noqa: S603
-        command, cwd=directory, stdout=log, stderr=subprocess.STDOUT,
+    return subprocess.Popen(
+        command,
+        cwd=directory,
+        stdout=log,
+        stderr=subprocess.STDOUT,
         env={
             **os.environ,
             "PYTHONIOENCODING": "utf-8",
@@ -180,13 +210,19 @@ def _start_server(
         creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
     )
 
-def _stop_server(process: subprocess.Popen) -> None:
+
+def _stop_server(
+    process: subprocess.Popen,
+    known: dict[int, psutil.Process],
+) -> None:
     """Release the exact owned process tree, including Granian's worker.
 
     Parameters
     ----------
     process : subprocess.Popen
         Test server process to stop, if still running.
+    known : dict[int, psutil.Process]
+        Owned process identities retained while the server was running.
 
     Returns
     -------
@@ -195,34 +231,38 @@ def _stop_server(process: subprocess.Popen) -> None:
 
     Raises
     ------
-    RuntimeError
-        If taskkill is unavailable on Windows.
+    psutil.Error
+        If an owned process cannot be inspected or terminated.
     subprocess.TimeoutExpired
         If any owned process exceeds its five-second exit deadline.
     """
-    if process.poll() is not None:
-        return
-    descendants: list[psutil.Process] = []
     if sys.platform == "win32":
-        executable = shutil.which("taskkill")
-        if executable is None:
-            error_msg = "Windows taskkill is required to release the test server tree"
-            raise RuntimeError(error_msg)
-        try:
-            descendants = psutil.Process(process.pid).children(recursive=True)
-        except psutil.NoSuchProcess:
-            process.wait(timeout=5)
-            return
-        subprocess.run(  # noqa: S603
-            [executable, "/PID", str(process.pid), "/T", "/F"],
-            check=False, capture_output=True, timeout=5,
-        )
+        owned = dict(known)
+        if process.poll() is None:
+            try:
+                root = psutil.Process(process.pid)
+                children = root.children(recursive=True)
+            except psutil.NoSuchProcess:
+                pass
+            else:
+                owned = {root.pid: root, **owned}
+                owned.update((child.pid, child) for child in children)
+        for child in owned.values():
+            with suppress(psutil.NoSuchProcess):
+                child.terminate()
+        _, alive = psutil.wait_procs(list(owned.values()), timeout=5)
+        for child in alive:
+            with suppress(psutil.NoSuchProcess):
+                child.kill()
+        _, survivors = psutil.wait_procs(alive, timeout=5)
+        process.wait(timeout=5)
+        if survivors:
+            raise subprocess.TimeoutExpired(process.args, 5)
     else:
-        process.terminate()
-    process.wait(timeout=5)
-    _, alive = psutil.wait_procs(descendants, timeout=5)
-    if alive:
-        raise subprocess.TimeoutExpired(process.args, 5)
+        if process.poll() is None:
+            process.terminate()
+        process.wait(timeout=5)
+
 
 class _Peer:
     """Exchange small RFC6455 frames without creating a public client library."""
@@ -230,7 +270,9 @@ class _Peer:
     __slots__ = ("reader", "writer")
 
     def __init__(
-        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter,
+        self,
+        reader: asyncio.StreamReader,
+        writer: asyncio.StreamWriter,
     ) -> None:
         """Own one TCP reader and writer for a test connection.
 
@@ -281,9 +323,12 @@ class _Peer:
         await writer.drain()
         try:
             headers = await reader.readuntil(b"\r\n\r\n")
-            expected = base64.b64encode(hashlib.sha1(
-                (key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").encode("ascii"),
-            ).digest())
+            expected = base64.b64encode(
+                hashlib.sha1(
+                    (key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").encode("ascii"),
+                    usedforsecurity=False,
+                ).digest(),
+            )
             _require(headers.startswith(b"HTTP/1.1 101"), headers.decode("latin-1"))
             _require(expected in headers, "Server returned an invalid upgrade hash")
             return cls(reader, writer)
@@ -309,8 +354,10 @@ class _Peer:
         """
         mask = secrets.token_bytes(4)
         length = len(payload)
-        prefix = bytes((0x80 | opcode, 0x80 | length)) if length < 126 else (
-            bytes((0x80 | opcode, 0xFE)) + struct.pack("!H", length)
+        prefix = (
+            bytes((0x80 | opcode, 0x80 | length))
+            if length < 126
+            else (bytes((0x80 | opcode, 0xFE)) + struct.pack("!H", length))
         )
         masked = bytes(value ^ mask[index % 4] for index, value in enumerate(payload))
         self.writer.write(prefix + mask + masked)
@@ -368,6 +415,7 @@ class _Peer:
             self.writer.close()
             await self.writer.wait_closed()
 
+
 async def _check_raw(port: int) -> None:
     """Verify Unicode text and binary echo over the installed Granian server.
 
@@ -384,12 +432,14 @@ async def _check_raw(port: int) -> None:
     peer = await _Peer.connect(port, "/echo")
     try:
         for opcode, payload in (
-            (1, "\u00a1Hola, \u4e16\u754c!".encode()), (2, b"\x00\xff\x80"),
+            (1, "\u00a1Hola, \u4e16\u754c!".encode()),
+            (2, b"\x00\xff\x80"),
         ):
             await peer.frame(opcode, payload)
             _require(await peer.receive() == (opcode, payload), "Raw echo mismatch")
     finally:
         await peer.close()
+
 
 async def _check_hub(port: int, codec: str) -> None:
     """Check ready, scalar RPC and client-result correlation for one codec.
@@ -415,31 +465,68 @@ async def _check_hub(port: int, codec: str) -> None:
         ready = decode(payload)
         _require(frame_type == opcode and ready["type"] == "ready", "Missing ready")
         _require(
-            ready["version"] == 1 and bool(ready["connection_id"]), "Invalid ready",
+            ready["version"] == 1 and bool(ready["connection_id"]),
+            "Invalid ready",
         )
-        await peer.frame(opcode, encode({
-            "type": "invoke", "id": "add-1", "target": "add", "args": [20, 22],
-        }))
+        await peer.frame(
+            opcode,
+            encode(
+                {
+                    "type": "invoke",
+                    "id": "add-1",
+                    "target": "add",
+                    "args": [20, 22],
+                },
+            ),
+        )
         _, payload = await peer.receive()
-        _require(decode(payload) == {
-            "type": "completion", "id": "add-1", "result": 42,
-        }, "Hub arithmetic completion mismatch")
-        await peer.frame(opcode, encode({
-            "type": "invoke", "id": "ask-1", "target": "ask", "args": [],
-        }))
+        _require(
+            decode(payload)
+            == {
+                "type": "completion",
+                "id": "add-1",
+                "result": 42,
+            },
+            "Hub arithmetic completion mismatch",
+        )
+        await peer.frame(
+            opcode,
+            encode(
+                {
+                    "type": "invoke",
+                    "id": "ask-1",
+                    "target": "ask",
+                    "args": [],
+                },
+            ),
+        )
         _, payload = await peer.receive()
         invoke = decode(payload)
         _require(invoke["type"] == "invoke", "Expected server-to-client invocation")
         _require(invoke["target"] == "getState", "Unexpected client method")
-        await peer.frame(opcode, encode({
-            "type": "completion", "id": invoke["id"], "result": {"online": True},
-        }))
+        await peer.frame(
+            opcode,
+            encode(
+                {
+                    "type": "completion",
+                    "id": invoke["id"],
+                    "result": {"online": True},
+                },
+            ),
+        )
         _, payload = await peer.receive()
-        _require(decode(payload) == {
-            "type": "completion", "id": "ask-1", "result": {"online": True},
-        }, "Bidirectional completion mismatch")
+        _require(
+            decode(payload)
+            == {
+                "type": "completion",
+                "id": "ask-1",
+                "result": {"online": True},
+            },
+            "Bidirectional completion mismatch",
+        )
     finally:
         await peer.close()
+
 
 async def _run(interface: str) -> None:
     """Execute all wire checks in an isolated server and release its processes.
@@ -464,13 +551,20 @@ async def _run(interface: str) -> None:
     port = _available_port()
     with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryFile() as log:
         process = _start_server(interface, port, log.fileno(), directory)
+        owned: dict[int, psutil.Process] = {}
         try:
             async with asyncio.timeout(15):
                 while True:
                     _require(process.poll() is None, "Granian exited during startup")
+                    root = psutil.Process(process.pid)
+                    owned[root.pid] = root
+                    owned.update(
+                        (child.pid, child) for child in root.children(recursive=True)
+                    )
                     try:
                         reader, writer = await asyncio.open_connection(
-                            "127.0.0.1", port,
+                            "127.0.0.1",
+                            port,
                         )
                     except OSError:
                         await asyncio.sleep(0.05)
@@ -487,7 +581,8 @@ async def _run(interface: str) -> None:
             sys.stderr.write(log.read().decode("utf-8", errors="replace"))
             raise
         finally:
-            await asyncio.to_thread(_stop_server, process)
+            await asyncio.to_thread(_stop_server, process, owned)
+
 
 class TestGranianIntegration(TestCase):
     """Run the same native WebSocket and Hub checks through both server adapters."""

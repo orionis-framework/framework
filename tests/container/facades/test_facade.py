@@ -1,7 +1,10 @@
+# ruff: noqa: N815, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Facade doubles expose the application isBooted protocol attribute.
 from __future__ import annotations
 import inspect
+from unittest.mock import patch
 from orionis.container.facades.facade import Facade
-from orionis.foundation.application import Application
 from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
@@ -9,6 +12,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 
 _ACCESSOR = "dummy_service"
+
 
 class _DummyService:
     """Lightweight service used as a stand-in for facade tests."""
@@ -22,6 +26,7 @@ class _DummyService:
             Value produced by the helper.
         """
         return "hello"
+
 
 class _ConcreteFacade(Facade):
     """Facade subclass with a fixed accessor key."""
@@ -37,18 +42,21 @@ class _ConcreteFacade(Facade):
         """
         return _ACCESSOR
 
+
 class _NoAccessorFacade(Facade):
     """Facade subclass that deliberately omits getFacadeAccessor."""
+
 
 class _UnbootedApp:
     """Fake application that reports itself as not booted."""
 
-    isBooted: bool = False  # noqa: N815
+    isBooted: bool = False
+
 
 class _BootedApp:
     """Fake booted application whose make() always returns a _DummyService."""
 
-    isBooted: bool = True  # noqa: N815
+    isBooted: bool = True
 
     async def make(
         self,
@@ -74,10 +82,11 @@ class _BootedApp:
         """
         return _DummyService()
 
+
 class _CapturingApp:
     """Fake booted application that records the arguments passed to make()."""
 
-    isBooted: bool = True  # noqa: N815
+    isBooted: bool = True
     captured_key: object = None
     captured_args: tuple[object, ...] = ()
     captured_kwargs: dict[str, object] | None = None
@@ -109,6 +118,7 @@ class _CapturingApp:
         _CapturingApp.captured_kwargs = kwargs
         return _DummyService()
 
+
 class _FacadeStateTestCase(TestCase):
     """
     Base case installing the facade class state around each test.
@@ -120,34 +130,33 @@ class _FacadeStateTestCase(TestCase):
     application_double: type | None = None
 
     def setUp(self) -> None:
-        """Install the declared application double before each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
+        """Install isolated facade state and restore the previous class attributes."""
+        super().setUp()
+        self.enterContext(
+            patch.multiple(
+                _CapturingApp,
+                captured_key=None,
+                captured_args=(),
+                captured_kwargs=None,
+            ),
+        )
         double = self.application_double
-        _ConcreteFacade._application = None if double is None else double()
-        _ConcreteFacade._pinned_instance = None
+        self.enterContext(
+            patch.object(
+                _ConcreteFacade,
+                "_application",
+                None if double is None else double(),
+            ),
+        )
+        self.enterContext(patch.object(_ConcreteFacade, "_pinned_instance", None))
 
-    def tearDown(self) -> None:
-        """Clear the facade class state after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        _ConcreteFacade._application = None
-        _ConcreteFacade._pinned_instance = None
 
 # ===========================================================================
 # Class attributes
 # ===========================================================================
 
-class TestFacadeClassAttributes(_FacadeStateTestCase):
 
+class TestFacadeClassAttributes(_FacadeStateTestCase):
     def testFacadeExposesTheSharedStateAttributes(self) -> None:
         """
         Expose the pinned instance and application slots on the base class.
@@ -155,17 +164,18 @@ class TestFacadeClassAttributes(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsNone(Facade._pinned_instance)
         self.assertTrue(hasattr(Facade, "_application"))
 
+
 # ===========================================================================
-# getFacadeAccessor()
+# Accessor contract
 # ===========================================================================
+
 
 class TestFacadeGetFacadeAccessor(_FacadeStateTestCase):
-
     def testBaseClassRaisesNotImplementedErrorNamingTheClass(self) -> None:
         """
         Raise NotImplementedError naming the class that lacks an accessor.
@@ -173,7 +183,7 @@ class TestFacadeGetFacadeAccessor(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(NotImplementedError) as ctx:
             Facade.getFacadeAccessor()
@@ -186,7 +196,7 @@ class TestFacadeGetFacadeAccessor(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(NotImplementedError) as ctx:
             _NoAccessorFacade.getFacadeAccessor()
@@ -199,7 +209,7 @@ class TestFacadeGetFacadeAccessor(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(_ConcreteFacade.getFacadeAccessor(), _ACCESSOR)
 
@@ -210,18 +220,19 @@ class TestFacadeGetFacadeAccessor(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertFalse(
             inspect.iscoroutinefunction(Facade.getFacadeAccessor),
         )
 
+
 # ===========================================================================
 # resolve() - application not booted
 # ===========================================================================
 
-class TestFacadeResolveWithoutBoot(_FacadeStateTestCase):
 
+class TestFacadeResolveWithoutBoot(_FacadeStateTestCase):
     application_double = _UnbootedApp
 
     async def testResolveRaisesRuntimeErrorHintingAtBoot(self) -> None:
@@ -231,7 +242,7 @@ class TestFacadeResolveWithoutBoot(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(RuntimeError) as ctx:
             await _ConcreteFacade.resolve()
@@ -244,18 +255,19 @@ class TestFacadeResolveWithoutBoot(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(RuntimeError):
             await _ConcreteFacade.pin()
         self.assertIsNone(_ConcreteFacade._pinned_instance)
 
+
 # ===========================================================================
 # resolve() - booted application
 # ===========================================================================
 
-class TestFacadeResolveWithBootedApplication(_FacadeStateTestCase):
 
+class TestFacadeResolveWithBootedApplication(_FacadeStateTestCase):
     application_double = _BootedApp
 
     async def testResolveReturnsTheServiceInstance(self) -> None:
@@ -265,7 +277,7 @@ class TestFacadeResolveWithBootedApplication(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsInstance(await _ConcreteFacade.resolve(), _DummyService)
 
@@ -276,7 +288,7 @@ class TestFacadeResolveWithBootedApplication(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsNot(
             await _ConcreteFacade.resolve(),
@@ -290,7 +302,7 @@ class TestFacadeResolveWithBootedApplication(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         await _ConcreteFacade.pin()
         self.assertIsInstance(_ConcreteFacade._pinned_instance, _DummyService)
@@ -302,18 +314,19 @@ class TestFacadeResolveWithBootedApplication(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         await _ConcreteFacade.pin()
         _ConcreteFacade.unpin()
         self.assertIsNone(_ConcreteFacade._pinned_instance)
 
+
 # ===========================================================================
 # resolve() - argument forwarding
 # ===========================================================================
 
-class TestFacadeResolveArgumentForwarding(_FacadeStateTestCase):
 
+class TestFacadeResolveArgumentForwarding(_FacadeStateTestCase):
     application_double = _CapturingApp
 
     async def testForwardsAccessorKeyAndArgumentsToMake(self) -> None:
@@ -323,7 +336,7 @@ class TestFacadeResolveArgumentForwarding(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         await _ConcreteFacade.resolve("extra", flag=True)
 
@@ -331,27 +344,36 @@ class TestFacadeResolveArgumentForwarding(_FacadeStateTestCase):
         self.assertEqual(_CapturingApp.captured_args, ("extra",))
         self.assertEqual(_CapturingApp.captured_kwargs, {"flag": True})
 
+
 # ===========================================================================
 # resolve() - lazy application bootstrap
 # ===========================================================================
 
-class TestFacadeLazyApplication(_FacadeStateTestCase):
 
+class TestFacadeLazyApplication(_FacadeStateTestCase):
     async def testResolveInitialisesTheSharedApplicationLazily(self) -> None:
         """
         Build the shared application on the first resolve without a cache.
 
-        The accessor is unknown to the real container, so the resolution
-        itself fails; the assertion targets the lazily cached application.
+        The constructor returns a controlled unbooted application. Resolution
+        must cache that object and then raise the specific boot guard error.
 
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
-        with self.assertRaises((RuntimeError, ValueError)):
+        application = _UnbootedApp()
+        with (
+            patch(
+                "orionis.foundation.application.Application",
+                return_value=application,
+            ) as factory,
+            self.assertRaisesRegex(RuntimeError, "Application not booted"),
+        ):
             await _ConcreteFacade.resolve()
-        self.assertIsInstance(_ConcreteFacade._application, Application)
+        factory.assert_called_once_with()
+        self.assertIs(_ConcreteFacade._application, application)
 
     def testUnpinIsIdempotentWhenNothingIsPinned(self) -> None:
         """
@@ -360,7 +382,7 @@ class TestFacadeLazyApplication(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         _ConcreteFacade.unpin()
         self.assertIsNone(_ConcreteFacade._pinned_instance)

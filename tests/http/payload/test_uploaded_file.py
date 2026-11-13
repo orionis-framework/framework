@@ -1,8 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from contextlib import closing
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.test import TestCase
+
 
 class TestUploadedFileAppend(TestCase):
     """Preserve uploaded content when writes follow partial reads."""
@@ -17,15 +20,20 @@ class TestUploadedFileAppend(TestCase):
         """
         for threshold in (0, 1024, 6, 1):
             for chunk in (b"XYZ", bytearray(b"XYZ"), memoryview(b"XYZ")):
-                with closing(UploadedFile(
-                    "sample.txt", "text/plain", memory_threshold=threshold,
-                )) as upload:
+                with closing(
+                    UploadedFile(
+                        "sample.txt",
+                        "text/plain",
+                        memory_threshold=threshold,
+                    ),
+                ) as upload:
                     upload.write(b"abcdef")
                     self.assertEqual(upload.requiresDiskWrite(), threshold == 1)
                     with closing(upload.chunks(2)) as reader:
                         self.assertEqual(next(reader), b"ab")
                     self.assertEqual(
-                        upload.requiresDiskWrite(len(chunk)), threshold in (1, 6),
+                        upload.requiresDiskWrite(len(chunk)),
+                        threshold in (1, 6),
                     )
                     upload.write(chunk)
                     self.assertEqual(upload.read(), b"abcdefXYZ")
@@ -42,9 +50,16 @@ class TestUploadedFileAppend(TestCase):
             Assertions verify the behavior described above.
         """
         for threshold in (0, 1):
-            with TemporaryDirectory() as directory, closing(UploadedFile(
-                "sample.txt", "text/plain", memory_threshold=threshold,
-            )) as upload:
+            with (
+                TemporaryDirectory() as directory,
+                closing(
+                    UploadedFile(
+                        "sample.txt",
+                        "text/plain",
+                        memory_threshold=threshold,
+                    ),
+                ) as upload,
+            ):
                 upload.write(b"original content")
                 upload.replace(b"12345")
                 with closing(upload.chunks(1)) as reader:

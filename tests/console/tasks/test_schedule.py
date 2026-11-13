@@ -1,6 +1,12 @@
+# ruff: noqa: E731, FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
+import asyncio
+from datetime import UTC, datetime
 from typing import Self
 from unittest.mock import AsyncMock, MagicMock, patch
+from apscheduler.jobstores.memory import MemoryJobStore
 import orionis.console.tasks.schedule as schedule_module
 from orionis.console.contracts.schedule import ISchedule
 from orionis.console.enums.events import SchedulerEvent
@@ -9,7 +15,248 @@ from orionis.console.fluent.contracts.task import ITask
 from orionis.console.tasks.schedule import Schedule
 from orionis.test import TestCase
 
+
 class TestSchedule(TestCase):
+    async def testPartialStartupReleasesTheFailingNativeStore(self) -> None:
+        """
+        Release an owned store even when its native startup fails.
+
+        Returns
+        -------
+        None
+            Preserve the startup failure after closing initialized resources.
+        """
+        error = OSError("native store startup failed")
+        released = []
+
+        class FailingStore(MemoryJobStore):
+            """Record cleanup of a partially initialized memory store."""
+
+            def start(self, scheduler: object, alias: str) -> None:
+                """Raise after the native store receives its owner."""
+                super().start(scheduler, alias)
+                raise error
+
+            def shutdown(self) -> None:
+                """Release the initialized store once."""
+                released.append(self)
+                super().shutdown()
+
+        store = FailingStore()
+        schedule = self._make()
+        schedule._Schedule__stores.store = "database"
+        schedule._Schedule__stores.database.return_value = store
+        with (
+            patch.object(schedule, "_Schedule__suppressApschedulerLogging"),
+            self.assertRaises(OSError) as caught,
+        ):
+            await schedule.boot()
+        self.assertIs(caught.exception, error)
+        self.assertEqual(released, [store])
+        self.assertTrue(schedule.isStopped())
+        self.assertIsNone(schedule._Schedule__scheduler)
+
+    async def testWaitIncludesCancelledJobFinalizers(self) -> None:
+        """
+        Retain native job futures until their cancellation cleanup completes.
+
+        Returns
+        -------
+        None
+            Keep the shutdown waiter pending while the job releases its resources.
+        """
+        schedule = self._make()
+        started, cleaning, release, finished = (
+            asyncio.Event(),
+            asyncio.Event(),
+            asyncio.Event(),
+            asyncio.Event(),
+        )
+
+        async def job() -> None:
+            """Hold asynchronous cleanup after native cancellation."""
+            started.set()
+            try:
+                await asyncio.Event().wait()
+            finally:
+                cleaning.set()
+                await release.wait()
+                finished.set()
+
+        with patch.object(schedule, "_Schedule__suppressApschedulerLogging"):
+            await schedule.boot()
+            schedule._Schedule__scheduler.add_job(
+                job,
+                trigger="date",
+                run_date=datetime.now(UTC),
+                misfire_grace_time=30,
+            )
+            waiter = None
+            try:
+                await asyncio.wait_for(started.wait(), 1)
+                schedule.shutdown(wait=0)
+                waiter = asyncio.create_task(schedule.wait())
+                await asyncio.wait_for(cleaning.wait(), 1)
+                with self.assertRaises(TimeoutError):
+                    await asyncio.wait_for(asyncio.shield(waiter), 1)
+            finally:
+                release.set()
+                if waiter is None:
+                    schedule.shutdown(wait=0)
+                    await schedule.wait()
+                else:
+                    await waiter
+        self.assertTrue(finished.is_set())
+
+    async def testConcurrentAndRepeatedBootKeepsOneNativeScheduler(self) -> None:
+        """
+        Share startup without replacing an active native scheduler.
+
+        Returns
+        -------
+        None
+            Admit one scheduler even when command discovery yields.
+        """
+        schedule = self._make()
+        entered, release = asyncio.Event(), asyncio.Event()
+        instances = []
+
+        async def commands() -> list[dict]:
+            """Pause command discovery so another startup can overlap."""
+            entered.set()
+            await release.wait()
+            return []
+
+        schedule._Schedule__reactor.info = AsyncMock(side_effect=commands)
+        schedule.on(
+            SchedulerEvent.STARTED,
+            lambda _event: instances.append(schedule._Schedule__scheduler),
+        )
+        tasks = []
+        with patch.object(schedule, "_Schedule__suppressApschedulerLogging"):
+            try:
+                tasks.append(asyncio.create_task(schedule.boot()))
+                await asyncio.wait_for(entered.wait(), 1)
+                tasks.append(asyncio.create_task(schedule.boot()))
+                await asyncio.sleep(0)
+                release.set()
+                await asyncio.gather(*tasks)
+                await schedule.boot()
+                self.assertEqual(len(instances), 1)
+            finally:
+                release.set()
+                await asyncio.gather(*tasks, return_exceptions=True)
+                for instance in instances:
+                    if instance.running:
+                        instance.shutdown(wait=False)
+                await asyncio.sleep(0)
+
+    async def testWaitIncludesListenersAdmittedDuringShutdown(self) -> None:
+        """
+        Wait for shutdown callbacks admitted by the native scheduler.
+
+        Returns
+        -------
+        None
+            Keep the shutdown waiter pending until the callback finishes.
+        """
+        schedule = self._make()
+        entered, release, finished = (
+            asyncio.Event(),
+            asyncio.Event(),
+            asyncio.Event(),
+        )
+
+        async def on_shutdown(_event: object) -> None:
+            """Hold the native shutdown callback until explicitly released."""
+            entered.set()
+            await release.wait()
+            finished.set()
+
+        schedule.on(SchedulerEvent.SHUTDOWN, on_shutdown)
+        with patch.object(schedule, "_Schedule__suppressApschedulerLogging"):
+            await schedule.boot()
+            schedule.shutdown(wait=0)
+            waiter = asyncio.create_task(schedule.wait())
+            try:
+                await asyncio.wait_for(entered.wait(), 1)
+                with self.assertRaises(TimeoutError):
+                    await asyncio.wait_for(asyncio.shield(waiter), 1)
+            finally:
+                release.set()
+                await waiter
+                await asyncio.gather(
+                    *tuple(schedule._Schedule__pending_listener_tasks),
+                    return_exceptions=True,
+                )
+        self.assertTrue(finished.is_set())
+
+    async def testShutdownReportsTheStoppedState(self) -> None:
+        """
+        Reflect the actual memory scheduler lifecycle after shutdown.
+
+        Returns
+        -------
+        None
+            Report running only while the native scheduler remains started.
+        """
+        schedule = self._make()
+        observed = []
+        for event in (
+            SchedulerEvent.STARTED,
+            SchedulerEvent.PAUSED,
+            SchedulerEvent.RESUMED,
+            SchedulerEvent.SHUTDOWN,
+        ):
+            schedule.on(
+                event,
+                lambda notification: observed.append(
+                    (notification.code, schedule.state()),
+                ),
+            )
+        with patch.object(schedule, "_Schedule__suppressApschedulerLogging"):
+            await schedule.boot()
+            try:
+                self.assertTrue(schedule.isRunning())
+                schedule.pause()
+                schedule.resume()
+            finally:
+                schedule.shutdown(wait=0)
+                await schedule.wait()
+        self.assertTrue(schedule.isStopped())
+        self.assertFalse(schedule.isRunning())
+        self.assertEqual(
+            observed,
+            [
+                (SchedulerEvent.STARTED, ScheduleStates.RUNNING.value),
+                (SchedulerEvent.PAUSED, ScheduleStates.PAUSED.value),
+                (SchedulerEvent.RESUMED, ScheduleStates.RUNNING.value),
+                (SchedulerEvent.SHUTDOWN, ScheduleStates.STOPPED.value),
+            ],
+        )
+
+    async def testFailedStartDoesNotReportRunning(self) -> None:
+        """
+        Restore the stopped state when scheduler startup fails.
+
+        Returns
+        -------
+        None
+            Preserve the startup exception and avoid a false running state.
+        """
+        schedule = self._make()
+        error = RuntimeError("scheduler startup rejected")
+        with (
+            patch("orionis.console.tasks._backend.SchedulerBackend") as scheduler_type,
+            patch.object(schedule, "_Schedule__suppressApschedulerLogging"),
+        ):
+            scheduler_type.return_value.start.side_effect = error
+            scheduler_type.return_value.takePending.return_value = ()
+            with self.assertRaises(RuntimeError) as caught:
+                await schedule.boot()
+        self.assertIs(caught.exception, error)
+        self.assertTrue(schedule.isStopped())
+
     def testLegacyScheduledCallableRemainsImportable(self: Self) -> None:
         """
         Resolve jobs stored with the earlier callable path.
@@ -457,7 +704,7 @@ class TestSchedule(TestCase):
             Assertions verify the behavior described above.
         """
         schedule = self._make()
-        listener = lambda _: None  # noqa: E731
+        listener = lambda _: None
         schedule.on(SchedulerEvent.STARTED, listener)
         self.assertIn(SchedulerEvent.STARTED, schedule._Schedule__scheduler_listeners)
 
@@ -953,7 +1200,9 @@ class TestSchedule(TestCase):
         schedule = self._make()
 
         with patch.object(
-            schedule, "_Schedule__finishShutdown", new_callable=AsyncMock,
+            schedule,
+            "_Schedule__finishShutdown",
+            new_callable=AsyncMock,
         ):
             schedule.shutdown(None)
             await schedule.wait()
@@ -973,7 +1222,9 @@ class TestSchedule(TestCase):
         schedule = self._make()
 
         with patch.object(
-            schedule, "_Schedule__finishShutdown", new_callable=AsyncMock,
+            schedule,
+            "_Schedule__finishShutdown",
+            new_callable=AsyncMock,
         ):
             schedule.shutdown(5)
             await schedule.wait()

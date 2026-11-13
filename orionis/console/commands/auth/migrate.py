@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Create the framework authentication tables without removing data."""
 
 from orionis.auth.authorization.schema import build_authorization_tables
@@ -8,10 +10,9 @@ from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.exceptions import DatabaseException, QueryException
 from orionis.foundation.contracts.application import IApplication
 
+
 class AuthMigrateCommand(BaseCommand):
     """Create the framework authentication tables without removing data."""
-
-    # ruff: noqa: TC001
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

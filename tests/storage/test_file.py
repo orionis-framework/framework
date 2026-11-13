@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import hashlib
 import tempfile
@@ -20,6 +22,7 @@ from orionis.test import TestCase
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
+
 async def chunk_stream(chunks: tuple[bytes, ...]) -> AsyncIterator[bytes]:
     """
     Yield every chunk of *chunks* asynchronously.
@@ -37,8 +40,8 @@ async def chunk_stream(chunks: tuple[bytes, ...]) -> AsyncIterator[bytes]:
     for chunk in chunks:
         yield chunk
 
-class TestFilePath(TestCase):
 
+class TestFilePath(TestCase):
     def setUp(self) -> None:
         """Build a driver-backed file factory before each test.
 
@@ -47,7 +50,7 @@ class TestFilePath(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._driver = MemoryStorageDriver()
 
@@ -59,7 +62,7 @@ class TestFilePath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(File(self._driver, "a.txt"), IFile)
 
@@ -71,7 +74,7 @@ class TestFilePath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = File(self._driver, "\\docs//sub/../a.txt")
         self.assertEqual(file.path(), "docs/a.txt")
@@ -84,7 +87,7 @@ class TestFilePath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StoragePathException):
             File(self._driver, "/")
@@ -97,13 +100,13 @@ class TestFilePath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StoragePathException):
             File(self._driver, "../escape.txt")
 
-class TestFileContent(TestCase):
 
+class TestFileContent(TestCase):
     def setUp(self) -> None:
         """Build a disk over a fresh memory driver before each test.
 
@@ -112,7 +115,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
 
@@ -124,7 +127,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = self._disk.file("f.txt")
         self.assertIs(await file.write(b"data"), file)
@@ -138,7 +141,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.file("f.txt").write("año")
         self.assertEqual(await file.read(), "año".encode())
@@ -151,10 +154,11 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.file("f.txt").write(
-            b"data", Visibility.PUBLIC.value,
+            b"data",
+            Visibility.PUBLIC.value,
         )
         self.assertEqual(await file.visibility(), Visibility.PUBLIC.value)
 
@@ -166,7 +170,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._disk.file("missing.txt").read()
@@ -179,7 +183,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abcde")
         chunks = [chunk async for chunk in file.readStream(2)]
@@ -193,7 +197,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = self._disk.file("f.txt")
         written = await file.writeStream(chunk_stream((b"ab", b"cd")))
@@ -208,10 +212,11 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.file("f.txt").writeStream(
-            chunk_stream((b"ab",)), Visibility.PUBLIC.value,
+            chunk_stream((b"ab",)),
+            Visibility.PUBLIC.value,
         )
         self.assertEqual(await file.visibility(), Visibility.PUBLIC.value)
 
@@ -223,7 +228,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = self._disk.file("f.txt")
         stream = file.open("wb")
@@ -240,7 +245,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(UnsupportedStorageOperationException):
             self._disk.file("f.txt").open("r")
@@ -253,7 +258,7 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = self._disk.file("f.txt")
         self.assertFalse(await file.exists())
@@ -268,14 +273,14 @@ class TestFileContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"data")
         self.assertTrue(await file.delete())
         self.assertFalse(await file.delete())
 
-class TestFileRelocation(TestCase):
 
+class TestFileRelocation(TestCase):
     def setUp(self) -> None:
         """Build a disk over a fresh memory driver before each test.
 
@@ -284,7 +289,7 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
 
@@ -296,7 +301,7 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = await self._disk.put("one.txt", b"data")
         clone = await original.copyTo("sub//two.txt")
@@ -313,7 +318,7 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._disk.file("missing.txt").copyTo("two.txt")
@@ -326,10 +331,12 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = await self._disk.put("one.txt", b"data")
         moved = await original.moveTo("sub/two.txt")
+        self.assertIsNot(moved, original)
+        self.assertEqual(original.path(), "one.txt")
         self.assertEqual(moved.path(), "sub/two.txt")
         self.assertEqual(await moved.read(), b"data")
         self.assertFalse(await original.exists())
@@ -342,7 +349,7 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._disk.file("missing.txt").moveTo("two.txt")
@@ -355,7 +362,7 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = await self._disk.put("docs/old.txt", b"data")
         renamed = await original.rename("new.txt")
@@ -370,7 +377,7 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = await self._disk.put("old.txt", b"data")
         renamed = await original.rename("new.txt")
@@ -384,7 +391,7 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("docs/old.txt", b"data")
         with self.assertRaises(StoragePathException):
@@ -398,7 +405,7 @@ class TestFileRelocation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("docs/old.txt", b"data")
         with self.assertRaises(StoragePathException):
@@ -406,8 +413,8 @@ class TestFileRelocation(TestCase):
         with self.assertRaises(StoragePathException):
             await file.rename("sub\\new.txt")
 
-class TestFileMetadata(TestCase):
 
+class TestFileMetadata(TestCase):
     def setUp(self) -> None:
         """Build a public disk over a fresh memory driver.
 
@@ -416,7 +423,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._disk = Disk(
             name="fake",
@@ -431,7 +438,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abc")
         self.assertEqual(await file.size(), 3)
@@ -444,7 +451,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         known = await self._disk.put("f.txt", b"abc")
         self.assertEqual(await known.mimeType(), "text/plain")
@@ -459,7 +466,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abc")
         self.assertIsNotNone((await file.lastModified()).tzinfo)
@@ -472,7 +479,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("img/a b.png", b"x")
         self.assertEqual(await file.url(), "https://cdn.test/img/a%20b.png")
@@ -485,7 +492,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abc")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -499,7 +506,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abc")
         self.assertEqual(await file.visibility(), Visibility.PRIVATE.value)
@@ -512,7 +519,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abc")
         self.assertIs(await file.setVisibility(Visibility.PUBLIC.value), file)
@@ -526,7 +533,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abc")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -540,12 +547,13 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abc")
         self.assertEqual(await file.hash(), hashlib.sha256(b"abc").hexdigest())
         self.assertEqual(
-            await file.hash("sha1"), hashlib.sha1(b"abc").hexdigest(),
+            await file.hash("sha1"),
+            hashlib.sha1(b"abc", usedforsecurity=False).hexdigest(),
         )
 
     async def testHashRejectsUnknownAlgorithms(self) -> None:
@@ -556,7 +564,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("f.txt", b"abc")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -570,7 +578,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("docs/report.pdf", b"pdf")
         with tempfile.TemporaryDirectory() as tmp:
@@ -586,7 +594,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         file = await self._disk.put("docs/f.txt", b"abc")
         info = await file.info()
@@ -605,7 +613,7 @@ class TestFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         missing = self._disk.file("missing.txt")
         with self.assertRaises(StorageFileNotFoundException):

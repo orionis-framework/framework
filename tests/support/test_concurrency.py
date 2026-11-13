@@ -1,11 +1,15 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import contextvars
 import inspect
 import threading
 from typing import Self
 from orionis.container.container import Container
+from orionis.container.context.scope import reset_scope, set_current_scope
 from orionis.support.concurrency import BoundedExecutor, WorkQueueFullError, threaded
 from orionis.test import TestCase
+
 
 class TestBoundedExecution(TestCase):
     """Exercise actual worker admission, context, injection and cancellation."""
@@ -17,10 +21,16 @@ class TestBoundedExecution(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         context = contextvars.ContextVar("test-request", default="absent")
-        context.set("request-one")
+        self.addCleanup(context.reset, context.set("request-one"))
+        self.addCleanup(
+            reset_scope,
+            set_current_scope(None),
+        )
+        container = object.__new__(Container)
+        Container.__init__(container)
         caller = threading.get_ident()
 
         @threaded
@@ -44,14 +54,13 @@ class TestBoundedExecution(TestCase):
             str(inspect.signature(callback)),
             "(value: str = 'default') -> tuple",
         )
-        value, request, worker = await Container().invoke(callback, value="provided")
+        value, request, worker = await container.invoke(callback, value="provided")
         self.assertEqual((value, request), ("provided", "request-one"))
         self.assertNotEqual(caller, worker)
 
         class Dependency:
             pass
 
-        container = Container()
         container.singleton(Dependency, Dependency)
 
         @threaded
@@ -82,7 +91,7 @@ class TestBoundedExecution(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         pool = BoundedExecutor(1, max_pending=0)
         entered, released = threading.Event(), threading.Event()
@@ -101,17 +110,19 @@ class TestBoundedExecution(TestCase):
 
         task = asyncio.create_task(pool.run(work))
         try:
-            await asyncio.to_thread(entered.wait, 5)
+            self.assertTrue(await asyncio.to_thread(entered.wait, 5))
             task.cancel()
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0)
             self.assertFalse(task.done())
             with self.assertRaises(WorkQueueFullError):
                 await pool.run(lambda: None)
         finally:
             released.set()
-            with self.assertRaises(asyncio.CancelledError):
-                await task
-            await pool.aclose()
+            try:
+                with self.assertRaises(asyncio.CancelledError):
+                    await task
+            finally:
+                await pool.aclose()
         with self.assertRaisesRegex(RuntimeError, "closed"):
             await pool.run(lambda: None)
 
@@ -124,7 +135,7 @@ class TestBoundedExecution(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         pool = BoundedExecutor(1, max_pending=1)
         entered, released = threading.Event(), threading.Event()
@@ -144,7 +155,7 @@ class TestBoundedExecution(TestCase):
 
         running = asyncio.create_task(pool.run(work))
         try:
-            await asyncio.to_thread(entered.wait, 5)
+            self.assertTrue(await asyncio.to_thread(entered.wait, 5))
             queued = asyncio.create_task(pool.run(calls.append, "unexpected"))
             await asyncio.sleep(0)
             queued.cancel()
@@ -153,5 +164,7 @@ class TestBoundedExecution(TestCase):
             self.assertEqual(calls, [])
         finally:
             released.set()
-            await running
-            await pool.aclose()
+            try:
+                await running
+            finally:
+                await pool.aclose()

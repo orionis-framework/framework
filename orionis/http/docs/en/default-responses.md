@@ -13,10 +13,13 @@ Override the GET favicon, robots and sitemap routes by declaring their paths in 
 ```python
 from orionis.http.default.contracts.responses import IDefaultResponses
 
+
 async def unavailable(pages: IDefaultResponses):
     return await pages.error(
-        503, {"message": "Catalog temporarily unavailable"},
-        expects_json=True, headers={"Retry-After": "30"},
+        503,
+        {"message": "Catalog temporarily unavailable"},
+        expects_json=True,
+        headers={"Retry-After": "30"},
     )
 ```
 
@@ -35,6 +38,8 @@ Route.auth()
 ```
 
 Declare it once in web routes. Supply `login_controller`, `register_controller` or `forgot_password_controller` to replace individual controllers. Preserve methods expected by [the actual registration](../../routes/auth.py). Default registration/profile controllers depend on `app.models.user.User`, application views, hashing and mail; they are not a generic flow for every identity model. Check those contracts before enabling them. Read [account recovery](../../../auth/docs/en/account-recovery.md).
+
+Registration commits through the native transaction context before scheduling email. Cancellation and failed or vetoed persistence do not leave partial accounts committed. Ordinary backend failures reach the central reporter while the form receives a generic message; email verification never reports success after a persistence veto.
 
 ## Caches and file changes
 

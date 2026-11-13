@@ -1,7 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import MappingProxyType
 from typing import Self
 from orionis.support.structures.freezer import FreezeThaw
 from orionis.test import TestCase
+
 
 class TestFreezeThaw(TestCase):
     # ------------------------------------------------ freeze: dict
@@ -15,7 +18,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = {"a": 1, "b": 2}
         frozen = FreezeThaw.freeze(data)
@@ -30,7 +33,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = {"a": 1}
         frozen = FreezeThaw.freeze(data)
@@ -46,7 +49,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = {"x": 10, "y": "hello"}
         frozen = FreezeThaw.freeze(data)
@@ -56,19 +59,20 @@ class TestFreezeThaw(TestCase):
     def testFreezeNestedDictRecursively(self: Self) -> None:
         """Freeze nested dicts and preserve values.
 
-        Validates that inner dict values are preserved after
-        freezing even though inner containers may not be fully
-        converted due to processing order.
+        Preserve inner values while making every nested dictionary immutable.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = {"outer": {"inner": 1}}
         frozen = FreezeThaw.freeze(data)
         self.assertIsInstance(frozen, MappingProxyType)
         self.assertEqual(frozen["outer"]["inner"], 1)
+        self.assertIsInstance(frozen["outer"], MappingProxyType)
+        with self.assertRaises(TypeError):
+            frozen["outer"]["inner"] = 2
 
     # ------------------------------------------------ freeze: list
 
@@ -81,7 +85,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = [1, 2, 3]
         frozen = FreezeThaw.freeze(data)
@@ -96,7 +100,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = [1, "a", 3.14]
         frozen = FreezeThaw.freeze(data)
@@ -111,13 +115,12 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = [[1, 2], [3, 4]]
         frozen = FreezeThaw.freeze(data)
         self.assertIsInstance(frozen, tuple)
-        self.assertEqual(list(frozen[0]), [1, 2])
-        self.assertEqual(list(frozen[1]), [3, 4])
+        self.assertEqual(frozen, ((1, 2), (3, 4)))
 
     def testFreezeMixedStructure(self: Self) -> None:
         """Freeze a dict containing lists and nested dicts.
@@ -128,12 +131,13 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = {"items": [1, 2], "meta": {"key": "val"}}
         frozen = FreezeThaw.freeze(data)
         self.assertIsInstance(frozen, MappingProxyType)
-        self.assertEqual(list(frozen["items"]), [1, 2])
+        self.assertEqual(frozen["items"], (1, 2))
+        self.assertIsInstance(frozen["meta"], MappingProxyType)
         self.assertEqual(frozen["meta"]["key"], "val")
 
     # ------------------------------------------------ freeze: edge cases
@@ -147,7 +151,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(FreezeThaw.freeze(42), 42)
         self.assertEqual(FreezeThaw.freeze("text"), "text")
@@ -162,7 +166,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         frozen = FreezeThaw.freeze({})
         self.assertIsInstance(frozen, MappingProxyType)
@@ -176,7 +180,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         frozen = FreezeThaw.freeze([])
         self.assertIsInstance(frozen, tuple)
@@ -191,7 +195,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         proxy = MappingProxyType({"a": 1})
         frozen = FreezeThaw.freeze(proxy)
@@ -208,7 +212,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         proxy = MappingProxyType({"a": 1})
         thawed = FreezeThaw.thaw(proxy)
@@ -224,7 +228,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         proxy = MappingProxyType({"a": 1})
         thawed = FreezeThaw.thaw(proxy)
@@ -240,7 +244,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         proxy = MappingProxyType({"x": 10, "y": "hi"})
         thawed = FreezeThaw.thaw(proxy)
@@ -256,7 +260,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         inner = MappingProxyType({"k": "v"})
         outer = MappingProxyType({"nested": inner})
@@ -274,7 +278,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = (1, 2, 3)
         thawed = FreezeThaw.thaw(data)
@@ -289,7 +293,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = (1, "a", 3.14)
         thawed = FreezeThaw.thaw(data)
@@ -303,7 +307,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = ((1, 2), (3, 4))
         thawed = FreezeThaw.thaw(data)
@@ -320,7 +324,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         frozen = MappingProxyType(
             {
@@ -344,7 +348,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(FreezeThaw.thaw(42), 42)
         self.assertEqual(FreezeThaw.thaw("text"), "text")
@@ -359,7 +363,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         proxy = MappingProxyType({})
         thawed = FreezeThaw.thaw(proxy)
@@ -374,7 +378,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         thawed = FreezeThaw.thaw(())
         self.assertIsInstance(thawed, list)
@@ -391,7 +395,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = {"a": 1, "b": [2, 3], "c": {"d": 4}}
         frozen = FreezeThaw.freeze(original)
@@ -407,7 +411,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = [1, [2, 3], {"a": 4}]
         frozen = FreezeThaw.freeze(original)
@@ -423,7 +427,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = {"items": [1, 2]}
         frozen = FreezeThaw.freeze(original)
@@ -444,7 +448,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = {"a": 1}
         thawed = FreezeThaw.thaw(data)
@@ -460,7 +464,7 @@ class TestFreezeThaw(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = [1, 2, 3]
         thawed = FreezeThaw.thaw(data)

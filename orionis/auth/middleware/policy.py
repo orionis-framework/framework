@@ -1,6 +1,8 @@
+# ruff: noqa: ARG002, TC001
+# Preserve the middleware request parameter and runtime injection types.
 """Gate a route behind a policy ability declared on a resource class."""
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.contracts.authorizer import IAuthorizer
 from orionis.auth.exceptions import (
@@ -10,10 +12,10 @@ from orionis.auth.exceptions import (
 )
 from orionis.http.middleware import BaseMiddleware
 
-if TYPE_CHECKING:
-    from orionis.http.layer.contracts.middleware import NextCallable
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
+from orionis.http.layer.contracts.middleware import NextCallable
+from orionis.http.request import Request
+from orionis.http.responses import Response
+
 
 class RequirePolicyMiddleware(BaseMiddleware):
     """
@@ -32,8 +34,6 @@ class RequirePolicyMiddleware(BaseMiddleware):
 
         await Auth.authorizeResource("update", post)
     """
-
-    # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_authorizer",)
     """Declare the instance attribute slots reserved by this class."""
@@ -58,14 +58,14 @@ class RequirePolicyMiddleware(BaseMiddleware):
         Returns
         -------
         None
-            The middleware keeps no per request state.
+            No return value.
         """
         self._authorizer = authorizer
         """Component resolving and running the policy."""
 
     async def handle(
         self,
-        request: Request,  # noqa: ARG002
+        request: Request,
         call_next: NextCallable,
     ) -> Response:
         """

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import threading
 from orionis.support.patterns.final.meta import Final
@@ -6,6 +8,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 # Fixture helpers
 # ---------------------------------------------------------------------------
+
 
 class _BaseFinal(metaclass=Final):
     """Minimal class marked as final."""
@@ -20,15 +23,17 @@ class _BaseFinal(metaclass=Final):
         """
         return 42
 
+
 class _UnrelatedBase:
     """Non-final class used for valid inheritance checks."""
+
 
 # ---------------------------------------------------------------------------
 # Test class
 # ---------------------------------------------------------------------------
 
-class TestFinalMeta(TestCase):
 
+class TestFinalMeta(TestCase):
     # ------------------------------------------------ creation
 
     def testFinalClassCanBeCreated(self) -> None:
@@ -40,7 +45,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(type(_BaseFinal), Final))
 
@@ -53,7 +58,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(_BaseFinal.__dict__.get("__is_final__", False))
 
@@ -66,7 +71,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         obj = _BaseFinal()
         self.assertEqual(obj.value(), 42)
@@ -82,9 +87,10 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
+
             class _Child(_BaseFinal):
                 pass
 
@@ -97,7 +103,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -105,6 +111,7 @@ class TestFinalMeta(TestCase):
             Raised by this helper to exercise the failure path.
         """
         try:
+
             class _Child(_BaseFinal):
                 pass
         except TypeError as exc:
@@ -122,7 +129,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Child(_UnrelatedBase):
@@ -140,7 +147,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _NonFinal(_UnrelatedBase):
@@ -148,6 +155,7 @@ class TestFinalMeta(TestCase):
 
         # Directly from the final class — must still be blocked
         with self.assertRaises(TypeError):
+
             class _GrandChild(_BaseFinal, _NonFinal):
                 pass
 
@@ -162,7 +170,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _FinalA(metaclass=Final):
@@ -183,7 +191,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Config(metaclass=Final):
@@ -213,7 +221,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(type(_BaseFinal), Final)
 
@@ -226,7 +234,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         obj = _BaseFinal()
         self.assertIsInstance(obj, _BaseFinal)
@@ -240,7 +248,7 @@ class TestFinalMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         errors: list[Exception] = []
         results: list[bool] = []
@@ -251,7 +259,7 @@ class TestFinalMeta(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             try:
                 type("_Dynamic", (_BaseFinal,), {})

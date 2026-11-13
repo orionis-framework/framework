@@ -34,19 +34,46 @@ __all__ = [
     "ResolveTokenIdentityMiddleware",
 ]
 
+_AUTHENTICATE_MODULE = "orionis.auth.middleware.authenticate"
+"""Module defining authentication-required middleware variants."""
+_RESOLVE_MODULE = "orionis.auth.middleware.resolve_identity"
+"""Module defining optional identity-resolution middleware variants."""
+
 _EXPORTS = {
-    "AuthenticateMiddleware": ("orionis.auth.middleware.authenticate", "AuthenticateMiddleware"),
-    "AuthenticateSessionMiddleware": ("orionis.auth.middleware.authenticate", "AuthenticateSessionMiddleware"),
-    "AuthenticateTokenMiddleware": ("orionis.auth.middleware.authenticate", "AuthenticateTokenMiddleware"),
+    "AuthenticateMiddleware": (_AUTHENTICATE_MODULE, "AuthenticateMiddleware"),
+    "AuthenticateSessionMiddleware": (
+        _AUTHENTICATE_MODULE,
+        "AuthenticateSessionMiddleware",
+    ),
+    "AuthenticateTokenMiddleware": (
+        _AUTHENTICATE_MODULE,
+        "AuthenticateTokenMiddleware",
+    ),
     "GuestMiddleware": ("orionis.auth.middleware.guest", "GuestMiddleware"),
-    "RequirePermissionMiddleware": ("orionis.auth.middleware.authorize", "RequirePermissionMiddleware"),
-    "RequirePolicyMiddleware": ("orionis.auth.middleware.policy", "RequirePolicyMiddleware"),
-    "RequireRoleMiddleware": ("orionis.auth.middleware.authorize", "RequireRoleMiddleware"),
-    "ResolveIdentityMiddleware": ("orionis.auth.middleware.resolve_identity", "ResolveIdentityMiddleware"),
-    "ResolveSessionIdentityMiddleware": ("orionis.auth.middleware.resolve_identity", "ResolveSessionIdentityMiddleware"),
-    "ResolveTokenIdentityMiddleware": ("orionis.auth.middleware.resolve_identity", "ResolveTokenIdentityMiddleware"),
+    "RequirePermissionMiddleware": (
+        "orionis.auth.middleware.authorize",
+        "RequirePermissionMiddleware",
+    ),
+    "RequirePolicyMiddleware": (
+        "orionis.auth.middleware.policy",
+        "RequirePolicyMiddleware",
+    ),
+    "RequireRoleMiddleware": (
+        "orionis.auth.middleware.authorize",
+        "RequireRoleMiddleware",
+    ),
+    "ResolveIdentityMiddleware": (_RESOLVE_MODULE, "ResolveIdentityMiddleware"),
+    "ResolveSessionIdentityMiddleware": (
+        _RESOLVE_MODULE,
+        "ResolveSessionIdentityMiddleware",
+    ),
+    "ResolveTokenIdentityMiddleware": (
+        _RESOLVE_MODULE,
+        "ResolveTokenIdentityMiddleware",
+    ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -68,6 +95,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

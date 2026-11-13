@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeHttpSchemaRule(MakeStubCommand):
     """Generate a custom HTTP validation rule class."""
 
@@ -19,4 +20,3 @@ class MakeHttpSchemaRule(MakeStubCommand):
     """Success label identifier: ``HTTP schema rule``."""
     postfix: str | None = "Rule"
     """Postfix identifier: ``Rule``."""
-

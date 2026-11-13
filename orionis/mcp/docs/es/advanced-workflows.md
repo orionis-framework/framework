@@ -7,6 +7,7 @@ Estas capacidades permiten flujos más largos que una llamada simple, manteniend
 ```python
 from orionis.mcp import McpResponse, Tool
 
+
 class ReportTool(Tool):
     async def handle(self):
         yield McpResponse.progress(0, total=2, message="Starting")
@@ -23,18 +24,25 @@ Un handler puede devolver `InputRequiredResult(inputRequests=..., requestState=.
 ```python
 from orionis.mcp import InputRequiredResult, McpRequest, McpResponse, Tool
 
+
 class ConfirmTool(Tool):
     async def handle(self, request: McpRequest):
         if request.input_responses:
             return McpResponse.text("Response received; validate before acting")
-        return InputRequiredResult(inputRequests={
-            "choice": {"method": "elicitation/create", "params": {
-                "message": "Choose a label",
-                "requestedSchema": {"type": "object", "properties": {
-                    "label": {"type": "string"}
-                }},
-            }},
-        })
+        return InputRequiredResult(
+            inputRequests={
+                "choice": {
+                    "method": "elicitation/create",
+                    "params": {
+                        "message": "Choose a label",
+                        "requestedSchema": {
+                            "type": "object",
+                            "properties": {"label": {"type": "string"}},
+                        },
+                    },
+                },
+            }
+        )
 ```
 
 El ejemplo demuestra estructura, no ejecuta una acción al recibir cualquier respuesta. Antes de actuar comprueba clave, acción y contenido validados; una respuesta decline/cancel no es aceptación. Las formas de elicitation admiten un objeto plano de campos primitivos, no un schema arbitrario anidado. Anuncia capacidades compatibles en `_meta` del cliente; una petición que no las declare falla antes de pedir datos.
@@ -44,6 +52,8 @@ Para estado confiable utiliza `McpState.seal(request, value, ttl=300)` y `open(r
 ## Suscribirse a cambios
 
 Declara `Server.list_changed=True` para cambios de catálogos y `resource_subscriptions=True` para recursos. El cliente abre `subscriptions/listen` con un filtro `notifications` que contiene `toolsListChanged`, `promptsListChanged`, `resourcesListChanged` o `resourceSubscriptions`. Acceso a cada URI se verifica al admitir la suscripción y durante el flujo según dispatcher.
+
+Cada actualización de recurso vuelve a comprobar disponibilidad y autorización antes de entregarse. Las actualizaciones denegadas por la política actual se omiten sin cerrar otros filtros aceptados; las siguientes pueden entregarse si se restablece el acceso.
 
 Después de modificar el catálogo llama `await Mcp.toolsChanged(ServerClass)`, `promptsChanged`, `resourcesChanged` o `resourceUpdated(ServerClass, uri)`. La clase debe estar registrada en ese manager. Las notificaciones pertenecen a listeners de ese servidor. El bus predeterminado es local al proceso, con buffers y cantidad de subscripciones acotados; no ofrece entrega entre workers ni replay. Cierra streams y listeners en desconexión/shutdown.
 

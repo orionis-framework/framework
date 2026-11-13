@@ -50,6 +50,7 @@ from orionis.schemas.rules.uuid_string import Uuid
 # Numeric constraints
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True, slots=True)
 class GreaterThan(ConstraintMetadata):
     """
@@ -65,6 +66,7 @@ class GreaterThan(ConstraintMetadata):
 
     value: int | float
     message: str | None = field(default=None, kw_only=True)
+
 
 @dataclass(frozen=True, slots=True)
 class GreaterThanOrEqual(ConstraintMetadata):
@@ -82,6 +84,7 @@ class GreaterThanOrEqual(ConstraintMetadata):
     value: int | float
     message: str | None = field(default=None, kw_only=True)
 
+
 @dataclass(frozen=True, slots=True)
 class LessThan(ConstraintMetadata):
     """
@@ -97,6 +100,7 @@ class LessThan(ConstraintMetadata):
 
     value: int | float
     message: str | None = field(default=None, kw_only=True)
+
 
 @dataclass(frozen=True, slots=True)
 class LessThanOrEqual(ConstraintMetadata):
@@ -114,6 +118,7 @@ class LessThanOrEqual(ConstraintMetadata):
     value: int | float
     message: str | None = field(default=None, kw_only=True)
 
+
 @dataclass(frozen=True, slots=True)
 class MultipleOf(ConstraintMetadata):
     """
@@ -130,9 +135,11 @@ class MultipleOf(ConstraintMetadata):
     value: int | float
     message: str | None = field(default=None, kw_only=True)
 
+
 # ---------------------------------------------------------------------------
 # String / collection constraints
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True, slots=True)
 class Pattern(ConstraintMetadata):
@@ -142,13 +149,14 @@ class Pattern(ConstraintMetadata):
     Attributes
     ----------
     regex : str
-        A regular expression that the field value must fully match.
+        An unanchored regular expression searched within the field value.
     message : str | None
         Custom error message reported when this constraint fails.
     """
 
     regex: str
     message: str | None = field(default=None, kw_only=True)
+
 
 @dataclass(frozen=True, slots=True)
 class MinLength(ConstraintMetadata):
@@ -166,6 +174,7 @@ class MinLength(ConstraintMetadata):
     value: int
     message: str | None = field(default=None, kw_only=True)
 
+
 @dataclass(frozen=True, slots=True)
 class MaxLength(ConstraintMetadata):
     """
@@ -182,9 +191,11 @@ class MaxLength(ConstraintMetadata):
     value: int
     message: str | None = field(default=None, kw_only=True)
 
+
 # ---------------------------------------------------------------------------
 # Temporal constraints
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True, slots=True)
 class TimezoneAware(ConstraintMetadata):
@@ -201,6 +212,7 @@ class TimezoneAware(ConstraintMetadata):
 
     message: str | None = field(default=None, kw_only=True)
 
+
 @dataclass(frozen=True, slots=True)
 class TimezoneNaive(ConstraintMetadata):
     """
@@ -215,6 +227,7 @@ class TimezoneNaive(ConstraintMetadata):
     """
 
     message: str | None = field(default=None, kw_only=True)
+
 
 # ---------------------------------------------------------------------------
 # Public API

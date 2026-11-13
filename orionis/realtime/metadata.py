@@ -10,7 +10,14 @@ from enum import Enum
 from functools import lru_cache
 from types import FunctionType, MappingProxyType, UnionType
 from typing import (
-    Annotated, Any, Literal, Union, cast, get_args, get_origin, get_type_hints,
+    Annotated,
+    Any,
+    Literal,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+    get_type_hints,
 )
 from uuid import UUID
 import msgspec
@@ -19,9 +26,13 @@ from orionis.introspection.callables.reflection import ReflectionCallable
 from orionis.realtime.decorators import REMOTE_ATTRIBUTE, validate_remote_name
 from orionis.realtime.errors import RPCError
 from orionis.realtime.hub import Hub
+from orionis.schemas.coercion import _coerce_value, _requires_preparation
 from orionis.schemas.exceptions.validation import ValidationException
-from orionis.schemas.rules_executor import _build_plan, _collect_with_plan
-from orionis.schemas.schema import Schema as OrionisSchema
+from orionis.schemas.rules_executor import (
+    _SchemaPlan,
+    _schema_plans,
+    _validate_schemas,
+)
 
 _EMPTY = inspect.Parameter.empty
 _INVALID_ARGUMENTS = "invalid_arguments"
@@ -30,13 +41,28 @@ _VALIDATION_ERROR = "validation_error"
 """Protocol error code returned when invocation arguments fail validation."""
 _ARGUMENTS_MESSAGE = "Invalid arguments"
 """Error text for arguments message: ``Invalid arguments``."""
-_SCALARS = frozenset({
-    str, int, float, bool, bytes, object, type(None), datetime, date, time,
-    timedelta, Decimal, UUID, Any,
-})
+_SCALARS = frozenset(
+    {
+        str,
+        int,
+        float,
+        bool,
+        bytes,
+        object,
+        type(None),
+        datetime,
+        date,
+        time,
+        timedelta,
+        Decimal,
+        UUID,
+        Any,
+    },
+)
 """Scalars used by ``metadata``."""
 _COLLECTIONS = frozenset({list, tuple, dict, set, frozenset, Sequence, Mapping})
 """Collections used by ``metadata``."""
+
 
 def _base_annotation(annotation: object) -> object:
     """
@@ -55,6 +81,7 @@ def _base_annotation(annotation: object) -> object:
     while get_origin(annotation) is Annotated:
         annotation = get_args(annotation)[0]
     return annotation
+
 
 def _is_data(annotation: object) -> bool:
     """
@@ -78,9 +105,15 @@ def _is_data(annotation: object) -> bool:
         return True
     if origin in _COLLECTIONS:
         return all(item is Ellipsis or _is_data(item) for item in get_args(annotation))
-    return annotation in _SCALARS or annotation in _COLLECTIONS or (
-        isinstance(annotation, type) and issubclass(annotation, (msgspec.Struct, Enum))
+    return (
+        annotation in _SCALARS
+        or annotation in _COLLECTIONS
+        or (
+            isinstance(annotation, type)
+            and issubclass(annotation, (msgspec.Struct, Enum))
+        )
     )
+
 
 def _dependency_type(annotation: object) -> type | None:
     """
@@ -108,112 +141,6 @@ def _dependency_type(annotation: object) -> type | None:
         return annotation
     return None
 
-@dataclass(frozen=True, slots=True)
-class _SchemaPlan:
-    """Retain trusted field names and existing rule metadata for one Struct."""
-
-    fields: tuple[str, ...]
-    """Fields included in the compiled schema plan."""
-    rules: tuple
-    """Validation rules applied by the compiled schema plan."""
-
-def _schema_plans(annotation: object) -> Mapping[type, _SchemaPlan]: # NOSONAR
-    """
-    Compile schema traversal and local rules through nested data structures.
-
-    Parameters
-    ----------
-    annotation : object
-        Accepted client annotation, possibly optional or Annotated.
-
-    Returns
-    -------
-    collections.abc.Mapping[type, orionis.realtime.metadata._SchemaPlan]
-        Immutable traversal metadata, including recursive Struct references.
-    """
-    plans: dict[type, _SchemaPlan] = {}
-
-    def visit(hint: object) -> None:
-        """
-        Visit each trusted Struct annotation at most once.
-
-        Parameters
-        ----------
-        hint : object
-            Field or parameter annotation originating in application code.
-
-        Returns
-        -------
-        None
-            Add complete field traversal and rule metadata to the local map.
-        """
-        hint = _base_annotation(hint)
-        if get_origin(hint) in {Union, UnionType} | _COLLECTIONS:
-            for item in get_args(hint):
-                visit(item)
-        elif isinstance(hint, type) and issubclass(hint, msgspec.Struct):
-            if hint in plans:
-                return
-            # Publish before following fields so recursive schemas terminate.
-            plans[hint] = _SchemaPlan((), ())
-            fields = msgspec.structs.fields(hint)
-            for field in fields:
-                visit(field.type)
-            rules = ()
-            if issubclass(hint, OrionisSchema):
-                # Traverse nested values ourselves, including collections and
-                # plain Struct wrappers, while running each framework rule once.
-                rules = tuple(
-                    (name, prefix, getter, validators, False)
-                    for name, prefix, getter, validators, _nested in _build_plan(hint)
-                    if validators
-                )
-            plans[hint] = _SchemaPlan(tuple(field.name for field in fields), rules)
-
-    visit(annotation)
-    return MappingProxyType(plans)
-
-async def _validate_schemas( # NOSONAR
-    value: object,
-    plans: Mapping[type, _SchemaPlan],
-) -> None:
-    """
-    Await existing schema rules across an already converted RPC data value.
-
-    Parameters
-    ----------
-    value : object
-        Converted schema or collection with a compiled schema-containing type.
-    plans : collections.abc.Mapping[type, orionis.realtime.metadata._SchemaPlan]
-        Trusted field and rule metadata compiled during Hub registration.
-
-    Returns
-    -------
-    None
-        Execute validation without re-inspecting callable metadata.
-
-    Raises
-    ------
-    orionis.schemas.exceptions.ValidationException
-        If a contained schema violates a framework rule.
-    """
-    if isinstance(value, msgspec.Struct):
-        plan = plans.get(type(value))
-        if plan is not None:
-            if plan.rules:
-                failures = []
-                await _collect_with_plan(plan.rules, value, "", failures)
-                if failures:
-                    raise ValidationException(failures)
-            for name in plan.fields:
-                await _validate_schemas(getattr(value, name), plans)
-    elif isinstance(value, (list, tuple, set, frozenset)):
-        for item in value:
-            await _validate_schemas(item, plans)
-    elif isinstance(value, dict):
-        for key, item in value.items():
-            await _validate_schemas(key, plans)
-            await _validate_schemas(item, plans)
 
 @dataclass(frozen=True, slots=True)
 class _ClientParameter:
@@ -229,6 +156,8 @@ class _ClientParameter:
     """Whether the client argument must be passed by keyword."""
     schema_plans: Mapping[type, _SchemaPlan]
     """Compiled schema-validation plans for the argument."""
+    requires_preparation: bool
+    """Whether marked coercion or existing-Struct expansion is required."""
 
     async def convert(self, value: object) -> object:
         """
@@ -250,12 +179,15 @@ class _ClientParameter:
             If type constraints or schema rules reject the value.
         """
         try:
+            if self.requires_preparation:
+                value = _coerce_value(value, self.annotation, enabled=False)
             converted = msgspec.convert(value, type=cast("type", self.annotation))
             if self.schema_plans:
                 await _validate_schemas(converted, self.schema_plans)
             return converted
         except (msgspec.ValidationError, ValidationException, TypeError) as exc:
             raise RPCError(_VALIDATION_ERROR, _ARGUMENTS_MESSAGE) from exc
+
 
 @dataclass(frozen=True, slots=True)
 class RemoteMethod:
@@ -275,7 +207,9 @@ class RemoteMethod:
     """Names of arguments the client is permitted to supply."""
 
     async def bind(
-        self, args: list[object], kwargs: dict[str, object],
+        self,
+        args: list[object],
+        kwargs: dict[str, object],
     ) -> dict[str, object]:
         """
         Bind and validate client-owned parameters, providing declared defaults.
@@ -298,7 +232,8 @@ class RemoteMethod:
             If an argument is missing, duplicated, unknown or invalid.
         """
         if (
-            not isinstance(args, list) or not isinstance(kwargs, dict)
+            not isinstance(args, list)
+            or not isinstance(kwargs, dict)
             or len(args) > len(self.positional)
             or kwargs.keys() - self.client_names
         ):
@@ -317,6 +252,7 @@ class RemoteMethod:
                 raise RPCError(_INVALID_ARGUMENTS, _ARGUMENTS_MESSAGE)
             result[parameter.name] = await parameter.convert(value)
         return result
+
 
 def _method_plan(hub: type[Hub], name: str, function: FunctionType) -> RemoteMethod:
     """
@@ -347,7 +283,7 @@ def _method_plan(hub: type[Hub], name: str, function: FunctionType) -> RemoteMet
     try:
         hints = get_type_hints(function, localns=namespace, include_extras=True)
     except (AttributeError, NameError, SyntaxError, TypeError) as exc:
-        message = (
+        message = (  # NOSONAR(S1110) - Preserve multiline grouping.
             f"Remote annotations must resolve at registration: {hub.__name__}.{name}"
         )
         raise TypeError(message) from exc
@@ -359,7 +295,8 @@ def _method_plan(hub: type[Hub], name: str, function: FunctionType) -> RemoteMet
     dependencies = {}
     for parameter in parameters[1:]:
         if parameter.kind in {
-            inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.VAR_POSITIONAL,
+            inspect.Parameter.POSITIONAL_ONLY,
+            inspect.Parameter.VAR_POSITIONAL,
             inspect.Parameter.VAR_KEYWORD,
         }:
             message = "Remote methods reject positional-only or variadic parameters"
@@ -371,11 +308,16 @@ def _method_plan(hub: type[Hub], name: str, function: FunctionType) -> RemoteMet
         if _is_data(annotation):
             # Validate msgspec support at registration rather than per invocation.
             msgspec.json.Decoder(type=cast("type", annotation))
-            clients.append(_ClientParameter(
-                parameter.name, annotation, parameter.default,
-                parameter.kind is inspect.Parameter.KEYWORD_ONLY,
-                _schema_plans(annotation),
-            ))
+            clients.append(
+                _ClientParameter(
+                    parameter.name,
+                    annotation,
+                    parameter.default,
+                    parameter.kind is inspect.Parameter.KEYWORD_ONLY,
+                    _schema_plans(annotation),
+                    _requires_preparation(annotation),
+                ),
+            )
         elif (dependency := _dependency_type(annotation)) is not None:
             dependencies[parameter.name] = dependency
         else:
@@ -385,7 +327,8 @@ def _method_plan(hub: type[Hub], name: str, function: FunctionType) -> RemoteMet
     return_annotation = hints.get("return")
     origin = get_origin(return_annotation) or return_annotation
     stream = inspect.isasyncgenfunction(function) or origin in {
-        AsyncIterable, AsyncIterator,
+        AsyncIterable,
+        AsyncIterator,
     }
     return RemoteMethod(
         method_name=name,
@@ -397,6 +340,7 @@ def _method_plan(hub: type[Hub], name: str, function: FunctionType) -> RemoteMet
         ),
         client_names=frozenset(parameter.name for parameter in clients),
     )
+
 
 @lru_cache(maxsize=1024)
 def compile_hub(hub: type[Hub]) -> Mapping[str, RemoteMethod]:
@@ -430,7 +374,8 @@ def compile_hub(hub: type[Hub]) -> Mapping[str, RemoteMethod]:
     for name, descriptor in members.items():
         candidate = (
             descriptor.__func__
-            if isinstance(descriptor, (classmethod, staticmethod)) else descriptor
+            if isinstance(descriptor, (classmethod, staticmethod))
+            else descriptor
         )
         alias = getattr(candidate, REMOTE_ATTRIBUTE, None)
         if alias is None:

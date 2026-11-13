@@ -1,12 +1,51 @@
+# ruff: noqa: SLF001
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Parse and expose HTTP headers with case-insensitive lookup."""
 
 from typing import TYPE_CHECKING, Self
+import re
 from orionis.support.patterns.final.meta import Final
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from typing import Self
     from granian.rsgi import Headers as RSGIHeaders
+
+_HEADER_NAME = re.compile(r"[!#$%&'*+.^_`|~0-9A-Za-z-]+\Z")
+"""HTTP field-name token, excluding separators and non-ASCII characters."""
+_HEADER_CONTROLS = re.compile(r"[\x00-\x08\x0a-\x1f\x7f]")
+"""Field-value controls other than the permitted horizontal tab."""
+
+
+def _validate_header(name: str, value: str) -> None:
+    """Reject malformed outgoing field names and values before transport emission.
+
+    Parameters
+    ----------
+    name : str
+        Header field name.
+    value : str
+        Header field value, allowing horizontal tabs and Latin-1 text.
+
+    Returns
+    -------
+    None
+        No return value.
+
+    Raises
+    ------
+    TypeError
+        If the name or value is not a string.
+    ValueError
+        If the name is not an HTTP token or the value contains unsafe controls.
+    """
+    if not isinstance(name, str) or not isinstance(value, str):
+        error_msg = "HTTP header names and values must be strings"
+        raise TypeError(error_msg)
+    if _HEADER_NAME.fullmatch(name) is None or _HEADER_CONTROLS.search(value):
+        error_msg = "Invalid HTTP response header"
+        raise ValueError(error_msg)
+
 
 class Headers(metaclass=Final):
     """Parse and expose HTTP headers with case-insensitive lookup."""
@@ -94,9 +133,9 @@ class Headers(metaclass=Final):
             else:
                 index[key] = [bucket, *values]
         instance = cls.__new__(cls)
-        instance._items = items  # noqa: SLF001
-        instance._index = index  # noqa: SLF001
-        instance._has_invalid_format = invalid  # noqa: SLF001
+        instance._items = items
+        instance._index = index
+        instance._has_invalid_format = invalid
         return instance
 
     def hasInvalidFormat(self: Self) -> bool:

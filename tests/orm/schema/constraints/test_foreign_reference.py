@@ -1,6 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema foreign reference behavior."""
+
 from dataclasses import FrozenInstanceError
 from orionis.orm.schema.constraints.foreign_reference import ForeignReference
 from orionis.test import TestCase
+
 
 class TestForeignReference(TestCase):
     """Verify parsing and the immutable foreign-key reference contract."""
@@ -11,7 +16,7 @@ class TestForeignReference(TestCase):
         Returns
         -------
         None
-            Verify parsed fields, equality, and the qualified representation.
+            No return value.
         """
         reference = ForeignReference.parse("companies.company_id")
         self.assertEqual(reference.table, "companies")
@@ -25,7 +30,7 @@ class TestForeignReference(TestCase):
         Returns
         -------
         None
-            Verify malformed and non-string inputs raise ValueError.
+            No return value.
         """
         for value in ("", "companies", ".id", "companies.", "a.b.c", None, 7):
             with self.assertRaises(ValueError):
@@ -37,7 +42,7 @@ class TestForeignReference(TestCase):
         Returns
         -------
         None
-            Verify equivalent references share hashing and reject mutation.
+            No return value.
         """
         reference = ForeignReference("companies", "id")
         self.assertEqual(

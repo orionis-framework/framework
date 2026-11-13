@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from dataclasses import dataclass, field
 from types import SimpleNamespace
@@ -16,6 +18,7 @@ from orionis.mcp.transport import http as module
 from orionis.mcp.transport.headers import compile_header_bindings
 from orionis.mcp.transport.http import McpHttpTransport
 from orionis.test import TestCase
+
 
 class _Input:
     """Expose native ASGI body consumption and an independently signaled disconnect."""
@@ -52,6 +55,7 @@ class _Input:
             return {"type": "http.request", "body": self.body, "more_body": False}
         await self.disconnect.wait()
         return {"type": "http.disconnect"}
+
 
 class _Messages:
     """Own an iterator whose close is observable even without iteration."""
@@ -111,6 +115,7 @@ class _Messages:
         """
         self.closed += 1
 
+
 @dataclass(slots=True)
 class _State:
     """Drive deterministic dispatch results while preserving real transport objects."""
@@ -119,6 +124,7 @@ class _State:
         default_factory=lambda: DispatchResult(b'{"ok":true}'),
     )
     calls: int = 0
+
 
 class _Dispatcher:
     """Record only dispatch, leaving envelope and header validation real."""
@@ -180,6 +186,7 @@ class _Dispatcher:
         """
         self.state.calls += 1
         return self.state.result
+
 
 class TestHttpTransport(TestCase):
     """Check failure statuses, no-body rejection and SSE cleanup/backpressure."""

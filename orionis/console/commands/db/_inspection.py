@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415, S608
+# Keep runtime reflection annotations and intentionally deferred imports.
+# SQL fragments use controlled identifiers; data values remain bound.
 """Inspect user objects without opening a separate database engine."""
 
 from __future__ import annotations
@@ -8,10 +11,9 @@ if TYPE_CHECKING:
     from orionis.database.contracts.connection import IConnection
     from orionis.database.contracts.connection_manager import IConnectionManager
 
+
 class DatabaseInspector:
     """Inspect user objects without opening a separate database engine."""
-
-    # ruff: noqa: PLC0415, S608
 
     __slots__ = ("config", "connection", "driver", "name")
     """Declare the instance attribute slots reserved by this class."""
@@ -297,7 +299,8 @@ class DatabaseInspector:
                 """,
             )
             return (
-                int(ordinary[0]["object_count"]), int(materialized[0]["object_count"]),
+                int(ordinary[0]["object_count"]),
+                int(materialized[0]["object_count"]),
             )
         if driver == "sqlite":
             rows = await self.connection.select(
@@ -535,7 +538,7 @@ class DatabaseInspector:
                     WHERE username = USER
                     """,
                 )
-        except (QueryException, SQLAlchemyError):
+        except QueryException, SQLAlchemyError:
             # Server activity views often require extra privileges.
             return None
         return int(rows[0]["count"]) if rows else None
@@ -589,7 +592,7 @@ class DatabaseInspector:
                     """,
                     {"name": name},
                 )
-            except (QueryException, SQLAlchemyError):
+            except QueryException, SQLAlchemyError:
                 # SQLite's optional dbstat virtual table may be unavailable.
                 return None
         elif self.driver == "pgsql":
@@ -705,7 +708,7 @@ class DatabaseInspector:
                 """
         try:
             rows = await self.connection.select(query)
-        except (QueryException, SQLAlchemyError):
+        except QueryException, SQLAlchemyError:
             if driver == "sqlite":
                 # SQLite may be built without the dbstat virtual table.
                 return {}
@@ -743,8 +746,7 @@ class DatabaseInspector:
         name = resolved
         if self.driver in {"pgsql", "redshift", "sqlserver"} and name.count(".") != 1:
             msg = (
-                "Cannot inspect a schema-qualified object whose name "
-                "contains a period."
+                "Cannot inspect a schema-qualified object whose name contains a period."
             )
             raise ValueError(msg)
         if self.driver == "sqlite":
@@ -873,7 +875,8 @@ class DatabaseInspector:
                 return matches[0]
         if self.driver == "sqlserver" and "." not in name:
             matches = [
-                table for table in tables
+                table
+                for table in tables
                 if table.rpartition(".")[2].casefold() == name.casefold()
             ]
             if len(matches) == 1:
@@ -931,12 +934,14 @@ class DatabaseInspector:
             if index_name != last_index:
                 if indexes:
                     indexes[-1]["columns"] = ", ".join(index_columns)
-                indexes.append({
-                    "name": index_name,
-                    "columns": "",
-                    "unique": bool(row["is_unique"]),
-                    "primary": row["origin"] == "pk",
-                })
+                indexes.append(
+                    {
+                        "name": index_name,
+                        "columns": "",
+                        "unique": bool(row["is_unique"]),
+                        "primary": row["origin"] == "pk",
+                    },
+                )
                 index_columns = []
                 last_index = index_name
             if row["column_name"] is not None:
@@ -1249,8 +1254,8 @@ class DatabaseInspector:
                 "column": row.get("column_name") or "-",
                 "references": (
                     f"{row['ref_table']}.{row['ref_column']}"
-                    if row.get("ref_column") else row.get("definition")
-                    or row.get("ref_table") or "-"
+                    if row.get("ref_column")
+                    else row.get("definition") or row.get("ref_table") or "-"
                 ),
                 "on_delete": row.get("on_delete") or "-",
             }
@@ -1259,7 +1264,11 @@ class DatabaseInspector:
         return columns, indexes, foreign_keys
 
     async def _redshiftObjects(
-        self, kind: str, *, name: str | None = None, count: bool = False,
+        self,
+        kind: str,
+        *,
+        name: str | None = None,
+        count: bool = False,
     ) -> list[dict[str, Any]]:
         """
         Read visible local objects without treating materialized views as tables.
@@ -1281,13 +1290,16 @@ class DatabaseInspector:
         # These system views cannot be joined on Redshift compute nodes.
         # Read each independently instead of using an unsupported correlated
         # subquery, including when the caller requests an object count.
-        clauses = ["SELECT t.schema_name || '.' || t.table_name AS name", """
+        clauses = [
+            "SELECT t.schema_name || '.' || t.table_name AS name",
+            """
             FROM svv_redshift_tables t
             WHERE t.database_name = current_database()
               AND t.table_type = :kind
               AND LEFT(t.schema_name, 3) <> 'pg_'
               AND t.schema_name <> 'information_schema'
-            """]
+            """,
+        ]
         bindings = {"kind": kind}
         if name is not None:
             schema, separator, table = name.rpartition(".")
@@ -1311,14 +1323,18 @@ class DatabaseInspector:
                     materialized_query += " AND schema_name = :schema"
                     materialized_bindings["schema"] = schema
             materialized = await self.connection.select(
-                materialized_query, materialized_bindings,
+                materialized_query,
+                materialized_bindings,
             )
             excluded = {str(row["name"]).strip() for row in materialized}
             rows = [row for row in rows if str(row["name"]).strip() not in excluded]
         return [{"object_count": len(rows)}] if count else rows
 
     async def _redshiftSizeRows(
-        self, name: str | None = None, *, aggregate: bool = False,
+        self,
+        name: str | None = None,
+        *,
+        aggregate: bool = False,
     ) -> list[dict[str, Any]] | None:
         """
         Read native block sizes when the caller can access SVV_TABLE_INFO.
@@ -1339,13 +1355,16 @@ class DatabaseInspector:
 
         projection = (
             "SELECT COALESCE(SUM(size), 0) * 1048576 AS bytes"
-            if aggregate else
-            'SELECT "schema" || \'.\' || "table" AS name, size * 1048576 AS bytes'
+            if aggregate
+            else 'SELECT "schema" || \'.\' || "table" AS name, size * 1048576 AS bytes'
         )
-        query = projection + """
+        query = (
+            projection
+            + """
             FROM svv_table_info
             WHERE "database" = current_database()
             """
+        )
         bindings = {}
         if name is not None:
             schema, _, table = name.rpartition(".")
@@ -1353,11 +1372,12 @@ class DatabaseInspector:
             bindings = {"schema": schema or "public", "table": table}
         try:
             return await self.connection.select(query, bindings)
-        except (QueryException, SQLAlchemyError):
+        except QueryException, SQLAlchemyError:
             return None
 
     async def _redshiftDetails(
-        self, name: str,
+        self,
+        name: str,
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
         """
         Read Redshift columns and informational keys without querying indexes.

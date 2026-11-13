@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use explicit process arguments or locally constructed execution fixtures.
 import json
 import os
 import subprocess
@@ -438,8 +441,8 @@ class Application:
 app = Application()
     '''
 
-class TestStartupEntryPoints(unittest.TestCase):
 
+class TestStartupEntryPoints(unittest.TestCase):
     def setUp(self) -> None:
         """
         Create an isolated bootstrap for both production CLI launchers.
@@ -476,7 +479,10 @@ class TestStartupEntryPoints(unittest.TestCase):
         return environment
 
     def _run(
-        self, entry: str, scenario: str, *arguments: str,
+        self,
+        entry: str,
+        scenario: str,
+        *arguments: str,
     ) -> tuple[subprocess.CompletedProcess[bytes], bytes, dict[str, object]]:
         """
         Run a launcher and separate command stdout from test metadata.
@@ -495,10 +501,16 @@ class TestStartupEntryPoints(unittest.TestCase):
         tuple[subprocess.CompletedProcess[bytes], bytes, dict[str, object]]
             Completed process, command stdout, and decoded launcher state.
         """
-        result = subprocess.run(  # noqa: S603
+        result = subprocess.run(
             [
-                sys.executable, "-B", "-c", _DRIVER, entry, scenario,
-                str(_PROJECT_ROOT / "reactor"), *arguments,
+                sys.executable,
+                "-B",
+                "-c",
+                _DRIVER,
+                entry,
+                scenario,
+                str(_PROJECT_ROOT / "reactor"),
+                *arguments,
             ],
             cwd=self.root,
             env=self._environment(),
@@ -563,7 +575,8 @@ class TestStartupEntryPoints(unittest.TestCase):
                     stderr = _FRAME + _CLEAR
                     if scenario == "bootstrap_stdout":
                         self.assertEqual(
-                            output, b"bootstrap" + _NEWLINE + b"command" + _NEWLINE,
+                            output,
+                            b"bootstrap" + _NEWLINE + b"command" + _NEWLINE,
                         )
                     else:
                         self.assertEqual(output, b"command" + _NEWLINE)
@@ -603,7 +616,9 @@ class TestStartupEntryPoints(unittest.TestCase):
         """
         interruption = subprocess.run(
             [sys.executable, "-B", "-c", "raise KeyboardInterrupt"],
-            capture_output=True, check=False, timeout=10,
+            capture_output=True,
+            check=False,
+            timeout=10,
         ).returncode
         cases = (
             ("bootstrap_exit", 23, "SystemExit", "list"),
@@ -621,7 +636,8 @@ class TestStartupEntryPoints(unittest.TestCase):
                     self.assertEqual(metadata["exception"], error)
                     if error != "SystemExit":
                         self.assertIn(
-                            error.encode(), result.stderr[len(_FRAME + _CLEAR):],
+                            error.encode(),
+                            result.stderr[len(_FRAME + _CLEAR) :],
                         )
                     self._assertRestored(metadata)
 

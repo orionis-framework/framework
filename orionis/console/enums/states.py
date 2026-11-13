@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class ScheduleStates(Enum):
     """
     Represent the possible states of a schedule.

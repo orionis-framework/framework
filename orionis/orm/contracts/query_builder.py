@@ -1,12 +1,12 @@
+# ruff: noqa: TC001
 """Contract of the entry point backing the ``DB`` facade."""
 
 from __future__ import annotations
 from abc import abstractmethod, ABC
-from typing import TYPE_CHECKING, Self
+from typing import Self
+from orionis.database.contracts.transaction import ITransaction
+from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 
-if TYPE_CHECKING:
-    from orionis.database.contracts.transaction import ITransaction
-    from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 
 class IQueryBuilder(ABC):
     """
@@ -87,7 +87,7 @@ class IQueryBuilder(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -109,7 +109,7 @@ class IQueryBuilder(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -131,7 +131,7 @@ class IQueryBuilder(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -181,7 +181,7 @@ class IQueryBuilder(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------

@@ -1,4 +1,7 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
+from unittest.mock import patch
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.localization import provider as provider_module
 from orionis.localization.contracts.manager import ILocalizationManager
@@ -7,10 +10,12 @@ from orionis.localization.manager import LocalizationManager
 from orionis.localization.provider import LocalizationProvider
 from orionis.test import TestCase
 
+
 class _StubTranslator:
     """Translator double standing in for the shared instance."""
 
     __slots__ = ()
+
 
 class _StubManager:
     """Localization manager double returning a fixed translator."""
@@ -28,7 +33,7 @@ class _StubManager:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.shared = shared
         self.calls = 0
@@ -44,6 +49,7 @@ class _StubManager:
         """
         self.calls += 1
         return self.shared
+
 
 class _StubApp:
     """Container double recording bindings and resolutions."""
@@ -61,7 +67,7 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.manager = manager
         self.singletons: list[tuple[object, object]] = []
@@ -119,6 +125,7 @@ class _StubApp:
         self.resolved.append(abstract)
         return self.manager
 
+
 class _StubLangFacade:
     """Language facade double counting how many times it was pinned."""
 
@@ -130,7 +137,7 @@ class _StubLangFacade:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.pinned = 0
 
@@ -144,6 +151,7 @@ class _StubLangFacade:
         """
         self.pinned += 1
 
+
 class TestLocalizationProviderDefinition(TestCase):
     """Validate the structural contract of the provider."""
 
@@ -156,7 +164,7 @@ class TestLocalizationProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(LocalizationProvider, ServiceProvider))
 
@@ -169,7 +177,7 @@ class TestLocalizationProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         self.assertIs(LocalizationProvider(app).app, app)
@@ -183,9 +191,10 @@ class TestLocalizationProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(inspect.iscoroutinefunction(LocalizationProvider.boot))
+
 
 class TestLocalizationProviderRegistration(TestCase):
     """Validate the bindings declared during registration."""
@@ -198,7 +207,7 @@ class TestLocalizationProviderRegistration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         LocalizationProvider(app).register()
@@ -216,11 +225,12 @@ class TestLocalizationProviderRegistration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         LocalizationProvider(app).register()
         self.assertEqual(app.bound, [])
+
 
 class TestLocalizationProviderBoot(TestCase):
     """Validate the wiring performed during the boot phase."""
@@ -236,25 +246,12 @@ class TestLocalizationProviderBoot(TestCase):
         -------
         None
         """
-        self._original_facade = provider_module.LangFacade
+        super().setUp()
         self._facade = _StubLangFacade()
-        provider_module.LangFacade = self._facade
+        self.enterContext(patch.object(provider_module, "LangFacade", self._facade))
         self._translator = _StubTranslator()
         self._manager = _StubManager(self._translator)
         self._app = _StubApp(self._manager)
-
-    def tearDown(self) -> None:
-        """
-        Restore the original language facade.
-
-        Guarantees that module-level state is never leaked to other
-        test cases.
-
-        Returns
-        -------
-        None
-        """
-        provider_module.LangFacade = self._original_facade
 
     async def testBootResolvesTheManagerContract(self) -> None:
         """Resolve the manager contract exactly once.
@@ -265,7 +262,7 @@ class TestLocalizationProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await LocalizationProvider(self._app).boot()
         self.assertEqual(self._app.resolved, [ILocalizationManager])
@@ -279,7 +276,7 @@ class TestLocalizationProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await LocalizationProvider(self._app).boot()
         self.assertEqual(self._app.bound, [(ITranslator, self._translator)])
@@ -292,7 +289,7 @@ class TestLocalizationProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await LocalizationProvider(self._app).boot()
         self.assertEqual(self._manager.calls, 1)
@@ -306,7 +303,7 @@ class TestLocalizationProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await LocalizationProvider(self._app).boot()
         self.assertEqual(self._facade.pinned, 1)

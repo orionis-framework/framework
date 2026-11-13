@@ -6,6 +6,7 @@ from orionis.console.debug.dumper import Dumper
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.support.facades.debug import Debug
 
+
 class DumperProvider(ServiceProvider):
     """Register dumper services in the application container."""
 

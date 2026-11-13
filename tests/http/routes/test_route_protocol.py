@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import json
 from typing import TYPE_CHECKING
 from orionis.http.routes.enums.protocols import RouteProtocol
@@ -19,6 +21,7 @@ from tests.http.routes.test_nested_routing import (
 if TYPE_CHECKING:
     from orionis.http.websocket import WebSocket
     from orionis.http.websocket_middleware import WebSocketNext
+
 
 class _SocketMiddleware(WebSocketMiddleware):
     """Provide importable connection middleware for route cache coverage."""
@@ -43,6 +46,7 @@ class _SocketMiddleware(WebSocketMiddleware):
         """
         del socket
         await call_next()
+
 
 class TestRouteProtocol(TestCase):
     """Verify protocol isolation through compilation, resolution and caching."""
@@ -117,7 +121,8 @@ class TestRouteProtocol(TestCase):
         self.assertEqual(resolved.params, {"room": 7, "topic": "news"})
         self.assertEqual(resolved.route.compiled_middlewares, (_SocketMiddleware,))
         self.assertIs(
-            resolver.resolve("WEBSOCKET", "/rooms/7/events/news"), resolved,
+            resolver.resolve("WEBSOCKET", "/rooms/7/events/news"),
+            resolved,
         )
 
     def testCacheRestoresExplicitProtocolAndIsolatesSocketRoutes(self) -> None:

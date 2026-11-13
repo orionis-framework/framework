@@ -1,9 +1,11 @@
+# ruff: noqa: ANN401, TC001
+# Keep arbitrary model attributes and runtime factory-property annotations.
 """Build and persist model instances from reusable attribute definitions."""
 
 from collections.abc import AsyncIterator, Callable, Iterator
 from copy import deepcopy
 from inspect import iscoroutinefunction
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 from orionis.orm.factories._attributes import copy_attributes
 from orionis.orm.factories._faker import create_faker
 from orionis.orm.factories.exceptions import (
@@ -16,18 +18,23 @@ from orionis.orm.factories.sequence import Sequence
 from orionis.orm.model import Model
 from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from orionis.orm.factories.fake import Fake
+from orionis.orm.factories.fake import Fake
 
 type State = dict[str, Any] | Callable[[dict[str, Any]], dict[str, Any]]
 """Type alias for ``dict[str, Any] | Callable[[dict[str, Any]], dict[str, Any]]``."""
+
 
 class Factory[TModel: Model]:
     """Build and persist model instances from reusable attribute definitions."""
 
     __slots__ = (
-        "_busy", "_count", "_fake", "_model", "_sequence",
-        "_sequence_index", "_states",
+        "_busy",
+        "_count",
+        "_fake",
+        "_model",
+        "_sequence",
+        "_sequence_index",
+        "_states",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -61,7 +68,7 @@ class Factory[TModel: Model]:
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         model = self.model
         if (
@@ -80,14 +87,10 @@ class Factory[TModel: Model]:
         ):
             error_msg = "A factory must implement synchronous definition()."
             raise FactoryDefinitionException(error_msg)
-        if locale is not None and (
-            not isinstance(locale, str) or not locale.strip()
-        ):
+        if locale is not None and (not isinstance(locale, str) or not locale.strip()):
             error_msg = "Factory locale must be a nonempty locale string."
             raise FactoryConfigurationException(error_msg)
-        if seed is not None and (
-            isinstance(seed, bool) or not isinstance(seed, int)
-        ):
+        if seed is not None and (isinstance(seed, bool) or not isinstance(seed, int)):
             error_msg = "Factory seed must be an integer or None."
             raise FactoryConfigurationException(error_msg)
         self._model = model
@@ -203,7 +206,7 @@ class Factory[TModel: Model]:
 
         Parameters
         ----------
-        sequence : collections.abc.Sequence
+        sequence : orionis.orm.factories.Sequence
             Cycling mappings or callbacks of the absolute item index.
 
         Returns
@@ -237,7 +240,7 @@ class Factory[TModel: Model]:
         self._fake.unique.clear()
         return self
 
-    def make(self, **overrides: Any) -> TModel | Collection:  # noqa: ANN401
+    def make(self, **overrides: Any) -> TModel | Collection:
         """
         Construct models without database access or persistence events.
 
@@ -248,7 +251,7 @@ class Factory[TModel: Model]:
 
         Returns
         -------
-        ``TModel`` or collections.abc.Collection
+        ``TModel`` or orionis.support.types.Collection
             One model for count one; otherwise a Collection of models.
         """
         stream = self.iterMake(**overrides)
@@ -261,7 +264,7 @@ class Factory[TModel: Model]:
 
     async def create(
         self,
-        **overrides: Any,  # noqa: ANN401
+        **overrides: Any,
     ) -> TModel | Collection:
         """
         Construct and save each model through Orionis's event lifecycle.
@@ -273,7 +276,7 @@ class Factory[TModel: Model]:
 
         Returns
         -------
-        ``TModel`` or collections.abc.Collection
+        ``TModel`` or orionis.support.types.Collection
             Persisted models, with the same cardinality rules as ``make``.
 
         Notes
@@ -289,7 +292,7 @@ class Factory[TModel: Model]:
         finally:
             await stream.aclose()
 
-    def iterMake(self, **overrides: Any) -> Iterator[TModel]:  # noqa: ANN401
+    def iterMake(self, **overrides: Any) -> Iterator[TModel]:
         """
         Yield unsaved models progressively, holding no result collection.
 
@@ -318,7 +321,7 @@ class Factory[TModel: Model]:
 
     async def iterCreate(
         self,
-        **overrides: Any,  # noqa: ANN401
+        **overrides: Any,
     ) -> AsyncIterator[TModel]:
         """
         Yield models immediately after each awaited save operation.
@@ -364,7 +367,7 @@ class Factory[TModel: Model]:
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         if self._busy:
             error_msg = "Factory is in use; create an instance for each task."

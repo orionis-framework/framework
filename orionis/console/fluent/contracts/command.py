@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.console.entities.command import Command as CommandEntity
 
+
 class ICommand(ABC):
     """Define the contract for command implementations."""
 

@@ -1,8 +1,12 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest.mock import AsyncMock, patch
 from orionis.database.connection import Connection
+from orionis.database.exceptions import QueryException
 from orionis.queues.drivers.database import DatabaseQueueDriver
 from orionis.queues.failed.repository import DatabaseFailedJobRepository
 from orionis.queues.exceptions import QueueConfigurationError
@@ -12,11 +16,16 @@ from tests.queues.drivers.test_database import make_envelope
 if TYPE_CHECKING:
     from orionis.queues.entities.failed_job import FailedJob
 
+
 class TestDatabaseFailedJobRepository(TestCase):
     """Verify durable failure diagnostics and idempotent failure persistence."""
 
     __slots__ = (
-        "_connection", "_driver", "_path", "_repository", "_temporary",
+        "_connection",
+        "_driver",
+        "_path",
+        "_repository",
+        "_temporary",
     )
 
     async def asyncSetUp(self) -> None:
@@ -29,9 +38,14 @@ class TestDatabaseFailedJobRepository(TestCase):
         """
         self._temporary = tempfile.TemporaryDirectory()
         self._path = str(Path(self._temporary.name) / "failures.sqlite")
-        self._connection = Connection("failures", {
-            "driver": "sqlite", "database": self._path, "prefix": "f_",
-        })
+        self._connection = Connection(
+            "failures",
+            {
+                "driver": "sqlite",
+                "database": self._path,
+                "prefix": "f_",
+            },
+        )
         self._driver = DatabaseQueueDriver(self._connection)
         self._repository = DatabaseFailedJobRepository(self._connection)
         await self._repository.all()
@@ -58,7 +72,9 @@ class TestDatabaseFailedJobRepository(TestCase):
         await self._driver.push(make_envelope())
         reserved = await self._driver.reserve(("default",), 60.0)
         return await self._repository.record(
-            reserved, "database", RuntimeError("delivery failed"),
+            reserved,
+            "database",
+            RuntimeError("delivery failed"),
         )
 
     async def testRecordFindAndList(self) -> None:
@@ -106,10 +122,12 @@ class TestDatabaseFailedJobRepository(TestCase):
         """
         await self._driver.push(make_envelope())
         reserved = await self._driver.reserve(("default",), 60.0)
-        failures = await asyncio.gather(*(
-            self._repository.record(reserved, "database", RuntimeError("failed"))
-            for _ in range(20)
-        ))
+        failures = await asyncio.gather(
+            *(
+                self._repository.record(reserved, "database", RuntimeError("failed"))
+                for _ in range(20)
+            ),
+        )
         persisted = await self._repository.all()
         self.assertEqual(len(persisted), 1)
         self.assertTrue(all(item == persisted[0] for item in failures))
@@ -136,9 +154,14 @@ class TestDatabaseFailedJobRepository(TestCase):
         """
         failure = await self._recordFailure()
         await self._connection.disconnect()
-        self._connection = Connection("failures", {
-            "driver": "sqlite", "database": self._path, "prefix": "f_",
-        })
+        self._connection = Connection(
+            "failures",
+            {
+                "driver": "sqlite",
+                "database": self._path,
+                "prefix": "f_",
+            },
+        )
         self._repository = DatabaseFailedJobRepository(self._connection)
         self.assertEqual(await self._repository.find(failure.id), failure)
 
@@ -204,3 +227,66 @@ class TestDatabaseFailedJobRepository(TestCase):
         await self._repository.forget(previous.id)
         self.assertEqual(await self._repository.find(current.id), current)
         self.assertEqual(await self._repository.all(), (current,))
+
+    async def testSchemaRecoveryKeepsTheCreationErrorAndItsCause(self) -> None:
+        """Preserve schema creation failures when their recovery reads also fail.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for storage_type in (DatabaseQueueDriver, DatabaseFailedJobRepository):
+            with self.subTest(storage=storage_type.__name__):
+                primary = QueryException("schema creation failed")
+                cause = OSError("creation cause")
+                primary.__cause__ = cause
+                secondary = QueryException("schema recovery read failed")
+                observed = AsyncMock()
+                storage = storage_type(self._connection, "unconfirmed_schema")
+                with (
+                    patch.object(Connection, "createTable", side_effect=primary),
+                    patch.object(Connection, "select", side_effect=secondary),
+                    patch("orionis.failure.runtime.capture", new=observed),
+                    self.assertRaises(QueryException) as caught,
+                ):
+                    if isinstance(storage, DatabaseQueueDriver):
+                        await storage.size("default")
+                    else:
+                        await storage.all()
+                self.assertIs(caught.exception, primary)
+                self.assertIs(caught.exception.__cause__, cause)
+                self.assertFalse(storage._ready)
+                observed.assert_awaited_once()
+                self.assertIs(observed.await_args.args[0], secondary)
+
+    async def testRecordRecoveryKeepsTheInsertErrorAndItsCause(self) -> None:
+        """Keep the original failed-job write when duplicate lookup also fails.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        await self._driver.push(make_envelope())
+        reserved = await self._driver.reserve(("default",), 60.0)
+        primary = QueryException("failed-job insert failed")
+        cause = OSError("insert cause")
+        primary.__cause__ = cause
+        secondary = QueryException("failed-job recovery read failed")
+        observed = AsyncMock()
+        with (
+            patch.object(Connection, "insert", side_effect=primary),
+            patch.object(Connection, "select", side_effect=secondary),
+            patch("orionis.failure.runtime.capture", new=observed),
+            self.assertRaises(QueryException) as caught,
+        ):
+            await self._repository.record(
+                reserved,
+                "database",
+                RuntimeError("job failed"),
+            )
+        self.assertIs(caught.exception, primary)
+        self.assertIs(caught.exception.__cause__, cause)
+        observed.assert_awaited_once()
+        self.assertIs(observed.await_args.args[0], secondary)

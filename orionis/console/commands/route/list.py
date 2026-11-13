@@ -1,3 +1,5 @@
+# ruff: noqa: TC001, TC002
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Display registered HTTP routes in URI order."""
 
 from rich import box
@@ -7,10 +9,9 @@ from orionis.console.base.command import BaseCommand
 from orionis.http.routes.entities.compiled_route import CompiledRoute
 from orionis.http.routes.loader import RouteLoader
 
+
 class RouteListCommand(BaseCommand):
     """Display registered HTTP routes in URI order."""
-
-    # ruff: noqa: TC001, TC002
 
     timestamps: bool = False
     """Timestamps flag used by ``RouteListCommand``."""

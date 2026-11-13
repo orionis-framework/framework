@@ -26,6 +26,7 @@ return 1
 """
 """Redis owns the clock and makes expiration, quota checking and insertion atomic."""
 
+
 class RedisRateLimitStore:
     """Share sliding-window quotas using a single-key atomic Redis script."""
 
@@ -60,17 +61,21 @@ class RedisRateLimitStore:
         self.__owns_client = client is None
         """Whether this object must close the client during its own cleanup."""
         connection = config.toDict()["rate_limit_redis"]
-        self.__client = client if client is not None else Redis(
-            host=connection["endpoint"],
-            port=connection["port"],
-            db=connection["db"],
-            password=connection["password"],
-            socket_connect_timeout=config.rate_limit_redis_timeout_seconds,
-            socket_timeout=config.rate_limit_redis_timeout_seconds,
-            retry_on_timeout=False,
-            retry=Retry(NoBackoff(), 0),
-            max_connections=100,
-            protocol=2,
+        self.__client = (
+            client
+            if client is not None
+            else Redis(
+                host=connection["endpoint"],
+                port=connection["port"],
+                db=connection["db"],
+                password=connection["password"],
+                socket_connect_timeout=config.rate_limit_redis_timeout_seconds,
+                socket_timeout=config.rate_limit_redis_timeout_seconds,
+                retry_on_timeout=False,
+                retry=Retry(NoBackoff(), 0),
+                max_connections=100,
+                protocol=2,
+            )
         )
         """Externally owned transport. The caller remains responsible for it."""
 
@@ -104,7 +109,12 @@ class RedisRateLimitStore:
         try:
             async with timeout(self.__timeout):
                 result = await self.__client.eval(
-                    _HIT, 1, redis_key, limit, window, uuid4().hex,
+                    _HIT,
+                    1,
+                    redis_key,
+                    limit,
+                    window,
+                    uuid4().hex,
                 )
         except TimeoutError as exc:
             error_msg = "Rate-limit Redis operation timed out."

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import base64
 from orionis.environment.key.key_generator import SecureKeyGenerator
 from orionis.foundation.config.app.enums.ciphers import Cipher
@@ -10,8 +12,8 @@ _KEY_PREFIX: str = "base64:"
 # TestSecureKeyGeneratorCatalogue
 # ---------------------------------------------------------------------------
 
-class TestSecureKeyGeneratorCatalogue(TestCase):
 
+class TestSecureKeyGeneratorCatalogue(TestCase):
     def testCoversEveryDeclaredCipher(self) -> None:
         """Map every declared cipher to a key size.
 
@@ -21,7 +23,7 @@ class TestSecureKeyGeneratorCatalogue(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(set(SecureKeyGenerator.KEY_SIZES), set(Cipher))
 
@@ -34,7 +36,7 @@ class TestSecureKeyGeneratorCatalogue(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             SecureKeyGenerator.KEY_SIZES,
@@ -46,13 +48,14 @@ class TestSecureKeyGeneratorCatalogue(TestCase):
             },
         )
 
+
 # ---------------------------------------------------------------------------
 # TestSecureKeyGeneratorOutput
 # ---------------------------------------------------------------------------
 
-class TestSecureKeyGeneratorOutput(TestCase):
 
-    def testDefaultsToTheAes256CbcCipher(self) -> None:
+class TestSecureKeyGeneratorOutput(TestCase):
+    def testDefaultsToTheAes256GcmCipher(self) -> None:
         """Generate a 32 byte key when no cipher is supplied.
 
         Validates the documented default, which must stay aligned with the
@@ -61,7 +64,7 @@ class TestSecureKeyGeneratorOutput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         generated = SecureKeyGenerator.generate()
         payload = base64.b64decode(generated.removeprefix(_KEY_PREFIX))
@@ -76,7 +79,7 @@ class TestSecureKeyGeneratorOutput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for cipher, size in SecureKeyGenerator.KEY_SIZES.items():
             generated = SecureKeyGenerator.generate(cipher)
@@ -96,7 +99,7 @@ class TestSecureKeyGeneratorOutput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for cipher, size in SecureKeyGenerator.KEY_SIZES.items():
             generated = SecureKeyGenerator.generate(cipher.value)
@@ -112,17 +115,18 @@ class TestSecureKeyGeneratorOutput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         generated = {SecureKeyGenerator.generate() for _ in range(25)}
         self.assertEqual(len(generated), 25)
+
 
 # ---------------------------------------------------------------------------
 # TestSecureKeyGeneratorRejections
 # ---------------------------------------------------------------------------
 
-class TestSecureKeyGeneratorRejections(TestCase):
 
+class TestSecureKeyGeneratorRejections(TestCase):
     def testRejectsAnUnknownCipherName(self) -> None:
         """Raise ValueError when the cipher name is not recognised.
 
@@ -132,7 +136,7 @@ class TestSecureKeyGeneratorRejections(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             SecureKeyGenerator.generate("AES-512-CBC")
@@ -149,7 +153,7 @@ class TestSecureKeyGeneratorRejections(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             SecureKeyGenerator.generate("")
@@ -163,18 +167,19 @@ class TestSecureKeyGeneratorRejections(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             SecureKeyGenerator.generate(object())
         self.assertIn("is not supported", str(ctx.exception))
 
+
 # ---------------------------------------------------------------------------
 # TestSecureKeyGeneratorLayout
 # ---------------------------------------------------------------------------
 
-class TestSecureKeyGeneratorLayout(TestCase):
 
+class TestSecureKeyGeneratorLayout(TestCase):
     def testDeclaresEmptySlots(self) -> None:
         """Declare empty slots for a generator that holds no state.
 
@@ -184,7 +189,7 @@ class TestSecureKeyGeneratorLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(SecureKeyGenerator.__slots__, ())
 
@@ -197,6 +202,6 @@ class TestSecureKeyGeneratorLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(SecureKeyGenerator(), "__dict__"))

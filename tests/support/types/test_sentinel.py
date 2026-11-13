@@ -1,11 +1,15 @@
+# ruff: noqa: FBT003, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
+from importlib import import_module
 from orionis.support.types.sentinel import _MISSING_TYPE, MISSING
 from orionis.test import TestCase
 
-class TestMissingSentinel(TestCase):
 
+class TestMissingSentinel(TestCase):
     # ------------------------------------------------ __repr__
 
-    def testReprReturnsMissingString(self):
+    def testReprReturnsMissingString(self) -> None:
         """Return the sentinel string representation.
 
         Validates that repr of MISSING produces the exact string
@@ -14,11 +18,11 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(repr(MISSING), "<MISSING>")
 
-    def testReprReturnType(self):
+    def testReprReturnType(self) -> None:
         """Return a str instance from repr.
 
         Validates that calling repr on the MISSING sentinel
@@ -27,13 +31,13 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(repr(MISSING), str)
 
     # ------------------------------------------------ __bool__
 
-    def testBoolIsFalsy(self):
+    def testBoolIsFalsy(self) -> None:
         """Evaluate as falsy in boolean context.
 
         Validates that the MISSING sentinel evaluates to False
@@ -42,11 +46,11 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(MISSING)
 
-    def testBoolReturnsFalse(self):
+    def testBoolReturnsFalse(self) -> None:
         """Return exactly False from bool conversion.
 
         Validates that calling bool on MISSING returns the
@@ -55,11 +59,11 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(bool(MISSING), False)
 
-    def testBoolInIfStatement(self):
+    def testBoolInIfStatement(self) -> None:
         """Behave as falsy in conditional statements.
 
         Validates that the MISSING sentinel causes the else
@@ -68,14 +72,14 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = "present" if MISSING else "missing"
         self.assertEqual(result, "missing")
 
     # ------------------------------------------------ type identity
 
-    def testMissingIsInstanceOfMissingType(self):
+    def testMissingIsInstanceOfMissingType(self) -> None:
         """Verify MISSING is an instance of _MISSING_TYPE.
 
         Validates that the module-level MISSING constant is a
@@ -84,11 +88,11 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(MISSING, _MISSING_TYPE)
 
-    def testMissingIsSingleton(self):
+    def testMissingIsSingleton(self) -> None:
         """Verify MISSING is stable across imports.
 
         Validates that importing MISSING always returns the
@@ -97,12 +101,12 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        from orionis.support.types.sentinel import MISSING as REIMPORTED
-        self.assertIs(MISSING, REIMPORTED)
+        module = import_module("orionis.support.types.sentinel")
+        self.assertIs(MISSING, module.MISSING)
 
-    def testNewInstanceIsDifferentObject(self):
+    def testNewInstanceIsDifferentObject(self) -> None:
         """Create distinct instances from the class constructor.
 
         Validates that constructing a new _MISSING_TYPE instance
@@ -111,14 +115,14 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         other = _MISSING_TYPE()
         self.assertIsNot(MISSING, other)
 
     # ---------------------------------------- comparison behavior
 
-    def testMissingIsNotNone(self):
+    def testMissingIsNotNone(self) -> None:
         """Distinguish MISSING from None.
 
         Validates that the MISSING sentinel is not None, ensuring
@@ -127,12 +131,12 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNot(MISSING, None)
         self.assertNotEqual(MISSING, None)
 
-    def testMissingIsNotFalse(self):
+    def testMissingIsNotFalse(self) -> None:
         """Distinguish MISSING from False.
 
         Validates that the MISSING sentinel is not the boolean
@@ -141,11 +145,11 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNot(MISSING, False)
 
-    def testMissingIsNotZero(self):
+    def testMissingIsNotZero(self) -> None:
         """Distinguish MISSING from zero.
 
         Validates that the MISSING sentinel is not equal to zero
@@ -154,11 +158,11 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertNotEqual(MISSING, 0)
 
-    def testMissingIsNotEmptyString(self):
+    def testMissingIsNotEmptyString(self) -> None:
         """Distinguish MISSING from an empty string.
 
         Validates that the MISSING sentinel is not equal to an
@@ -167,13 +171,13 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertNotEqual(MISSING, "")
 
     # ---------------------------------------- usage patterns
 
-    def testUsableAsDefaultArgument(self):
+    def testUsableAsDefaultArgument(self) -> None:
         """Serve as a default argument sentinel.
 
         Validates that MISSING can be used as a default parameter
@@ -182,10 +186,10 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
-        def func(value=MISSING):
+        def func(value: object = MISSING) -> bool:
             """Check whether the supplied value is the missing sentinel.
 
             Parameters
@@ -199,10 +203,11 @@ class TestMissingSentinel(TestCase):
                 Value produced by the helper.
             """
             return value is MISSING
+
         self.assertTrue(func())
         self.assertFalse(func(42))
 
-    def testUsableAsDefaultWithNone(self):
+    def testUsableAsDefaultWithNone(self) -> None:
         """Distinguish MISSING from explicit None argument.
 
         Validates that passing None as an argument is detected
@@ -211,10 +216,10 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
-        def func(value=MISSING):
+        def func(value: object = MISSING) -> bool:
             """Check whether the supplied value is the missing sentinel.
 
             Parameters
@@ -228,9 +233,10 @@ class TestMissingSentinel(TestCase):
                 Value produced by the helper.
             """
             return value is MISSING
+
         self.assertFalse(func(None))
 
-    def testUsableInDictionaryAsValue(self):
+    def testUsableInDictionaryAsValue(self) -> None:
         """Store MISSING as a dictionary value.
 
         Validates that MISSING can be stored and retrieved from
@@ -239,12 +245,12 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = {"key": MISSING}
         self.assertIs(d["key"], MISSING)
 
-    def testUsableInListContainment(self):
+    def testUsableInListContainment(self) -> None:
         """Check MISSING membership in a list.
 
         Validates that the `in` operator correctly detects MISSING
@@ -253,7 +259,7 @@ class TestMissingSentinel(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         items = [1, None, MISSING, "x"]
         self.assertIn(MISSING, items)

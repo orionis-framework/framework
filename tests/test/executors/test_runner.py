@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import io
 from rich.console import Console
 from orionis.test import TestCase
@@ -8,6 +11,7 @@ from orionis.test.executors.runner import TestRunner
 
 # Message raised by the suite double used to check cleanup handling.
 _SUITE_FAILURE: str = "suite exploded"
+
 
 def _probe_test(_self: object) -> None:
     """
@@ -24,6 +28,7 @@ def _probe_test(_self: object) -> None:
         Complete without assertions or side effects.
     """
 
+
 def _make_case() -> CoreTestCase:
     """
     Create a test case instance used as the subject of a report.
@@ -35,6 +40,7 @@ def _make_case() -> CoreTestCase:
     """
     probe = type("_ProbeCase", (CoreTestCase,), {"testProbe": _probe_test})
     return probe("testProbe")
+
 
 def _bind_console(runner: TestRunner, width: int = 120) -> io.StringIO:
     """
@@ -55,6 +61,7 @@ def _bind_console(runner: TestRunner, width: int = 120) -> io.StringIO:
     buffer = io.StringIO()
     runner._TestRunner__console = Console(file=buffer, width=width)
     return buffer
+
 
 class _StubSuite:
     """Suite double feeding predefined outcomes into a result object."""
@@ -121,6 +128,7 @@ class _StubSuite:
                 else:
                     result.addError(self.case, info)
 
+
 class _ExplodingSuite:
     """Suite double raising while it is executed by the runner."""
 
@@ -141,6 +149,7 @@ class _ExplodingSuite:
             Always raised to exercise runner cleanup.
         """
         raise RuntimeError(_SUITE_FAILURE)
+
 
 class _RunnerTestCase(TestCase):
     """Base scenario running suite doubles through the runner."""
@@ -163,8 +172,8 @@ class _RunnerTestCase(TestCase):
         """
         return runner.run(suite)  # type: ignore[arg-type]
 
-class TestTestRunnerDefinition(_RunnerTestCase):
 
+class TestTestRunnerDefinition(_RunnerTestCase):
     def testDerivesFromTextTestRunner(self) -> None:
         """
         Derive from the textual runner of the standard library.
@@ -222,8 +231,8 @@ class TestTestRunnerDefinition(_RunnerTestCase):
         self.assertEqual(runner.warnings, "ignore")
         self.assertIs(runner._TestRunner__with_panel, False)
 
-class TestTestRunnerExecution(_RunnerTestCase):
 
+class TestTestRunnerExecution(_RunnerTestCase):
     def testRunReturnsTheResultProcessor(self) -> None:
         """
         Return the processor holding every recorded outcome.
@@ -298,8 +307,8 @@ class TestTestRunnerExecution(_RunnerTestCase):
         with self.assertRaises(RuntimeError):
             self._run(runner, _ExplodingSuite())
 
-class TestTestRunnerPanels(_RunnerTestCase):
 
+class TestTestRunnerPanels(_RunnerTestCase):
     def testStartPanelDescribesTheSession(self) -> None:
         """
         Render the session banner before the suite executes.
@@ -324,12 +333,14 @@ class TestTestRunnerPanels(_RunnerTestCase):
         buffer = _bind_console(runner)
         self._run(
             runner,
-            _StubSuite((
-                TestStatus.PASSED,
-                TestStatus.FAILED,
-                TestStatus.ERRORED,
-                TestStatus.SKIPPED,
-            )),
+            _StubSuite(
+                (
+                    TestStatus.PASSED,
+                    TestStatus.FAILED,
+                    TestStatus.ERRORED,
+                    TestStatus.SKIPPED,
+                ),
+            ),
         )
         output = buffer.getvalue()
         self.assertIn("Total", output)

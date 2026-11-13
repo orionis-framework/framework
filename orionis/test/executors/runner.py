@@ -1,3 +1,6 @@
+# ruff: noqa: FBT001, FBT002
+# Preserve the positional boolean arguments of the unittest runner contract.
+
 """Execute test suites and report their structured results."""
 
 import asyncio
@@ -17,9 +20,8 @@ from orionis.test.executors.results import TestResultProcessor
 if TYPE_CHECKING:
     from orionis.test.entities.result import TestResult
 
-class TestRunner(unittest.TextTestRunner):
 
-    # ruff: noqa: FBT001, FBT002
+class TestRunner(unittest.TextTestRunner):
     """Execute test suites and report their structured results."""
 
     resultclass = TestResultProcessor
@@ -61,7 +63,7 @@ class TestRunner(unittest.TextTestRunner):
         Returns
         -------
         None
-            This constructor initializes the instance and returns None.
+            No return value.
         """
         # Call the parent constructor with provided arguments
         super().__init__(
@@ -92,7 +94,7 @@ class TestRunner(unittest.TextTestRunner):
         Returns
         -------
         None
-            This method performs output and does not return a value.
+            No return value.
         """
         # Clear previous output and add spacing
         self.__console.clear()
@@ -106,14 +108,15 @@ class TestRunner(unittest.TextTestRunner):
 
         # Get the current event loop policy to display in the panel
         policy_cls = asyncio.DefaultEventLoopPolicy
-        loop_name = f"{policy_cls.__module__}.{policy_cls.__name__}"\
-                    .title()\
-                    .replace("Asyncio", "AsyncIO")\
-                    .replace("_", "")\
-                    .replace("event", "Event")\
-                    .replace("proactor", "Proactor")\
-                    .replace("policy", "Policy")\
-                    .replace("loop", "Loop")
+        loop_name = (
+            f"{policy_cls.__module__}.{policy_cls.__name__}".title()
+            .replace("Asyncio", "AsyncIO")
+            .replace("_", "")
+            .replace("event", "Event")
+            .replace("proactor", "Proactor")
+            .replace("policy", "Policy")
+            .replace("loop", "Loop")
+        )
 
         # Build the panel content for server status
         panel_content: Text = Text.assemble(
@@ -137,7 +140,9 @@ class TestRunner(unittest.TextTestRunner):
         self.__console.line()
 
     def __endPanel(
-        self, test_result: list[TestResult], time_taken: float,
+        self,
+        test_result: list[TestResult],
+        time_taken: float,
     ) -> None:
         """
         Display the test summary panel using Rich.
@@ -155,7 +160,7 @@ class TestRunner(unittest.TextTestRunner):
         Returns
         -------
         None
-            This method performs output and does not return a value.
+            No return value.
         """
         # Print a blank line before displaying results.
         self.__console.line()

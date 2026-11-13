@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.localization import contracts
 from orionis.localization.contracts.loader import ITranslationLoader
 from orionis.localization.contracts.manager import ILocalizationManager
@@ -13,6 +15,7 @@ _EXPECTED_EXPORTS: tuple[str, ...] = (
     "ITranslator",
 )
 
+
 class TestLocalizationContractsPackage(TestCase):
     """Validate the public surface of the contracts package."""
 
@@ -25,24 +28,9 @@ class TestLocalizationContractsPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(tuple(contracts.__all__), _EXPECTED_EXPORTS)
-
-    def testAllIsSortedAndFreeOfDuplicates(self) -> None:
-        """Keep the export list sorted and unique.
-
-        Validates that the contract catalogue stays readable and free
-        of repeated names.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        exported = list(contracts.__all__)
-        self.assertEqual(exported, sorted(exported))
-        self.assertEqual(len(exported), len(set(exported)))
 
     def testExportsReuseTheDefiningModules(self) -> None:
         """Re-export the very interfaces declared by each module.
@@ -53,7 +41,7 @@ class TestLocalizationContractsPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(contracts.ITranslationLoader, ITranslationLoader)
         self.assertIs(contracts.ITranslationRepository, ITranslationRepository)

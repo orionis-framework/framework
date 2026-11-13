@@ -34,7 +34,7 @@ print(NAME, (major, minor, patch))
 
 ### Metadatos de compatibilidad
 
-`PYTHON_REQUIRES` guarda el intérprete mínimo como `(major, minor)`, lo cual permite compararlo directamente con `sys.version_info`. No es un string de requisito de empaquetado; el manifiesto deriva la forma equivalente `>=major.minor`.
+`PYTHON_REQUIRES` guarda el intérprete mínimo como `(major, minor)`, lo cual permite compararlo directamente con `sys.version_info`. No es un string de requisito de empaquetado. El manifiesto declara por separado la forma equivalente `>=major.minor`; las pruebas del repositorio verifican que ambas declaraciones coincidan.
 
 ### Ubicaciones del proyecto
 
@@ -91,8 +91,16 @@ import orionis.metadata as metadata
 
 values = {name: getattr(metadata, name) for name in metadata.__all__}
 assert set(values) == {
-    "API", "AUTHOR", "AUTHOR_EMAIL", "DESCRIPTION", "DOCS",
-    "FRAMEWORK", "NAME", "PYTHON_REQUIRES", "SKELETON", "VERSION",
+    "API",
+    "AUTHOR",
+    "AUTHOR_EMAIL",
+    "DESCRIPTION",
+    "DOCS",
+    "FRAMEWORK",
+    "NAME",
+    "PYTHON_REQUIRES",
+    "SKELETON",
+    "VERSION",
 }
 assert all(isinstance(value, (str, tuple)) for value in values.values())
 ```
@@ -151,7 +159,7 @@ La guarda de versión de la aplicación y los comandos informativos consumen est
 
 ## Rendimiento y concurrencia
 
-El trabajo de importación se limita a enlazar strings, una tupla y reexports. No hay I/O, bloqueos, caché, colecciones mutables, trabajo async ni estado por solicitud. Las lecturas concurrentes son seguras bajo la semántica normal de módulos Python.
+Además de la carga normal de módulos de Python, el trabajo de importación se limita a enlazar strings, una tupla y reexports. No hay I/O de aplicación, bloqueos, caché, trabajo async ni estado por solicitud. Los valores exportados son inmutables; los atributos del módulo y la lista `__all__` siguen siendo objetos Python mutables ordinarios. Las lecturas concurrentes son seguras bajo la semántica normal de módulos Python.
 
 ## Compatibilidad
 

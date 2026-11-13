@@ -1,7 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema numeric common behavior."""
+
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.orm.schema.types.numeric_common import NumericCommon
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestNumericCommonOptions(TestCase):
     """Verify NumericCommon constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestNumericCommonOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = NumericCommon()
         assert_column_options(

@@ -6,6 +6,7 @@ from typing import Any
 from orionis.support.entities.base import BaseEntity
 from orionis.console.enums.events import TaskEvent as TaskEventEnum
 
+
 @dataclass(kw_only=True)
 class TaskEvent(BaseEntity):
     """
@@ -85,14 +86,14 @@ class TaskEvent(BaseEntity):
 
         # Map event codes to descriptive messages
         code_to_message = {
-            TaskEventEnum.ADDED : "Task Added.",
-            TaskEventEnum.REMOVED : "Task Removed.",
-            TaskEventEnum.MODIFIED : "Task Modified.",
-            TaskEventEnum.EXECUTED : "Task Executed.",
-            TaskEventEnum.ERROR : "Task Error.",
-            TaskEventEnum.MISSED : "Task Missed.",
-            TaskEventEnum.SUBMITTED : "Task Submitted.",
-            TaskEventEnum.MAX_INSTANCES : "Task Reached Max Instances.",
+            TaskEventEnum.ADDED: "Task Added.",
+            TaskEventEnum.REMOVED: "Task Removed.",
+            TaskEventEnum.MODIFIED: "Task Modified.",
+            TaskEventEnum.EXECUTED: "Task Executed.",
+            TaskEventEnum.ERROR: "Task Error.",
+            TaskEventEnum.MISSED: "Task Missed.",
+            TaskEventEnum.SUBMITTED: "Task Submitted.",
+            TaskEventEnum.MAX_INSTANCES: "Task Reached Max Instances.",
         }
 
         # Set the description attribute for the event

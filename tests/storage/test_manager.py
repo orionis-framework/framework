@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import tempfile
 from pathlib import Path
@@ -26,8 +28,9 @@ from orionis.test import TestCase
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-# Relative root shipped by the framework, already present in the repo.
+# Conventional relative root, resolved inside each test's temporary application.
 _RELATIVE_ROOT: str = "storage/app/private"
+
 
 class _StubApp:
     """Application double exposing a base path and raw configuration."""
@@ -47,7 +50,7 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._base_path = base_path
         self._config = config
@@ -87,6 +90,7 @@ class _StubApp:
             raise KeyError(key)
         return self._config
 
+
 class _FakeUpload:
     """Duck-typed multipart payload produced by the HTTP layer."""
 
@@ -105,7 +109,7 @@ class _FakeUpload:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.filename = filename
         self.content_type = "application/octet-stream"
@@ -151,7 +155,7 @@ class _FakeUpload:
             The next chunk of the buffered payload.
         """
         for start in range(0, len(self.payload), size):
-            yield self.payload[start:start + size]
+            yield self.payload[start : start + size]
 
     def close(self) -> None:
         """Release the buffered payload (no-op for the double).
@@ -159,8 +163,9 @@ class _FakeUpload:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
+
 
 def build_manager(
     base_path: Path,
@@ -187,8 +192,8 @@ def build_manager(
     config = {"default": default, "disks": disks}
     return StorageManager(_StubApp(base_path, config))  # type: ignore[arg-type]
 
-class TestStorageManagerConfiguration(TestCase):
 
+class TestStorageManagerConfiguration(TestCase):
     def setUp(self) -> None:
         """Create an isolated base path before each test.
 
@@ -197,22 +202,11 @@ class TestStorageManagerConfiguration(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._base = Path(self._tmpdir.name)
-
-    def tearDown(self) -> None:
-        """Remove the temporary base path after each test.
-
-        Ensures roots created by the manager are cleaned up.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     def testImplementsTheManagerContract(self) -> None:
         """Expose the manager through its published contract.
@@ -222,7 +216,7 @@ class TestStorageManagerConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(
             self._base,
@@ -238,7 +232,7 @@ class TestStorageManagerConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(
             self._base,
@@ -255,7 +249,7 @@ class TestStorageManagerConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = Filesystems(
             default="public",
@@ -265,8 +259,8 @@ class TestStorageManagerConfiguration(TestCase):
         self.assertIs(manager._config, entity)
         self.assertEqual(manager._default, "public")
 
-class TestStorageManagerDiskResolution(TestCase):
 
+class TestStorageManagerDiskResolution(TestCase):
     def setUp(self) -> None:
         """Build a manager with two local disks before each test.
 
@@ -275,9 +269,10 @@ class TestStorageManagerDiskResolution(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._base = Path(self._tmpdir.name)
         self._manager = build_manager(
             self._base,
@@ -294,18 +289,6 @@ class TestStorageManagerDiskResolution(TestCase):
             },
         )
 
-    def tearDown(self) -> None:
-        """Remove the temporary base path after each test.
-
-        Ensures roots created by the manager are cleaned up.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
-
     def testDiskResolvesTheRequestedName(self) -> None:
         """Resolve the disk declared under the requested name.
 
@@ -314,7 +297,7 @@ class TestStorageManagerDiskResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         disk = self._manager.disk("public")
         self.assertIsInstance(disk, IDisk)
@@ -328,7 +311,7 @@ class TestStorageManagerDiskResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._manager.disk().name(), "local")
 
@@ -340,7 +323,7 @@ class TestStorageManagerDiskResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(self._manager.default(), self._manager.disk())
 
@@ -352,10 +335,11 @@ class TestStorageManagerDiskResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(
-            self._manager.disk("public"), self._manager.disk("public"),
+            self._manager.disk("public"),
+            self._manager.disk("public"),
         )
 
     def testUnknownDiskRaisesDiskNotFound(self) -> None:
@@ -366,7 +350,7 @@ class TestStorageManagerDiskResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(DiskNotFoundException) as ctx:
             self._manager.disk("dropbox")
@@ -380,7 +364,7 @@ class TestStorageManagerDiskResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(self._manager.disk("local"), Disk)
 
@@ -392,14 +376,14 @@ class TestStorageManagerDiskResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._manager.disk("local").put("inner/data.txt", "ok")
         stored = self._base / "private" / "inner" / "data.txt"
         self.assertEqual(stored.read_text(encoding="utf-8"), "ok")
 
-class TestStorageManagerDriverSelection(TestCase):
 
+class TestStorageManagerDriverSelection(TestCase):
     def setUp(self) -> None:
         """Create an isolated base path before each test.
 
@@ -408,22 +392,11 @@ class TestStorageManagerDriverSelection(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._base = Path(self._tmpdir.name)
-
-    def tearDown(self) -> None:
-        """Remove the temporary base path after each test.
-
-        Ensures roots created by the manager are cleaned up.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     def testLocalDriverKeepsAbsoluteRoots(self) -> None:
         """Bind local disks declaring an absolute path as is.
@@ -433,11 +406,12 @@ class TestStorageManagerDriverSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         root = self._base / "private"
         manager = build_manager(
-            self._base, {"local": {"driver": "local", "path": str(root)}},
+            self._base,
+            {"local": {"driver": "local", "path": str(root)}},
         )
         driver = manager.disk("local")._driver
         self.assertIsInstance(driver, LocalStorageDriver)
@@ -451,7 +425,7 @@ class TestStorageManagerDriverSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(
             self._base,
@@ -468,7 +442,7 @@ class TestStorageManagerDriverSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(
             self._base,
@@ -491,7 +465,7 @@ class TestStorageManagerDriverSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(
             self._base,
@@ -516,7 +490,7 @@ class TestStorageManagerDriverSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(
             self._base,
@@ -529,10 +503,12 @@ class TestStorageManagerDriverSelection(TestCase):
         )
         self.assertIsInstance(manager.disk("s3")._driver, S3StorageDriver)
         self.assertIsInstance(
-            manager.disk("azure")._driver, AzureStorageDriver,
+            manager.disk("azure")._driver,
+            AzureStorageDriver,
         )
         self.assertIsInstance(
-            manager.disk("gcs")._driver, GoogleStorageDriver,
+            manager.disk("gcs")._driver,
+            GoogleStorageDriver,
         )
 
     def testCloudDriverAliasesAreAccepted(self) -> None:
@@ -543,7 +519,7 @@ class TestStorageManagerDriverSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(
             self._base,
@@ -555,7 +531,8 @@ class TestStorageManagerDriverSelection(TestCase):
         )
         self.assertIsInstance(manager.disk("s3")._driver, S3StorageDriver)
         self.assertIsInstance(
-            manager.disk("gcs")._driver, GoogleStorageDriver,
+            manager.disk("gcs")._driver,
+            GoogleStorageDriver,
         )
 
     def testUnknownDriverRaisesDriverNotSupported(self) -> None:
@@ -566,7 +543,7 @@ class TestStorageManagerDriverSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(
             self._base,
@@ -577,8 +554,8 @@ class TestStorageManagerDriverSelection(TestCase):
             manager.disk("s3")
         self.assertIn("StorageManager.extend()", str(ctx.exception))
 
-class TestStorageManagerExtension(TestCase):
 
+class TestStorageManagerExtension(TestCase):
     def setUp(self) -> None:
         """Build a manager with a cloud disk before each test.
 
@@ -587,9 +564,10 @@ class TestStorageManagerExtension(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._base = Path(self._tmpdir.name)
         self._manager = build_manager(
             self._base,
@@ -602,18 +580,6 @@ class TestStorageManagerExtension(TestCase):
             },
         )
 
-    def tearDown(self) -> None:
-        """Remove the temporary base path after each test.
-
-        Ensures roots created by the manager are cleaned up.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
-
     async def testCustomFactoryTakesPrecedenceOverBuiltins(self) -> None:
         """Resolve disks through factories registered at runtime.
 
@@ -622,7 +588,7 @@ class TestStorageManagerExtension(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._manager.extend("aws", lambda _config: MemoryStorageDriver())
         disk = self._manager.disk("s3")
@@ -638,7 +604,7 @@ class TestStorageManagerExtension(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         received: list[object] = []
 
@@ -660,6 +626,7 @@ class TestStorageManagerExtension(TestCase):
 
         self._manager.extend("aws", factory)
         self._manager.disk("s3")
+        self.assertEqual(len(received), 1)
         self.assertEqual(getattr(received[0], "region", None), "us-east-1")
 
     def testExtendInvalidatesPreviouslyCachedDisks(self) -> None:
@@ -670,7 +637,7 @@ class TestStorageManagerExtension(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         first = self._manager.disk("local")
         self._manager.extend("local", lambda _config: MemoryStorageDriver())
@@ -678,8 +645,8 @@ class TestStorageManagerExtension(TestCase):
         self.assertIsNot(first, second)
         self.assertIsInstance(second._driver, MemoryStorageDriver)
 
-class TestStorageManagerUploads(TestCase):
 
+class TestStorageManagerUploads(TestCase):
     def setUp(self) -> None:
         """Build a manager backed by a temporary local disk.
 
@@ -688,9 +655,10 @@ class TestStorageManagerUploads(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._base = Path(self._tmpdir.name)
         self._manager = build_manager(
             self._base,
@@ -702,18 +670,6 @@ class TestStorageManagerUploads(TestCase):
             },
         )
 
-    def tearDown(self) -> None:
-        """Remove the temporary base path after each test.
-
-        Ensures roots created by the manager are cleaned up.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
-
     def testUploadedWrapsThePayload(self) -> None:
         """Wrap an HTTP payload into a storable uploaded file.
 
@@ -722,7 +678,7 @@ class TestStorageManagerUploads(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         upload = self._manager.uploaded(
             _FakeUpload("photo.png", b"png-bytes"),  # type: ignore[arg-type]
@@ -737,7 +693,7 @@ class TestStorageManagerUploads(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         upload = self._manager.uploaded(
             _FakeUpload("photo.png", b"png-bytes"),  # type: ignore[arg-type]

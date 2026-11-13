@@ -1,11 +1,9 @@
 """Accumulator of ON conditions for a join declared with a callback."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import Self
 from orionis.orm.query.expressions import JoinCondition
 
-if TYPE_CHECKING:
-    from typing import Self
 
 class JoinClause:
     """
@@ -26,7 +24,7 @@ class JoinClause:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self._conditions: list[JoinCondition] = []
         """Predicates composing the join condition."""
@@ -74,7 +72,10 @@ class JoinClause:
         """
         self._conditions.append(
             JoinCondition(
-                first=first, operator=operator, second=second, boolean="or",
+                first=first,
+                operator=operator,
+                second=second,
+                boolean="or",
             ),
         )
         return self

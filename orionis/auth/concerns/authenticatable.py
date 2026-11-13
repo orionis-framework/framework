@@ -1,19 +1,18 @@
+# ruff: noqa: S105
+# AUTH_PASSWORD names an attribute and does not contain a credential.
+
 """Turn any Orionis model into an authenticatable identity."""
 
 from typing import ClassVar
 from orionis.auth.concerns.functions import model_primary_key
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 
+
 class Authenticatable:
     """
     Turn any Orionis model into an authenticatable identity.
 
-    Mix it into the model backing your users::
-
-        class User(Model, Authenticatable, Authorizable):
-            id = Integer().primary().autoIncrement()
-            email = String(255).unique()
-            password = String(255)
+    Mix it into the model backing application identities.
 
     The mixin is a plain class registered as a virtual implementation of
     :class:`orionis.auth.contracts.IAuthenticatable`. Inheriting from the ABC directly
@@ -26,7 +25,7 @@ class Authenticatable:
 
     # Attribute holding the password hash. Override it when the model
     # stores the hash under a different name.
-    AUTH_PASSWORD: ClassVar[str] = "password"  # noqa: S105
+    AUTH_PASSWORD: ClassVar[str] = "password"
     """
     Attribute holding the password hash. Override it when the model stores the hash
     under a different name.
@@ -66,6 +65,7 @@ class Authenticatable:
         """
         stored = getattr(self, self.AUTH_PASSWORD, None)
         return stored if isinstance(stored, str) else ""
+
 
 # Registered as a virtual subclass so ``isinstance`` and ``issubclass``
 # work without forcing ``ABCMeta`` onto every model.

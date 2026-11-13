@@ -6,6 +6,6 @@ Una tarea de background pertenece al mismo proceso y se ejecuta después de entr
 
 1. [Ejecutar acciones después de responder](response-tasks.md): requisitos, uso progresivo, configuración, integración, errores y referencia pública.
 
-Los ejemplos aislados usan objetos de aplicación mínimos; las facades requieren una aplicación Orionis inicializada y sus providers. El código fuente y los contratos determinan las capacidades descritas.
+Los ejemplos de construcción de respuestas difieren la ejecución. Para ejecutar sus tareas de background, usa una aplicación Orionis inicializada mediante boot y los providers que requiere la fachada del logger.
 
 Relacionados: [http](../../../http/docs/es/README.md) · [queues](../../../queues/docs/es/README.md) · [logging](../../../logging/docs/es/README.md)

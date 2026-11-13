@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.http.routes.entities.resolved_route import ResolvedRoute
 
+
 class IRouteResolver(ABC):
     """Define the contract for route resolver implementations."""
 

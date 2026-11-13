@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 import io
 import json
@@ -14,6 +16,7 @@ if TYPE_CHECKING:
 # Module name used to simulate a class whose source file cannot be resolved.
 _MISSING_MODULE: str = "_orionis_missing_module"
 
+
 def _probe_test(_self: object) -> None:
     """
     Provide a no-op test method for report metadata.
@@ -28,6 +31,7 @@ def _probe_test(_self: object) -> None:
     None
         Complete without assertions or side effects.
     """
+
 
 def _make_case(*, module: str | None = None) -> CoreTestCase:
     """
@@ -48,6 +52,7 @@ def _make_case(*, module: str | None = None) -> CoreTestCase:
         probe.__module__ = module
     return probe("testProbe")
 
+
 def _raise_failure() -> None:
     """
     Raise an assertion error from a known source line.
@@ -61,6 +66,7 @@ def _raise_failure() -> None:
     # A deliberately long comment line used to exercise the source code trimming
     raise AssertionError(error_msg)
 
+
 def _raise_error() -> None:
     """
     Raise a runtime error from a known source line.
@@ -72,6 +78,7 @@ def _raise_error() -> None:
     """
     error_msg = "probe error"
     raise RuntimeError(error_msg)
+
 
 def _bind_console(processor: TestResultProcessor, width: int) -> io.StringIO:
     """
@@ -93,6 +100,7 @@ def _bind_console(processor: TestResultProcessor, width: int) -> io.StringIO:
     processor._TestResultProcessor__console = Console(file=buffer, width=width)
     processor._TestResultProcessor__max_width = width * 0.8
     return buffer
+
 
 class _ProcessorTestCase(TestCase):
     """Base scenario providing processors bound to an in-memory console."""
@@ -185,8 +193,8 @@ class _ProcessorTestCase(TestCase):
             record(case, (type(exc), exc, exc.__traceback__))
         return processor.getTestResults()[-1]
 
-class TestTestResultProcessorDefinition(_ProcessorTestCase):
 
+class TestTestResultProcessorDefinition(_ProcessorTestCase):
     def testDerivesFromStandardTestResult(self) -> None:
         """
         Derive from the result collector of the standard library.
@@ -242,8 +250,8 @@ class TestTestResultProcessorDefinition(_ProcessorTestCase):
         self.assertEqual(quiet._TestResultProcessor__print_verbosity, 0)
         self.assertEqual(verbose._TestResultProcessor__print_verbosity, 2)
 
-class TestTestResultProcessorOutcomes(_ProcessorTestCase):
 
+class TestTestResultProcessorOutcomes(_ProcessorTestCase):
     def testSuccessIsRecorded(self) -> None:
         """
         Record a passed report for a successful test.
@@ -326,6 +334,23 @@ class TestTestResultProcessorOutcomes(_ProcessorTestCase):
         self.assertIsNotNone(result.line_no)
         self.assertIn(result.line_no, [line for line, _code in result.source_code])
 
+    def testDeferredErrorUsesTheProvidedTraceback(self) -> None:
+        """Retain source context when reporting after exception handling ends."""
+        processor = self._makeProcessor()
+        case = _make_case()
+        processor.startTest(case)
+        captured = None
+        try:
+            _raise_error()
+        except RuntimeError as error:
+            captured = (type(error), error, error.__traceback__)
+        processor.addError(case, captured)
+        result = processor.getTestResults()[-1]
+        self.assertIsNotNone(result.line_no)
+        self.assertTrue(
+            any("raise RuntimeError" in code for _, code in result.source_code),
+        )
+
     def testErrorIsRecorded(self) -> None:
         """
         Record an errored report for an unexpected exception.
@@ -398,7 +423,9 @@ class TestTestResultProcessorOutcomes(_ProcessorTestCase):
         the reporting pipeline.
         """
         result = self._addOutcome(
-            self._makeProcessor(), errored=False, module=_MISSING_MODULE,
+            self._makeProcessor(),
+            errored=False,
+            module=_MISSING_MODULE,
         )
         self.assertIsNone(result.file_path)
         self.assertIsNone(result.line_no)
@@ -420,8 +447,8 @@ class TestTestResultProcessorOutcomes(_ProcessorTestCase):
         self.assertEqual(result.method, "")
         self.assertIsNone(result.doc_string)
 
-class TestTestResultProcessorDefaultRendering(_ProcessorTestCase):
 
+class TestTestResultProcessorDefaultRendering(_ProcessorTestCase):
     def testUnsetVerbosityRendersNothing(self) -> None:
         """
         Render no output when no reporting verbosity was configured.
@@ -432,8 +459,8 @@ class TestTestResultProcessorDefaultRendering(_ProcessorTestCase):
         self._addSuccess(self._makeProcessor())
         self.assertEqual(self._output(), "")
 
-class TestTestResultProcessorRendering(_ProcessorTestCase):
 
+class TestTestResultProcessorRendering(_ProcessorTestCase):
     def testSilentVerbosityRendersNothing(self) -> None:
         """
         Render no output when the reporting verbosity is silent.

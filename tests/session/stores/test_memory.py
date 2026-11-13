@@ -1,8 +1,13 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify session storage contracts and isolated persistence behavior."""
+
 from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from orionis.session.entities.record import SessionRecord
 from orionis.session.stores.memory import MemorySessionStore
 from orionis.test import TestCase
+
 
 def _make_record(
     session_id: str = "test-id",
@@ -31,6 +36,7 @@ def _make_record(
         expires_at=datetime.now(UTC) + timedelta(seconds=offset_seconds),
     )
 
+
 class TestMemorySessionStore(TestCase):
     """Unit tests for the in-process MemorySessionStore."""
 
@@ -45,7 +51,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         result = await store.read("nonexistent")
@@ -60,7 +66,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         record = _make_record("abc")
@@ -70,38 +76,20 @@ class TestMemorySessionStore(TestCase):
         self.assertEqual(result.id, "abc")  # type: ignore[union-attr]
 
     async def testReadReturnsNoneForExpiredRecord(self) -> None:
-        """Evict and return None for an expired session record.
-
-        Validates that a record whose expires_at is in the past is
-        treated as a cache miss and removed from the internal store.
+        """Return a miss and evict each expired record during its first read.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        store = MemorySessionStore()
-        record = _make_record("expired", offset_seconds=-1)
-        await store.write(record)
-        result = await store.read("expired")
-        self.assertIsNone(result)
-
-    async def testReadRemovesExpiredRecordFromStorage(self) -> None:
-        """Delete an expired record during the read operation.
-
-        Validates that after reading an expired record the internal
-        dictionary no longer contains the entry.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        store = MemorySessionStore()
-        record = _make_record("stale", offset_seconds=-10)
-        await store.write(record)
-        await store.read("stale")
-        self.assertNotIn("stale", store._storage)
+        for offset in (-1, -10):
+            with self.subTest(offset=offset):
+                store = MemorySessionStore()
+                record = _make_record("expired", offset_seconds=offset)
+                await store.write(record)
+                self.assertIsNone(await store.read(record.id))
+                self.assertNotIn(record.id, store._storage)
 
     async def testReadPreservesDataPayload(self) -> None:
         """Return the exact data payload stored with the session record.
@@ -112,18 +100,22 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         record = SessionRecord(
             id="data-test",
-            data={"user_id": 42, "role": "admin"},
+            data={"user_id": 42, "role": "admin", "tags": ["editor"]},
             expires_at=datetime.now(UTC) + timedelta(hours=1),
         )
         await store.write(record)
+        record.data["tags"].append("changed")
         result = await store.read("data-test")
         self.assertIsNotNone(result)
-        self.assertEqual(result.data, {"user_id": 42, "role": "admin"})  # type: ignore[union-attr]
+        expected = {"user_id": 42, "role": "admin", "tags": ["editor"]}
+        self.assertEqual(result.data, expected)
+        result.data["tags"].append("also changed")
+        self.assertEqual((await store.read(record.id)).data, expected)
 
     # ── write ────────────────────────────────────────────────────────────────
 
@@ -136,7 +128,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         record = _make_record("new-entry")
@@ -152,7 +144,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         record_v1 = SessionRecord(
@@ -180,7 +172,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         await store.write(_make_record("s1"))
@@ -203,11 +195,11 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         await store.write(_make_record("to-delete"))
-        await store.delete("to-delete")
+        self.assertTrue(await store.delete("to-delete"))
         result = await store.read("to-delete")
         self.assertIsNone(result)
 
@@ -220,10 +212,10 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
-        await store.delete("ghost")
+        self.assertFalse(await store.delete("ghost"))
 
     async def testDeleteDoesNotAffectOtherRecords(self) -> None:
         """Preserve unrelated records when a specific one is deleted.
@@ -234,7 +226,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         await store.write(_make_record("keep"))
@@ -254,7 +246,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         await store.write(_make_record("live", offset_seconds=3600))
@@ -272,7 +264,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         await store.write(_make_record("session-a", offset_seconds=7200))
@@ -289,7 +281,7 @@ class TestMemorySessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = MemorySessionStore()
         await store.gc()

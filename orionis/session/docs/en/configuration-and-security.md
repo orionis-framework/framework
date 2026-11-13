@@ -18,8 +18,14 @@ Enable Secure in production HTTPS. `SameSite=None` requires Secure. Renewal inte
 ```python
 from orionis.foundation.config.session import Session as SessionConfig
 
-config = SessionConfig(driver="memory", lifetime=120, renewal_interval=300,
-                       secure=True, http_only=True, same_site="none")
+config = SessionConfig(
+    driver="memory",
+    lifetime=120,
+    renewal_interval=300,
+    secure=True,
+    http_only=True,
+    same_site="none",
+)
 assert config.renewal_interval == 300
 ```
 
@@ -38,7 +44,7 @@ session.invalidate()
 assert session.invalidated
 ```
 
-`regenerate()` requests rotation; the identifier does not change immediately. The manager coordinates deleting the old record and persisting the new one when saving the response. Auth login already integrates rotation: do not build a parallel flow that bypasses its context. `invalidate()` clears data and requests record deletion/an expired cookie. `clear()` only removes values; it is not secure logout.
+`regenerate()` requests rotation; the identifier does not change immediately. The manager deletes the old record before persisting the replacement when saving the response; these are separate store operations, not a transaction across both identifiers. Auth login already integrates rotation: do not build a parallel flow that bypasses its context. `invalidate()` clears data and requests record deletion/an expired cookie. Expiration preserves the configured path, domain, Secure, HttpOnly, SameSite and Partitioned attributes, including secure cookie prefixes and partitioned sessions. `clear()` only removes values; it is not secure logout.
 
 ## Recovery and failures
 

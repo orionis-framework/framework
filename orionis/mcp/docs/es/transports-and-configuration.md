@@ -7,16 +7,20 @@ from orionis.mcp import McpResponse, Server, Tool
 from orionis.schemas import Schema
 from orionis.support.facades import Mcp
 
+
 class GreetInput(Schema):
     name: str
+
 
 class GreetTool(Tool[GreetInput, str]):
     def handle(self, payload: GreetInput) -> McpResponse:
         return McpResponse.structured(f"Hello, {payload.name}!")
 
+
 class ApplicationServer(Server):
     name = "Application"
     tools = (GreetTool,)
+
 
 Mcp.web("/mcp/application", ApplicationServer)
 Mcp.local("application", ApplicationServer)
@@ -61,7 +65,11 @@ Inicia un handle registrado con `python -B reactor mcp:start application`; `pyth
 
 STDIO usa mensajes JSON por línea; stdout se reserva exclusivamente para frames y diagnósticos van a stderr. El transporte acota lectura y concurrencia, admite cancelación por notificación y usa el mismo dispatcher que HTTP. No imprimas logging convencional en stdout dentro de handlers.
 
+La salida solo se confirma después de escribir y vaciar el frame completo, incluso si un stream sin buffer admite escrituras parciales. Si no acepta ningún byte, falla explícitamente; el transporte no descarta el resto ni reintenta indefinidamente una salida bloqueada.
+
 ## Presupuestos
+
+El provider acepta un `McpConfig`, un mapping de configuración o `None` para usar valores predeterminados. Un valor falsy de otro tipo (`False`, `0`, `""` o `[]`) es inválido y falla antes de registrar servicios; no selecciona defaults silenciosamente.
 
 | Variable | Predeterminado |
 |---|---:|

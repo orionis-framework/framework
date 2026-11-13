@@ -1,47 +1,70 @@
+# ruff: noqa: ASYNC109, TC001
+# Keep the existing boundary behavior and deliberately shaped fixtures.
+# Keep connection and lifecycle annotations resolvable at runtime.
 """Own tasks and pending client results for exactly one connection."""
 
 import asyncio
 from functools import partial
 from math import isfinite
-from typing import TYPE_CHECKING
 import msgspec
 from orionis.failure.runtime import (
-    capture, capture_nowait, current_operation, get_runtime, handoff, operation,
+    FailureRuntime,
+    capture,
+    capture_nowait,
+    current_operation,
+    get_runtime,
+    handoff,
+    operation,
 )
+from orionis.foundation.config.realtime.entities.realtime import RealtimeConfig
+from orionis.http import WebSocket
 from orionis.http.adapters.response.streams import await_cleanup
 from orionis.http.exceptions.websocket import WebSocketDisconnected
 from orionis.realtime.errors import ClientInvocationError
-
-if TYPE_CHECKING:
-    from orionis.failure.runtime import FailureRuntime
-    from orionis.foundation.config.realtime.entities.realtime import RealtimeConfig
-    from orionis.http import WebSocket
-    from orionis.realtime.hub import Hub, HubContext
-    from orionis.realtime.protocol import Completion, HubProtocol
+from orionis.realtime.hub import Hub, HubContext
+from orionis.realtime.protocol import Completion, HubProtocol
 
 _TARGET_LIMIT = 128
 """Target limit value used by ``connection``."""
 _ARGUMENT_LIMIT = 64
 """Argument limit value used by ``connection``."""
 
+
 class RealtimeConnection:
     """Own tasks and pending client results for exactly one connection."""
 
     __slots__ = (
-        "__weakref__", "_cancel_requested", "_counter", "_failure_operation",
+        "__weakref__",
+        "_cancel_requested",
+        "_counter",
+        "_failure_operation",
         "_failure_runtime",
-        "_reports", "_write_lock",
-        "_write_task", "active",
-        "closing", "config", "context", "failure", "finishing", "hub", "owner",
-        "pending", "protocol",
-        "ready", "socket",
+        "_reports",
+        "_write_lock",
+        "_write_task",
+        "active",
+        "closing",
+        "config",
+        "context",
+        "failure",
+        "finishing",
+        "hub",
+        "owner",
+        "pending",
+        "protocol",
+        "ready",
+        "socket",
     )
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, context: HubContext, hub: type[Hub], protocol: HubProtocol,
+        self,
+        context: HubContext,
+        hub: type[Hub],
+        protocol: HubProtocol,
         config: RealtimeConfig,
-        *, runtime: FailureRuntime | None = None,
+        *,
+        runtime: FailureRuntime | None = None,
     ) -> None:
         """
         Bind connection state and initialize task, result, and write ownership.
@@ -126,8 +149,10 @@ class RealtimeConnection:
             failure delivery until completion.
         """
         original = (
-            error.__cause__ if isinstance(error, WebSocketDisconnected)
-            and isinstance(error.__cause__, Exception) else error
+            error.__cause__
+            if isinstance(error, WebSocketDisconnected)
+            and isinstance(error.__cause__, Exception)
+            else error
         )
         # A shielded write may finish after its invocation context has closed.
         # Claim a live receipt before notifying the still-active connection owner.
@@ -138,7 +163,10 @@ class RealtimeConnection:
             if previous is not None:
                 handoff(original, target=boundary, receipt=previous)
             pending = capture_nowait(
-                original, runtime=self._failure_runtime, flow="realtime", phase=phase,
+                original,
+                runtime=self._failure_runtime,
+                flow="realtime",
+                phase=phase,
                 correlation_id=self.context.connection_id,
                 expected=isinstance(original, WebSocketDisconnected),
             )
@@ -176,7 +204,10 @@ class RealtimeConnection:
         self._failure_operation = current_operation()
 
     def _writeDone(
-        self, task: asyncio.Task[None], *, ready: asyncio.Future | None = None,
+        self,
+        task: asyncio.Task[None],
+        *,
+        ready: asyncio.Future | None = None,
     ) -> None:
         """
         Retire a completed write and notify its waiter without losing failures.
@@ -337,7 +368,13 @@ class RealtimeConnection:
             message = "Realtime connection is closed"
             raise ConnectionError(message)
         ready = asyncio.get_running_loop().create_future()
-        task = asyncio.create_task(self._sendOwned(data))
+        write = self._sendOwned(data)
+        try:
+            task = asyncio.create_task(write)
+        except BaseException:
+            write.close()
+            self._write_lock.release()
+            raise
         self._write_task = task
         task.add_done_callback(partial(self._writeDone, ready=ready))
         # Cancellation only cancels the notification. The connection retains and
@@ -366,8 +403,10 @@ class RealtimeConnection:
             before propagating them.
         """
         with operation(
-            runtime=self._failure_runtime, flow="realtime",
-            operation="send", correlation_id=self.context.connection_id,
+            runtime=self._failure_runtime,
+            flow="realtime",
+            operation="send",
+            correlation_id=self.context.connection_id,
             isolated=True,
         ):
             try:
@@ -404,8 +443,10 @@ class RealtimeConnection:
         await self.sendEncoded(self.protocol.encode(envelope))
 
     async def invoke(
-        self, target: str, *args: object,
-        timeout: float | None = None,  # noqa: ASYNC109 # NOSONAR
+        self,
+        target: str,
+        *args: object,
+        timeout: float | None = None,  # NOSONAR
     ) -> object:
         """
         Invoke a client method and release its pending result on every exit.
@@ -446,16 +487,20 @@ class RealtimeConnection:
             message = "Realtime connection is not ready"
             raise ConnectionError(message)
         if (
-            not isinstance(target, str) or not target.isidentifier()
-            or target.startswith("_") or len(target) > _TARGET_LIMIT
+            not isinstance(target, str)
+            or not target.isidentifier()
+            or target.startswith("_")
+            or len(target) > _TARGET_LIMIT
             or len(args) > _ARGUMENT_LIMIT
         ):
             message = "Invalid client invocation target"
             raise ValueError(message)
         deadline = self.config.client_result_timeout if timeout is None else timeout
         if (
-            isinstance(deadline, bool) or not isinstance(deadline, (int, float))
-            or not isfinite(deadline) or deadline <= 0
+            isinstance(deadline, bool)
+            or not isinstance(deadline, (int, float))
+            or not isfinite(deadline)
+            or deadline <= 0
         ):
             message = "Client invocation timeout must be finite and positive"
             raise ValueError(message)
@@ -468,10 +513,14 @@ class RealtimeConnection:
         self.pending[invocation_id] = future
         try:
             async with asyncio.timeout(deadline):
-                await self.send({
-                    "type": "invoke", "id": invocation_id,
-                    "target": target, "args": args,
-                })
+                await self.send(
+                    {
+                        "type": "invoke",
+                        "id": invocation_id,
+                        "target": target,
+                        "args": args,
+                    },
+                )
                 return await future
         finally:
             self.pending.pop(invocation_id, None)
@@ -482,11 +531,15 @@ class RealtimeConnection:
                 failure = future.exception()
                 if failure is not None:
                     await capture(
-                        failure, runtime=self._failure_runtime, flow="realtime",
-                        phase="client_result", operation=target,
+                        failure,
+                        runtime=self._failure_runtime,
+                        flow="realtime",
+                        phase="client_result",
+                        operation=target,
                         correlation_id=invocation_id,
                         expected=isinstance(
-                            failure, (ClientInvocationError, ConnectionError),
+                            failure,
+                            (ClientInvocationError, ConnectionError),
                         ),
                     )
 
@@ -510,9 +563,12 @@ class RealtimeConnection:
             return
         if completion.error is not msgspec.UNSET:
             # The untrusted message is not propagated into server diagnostics.
-            future.set_exception(ClientInvocationError(
-                "client_error", "Client invocation failed",
-            ))
+            future.set_exception(
+                ClientInvocationError(
+                    "client_error",
+                    "Client invocation failed",
+                ),
+            )
         else:
             future.set_result(completion.result)
 
@@ -537,14 +593,19 @@ class RealtimeConnection:
         tasks = self._cancelWork()
         try:
             if tasks:
-                results = await await_cleanup(asyncio.gather(
-                    *tasks, return_exceptions=True,
-                ))
+                results = await await_cleanup(
+                    asyncio.gather(
+                        *tasks,
+                        return_exceptions=True,
+                    ),
+                )
                 for failure in results:
                     if isinstance(failure, BaseException):
                         await capture(
-                            failure, runtime=self._failure_runtime,
-                            flow="realtime", phase="cleanup",
+                            failure,
+                            runtime=self._failure_runtime,
+                            flow="realtime",
+                            phase="cleanup",
                             correlation_id=self.context.connection_id,
                         )
             if self._reports:

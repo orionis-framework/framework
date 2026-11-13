@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Observe Azure policy fallbacks using in-memory SDK collaborators."""
 
 from datetime import UTC, datetime
@@ -16,6 +18,7 @@ class TestAzureFailureObservation(TestCase):
     async def testVisibilityFallbackReportsOriginalPolicyError(self) -> None:
         """Verify visibility fallback reports original policy error."""
         app, runtime, handler = activate_runtime()
+        self.addAsyncCleanup(runtime.shutdown)
         error = OSError("policy service")
         driver = AzureStorageDriver(Azure(account_name="test", container="media"))
         driver._http_error = OSError
@@ -39,15 +42,17 @@ class TestAzureFailureObservation(TestCase):
     async def testInfoFallbackReportsWithoutLosingMetadata(self) -> None:
         """Verify info fallback reports without losing metadata."""
         app, runtime, handler = activate_runtime()
+        self.addAsyncCleanup(runtime.shutdown)
         error = OSError("policy service")
         driver = AzureStorageDriver(Azure(account_name="test", container="media"))
         driver._http_error = OSError
         props = SimpleNamespace(
             content_settings=SimpleNamespace(
-                content_md5=None, content_type="text/plain",
+                content_md5=None,
+                content_type="text/plain",
             ),
             size=12,
-            last_modified=datetime.now(UTC),
+            last_modified=datetime(2024, 1, 1, tzinfo=UTC),
             creation_time=None,
             etag="etag",
         )

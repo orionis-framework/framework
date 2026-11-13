@@ -4,9 +4,8 @@ from inspect import iscoroutinefunction
 from orionis.schemas.contracts.constraint import IRule
 from orionis.schemas.entities.failure import ValidationFailure
 
-class Rule(IRule):
 
-    # Restrict rule instances to their declared attributes.
+class Rule(IRule):
     """Define a reusable validation rule and its failure message."""
 
     __slots__ = ("_code", "_message")
@@ -26,7 +25,7 @@ class Rule(IRule):
         Returns
         -------
         None
-            Complete subclass creation when enforcement is asynchronous.
+            No return value.
 
         Raises
         ------
@@ -50,7 +49,7 @@ class Rule(IRule):
         Returns
         -------
         None
-            Return ``None`` after resolving the code and message to report.
+            No return value.
         """
         # Resolve class-level attributes once at construction time, so the
         # failure path only reads two slots.
@@ -84,6 +83,11 @@ class Rule(IRule):
         -------
         bool
             Return ``True`` when the value passes validation.
+
+        Raises
+        ------
+        NotImplementedError
+            If a subclass does not provide its own enforcement implementation.
         """
         error_msg = "Subclasses must implement the enforce method."
         raise NotImplementedError(error_msg)

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from typing import TYPE_CHECKING
 from orionis.queues.exceptions import QueueConfigurationError, QueueDispatchError
@@ -27,7 +29,11 @@ class DispatchRecorder:
         self.release = asyncio.Event()
 
     async def submit(
-        self, job: BaseJob, connection: str | None, queue: str | None, delay: float,
+        self,
+        job: BaseJob,
+        connection: str | None,
+        queue: str | None,
+        delay: float,
     ) -> str:
         """Record one submission and wait for explicit completion.
 

@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import inspect
 from orionis.container.container import Container
@@ -9,15 +11,18 @@ from orionis.mcp.server.primitives import Server, Tool
 from orionis.schemas import Schema
 from orionis.test import TestCase
 
+
 class _Repository:
     """A dependency whose identity must never come from client arguments."""
 
     __slots__ = ()
 
+
 class _Input(Schema):
     """A payload is allowed to contain a dependency-looking field name."""
 
     repository: str
+
 
 class _InjectedTool(Tool[_Input]):
     """Keep a trusted service and a similarly named payload field distinct."""
@@ -53,11 +58,13 @@ class _InjectedTool(Tool[_Input]):
         await asyncio.sleep(0)
         return payload.repository, repository, request.id, mode
 
+
 class _Server(Server):
     """Test-only immutable registry."""
 
     name = "Binding"
     tools = (_InjectedTool,)
+
 
 class TestInvoker(TestCase):
     """Run independent call scopes without bootstrapping an HTTP application."""

@@ -1,14 +1,18 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Self
+from unittest.mock import patch
 from orionis.cache.stores.database import DatabaseCacheBackend
 from orionis.database.connection import Connection
 from orionis.test import TestCase
 
-class TestDatabaseCacheBackend(TestCase):
 
+class TestDatabaseCacheBackend(TestCase):
     async def asyncSetUp(self: Self) -> None:
         """Create an in-memory SQLite connection and a fresh backend per test.
 
@@ -19,29 +23,18 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._connection = Connection(
             "sqlite",
             {"driver": "sqlite", "database": ":memory:", "prefix": ""},
         )
+        self.addAsyncCleanup(self._connection.disconnect)
         self._backend = DatabaseCacheBackend(
             connection=self._connection,
             table="cache",
             lock_table="cache_locks",
         )
-
-    async def asyncTearDown(self: Self) -> None:
-        """Dispose the in-memory engine after each test.
-
-        Releases the pooled in-memory database.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._connection.disconnect()
 
     # ── get ──────────────────────────────────────────────────────────────────
 
@@ -54,7 +47,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.get("absent")
         self.assertIsNone(result)
@@ -68,7 +61,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.get("absent", default="fallback")
         self.assertEqual(result, "fallback")
@@ -81,7 +74,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("k1", "hello")
         result = await self._backend.get("k1")
@@ -96,12 +89,16 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("ttl_key", "data", ttl=0.05)
-        await asyncio.sleep(0.1)
-        result = await self._backend.get("ttl_key")
-        self.assertIsNone(result)
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.database.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("ttl_key", "data", ttl=0.05)
+            clock.now += 0.1
+            self.assertIsNone(await self._backend.get("ttl_key"))
 
     # ── set ──────────────────────────────────────────────────────────────────
 
@@ -113,7 +110,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.set("k", "v")
         self.assertTrue(result)
@@ -127,7 +124,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("k", "first")
         await self._backend.set("k", "second")
@@ -143,11 +140,16 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("persist", 42, ttl=None)
-        result = await self._backend.get("persist")
-        self.assertEqual(result, 42)
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.database.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("persist", 42, ttl=None)
+            clock.now += 10**9
+            self.assertEqual(await self._backend.get("persist"), 42)
 
     async def testSetStoresNoneValue(self: Self) -> None:
         """Store and retrieve an explicit None value.
@@ -158,7 +160,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("null_key", None)
         result = await self._backend.get("null_key", default="missing")
@@ -174,7 +176,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("ex", "val")
         self.assertTrue(await self._backend.exists("ex"))
@@ -187,7 +189,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await self._backend.exists("ghost"))
 
@@ -199,11 +201,16 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("exp", "x", ttl=0.05)
-        await asyncio.sleep(0.1)
-        self.assertFalse(await self._backend.exists("exp"))
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.database.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("exp", "x", ttl=0.05)
+            clock.now += 0.1
+            self.assertFalse(await self._backend.exists("exp"))
 
     # ── delete ───────────────────────────────────────────────────────────────
 
@@ -215,7 +222,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("d", "v")
         result = await self._backend.delete("d")
@@ -230,7 +237,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.delete("missing")
         self.assertEqual(result, 0)
@@ -245,7 +252,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("a", 1)
         await self._backend.set("b", 2)
@@ -264,7 +271,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("m1", "one")
         await self._backend.set("m2", "two")
@@ -279,7 +286,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.multiSet([("s1", "a"), ("s2", "b")])
         self.assertTrue(result)
@@ -294,7 +301,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.multi_set([("al1", "x")])
         result = await self._backend.multi_get(["al1"])
@@ -310,7 +317,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.add("new", "val")
         self.assertTrue(result)
@@ -324,7 +331,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("dup", "existing")
         with self.assertRaises(ValueError):
@@ -340,7 +347,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.increment("counter")
         self.assertEqual(result, 1)
@@ -353,7 +360,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("counter2", 10)
         result = await self._backend.increment("counter2", delta=5)
@@ -368,7 +375,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("counter3", 10)
         result = await self._backend.increment("counter3", delta=-4)
@@ -382,12 +389,16 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("counter4", 10, ttl=0.05)
-        await asyncio.sleep(0.1)
-        result = await self._backend.increment("counter4")
-        self.assertEqual(result, 1)
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.database.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("counter4", 10, ttl=0.05)
+            clock.now += 0.1
+            self.assertEqual(await self._backend.increment("counter4"), 1)
 
     # ── atomic locks ─────────────────────────────────────────────────────────
 
@@ -399,7 +410,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         acquired = await self._backend.acquireLock("res", "owner-a", lease=5)
         self.assertTrue(acquired)
@@ -412,7 +423,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.acquireLock("res2", "owner-a", lease=5)
         acquired = await self._backend.acquireLock("res2", "owner-b", lease=5)
@@ -426,7 +437,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.acquireLock("res3", "owner-a", lease=5)
         acquired = await self._backend.acquireLock("res3", "owner-a", lease=5)
@@ -440,12 +451,16 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.acquireLock("res4", "owner-a", lease=0.05)
-        await asyncio.sleep(0.1)
-        acquired = await self._backend.acquireLock("res4", "owner-b", lease=5)
-        self.assertTrue(acquired)
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.database.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.acquireLock("res4", "owner-a", lease=0.05)
+            clock.now += 0.1
+            self.assertTrue(await self._backend.acquireLock("res4", "owner-b", lease=5))
 
     async def testReleaseLockAllowsReacquisitionByOtherOwner(self: Self) -> None:
         """Free the lock row so another owner can acquire it immediately.
@@ -455,7 +470,7 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.acquireLock("res5", "owner-a", lease=5)
         await self._backend.releaseLock("res5", "owner-a")
@@ -474,18 +489,18 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("fractional", "v", ttl=0.25)
-
+        with patch(
+            "orionis.cache.stores.database.time",
+            SimpleNamespace(time=lambda: 100.125),
+        ):
+            await self._backend.set("fractional", "v", ttl=0.25)
         rows = await self._connection.select(
             "SELECT expiration FROM cache WHERE cache_key = :k",
             {"k": "fractional"},
         )
-        stored = rows[0]["expiration"]
-
-        self.assertIsInstance(stored, float)
-        self.assertNotEqual(stored % 1, 0.0)
+        self.assertEqual(rows[0]["expiration"], 100.375)
 
     async def testLockExpirationKeepsSubSecondPrecision(self: Self) -> None:
         """Store a fractional lease without losing its decimals.
@@ -496,18 +511,18 @@ class TestDatabaseCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.acquireLock("res6", "owner-a", lease=0.25)
-
+        with patch(
+            "orionis.cache.stores.database.time",
+            SimpleNamespace(time=lambda: 100.125),
+        ):
+            await self._backend.acquireLock("res6", "owner-a", lease=0.25)
         rows = await self._connection.select(
             "SELECT expiration FROM cache_locks WHERE cache_key = :k",
             {"k": "res6"},
         )
-        stored = rows[0]["expiration"]
-
-        self.assertIsInstance(stored, float)
-        self.assertNotEqual(stored % 1, 0.0)
+        self.assertEqual(rows[0]["expiration"], 100.375)
 
 
 class TestDatabaseCacheBackendConcurrency(TestCase):
@@ -528,9 +543,10 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._connection = Connection(
             "sqlite",
             {
@@ -543,24 +559,12 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
                 "busy_timeout": 30000,
             },
         )
+        self.addAsyncCleanup(self._connection.disconnect)
         self._backend = DatabaseCacheBackend(
             connection=self._connection,
             table="cache",
         )
         await self._backend._ensureSchema()
-
-    async def asyncTearDown(self: Self) -> None:
-        """Dispose the engine and remove the temporary database file.
-
-        Releases the file handle before the directory is cleaned up.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._connection.disconnect()
-        self._tmpdir.cleanup()
 
     async def testConcurrentAddGrantsASingleWinner(self: Self) -> None:
         """Let exactly one concurrent caller create the key.
@@ -572,7 +576,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         results = await asyncio.gather(
             *(self._backend.add("race", f"value-{n}") for n in range(10)),
@@ -595,7 +599,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("hits", 0)
 
@@ -614,7 +618,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await asyncio.gather(
             *(self._backend.increment("fresh") for _ in range(10)),
@@ -631,7 +635,7 @@ class TestDatabaseCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         results = await asyncio.gather(
             *(

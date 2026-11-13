@@ -10,9 +10,11 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
 
 _PROTOCOL_STDOUT: ContextVar[BinaryIO | None] = ContextVar(
-    "orionis_protocol_stdout", default=None,
+    "orionis_protocol_stdout",
+    default=None,
 )
 """Context-local protocol stdout isolated between asynchronous tasks."""
+
 
 def protocol_stdout() -> BinaryIO | None:
     """
@@ -24,6 +26,7 @@ def protocol_stdout() -> BinaryIO | None:
         The original protocol writer while diagnostic stdout is redirected.
     """
     return _PROTOCOL_STDOUT.get()
+
 
 @contextmanager
 def protocol_stdio(arguments: Sequence[str] | None) -> Generator[None]:

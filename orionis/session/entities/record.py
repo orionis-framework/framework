@@ -1,11 +1,12 @@
+# ruff: noqa: TC003
+# Resolve the public record's datetime annotation during native reflection.
 """Persistent representation of a single session."""
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from datetime import datetime
+from typing import Any
 
-if TYPE_CHECKING:
-    from datetime import datetime
 
 @dataclass(slots=True)
 class SessionRecord:

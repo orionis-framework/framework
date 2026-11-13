@@ -4,6 +4,7 @@ from orionis.container.providers.service_provider import ServiceProvider
 from orionis.database.contracts.schema import ISchema
 from orionis.database.schema.schema import Schema
 
+
 class SchemaProvider(ServiceProvider):
     """Register schema services in the application container."""
 
@@ -18,7 +19,7 @@ class SchemaProvider(ServiceProvider):
         Returns
         -------
         None
-            The binding is registered as a side effect.
+            No return value.
         """
         # Register a transient binding to avoid leaking state between uses
         self.app.transient(ISchema, Schema)

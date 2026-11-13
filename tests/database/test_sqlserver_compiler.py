@@ -1,4 +1,6 @@
-"""SQL Server compilation regressions confirmed by private database tests."""
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify SQL Server SQLAlchemy compilation without a database server."""
 
 from sqlalchemy.dialects import mssql
 from orionis.database.compiler import SQLCompiler
@@ -36,11 +38,15 @@ class TestSQLServerCompiler(TestCase):
         Returns
         -------
         None
-            Assert that compiled table DDL contains no identity clause.
+            No return value.
         """
-        ddl = str(SQLCompiler(driver="sqlserver").compileCreateTable(
-            self.definition(),
-        ).compile(dialect=mssql.dialect()))
+        ddl = str(
+            SQLCompiler(driver="sqlserver")
+            .compileCreateTable(
+                self.definition(),
+            )
+            .compile(dialect=mssql.dialect()),
+        )
         self.assertNotIn("IDENTITY", ddl.upper())
 
     def testExplicitAutoIncrementIntegerPrimaryKeyRetainsIdentity(self) -> None:
@@ -50,11 +56,15 @@ class TestSQLServerCompiler(TestCase):
         Returns
         -------
         None
-            Assert that compiled table DDL includes an identity clause.
+            No return value.
         """
-        ddl = str(SQLCompiler(driver="sqlserver").compileCreateTable(
-            self.definition(incrementing=True),
-        ).compile(dialect=mssql.dialect()))
+        ddl = str(
+            SQLCompiler(driver="sqlserver")
+            .compileCreateTable(
+                self.definition(incrementing=True),
+            )
+            .compile(dialect=mssql.dialect()),
+        )
         self.assertIn("IDENTITY", ddl.upper())
 
     def testUpdateLockUsesSqlServerHintOnAliasedTable(self) -> None:
@@ -64,7 +74,7 @@ class TestSQLServerCompiler(TestCase):
         Returns
         -------
         None
-            Assert that the compiled query includes UPDLOCK and ROWLOCK hints.
+            No return value.
         """
         statement = SQLCompiler(driver="sqlserver").compileSelect(
             SelectPlan(table=self.definition(), alias="u", lock=LockMode.UPDATE),
@@ -79,11 +89,16 @@ class TestSQLServerCompiler(TestCase):
         Returns
         -------
         None
-            Assert that the compiled query includes HOLDLOCK and ROWLOCK hints.
+            No return value.
         """
         statement = SQLCompiler(driver="sqlserver").compileSelect(
             SelectPlan(table=self.definition(), lock=LockMode.SHARE),
         )
-        self.assertIn("WITH (HOLDLOCK, ROWLOCK)", str(statement.compile(
-            dialect=mssql.dialect(),
-        )))
+        self.assertIn(
+            "WITH (HOLDLOCK, ROWLOCK)",
+            str(
+                statement.compile(
+                    dialect=mssql.dialect(),
+                ),
+            ),
+        )

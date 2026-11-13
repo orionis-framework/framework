@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class SQLiteJournalMode(Enum):
     """
     Enumerate SQLite journal modes.
@@ -32,9 +33,9 @@ class SQLiteJournalMode(Enum):
         This class defines enumeration members and does not return a value.
     """
 
-    DELETE = "DELETE"      # Default: journal file deleted at transaction end.
+    DELETE = "DELETE"  # Default: journal file deleted at transaction end.
     TRUNCATE = "TRUNCATE"  # Journal file truncated to zero bytes.
-    PERSIST = "PERSIST"    # Journal file retained but marked inactive.
-    MEMORY = "MEMORY"      # Journal kept in memory (faster, less safe).
-    WAL = "WAL"            # Write-Ahead Logging for improved concurrency.
-    OFF = "OFF"            # Journaling disabled (no failure protection).
+    PERSIST = "PERSIST"  # Journal file retained but marked inactive.
+    MEMORY = "MEMORY"  # Journal kept in memory (faster, less safe).
+    WAL = "WAL"  # Write-Ahead Logging for improved concurrency.
+    OFF = "OFF"  # Journaling disabled (no failure protection).

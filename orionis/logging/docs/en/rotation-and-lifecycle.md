@@ -10,6 +10,8 @@ The size limit is checked before writing against bytes already recorded; one ent
 
 `switchChannel()` removes handlers before building the replacement. A `False` result after a failure does not mean the previous channel remains active. Check `getActiveChannel()` and report failure through an available operational channel. `reloadConfiguration()` rereads `app.config("logging")`: it does not automatically reload `.env` or Python files. Editing a file on disk does not itself change a running application's configuration.
 
+Reload detaches all previous handlers and attempts to close each one. If cleanup fails, it leaves no active handler and raises `RuntimeError` with the first failure as its cause; additional failures reach the central failure runtime. Configuration is reread only after cleanup succeeds. Stop concurrent producers before reloading, switching, or closing: these operations do not guarantee delivery of records emitted during the transition.
+
 ### Extend output
 
 `getLogger()` allows standard handlers. A subsequent reload or close may remove them: coordinate ownership. For a custom rotation policy, construct `AdvancedRotatingFileHandler` with a `SuffixResolver` implementation (`getSuffix`, `getNextRotationTime`); the built-in factory only knows the six documented names. `Logger` has no channel `extend()` registry. Replace `ILogger` in your provider for another global policy.
@@ -21,9 +23,11 @@ Locks are thread-level, not process-level. Workers using the same pattern can ro
 
 Time channels use a suffix resolver and rotate when its suffix changes. Hourly uses `YYYY-MM-DD_HH`, daily `YYYY-MM-DD`, weekly the ISO year/week, and monthly `YYYY-MM`. `chunked` rotates when the tracked encoded byte size reaches `mb_size`, generates timestamp/counter suffixes, and gzip-compresses rotated files.
 
+`getNextRotationTime()` converts an aware input to the resolver timezone and interprets a naive input in that timezone. Weekly and monthly boundaries can fall later on the current Monday or first day of the month; an input already at the boundary advances to the next period. These calculations do not schedule handler rotation.
+
 ### Retention
 
-Rotating handlers scan only files matching their path template, sort them by modification time, and delete entries beyond the configured backup count. Retention values represent channel periods: hours, days, weeks, months, or a file count—not a universal duration.
+Rotating handlers scan only files matching their path template, sort them by modification time, and delete entries beyond the configured backup count. Each matching file counts separately, including a plain file and its gzip archive. These counts do not guarantee a duration. Compression replaces an archive only after a complete temporary archive is ready; failed compression preserves the original file and any previous archive.
 
 ## Configuration
 
@@ -38,8 +42,9 @@ Rotating handlers scan only files matching their path template, sort them by mod
 | Daily rotation time | `LOG_ROTATION_TIME` | `00:00:00` |
 | Chunk size | `LOG_MB_SIZE` | 10 MiB |
 | Chunk retention | `LOG_FILES` | 5 files |
+| Queue capacity per handler | `LOG_QUEUE_CAPACITY` | 0 (synchronous) |
 
-`LOG_PATH` and `LOG_RETENTION` override only the channel selected by `LOG_CHANNEL`; edit `config/logging.py` or use dedicated environment keys if several channels need independent overrides. Paths are resolved below the application root. Rotating path templates should contain `{suffix}` to avoid writing every period to the same file.
+`LOG_PATH` and `LOG_RETENTION` override only the channel selected by `LOG_CHANNEL`; edit `config/logging.py` or use dedicated environment keys if several channels need independent overrides. Relative paths are resolved below the application root; absolute paths are used as supplied. Rotating path templates should contain `{suffix}` to avoid writing every period to the same file.
 
 
 
@@ -60,7 +65,12 @@ class App:
             "default": "stack",
             "channels": {
                 "stack": {"path": "stack.log", "level": "INFO"},
-                "chunked": {"path": "chunk_{suffix}.log", "level": "INFO", "mb_size": 1, "files": 2},
+                "chunked": {
+                    "path": "chunk_{suffix}.log",
+                    "level": "INFO",
+                    "mb_size": 1,
+                    "files": 2,
+                },
             },
         }
 
@@ -121,7 +131,7 @@ with TemporaryDirectory() as root:
 - String levels are normalized through standard logging names; unknown strings become `INFO`.
 - Rotation/compression/retention I/O errors are handled defensively so logging does not normally interrupt application work; standard logging may report handler errors.
 - Retention `0` removes matching rotated files during cleanup. Misconfigured templates without `{suffix}` defeat distinct time files.
-- `close()` is idempotent and suppresses common cleanup errors; using the wrapper afterward rebuilds it.
+- `close()` attempts every handler and is idempotent. It observes and suppresses common `OSError`, `RuntimeError`, and `ValueError` cleanup failures, but propagates retained queued-delivery or unexpected failures after cleanup. Using the wrapper afterward rebuilds it.
 - Multiple processes write independently and do not coordinate rotation locks across process boundaries.
 
 

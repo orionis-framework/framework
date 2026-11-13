@@ -3,6 +3,7 @@
 from orionis.container.facades.facade import Facade
 from orionis.realtime.contracts.manager import IConnectionManager
 
+
 class Realtime(Facade):
     """Expose worker-local Hub targeting from ordinary application services."""
 

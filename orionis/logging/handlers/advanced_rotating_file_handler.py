@@ -1,21 +1,25 @@
+# ruff: noqa: PLR0913, TC001
+# Preserve handler configuration parameters and runtime resolver annotations.
 """Rotate log files using size limits and resolved time suffixes."""
 
 from __future__ import annotations
+import codecs
 import gzip
 import re
 import shutil
 import time
 from logging import Handler, LogRecord
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from threading import Lock
-from typing import TYPE_CHECKING
+from orionis.failure import runtime as failure_runtime
+from orionis.logging.contracts.suffix_resolver import SuffixResolver
 
-if TYPE_CHECKING:
-    from orionis.logging.contracts.suffix_resolver import SuffixResolver
+_PATH_CACHE_LIMIT = 50
+"""Threshold for clearing previously resolved suffix paths."""
+
 
 class AdvancedRotatingFileHandler(Handler):
-
-    # ruff: noqa: PERF401, PLR0913
     """Rotate log files using size limits and resolved time suffixes."""
 
     def __init__(
@@ -57,6 +61,7 @@ class AdvancedRotatingFileHandler(Handler):
         None
             This method does not return a value.
         """
+        utf8_encoding = codecs.lookup(encoding).name == "utf-8"
         super().__init__()
 
         self.path_template = path_template
@@ -69,6 +74,8 @@ class AdvancedRotatingFileHandler(Handler):
         """Maximum number of backup files to retain."""
         self.encoding = encoding
         """File encoding."""
+        self._utf8_encoding = utf8_encoding
+        """Whether independent UTF-8 encoding gives the exact appended byte count."""
         self.delay = delay
         """If True, delay file opening until the first log record."""
         self.compress_rotated = compress_rotated
@@ -77,7 +84,7 @@ class AdvancedRotatingFileHandler(Handler):
         """Application root directory."""
 
         self.stream = None
-        """Iterator supplying response body chunks."""
+        """Text stream receiving records for the active log file."""
         self.current_path = None
         """Filesystem path of the active log file."""
         self.current_suffix = None
@@ -126,7 +133,7 @@ class AdvancedRotatingFileHandler(Handler):
             return self._path_cache[cache_key]
 
         # Clear old suffix paths when the cache exceeds its size limit.
-        if len(self._path_cache) > 50:  # noqa: PLR2004
+        if len(self._path_cache) > _PATH_CACHE_LIMIT:
             self._path_cache.clear()
 
         # Replace the placeholder with the provided suffix
@@ -151,8 +158,7 @@ class AdvancedRotatingFileHandler(Handler):
         Parameters
         ----------
         current_suffix : str
-            The suffix already resolved by the caller, avoiding a redundant
-            getSuffix() call (C1).
+            The suffix already resolved by the caller.
 
         Returns
         -------
@@ -210,24 +216,44 @@ class AdvancedRotatingFileHandler(Handler):
         """
         src = Path(file_path)
         dst = src.with_suffix(src.suffix + ".gz")
+        temporary: Path | None = None
         try:
-            # Open the original file and create a gzip-compressed copy.
-            with src.open("rb") as f_in, gzip.open(dst, "wb") as f_out:
-                shutil.copyfileobj(f_in, f_out)
+            # Publish only complete archives; a prior archive survives failures.
+            with (
+                src.open("rb") as f_in,
+                NamedTemporaryFile(
+                    dir=src.parent,
+                    prefix=f".{src.name}.",
+                    suffix=".tmp",
+                    delete=False,
+                ) as output,
+            ):
+                temporary = Path(output.name)
+                with gzip.GzipFile(
+                    filename=src.name,
+                    mode="wb",
+                    fileobj=output,
+                ) as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+            temporary.replace(dst)
+            temporary = None
             # Remove the original file after compression.
             src.unlink()
         except OSError as error:
             self._observeFailure(error, phase="compression")
-            # If compression fails, remove the incomplete compressed file.
-            if dst.exists():
-                dst.unlink()
+        finally:
+            if temporary is not None:
+                try:
+                    temporary.unlink(missing_ok=True)
+                except OSError as error:
+                    self._observeFailure(error, phase="compression")
 
     def _cleanupOldFiles(self) -> None:
         """
         Remove old log files exceeding the backup count.
 
-        This method deletes log files that exceed the configured backup count,
-        including compressed versions if present.
+        Count plain and compressed log files independently and retain the newest
+        files up to the configured backup count.
 
         Returns
         -------
@@ -244,24 +270,20 @@ class AdvancedRotatingFileHandler(Handler):
 
             # Use precompiled pattern to match related log files
             pattern = self._cleanup_pattern
-            related_files: list[Path] = []
-
             # Collect files matching the pattern in the directory
-            for file_path in directory.glob("*"):
-                if file_path.is_file() and pattern.match(file_path.name):
-                    related_files.append(file_path)
+            related_files = [
+                file_path
+                for file_path in directory.glob("*")
+                if file_path.is_file() and pattern.match(file_path.name)
+            ]
 
             # Sort files by modification time, newest first
             related_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
 
             # Remove files exceeding the backup count
-            for file_path in related_files[self.backup_count:]:
+            for file_path in related_files[self.backup_count :]:
                 try:
                     file_path.unlink()
-                    # Also remove compressed version if it exists
-                    gz_path: Path = file_path.with_suffix(file_path.suffix + ".gz")
-                    if gz_path.exists():
-                        gz_path.unlink()
                 except OSError as error:
                     self._observeFailure(error, phase="cleanup")
                     # Ignore errors during file removal
@@ -285,12 +307,13 @@ class AdvancedRotatingFileHandler(Handler):
         Returns
         -------
         None
-            Forward the failure with logging metadata and any bound application.
+            This method does not return a value.
         """
-        from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
-        capture_nowait(
-            error, app=getattr(self, "_orionis_failure_app", None),
-            flow="logging", phase=phase,
+        failure_runtime.capture_nowait(
+            error,
+            app=getattr(self, "_orionis_failure_app", None),
+            flow="logging",
+            phase=phase,
         )
 
     def _ensureStream(self) -> None:
@@ -305,7 +328,15 @@ class AdvancedRotatingFileHandler(Handler):
         None
             This method does not return a value.
         """
-        current_suffix: str = self.suffix_resolver.getSuffix()
+        if (
+            self.max_bytes is not None
+            and self.current_suffix is not None
+            and self.file_size < self.max_bytes
+        ):
+            # Request unique chunk suffixes only when a new chunk is needed.
+            current_suffix = self.current_suffix
+        else:
+            current_suffix = self.suffix_resolver.getSuffix()
 
         # Check if rotation is needed before writing
         if self._shouldRotate(current_suffix):
@@ -322,7 +353,10 @@ class AdvancedRotatingFileHandler(Handler):
 
             # Open the current file for appended log lines.
             self.stream = _p.open(
-                "a", encoding=self.encoding, buffering=1, newline="\n",
+                "a",
+                encoding=self.encoding,
+                buffering=1,
+                newline="\n",
             )
 
     def emit(self, record: LogRecord) -> None:
@@ -343,17 +377,20 @@ class AdvancedRotatingFileHandler(Handler):
             # Format the record before acquiring the stream lock.
             msg: str = self.format(record)
             line: str = msg + "\n"
-            written_bytes = len(line.encode(self.encoding))
+            written_bytes = len(line.encode("utf-8")) if self._utf8_encoding else None
             with self._lock:
                 # Ensure the stream is ready and rotate if needed
                 self._ensureStream()
 
                 if self.stream:
                     self.stream.write(line)
-                    self.file_size += written_bytes
+                    if written_bytes is None:
+                        # Preserve codec state, including BOMs and shift sequences.
+                        self.file_size = self.stream.tell()
+                    else:
+                        self.file_size += written_bytes
 
         except OSError:
-
             # Handle errors during log emission
             self.handleError(record)
 

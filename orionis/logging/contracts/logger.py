@@ -1,13 +1,14 @@
+# ruff: noqa: TC003
+# Keep the standard logger return annotation available to runtime introspection.
 """Define the contract for logger implementations."""
 
 from __future__ import annotations
 import asyncio
+import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from orionis.support.concurrency import complete_on_cancel
 
-if TYPE_CHECKING:
-    import logging
 
 class ILogger(ABC):
     """Define the contract for logger implementations."""
@@ -19,7 +20,7 @@ class ILogger(ABC):
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         await complete_on_cancel(asyncio.to_thread(self.close))
 
@@ -48,7 +49,7 @@ class ILogger(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod
@@ -64,7 +65,7 @@ class ILogger(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod
@@ -80,7 +81,7 @@ class ILogger(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod
@@ -96,7 +97,7 @@ class ILogger(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod
@@ -112,7 +113,7 @@ class ILogger(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod
@@ -142,7 +143,7 @@ class ILogger(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod
@@ -176,7 +177,7 @@ class ILogger(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod

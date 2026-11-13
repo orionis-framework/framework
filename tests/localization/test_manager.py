@@ -1,9 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import tempfile
 from pathlib import Path
 from orionis.localization.contracts.manager import ILocalizationManager
 from orionis.localization.exceptions import InvalidLocaleException
 from orionis.localization.manager import LocalizationManager
 from orionis.test import TestCase
+
 
 class _StubApp:
     """Application double exposing a base path and configuration values."""
@@ -23,7 +26,7 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._base_path = base_path
         self._config = config
@@ -58,6 +61,7 @@ class _StubApp:
         self.requested.append(key)
         return self._config.get(key)
 
+
 class _ManagerFixture(TestCase):
     """Provide an application double over a temporary project tree."""
 
@@ -72,23 +76,10 @@ class _ManagerFixture(TestCase):
         -------
         None
         """
-        self._temporary = tempfile.TemporaryDirectory()
-        self._base = Path(self._temporary.name)
+        super().setUp()
+        self._base = Path(self.enterContext(tempfile.TemporaryDirectory()))
         self._writeSource(self._base / "resources" / "lang", "es", "Bienvenido")
         self._writeSource(self._base / "resources" / "lang", "en", "Welcome")
-
-    def tearDown(self) -> None:
-        """
-        Remove the temporary application root.
-
-        Guarantees that no fixture file survives the test that created
-        it.
-
-        Returns
-        -------
-        None
-        """
-        self._temporary.cleanup()
 
     def _writeSource(self, directory: Path, locale: str, line: str) -> None:
         """
@@ -130,6 +121,7 @@ class _ManagerFixture(TestCase):
         self._app = _StubApp(self._base, config)
         return LocalizationManager(self._app)
 
+
 class TestLocalizationManagerDefinition(_ManagerFixture):
     """Validate the structural contract of the manager."""
 
@@ -142,7 +134,7 @@ class TestLocalizationManagerDefinition(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = self._makeManager({})
         self.assertIsInstance(manager, ILocalizationManager)
@@ -156,9 +148,10 @@ class TestLocalizationManagerDefinition(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(self._makeManager({}), "__dict__"))
+
 
 class TestLocalizationManagerWiring(_ManagerFixture):
     """Validate translator construction from the configuration."""
@@ -172,13 +165,15 @@ class TestLocalizationManagerWiring(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        manager = self._makeManager({
-            "app.locale": "es",
-            "app.fallback_locale": "en",
-            "app.language_path": "resources/lang/",
-        })
+        manager = self._makeManager(
+            {
+                "app.locale": "es",
+                "app.fallback_locale": "en",
+                "app.language_path": "resources/lang/",
+            },
+        )
         translator = manager.translator()
         self.assertEqual(translator.getLocale(), "es")
         self.assertEqual(translator.get("Welcome"), "Bienvenido")
@@ -193,7 +188,7 @@ class TestLocalizationManagerWiring(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = self._makeManager({"app.locale": "es"})
         translator = manager.translator()
@@ -209,12 +204,14 @@ class TestLocalizationManagerWiring(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        manager = self._makeManager({
-            "app.locale": "es",
-            "app.fallback_locale": "en",
-        })
+        manager = self._makeManager(
+            {
+                "app.locale": "es",
+                "app.fallback_locale": "en",
+            },
+        )
         translator = manager.translator()
         translator.setLocale("fr")
         self.assertEqual(translator.get("Welcome"), "Welcome")
@@ -228,11 +225,12 @@ class TestLocalizationManagerWiring(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = self._makeManager({"app.locale": "../etc"})
         with self.assertRaises(InvalidLocaleException):
             manager.translator()
+
 
 class TestLocalizationManagerDefaults(_ManagerFixture):
     """Validate the fallback values applied to missing settings."""
@@ -246,7 +244,7 @@ class TestLocalizationManagerDefaults(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = self._makeManager({})
         self.assertEqual(manager.translator().getLocale(), "en")
@@ -260,7 +258,7 @@ class TestLocalizationManagerDefaults(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = self._makeManager({"app.locale": "es"})
         translator = manager.translator()
@@ -276,10 +274,11 @@ class TestLocalizationManagerDefaults(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = self._makeManager({"app.locale": "es"})
         self.assertEqual(manager.translator().get("Welcome"), "Bienvenido")
+
 
 class TestLocalizationManagerPaths(_ManagerFixture):
     """Validate resolution of the configured language directory."""
@@ -293,13 +292,15 @@ class TestLocalizationManagerPaths(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeSource(self._base / "custom" / "lang", "es", "Relativo")
-        manager = self._makeManager({
-            "app.locale": "es",
-            "app.language_path": "custom/lang",
-        })
+        manager = self._makeManager(
+            {
+                "app.locale": "es",
+                "app.language_path": "custom/lang",
+            },
+        )
         self.assertEqual(manager.translator().get("Welcome"), "Relativo")
 
     def testHonoursAnAbsoluteLanguagePath(self) -> None:
@@ -311,12 +312,14 @@ class TestLocalizationManagerPaths(_ManagerFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         absolute = self._base / "absolute" / "lang"
         self._writeSource(absolute, "es", "Absoluto")
-        manager = self._makeManager({
-            "app.locale": "es",
-            "app.language_path": str(absolute),
-        })
+        manager = self._makeManager(
+            {
+                "app.locale": "es",
+                "app.language_path": str(absolute),
+            },
+        )
         self.assertEqual(manager.translator().get("Welcome"), "Absoluto")

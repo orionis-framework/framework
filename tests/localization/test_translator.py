@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 from orionis.localization.contracts.translator import ITranslator
 from orionis.localization.exceptions import InvalidLocaleException
 from orionis.localization.loader import TranslationLoader
@@ -9,15 +12,14 @@ from orionis.test import TestCase
 
 # Spanish fixture acting as the active locale.
 _SPANISH_SOURCE = (
-    '{"Welcome": "Bienvenido", "Hello :name": "Hola :name", '
-    '"Shared": "Compartido"}'
+    '{"Welcome": "Bienvenido", "Hello :name": "Hola :name", "Shared": "Compartido"}'
 )
 
 # English fixture acting as the fallback locale.
 _ENGLISH_SOURCE = (
-    '{"Welcome": "Welcome", "Only English": "Only English", '
-    '"Shared": "Shared"}'
+    '{"Welcome": "Welcome", "Only English": "English fallback", "Shared": "Shared"}'
 )
+
 
 class _MissingRecorder:
     """Missing-key handler double recording every invocation."""
@@ -35,7 +37,7 @@ class _MissingRecorder:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.line = line
         self.calls: list[tuple[str, str]] = []
@@ -59,6 +61,7 @@ class _MissingRecorder:
         self.calls.append((key, locale))
         return self.line
 
+
 class _TranslatorFixture(TestCase):
     """Provide a translator wired to isolated translation sources."""
 
@@ -73,26 +76,13 @@ class _TranslatorFixture(TestCase):
         -------
         None
         """
-        self._temporary = tempfile.TemporaryDirectory()
-        self._root = Path(self._temporary.name)
+        super().setUp()
+        self._root = Path(self.enterContext(tempfile.TemporaryDirectory()))
         self._writeSource("es.json", _SPANISH_SOURCE)
         self._writeSource("en.json", _ENGLISH_SOURCE)
         self._loader = TranslationLoader(self._root)
         self._repository = TranslationRepository(self._loader)
         self._translator = self._makeTranslator()
-
-    def tearDown(self) -> None:
-        """
-        Remove the temporary language directory.
-
-        Guarantees that no fixture file survives the test that created
-        it.
-
-        Returns
-        -------
-        None
-        """
-        self._temporary.cleanup()
 
     def _writeSource(self, name: str, payload: str) -> None:
         """
@@ -134,6 +124,7 @@ class _TranslatorFixture(TestCase):
             repository=self._repository,
         )
 
+
 class TestTranslatorDefinition(_TranslatorFixture):
     """Validate the structural contract of the translator."""
 
@@ -146,7 +137,7 @@ class TestTranslatorDefinition(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(self._translator, ITranslator)
 
@@ -159,7 +150,7 @@ class TestTranslatorDefinition(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(self._translator, "__dict__"))
 
@@ -172,7 +163,7 @@ class TestTranslatorDefinition(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidLocaleException):
             self._makeTranslator(locale="../etc")
@@ -186,10 +177,11 @@ class TestTranslatorDefinition(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidLocaleException):
             self._makeTranslator(fallback="en/../es")
+
 
 class TestTranslatorLookup(_TranslatorFixture):
     """Validate translation resolution and fallback chaining."""
@@ -202,7 +194,7 @@ class TestTranslatorLookup(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.get("Welcome"), "Bienvenido")
 
@@ -215,7 +207,7 @@ class TestTranslatorLookup(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.get("Welcome", locale="en"), "Welcome")
         self.assertEqual(self._translator.getLocale(), "es")
@@ -228,9 +220,9 @@ class TestTranslatorLookup(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(self._translator.get("Only English"), "Only English")
+        self.assertEqual(self._translator.get("Only English"), "English fallback")
 
     def testEchoesTheKeyWhenNoTranslationExists(self) -> None:
         """Return the key itself when no translation exists.
@@ -241,7 +233,7 @@ class TestTranslatorLookup(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.get("Unknown Key"), "Unknown Key")
 
@@ -254,9 +246,15 @@ class TestTranslatorLookup(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(self._translator.get("Ghost", locale="en"), "Ghost")
+        with patch.object(
+            TranslationRepository,
+            "get",
+            wraps=self._repository.get,
+        ) as get_locale:
+            self.assertEqual(self._translator.get("Ghost", locale="en"), "Ghost")
+        get_locale.assert_called_once_with("en")
 
     def testRejectsAMalformedExplicitLocale(self) -> None:
         """Reject a malformed locale requested per call.
@@ -266,10 +264,11 @@ class TestTranslatorLookup(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.get("Welcome", locale="")
+
 
 class TestTranslatorExistence(_TranslatorFixture):
     """Validate existence checks over the translation maps."""
@@ -282,7 +281,7 @@ class TestTranslatorExistence(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(self._translator.has("Welcome"))
 
@@ -295,7 +294,7 @@ class TestTranslatorExistence(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(self._translator.has("Only English"))
 
@@ -307,7 +306,7 @@ class TestTranslatorExistence(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(self._translator.has("Only English", fallback=False))
 
@@ -320,9 +319,15 @@ class TestTranslatorExistence(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertFalse(self._translator.has("Unknown Key", locale="en"))
+        with patch.object(
+            TranslationRepository,
+            "get",
+            wraps=self._repository.get,
+        ) as get_locale:
+            self.assertFalse(self._translator.has("Unknown Key", locale="en"))
+        get_locale.assert_called_once_with("en")
 
     def testReturnsFalseForUnknownKeys(self) -> None:
         """Report an unknown key as absent.
@@ -332,7 +337,7 @@ class TestTranslatorExistence(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(self._translator.has("Unknown Key"))
 
@@ -345,10 +350,11 @@ class TestTranslatorExistence(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.has("Welcome", locale="es!")
+
 
 class TestTranslatorReplacements(_TranslatorFixture):
     """Validate placeholder interpolation on resolved lines."""
@@ -361,7 +367,7 @@ class TestTranslatorReplacements(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             self._translator.get("Hello :name", name="Carlos"),
@@ -377,7 +383,7 @@ class TestTranslatorReplacements(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = ":name | :Name | :NAME"
         self.assertEqual(
@@ -394,7 +400,7 @@ class TestTranslatorReplacements(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = ":name greets :name_full"
         self.assertEqual(
@@ -411,7 +417,7 @@ class TestTranslatorReplacements(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.get("Total: :total", total=7), "Total: 7")
 
@@ -424,9 +430,10 @@ class TestTranslatorReplacements(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.get("Hello :name"), "Hola :name")
+
 
 class TestTranslatorMissingHandler(_TranslatorFixture):
     """Validate the hook invoked when a key cannot be resolved."""
@@ -439,7 +446,7 @@ class TestTranslatorMissingHandler(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._translator.missing(_MissingRecorder("Sin traduccion"))
         self.assertEqual(self._translator.get("Ghost"), "Sin traduccion")
@@ -453,7 +460,7 @@ class TestTranslatorMissingHandler(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         recorder = _MissingRecorder("x")
         self._translator.missing(recorder)
@@ -469,7 +476,7 @@ class TestTranslatorMissingHandler(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._translator.missing(_MissingRecorder(None))
         self.assertEqual(self._translator.get("Ghost"), "Ghost")
@@ -483,11 +490,12 @@ class TestTranslatorMissingHandler(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._translator.missing(_MissingRecorder("Sin traduccion"))
         self._translator.missing(None)
         self.assertEqual(self._translator.get("Ghost"), "Ghost")
+
 
 class TestTranslatorPluralization(_TranslatorFixture):
     """Validate segment selection for pluralized lines."""
@@ -501,7 +509,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "Una manzana|:count manzanas"
         self.assertEqual(self._translator.choice(line, 1), "Una manzana")
@@ -514,7 +522,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "Una manzana|:count manzanas"
         self.assertEqual(self._translator.choice(line, 5), "5 manzanas")
@@ -527,7 +535,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.choice("Sin plural", 9), "Sin plural")
 
@@ -540,7 +548,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "{0} ninguna|{1} una manzana|[2,*] :count manzanas"
         self.assertEqual(self._translator.choice(line, 0), "ninguna")
@@ -555,7 +563,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "{*} cualquiera|otra"
         self.assertEqual(self._translator.choice(line, 42), "cualquiera")
@@ -568,7 +576,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "[0,1] pocas|[2,4] varias|[5,*] muchas"
         self.assertEqual(self._translator.choice(line, 1), "pocas")
@@ -584,7 +592,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "{x} primera|segunda"
         self.assertEqual(self._translator.choice(line, 1), "primera")
@@ -599,7 +607,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "[a,*] primera|segunda"
         self.assertEqual(self._translator.choice(line, 5), "segunda")
@@ -613,7 +621,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             self._translator.choice("Hay :count manzanas", 3),
@@ -628,7 +636,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "Una manzana de :owner|:count manzanas de :owner"
         self.assertEqual(
@@ -644,7 +652,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeSource("en.json", '{"apples": "one apple|:count apples"}')
         self._repository.flush()
@@ -652,6 +660,7 @@ class TestTranslatorPluralization(_TranslatorFixture):
             self._translator.choice("apples", 4, locale="en"),
             "4 apples",
         )
+
 
 class TestTranslatorLocaleManagement(_TranslatorFixture):
     """Validate runtime locale switching and discovery."""
@@ -664,7 +673,7 @@ class TestTranslatorLocaleManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.getLocale(), "es")
 
@@ -677,7 +686,7 @@ class TestTranslatorLocaleManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._translator.setLocale("en")
         self.assertEqual(self._translator.getLocale(), "en")
@@ -691,10 +700,13 @@ class TestTranslatorLocaleManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        for candidate in ("", "../etc", "es/es", "es.json", "es ", "_es"):
-            with self.assertRaises(InvalidLocaleException):
+        for candidate in ("", "../etc", "es/es", "es.json", "es ", "_es", "en\n"):
+            with (
+                self.subTest(locale=candidate),
+                self.assertRaises(InvalidLocaleException),
+            ):
                 self._translator.setLocale(candidate)
 
     def testRejectsLocaleCodesThatAreNotStrings(self) -> None:
@@ -706,7 +718,7 @@ class TestTranslatorLocaleManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.setLocale(42)  # type: ignore[arg-type]
@@ -720,11 +732,12 @@ class TestTranslatorLocaleManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for candidate in ("en", "en_US", "en-US", "zh-Hant-TW"):
-            self._translator.setLocale(candidate)
-            self.assertEqual(self._translator.getLocale(), candidate)
+            with self.subTest(locale=candidate):
+                self._translator.setLocale(candidate)
+                self.assertEqual(self._translator.getLocale(), candidate)
 
     def testDiscoversTheAvailableLocales(self) -> None:
         """Expose the locales discovered by the loader.
@@ -735,9 +748,10 @@ class TestTranslatorLocaleManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.availableLocales(), ("en", "es"))
+
 
 class TestTranslatorCacheManagement(_TranslatorFixture):
     """Validate cache invalidation exposed by the translator."""
@@ -751,7 +765,7 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._translator.get("Welcome"), "Bienvenido")
         self._writeSource("es.json", '{"Welcome": "Hola de nuevo"}')
@@ -766,7 +780,7 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._translator.get("Welcome")
         self._translator.get("Welcome", locale="en")
@@ -785,7 +799,7 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.reload("../etc")
@@ -799,7 +813,7 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._translator.get("Welcome")
         self.assertTrue(self._translator.forget("es"))
@@ -813,7 +827,7 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidLocaleException):
             self._translator.forget("es/es")
@@ -826,7 +840,7 @@ class TestTranslatorCacheManagement(_TranslatorFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._translator.get("Welcome")
         self._translator.flush()

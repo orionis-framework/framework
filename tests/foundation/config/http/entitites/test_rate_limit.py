@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.foundation.config.http import HTTP, HTTPRateLimit, Redis
 from orionis.test import TestCase
+
 
 class TestHTTPRateLimitConfig(TestCase):
     """Validate bounded capacities and optional distributed transport settings."""
@@ -18,14 +21,16 @@ class TestHTTPRateLimitConfig(TestCase):
             "db": 4,
             "password": "test@credential:/?#%",
         }
-        config = HTTP(rate_limit={
-            "rate_limit_store": "redis",
-            "rate_limit_max_keys": 20,
-            "rate_limit_max_events": 50,
-            "rate_limit_redis": connection,
-            "rate_limit_redis_prefix": "my-app:rate-limit",
-            "rate_limit_redis_timeout_seconds": 2,
-        }).toDict()["rate_limit"]
+        config = HTTP(
+            rate_limit={
+                "rate_limit_store": "redis",
+                "rate_limit_max_keys": 20,
+                "rate_limit_max_events": 50,
+                "rate_limit_redis": connection,
+                "rate_limit_redis_prefix": "my-app:rate-limit",
+                "rate_limit_redis_timeout_seconds": 2,
+            },
+        ).toDict()["rate_limit"]
         self.assertEqual(config["rate_limit_store"], "redis")
         self.assertEqual(config["rate_limit_max_keys"], 20)
         self.assertEqual(config["rate_limit_max_events"], 50)
@@ -74,7 +79,10 @@ class TestHTTPRateLimitConfig(TestCase):
             {"rate_limit_redis_timeout_seconds": 0},
         )
         for values in invalid:
-            with self.subTest(values=values), self.assertRaises(
-                (TypeError, ValueError),
+            with (
+                self.subTest(values=values),
+                self.assertRaises(
+                    (TypeError, ValueError),
+                ),
             ):
                 HTTPRateLimit(**values)

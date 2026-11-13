@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class MySQLCharset(Enum):
     """
     Enumerate MySQL character sets usable by the configured connection drivers.

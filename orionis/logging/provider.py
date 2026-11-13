@@ -6,6 +6,7 @@ from orionis.logging.contracts.logger import ILogger
 from orionis.logging import Logger
 from orionis.support.facades.logger import Log as LoggerFacade
 
+
 class LoggerProvider(ServiceProvider):
     """Register logger services in the application container."""
 
@@ -14,31 +15,26 @@ class LoggerProvider(ServiceProvider):
         Register the Logger service implementation in the application container.
 
         Bind the ``Logger`` class to the ``ILogger`` contract within the application's
-        dependency injection container. Retrieve the logging configuration from the
-        application, create a ``Logger`` instance using this configuration, and
-        register it with an alias for internal framework identification.
+        dependency injection container with an alias for internal framework
+        identification. Construction remains lazy until the service is resolved.
 
         Returns
         -------
         None
-            No return value. Performs service registration as a side effect on the
-            application container.
+            No return value.
         """
         self.app.singleton(ILogger, Logger, alias="x-orionis-ILogger")
 
     async def boot(self) -> None:
         """
-        Initialize the logging system after all services are registered.
+        Resolve the logger service and pin its application facade.
 
-        This method retrieves the logging configuration from the application,
-        creates a Logger instance with this configuration, and initializes the
-        Logger service. Ensures the logging system is ready after all providers
-        have been registered.
+        Resolving the singleton retains application configuration. File handlers
+        and queue listeners remain lazy until a message or ``getLogger`` call.
 
         Returns
         -------
         None
-            This method does not return a value. It performs initialization as a
-            side effect.
+            No return value.
         """
         await LoggerFacade.pin()

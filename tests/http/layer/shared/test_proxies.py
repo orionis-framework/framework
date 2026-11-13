@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from ipaddress import ip_address
 from typing import TYPE_CHECKING
@@ -8,6 +10,7 @@ from tests.http.test_support import make_adapter, replace_attribute
 
 if TYPE_CHECKING:
     from ipaddress import IPv4Address, IPv6Address
+
 
 class TestProxyAddressResolution(TestCase):
     """Preserve proxy trust while avoiding redundant peer address parsing."""
@@ -52,9 +55,14 @@ class TestProxyAddressResolution(TestCase):
                         adapter = make_adapter([])
                         adapter.setClient(peer)
                         self.assertIs(middleware.handle(adapter), adapter)
-                        self.assertEqual(adapter["forwarded"], {
-                            "client": peer, "proxies": [], "chain": [peer],
-                        })
+                        self.assertEqual(
+                            adapter["forwarded"],
+                            {
+                                "client": peer,
+                                "proxies": [],
+                                "chain": [peer],
+                            },
+                        )
                 self.assertEqual(parsed, [])
 
     def testExactProxyStillValidatesTheForwardedChain(self) -> None:
@@ -66,21 +74,26 @@ class TestProxyAddressResolution(TestCase):
             An untrusted hop prevents trusting addresses farther to its left.
         """
         middleware = ProxiesMiddleware({"trusted_proxies": ["127.0.0.1"]})
-        adapter = make_adapter([
-            (b"x-forwarded-for", b"203.0.113.8, invalid, 198.51.100.9, 127.0.0.1"),
-            (b"x-forwarded-proto", b"https"),
-        ])
+        adapter = make_adapter(
+            [
+                (b"x-forwarded-for", b"203.0.113.8, invalid, 198.51.100.9, 127.0.0.1"),
+                (b"x-forwarded-proto", b"https"),
+            ],
+        )
         adapter.setClient("127.0.0.1")
 
         middleware.handle(adapter)
 
         self.assertEqual(adapter.client(), "198.51.100.9")
         self.assertEqual(adapter.scheme(), "https")
-        self.assertEqual(adapter["forwarded"], {
-            "client": "198.51.100.9",
-            "proxies": ["203.0.113.8", "127.0.0.1"],
-            "chain": ["203.0.113.8", "198.51.100.9", "127.0.0.1"],
-        })
+        self.assertEqual(
+            adapter["forwarded"],
+            {
+                "client": "198.51.100.9",
+                "proxies": ["203.0.113.8", "127.0.0.1"],
+                "chain": ["203.0.113.8", "198.51.100.9", "127.0.0.1"],
+            },
+        )
 
     def testCidrAndEquivalentIpv6PeersRetainNetworkValidation(self) -> None:
         """Resolve networks and noncanonical peer spellings through IP parsing.
@@ -99,21 +112,26 @@ class TestProxyAddressResolution(TestCase):
         for peer, trusted in cases:
             with self.subTest(peer=peer):
                 middleware = ProxiesMiddleware({"trusted_proxies": [trusted]})
-                adapter = make_adapter([
-                    (b"x-forwarded-for", b"198.51.100.9"),
-                    (b"x-forwarded-proto", b"https"),
-                ])
+                adapter = make_adapter(
+                    [
+                        (b"x-forwarded-for", b"198.51.100.9"),
+                        (b"x-forwarded-proto", b"https"),
+                    ],
+                )
                 adapter.setClient(peer)
 
                 middleware.handle(adapter)
 
                 self.assertEqual(adapter.client(), "198.51.100.9")
                 self.assertEqual(adapter.scheme(), "https")
-                self.assertEqual(adapter["forwarded"], {
-                    "client": "198.51.100.9",
-                    "proxies": [],
-                    "chain": ["198.51.100.9"],
-                })
+                self.assertEqual(
+                    adapter["forwarded"],
+                    {
+                        "client": "198.51.100.9",
+                        "proxies": [],
+                        "chain": ["198.51.100.9"],
+                    },
+                )
 
     def testTrustIsLocalToEachMiddlewareConfiguration(self) -> None:
         """Keep exact peer trust independent across middleware instances.
@@ -132,10 +150,12 @@ class TestProxyAddressResolution(TestCase):
         for peer, trusted, accepted in cases:
             with self.subTest(peer=peer, trusted=trusted):
                 middleware = ProxiesMiddleware({"trusted_proxies": trusted})
-                adapter = make_adapter([
-                    (b"x-forwarded-for", b"198.51.100.9"),
-                    (b"x-forwarded-proto", b"https"),
-                ])
+                adapter = make_adapter(
+                    [
+                        (b"x-forwarded-for", b"198.51.100.9"),
+                        (b"x-forwarded-proto", b"https"),
+                    ],
+                )
                 adapter.setClient(peer)
 
                 middleware.handle(adapter)

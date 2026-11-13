@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
+import json
 import tempfile
 from pathlib import Path
 from types import ModuleType
@@ -11,6 +14,8 @@ from orionis.console.core.contracts.loader import ILoader
 from orionis.console.core.loader import Loader
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.test import TestCase
+from orionis.support.types.sentinel import MISSING
+
 
 class MockCommand(BaseCommand):
     """
@@ -52,6 +57,7 @@ class MockCommand(BaseCommand):
             A fixed string indicating successful mock execution.
         """
         return "mock handled"
+
 
 class TestLoader(TestCase):
     class NestedArgumentType:
@@ -508,7 +514,8 @@ class TestLoader(TestCase):
 
         error_message: str = str(context.exception)
         self.assertIn(
-            "must contain only alphanumeric characters", error_message,
+            "must contain only alphanumeric characters",
+            error_message,
         )
 
     def testGetSignatureRejectsTrailingInvalidCharacters(self) -> None:
@@ -796,6 +803,108 @@ class TestLoader(TestCase):
 
         self.assertIs(decoded.type_, self.NestedArgumentType)
 
+    def testMissingCachedArgumentTypeCannotDisableConversion(self) -> None:
+        """Reject unresolved parser types rather than silently accepting raw strings.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        loader = Loader(self.mock_app)
+        for type_name in ("builtins.NoSuchArgumentType", "unknown_argument.Type"):
+            with self.subTest(type_name=type_name), self.assertRaises(ImportError):
+                loader._Loader__argFromDict(
+                    {
+                        "name_or_flags": "--count",
+                        "type_": type_name,
+                    },
+                )
+
+    def testArgumentTypePreservesItsModuleDependencyFailure(self) -> None:
+        """Surface a real dependency import error while restoring a parser type.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        loader = Loader(self.mock_app)
+        failure = ModuleNotFoundError("missing dependency", name="parser_dependency")
+        with (
+            patch(
+                "orionis.console.core.loader.importlib.import_module",
+                side_effect=failure,
+            ),
+            self.assertRaises(ModuleNotFoundError) as caught,
+        ):
+            loader._Loader__argFromDict(
+                {
+                    "name_or_flags": "--count",
+                    "type_": "application_parser.Count",
+                },
+            )
+        self.assertIs(caught.exception, failure)
+
+    def testCachedLiteralValuesCannotBecomeTheMissingSentinel(self) -> None:
+        """Preserve user strings that happen to equal the historical cache marker.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        loader = Loader(self.mock_app)
+        argument = Argument(
+            name_or_flags="--value",
+            nargs="?",
+            const="__MISSING__",
+            default="__MISSING__",
+        )
+        metadata = json.loads(json.dumps(loader._Loader__argToDict(argument)))
+        parser = loader._Loader__buildArgumentParser(
+            [metadata],
+            "test:literal",
+            "Preserve literal defaults",
+        )
+        self.assertEqual(parser.parse_args([]).value, "__MISSING__")
+        self.assertEqual(parser.parse_args(["--value"]).value, "__MISSING__")
+        encoded = loader._Loader__argToDict(Argument(name_or_flags="--value"))
+        legacy = {
+            key: value
+            for key, value in encoded.items()
+            if key not in {"const_missing", "default_missing"}
+        }
+        for metadata in (encoded, legacy):
+            with self.subTest(metadata=metadata):
+                decoded = loader._Loader__argFromDict(metadata)
+                self.assertIs(decoded.default, MISSING)
+                self.assertIs(decoded.const, MISSING)
+
+    def testCachedMissingFlagsRejectNonBooleanValues(self) -> None:
+        """
+        Reject malformed flags instead of interpreting them as legacy absence.
+
+        Returns
+        -------
+        None
+            Protect literal sentinel strings from malformed cache metadata.
+        """
+        loader = Loader(self.mock_app)
+        for name in ("const", "default"):
+            for value in (None, 0, "false"):
+                with (
+                    self.subTest(name=name, value=value),
+                    self.assertRaises(TypeError),
+                ):
+                    loader._Loader__argFromDict(
+                        {
+                            "name_or_flags": "--value",
+                            name: "__MISSING__",
+                            f"{name}_missing": value,
+                        },
+                    )
+
     async def testCustomDiscoveryIgnoresImportedCommands(self) -> None:
         """Register only command classes defined in the discovered module.
 
@@ -940,7 +1049,9 @@ class TestLoader(TestCase):
 
         # Test with empty arguments list - parser should still be created
         parser = loader._Loader__buildArgumentParser(
-            [], "test:sig", "Test description",
+            [],
+            "test:sig",
+            "Test description",
         )
 
         self.assertIsNotNone(parser)

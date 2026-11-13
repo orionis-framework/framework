@@ -21,7 +21,27 @@ Las 49 validaciones incluidas se componen de 39 reglas ejecutables y 10 constrai
 
 Todas aceptan `message=` como opción keyword. `Between` y `Size` usan magnitud numérica, longitud para texto/colecciones y kilobytes para uploads. `Dimensions` admite `width`, `height`, `min_width`, `max_width`, `min_height`, `max_height`, `ratio`, `min_ratio`, `max_ratio`; los ratios pueden ser números o textos como `"3/2"`. El lector de imágenes inspecciona cabeceras; no convierte ni sanea un archivo.
 
-`StrongPassword` exige al menos ocho caracteres, una mayúscula ASCII, una minúscula ASCII y un dígito. No exige un símbolo ni consulta contraseñas filtradas. La validación no reemplaza el [hashing](../../../hashing/docs/es/README.md).
+Las reglas que leen uploads ejecutan el lector síncrono fuera del hilo del loop.
+Si se cancela la operación, esperan a que termine la lectura activa antes de
+propagar `CancelledError`. El upload sigue perteneciendo al llamador y el lector
+no lo cierra.
+
+Las comparaciones de magnitud conservan la precisión de `Decimal`, incluidos los
+límites entre campos. `MaxDigits` requiere un entero o un texto de dígitos con
+signo opcional; rechaza letras y signos mal ubicados. `Integer`, `Email`,
+`MacAddress` y `Uuid` comprueban el formato completo y rechazan saltos de línea
+finales. `Ulid` exige el alfabeto Crockford ASCII y el rango de 128 bits en ambas
+cajas.
+
+`Image` y `Dimensions` reconocen cabeceras compatibles de PNG, JPEG, GIF, BMP y
+WebP con dimensiones positivas. No decodifican píxeles, comprueban checksums ni
+verifican todo el contenido comprimido. Reconocer la cabecera no demuestra que
+un decodificador pueda leer la imagen completa. `Encoding` devuelve un fallo de
+regla si el upload está cerrado o no puede leerse.
+
+Las reglas de comparación temporal rechazan textos que no representan una fecha. Los números y `None` siguen sujetos al tipo declarado del campo. `Dimensions` exige ratios finitos y `Json` rechaza textos que no se pueden codificar como UTF-8 válido.
+
+`StrongPassword` exige al menos ocho caracteres, una mayúscula ASCII, una minúscula ASCII y un dígito ASCII. No exige un símbolo ni consulta contraseñas filtradas. La validación no reemplaza el [hashing](../../../hashing/docs/es/README.md).
 
 ## Valores vacíos y no vacíos
 
@@ -33,6 +53,7 @@ Los espacios solo se comprueban: no se eliminan del valor almacenado. `"0"` y `"
 from orionis.schemas import Schema
 from orionis.schemas.fields import Field
 from orionis.schemas.rules import Empty, NoEmpty
+
 
 class Form(Schema):
     name: Field[str, NoEmpty(message="Name required.")]
@@ -59,6 +80,7 @@ Hereda de `Rule`, define `__code__` y `__message__` e implementa `async def enfo
 ```python
 from orionis.schemas.rule import Rule
 
+
 class Even(Rule):
     __code__ = "even"
     __message__ = "Value must be even."
@@ -77,18 +99,23 @@ from orionis.schemas.fields import Field
 from orionis.schemas.rules import Accepted, ConfirmPassword, Email, StrongPassword
 from orionis.schemas.validator import Schema as Validator
 
+
 class Registration(Schema):
     email: Field[str, Email()]
     password: Field[str, StrongPassword()]
     password_confirmation: Field[str, ConfirmPassword()]
     accepted_terms: Field[bool, Accepted()]
 
-registration = await Validator.validate({
-    "email": "ada@example.com",
-    "password": "Example42",
-    "password_confirmation": "Example42",
-    "accepted_terms": True,
-}, Registration)
+
+registration = await Validator.validate(
+    {
+        "email": "ada@example.com",
+        "password": "Example42",
+        "password_confirmation": "Example42",
+        "accepted_terms": True,
+    },
+    Registration,
+)
 assert registration.email == "ada@example.com"
 ```
 

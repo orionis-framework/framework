@@ -1,10 +1,12 @@
+# ruff: noqa: TC001
+# Runtime handler annotations are inspected by the real container.
 """Provide isolated application handlers for runtime integration tests."""
 
 from orionis.container.container import Container
 from orionis.container.context.scope import reset_scope, set_current_scope
 from functools import partial
 from orionis.failure.entities.handling import FailureHandling
-from orionis.failure.entities.context import FailureContext  # noqa: TC001
+from orionis.failure.entities.context import FailureContext
 from orionis.failure.runtime import FailureRuntime, operation
 from orionis.test import TestCase
 
@@ -30,20 +32,24 @@ class RecordingFailureHandler:
     """Record original failures and results without external logging services."""
 
     def __init__(self) -> None:
+        """Create independent record lists for one runtime fixture."""
         self.failures: list[tuple[BaseException, FailureContext]] = []
         self.reports: list[BaseException] = []
         self.results: list[tuple[object, FailureContext]] = []
         self.rendered: list[BaseException] = []
 
     async def handleFailure(
-        self, exception: BaseException, context: FailureContext,
+        self,
+        exception: BaseException,
+        context: FailureContext,
     ) -> FailureHandling:
         """Select isolated logging and presentation for the original failure."""
         self.failures.append((exception, context))
         return FailureHandling(
             logging=(
                 partial(self.log, exception)
-                if not context.expected and context.reporting_allowed else None
+                if not context.expected and context.reporting_allowed
+                else None
             ),
             presentation=partial(self.present, exception),
         )
@@ -57,7 +63,11 @@ class RecordingFailureHandler:
         self.results.append((value, context))
 
     async def present(
-        self, exception: BaseException, *, flow: str, request: object = None,
+        self,
+        exception: BaseException,
+        *,
+        flow: str,
+        request: object = None,
     ) -> object:
         """Record rendering separately and return the caller's HTTP response."""
         self.rendered.append(exception)

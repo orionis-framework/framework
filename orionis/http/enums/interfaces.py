@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class Interface(StrEnum):
     """Represent the supported HTTP interface types.
 

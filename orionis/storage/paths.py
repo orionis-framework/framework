@@ -3,6 +3,7 @@
 from __future__ import annotations
 from orionis.storage.exceptions import StoragePathException
 
+
 def normalize_path(path: str) -> str:
     """
     Normalize a storage path into a canonical root-relative form.
@@ -51,13 +52,13 @@ def normalize_path(path: str) -> str:
         # Block drive-letter and stream separators (e.g. 'C:', 'file:x').
         if ":" in segment:
             error_msg = (
-                f"Storage path segment [{segment}] contains a forbidden "
-                "character."
+                f"Storage path segment [{segment}] contains a forbidden character."
             )
             raise StoragePathException(error_msg)
         segments.append(segment)
 
     return "/".join(segments)
+
 
 def normalize_file_path(path: str) -> str:
     """
@@ -91,11 +92,13 @@ def normalize_file_path(path: str) -> str:
 
     return normalized
 
+
 _LEGACY_EXPORTS = {
     "normalizePath": normalize_path,
     "normalizeFilePath": normalize_file_path,
 }
 """Legacy exports definitions used by ``paths``."""
+
 
 def __getattr__(name: str) -> object:
     """

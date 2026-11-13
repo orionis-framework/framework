@@ -8,6 +8,9 @@ Organize resources by locale, choose a fallback, and pass a locale explicitly wh
 - UTF-8 JSON translation files whose root value is an object.
 - A valid language path for file-backed translations.
 - A booted Orionis application when using `orionis.support.facades.Lang`.
+
+Run the file examples from an application root containing the shipped English and Spanish resources. Each block is independent; only the facade example needs application bootstrap.
+
 ## Quick start
 
 ```python
@@ -16,7 +19,9 @@ from orionis.localization import TranslationLoader, TranslationRepository, Trans
 
 loader = TranslationLoader(Path("resources/lang"))
 repository = TranslationRepository(loader)
-translator = Translator(locale="en", fallback="en", loader=loader, repository=repository)
+translator = Translator(
+    locale="en", fallback="en", loader=loader, repository=repository
+)
 assert translator.get("Welcome") == "Welcome"
 assert translator.get("Welcome", locale="es") == "Bienvenido"
 assert translator.availableLocales() == ("en", "es")
@@ -33,7 +38,7 @@ Locale codes preserve case and separators: `es-CO`, `es_CO`, and `es` are distin
 
 ### Request locale and resource updates
 
-Use `Lang.get("cart.items", locale=requested_locale)` or `Lang.choice("cart.items", quantity, locale=requested_locale)`. Do not call `setLocale()` for a concurrent request: the provider supplies a mutable singleton. In a Jinja template, likewise pass `locale=` to `trans`, `__`, or `choice`; Jinja automatically awaits async helpers.
+Use `Lang.get("cart.items", locale=requested_locale)` or `Lang.choice("cart.items", quantity, locale=requested_locale)`. Do not call `setLocale()` for a concurrent request: the provider supplies a mutable singleton. In a Jinja template, likewise pass `locale=` to `trans`, `__`, or `choice`; these helpers use the same translator.
 
 The cache does not watch files. After publishing updated resources, restart each worker or invalidate locales in each process. `reload("es")` discards a map; the next read loads it again. It does not change configuration, update other processes, or immediately validate JSON. Translation methods are synchronous: warming locales during boot avoids file I/O on the first request.
 
@@ -51,7 +56,7 @@ The cache does not watch files. After publishing updated resources, restart each
 
 ### Replacement
 
-Placeholders use `:name`. The translator also replaces `:Name` with a capitalized value and `:NAME` with an uppercased value. Longer placeholder names are processed first, preventing a short name from consuming a longer prefix.
+Placeholders use `:name`. The translator also replaces `:Name` with a capitalized value and `:NAME` with an uppercased value. Longer matching names take precedence, preventing a short name from consuming a longer prefix. Inserted values are literal text and are not reinterpreted as placeholders.
 
 ### Plural selection
 
@@ -98,7 +103,9 @@ class MemoryLoader:
 
 loader = MemoryLoader()
 repository = TranslationRepository(loader)
-translator = Translator(locale="es", fallback="en", loader=loader, repository=repository)
+translator = Translator(
+    locale="es", fallback="en", loader=loader, repository=repository
+)
 assert translator.get("greeting", name="Ada") == "Hello Ada"
 assert translator.has("greeting")
 assert not translator.has("greeting", fallback=False)
@@ -184,9 +191,12 @@ print("cache cleared")
 ```python
 from orionis.support.facades import Lang
 
-title = Lang.get("Welcome")
-message = Lang.choice("cart.items", 3, user="Ada")
+title = Lang.get("Welcome", locale="es")
+message = Lang.choice("One item|:count items", 3)
 available = Lang.availableLocales()
+assert title == "Bienvenido"
+assert message == "3 items"
+assert "es" in available
 ```
 
 ## Configuration
@@ -210,6 +220,7 @@ Direct construction is useful for libraries and tests. Application code should i
 ## Errors and edge cases
 
 - Malformed or path-like locale codes raise `InvalidLocaleException` before filesystem access.
+- The file loader applies the same locale validation when called directly. It resolves the configured root and rejects translation files or directories whose symbolic links or junctions lead outside it with `TranslationException`; discovery omits those external entries and invalid locale names. Links to resources inside the root remain supported.
 - Invalid UTF-8, malformed JSON, or a non-object JSON root raises `TranslationSyntaxException`.
 - A file removed between discovery and reading raises `TranslationFileNotFoundException`.
 - Missing directories/locales are not exceptional: discovery returns `()` and loading returns `{}`.
@@ -223,7 +234,9 @@ Direct construction is useful for libraries and tests. Application code should i
 
 JSON decoding uses `msgspec`; nested dictionaries are flattened once when a locale is first requested. Subsequent key lookup is O(1) in the repository map. Filesystem discovery and loading are synchronous, so warm required locales during bootstrap if first-request latency matters.
 
-The provider shares one mutable translator without a lock. Concurrent reads are appropriate after caches are warm, but `setLocale`, `missing`, `reload`, `forget`, and `flush` are global mutations and can race with reads. Prefer explicit `locale=` for request-scoped selection and coordinate cache invalidation operationally.
+The repository uses a reentrant lock to protect cache access and loading across threads. A cache miss holds this lock while the loader reads its files, so cold loads serialize. Returned maps are the cached objects themselves; treat them as read-only, since the repository cannot protect caller mutations after returning a map.
+
+The provider shares one mutable translator. Its active locale and missing-key handler belong to that shared instance; prefer explicit `locale=` for request-specific selection. Cache invalidation is synchronized by the repository but affects every caller in that process. Coordinate changes to the active locale, handler, and deployed resources with the application lifecycle.
 
 ## Public API
 
@@ -233,9 +246,11 @@ The package exports `TranslationLoader`, `TranslationRepository`, `Translator`, 
 
 `load(locale)` returns a flat `dict[str, str]`; an unknown locale yields an empty dictionary. `availableLocales()` returns a sorted tuple gathered from root `.json` files and directories containing `.json` group files. The loader deliberately holds no cache.
 
-### `TranslationRepository(loader)`
+### `TranslationRepository(loader, *, max_locales=256, negative_ttl=30)`
 
-`get(locale)` loads once and returns the cached map. `has(locale)`, `forget(locale)`, `flush()`, and `loadedLocales()` inspect or invalidate that process-local cache. Loaded-locale order follows insertion order.
+`get(locale)` loads on a miss and returns the cached map. Up to `max_locales` maps are retained, including empty results; reaching capacity evicts the least recently used locale. Hits refresh recency. Empty maps expire after `negative_ttl` seconds so new files become visible without restarting; positive maps require explicit invalidation to reflect file changes. A zero TTL disables retention of empty results between reads.
+
+`has(locale)` checks the cache without loading and removes an expired entry. `forget(locale)` and `flush()` invalidate one or all entries. `loadedLocales()` removes expired entries and returns locale codes in order from least to most recently used. Cache limits apply independently in each process.
 
 ### `Translator`
 
@@ -247,7 +262,7 @@ The package exports `TranslationLoader`, `TranslationRepository`, `Translator`, 
 
 ### `LocalizationManager(app)`
 
-`translator()` lazily creates one translator using `app.locale`, `app.fallback_locale`, and `app.language_path`. Relative resource paths are resolved against `app.basePath`.
+`translator()` lazily creates one translator using `app.locale`, `app.fallback_locale`, and `app.language_path`. A lock protects initial construction and publication so concurrent first callers receive the same instance. Later calls return the retained instance directly. Relative resource paths are resolved against `app.basePath`.
 
 ## Implementation reference for extensions
 

@@ -1,7 +1,10 @@
+# ruff: noqa: PLR0913, PLR2004
+# Keep established public and external protocol names and signatures.
 """Configure scheduled command execution with fluent scheduling options."""
 
 from __future__ import annotations
 import secrets
+from copy import copy
 from datetime import datetime
 from typing import TYPE_CHECKING, ClassVar, Self
 from apscheduler.triggers.cron import CronTrigger
@@ -16,9 +19,8 @@ from orionis.support.facades.datetime import DateTime
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-class Task(ITask):
 
-    # ruff: noqa: PLR2004, PLR0913
+class Task(ITask):
     """Configure scheduled command execution with fluent scheduling options."""
 
     _ERROR_MSG_INVALID_INTERVAL = "Interval value must be a positive integer."
@@ -112,6 +114,9 @@ class Task(ITask):
         # Initialize the trigger for the task as None
         self.__trigger: CronTrigger | DateTrigger | IntervalTrigger | None = None
         """Initialize the trigger for the task as None."""
+
+        self.__allows_jitter = True
+        """Whether the selected schedule permits randomized delays."""
 
         # Initialize the details for the task as None
         self.__details: str | None = None
@@ -219,6 +224,38 @@ class Task(ITask):
             tzinfo=self.__default_tz,
         )
 
+    def __setTrigger(
+        self,
+        trigger: CronTrigger | DateTrigger | IntervalTrigger,
+        *,
+        allow_jitter: bool = True,
+    ) -> None:
+        """
+        Select a trigger and retain its delay policy.
+
+        Parameters
+        ----------
+        trigger : ``CronTrigger`` or ``DateTrigger`` or ``IntervalTrigger``
+            Configured scheduler trigger.
+        allow_jitter : bool, default True
+            Whether the schedule permits a randomized delay.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        ValueError
+            If an explicit positive delay conflicts with an exact schedule.
+        """
+        if not allow_jitter and self.__random_delay:
+            error_msg = "Random delay cannot be applied to this exact schedule."
+            raise ValueError(error_msg)
+        self.__trigger = trigger
+        self.__allows_jitter = allow_jitter
+
     def entity(
         self,
         random_delay: int | None = 0,
@@ -236,7 +273,8 @@ class Task(ITask):
         Parameters
         ----------
         random_delay : int | None, optional
-            Random delay in seconds before triggering. Defaults to 0.
+            Inherited delay in seconds for schedules permitting jitter.
+            Exact schedules retain zero delay. Defaults to 0.
         max_instances : int | None, optional
             Maximum concurrent instances allowed. Defaults to 1.
         misfire_grace_time : int | None, optional
@@ -268,10 +306,20 @@ class Task(ITask):
         """
         # Ensure both signature and trigger are set before creating the entity.
         if not (self.__signature and self.__trigger):
-            error_msg = (
-                "Both signature and trigger must be set to create a TaskEntity."
-            )
+            error_msg = "Both signature and trigger must be set to create a TaskEntity."
             raise ValueError(error_msg)
+
+        delay = self.__random_delay if self.__random_delay is not None else random_delay
+        if not self.__allows_jitter:
+            delay = 0
+        trigger = self.__trigger
+        if (
+            delay
+            and isinstance(trigger, (CronTrigger, IntervalTrigger))
+            and trigger.jitter != delay
+        ):
+            trigger = copy(trigger)
+            trigger.jitter = delay
 
         # Construct and return a TaskEntity with the current task's attributes.
         # The task-level value (self.__xxx) wins whenever it was explicitly
@@ -282,14 +330,10 @@ class Task(ITask):
             args=self.__args,
             kwargs=self.__kwargs,
             purpose=self.__purpose,
-            random_delay=(
-                self.__random_delay
-                if self.__random_delay is not None
-                else random_delay
-            ),
+            random_delay=delay,
             start_date=self.__start_date,
             end_date=self.__end_date,
-            trigger=self.__trigger,
+            trigger=trigger,
             details=self.__details,
             max_instances=(
                 self.__max_instances
@@ -301,9 +345,7 @@ class Task(ITask):
                 if self.__misfire_grace_time is not None
                 else misfire_grace_time
             ),
-            coalesce=(
-                self.__coalesce if self.__coalesce is not None else coalesce
-            ),
+            coalesce=(self.__coalesce if self.__coalesce is not None else coalesce),
             listeners=self.__listeners,
         )
 
@@ -441,7 +483,12 @@ class Task(ITask):
         """
         # Assign the start date to the internal attribute.
         self.__start_date = self.__datetime(
-            year, month, day, hour, minute, second,
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
         )
 
         # Return self to allow method chaining.
@@ -517,22 +564,25 @@ class Task(ITask):
         """
         # Validate that max_seconds is an integer within the allowed range.
         if not isinstance(max_seconds, int) or max_seconds < 0 or max_seconds > 120:
-            error_msg = (
-                "Max seconds must be a positive integer between 0 and 120."
-            )
+            error_msg = "Max seconds must be a positive integer between 0 and 120."
             raise ValueError(error_msg)
 
         # Set a random delay between 0 and max_seconds using a cryptographically secure
         # generator, or 0 if max_seconds is 0.
-        self.__random_delay = (
-            secrets.randbelow(max_seconds + 1) if max_seconds > 0 else 0
-        )
+        delay = secrets.randbelow(max_seconds + 1) if max_seconds > 0 else 0
+        if not self.__allows_jitter and delay:
+            error_msg = "Random delay cannot be applied to this exact schedule."
+            raise ValueError(error_msg)
+        self.__random_delay = delay
 
         # If a trigger was already configured before this call (e.g. the fluent
         # chain calls .everyMinutes() before .randomDelay()), the trigger was
         # built with the jitter known at that time. Patch it in place so the
         # random delay is never silently dropped due to call order.
-        if self.__trigger is not None and hasattr(self.__trigger, "jitter"):
+        if self.__allows_jitter and isinstance(
+            self.__trigger,
+            (CronTrigger, IntervalTrigger),
+        ):
             self.__trigger.jitter = self.__random_delay
 
         # Return self to allow method chaining.
@@ -631,9 +681,7 @@ class Task(ITask):
         """
         # Ensure the listener implements the BaseTaskListener interface.
         if not isinstance(listener, BaseTaskListener):
-            error_msg = (
-                "Listener instance must implement BaseTaskListener interface."
-            )
+            error_msg = "Listener instance must implement BaseTaskListener interface."
             raise TypeError(error_msg)
         listener_instance = listener
 
@@ -698,9 +746,7 @@ class Task(ITask):
         # defaults to None (randomDelay() was never called), so it must be
         # guarded before the numeric comparison to avoid a TypeError.
         if self.__random_delay and self.__random_delay > 0:
-            error_msg = (
-                "Random delay cannot be applied to a one-time execution."
-            )
+            error_msg = "Random delay cannot be applied to a one-time execution."
             raise ValueError(error_msg)
 
         # Set both start and end dates to the specified date.
@@ -709,9 +755,12 @@ class Task(ITask):
         self.__max_instances = 1
 
         # Configure the trigger for one-time execution at the specified date.
-        self.__trigger = DateTrigger(
-            run_date=date,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            DateTrigger(
+                run_date=date,
+                timezone=self.__default_tz,
+            ),
+            allow_jitter=False,
         )
 
         # Store a human-readable description of the scheduled execution.
@@ -760,11 +809,14 @@ class Task(ITask):
 
         # Configure the trigger to execute the event at the specified interval,
         # using any previously set start_date and end_date.
-        self.__trigger = IntervalTrigger(
-            seconds=seconds,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            IntervalTrigger(
+                seconds=seconds,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                timezone=self.__default_tz,
+            ),
+            allow_jitter=False,
         )
 
         # Store a human-readable description of the schedule.
@@ -1008,12 +1060,14 @@ class Task(ITask):
 
         # Configure the trigger to execute the event at the specified interval,
         # using any previously set start_date, end_date, and random_delay (jitter).
-        self.__trigger = IntervalTrigger(
-            minutes=minutes,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            IntervalTrigger(
+                minutes=minutes,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -1053,12 +1107,15 @@ class Task(ITask):
 
         # Set the trigger to execute the event every minute at the specified second.
         # Jitter is not applied for this schedule.
-        self.__trigger = CronTrigger(
-            minute="*",
-            second=seconds,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                minute="*",
+                second=seconds,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                timezone=self.__default_tz,
+            ),
+            allow_jitter=False,
         )
 
         # Store a human-readable description of the schedule.
@@ -1106,12 +1163,15 @@ class Task(ITask):
             raise ValueError(error_msg)
 
         # Set the trigger to execute at the specified second of every N-minute interval.
-        self.__trigger = CronTrigger(
-            minute=f"*/{minutes}",
-            second=seconds,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                minute=f"*/{minutes}",
+                second=seconds,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                timezone=self.__default_tz,
+            ),
+            allow_jitter=False,
         )
 
         # Store a human-readable description of the schedule.
@@ -1639,12 +1699,14 @@ class Task(ITask):
             Always returns True after configuring the interval trigger.
         """
         # Configure the trigger to execute the event every hour.
-        self.__trigger = IntervalTrigger(
-            hours=1,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            IntervalTrigger(
+                hours=1,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -1700,12 +1762,15 @@ class Task(ITask):
         # Set up the trigger to execute the event every hour at the specified minute
         # and second. CronTrigger is used because IntervalTrigger does not accept
         # minute/second positioning parameters.
-        self.__trigger = CronTrigger(
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                timezone=self.__default_tz,
+            ),
+            allow_jitter=False,
         )
 
         # Store a human-readable description of the schedule for reference or logging.
@@ -1732,12 +1797,14 @@ class Task(ITask):
         """
         # Configure the trigger to execute the event at every odd hour (1, 3, ..., 23)
         # using a CronTrigger. The `hour='1-23/2'` specifies odd hours in the range.
-        self.__trigger = CronTrigger(
-            hour="1-23/2",                # Schedule the task for odd hours.
-            start_date=self.__start_date, # Restrict the schedule start if set.
-            end_date=self.__end_date,     # Restrict the schedule end if set.
-            jitter=self.__random_delay,   # Apply random delay (jitter) if configured.
-            timezone=self.__default_tz,   # Use the default timezone for scheduling.
+        self.__setTrigger(
+            CronTrigger(
+                hour="1-23/2",  # Schedule the task for odd hours.
+                start_date=self.__start_date,  # Restrict the schedule start if set.
+                end_date=self.__end_date,  # Restrict the schedule end if set.
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,  # Use the default timezone for scheduling.
+            ),
         )
 
         # Store a human-readable description of the schedule for reference or logging.
@@ -1764,12 +1831,14 @@ class Task(ITask):
         """
         # Configure the trigger to execute the event at every even hour (0, 2, ..., 22)
         # using a CronTrigger. The `hour='0-22/2'` specifies even hours in the range.
-        self.__trigger = CronTrigger(
-            hour="0-22/2",                # Schedule the task for even hours.
-            start_date=self.__start_date, # Restrict the schedule start if set.
-            end_date=self.__end_date,     # Restrict the schedule end if set.
-            jitter=self.__random_delay,   # Apply random delay (jitter) if configured.
-            timezone=self.__default_tz,   # Use the default timezone for scheduling.
+        self.__setTrigger(
+            CronTrigger(
+                hour="0-22/2",  # Schedule the task for even hours.
+                start_date=self.__start_date,  # Restrict the schedule start if set.
+                end_date=self.__end_date,  # Restrict the schedule end if set.
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,  # Use the default timezone for scheduling.
+            ),
         )
 
         # Store a human-readable description of the schedule for reference or logging.
@@ -1802,7 +1871,6 @@ class Task(ITask):
         """
         # Validate that the `hours` parameter is a positive integer.
         if not isinstance(hours, int) or hours <= 0:
-
             # Assign error message before raising exception.
             error_msg = self._ERROR_MSG_INVALID_INTERVAL
             raise ValueError(error_msg)
@@ -1810,12 +1878,14 @@ class Task(ITask):
         # Configure the trigger to execute the event at the specified interval.
         # The `start_date` and `end_date` define the optional scheduling window.
         # The `jitter` adds a random delay if configured.
-        self.__trigger = IntervalTrigger(
-            hours=hours,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            IntervalTrigger(
+                hours=hours,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule for reference or logging.
@@ -1857,28 +1927,24 @@ class Task(ITask):
         """
         # Validate that the `hours` parameter is a positive integer.
         if not isinstance(hours, int) or hours <= 0:
-
             # Assign error message before raising exception.
             error_msg = self._ERROR_MSG_INVALID_INTERVAL
             raise ValueError(error_msg)
 
         # Validate that minute and second are integers.
         if not isinstance(minute, int) or not isinstance(second, int):
-
             # Assign error message before raising exception.
             error_msg = "Minute and second must be integers."
             raise TypeError(error_msg)
 
         # Validate that minute is within the range [0, 59].
         if not (0 <= minute < 60):
-
             # Assign error message before raising exception.
             error_msg = self._ERROR_MSG_INVALID_MINUTE
             raise ValueError(error_msg)
 
         # Validate that second is within the range [0, 59].
         if not (0 <= second < 60):
-
             # Assign error message before raising exception.
             error_msg = self._ERROR_MSG_INVALID_SECOND
             raise ValueError(error_msg)
@@ -1886,13 +1952,16 @@ class Task(ITask):
         # Configure the trigger to execute the event every N hours at the specified
         # minute and second. CronTrigger is used because IntervalTrigger does not
         # accept minute/second positioning parameters.
-        self.__trigger = CronTrigger(
-            hour=f"*/{hours}",
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                hour=f"*/{hours}",
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                timezone=self.__default_tz,
+            ),
+            allow_jitter=False,
         )
 
         # Store a human-readable description of the schedule.
@@ -2416,14 +2485,16 @@ class Task(ITask):
             Always returns True after configuring the daily schedule.
         """
         # Set up the trigger to execute the event every day at 00:00:00.
-        self.__trigger = CronTrigger(
-            hour=0,
-            minute=0,
-            second=0,
-            start_date=self.__start_date,  # Restrict the schedule start if set.
-            end_date=self.__end_date,      # Restrict the schedule end if set.
-            jitter=self.__random_delay,    # Apply random delay if configured.
-            timezone=self.__default_tz,    # Use the default timezone for scheduling.
+        self.__setTrigger(
+            CronTrigger(
+                hour=0,
+                minute=0,
+                second=0,
+                start_date=self.__start_date,  # Restrict the schedule start if set.
+                end_date=self.__end_date,  # Restrict the schedule end if set.
+                jitter=self.__random_delay,  # Apply random delay if configured.
+                timezone=self.__default_tz,  # Use the default timezone for scheduling.
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -2460,9 +2531,9 @@ class Task(ITask):
         """
         # Validate that hour, minute, and second are integers.
         if (
-            not isinstance(hour, int) or
-            not isinstance(minute, int) or
-            not isinstance(second, int)
+            not isinstance(hour, int)
+            or not isinstance(minute, int)
+            or not isinstance(second, int)
         ):
             error_msg = "Hour, minute, and second must be integers."
             raise TypeError(error_msg)
@@ -2482,14 +2553,16 @@ class Task(ITask):
 
         # Set up the trigger to execute the event daily at the
         # specified time using CronTrigger.
-        self.__trigger = CronTrigger(
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -2526,12 +2599,14 @@ class Task(ITask):
 
         # Configure the trigger to execute the event at the specified interval,
         # using any previously set start_date, end_date, and random_delay (jitter).
-        self.__trigger = IntervalTrigger(
-            days=days,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            IntervalTrigger(
+                days=days,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -2597,15 +2672,17 @@ class Task(ITask):
             raise ValueError(error_msg)
 
         # Set up the trigger to execute the event every N days at the specified time.
-        self.__trigger = CronTrigger(
-            day=f"*/{days}",
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day=f"*/{days}",
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -2934,15 +3011,17 @@ class Task(ITask):
             raise ValueError(error_msg)
 
         # Configure the trigger to execute the event every Monday at the specified time.
-        self.__trigger = CronTrigger(
-            day_of_week="mon",
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day_of_week="mon",
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -2994,15 +3073,17 @@ class Task(ITask):
 
         # Configure the trigger to execute the event every
         # Tuesday at the specified time.
-        self.__trigger = CronTrigger(
-            day_of_week="tue",
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day_of_week="tue",
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -3054,15 +3135,17 @@ class Task(ITask):
 
         # Configure the trigger to execute the event every
         # Wednesday at the specified time.
-        self.__trigger = CronTrigger(
-            day_of_week="wed",
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day_of_week="wed",
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -3114,15 +3197,17 @@ class Task(ITask):
 
         # Configure the trigger to execute the event every
         # Thursday at the specified time.
-        self.__trigger = CronTrigger(
-            day_of_week="thu",
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day_of_week="thu",
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -3173,15 +3258,17 @@ class Task(ITask):
             raise ValueError(error_msg)
 
         # Configure the trigger to execute the event every Friday at the specified time.
-        self.__trigger = CronTrigger(
-            day_of_week="fri",
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day_of_week="fri",
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -3233,15 +3320,17 @@ class Task(ITask):
 
         # Configure the trigger to execute the event every Saturday
         # at the specified time.
-        self.__trigger = CronTrigger(
-            day_of_week="sat",
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day_of_week="sat",
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -3292,15 +3381,17 @@ class Task(ITask):
             raise ValueError(error_msg)
 
         # Configure the trigger to execute the event every Sunday at the specified time.
-        self.__trigger = CronTrigger(
-            day_of_week="sun",
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day_of_week="sun",
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -3326,15 +3417,17 @@ class Task(ITask):
             True if the scheduling was successfully configured.
         """
         # Configure the trigger to execute the event every week on Sunday at 00:00:00.
-        self.__trigger = CronTrigger(
-            day_of_week="sun",
-            hour=0,
-            minute=0,
-            second=0,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                day_of_week="sun",
+                hour=0,
+                minute=0,
+                second=0,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule for reference or logging.
@@ -3375,12 +3468,14 @@ class Task(ITask):
             raise ValueError(error_msg)
 
         # Configure the trigger to execute the event at the specified interval.
-        self.__trigger = IntervalTrigger(
-            weeks=weeks,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            IntervalTrigger(
+                weeks=weeks,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Store a human-readable description of the schedule.
@@ -3436,30 +3531,28 @@ class Task(ITask):
             "seconds": seconds,
         }.items():
             if not isinstance(param_value, int) or param_value < 0:
-                error_msg = (
-                    f"{param_name.capitalize()} must be a non-negative integer."
-                )
+                error_msg = f"{param_name.capitalize()} must be a non-negative integer."
                 raise ValueError(error_msg)
 
         # Ensure that at least one parameter is greater than zero.
         intervals = [weeks, days, hours, minutes, seconds]
         if all(param == 0 for param in intervals):
-            error_msg = (
-                "At least one interval parameter must be greater than zero."
-            )
+            error_msg = "At least one interval parameter must be greater than zero."
             raise ValueError(error_msg)
 
         # Configure the trigger to execute the event at the specified interval.
-        self.__trigger = IntervalTrigger(
-            weeks=weeks,
-            days=days,
-            hours=hours,
-            minutes=minutes,
-            seconds=seconds,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            IntervalTrigger(
+                weeks=weeks,
+                days=days,
+                hours=hours,
+                minutes=minutes,
+                seconds=seconds,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Build a human-readable description of the schedule.
@@ -3529,19 +3622,21 @@ class Task(ITask):
             raise ValueError(error_msg)
 
         # Configure the trigger using the provided CRON fields
-        self.__trigger = CronTrigger(
-            year=year,
-            month=month,
-            day=day,
-            week=week,
-            day_of_week=day_of_week,
-            hour=hour,
-            minute=minute,
-            second=second,
-            start_date=self.__start_date,
-            end_date=self.__end_date,
-            jitter=self.__random_delay,
-            timezone=self.__default_tz,
+        self.__setTrigger(
+            CronTrigger(
+                year=year,
+                month=month,
+                day=day,
+                week=week,
+                day_of_week=day_of_week,
+                hour=hour,
+                minute=minute,
+                second=second,
+                start_date=self.__start_date,
+                end_date=self.__end_date,
+                jitter=self.__random_delay,
+                timezone=self.__default_tz,
+            ),
         )
 
         # Build a human-readable description using all possible arguments

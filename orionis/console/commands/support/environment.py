@@ -1,13 +1,14 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Display the active application environment."""
 
 from orionis.console.base.command import BaseCommand
 from orionis.console.output.console import Console
 from orionis.foundation.contracts.application import IApplication
 
+
 class EnvironmentCommand(BaseCommand):
     """Display the active application environment."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = False
     """Timestamps flag used by ``EnvironmentCommand``."""

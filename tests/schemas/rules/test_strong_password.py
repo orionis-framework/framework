@@ -1,9 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.rules.strong_password import StrongPassword
 from orionis.test import TestCase
 
-class TestStrongPasswordEnforce(TestCase):
 
+class TestStrongPasswordEnforce(TestCase):
     async def testValidPasswordPasses(self) -> None:
         """Accept a password meeting every requirement.
 
@@ -13,7 +15,7 @@ class TestStrongPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(
             await StrongPassword().enforce("password", "Secure1!", object()),
@@ -27,7 +29,7 @@ class TestStrongPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await StrongPassword().enforce("password", "Ab1!", object()))
 
@@ -39,7 +41,7 @@ class TestStrongPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(
             await StrongPassword().enforce("password", "abcdef12", object()),
@@ -53,7 +55,7 @@ class TestStrongPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(
             await StrongPassword().enforce("password", "ABCDEF12", object()),
@@ -67,7 +69,7 @@ class TestStrongPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(
             await StrongPassword().enforce("password", "Abcdefgh", object()),
@@ -81,7 +83,7 @@ class TestStrongPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = StrongPassword()
         self.assertTrue(await rule.enforce("password", 12345, object()))
@@ -95,7 +97,7 @@ class TestStrongPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(
             await StrongPassword().enforce("password", "Aa000000", object()),
@@ -109,14 +111,14 @@ class TestStrongPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(
             await StrongPassword().enforce("password", "Aa00000", object()),
         )
 
-class TestStrongPasswordValidate(TestCase):
 
+class TestStrongPasswordValidate(TestCase):
     async def testValidateReturnsNoneForStrongPassword(self) -> None:
         """Return None when the password satisfies the rule.
 
@@ -125,7 +127,7 @@ class TestStrongPasswordValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(await StrongPassword().validate("pwd", "Secure1!", object()))
 
@@ -137,7 +139,7 @@ class TestStrongPasswordValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await StrongPassword().validate("pwd", "weakpass", object())
         self.assertIsInstance(result, ValidationFailure)
@@ -151,6 +153,6 @@ class TestStrongPasswordValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(StrongPassword.__code__, "strong_password")

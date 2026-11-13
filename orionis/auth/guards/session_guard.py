@@ -1,7 +1,8 @@
+# ruff: noqa: TC001, TC003
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Resolve the identity of web requests from the HTTP session."""
 
 import secrets
-from typing import TYPE_CHECKING
 from uuid import UUID
 from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.contracts.session_guard import ISessionGuard
@@ -12,15 +13,16 @@ from orionis.auth.tokens.functions import hash_token_secret
 from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
-    from orionis.http.request import Request
-    from orionis.session.contracts.session import ISession
+import orionis.http as _http
+from collections.abc import Mapping
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+from orionis.session.contracts.session import ISession
+
 
 # Fallback applied when the configuration section is absent.
 _DEFAULT_SESSION_KEY: str = "_auth_identifier"
 """Fallback applied when the configuration section is absent."""
+
 
 class SessionGuard(ISessionGuard):
     """
@@ -36,11 +38,13 @@ class SessionGuard(ISessionGuard):
     lives in the session object owned by the request itself.
     """
 
-    # ruff: noqa: TC001 (Dependency Injection)
-
     __slots__ = (
-        "__csrf_key", "__csrf_length", "__identities", "__password_key",
-        "__remember", "__session_key",
+        "__csrf_key",
+        "__csrf_length",
+        "__identities",
+        "__password_key",
+        "__remember",
+        "__session_key",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -58,11 +62,9 @@ class SessionGuard(ISessionGuard):
         Returns
         -------
         None
-            Only the session key and the provider are retained.
+            No return value.
         """
-        self.__session_key: str = (
-            app.config("auth.session.key") or _DEFAULT_SESSION_KEY
-        )
+        self.__session_key: str = app.config("auth.session.key") or _DEFAULT_SESSION_KEY
         """Session key under which the authenticated identity is stored."""
         self.__password_key: str = self.__session_key + "_password"
         """Session key used to retain the authenticated password fingerprint."""
@@ -87,7 +89,7 @@ class SessionGuard(ISessionGuard):
         """
         return Guards.SESSION.value
 
-    async def resolve(self, request: Request) -> GuardResult | None:
+    async def resolve(self, request: _http.Request) -> GuardResult | None:
         """
         Resolve the identity remembered in the session.
 
@@ -116,9 +118,12 @@ class SessionGuard(ISessionGuard):
         fingerprint = session.get(self.__password_key)
         if (
             identity is None
+            or getattr(identity, "active", True) is not True
             or not isinstance(fingerprint, str)
+            or not fingerprint.isascii()
             or not secrets.compare_digest(
-                fingerprint, hash_token_secret(identity.getAuthPassword()),
+                fingerprint,
+                hash_token_secret(identity.getAuthPassword()),
             )
         ):
             session.forget(self.__session_key)
@@ -129,7 +134,7 @@ class SessionGuard(ISessionGuard):
 
     async def attempt(
         self,
-        request: Request,
+        request: _http.Request,
         credentials: Mapping[str, object],
         *,
         remember: bool = False,
@@ -173,7 +178,7 @@ class SessionGuard(ISessionGuard):
         self.login(request, identity)
         return identity
 
-    async def __restoreRemembered(self, request: Request) -> GuardResult | None:
+    async def __restoreRemembered(self, request: _http.Request) -> GuardResult | None:
         """
         Restore an identity from a persistent credential.
 
@@ -193,7 +198,7 @@ class SessionGuard(ISessionGuard):
         self.login(request, identity)
         return GuardResult(identity=identity, guard=Guards.SESSION.value)
 
-    def login(self, request: Request, identity: IAuthenticatable) -> None:
+    def login(self, request: _http.Request, identity: IAuthenticatable) -> None:
         """
         Persist an identity in the session of the current request.
 
@@ -207,7 +212,7 @@ class SessionGuard(ISessionGuard):
         Returns
         -------
         None
-            The session is mutated as a side effect.
+            No return value.
 
         Raises
         ------
@@ -241,7 +246,7 @@ class SessionGuard(ISessionGuard):
         session.put(self.__csrf_key, csrf)
         request.state.csrf_token = csrf
 
-    async def logout(self, request: Request) -> None:
+    async def logout(self, request: _http.Request) -> None:
         """
         Drop the authenticated state from the session.
 
@@ -253,8 +258,7 @@ class SessionGuard(ISessionGuard):
         Returns
         -------
         None
-            The persistent credential is revoked before invalidating the
-            session and clearing both cookies through the web pipeline.
+            No return value.
         """
         session = self.__session(request)
         if session is None:
@@ -267,7 +271,7 @@ class SessionGuard(ISessionGuard):
         session.invalidate()
 
     @staticmethod
-    def __session(request: Request) -> ISession | None:
+    def __session(request: _http.Request) -> ISession | None:
         """
         Return the session attached to a request, when present.
 

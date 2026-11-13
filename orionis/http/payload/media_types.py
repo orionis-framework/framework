@@ -20,6 +20,7 @@ Special type alias for synchronous body parsers that take a bytes payload and re
 a parsed object.
 """
 
+
 class MediaTypeRegistry(IMediaTypeRegistry):
     """
     Map lowercased media-type strings to synchronous ``BodyParser`` callables.

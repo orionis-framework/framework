@@ -13,21 +13,27 @@ La metadata documental alimenta compiladores JSON Schema/OpenAPI sin formar part
 - Campos obligatorios ausentes, valores incompatibles y límites producen `ValidationException` bajo `Validator`.
 - `msgspec.convert` directo lanza `msgspec.ValidationError`, no la excepción agrupada.
 - Construcción directa no ejecuta todo el pipeline no confiable.
+- Las instancias existentes de schemas o `msgspec.Struct` dentro de mapas y colecciones de entrada se revalidan incluso sin `Coerce()`, sin modificar los originales.
 - El orden de reglas sigue metadata; se acumulan fallos del mismo campo, de otros campos y de schemas anidados.
 - Un límite incumplido no impide ejecutar otras restricciones ni reglas si el valor se pudo convertir a su tipo base. Un tipo incompatible impide ejecutar sus reglas de valor.
 - `Message` cubre tipo, no toda regla; use `message=` en la regla exacta.
 - `ActiveUrl` usa red; `Unique` usa database; reglas de archivo/imagen requieren upload compatible.
 - Metadata conflictiva falla al declarar la clase.
 
+`ValidationException` acepta un `ValidationFailure` o una secuencia de fallos.
+Conserva un resumen explícito, incluso si es un string vacío. Sin ese resumen,
+usa el primer fallo y cuenta todos los restantes, aunque varios pertenezcan al
+mismo campo. `failure` es la primera entidad y `failures` es una tupla inmutable.
+
 ## Rendimiento y concurrencia
 
-Metadata estructural y planes se compilan al crear la clase y cachean por tipo. Los schemas sin `Coerce()` conservan una sola llamada optimizada `msgspec.convert` en el camino exitoso. Los campos marcados se normalizan primero con un plan de recorrido cacheado y acotado; el payload preparado se usa tanto para validar como para recopilar fallos. La inspección detallada de errores se reserva para entradas rechazadas.
+Metadata estructural y planes se compilan al crear la clase y cachean por tipo. Las entradas planas sin `Coerce()` usan conversión nativa sin recorrer un plan de coerción. Las instancias anidadas existentes se preparan para volver a validarlas. Los campos marcados se normalizan primero con un plan de recorrido cacheado y acotado; el payload preparado se usa tanto para validar como para recopilar fallos. La inspección detallada de errores se reserva para entradas rechazadas.
 
 Los planes se comparten por clase; no guarde datos de una solicitud en las instancias de reglas. Las reglas asíncronas preservan loop/transacción. Espere siempre `validate`, incluso en schemas sin reglas de I/O. Cada regla implementa `async def enforce`; use allí I/O asíncrono nativo para no bloquear el loop. Los checks puros no necesitan hilos auxiliares. Los tipos y constraints se verifican con el motor nativo de `msgspec`; las reglas Python y las consultas externas conservan su coste propio.
 
 ## Compatibilidad
 
-Los schemas son `msgspec.Struct` y pueden codificarse con codecs compatibles. La declaración pública depende de anotaciones diferidas Python 3.14. Use metadata Orionis en vez de construir `msgspec.Meta` para conservar mensajes/documentación consistentes.
+Los schemas son `msgspec.Struct` y pueden codificarse con codecs compatibles. Las declaraciones admiten anotaciones diferidas de Python 3.14, anotaciones de texto y mapas explícitos de anotaciones. Use metadata Orionis en vez de construir `msgspec.Meta` para conservar mensajes/documentación consistentes.
 
 La validación ahora solo ofrece la entrada asíncrona `validate`. Migre cada llamada a `await Validator.validate(...)`; ya no se admiten llamadas síncronas ni el método alternativo anterior. Las reglas personalizadas deben implementar `async def enforce`, y las llamadas directas a ese método también se deben esperar. La recolección de fallos espera las reglas tras errores de conversión.
 
@@ -36,15 +42,21 @@ La validación ahora solo ofrece la entrada asíncrona `validate`. Migre cada ll
 Las reglas del schema hijo se ejecutan tanto en campos anidados directos como en schemas dentro de listas, valores de diccionarios, tuplas, sets y frozensets, incluidas colecciones anidadas, valores opcionales y aliases compatibles como `Sequence` y `Mapping`. Son comprobaciones de Orionis adicionales a la conversión de tipos y los constraints estructurales compilados de msgspec; no hace falta validar manualmente cada elemento.
 
 ```python
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.rules import Email
+
+
 class Contact(Schema):
     email: Field[str, Email()]
+
 
 class Accounts(Schema):
     contacts: list[Contact]
     by_name: dict[str, Contact]
 ```
 
-Con los imports del ejemplo inferior, `await Validator.validate(...)` rechaza un correo inválido del hijo con la ruta `contacts[0].email` o `by_name['primary'].email`. El anidamiento directo conserva rutas como `contact.email`. Las claves de diccionario usan su `repr` de Python, de modo que la puntuación de una clave sigue formando parte de ella.
+La validación rechaza un correo inválido del hijo con la ruta `contacts[0].email` o `by_name['primary'].email`. El anidamiento directo conserva rutas como `contact.email`. Las claves de diccionario usan su `repr` de Python, de modo que la puntuación de una clave sigue formando parte de ella.
 
 Si un campo o elemento falla la conversión, se siguen esperando las reglas de sus hermanos convertidos correctamente, incluidos los campos válidos de un hijo convertido parcialmente. Si solo fallan constraints y el tipo base es válido, también se ejecutan las reglas del propio campo. El valor con tipo incompatible no ejecuta sus propias reglas. Los constraints de la colección se conservan junto a los fallos de sus hijos. Las reglas entre campos reciben la instancia del hijo, o un namespace con los atributos convertidos y valores predeterminados disponibles en el camino de error, no la colección padre.
 
@@ -67,33 +79,43 @@ from orionis.schemas.rules import Email
 from orionis.schemas.validator import Schema as Validator
 from orionis.schemas.exceptions import ValidationException
 
+
 class Line(Schema):
     sku: Field[str, MinLength(3)]
     quantity: Field[int, GreaterThan(0)]
+
 
 class Order(Schema, forbid_unknown_fields=True):
     email: Field[str, Email()]
     lines: Field[list[Line], MinLength(1)]
     note: str | None = None
 
+
 async def main() -> None:
-    order = await Validator.validate({
-        "email": "ada@example.com",
-        "lines": [{"sku": "BK-1", "quantity": 2}],
-    }, Order)
+    order = await Validator.validate(
+        {
+            "email": "ada@example.com",
+            "lines": [{"sku": "BK-1", "quantity": 2}],
+        },
+        Order,
+    )
     assert order.lines[0].quantity == 2
     assert order.note is None
     try:
-        await Validator.validate({
-            "email": "ada@example.com",
-            "lines": [{"sku": "BK-1", "quantity": 0}],
-        }, Order)
+        await Validator.validate(
+            {
+                "email": "ada@example.com",
+                "lines": [{"sku": "BK-1", "quantity": 0}],
+            },
+            Order,
+        )
     except ValidationException as error:
         assert error.failures
         assert error.error()["errors"] == error.errors
         assert error.errors["lines[0].quantity"][0]["rule"] == "gt"
     else:
         raise AssertionError("invalid order accepted")
+
 
 asyncio.run(main())
 ```
@@ -110,15 +132,19 @@ from orionis.schemas.exceptions import ValidationException
 from orionis.schemas.fields import Field
 from orionis.schemas.validator import Schema as Validator
 
+
 class Purchase(Schema):
     quantity: Field[
-        int, GreaterThanOrEqual(1, message="Quantity must be positive."),
+        int,
+        GreaterThanOrEqual(1, message="Quantity must be positive."),
         MultipleOf(2, message="Quantity must be even."),
     ]
     email: Field[
-        str, MinLength(5, message="Email is too short."),
+        str,
+        MinLength(5, message="Email is too short."),
         Email(message="Email is invalid."),
     ]
+
 
 async def main() -> None:
     try:
@@ -130,10 +156,12 @@ async def main() -> None:
             {"rule": "multiple_of", "message": "Quantity must be even."},
         ]
         assert [detail["rule"] for detail in error.errors["email"]] == [
-            "min_length", "email",
+            "min_length",
+            "email",
         ]
     else:
         raise AssertionError("invalid purchase accepted")
+
 
 asyncio.run(main())
 ```

@@ -11,6 +11,7 @@ from orionis.foundation.config.database.enums import (
 from orionis.foundation.config.validation import normalize_enum, validate_integer
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class SQLite(BaseEntity):
     """

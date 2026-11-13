@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.http.default.contracts.responses import IDefaultResponses
     from orionis.http.responses import Response
 
+
 class UnderMaintenanceMiddleware:
     """
     Reject every incoming request with 503 while in maintenance mode.
@@ -69,9 +70,7 @@ class UnderMaintenanceMiddleware:
             ``None`` otherwise.
         """
         is_under_maintenance = (
-            self.__under_maintenance
-            if under_maintenance is None
-            else under_maintenance
+            self.__under_maintenance if under_maintenance is None else under_maintenance
         )
         if not is_under_maintenance:
             return None

@@ -1,9 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from contextlib import closing
 from orionis.http.payload.parsers import parse_content_type
 from orionis.http.payload.part import MultipartPart
 from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.test import TestCase
 from tests.http.test_request import make_asgi_request
+
 
 class TestQuotedHeaderParameters(TestCase):
     """Preserve quoted delimiters across header and multipart parsing."""
@@ -23,7 +26,7 @@ class TestQuotedHeaderParameters(TestCase):
             ),
             (
                 r'text/plain; note="alpha\";beta"; next=value',
-                {"note": r'alpha\";beta', "next": "value"},
+                {"note": r"alpha\";beta", "next": "value"},
             ),
             (
                 r'text/plain; note="alpha\\"; next=value',
@@ -106,21 +109,23 @@ class TestQuotedHeaderParameters(TestCase):
             Assertions verify the behavior described above.
         """
         body = (
-            b'--orionis;boundary\r\n'
+            b"--orionis;boundary\r\n"
             b'Content-Disposition: form-data; name="alpha;beta"\r\n\r\n'
-            b'field value\r\n'
-            b'--orionis;boundary\r\n'
+            b"field value\r\n"
+            b"--orionis;boundary\r\n"
             b'Content-Disposition: form-data; name="file;data"; filename="a;b.txt"\r\n'
-            b'Content-Type: text/plain\r\n\r\n'
-            b'uploaded content\r\n'
-            b'--orionis;boundary--\r\n'
+            b"Content-Type: text/plain\r\n\r\n"
+            b"uploaded content\r\n"
+            b"--orionis;boundary--\r\n"
         )
         request = make_asgi_request(
             body=body,
-            headers=[(
-                b"content-type",
-                b'multipart/form-data; boundary="orionis;boundary"; charset=UTF-8',
-            )],
+            headers=[
+                (
+                    b"content-type",
+                    b'multipart/form-data; boundary="orionis;boundary"; charset=UTF-8',
+                ),
+            ],
         )
         with await request.form() as form:
             self.assertEqual(form.get("alpha;beta"), "field value")

@@ -7,6 +7,7 @@ from threading import Lock
 from time import monotonic
 from orionis.foundation.config.validation import validate_integer
 
+
 @dataclass(slots=True)
 class _RateLimitBucket:
     """Track accepted timestamps and the time the last one expires."""
@@ -16,12 +17,18 @@ class _RateLimitBucket:
     timestamps: deque[float] = field(default_factory=deque)
     """Timestamps produced by ``field``."""
 
+
 class MemoryRateLimitStore:
     """Track rate-limit counters in process-local memory."""
 
     __slots__ = (
-        "__keys", "__lock", "__max_events", "__max_keys", "__storage",
-        "__ticks", "__total_events",
+        "__keys",
+        "__lock",
+        "__max_events",
+        "__max_keys",
+        "__storage",
+        "__ticks",
+        "__total_events",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -69,7 +76,7 @@ class MemoryRateLimitStore:
         self.__ticks: int = 0
         """Ticks value used by ``MemoryRateLimitStore``."""
 
-    async def hit( # NOSONAR
+    async def hit(  # NOSONAR
         self,
         key: str,
         limit: int,
@@ -163,7 +170,10 @@ class MemoryRateLimitStore:
         return True
 
     def __newBucket(
-        self, key: str, now: float, window: int,
+        self,
+        key: str,
+        now: float,
+        window: int,
     ) -> _RateLimitBucket | None:
         """
         Create a bucket only when bounded reclamation makes room for it.
@@ -228,4 +238,3 @@ class MemoryRateLimitStore:
                 del storage[key]
             else:
                 keys.append(key)
-

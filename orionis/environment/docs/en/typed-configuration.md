@@ -1,6 +1,6 @@
 # Reading and writing environment configuration
 
-Each block on this page is a separate program. Run the `DotEnv` example in a fresh process: the singleton's first construction selects its file for the whole process.
+Each block on this page is a separate program. Run each in a fresh process with a temporary working directory: the singleton's first construction selects its file for the whole process. `only_os=True` limits the requested mutation; it does not skip the initial `.env` load.
 
 ## Quick start
 
@@ -22,7 +22,9 @@ print("7 fallback")
 
 ### Typed values
 
-Supported hints are `str`, `int`, `float`, `bool`, `list`, `dict`, `tuple`, `set`, `path`, and `base64`. Typed storage has the form `<hint>:<payload>`. Container payloads use safe literal parsing; paths normalize to POSIX form; Base64 parses to UTF-8 text when possible and otherwise bytes.
+Supported hints are `str`, `int`, `float`, `bool`, `list`, `dict`, `tuple`, `set`, `path`, and `base64`. Typed storage has the form `<hint>:<payload>`. Container payloads use safe literal parsing. Path serialization expands `~`, resolves relative paths, and normalizes separators to POSIX form. Base64 parses to UTF-8 text when possible and otherwise bytes.
+
+`EnvironmentCaster(value).to("base64")` also accepts binary bytes that are not UTF-8. Values that already contain valid Base64 are preserved; other strings or bytes are encoded. This direct caster interface is broader than `Env.set` with a type hint, whose input validator accepts strings, numbers, booleans, and literal containers.
 
 ### Singleton path
 
@@ -40,7 +42,7 @@ Use `Env.set("WORKERS", 4, "int")`; the file stores `int:4` and later reads retu
 
 ### Apply an external file edit
 
-Call `Env.reload()` after changing the selected `.env` outside the process. It overrides matching process values and refreshes `all()`. A key removed from the file is removed from the cache, but `python-dotenv` does not automatically delete an already-existing process variable.
+Call `Env.reload()` after changing the selected `.env` outside the process. It parses and interpolates the file once, using the same snapshot to override matching process values and refresh `all()`. A key removed from the file is removed from the cache; an already-existing process variable is retained.
 
 ## Examples
 
@@ -95,14 +97,16 @@ File values support plain dotenv syntax and these typed prefixes:
 
 | Prefix | Parsed value |
 |---|---|
-| `str:` | String with leading value whitespace removed. |
+| `str:` | String with leading value whitespace removed; an empty payload is `""`. |
 | `int:`, `float:` | Python number. |
-| `bool:` | `true/1/yes/on/enabled` or `false/0/no/off/disabled`. |
+| `bool:` | `true/1/yes/on/enabled` or `false/0/no/off/disabled`, ignoring case; other spellings raise `ValueError`. |
 | `list:`, `dict:`, `tuple:`, `set:` | Matching Python literal container. |
 | `path:` | Normalized POSIX path string. |
-| `base64:` | Decoded UTF-8 string or raw bytes. |
+| `base64:` | Decoded UTF-8 string or raw bytes; an empty payload is `""`. |
 
 Unprefixed `none`, `null`, `nan`, and `nil` map to `None`; unprefixed safe literals are parsed with `ast.literal_eval`.
+
+Set `PYTHON_DOTENV_DISABLED` to `1`, `true`, `t`, `yes`, or `y` (case-insensitive) to prevent automatic publication of file values into `os.environ`. The file snapshot is still available through `all()`, and explicit `set` and `unset` operations still modify the process environment.
 
 ## Evidence and next steps
 

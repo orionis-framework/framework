@@ -1,11 +1,15 @@
+# ruff: noqa: PLC0415, SLF001, TC001
+# Defer transport loading, use the native route hook, and expose runtime service types.
 """Own one compiled registry shared by native HTTP, STDIO, DI and the facade."""
 
 from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
+import orionis.http as http_module
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.functions import normalize_path, normalize_request_path
+from orionis.http.routes.fluent import FluentRoute
 from orionis.mcp.config import McpConfig
 from orionis.mcp.contracts.event_bus import IMcpEventBus
 from orionis.mcp.contracts.manager import IMcpManager
@@ -16,18 +20,14 @@ from orionis.mcp.server.compiler import (
 from orionis.mcp.server.primitives import Server
 
 if TYPE_CHECKING:
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
-    from orionis.http.routes.fluent import FluentRoute
     from orionis.mcp.transport.http import McpHttpTransport
 
 _LOCAL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
 """Compiled pattern used to recognize local name."""
 
+
 class McpManager(IMcpManager):
     """Own one compiled registry shared by native HTTP, STDIO, DI and the facade."""
-
-    # ruff: noqa: PLC0415, SLF001, TC001
 
     __slots__ = ("_app", "_bus", "_compiled", "_config", "_local", "_router", "_web")
     """Declare the instance attribute slots reserved by this class."""
@@ -69,7 +69,8 @@ class McpManager(IMcpManager):
         self._compiled: dict[type[Server], CompiledMcpServer] = {}
         """Compiled server metadata indexed by the original server class."""
         self._web: dict[
-            str, tuple[FluentRoute, CompiledMcpServer, McpHttpTransport],
+            str,
+            tuple[FluentRoute, CompiledMcpServer, McpHttpTransport],
         ] = {}
         """HTTP routes, compiled servers and transports indexed by endpoint path."""
         self._local: dict[str, CompiledMcpServer] = {}
@@ -243,7 +244,10 @@ class McpManager(IMcpManager):
             for name, compiled in self._local.items()
         )
 
-    async def dispatchHttp(self, request: Request) -> Response:
+    async def dispatchHttp(
+        self,
+        request: http_module.Request,
+    ) -> http_module.Response:
         """
         Use the same server and invoker reached by its local registration.
 
@@ -355,7 +359,10 @@ class McpManager(IMcpManager):
         await self._publish(server, "notifications/resources/updated", uri)
 
     async def _publish(
-        self, server: type[Server], method: str, uri: str | None = None,
+        self,
+        server: type[Server],
+        method: str,
+        uri: str | None = None,
     ) -> None:
         """
         Scope events to a declaration already registered in this application.

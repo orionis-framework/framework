@@ -1,3 +1,5 @@
+# ruff: noqa: BLE001, PLC0415, TC003
+# Observe cleanup failures centrally and retain callback annotations at runtime.
 """Serialize one checked-out DBAPI connection on one worker thread."""
 
 from __future__ import annotations
@@ -6,10 +8,86 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from contextvars import copy_context
 from functools import partial
-from typing import TYPE_CHECKING
+from collections.abc import Awaitable, Callable
+from sqlalchemy.exc import SQLAlchemyError
+from orionis.database.exceptions import QueryException
 
-if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
+
+def _diagnostic_error(error: BaseException) -> BaseException:
+    """Redact native SQL diagnostics before passing them to failure reporting.
+
+    Parameters
+    ----------
+    error : BaseException
+        Error observed while completing or releasing database work.
+
+    Returns
+    -------
+    BaseException
+        Sanitized query error for SQLAlchemy failures; otherwise the same error.
+    """
+    if isinstance(error, SQLAlchemyError):
+        return QueryException(f"Database operation failed ({type(error).__name__}).")
+    return error
+
+
+async def _complete_cleanup(
+    operation: Awaitable[object],
+    primary: BaseException | None,
+) -> None:
+    """Complete database cleanup without replacing an existing ordinary failure.
+
+    Parameters
+    ----------
+    operation : collections.abc.Awaitable[object]
+        Cleanup owned by the database context.
+    primary : BaseException | None
+        Failure already propagating from that context, if any.
+
+    Returns
+    -------
+    None
+        No return value.
+    """
+    try:
+        await _wait_for_completion(asyncio.ensure_future(operation))
+    except Exception as error:
+        if primary is None:
+            raise
+        from orionis.failure.runtime import capture
+
+        await capture(_diagnostic_error(error), flow="database", phase="cleanup")
+
+
+async def _rollback_or_invalidate(
+    operation: Awaitable[object],
+    invalidate: Callable[[], Awaitable[None]],
+) -> None:
+    """Discard a checkout when rollback fails before its release to the pool.
+
+    Parameters
+    ----------
+    operation : collections.abc.Awaitable[object]
+        Native rollback or transaction-exit operation already owned by cleanup.
+    invalidate : collections.abc.Callable[[], collections.abc.Awaitable[None]]
+        Discard the associated checkout without another pool reset.
+
+    Returns
+    -------
+    None
+        No return value.
+
+    Raises
+    ------
+    sqlalchemy.exc.SQLAlchemyError
+        Original rollback failure after invalidation has been attempted.
+    """
+    try:
+        await operation
+    except SQLAlchemyError as error:
+        await _complete_cleanup(invalidate(), error)
+        raise
+
 
 async def _wait_for_completion[T](
     future: asyncio.Future[T],
@@ -50,7 +128,7 @@ async def _wait_for_completion[T](
         Returns
         -------
         None
-            Wake the waiting task without forwarding a worker exception.
+            No return value.
         """
         if not notification.done():
             notification.set_result(None)
@@ -63,19 +141,28 @@ async def _wait_for_completion[T](
             with suppress(asyncio.CancelledError):
                 await asyncio.shield(notification)
         if not future.cancelled():
-            from orionis.failure.runtime import capture  # noqa: PLC0415
+            from orionis.failure.runtime import capture
 
             error = future.exception()
             if error is not None:
-                await capture(error, flow="database", phase="cancelled_work")
+                await capture(
+                    _diagnostic_error(error),
+                    flow="database",
+                    phase="cancelled_work",
+                )
             elif on_cancel is not None:
                 try:
                     with suppress(asyncio.CancelledError):
                         await on_cancel(future.result())
-                except Exception as cleanup_error:  # noqa: BLE001
-                    await capture(cleanup_error, flow="database", phase="cleanup")
+                except Exception as cleanup_error:
+                    await capture(
+                        _diagnostic_error(cleanup_error),
+                        flow="database",
+                        phase="cleanup",
+                    )
         raise
     return future.result()
+
 
 class ThreadedWorker:
     """
@@ -83,9 +170,11 @@ class ThreadedWorker:
 
     Cancellation waits for blocking I/O to finish before releasing its connection.
     Operations on other checkouts use independent workers and remain concurrent.
+    Closing rejects new work and joins both submitted operations and their
+    cancellation cleanup; concurrent close callers share that completion.
     """
 
-    __slots__ = ("_closed", "_executor")
+    __slots__ = ("_close_task", "_closed", "_executor", "_pending")
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
@@ -94,12 +183,17 @@ class ThreadedWorker:
         Returns
         -------
         None
-            Initialize a lazy single-thread executor.
+            No return value.
         """
         self._closed = False
-        """Whether this resource has completed its close lifecycle."""
+        """Whether admission has closed, including while shutdown is pending."""
+        self._close_task: asyncio.Task[None] | None = None
+        """Shared shutdown operation while owned work is being drained."""
+        self._pending: set[asyncio.Future[None]] = set()
+        """Completion notices including each operation's late-result cleanup."""
         self._executor = ThreadPoolExecutor(
-            max_workers=1, thread_name_prefix="orionis-redshift",
+            max_workers=1,
+            thread_name_prefix="orionis-redshift",
         )
         """Executor produced by ``ThreadPoolExecutor``."""
 
@@ -134,9 +228,9 @@ class ThreadedWorker:
         if self._closed:
             message = "The database worker is closed."
             raise RuntimeError(message)
-        future = asyncio.get_running_loop().run_in_executor(
-            self._executor, partial(copy_context().run, operation),
-        )
+        loop = asyncio.get_running_loop()
+        completion = loop.create_future()
+        self._pending.add(completion)
 
         async def discard(value: T) -> None:
             """
@@ -150,14 +244,27 @@ class ThreadedWorker:
             Returns
             -------
             None
-                Complete the supplied cancellation cleanup.
+                No return value.
             """
             if on_cancel is not None:
-                await self.run(partial(on_cancel, value))
+                cleanup = loop.run_in_executor(
+                    self._executor,
+                    partial(copy_context().run, partial(on_cancel, value)),
+                )
+                await _wait_for_completion(cleanup)
 
-        return await _wait_for_completion(
-            future, on_cancel=discard if on_cancel is not None else None,
-        )
+        try:
+            future = loop.run_in_executor(
+                self._executor,
+                partial(copy_context().run, operation),
+            )
+            return await _wait_for_completion(
+                future,
+                on_cancel=discard if on_cancel is not None else None,
+            )
+        finally:
+            self._pending.discard(completion)
+            completion.set_result(None)
 
     async def close(self) -> None:
         """Join this worker without blocking the event loop.
@@ -165,17 +272,55 @@ class ThreadedWorker:
         Returns
         -------
         None
-            Complete all submitted work and release the worker thread.
+            No return value.
 
         Raises
         ------
         asyncio.CancelledError
             Only after executor shutdown has completed.
         """
-        if self._closed:
-            return
-        self._closed = True
+        if self._close_task is None:
+            if self._closed:
+                return
+            self._closed = True
+            shutdown = self._shutdown()
+            try:
+                self._close_task = asyncio.create_task(shutdown)
+            except BaseException:
+                shutdown.close()
+                self._closed = False
+                raise
+            self._close_task.add_done_callback(self._closedTask)
+        await _wait_for_completion(self._close_task)
+
+    def _closedTask(self, pending: asyncio.Task[None]) -> None:
+        """Release the completed coordinator and its copied execution context.
+
+        Parameters
+        ----------
+        pending : asyncio.Task[None]
+            Shared shutdown task that has reached a terminal state.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if self._close_task is pending:
+            self._close_task = None
+
+    async def _shutdown(self) -> None:
+        """Drain logical operations before shutting down their reserved executor.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if self._pending:
+            await asyncio.gather(*self._pending)
         future = asyncio.get_running_loop().run_in_executor(
-            None, partial(self._executor.shutdown, wait=True),
+            None,
+            partial(self._executor.shutdown, wait=True),
         )
         await _wait_for_completion(future)

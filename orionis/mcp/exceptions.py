@@ -6,6 +6,7 @@ Includes ``McpProtocolException``, ``McpInvalidParams``,
 
 import msgspec
 
+
 class McpProtocolException(Exception):
     """Carry an explicitly safe JSON-RPC error and HTTP status."""
 
@@ -13,7 +14,11 @@ class McpProtocolException(Exception):
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, code: int, message: str, *, status: int = 400,
+        self,
+        code: int,
+        message: str,
+        *,
+        status: int = 400,
         data: object = msgspec.UNSET,
     ) -> None:
         """
@@ -45,6 +50,7 @@ class McpProtocolException(Exception):
         self.data = data
         """Value supplied for ``data``."""
 
+
 class McpInvalidParams(McpProtocolException):
     """Reject malformed method parameters."""
 
@@ -52,7 +58,10 @@ class McpInvalidParams(McpProtocolException):
     """Declare that this class introduces no additional instance slots."""
 
     def __init__(
-        self, message: str = "Invalid params", *, data: object = msgspec.UNSET,
+        self,
+        message: str = "Invalid params",
+        *,
+        data: object = msgspec.UNSET,
     ) -> None:
         """
         Use the standard JSON-RPC invalid-params code.
@@ -70,6 +79,7 @@ class McpInvalidParams(McpProtocolException):
             Complete the documented operation without returning a value.
         """
         super().__init__(-32602, message, data=data)
+
 
 class McpAuthorizationException(McpProtocolException):
     """Deny a primitive through its explicit authorization hook."""

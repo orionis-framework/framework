@@ -1,4 +1,9 @@
+# ruff: noqa: ARG001, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# The injected method accepts an unused receiver to preserve method binding.
+
 import inspect
+from abc import ABC, abstractmethod
 from orionis.introspection.concretes.reflection import ReflectionConcrete
 from orionis.introspection.dependencies.entities.signature import Signature
 from orionis.test import TestCase
@@ -7,12 +12,13 @@ from orionis.test import TestCase
 # Test fixtures
 # ---------------------------------------------------------------------------
 
+
 class SampleConcrete:
     """A concrete class with varied members for introspection testing."""
 
     public_attr: int = 10
     _protected_attr: str = "protected"
-    __private_attr: str = "private" # NOSONAR
+    __private_attr: str = "private"
 
     def __init__(self, x: int = 0) -> None:
         """Initialise with an optional integer.
@@ -25,7 +31,7 @@ class SampleConcrete:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.x = x
 
@@ -39,7 +45,7 @@ class SampleConcrete:
         """
         return "public"
 
-    async def publicAsyncMethod(self) -> str: # NOSONAR
+    async def publicAsyncMethod(self) -> str:
         """Return a fixed async string.
 
         Returns
@@ -65,10 +71,10 @@ class SampleConcrete:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
-    def __privateMethod(self) -> int:  # NOSONAR
+    def __privateMethod(self) -> int:
         """Return zero as a private method.
 
         Returns
@@ -78,7 +84,7 @@ class SampleConcrete:
         """
         return 0
 
-    async def __privateAsyncMethod(self) -> int:  # NOSONAR
+    async def __privateAsyncMethod(self) -> int:
         """Return zero as a private async method.
 
         Returns
@@ -100,7 +106,7 @@ class SampleConcrete:
         return True
 
     @staticmethod
-    async def staticAsyncMethod() -> bool: # NOSONAR
+    async def staticAsyncMethod() -> bool:
         """Return True from an async static context.
 
         Returns
@@ -122,7 +128,7 @@ class SampleConcrete:
         return 0
 
     @staticmethod
-    async def _protectedStaticAsyncMethod() -> int: # NOSONAR
+    async def _protectedStaticAsyncMethod() -> int:
         """Return 0 from a protected async static context.
 
         Returns
@@ -133,7 +139,7 @@ class SampleConcrete:
         return 0
 
     @staticmethod
-    def __privateStaticMethod() -> int: # NOSONAR
+    def __privateStaticMethod() -> int:
         """Return 1 from a private static context.
 
         Returns
@@ -144,7 +150,7 @@ class SampleConcrete:
         return 1
 
     @staticmethod
-    async def __privateStaticAsyncMethod() -> int: # NOSONAR
+    async def __privateStaticAsyncMethod() -> int:
         """Return 1 from a private async static context.
 
         Returns
@@ -166,7 +172,7 @@ class SampleConcrete:
         return cls.__name__
 
     @classmethod
-    async def classAsyncMethod(cls) -> str: # NOSONAR
+    async def classAsyncMethod(cls) -> str:
         """Return the class name from an async class method.
 
         Returns
@@ -183,11 +189,11 @@ class SampleConcrete:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     @classmethod
-    async def _protectedClassAsyncMethod(cls) -> str: # NOSONAR
+    async def _protectedClassAsyncMethod(cls) -> str:
         """Return the class name from a protected async class method.
 
         Returns
@@ -198,7 +204,7 @@ class SampleConcrete:
         return cls.__name__
 
     @classmethod
-    def __privateClassMethod(cls) -> str: # NOSONAR
+    def __privateClassMethod(cls) -> str:
         """Return the class name from a private class method.
 
         Returns
@@ -209,7 +215,7 @@ class SampleConcrete:
         return cls.__name__
 
     @classmethod
-    async def __privateClassAsyncMethod(cls) -> str: # NOSONAR
+    async def __privateClassAsyncMethod(cls) -> str:
         """Return the class name from a private async class method.
 
         Returns
@@ -242,7 +248,7 @@ class SampleConcrete:
         return "protected_value"
 
     @property
-    def __privateProperty(self) -> str: # NOSONAR
+    def __privateProperty(self) -> str:
         """Return a fixed private property string.
 
         Returns
@@ -261,6 +267,7 @@ class SampleConcrete:
             Value produced by the helper.
         """
         return f"SampleConcrete(x={self.x})"
+
 
 def _make_mutable_concrete() -> type:
     """
@@ -287,6 +294,7 @@ def _make_mutable_concrete() -> type:
 
     return _Mutable
 
+
 def _make_private_method_concrete() -> type:
     """
     Return a fresh concrete type exposing a deletable private method.
@@ -298,8 +306,7 @@ def _make_private_method_concrete() -> type:
     """
 
     class _PrivateHolder:
-
-        def __hiddenMethod(self) -> int: # NOSONAR
+        def __hiddenMethod(self) -> int:
             """Return 2.
 
             Returns
@@ -311,7 +318,8 @@ def _make_private_method_concrete() -> type:
 
     return _PrivateHolder
 
-def _replacement_method(self) -> int:  # noqa: ARG001
+
+def _replacement_method(self: object) -> int:
     """
     Return a fixed integer used when injecting methods at runtime.
 
@@ -321,6 +329,7 @@ def _replacement_method(self) -> int:  # noqa: ARG001
         Always returns 3.
     """
     return 3
+
 
 def _make_moduleless_concrete() -> type:
     """
@@ -336,6 +345,7 @@ def _make_moduleless_concrete() -> type:
         (),
         {"__module__": "orionis_missing_module_xyz"},
     )
+
 
 # Accessors that trigger the lazy single-pass class scan on first use
 _SCAN_TRIGGERING_GETTERS = (
@@ -385,8 +395,8 @@ _SCAN_TRIGGERING_GETTERS = (
 # __init__ / construction
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteInit(TestCase):
 
+class TestReflectionConcreteInit(TestCase):
     def testInitWithConcreteClassSucceeds(self) -> None:
         """
         Assert that wrapping a plain concrete class does not raise.
@@ -394,7 +404,7 @@ class TestReflectionConcreteInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(SampleConcrete)
         self.assertIsInstance(rc, ReflectionConcrete)
@@ -406,19 +416,18 @@ class TestReflectionConcreteInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
-        from abc import ABC, abstractmethod
 
         class _Abstract(ABC):
             @abstractmethod
-            def m(self):
+            def m(self) -> None:
                 """Run the m helper.
 
                 Returns
                 -------
                 None
-                    Completes the operation described above.
+                    No return value.
                 """
                 ...
 
@@ -432,7 +441,7 @@ class TestReflectionConcreteInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionConcrete(len)  # type: ignore[arg-type]
@@ -444,7 +453,7 @@ class TestReflectionConcreteInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionConcrete(42)  # type: ignore[arg-type]
@@ -456,35 +465,25 @@ class TestReflectionConcreteInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionConcrete(None)  # type: ignore[arg-type]
 
-    def testInstanceIsReflectionConcrete(self) -> None:
-        """
-        Assert that the returned object is an instance of ReflectionConcrete.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIsInstance(ReflectionConcrete(SampleConcrete), ReflectionConcrete)
 
 # ---------------------------------------------------------------------------
 # Cache protocol
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteCacheProtocol(TestCase):
 
+class TestReflectionConcreteCacheProtocol(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for cache tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -495,7 +494,7 @@ class TestReflectionConcreteCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rc["my_key"] = "my_value"
         self.assertEqual(self.rc["my_key"], "my_value")
@@ -507,7 +506,7 @@ class TestReflectionConcreteCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rc["exists"] = True
         self.assertIn("exists", self.rc)
@@ -519,7 +518,7 @@ class TestReflectionConcreteCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("ghost_key", self.rc)
 
@@ -530,7 +529,7 @@ class TestReflectionConcreteCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rc["absent_key"])
 
@@ -541,7 +540,7 @@ class TestReflectionConcreteCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rc["to_delete"] = 99
         del self.rc["to_delete"]
@@ -554,23 +553,24 @@ class TestReflectionConcreteCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         del self.rc["never_existed"]  # must not raise
+
 
 # ---------------------------------------------------------------------------
 # Identity
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteIdentity(TestCase):
 
+class TestReflectionConcreteIdentity(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for identity tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -581,7 +581,7 @@ class TestReflectionConcreteIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.rc.getClass(), SampleConcrete)
 
@@ -592,7 +592,7 @@ class TestReflectionConcreteIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getClassName(), str)
 
@@ -603,7 +603,7 @@ class TestReflectionConcreteIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.rc.getClassName(), "SampleConcrete")
 
@@ -614,7 +614,7 @@ class TestReflectionConcreteIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getModuleName(), str)
 
@@ -625,7 +625,7 @@ class TestReflectionConcreteIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("SampleConcrete", self.rc.getModuleWithClassName())
 
@@ -636,24 +636,25 @@ class TestReflectionConcreteIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         fqn = self.rc.getModuleWithClassName()
         self.assertIn(self.rc.getModuleName(), fqn)
+
 
 # ---------------------------------------------------------------------------
 # Metadata
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteMetadata(TestCase):
 
+class TestReflectionConcreteMetadata(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for metadata tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -664,7 +665,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getDocstring(), str)
 
@@ -675,7 +676,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
 
         class _NoDoc:
@@ -692,7 +693,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getBaseClasses(), list)
 
@@ -703,7 +704,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(object, self.rc.getBaseClasses())
 
@@ -714,7 +715,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         src = self.rc.getSourceCode()
         self.assertIsInstance(src, str)
@@ -727,7 +728,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         src = self.rc.getSourceCode("publicMethod")
         self.assertIsInstance(src, str)
@@ -739,7 +740,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rc.getSourceCode("does_not_exist"))
 
@@ -750,7 +751,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         f = self.rc.getFile()
         self.assertIsInstance(f, str)
@@ -763,7 +764,7 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getAnnotations(), dict)
 
@@ -774,23 +775,24 @@ class TestReflectionConcreteMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("public_attr", self.rc.getAnnotations())
+
 
 # ---------------------------------------------------------------------------
 # Attribute inspection
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcretePublicAttributes(TestCase):
 
+class TestReflectionConcretePublicAttributes(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for attribute tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -801,7 +803,7 @@ class TestReflectionConcretePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicAttributes(), dict)
 
@@ -812,7 +814,7 @@ class TestReflectionConcretePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("public_attr", self.rc.getPublicAttributes())
 
@@ -823,7 +825,7 @@ class TestReflectionConcretePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("_protected_attr", self.rc.getPublicAttributes())
 
@@ -834,7 +836,7 @@ class TestReflectionConcretePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(self.rc.hasAttribute("public_attr"))
 
@@ -845,7 +847,7 @@ class TestReflectionConcretePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(self.rc.hasAttribute("nonexistent_attr"))
 
@@ -856,7 +858,7 @@ class TestReflectionConcretePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.rc.getAttribute("public_attr"), 10)
 
@@ -867,7 +869,7 @@ class TestReflectionConcretePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rc.getAttribute("does_not_exist"))
 
@@ -878,19 +880,19 @@ class TestReflectionConcretePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getAttributes(), dict)
 
-class TestReflectionConcreteProtectedAttributes(TestCase):
 
+class TestReflectionConcreteProtectedAttributes(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for protected attribute tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -901,7 +903,7 @@ class TestReflectionConcreteProtectedAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getProtectedAttributes(), dict)
 
@@ -912,7 +914,7 @@ class TestReflectionConcreteProtectedAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protected_attr", self.rc.getProtectedAttributes())
 
@@ -923,19 +925,19 @@ class TestReflectionConcreteProtectedAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("public_attr", self.rc.getProtectedAttributes())
 
-class TestReflectionConcreteDunderAttributes(TestCase):
 
+class TestReflectionConcreteDunderAttributes(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for dunder attribute tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -946,7 +948,7 @@ class TestReflectionConcreteDunderAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getDunderAttributes(), dict)
 
@@ -957,19 +959,20 @@ class TestReflectionConcreteDunderAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(
             self.rc.getMagicAttributes(),
             self.rc.getDunderAttributes(),
         )
 
+
 # ---------------------------------------------------------------------------
 # Attribute mutation
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteSetAttribute(TestCase):
 
+class TestReflectionConcreteSetAttribute(TestCase):
     def testSetAttributeReturnsTrueOnSuccess(self) -> None:
         """
         Assert that setAttribute returns True when the attribute is set.
@@ -977,7 +980,7 @@ class TestReflectionConcreteSetAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         self.assertTrue(rc.setAttribute("new_attr", 42))
@@ -989,7 +992,7 @@ class TestReflectionConcreteSetAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         with self.assertRaises(ValueError):
@@ -1002,7 +1005,7 @@ class TestReflectionConcreteSetAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         with self.assertRaises(ValueError):
@@ -1015,14 +1018,14 @@ class TestReflectionConcreteSetAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         with self.assertRaises(TypeError):
             rc.setAttribute("fn", lambda: None)
 
-class TestReflectionConcreteRemoveAttribute(TestCase):
 
+class TestReflectionConcreteRemoveAttribute(TestCase):
     def testRemoveAttributeReturnsTrueOnSuccess(self) -> None:
         """
         Assert that removeAttribute returns True when the attribute is removed.
@@ -1030,7 +1033,7 @@ class TestReflectionConcreteRemoveAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         self.assertTrue(rc.removeAttribute("mutable_attr"))
@@ -1042,25 +1045,26 @@ class TestReflectionConcreteRemoveAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         with self.assertRaises(ValueError):
             rc.removeAttribute("nonexistent_attr")
 
+
 # ---------------------------------------------------------------------------
 # Public methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcretePublicMethods(TestCase):
 
+class TestReflectionConcretePublicMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for public method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1071,7 +1075,7 @@ class TestReflectionConcretePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicMethods(), list)
 
@@ -1082,7 +1086,7 @@ class TestReflectionConcretePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicMethod", self.rc.getPublicMethods())
 
@@ -1093,7 +1097,7 @@ class TestReflectionConcretePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicAsyncMethod", self.rc.getPublicMethods())
 
@@ -1104,7 +1108,7 @@ class TestReflectionConcretePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("_protectedMethod", self.rc.getPublicMethods())
 
@@ -1115,7 +1119,7 @@ class TestReflectionConcretePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicSyncMethods(), list)
 
@@ -1126,7 +1130,7 @@ class TestReflectionConcretePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("publicAsyncMethod", self.rc.getPublicSyncMethods())
 
@@ -1137,7 +1141,7 @@ class TestReflectionConcretePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicAsyncMethods(), list)
 
@@ -1148,23 +1152,24 @@ class TestReflectionConcretePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicAsyncMethod", self.rc.getPublicAsyncMethods())
+
 
 # ---------------------------------------------------------------------------
 # Protected methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteProtectedMethods(TestCase):
 
+class TestReflectionConcreteProtectedMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for protected method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1175,7 +1180,7 @@ class TestReflectionConcreteProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getProtectedMethods(), list)
 
@@ -1186,7 +1191,7 @@ class TestReflectionConcreteProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protectedMethod", self.rc.getProtectedMethods())
 
@@ -1197,7 +1202,7 @@ class TestReflectionConcreteProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("publicMethod", self.rc.getProtectedMethods())
 
@@ -1208,7 +1213,7 @@ class TestReflectionConcreteProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getProtectedSyncMethods(), list)
 
@@ -1219,10 +1224,11 @@ class TestReflectionConcreteProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn(
-            "_protectedAsyncMethod", self.rc.getProtectedSyncMethods(),
+            "_protectedAsyncMethod",
+            self.rc.getProtectedSyncMethods(),
         )
 
     def testGetProtectedAsyncMethodsReturnsList(self) -> None:
@@ -1232,7 +1238,7 @@ class TestReflectionConcreteProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getProtectedAsyncMethods(), list)
 
@@ -1243,25 +1249,27 @@ class TestReflectionConcreteProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
-            "_protectedAsyncMethod", self.rc.getProtectedAsyncMethods(),
+            "_protectedAsyncMethod",
+            self.rc.getProtectedAsyncMethods(),
         )
+
 
 # ---------------------------------------------------------------------------
 # Private methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcretePrivateMethods(TestCase):
 
+class TestReflectionConcretePrivateMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for private method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1272,7 +1280,7 @@ class TestReflectionConcretePrivateMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPrivateMethods(), list)
 
@@ -1283,7 +1291,7 @@ class TestReflectionConcretePrivateMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateMethod", self.rc.getPrivateMethods())
 
@@ -1294,23 +1302,24 @@ class TestReflectionConcretePrivateMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPrivateSyncMethods(), list)
+
 
 # ---------------------------------------------------------------------------
 # Class methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteClassMethods(TestCase):
 
+class TestReflectionConcreteClassMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for class method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1321,7 +1330,7 @@ class TestReflectionConcreteClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicClassMethods(), list)
 
@@ -1332,7 +1341,7 @@ class TestReflectionConcreteClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("classMethod", self.rc.getPublicClassMethods())
 
@@ -1343,7 +1352,7 @@ class TestReflectionConcreteClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getProtectedClassMethods(), list)
 
@@ -1354,10 +1363,11 @@ class TestReflectionConcreteClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
-            "_protectedClassMethod", self.rc.getProtectedClassMethods(),
+            "_protectedClassMethod",
+            self.rc.getProtectedClassMethods(),
         )
 
     def testGetPublicClassSyncMethodsReturnsList(self) -> None:
@@ -1367,23 +1377,24 @@ class TestReflectionConcreteClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicClassSyncMethods(), list)
+
 
 # ---------------------------------------------------------------------------
 # Static methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteStaticMethods(TestCase):
 
+class TestReflectionConcreteStaticMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for static method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1394,7 +1405,7 @@ class TestReflectionConcreteStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicStaticMethods(), list)
 
@@ -1405,7 +1416,7 @@ class TestReflectionConcreteStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("staticMethod", self.rc.getPublicStaticMethods())
 
@@ -1416,7 +1427,7 @@ class TestReflectionConcreteStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getProtectedStaticMethods(), list)
 
@@ -1427,10 +1438,11 @@ class TestReflectionConcreteStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
-            "_protectedStaticMethod", self.rc.getProtectedStaticMethods(),
+            "_protectedStaticMethod",
+            self.rc.getProtectedStaticMethods(),
         )
 
     def testGetPublicStaticSyncMethodsReturnsList(self) -> None:
@@ -1440,23 +1452,24 @@ class TestReflectionConcreteStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicStaticSyncMethods(), list)
+
 
 # ---------------------------------------------------------------------------
 # Dunder methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteDunderMethods(TestCase):
 
+class TestReflectionConcreteDunderMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for dunder method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1467,7 +1480,7 @@ class TestReflectionConcreteDunderMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getDunderMethods(), list)
 
@@ -1478,7 +1491,7 @@ class TestReflectionConcreteDunderMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.rc.getMagicMethods(), self.rc.getDunderMethods())
 
@@ -1489,16 +1502,17 @@ class TestReflectionConcreteDunderMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__repr__", self.rc.getDunderMethods())
+
 
 # ---------------------------------------------------------------------------
 # Method operations (set / remove / signature)
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteMethodOperations(TestCase):
 
+class TestReflectionConcreteMethodOperations(TestCase):
     def testSetMethodReturnsTrueOnSuccess(self) -> None:
         """
         Assert that setMethod returns True when a new method is added.
@@ -1506,7 +1520,7 @@ class TestReflectionConcreteMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         self.assertTrue(rc.setMethod("new_method", lambda _self: None))
@@ -1518,7 +1532,7 @@ class TestReflectionConcreteMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         with self.assertRaises(ValueError):
@@ -1531,7 +1545,7 @@ class TestReflectionConcreteMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         with self.assertRaises(ValueError):
@@ -1544,7 +1558,7 @@ class TestReflectionConcreteMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         with self.assertRaises(TypeError):
@@ -1557,7 +1571,7 @@ class TestReflectionConcreteMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         self.assertTrue(rc.removeMethod("deletableMethod"))
@@ -1569,7 +1583,7 @@ class TestReflectionConcreteMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(_make_mutable_concrete())
         with self.assertRaises(ValueError):
@@ -1582,7 +1596,7 @@ class TestReflectionConcreteMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(SampleConcrete)
         sig = rc.getMethodSignature("publicMethod")
@@ -1595,25 +1609,26 @@ class TestReflectionConcreteMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionConcrete(SampleConcrete)
         with self.assertRaises(ValueError):
             rc.getMethodSignature("nonexistent_method")
 
+
 # ---------------------------------------------------------------------------
 # Properties
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteProperties(TestCase):
 
+class TestReflectionConcreteProperties(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for property tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1624,7 +1639,7 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getProperties(), list)
 
@@ -1635,7 +1650,7 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("aProperty", self.rc.getProperties())
 
@@ -1646,7 +1661,7 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getPublicProperties(), list)
 
@@ -1657,7 +1672,7 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("aProperty", self.rc.getPublicProperties())
 
@@ -1668,7 +1683,7 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("_protectedProperty", self.rc.getPublicProperties())
 
@@ -1679,7 +1694,7 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getProtectedProperties(), list)
 
@@ -1690,7 +1705,7 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protectedProperty", self.rc.getProtectedProperties())
 
@@ -1701,10 +1716,11 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(
-            self.rc.getPropertySignature("aProperty"), inspect.Signature,
+            self.rc.getPropertySignature("aProperty"),
+            inspect.Signature,
         )
 
     def testGetPropertyDocstringReturnsStrOrNone(self) -> None:
@@ -1714,7 +1730,7 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         doc = self.rc.getPropertyDocstring("aProperty")
         self.assertIsInstance(doc, str)
@@ -1726,24 +1742,25 @@ class TestReflectionConcreteProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self.rc.getProperty("nonexistent_property")
+
 
 # ---------------------------------------------------------------------------
 # Dependency / signature analysis
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteDependencies(TestCase):
 
+class TestReflectionConcreteDependencies(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for dependency tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1754,10 +1771,11 @@ class TestReflectionConcreteDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(
-            self.rc.getConstructorSignature(), inspect.Signature,
+            self.rc.getConstructorSignature(),
+            inspect.Signature,
         )
 
     def testConstructorSignatureReturnsSignature(self) -> None:
@@ -1767,7 +1785,7 @@ class TestReflectionConcreteDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.constructorSignature(), Signature)
 
@@ -1778,10 +1796,11 @@ class TestReflectionConcreteDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(
-            self.rc.methodSignature("publicMethod"), Signature,
+            self.rc.methodSignature("publicMethod"),
+            Signature,
         )
 
     def testMethodSignatureMissingRaisesAttributeError(self) -> None:
@@ -1791,24 +1810,25 @@ class TestReflectionConcreteDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.rc.methodSignature("ghost_method")
+
 
 # ---------------------------------------------------------------------------
 # clearCache
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteClearCache(TestCase):
 
+class TestReflectionConcreteClearCache(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for clearCache tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1819,7 +1839,7 @@ class TestReflectionConcreteClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rc.clearCache())
 
@@ -1830,7 +1850,7 @@ class TestReflectionConcreteClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rc["sentinel"] = True
         self.rc.clearCache()
@@ -1843,7 +1863,7 @@ class TestReflectionConcreteClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         _ = self.rc.getSourceCode()
         self.rc.clearCache()
@@ -1856,25 +1876,26 @@ class TestReflectionConcreteClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         _ = self.rc.getPublicMethods()
         self.rc.clearCache()
         self.assertIsInstance(self.rc.getPublicMethods(), list)
 
+
 # ---------------------------------------------------------------------------
 # Asynchronous and private member classification
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteAsyncMembers(TestCase):
 
+class TestReflectionConcreteAsyncMembers(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for async member tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -1885,7 +1906,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         methods = self.rc.getMethods()
         self.assertIn("publicMethod", methods)
@@ -1899,7 +1920,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__private_attr", self.rc.getPrivateAttributes())
 
@@ -1910,7 +1931,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.rc.getPrivateAsyncMethods()
         self.assertIn("__privateAsyncMethod", result)
@@ -1923,7 +1944,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("classAsyncMethod", self.rc.getPublicClassAsyncMethods())
 
@@ -1934,7 +1955,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sync_methods = self.rc.getProtectedClassSyncMethods()
         async_methods = self.rc.getProtectedClassAsyncMethods()
@@ -1948,7 +1969,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateClassMethod", self.rc.getPrivateClassMethods())
         self.assertIn(
@@ -1967,7 +1988,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("staticAsyncMethod", self.rc.getPublicStaticAsyncMethods())
 
@@ -1978,7 +1999,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sync_methods = self.rc.getProtectedStaticSyncMethods()
         async_methods = self.rc.getProtectedStaticAsyncMethods()
@@ -1992,7 +2013,7 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateStaticMethod", self.rc.getPrivateStaticMethods())
         self.assertIn(
@@ -2011,23 +2032,24 @@ class TestReflectionConcreteAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateProperty", self.rc.getPrivateProperties())
+
 
 # ---------------------------------------------------------------------------
 # Private member access through name mangling
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcretePrivateAccess(TestCase):
 
+class TestReflectionConcretePrivateAccess(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for private access tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -2038,7 +2060,7 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.rc.getProperty("__privateProperty"), "private_value")
 
@@ -2049,7 +2071,7 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         signature = self.rc.getPropertySignature("__privateProperty")
         self.assertIsInstance(signature, inspect.Signature)
@@ -2061,7 +2083,7 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         signature = self.rc.getMethodSignature("__privateMethod")
         self.assertIsInstance(signature, inspect.Signature)
@@ -2073,7 +2095,7 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         docstring = self.rc.getPropertyDocstring("__privateProperty")
         self.assertIn("private property", docstring)
@@ -2085,7 +2107,7 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNotNone(self.rc.methodSignature("__privateMethod"))
 
@@ -2096,7 +2118,7 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         source = self.rc.getSourceCode("__privateMethod")
         self.assertIn("def __privateMethod", source)
@@ -2108,7 +2130,7 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionConcrete(_make_mutable_concrete())
         self.assertTrue(reflection.setAttribute("__hidden", 5))
@@ -2123,7 +2145,7 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionConcrete(_make_mutable_concrete())
         self.assertTrue(reflection.setMethod("__injected", _replacement_method))
@@ -2136,18 +2158,19 @@ class TestReflectionConcretePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionConcrete(_make_private_method_concrete())
         self.assertTrue(reflection.removeMethod("__hiddenMethod"))
         self.assertFalse(reflection.hasMethod("__hiddenMethod"))
 
+
 # ---------------------------------------------------------------------------
 # Error branches
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteErrorBranches(TestCase):
 
+class TestReflectionConcreteErrorBranches(TestCase):
     def testGetSourceCodeReturnsNoneWhenUnavailable(self) -> None:
         """
         Assert that classes without locatable source return None.
@@ -2155,22 +2178,10 @@ class TestReflectionConcreteErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionConcrete(_make_moduleless_concrete())
         self.assertIsNone(reflection.getSourceCode())
-
-    def testGetSourceCodeReturnsNoneForUnknownMethods(self) -> None:
-        """
-        Assert that unknown method names produce no source.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        reflection = ReflectionConcrete(SampleConcrete)
-        self.assertIsNone(reflection.getSourceCode("ghostMethod"))
 
     def testGetFileRaisesValueErrorForUnknownModules(self) -> None:
         """
@@ -2179,7 +2190,7 @@ class TestReflectionConcreteErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionConcrete(_make_moduleless_concrete())
         with self.assertRaises(ValueError):
@@ -2192,7 +2203,7 @@ class TestReflectionConcreteErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -2213,7 +2224,7 @@ class TestReflectionConcreteErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionConcrete(SampleConcrete)
         with self.assertRaises(TypeError):
@@ -2226,7 +2237,7 @@ class TestReflectionConcreteErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionConcrete(SampleConcrete)
         with self.assertRaises(TypeError):
@@ -2239,25 +2250,26 @@ class TestReflectionConcreteErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionConcrete(SampleConcrete)
         with self.assertRaises(TypeError):
             reflection.getProperty("publicMethod")
 
+
 # ---------------------------------------------------------------------------
 # Memoization
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteMemoization(TestCase):
 
+class TestReflectionConcreteMemoization(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for memoization tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
 
@@ -2268,7 +2280,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.rc.getModuleWithClassName(),
@@ -2282,7 +2294,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.rc.getSourceCode(), self.rc.getSourceCode())
 
@@ -2293,7 +2305,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.rc.getSourceCode("publicMethod"),
@@ -2307,7 +2319,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.rc.getFile(), self.rc.getFile())
 
@@ -2318,7 +2330,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.rc.getAnnotations(), self.rc.getAnnotations())
 
@@ -2329,7 +2341,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.rc.getMethodSignature("publicMethod"),
@@ -2343,7 +2355,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.rc.getPropertySignature("aProperty"),
@@ -2357,7 +2369,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.rc.getPropertyDocstring("aProperty"),
@@ -2371,7 +2383,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.rc.getConstructorSignature(),
@@ -2385,7 +2397,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.rc.constructorSignature(),
@@ -2399,7 +2411,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.rc.methodSignature("publicMethod"),
@@ -2413,7 +2425,7 @@ class TestReflectionConcreteMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -2426,33 +2438,22 @@ class TestReflectionConcreteMemoization(TestCase):
             result = getattr(reflection, getter)()
             self.assertIsInstance(result, (dict, list), msg=getter)
 
+
 # ---------------------------------------------------------------------------
 # Missing property lookups
 # ---------------------------------------------------------------------------
 
-class TestReflectionConcreteMissingProperties(TestCase):
 
+class TestReflectionConcreteMissingProperties(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionConcrete for missing-name tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionConcrete(SampleConcrete)
-
-    def testGetPropertyRaisesValueErrorForUnknownName(self) -> None:
-        """
-        Assert that reading an unknown property raises ValueError.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        with self.assertRaises(ValueError):
-            self.rc.getProperty("ghostProperty")
 
     def testGetPropertySignatureRaisesValueErrorForUnknownName(self) -> None:
         """
@@ -2461,7 +2462,7 @@ class TestReflectionConcreteMissingProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self.rc.getPropertySignature("ghostProperty")
@@ -2473,7 +2474,7 @@ class TestReflectionConcreteMissingProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self.rc.getPropertyDocstring("ghostProperty")

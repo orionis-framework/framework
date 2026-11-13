@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.background.contracts.task import IBackgroundTask
 from orionis.background.task import BackgroundTask
@@ -6,6 +8,7 @@ from orionis.test import TestCase
 
 # Methods every background task implementation must provide.
 _ABSTRACT_METHODS: frozenset[str] = frozenset({"run"})
+
 
 def parameter_names(owner: type, method: str) -> list[str]:
     """
@@ -25,33 +28,22 @@ def parameter_names(owner: type, method: str) -> list[str]:
     """
     return list(inspect.signature(getattr(owner, method)).parameters)
 
+
 class _IncompleteTask(IBackgroundTask):
     """Contract implementation that leaves the run method abstract."""
+
 
 class _MinimalTask(IBackgroundTask):
     """Smallest possible implementation of the background task contract."""
 
     def __init__(self) -> None:
-        """
-        Initialise the execution log.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
+        """Initialise the execution log."""
         self.executions: list[str] = []
 
     async def run(self) -> None:
-        """
-        Record a single execution of the task.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
+        """Record a single execution of the task."""
         self.executions.append("ran")
+
 
 class TestBackgroundTaskContract(TestCase):
     """Validate the abstract interface of a background task."""
@@ -62,10 +54,6 @@ class TestBackgroundTaskContract(TestCase):
         Validates that implementers know the complete set of methods they
         are required to provide.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(IBackgroundTask.__abstractmethods__, _ABSTRACT_METHODS)
 
@@ -75,10 +63,6 @@ class TestBackgroundTaskContract(TestCase):
         Validates that callers can await the contract method without
         inspecting the concrete implementation.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertTrue(inspect.iscoroutinefunction(IBackgroundTask.run))
 
@@ -88,10 +72,6 @@ class TestBackgroundTaskContract(TestCase):
         Validates that implementations declaring slots do not gain an
         instance dictionary through the contract.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(IBackgroundTask.__slots__, ())
 
@@ -101,10 +81,6 @@ class TestBackgroundTaskContract(TestCase):
         Validates that the contract stays abstract and cannot be used as a
         concrete task by mistake.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             IBackgroundTask()  # type: ignore[abstract]
@@ -115,10 +91,6 @@ class TestBackgroundTaskContract(TestCase):
         Validates that the abstract machinery keeps incomplete task
         implementations out of the system.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         with self.assertRaises(TypeError):
             _IncompleteTask()  # type: ignore[abstract]
@@ -129,10 +101,6 @@ class TestBackgroundTaskContract(TestCase):
         Validates that implementing the single abstract method is enough
         to obtain a usable background task.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         task = _MinimalTask()
 
@@ -145,10 +113,6 @@ class TestBackgroundTaskContract(TestCase):
         Validates that both concrete classes are substitutable wherever
         the contract is required.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertTrue(issubclass(BackgroundTask, IBackgroundTask))
         self.assertTrue(issubclass(BackgroundTasks, IBackgroundTask))
@@ -159,10 +123,6 @@ class TestBackgroundTaskContract(TestCase):
         Validates that the shipped task exposes the run method with the
         parameters declared by the interface.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(
             parameter_names(BackgroundTask, "run"),

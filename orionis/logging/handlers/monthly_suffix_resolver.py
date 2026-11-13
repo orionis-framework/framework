@@ -5,9 +5,11 @@ from datetime import datetime, time
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.support.facades.datetime import DateTime
 
-class MonthlySuffixResolver(SuffixResolver):
+_DECEMBER = 12
+"""Identify the final month before the calendar year advances."""
 
-    # ruff: noqa: PLR2004
+
+class MonthlySuffixResolver(SuffixResolver):
     """Resolve log suffixes for monthly rotation windows."""
 
     __slots__ = ("at_time", "tz")
@@ -59,23 +61,27 @@ class MonthlySuffixResolver(SuffixResolver):
         Parameters
         ----------
         current_time : datetime.datetime
-            The current datetime.
+            The current instant. Naive values use the resolver timezone.
 
         Returns
         -------
         datetime.datetime
             The datetime when the next rotation should occur.
         """
-        # Determine the first day of the next month
-        if current_time.month == 12:
-            next_month = datetime(current_time.year + 1, 1, 1, tzinfo=self.tz)
-        else:
-            next_month = datetime(
-                current_time.year, current_time.month + 1, 1, tzinfo=self.tz,
-            )
-        # Combine with the rotation time
-        return datetime.combine(
-            next_month.date(),
+        local_time = (
+            current_time.replace(tzinfo=self.tz)
+            if current_time.tzinfo is None
+            else current_time.astimezone(self.tz)
+        )
+        next_rotation = datetime.combine(
+            local_time.date().replace(day=1),
             self.at_time,
             tzinfo=self.tz,
         )
+        if next_rotation <= local_time:
+            next_rotation = (
+                next_rotation.replace(year=local_time.year + 1, month=1)
+                if local_time.month == _DECEMBER
+                else next_rotation.replace(month=local_time.month + 1)
+            )
+        return next_rotation

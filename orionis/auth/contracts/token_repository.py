@@ -1,14 +1,15 @@
+# ruff: noqa: TC001, TC003
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Define the persistence operations of personal access tokens."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-    from datetime import datetime
-    from orionis.auth.contracts.authorizable import IAuthorizable
-    from orionis.auth.entities.access_token import AccessToken
-    from orionis.auth.entities.new_access_token import NewAccessToken
+from collections.abc import Iterable
+from datetime import datetime
+from orionis.auth.contracts.authorizable import IAuthorizable
+from orionis.auth.entities.access_token import AccessToken
+from orionis.auth.entities.new_access_token import NewAccessToken
+
 
 class IAccessTokenRepository(ABC):
     """

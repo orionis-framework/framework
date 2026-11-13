@@ -127,66 +127,74 @@ __all__ = [
     "Uuid",
 ]
 
+_RELATIONS_MODULE = "orionis.orm.relations"
+"""Module defining the public relation classes."""
+_TYPES_MODULE = "orionis.orm.schema.types"
+"""Module defining the public column types."""
+_EXCEPTIONS_MODULE = "orionis.orm.exceptions"
+"""Module defining the public ORM exceptions."""
+
 _EXPORTS = {
-    "BelongsToManyRelation": ("orionis.orm.relations", "BelongsToManyRelation"), # NOSONAR
-    "BelongsToRelation": ("orionis.orm.relations", "BelongsToRelation"),
-    "BigInteger": ("orionis.orm.schema.types", "BigInteger"), # NOSONAR
-    "Boolean": ("orionis.orm.schema.types", "Boolean"),
+    "BelongsToManyRelation": (_RELATIONS_MODULE, "BelongsToManyRelation"),
+    "BelongsToRelation": (_RELATIONS_MODULE, "BelongsToRelation"),
+    "BigInteger": (_TYPES_MODULE, "BigInteger"),
+    "Boolean": (_TYPES_MODULE, "Boolean"),
     "Collection": ("orionis.orm.collections.collection", "Collection"),
-    "ColumnType": ("orionis.orm.schema.types", "ColumnType"),
+    "ColumnType": (_TYPES_MODULE, "ColumnType"),
     "ConnectionResolver": ("orionis.orm.resolver", "ConnectionResolver"),
-    "Date": ("orionis.orm.schema.types", "Date"),
-    "DateTime": ("orionis.orm.schema.types", "DateTime"),
-    "Double": ("orionis.orm.schema.types", "Double"),
-    "Enum": ("orionis.orm.schema.types", "Enum"),
-    "Float": ("orionis.orm.schema.types", "Float"),
-    "HasManyRelation": ("orionis.orm.relations", "HasManyRelation"),
-    "HasOneRelation": ("orionis.orm.relations", "HasOneRelation"),
-    "Integer": ("orionis.orm.schema.types", "Integer"),
-    "Interval": ("orionis.orm.schema.types", "Interval"),
-    "InvalidQueryException": ("orionis.orm.exceptions", "InvalidQueryException"), # NOSONAR
-    "LargeBinary": ("orionis.orm.schema.types", "LargeBinary"),
-    "MassAssignmentException": ("orionis.orm.exceptions", "MassAssignmentException"),
-    "MatchType": ("orionis.orm.schema.types", "MatchType"),
+    "Date": (_TYPES_MODULE, "Date"),
+    "DateTime": (_TYPES_MODULE, "DateTime"),
+    "Double": (_TYPES_MODULE, "Double"),
+    "Enum": (_TYPES_MODULE, "Enum"),
+    "Float": (_TYPES_MODULE, "Float"),
+    "HasManyRelation": (_RELATIONS_MODULE, "HasManyRelation"),
+    "HasOneRelation": (_RELATIONS_MODULE, "HasOneRelation"),
+    "Integer": (_TYPES_MODULE, "Integer"),
+    "Interval": (_TYPES_MODULE, "Interval"),
+    "InvalidQueryException": (_EXCEPTIONS_MODULE, "InvalidQueryException"),
+    "LargeBinary": (_TYPES_MODULE, "LargeBinary"),
+    "MassAssignmentException": (_EXCEPTIONS_MODULE, "MassAssignmentException"),
+    "MatchType": (_TYPES_MODULE, "MatchType"),
     "Model": ("orionis.orm.model", "Model"),
     "ModelCollection": ("orionis.orm.collections.collection", "ModelCollection"),
-    "ModelNotFoundException": ("orionis.orm.exceptions", "ModelNotFoundException"),
+    "ModelNotFoundException": (_EXCEPTIONS_MODULE, "ModelNotFoundException"),
     "ModelQueryBuilder": ("orionis.orm.query.builder", "ModelQueryBuilder"),
-    "Numeric": ("orionis.orm.schema.types", "Numeric"),
-    "NumericCommon": ("orionis.orm.schema.types", "NumericCommon"),
-    "OrmConfigurationException": ("orionis.orm.exceptions", "OrmConfigurationException"),
-    "OrmException": ("orionis.orm.exceptions", "OrmException"),
+    "Numeric": (_TYPES_MODULE, "Numeric"),
+    "NumericCommon": (_TYPES_MODULE, "NumericCommon"),
+    "OrmConfigurationException": (_EXCEPTIONS_MODULE, "OrmConfigurationException"),
+    "OrmException": (_EXCEPTIONS_MODULE, "OrmException"),
     "Paginator": ("orionis.orm.collections.paginator", "Paginator"),
-    "PickleType": ("orionis.orm.schema.types", "PickleType"),
-    "Relation": ("orionis.orm.relations", "Relation"),
-    "RelationNotFoundException": ("orionis.orm.exceptions", "RelationNotFoundException"),
-    "SchemaType": ("orionis.orm.schema.types", "SchemaType"),
-    "SmallInteger": ("orionis.orm.schema.types", "SmallInteger"),
-    "StrictArray": ("orionis.orm.schema.types", "StrictArray"),
-    "StrictBigInt": ("orionis.orm.schema.types", "StrictBigInt"),
-    "StrictBinary": ("orionis.orm.schema.types", "StrictBinary"),
-    "StrictBlob": ("orionis.orm.schema.types", "StrictBlob"),
-    "StrictChar": ("orionis.orm.schema.types", "StrictChar"),
-    "StrictClob": ("orionis.orm.schema.types", "StrictClob"),
-    "StrictDecimal": ("orionis.orm.schema.types", "StrictDecimal"),
-    "StrictDoublePrecision": ("orionis.orm.schema.types", "StrictDoublePrecision"),
-    "StrictInt": ("orionis.orm.schema.types", "StrictInt"),
-    "StrictJson": ("orionis.orm.schema.types", "StrictJson"),
-    "StrictNChar": ("orionis.orm.schema.types", "StrictNChar"),
-    "StrictNVarChar": ("orionis.orm.schema.types", "StrictNVarChar"),
-    "StrictReal": ("orionis.orm.schema.types", "StrictReal"),
-    "StrictSmallInt": ("orionis.orm.schema.types", "StrictSmallInt"),
-    "StrictTimestamp": ("orionis.orm.schema.types", "StrictTimestamp"),
-    "StrictVarBinary": ("orionis.orm.schema.types", "StrictVarBinary"),
-    "StrictVarChar": ("orionis.orm.schema.types", "StrictVarChar"),
-    "String": ("orionis.orm.schema.types", "String"),
-    "Text": ("orionis.orm.schema.types", "Text"),
-    "Time": ("orionis.orm.schema.types", "Time"),
-    "Unicode": ("orionis.orm.schema.types", "Unicode"),
-    "UnicodeText": ("orionis.orm.schema.types", "UnicodeText"),
-    "Uuid": ("orionis.orm.schema.types", "Uuid"),
+    "PickleType": (_TYPES_MODULE, "PickleType"),
+    "Relation": (_RELATIONS_MODULE, "Relation"),
+    "RelationNotFoundException": (_EXCEPTIONS_MODULE, "RelationNotFoundException"),
+    "SchemaType": (_TYPES_MODULE, "SchemaType"),
+    "SmallInteger": (_TYPES_MODULE, "SmallInteger"),
+    "StrictArray": (_TYPES_MODULE, "StrictArray"),
+    "StrictBigInt": (_TYPES_MODULE, "StrictBigInt"),
+    "StrictBinary": (_TYPES_MODULE, "StrictBinary"),
+    "StrictBlob": (_TYPES_MODULE, "StrictBlob"),
+    "StrictChar": (_TYPES_MODULE, "StrictChar"),
+    "StrictClob": (_TYPES_MODULE, "StrictClob"),
+    "StrictDecimal": (_TYPES_MODULE, "StrictDecimal"),
+    "StrictDoublePrecision": (_TYPES_MODULE, "StrictDoublePrecision"),
+    "StrictInt": (_TYPES_MODULE, "StrictInt"),
+    "StrictJson": (_TYPES_MODULE, "StrictJson"),
+    "StrictNChar": (_TYPES_MODULE, "StrictNChar"),
+    "StrictNVarChar": (_TYPES_MODULE, "StrictNVarChar"),
+    "StrictReal": (_TYPES_MODULE, "StrictReal"),
+    "StrictSmallInt": (_TYPES_MODULE, "StrictSmallInt"),
+    "StrictTimestamp": (_TYPES_MODULE, "StrictTimestamp"),
+    "StrictVarBinary": (_TYPES_MODULE, "StrictVarBinary"),
+    "StrictVarChar": (_TYPES_MODULE, "StrictVarChar"),
+    "String": (_TYPES_MODULE, "String"),
+    "Text": (_TYPES_MODULE, "Text"),
+    "Time": (_TYPES_MODULE, "Time"),
+    "Unicode": (_TYPES_MODULE, "Unicode"),
+    "UnicodeText": (_TYPES_MODULE, "UnicodeText"),
+    "Uuid": (_TYPES_MODULE, "Uuid"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -208,6 +216,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

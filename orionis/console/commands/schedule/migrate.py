@@ -1,13 +1,14 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Create the native scheduler task table without starting scheduled tasks."""
 
 from orionis.console.base.command import BaseCommand
 from orionis.console.contracts.store import IScheduleStore
 from orionis.database.exceptions import DatabaseException
 
+
 class ScheduleMigrateCommand(BaseCommand):
     """Create the native scheduler task table without starting scheduled tasks."""
-
-    # ruff: noqa: TC001
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

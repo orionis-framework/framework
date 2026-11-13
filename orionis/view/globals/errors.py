@@ -1,21 +1,18 @@
-"""Read-only view over the validation errors flashed for this request."""
+# ruff: noqa: BLE001, TC001
+# Keep public callback and application annotations resolvable at runtime.
+# Observe optional service failures centrally before returning a fallback.
+"""Expose validation errors from the current request session."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from orionis.foundation.contracts.application import IApplication
 from orionis.session.contracts.session import ISession
+from orionis.view._failures import capture_service_failure
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
-
-# ruff: noqa: ANN401, BLE001
-
-# Returned when no session is reachable, so templates never blow up.
-_EMPTY: dict[str, list[str]] = {}
-"""Returned when no session is reachable, so templates never blow up."""
 
 class ErrorBag:
     """
-    Read-only view over the validation errors flashed for this request.
+    Expose validation errors from the current request session.
 
     Exposed to templates as the ``errors`` global.  Every method is a
     coroutine, which Jinja2 awaits transparently in async environments::
@@ -38,7 +35,7 @@ class ErrorBag:
         Returns
         -------
         None
-            Bind the bag to the application container.
+            No return value.
         """
         self._app = app
         """Application container used for service resolution."""
@@ -55,9 +52,8 @@ class ErrorBag:
         try:
             session: ISession = await self._app.make(ISession)
         except Exception as error:
-            from orionis.view._failures import capture_service_failure  # noqa: PLC0415
             await capture_service_failure(error, ISession, app=self._app)
-            return _EMPTY
+            return {}
         return session.getErrors()
 
     async def all(self) -> dict[str, list[str]]:
@@ -67,7 +63,7 @@ class ErrorBag:
         Returns
         -------
         dict[str, list[str]]
-            Field-indexed error messages.
+            Existing session mapping, or a new empty mapping without a session.
         """
         return await self.__resolve()
 
@@ -80,7 +76,7 @@ class ErrorBag:
         bool
             ``True`` when the bag holds any message.
         """
-        return bool(await self.__resolve())
+        return any((await self.__resolve()).values())
 
     async def has(self, field: str) -> bool:
         """
@@ -140,7 +136,8 @@ class ErrorBag:
                 return messages[0]
         return ""
 
-def _global_errors(app: IApplication) -> Any:
+
+def _global_errors(app: IApplication) -> ErrorBag:
     """
     Build the ``errors`` template global.
 
@@ -151,7 +148,7 @@ def _global_errors(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    orionis.view.globals.errors.ErrorBag
         Bag exposing the validation errors flashed for this request.
     """
     return ErrorBag(app)

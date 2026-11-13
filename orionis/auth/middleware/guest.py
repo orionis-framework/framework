@@ -1,6 +1,8 @@
+# ruff: noqa: TC001
+# Resolve public middleware and injection annotations at runtime.
 """Keep web login and registration routes restricted to guests."""
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.auth.contracts.permission_repository import IPermissionRepository
 from orionis.auth.exceptions import AuthorizationException
@@ -9,14 +11,14 @@ from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.responses import RedirectResponse
 
-if TYPE_CHECKING:
-    from orionis.http.layer.contracts.middleware import NextCallable
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
+from orionis.http.layer.contracts.middleware import NextCallable
+from orionis.http.request import Request
+from orionis.http.responses import Response
 
 # Target used when ``auth.session.home`` is absent from the configuration.
 _DEFAULT_HOME: str = "/home"
 """Target used when ``auth.session.home`` is absent from the configuration."""
+
 
 class GuestMiddleware(ResolveIdentityMiddleware):
     """
@@ -26,8 +28,6 @@ class GuestMiddleware(ResolveIdentityMiddleware):
     ``auth.session.home``. Subclasses pin a different destination by
     overriding the ``redirect_to`` class attribute.
     """
-
-    # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_home",)
     """Declare the instance attribute slots reserved by this class."""
@@ -59,7 +59,7 @@ class GuestMiddleware(ResolveIdentityMiddleware):
         Returns
         -------
         None
-            The redirect target is resolved once, at boot time.
+            No return value.
         """
         super().__init__(manager, permissions)
         self._home: str = (

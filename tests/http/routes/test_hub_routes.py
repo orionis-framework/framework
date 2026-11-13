@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import json
 from typing import cast
 from orionis.http.routes.enums.protocols import RouteProtocol
@@ -45,9 +47,13 @@ class TestHubRoutes(TestCase):
         self.assertIs(resolved.route.type, RouteType.HUB)
         self.assertIs(resolved.route.protocol, RouteProtocol.WEBSOCKET)
         self.assertEqual(resolved.route.hub_protocol, "json")
-        self.assertEqual(resolved.route.action, {
-            "module": __name__, "class": "_ChatHub",
-        })
+        self.assertEqual(
+            resolved.route.action,
+            {
+                "module": __name__,
+                "class": "_ChatHub",
+            },
+        )
         self.assertEqual(resolved.route.compiled_middlewares, (_SocketMiddleware,))
         self.assertEqual(resolver.options("/org/4/chat"), [])
         with self.assertRaises(RouteNotFound):
@@ -67,18 +73,23 @@ class TestHubRoutes(TestCase):
                 router = make_router()
                 router.hub("/chat", _ChatHub, protocol=protocol)
                 cache = RouteCache()
-                snapshot = json.loads(json.dumps(cache.toCache(
-                    compile_router(router), None,
-                )))
+                snapshot = json.loads(
+                    json.dumps(
+                        cache.toCache(
+                            compile_router(router),
+                            None,
+                        ),
+                    ),
+                )
                 restored, _ = cache.fromCache(snapshot)
                 route = RouteResolver(restored).resolve("WEBSOCKET", "/chat").route
                 self.assertIs(route.type, RouteType.HUB)
                 self.assertIs(route.protocol, RouteProtocol.WEBSOCKET)
                 self.assertEqual(route.hub_protocol, protocol)
                 self.assertEqual(route.action["class"], "_ChatHub")
-                snapshot["routes"]["WEBSOCKET"]["static"]["/chat"][
-                    "hub_protocol"
-                ] = "invalid"
+                snapshot["routes"]["WEBSOCKET"]["static"]["/chat"]["hub_protocol"] = (
+                    "invalid"
+                )
                 with self.assertRaises(ValueError):
                     cache.fromCache(snapshot)
 

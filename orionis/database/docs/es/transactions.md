@@ -8,24 +8,34 @@ El contexto asíncrono confirma cuando el bloque termina normalmente y revierte 
 
 ```python
 import asyncio
+
 from orionis.database import Connection
 
 
 async def main() -> None:
+    """Verify nested rollback while preserving the outer transaction."""
+
     db = Connection("tx", {"driver": "sqlite", "database": ":memory:"})
+
     try:
         await db.statement("CREATE TABLE events (name TEXT NOT NULL)")
+
         async with db.transaction():
             await db.execute("INSERT INTO events VALUES (:name)", {"name": "outer"})
+
             try:
                 async with db.transaction():
                     await db.execute(
                         "INSERT INTO events VALUES (:name)", {"name": "inner"}
                     )
+
                     raise ValueError("discard inner work")
+
             except ValueError:
                 pass
+
         assert await db.select("SELECT name FROM events") == [{"name": "outer"}]
+
     finally:
         await db.disconnect()
 
@@ -34,6 +44,8 @@ asyncio.run(main())
 ```
 
 En una aplicación, la forma equivalente es `async with DB.transaction():` o `async with DB.transaction("reporting"):`. La facade usa `beginTransaction()`, `commit()` y `rollback()` para control manual; la conexión directa usa `begin()`, `commit()` y `rollback()`. Prefiere el contexto: el control manual debe manejar fallos y cancelación en todas las rutas. Confirmar o revertir sin transacción activa produce `TransactionException`.
+
+El rollback permanece en la tarea propietaria de la transacción. Si la reversión o la limpieza de conexión falla mientras ya escapa una excepción del cuerpo, se conserva esa excepción principal. Los fallos SQL secundarios o tardíos llegan al sistema central de excepciones sin revelar SQL ni valores enlazados.
 
 ## Anidamiento y propiedad de tareas
 

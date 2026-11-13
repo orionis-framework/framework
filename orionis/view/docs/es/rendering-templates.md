@@ -26,6 +26,7 @@ Devuélvela desde un controlador asíncrono:
 ```python
 from orionis.support.facades import View
 
+
 async def profile(user):
     return await View.make("users.profile", user=user)
 ```
@@ -74,6 +75,8 @@ async def invalid_form():
 
 Las mutaciones de `HTMLResponse`, como `addHeader()` o `withCookie()`, se ponen en cola y se reproducen después del render. Los argumentos se validan por la respuesta al aplicar cada llamada, no al encolarlos. Un atributo no invocable o inexistente produce `AttributeError`. El valor final lleva `X-Orionis-Render: SSR` salvo que una mutación lo cambie.
 
+Los errores de plantilla conservan su causa original al atravesar la respuesta pendiente. Una cola saturada de workers de plantillas produce `WorkQueueFullError`, lo que permite distinguir la sobrecarga de una plantilla inválida.
+
 
 ### Renderizar directamente con un motor aislado
 
@@ -83,6 +86,7 @@ import asyncio
 import jinja2
 
 from orionis.view.engine import Jinja2Engine
+
 
 class Environment:
     def __init__(self) -> None:
@@ -95,6 +99,7 @@ class Environment:
     def getJinjaEnvironment(self) -> jinja2.Environment:
         return self.jinja
 
+
 html = asyncio.run(Jinja2Engine(Environment()).render("hello", {"name": "Ada"}))
 assert html == "Hello Ada!"
 ```
@@ -106,9 +111,11 @@ import asyncio
 
 from orionis.view.factory import ViewFactory
 
+
 class Engine:
     async def render(self, template: str, context: dict) -> str:
         return f"<h1>{context['title']}</h1>"
+
 
 pending = ViewFactory(Engine()).make("pages.home", title="Welcome")
 pending.addHeader("X-Page", "home").withCookie("theme", "dark")

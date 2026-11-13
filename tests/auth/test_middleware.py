@@ -1,5 +1,10 @@
+# ruff: noqa: ARG002, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Preserve collaborator method signatures in deterministic middleware doubles.
+"""Verify middleware identity and authorization decisions with controlled services."""
+
 from types import SimpleNamespace
-from typing import Any, ClassVar
+from typing import ClassVar
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import bind_auth_context, current_auth_context
 from orionis.auth.entities.guard_result import GuardResult
@@ -19,11 +24,15 @@ from orionis.auth.middleware.authorize import (
 )
 from orionis.auth.middleware.guest import GuestMiddleware
 from orionis.auth.middleware.policy import RequirePolicyMiddleware
-from orionis.auth.middleware.resolve_identity import ResolveIdentityMiddleware
+from orionis.auth.middleware.resolve_identity import (
+    ResolveIdentityMiddleware,
+    ResolveSessionIdentityMiddleware,
+)
 from orionis.container.context.manager import ScopeManager
 from orionis.http.middleware import BaseMiddleware
 from orionis.http.responses import PlainTextResponse, RedirectResponse
 from orionis.test import TestCase
+
 
 class _Identity:
     """Identity double answering the authenticatable contract."""
@@ -41,7 +50,7 @@ class _Identity:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.identifier = identifier
 
@@ -75,6 +84,7 @@ class _Identity:
         """
         return ""
 
+
 class _StaticGuard:
     """Guard double resolving a fixed result."""
 
@@ -93,7 +103,7 @@ class _StaticGuard:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self._name = name
         self._result = result
@@ -110,7 +120,7 @@ class _StaticGuard:
         """
         return self._name
 
-    async def resolve(self, request: object) -> GuardResult | None:  # noqa: ARG002
+    async def resolve(self, request: object) -> GuardResult | None:
         """Return the configured result and count the call.
 
         Parameters
@@ -125,6 +135,7 @@ class _StaticGuard:
         """
         self.calls += 1
         return self._result
+
 
 class _StubManager:
     """Manager double exposing only the guard registry."""
@@ -142,7 +153,7 @@ class _StubManager:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.guards = guards
         self.requested: list[str | None] = []
@@ -162,6 +173,7 @@ class _StubManager:
         """
         self.requested.append(name)
         return self.guards[name]
+
 
 class _StaticRepository:
     """Permission repository double returning a fixed authorization."""
@@ -185,14 +197,14 @@ class _StaticRepository:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.permissions = permissions
         self.roles = roles
 
     async def loadFor(
         self,
-        authorizable: object,  # noqa: ARG002
+        authorizable: object,
     ) -> tuple[frozenset[str], frozenset[str]]:
         """Return the configured permissions and roles.
 
@@ -207,6 +219,7 @@ class _StaticRepository:
             Value produced by the helper.
         """
         return frozenset(self.permissions), frozenset(self.roles)
+
 
 class _StubApp:
     """Application double answering only the auth configuration."""
@@ -230,12 +243,12 @@ class _StubApp:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self._redirect_to = redirect_to
         self._home = home
 
-    def config(self, key: str | None = None) -> Any:  # noqa: ANN401
+    def config(self, key: str | None = None) -> str | None:
         """Answer the two keys the middleware reads.
 
         Parameters
@@ -245,8 +258,8 @@ class _StubApp:
 
         Returns
         -------
-        Any
-            Value produced by the helper.
+        str or None
+            Configured redirect target, home target, or no matching value.
         """
         if key == "auth.session.redirect_to":
             return self._redirect_to
@@ -254,12 +267,13 @@ class _StubApp:
             return self._home
         return None
 
+
 class _RecordingAuthorizer:
     """Authorizer double answering fixed verdicts."""
 
     __slots__ = ("calls", "verdict")
 
-    def __init__(self, verdict: bool) -> None:  # noqa: FBT001
+    def __init__(self, *, verdict: bool) -> None:
         """Store the verdict every check answers.
 
         Parameters
@@ -270,12 +284,12 @@ class _RecordingAuthorizer:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.verdict = verdict
         self.calls: list[tuple[str, object]] = []
 
-    async def can(self, context: object, permission: str) -> bool:  # noqa: ARG002
+    async def can(self, context: object, permission: str) -> bool:
         """Record and answer a single permission check.
 
         Parameters
@@ -293,7 +307,7 @@ class _RecordingAuthorizer:
         self.calls.append(("can", permission))
         return self.verdict
 
-    async def canAny(self, context: object, permissions: object) -> bool:  # noqa: ARG002
+    async def canAny(self, context: object, permissions: object) -> bool:
         """Record and answer an any-of permission check.
 
         Parameters
@@ -311,7 +325,7 @@ class _RecordingAuthorizer:
         self.calls.append(("canAny", tuple(permissions)))
         return self.verdict
 
-    async def canAll(self, context: object, permissions: object) -> bool:  # noqa: ARG002
+    async def canAll(self, context: object, permissions: object) -> bool:
         """Record and answer an all-of permission check.
 
         Parameters
@@ -329,7 +343,7 @@ class _RecordingAuthorizer:
         self.calls.append(("canAll", tuple(permissions)))
         return self.verdict
 
-    async def hasRole(self, context: object, role: str) -> bool:  # noqa: ARG002
+    async def hasRole(self, context: object, role: str) -> bool:
         """Record and answer a role check.
 
         Parameters
@@ -349,7 +363,7 @@ class _RecordingAuthorizer:
 
     async def allows(
         self,
-        context: object,  # noqa: ARG002
+        context: object,
         ability: str,
         resource: object,
     ) -> bool:
@@ -385,14 +399,16 @@ class _RecordingAuthorizer:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.calls.append(("registerPolicy", (resource, policy)))
+
 
 class _Post:
     """Resource double protected by a policy."""
 
     __slots__ = ()
+
 
 def web_request(*, wants_json: bool = False, ajax: bool = False) -> SimpleNamespace:
     """Build a request double with content negotiation answers.
@@ -415,8 +431,9 @@ def web_request(*, wants_json: bool = False, ajax: bool = False) -> SimpleNamesp
         isAjax=lambda: ajax,
     )
 
+
 async def call_next() -> str:
-    """Terminal of the pipeline used by every middleware test.
+    """Return the terminal marker used by middleware tests.
 
     Returns
     -------
@@ -425,12 +442,14 @@ async def call_next() -> str:
     """
     return "handled"
 
+
 class _CacheableArea(AuthenticateMiddleware):
     """Protected area opting out of the non-cacheable default."""
 
     __slots__ = ()
 
     cache_control: ClassVar[str | None] = None
+
 
 class _BackToRoot(GuestMiddleware):
     """Guest route pinning its own redirect target."""
@@ -439,12 +458,14 @@ class _BackToRoot(GuestMiddleware):
 
     redirect_to: ClassVar[str | None] = "/"
 
+
 class _CanViewUsers(RequirePermissionMiddleware):
     """Route guard requiring a single permission."""
 
     __slots__ = ()
 
     permissions: ClassVar[tuple[str, ...]] = ("users.view",)
+
 
 class _CanManageUsers(RequirePermissionMiddleware):
     """Route guard requiring several permissions at once."""
@@ -454,10 +475,12 @@ class _CanManageUsers(RequirePermissionMiddleware):
     permissions: ClassVar[tuple[str, ...]] = ("users.view", "users.delete")
     requires_all: ClassVar[bool] = False
 
+
 class _MissingPermissions(RequirePermissionMiddleware):
     """Misconfigured route guard declaring no permission."""
 
     __slots__ = ()
+
 
 class _MustBeAdmin(RequireRoleMiddleware):
     """Route guard requiring a single role."""
@@ -466,10 +489,12 @@ class _MustBeAdmin(RequireRoleMiddleware):
 
     roles: ClassVar[tuple[str, ...]] = ("admin",)
 
+
 class _MissingRoles(RequireRoleMiddleware):
     """Misconfigured route guard declaring no role."""
 
     __slots__ = ()
+
 
 class _CanCreatePosts(RequirePolicyMiddleware):
     """Route guard delegating to the policy of a resource class."""
@@ -479,21 +504,23 @@ class _CanCreatePosts(RequirePolicyMiddleware):
     ability: ClassVar[str] = "create"
     resource: ClassVar[type | None] = _Post
 
+
 class _MissingPolicy(RequirePolicyMiddleware):
     """Misconfigured route guard declaring no ability nor resource."""
 
     __slots__ = ()
 
+
 class TestResolveIdentityMiddleware(TestCase):
     """Validate the middleware that only establishes the context."""
 
     async def testReusesTheRequestGuardInsteadOfTheConfiguredDefault(self) -> None:
-        """An unpinned middleware respects the kernel's web or API context.
+        """Respect the kernel's web or API context in an unpinned middleware.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for identity in (None, _Identity(7)):
             manager = _StubManager({"token": _StaticGuard("token", None)})
@@ -508,15 +535,13 @@ class TestResolveIdentityMiddleware(TestCase):
                 self.assertEqual(manager.guards["token"].calls, 0)
 
     async def testPinnedGuardCannotReplaceAnAuthenticatedRequest(self) -> None:
-        """Automatic identity resolution preserves the guard-switch protection.
+        """Preserve guard-switch protection during automatic identity resolution.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        from orionis.auth.middleware import ResolveSessionIdentityMiddleware
-
         manager = _StubManager({"session": _StaticGuard("session", None)})
         middleware = ResolveSessionIdentityMiddleware(manager, _StaticRepository())
         async with ScopeManager():
@@ -528,20 +553,22 @@ class TestResolveIdentityMiddleware(TestCase):
             self.assertEqual(manager.guards["session"].calls, 0)
 
     async def testBindsTheResolvedIdentity(self) -> None:
-        """Validates the normal path of identity resolution.
+        """Validate the normal path of identity resolution.
 
         Everything downstream reads the identity from the context.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard(
-            "session", GuardResult(identity=_Identity(7), guard="session"),
+            "session",
+            GuardResult(identity=_Identity(7), guard="session"),
         )
         middleware = ResolveIdentityMiddleware(
-            _StubManager({None: guard}), _StaticRepository(),
+            _StubManager({None: guard}),
+            _StaticRepository(),
         )
         request = web_request()
 
@@ -552,18 +579,19 @@ class TestResolveIdentityMiddleware(TestCase):
             self.assertEqual(current_auth_context().identifier(), 7)
 
     async def testGuestsStillReachTheController(self) -> None:
-        """Validates that this middleware never rejects.
+        """Validate that this middleware never rejects.
 
         Public pages must keep working for anonymous visitors.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard("session", None)
         middleware = ResolveIdentityMiddleware(
-            _StubManager({None: guard}), _StaticRepository(),
+            _StubManager({None: guard}),
+            _StaticRepository(),
         )
 
         async with ScopeManager():
@@ -573,14 +601,14 @@ class TestResolveIdentityMiddleware(TestCase):
             self.assertTrue(current_auth_context().isGuest)
 
     async def testUsesTheDefaultGuardUnlessPinned(self) -> None:
-        """Validates how the guard is selected.
+        """Validate how the guard is selected.
 
         The base class defers to the configured default guard.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard("session", None)
         manager = _StubManager({None: guard})
@@ -592,14 +620,14 @@ class TestResolveIdentityMiddleware(TestCase):
         self.assertEqual(manager.requested, [None])
 
     async def testCarriesTheCredentialAbilitiesIntoTheContext(self) -> None:
-        """Validates that a token restriction survives the middleware.
+        """Validate that a token restriction survives the middleware.
 
         Dropping the abilities would silently widen the credential.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard(
             "token",
@@ -611,7 +639,8 @@ class TestResolveIdentityMiddleware(TestCase):
             ),
         )
         middleware = ResolveIdentityMiddleware(
-            _StubManager({None: guard}), _StaticRepository(("users.view",)),
+            _StubManager({None: guard}),
+            _StaticRepository(("users.view",)),
         )
 
         async with ScopeManager():
@@ -621,11 +650,12 @@ class TestResolveIdentityMiddleware(TestCase):
             self.assertEqual(context.abilities, frozenset({"users.view"}))
             self.assertEqual(context.credentialId, 99)
 
+
 class TestAuthenticateMiddleware(TestCase):
     """Validate the middleware that rejects anonymous requests."""
 
     async def testAuthenticatedRequestsContinue(self) -> None:
-        """Validates the happy path.
+        """Validate the happy path.
 
         A resolved identity reaches the controller, and the answer is
         marked as non-cacheable because it carries private data.
@@ -633,13 +663,16 @@ class TestAuthenticateMiddleware(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard(
-            "session", GuardResult(identity=_Identity(1), guard="session"),
+            "session",
+            GuardResult(identity=_Identity(1), guard="session"),
         )
         middleware = AuthenticateMiddleware(
-            _StubApp(), _StubManager({None: guard}), _StaticRepository(),
+            _StubApp(),
+            _StubManager({None: guard}),
+            _StaticRepository(),
         )
 
         async def handled() -> PlainTextResponse:
@@ -657,24 +690,28 @@ class TestAuthenticateMiddleware(TestCase):
 
             self.assertEqual(response.getBody(), b"handled")
             self.assertEqual(
-                response.getHeader("cache-control"), ["no-store, private"],
+                response.getHeader("cache-control"),
+                ["no-store, private"],
             )
 
     async def testTheCacheControlHeaderCanBeDisabled(self) -> None:
-        """Validates the opt-out of the non-cacheable default.
+        """Validate the opt-out of the non-cacheable default.
 
         A subclass serving public data keeps the upstream headers intact.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard(
-            "session", GuardResult(identity=_Identity(1), guard="session"),
+            "session",
+            GuardResult(identity=_Identity(1), guard="session"),
         )
         middleware = _CacheableArea(
-            _StubApp(), _StubManager({None: guard}), _StaticRepository(),
+            _StubApp(),
+            _StubManager({None: guard}),
+            _StaticRepository(),
         )
 
         async def handled() -> PlainTextResponse:
@@ -693,35 +730,35 @@ class TestAuthenticateMiddleware(TestCase):
             self.assertIsNone(response.getHeader("cache-control"))
 
     async def testGuestsRaiseAnAuthenticationError(self) -> None:
-        """Validates the ``401`` path without a redirect target.
+        """Validate the ``401`` path without a redirect target.
 
         The exception handler turns it into an unauthenticated response.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard("session", None)
         middleware = AuthenticateMiddleware(
-            _StubApp(), _StubManager({None: guard}), _StaticRepository(),
+            _StubApp(),
+            _StubManager({None: guard}),
+            _StaticRepository(),
         )
 
         async with ScopeManager():
-
             with self.assertRaises(AuthenticationException):
-
                 await middleware.handle(web_request(), call_next)
 
     async def testBrowsersAreRedirectedToTheConfiguredPage(self) -> None:
-        """Validates the browser friendly rejection.
+        """Validate the browser friendly rejection.
 
         A redirect keeps the flash data alive, unlike a raised exception.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard("session", None)
         middleware = AuthenticateMiddleware(
@@ -735,16 +772,17 @@ class TestAuthenticateMiddleware(TestCase):
 
         self.assertIsInstance(response, RedirectResponse)
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.getHeader("location"), ["/login"])
 
     async def testJsonClientsNeverGetARedirect(self) -> None:
-        """Validates the content negotiation of the rejection.
+        """Validate the content negotiation of the rejection.
 
         An API client expects a status code, not a redirect.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard("session", None)
         middleware = AuthenticateMiddleware(
@@ -754,20 +792,18 @@ class TestAuthenticateMiddleware(TestCase):
         )
 
         async with ScopeManager():
-
             with self.assertRaises(AuthenticationException):
-
                 await middleware.handle(web_request(wants_json=True), call_next)
 
     async def testAjaxClientsNeverGetARedirect(self) -> None:
-        """Validates that background requests are answered with a status.
+        """Validate that background requests are answered with a status.
 
         Following a redirect would replace the page fragment with HTML.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = _StaticGuard("session", None)
         middleware = AuthenticateMiddleware(
@@ -777,32 +813,37 @@ class TestAuthenticateMiddleware(TestCase):
         )
 
         async with ScopeManager():
-
             with self.assertRaises(AuthenticationException):
-
                 await middleware.handle(web_request(ajax=True), call_next)
 
     async def testTheGuardSpecificVariantsPinTheirGuard(self) -> None:
-        """Validates the ready made session and token middlewares.
+        """Validate the ready made session and token middlewares.
 
         Each one must always ask for its own guard.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session_guard = _StaticGuard("session", None)
         token_guard = _StaticGuard("token", None)
-        manager = _StubManager({
-            "session": session_guard, "token": token_guard,
-        })
+        manager = _StubManager(
+            {
+                "session": session_guard,
+                "token": token_guard,
+            },
+        )
 
         session_middleware = AuthenticateSessionMiddleware(
-            _StubApp(), manager, _StaticRepository(),
+            _StubApp(),
+            manager,
+            _StaticRepository(),
         )
         token_middleware = AuthenticateTokenMiddleware(
-            _StubApp(), manager, _StaticRepository(),
+            _StubApp(),
+            manager,
+            _StaticRepository(),
         )
 
         for middleware in (session_middleware, token_middleware):
@@ -818,7 +859,7 @@ class TestAuthenticateMiddleware(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = AuthenticateTokenMiddleware(
             _StubApp("/login"),
@@ -829,18 +870,19 @@ class TestAuthenticateMiddleware(TestCase):
             with self.assertRaises(AuthenticationException):
                 await middleware.handle(web_request(), call_next)
 
+
 class TestRequirePermissionMiddleware(TestCase):
     """Validate the permission gate placed on a route."""
 
     async def testAllowsAnAuthorizedIdentity(self) -> None:
-        """Validates the happy path of a permission gate.
+        """Validate the happy path of a permission gate.
 
         The controller runs when the permission is granted.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         authorizer = _RecordingAuthorizer(verdict=True)
         middleware = _CanViewUsers(authorizer)
@@ -850,20 +892,21 @@ class TestRequirePermissionMiddleware(TestCase):
                 AuthenticationContext(identity=_Identity(), guard="session"),
             )
             self.assertEqual(
-                await middleware.handle(web_request(), call_next), "handled",
+                await middleware.handle(web_request(), call_next),
+                "handled",
             )
 
         self.assertEqual(authorizer.calls, [("canAll", ("users.view",))])
 
     async def testRejectsAnUnauthorizedIdentity(self) -> None:
-        """Validates the ``403`` path.
+        """Validate the ``403`` path.
 
         The identity is known but lacks the permission.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _CanViewUsers(_RecordingAuthorizer(verdict=False))
 
@@ -875,32 +918,30 @@ class TestRequirePermissionMiddleware(TestCase):
                 await middleware.handle(web_request(), call_next)
 
     async def testRejectsGuestsAsUnauthenticated(self) -> None:
-        """Validates the ``401`` path of an authorization gate.
+        """Validate the ``401`` path of an authorization gate.
 
         A guest is not forbidden, it is simply unauthenticated.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _CanViewUsers(_RecordingAuthorizer(verdict=True))
 
         async with ScopeManager():
-
             with self.assertRaises(AuthenticationException):
-
                 await middleware.handle(web_request(), call_next)
 
     async def testSupportsAnyOfSemantics(self) -> None:
-        """Validates the alternative combination mode.
+        """Validate the alternative combination mode.
 
         Holding one of the listed permissions is enough.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         authorizer = _RecordingAuthorizer(verdict=True)
         middleware = _CanManageUsers(authorizer)
@@ -911,50 +952,52 @@ class TestRequirePermissionMiddleware(TestCase):
             )
             await middleware.handle(web_request(), call_next)
 
-        self.assertEqual(authorizer.calls[0][0], "canAny")
+        self.assertEqual(
+            authorizer.calls,
+            [("canAny", ("users.view", "users.delete"))],
+        )
 
     async def testFailsFastWhenNoPermissionIsDeclared(self) -> None:
-        """Validates the guard against a misconfigured subclass.
+        """Validate the guard against a misconfigured subclass.
 
         Silently allowing the request would be a security hole.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _MissingPermissions(_RecordingAuthorizer(verdict=True))
 
         async with ScopeManager():
-
             with self.assertRaises(AuthConfigurationException):
-
                 await middleware.handle(web_request(), call_next)
 
     def testIsARegularMiddlewareClass(self) -> None:
-        """Validates that the gate plugs into the routing pipeline.
+        """Validate that the gate plugs into the routing pipeline.
 
         Only ``BaseMiddleware`` subclasses may be attached to a route.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(_CanViewUsers, BaseMiddleware))
+
 
 class TestRequireRoleMiddleware(TestCase):
     """Validate the role gate placed on a route."""
 
     async def testAllowsAnIdentityHoldingTheRole(self) -> None:
-        """Validates the happy path of a role gate.
+        """Validate the happy path of a role gate.
 
         Roles are evaluated through the authorizer.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         authorizer = _RecordingAuthorizer(verdict=True)
         middleware = _MustBeAdmin(authorizer)
@@ -964,20 +1007,21 @@ class TestRequireRoleMiddleware(TestCase):
                 AuthenticationContext(identity=_Identity(), guard="session"),
             )
             self.assertEqual(
-                await middleware.handle(web_request(), call_next), "handled",
+                await middleware.handle(web_request(), call_next),
+                "handled",
             )
 
         self.assertEqual(authorizer.calls, [("hasRole", "admin")])
 
     async def testRejectsAnIdentityWithoutTheRole(self) -> None:
-        """Validates the ``403`` path of a role gate.
+        """Validate the ``403`` path of a role gate.
 
         The controller must never run.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _MustBeAdmin(_RecordingAuthorizer(verdict=False))
 
@@ -989,39 +1033,35 @@ class TestRequireRoleMiddleware(TestCase):
                 await middleware.handle(web_request(), call_next)
 
     async def testRejectsGuestsAsUnauthenticated(self) -> None:
-        """Validates that anonymous requests are answered with ``401``.
+        """Validate that anonymous requests are answered with ``401``.
 
         Roles cannot be evaluated without an identity.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _MustBeAdmin(_RecordingAuthorizer(verdict=True))
 
         async with ScopeManager():
-
             with self.assertRaises(AuthenticationException):
-
                 await middleware.handle(web_request(), call_next)
 
     async def testFailsFastWhenNoRoleIsDeclared(self) -> None:
-        """Validates the guard against a misconfigured subclass.
+        """Validate the guard against a misconfigured subclass.
 
         An empty requirement would let everything through.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _MissingRoles(_RecordingAuthorizer(verdict=True))
 
         async with ScopeManager():
-
             with self.assertRaises(AuthConfigurationException):
-
                 await middleware.handle(web_request(), call_next)
 
     async def testRoleMembershipCannotBypassTokenRestrictions(self) -> None:
@@ -1030,28 +1070,33 @@ class TestRequireRoleMiddleware(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _MustBeAdmin(_RecordingAuthorizer(verdict=True))
         async with ScopeManager():
-            bind_auth_context(AuthenticationContext(
-                identity=_Identity(), guard="token", abilities=(),
-            ))
+            bind_auth_context(
+                AuthenticationContext(
+                    identity=_Identity(),
+                    guard="token",
+                    abilities=(),
+                ),
+            )
             with self.assertRaises(AuthorizationException):
                 await middleware.handle(web_request(), call_next)
+
 
 class TestRequirePolicyMiddleware(TestCase):
     """Validate the policy gate placed on a route."""
 
     async def testAllowsWhenThePolicyAgrees(self) -> None:
-        """Validates the happy path of a policy gate.
+        """Validate the happy path of a policy gate.
 
         The ability is evaluated against the resource class.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         authorizer = _RecordingAuthorizer(verdict=True)
         middleware = _CanCreatePosts(authorizer)
@@ -1061,20 +1106,21 @@ class TestRequirePolicyMiddleware(TestCase):
                 AuthenticationContext(identity=_Identity(), guard="session"),
             )
             self.assertEqual(
-                await middleware.handle(web_request(), call_next), "handled",
+                await middleware.handle(web_request(), call_next),
+                "handled",
             )
 
         self.assertEqual(authorizer.calls, [("allows", ("create", _Post))])
 
     async def testRejectsWhenThePolicyDenies(self) -> None:
-        """Validates the ``403`` path of a policy gate.
+        """Validate the ``403`` path of a policy gate.
 
         A denial must stop the pipeline.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _CanCreatePosts(_RecordingAuthorizer(verdict=False))
 
@@ -1086,40 +1132,37 @@ class TestRequirePolicyMiddleware(TestCase):
                 await middleware.handle(web_request(), call_next)
 
     async def testRejectsGuestsAsUnauthenticated(self) -> None:
-        """Validates that anonymous requests never reach a policy.
+        """Validate that anonymous requests never reach a policy.
 
         Policies always receive a real identity.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _CanCreatePosts(_RecordingAuthorizer(verdict=True))
 
         async with ScopeManager():
-
             with self.assertRaises(AuthenticationException):
-
                 await middleware.handle(web_request(), call_next)
 
     async def testFailsFastWhenTheGateIsIncomplete(self) -> None:
-        """Validates the guard against a misconfigured subclass.
+        """Validate the guard against a misconfigured subclass.
 
         Both the ability and the resource are mandatory.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = _MissingPolicy(_RecordingAuthorizer(verdict=True))
 
         async with ScopeManager():
-
             with self.assertRaises(AuthConfigurationException):
-
                 await middleware.handle(web_request(), call_next)
+
 
 class TestGuestMiddleware(TestCase):
     """Validate the guest-only routes used for login and registration."""
@@ -1130,7 +1173,7 @@ class TestGuestMiddleware(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         middleware = GuestMiddleware(
             _StubApp(),
@@ -1139,7 +1182,8 @@ class TestGuestMiddleware(TestCase):
         )
         async with ScopeManager():
             self.assertEqual(
-                await middleware.handle(web_request(), call_next), "handled",
+                await middleware.handle(web_request(), call_next),
+                "handled",
             )
 
     async def testAuthenticatedBrowsersLeaveTheGuestRoute(self) -> None:
@@ -1148,7 +1192,7 @@ class TestGuestMiddleware(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = GuardResult(identity=_Identity(), guard="session")
         middleware = GuestMiddleware(
@@ -1167,7 +1211,7 @@ class TestGuestMiddleware(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = GuardResult(identity=_Identity(), guard="session")
         middleware = _BackToRoot(
@@ -1185,7 +1229,7 @@ class TestGuestMiddleware(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = GuardResult(identity=_Identity(), guard="session")
         middleware = GuestMiddleware(

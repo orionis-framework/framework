@@ -1,11 +1,11 @@
+# ruff: noqa: TC001
+# Runtime imports keep the public contract annotations introspectable.
 """Define the contract for the translation service."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.localization.types import MissingKeyHandler
 
-if TYPE_CHECKING:
-    from orionis.localization.types import MissingKeyHandler
 
 class ITranslator(ABC):
     """
@@ -141,7 +141,7 @@ class ITranslator(ABC):
         Returns
         -------
         None
-            Change the active locale at runtime.
+            No return value.
 
         Raises
         ------
@@ -184,7 +184,7 @@ class ITranslator(ABC):
         Returns
         -------
         None
-            Discard cached translations so they are re-read from disk.
+            No return value.
 
         Raises
         ------
@@ -221,7 +221,7 @@ class ITranslator(ABC):
         Returns
         -------
         None
-            Discard every cached translation map.
+            No return value.
         """
 
     @abstractmethod
@@ -242,5 +242,5 @@ class ITranslator(ABC):
         Returns
         -------
         None
-            Register a handler invoked when a translation key is missing.
+            No return value.
         """

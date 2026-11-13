@@ -1,12 +1,10 @@
+# ruff: noqa: N815, TC003
 """Immutable snapshot of a stored file's metadata."""
 
-# ruff: noqa: N815
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from datetime import datetime
 
-if TYPE_CHECKING:
-    from datetime import datetime
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class FileInfo:
@@ -33,7 +31,7 @@ class FileInfo:
         Timezone-aware creation timestamp, or ``None`` when the driver
         cannot provide it.
     etag : str | None
-        Entity tag of the content (MD5 hex digest for built-in drivers),
+        Backend entity tag, which need not be a complete-content MD5 digest,
         or ``None`` when unavailable.
     checksum : str | None
         SHA-256 hex digest of the content, or ``None`` when unavailable.
@@ -46,10 +44,10 @@ class FileInfo:
     # naming convention of the framework (see ruff N815 waiver above).
     path: str
     size: int
-    lastModified: datetime  # NOSONAR
+    lastModified: datetime
     visibility: str
-    mimeType: str | None = None  # NOSONAR
-    createdAt: datetime | None = None  # NOSONAR
+    mimeType: str | None = None
+    createdAt: datetime | None = None
     etag: str | None = None
     checksum: str | None = None
     url: str | None = None

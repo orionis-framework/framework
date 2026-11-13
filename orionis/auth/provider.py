@@ -19,6 +19,7 @@ from orionis.auth.tokens.repository import AccessTokenRepository
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.support.facades.auth import Auth as AuthFacade
 
+
 class AuthProvider(ServiceProvider):
     """
     Service provider wiring the authentication module.
@@ -42,7 +43,7 @@ class AuthProvider(ServiceProvider):
         Returns
         -------
         None
-            The container is populated as a side effect.
+            No return value.
         """
         # Identity resolution and password verification.
         self.app.scoped(IAuthenticationContext, AuthenticationContext)
@@ -68,6 +69,6 @@ class AuthProvider(ServiceProvider):
         Returns
         -------
         None
-            Attribute access on the facade becomes a direct passthrough.
+            No return value.
         """
         await AuthFacade.pin()

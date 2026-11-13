@@ -1,23 +1,19 @@
-"""Provide container facades operations through ``Facade``, ``ScopedFacade``."""
+# ruff: noqa: PLC0415, TC001
+# Load Application lazily to avoid bootstrap cycles; retain its public contract.
+"""Resolve global or scoped services through class-level facades."""
 
-from typing import Any, TYPE_CHECKING
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
 from orionis.container.facades.meta import FacadeMeta, ScopedFacadeMeta
+from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
 
 class Facade(metaclass=FacadeMeta):
-
-    # ruff: noqa: PLC0415
-
-    # Cached application instance shared across all facade subclasses
     """Resolve container services through a shared class-level interface."""
 
     _application: IApplication | None = None
     """Cached application instance shared across all facade subclasses."""
-    _pinned_instance: Any = None
+    _pinned_instance: object | None = None
     """Resolved service retained while the facade is pinned."""
 
     @classmethod
@@ -64,6 +60,7 @@ class Facade(metaclass=FacadeMeta):
         # Lazily initialize the shared application instance.
         if cls._application is None:
             from orionis.foundation.application import Application
+
             cls._application = Application()
 
         # Guard against resolution before application boot.
@@ -86,7 +83,7 @@ class Facade(metaclass=FacadeMeta):
         Returns
         -------
         None
-            Return ``None`` after storing the currently resolved instance.
+            This method does not return a value.
         """
         # Cache the currently resolved instance for direct reuse.
         cls._pinned_instance = await cls.resolve()
@@ -99,10 +96,11 @@ class Facade(metaclass=FacadeMeta):
         Returns
         -------
         None
-            Return ``None`` after clearing the cached pinned instance.
+            This method does not return a value.
         """
         # Remove the cached pinned instance to restore normal resolution.
         cls._pinned_instance = None
+
 
 class ScopedFacade(Facade, metaclass=ScopedFacadeMeta):
     """Expose a service already bound to the caller's active scope.
@@ -158,7 +156,7 @@ class ScopedFacade(Facade, metaclass=ScopedFacadeMeta):
         Returns
         -------
         None
-            Scoped attribute access is already direct.
+            This method does not return a value.
         """
         cls.scopedInstance()
 
@@ -169,5 +167,5 @@ class ScopedFacade(Facade, metaclass=ScopedFacadeMeta):
         Returns
         -------
         None
-            No global instance exists to clear.
+            This method does not return a value.
         """

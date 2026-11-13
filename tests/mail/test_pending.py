@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import asyncio
 from inspect import CORO_CLOSED, getcoroutinestate
 from typing import TYPE_CHECKING
@@ -14,6 +17,7 @@ from tests.mail.test_composer import RecordingDelivery
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
 
 class WelcomeMail(Mailable):
     """Declare a reusable message with an envelope, bodies, and a guide."""
@@ -73,6 +77,7 @@ class WelcomeMail(Mailable):
         """
         return [Attachment.fromStorage("documents/guide.pdf")]
 
+
 class PlainMail(Mailable):
     """Declare complete headers while keeping the default attachments."""
 
@@ -97,6 +102,7 @@ class PlainMail(Mailable):
             Value produced by the helper.
         """
         return Content(text="plain")
+
 
 class InvalidMail(PlainMail):
     """Supply configurable contract violations without a fake transport."""
@@ -152,6 +158,7 @@ class InvalidMail(PlainMail):
             Value produced by the helper.
         """
         return self.items
+
 
 class Callback:
     """Record invocations and return the outcome configured by a test."""
@@ -212,8 +219,8 @@ class Callback:
         await asyncio.sleep(0)
         return self(message)
 
-class TestPendingMail(TestCase):
 
+class TestPendingMail(TestCase):
     def setUp(self) -> None:
         """Create an isolated recorder and an empty pending chain.
 
@@ -342,9 +349,14 @@ class TestPendingMail(TestCase):
             Assertions verify the behavior described above.
         """
         await self.base.fromAddress("a@example.com").to("b@example.com").raw("text")
-        await PendingMail(self.delivery).fromAddress("a@example.com").to(
-            "b@example.com",
-        ).raw("text")
+        await (
+            PendingMail(self.delivery)
+            .fromAddress("a@example.com")
+            .to(
+                "b@example.com",
+            )
+            .raw("text")
+        )
 
         self.assertEqual(
             [item[0] for item in self.delivery.messages],

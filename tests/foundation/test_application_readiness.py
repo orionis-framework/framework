@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from collections import deque
 from pathlib import Path
 from orionis.foundation.application import Application
 from orionis.test import TestCase
+
 
 class _HeadlessApplication(Application):
     def create(self) -> Application:
@@ -15,6 +18,7 @@ class _HeadlessApplication(Application):
         """
         self._Application__booted = True
         return self
+
 
 class _BootProvider:
     __slots__ = ("calls", "entered", "failure", "release")
@@ -51,6 +55,7 @@ class _BootProvider:
         if self.failure is not None:
             raise self.failure
 
+
 def make_application() -> _HeadlessApplication:
     """Build an isolated application without replacing the running singleton.
 
@@ -62,6 +67,7 @@ def make_application() -> _HeadlessApplication:
     app = object.__new__(_HeadlessApplication)
     app.__init__(Path.cwd())
     return app
+
 
 class TestApplicationReadiness(TestCase):
     async def testHeadlessBootCreatesAndAwaitsProviders(self) -> None:

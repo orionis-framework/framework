@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, PT027, S106, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Exercise explicitly synthetic passwords through the controller.
 import asyncio
 import tempfile
 from pathlib import Path
@@ -25,6 +28,7 @@ from orionis.session.session import Session
 from orionis.test import TestCase
 from tests.auth.test_identity_and_session import build_app
 
+
 class RememberAccount(Model, Authenticatable):
     """Use the same persistent credential column declared in the app migration."""
 
@@ -35,6 +39,7 @@ class RememberAccount(Model, Authenticatable):
     password = String(255)
     active = Boolean()
     remember_token = String(100).nullable()
+
 
 def request(cookie: str | None = None, *, scheme: str = "https") -> SimpleNamespace:
     """Create an independent browser session with an optional remembered login.
@@ -57,6 +62,7 @@ def request(cookie: str | None = None, *, scheme: str = "https") -> SimpleNamesp
         cookies={} if cookie is None else {"orionis_remember": cookie},
     )
 
+
 def queued_cookie(incoming: SimpleNamespace) -> str:
     """Read the raw cookie only inside a test, never in application logs.
 
@@ -72,6 +78,7 @@ def queued_cookie(incoming: SimpleNamespace) -> str:
     """
     return incoming.state._auth_remember_cookie["value"]
 
+
 class TestRememberMe(TestCase):
     """Exercise real database updates and token races without live browser data."""
 
@@ -81,17 +88,20 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Prepares isolated state for the test.
+            No return value.
         """
         self.temp = tempfile.TemporaryDirectory()
+        self.enterContext(self.temp)
         self.app = build_app(identity={"model": f"{__name__}.RememberAccount"})
         self.app._config["database"]["connections"]["sqlite"]["database"] = str(
             Path(self.temp.name) / "remember.sqlite",
         )
         self.manager = ConnectionManager(self.app)
         self.previous_manager = ConnectionResolver._manager
+        self.addCleanup(ConnectionResolver.setManager, self.previous_manager)
         ConnectionResolver.setManager(self.manager)
         self.connection = self.manager.connection("sqlite")
+        self.addAsyncCleanup(self.manager.disconnect)
         await self.connection.createTable(RememberAccount.__meta__.table)
         self.hashing = HashManager(self.app)
         self.identities = ModelIdentityProvider(self.app, self.hashing)
@@ -104,18 +114,6 @@ class TestRememberMe(TestCase):
                 "active": True,
             },
         )
-
-    async def asyncTearDown(self) -> None:
-        """Release the temporary connection and restore the test resolver.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        ConnectionResolver.setManager(self.previous_manager)
-        await self.connection.disconnect()
-        self.temp.cleanup()
 
     async def login(self, *, remember: bool = True) -> SimpleNamespace:
         """Submit verified credentials through the real session guard.
@@ -148,7 +146,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         incoming = await self.login()
         cookie = queued_cookie(incoming)
@@ -173,7 +171,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = queued_cookie(await self.login())
         incoming = request(original)
@@ -194,7 +192,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         logged_in = await self.login()
         response = Response()
@@ -206,7 +204,7 @@ class TestRememberMe(TestCase):
             None,
         )
 
-        async def endpoint():
+        async def endpoint() -> Response:
             """Verify the identity associated with the remembered login.
 
             Returns
@@ -215,7 +213,8 @@ class TestRememberMe(TestCase):
                 Value produced by the helper.
             """
             self.assertEqual(
-                incoming.state.session.get("_auth_identifier"), str(self.user.id),
+                incoming.state.session.get("_auth_identifier"),
+                str(self.user.id),
             )
             return Response("authenticated")
 
@@ -231,7 +230,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         incoming = request()
         self.assertIsNone(
@@ -253,7 +252,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = queued_cookie(await self.login())
         incoming = await self.login(remember=False)
@@ -267,7 +266,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         incoming = await self.login()
         original = queued_cookie(incoming)
@@ -283,7 +282,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         incoming = request(queued_cookie(await self.login()))
         await self.guard.resolve(incoming)
@@ -297,7 +296,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = queued_cookie(await self.login())
         newest = queued_cookie(await self.login())
@@ -310,7 +309,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = queued_cookie(await self.login())
         identifier, expiry, secret = original.split("|")
@@ -330,7 +329,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = queued_cookie(await self.login())
         expiry = int(original.split("|")[1])
@@ -345,7 +344,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = queued_cookie(await self.login())
         await (
@@ -372,7 +371,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = queued_cookie(await self.login())
         incoming = [request(original) for _ in range(5)]
@@ -389,7 +388,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         incoming = request(scheme="http")
         with self.assertRaises(AuthException):
@@ -411,7 +410,7 @@ class TestRememberMe(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = queued_cookie(await self.login())
         await self.connection.createTable(
@@ -425,6 +424,7 @@ class TestRememberMe(TestCase):
         self.assertIsNone((await RememberAccount.find(self.user.id)).remember_token)
         self.assertIsNone(await self.guard.resolve(request(original)))
 
+
 class TestRememberConfigurationAndController(TestCase):
     """Verify opt-in wiring and the configuration's safety checks."""
 
@@ -434,7 +434,7 @@ class TestRememberConfigurationAndController(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for values in (
             {"lifetime": 0},
@@ -453,12 +453,12 @@ class TestRememberConfigurationAndController(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         controller = LoginController(build_app())
         for value, expected in (("on", True), (None, False), ("false", False)):
             auth = SimpleNamespace(attempt=AsyncMock(return_value=True))
-            payload = SimpleNamespace(email="ada@example.com", password="Secret1!")  # noqa: S106
+            payload = SimpleNamespace(email="ada@example.com", password="Secret1!")
             incoming = SimpleNamespace(data=AsyncMock(return_value={"remember": value}))
             outgoing = await controller.login(incoming, payload, auth)
             self.assertEqual(auth.attempt.call_args.kwargs, {"remember": expected})

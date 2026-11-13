@@ -1,3 +1,6 @@
+# ruff: noqa: ANN401, ARG004, PLC0415, TC003
+# DI returns arbitrary service types; allocation accepts subclass arguments.
+# HTTP/schema imports stay deferred, while public callable hints remain resolvable.
 """Resolve services from contracts, aliases and constructor signatures."""
 
 from __future__ import annotations
@@ -6,6 +9,7 @@ import contextvars
 import importlib
 import inspect
 import threading
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, ClassVar, Self, cast
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import get_current_scope
@@ -16,17 +20,16 @@ from orionis.container.enums.lifetimes import Lifetime
 from orionis.container.exceptions import CircularDependencyException
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
     import msgspec
     from orionis.container.contracts.service_provider import IServiceProvider
     from orionis.http.contracts.request import IRequest
     from orionis.introspection.dependencies.entities.argument import Argument
 
 # Context variable to track the resolution stack for circular dependency detection.
-_resolution_stack: contextvars.ContextVar[frozenset[type]] = contextvars.ContextVar(
-    "x-orionis-resolution-stack", default=frozenset(),
+_resolution_stack: contextvars.ContextVar[frozenset[tuple[int, type]]] = (
+    contextvars.ContextVar("x-orionis-resolution-stack", default=frozenset())
 )
-"""Context variable to track the resolution stack for circular dependency detection."""
+"""Resolution stack identifying both the owning container and concrete type."""
 _provider_stack: contextvars.ContextVar[frozenset[tuple[int, tuple[str, str]]]] = (
     contextvars.ContextVar("x-orionis-provider-stack", default=frozenset())
 )
@@ -34,8 +37,10 @@ _provider_stack: contextvars.ContextVar[frozenset[tuple[int, tuple[str, str]]]] 
 
 # Sentinel for parameters without annotations or default values.
 _INSPECT_EMPTY = inspect.Parameter.empty
+"""Sentinel representing an omitted annotation or default value."""
 _MISSING = object()
 """Sentinel distinguishing missing from ordinary values."""
+
 
 class Container(IContainer):
     """
@@ -43,8 +48,9 @@ class Container(IContainer):
 
     Concurrency
     -----------
-    ``__new__`` is thread-safe: concurrent construction of the same subclass
-    always yields a single instance, guarded by ``_lock``.
+    Allocation and initialization of container registries use ``_lock`` so
+    concurrent construction of the same subclass shares initialized state.
+    Subclasses remain responsible for safely initializing their additional state.
 
     Inside one event loop, the one-shot work behind ``Lifetime.SINGLETON``,
     ``Lifetime.SCOPED`` and deferred providers is serialised per key, so
@@ -54,8 +60,6 @@ class Container(IContainer):
     dictionaries without locks, and containers shared between distinct event
     loops fall back to per-loop serialisation only.
     """
-
-    # ruff: noqa: ANN401, FBT001, ARG004, C901, PLC0415, PLR0912
 
     # Dictionary to hold singleton instances for each class
     # This allows proper inheritance of the singleton pattern
@@ -78,7 +82,7 @@ class Container(IContainer):
         Create and return a singleton instance for each class in the hierarchy.
 
         Ensures thread-safe singleton instantiation for each subclass of Container.
-        Uses double-checked locking to avoid race conditions and optimize performance.
+        Acquire the allocation lock only when the subclass has no registered instance.
 
         Parameters
         ----------
@@ -125,16 +129,22 @@ class Container(IContainer):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
-        # Prevent multiple initializations for singleton instances
-        if "_Container__initialized" not in self.__dict__:
+        if "_Container__initialized" in self.__dict__:
+            return
+        # Allocation publishes the instance before Python calls __init__.
+        # Serialize that first initialization so another constructor cannot
+        # overwrite bindings already registered through the shared instance.
+        with self._lock:
+            if "_Container__initialized" in self.__dict__:
+                return
             # Deferred providers for lazy loading
             self._deferred_providers: dict[str, dict[str, str]] = {}
             """Deferred providers for lazy loading."""
 
             # Cache for singleton instances
-            self.__singleton_cache: dict[str, Any] = {}
+            self.__singleton_cache: dict[type[Any], Any] = {}
             """Cache for singleton instances."""
 
             # Aliases mapping for service resolution
@@ -142,11 +152,11 @@ class Container(IContainer):
             """Aliases mapping for service resolution."""
 
             # Registered bindings for services
-            self.__bindings: dict[Any, Binding] = {}
+            self.__bindings: dict[type[Any], Binding] = {}
             """Registered bindings for services."""
 
             # Tracks resolved deferred providers
-            self.__cache_resolve_deferred_providers: set[Any] = set()
+            self.__cache_resolve_deferred_providers: set[tuple[str, str]] = set()
             """Tracks resolved deferred providers."""
             self.__registered_deferred: dict[tuple[str, str], IServiceProvider] = {}
             """Deferred providers whose bindings have already been registered."""
@@ -156,7 +166,7 @@ class Container(IContainer):
             # Per-key locks serialising one-shot construction, paired with the
             # loop they were created on so a second loop never awaits a foreign lock.
             self.__creation_locks: dict[
-                Any,
+                object,
                 tuple[asyncio.AbstractEventLoop, asyncio.Lock],
             ] = {}
             """
@@ -170,14 +180,14 @@ class Container(IContainer):
 
     def __creationLock(
         self: Self,
-        key: Any,
+        key: object,
     ) -> asyncio.Lock:
         """
         Return the creation lock for a key, bound to the running loop.
 
         Parameters
         ----------
-        key : typing.Any
+        key : object
             Contract or deferred provider key whose construction is guarded.
 
         Returns
@@ -195,8 +205,8 @@ class Container(IContainer):
         self.__creation_locks[key] = (loop, lock)
         return lock
 
-    @staticmethod
     def __isBeingResolved(
+        self,
         concrete: type[Any],
     ) -> bool:
         """
@@ -213,7 +223,7 @@ class Container(IContainer):
             True when the type is already on the current resolution stack,
             which means the caller must skip the creation lock it already owns.
         """
-        return concrete in _resolution_stack.get()
+        return (id(self), concrete) in _resolution_stack.get()
 
     def __aliasService(
         self: Self,
@@ -260,9 +270,10 @@ class Container(IContainer):
 
     def __ensureCanOverrideScope(
         self: Self,
-        override: bool,
         abstract: type[Any],
         scope: ScopeManager,
+        *,
+        override: bool,
     ) -> None:
         """
         Ensure that a service can be overridden in the current scope.
@@ -279,7 +290,7 @@ class Container(IContainer):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -298,9 +309,10 @@ class Container(IContainer):
 
     def __ensureCanOverrideGlobal(
         self: Self,
-        override: bool,
         abstract: type[Any],
         alias: str | None,
+        *,
+        override: bool,
     ) -> None:
         """
         Ensure that a service or alias can be overridden globally.
@@ -317,7 +329,7 @@ class Container(IContainer):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -356,7 +368,7 @@ class Container(IContainer):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -391,7 +403,7 @@ class Container(IContainer):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -466,7 +478,7 @@ class Container(IContainer):
         alias = self.__aliasService(alias)
 
         # Enforce override rules for service registration
-        self.__ensureCanOverrideGlobal(override, abstract, alias)
+        self.__ensureCanOverrideGlobal(abstract, alias, override=override)
 
         # Register the binding in the container
         binding = Binding(
@@ -492,7 +504,7 @@ class Container(IContainer):
         override: bool = False,
     ) -> bool:
         """
-        Register an object instance as a singleton in the container.
+        Register an existing object globally or in the active scope.
 
         Parameters
         ----------
@@ -537,9 +549,9 @@ class Container(IContainer):
 
         # Enforce override rules for service registration
         if scope is not None:
-            self.__ensureCanOverrideScope(override, abstract, scope)
+            self.__ensureCanOverrideScope(abstract, scope, override=override)
         else:
-            self.__ensureCanOverrideGlobal(override, abstract, alias)
+            self.__ensureCanOverrideGlobal(abstract, alias, override=override)
 
         if scope is not None:
             if alias is not None:
@@ -762,8 +774,7 @@ class Container(IContainer):
         Returns
         -------
         None
-            This method does not return a value. Registers the deferred service
-            provider in the application container if found.
+            No return value.
 
         Notes
         -----
@@ -813,7 +824,7 @@ class Container(IContainer):
         Returns
         -------
         None
-            The provider is marked ready after its boot hook succeeds.
+            No return value.
         """
         # Keep registered instances available when boot needs retrying.
         instance = self.__registered_deferred.get(provider_key)
@@ -851,7 +862,7 @@ class Container(IContainer):
         Returns
         -------
         None
-            The provider is ready, or the caller is its own bootstrap task.
+            No return value.
         """
         original = key
         if isinstance(key, type):
@@ -919,8 +930,8 @@ class Container(IContainer):
         self: Self,
         abstract: type[Any],
         key: type[Any] | str,
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Resolve a binding for an abstract service or build it when unbound.
@@ -931,9 +942,9 @@ class Container(IContainer):
             Abstract service type to resolve.
         key : type[typing.Any] | str
             Original service key used for resolution and error messages.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments passed to the resolver or builder.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments passed to the resolver or builder.
 
         Returns
@@ -966,19 +977,22 @@ class Container(IContainer):
     async def make(
         self: Self,
         key: type[Any] | str,
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Resolve and return a service instance by key.
+
+        An explicitly registered scoped instance takes precedence over a cached
+        global singleton. The global instance remains available after scope exit.
 
         Parameters
         ----------
         key : type[typing.Any] | str
             The abstract type or alias to resolve.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for instantiation.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for instantiation.
 
         Returns
@@ -995,8 +1009,12 @@ class Container(IContainer):
         if self.__pending_deferred:
             await self.__awaitPendingProvider(key)
 
+        scope = get_current_scope()
+
         # If key is a type and already has a singleton instance, return it immediately.
         if not isinstance(key, str):
+            if scope is not None and key in scope:
+                return scope[key]
             _cached = self.__singleton_cache.get(key)
             if _cached is not None:
                 return _cached
@@ -1004,16 +1022,13 @@ class Container(IContainer):
         # Resolve the key to an abstract type, handling aliases and deferred providers.
         abstract = await self.__resolveKey(key)
 
+        if scope is not None and abstract in scope:
+            return scope[abstract]
+
         # If the abstract type has a cached singleton instance, return it immediately.
         _cached = self.__singleton_cache.get(abstract)
         if _cached is not None:
             return _cached
-
-        # Check if the abstract type is present in the current
-        # scope and return it if found.
-        scope: dict[Any, Any] | None = get_current_scope()
-        if scope is not None and abstract in scope:
-            return scope[abstract]
 
         # Finally, resolve or build the service instance according to
         # its binding or auto-resolve it if unbound.
@@ -1022,8 +1037,8 @@ class Container(IContainer):
     async def __resolve(
         self: Self,
         binding: Binding,
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Resolve an instance from a binding according to its lifetime.
@@ -1032,9 +1047,9 @@ class Container(IContainer):
         ----------
         binding : orionis.container.entities.Binding
             The binding to resolve.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for the constructor.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for the constructor.
 
         Returns
@@ -1081,8 +1096,8 @@ class Container(IContainer):
     async def __createSingleton(
         self: Self,
         binding: Binding,
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Build and cache the single instance backing a singleton binding.
@@ -1091,9 +1106,9 @@ class Container(IContainer):
         ----------
         binding : orionis.container.entities.Binding
             The singleton binding to materialize.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for the constructor.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for the constructor.
 
         Returns
@@ -1123,8 +1138,8 @@ class Container(IContainer):
         self: Self,
         binding: Binding,
         scope: ScopeManager,
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Build and store the instance backing a scoped binding.
@@ -1135,9 +1150,9 @@ class Container(IContainer):
             The scoped binding to materialize.
         scope : orionis.container.context.manager.ScopeManager
             The active scope that owns the resulting instance.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for the constructor.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for the constructor.
 
         Returns
@@ -1164,20 +1179,20 @@ class Container(IContainer):
 
     async def __autoResolveClass(
         self: Self,
-        type_: Callable[..., Any],
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        type_: type[Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Automatically instantiate a class with injected dependencies.
 
         Parameters
         ----------
-        ``type_`` : collections.abc.Callable[``...``, typing.Any]
+        ``type_`` : type[typing.Any]
             The class to instantiate.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for the constructor.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for the constructor.
 
         Returns
@@ -1201,7 +1216,8 @@ class Container(IContainer):
         # This is safe under async concurrency: each asyncio Task has its own
         # context, so concurrent resolutions of the same type never collide.
         stack = _resolution_stack.get()
-        if type_ in stack:
+        resolution_key = (id(self), type_)
+        if resolution_key in stack:
             type_key = f"{type_.__module__}.{type_.__name__}"
             error_msg = (
                 f"Circular dependency detected while resolving argument '{type_key}'."
@@ -1209,7 +1225,7 @@ class Container(IContainer):
             raise CircularDependencyException(error_msg)
 
         # Push type onto the per-task stack; token allows precise rollback
-        token = _resolution_stack.set(stack | {type_})
+        token = _resolution_stack.set(stack | {resolution_key})
         try:
             # Positional calls need neither a keyword mapping nor name matching.
             if not kwargs and not plan.has_keyword_only:
@@ -1224,6 +1240,7 @@ class Container(IContainer):
                 plan.arguments,
                 args,
                 kwargs,
+                positional_only=plan.positional_only,
             )
 
             # Instantiate with resolved arguments
@@ -1235,20 +1252,20 @@ class Container(IContainer):
 
     async def build(
         self: Self,
-        type_: Callable[..., Any],
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        type_: type[Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Build and return an instance of the specified type.
 
         Parameters
         ----------
-        ``type_`` : collections.abc.Callable[``...``, typing.Any]
+        ``type_`` : type[typing.Any]
             The class to instantiate.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for the constructor.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for the constructor.
 
         Returns
@@ -1283,8 +1300,8 @@ class Container(IContainer):
     async def invoke(
         self: Self,
         fn: Callable[..., Any],
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Invoke a callable with automatic dependency injection.
@@ -1293,9 +1310,9 @@ class Container(IContainer):
         ----------
         fn : collections.abc.Callable[``...``, typing.Any]
             The callable to invoke. Must not be a class or type.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for the callable.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for the callable.
 
         Returns
@@ -1376,7 +1393,7 @@ class Container(IContainer):
         type_: Callable[..., Any],
         *args: object,
         **kwargs: object,
-    ) -> type[Any]:
+    ) -> Any:
         """
         Resolve and invoke a callable, injecting dependencies.
 
@@ -1422,6 +1439,7 @@ class Container(IContainer):
             plan.arguments,
             args,
             kwargs,
+            positional_only=plan.positional_only,
         )
 
         # Invoke the callable with resolved arguments
@@ -1472,11 +1490,38 @@ class Container(IContainer):
             resolved.append(await self.__resolveArgument(argument))
         return resolved
 
-    async def __resolveSignature(  # NOSONAR
+    async def __resolveMissingParameter(self, argument: Argument) -> Any:
+        """Resolve a parameter whose value was omitted from a keyword call.
+
+        Parameters
+        ----------
+        argument : orionis.introspection.dependencies.entities.argument.Argument
+            Parameter metadata requiring a service, schema, or default value.
+
+        Returns
+        -------
+        typing.Any
+            Value selected from the current provider registrations and scope.
+        """
+        deferred = self._deferred_providers
+        if deferred and argument.full_class_path in deferred:
+            await self.__resolveDeferredProvider(argument.full_class_path)
+        if argument.is_schema:
+            return await self.__resolveSchemaArgument(argument)
+        arg_type = argument.type
+        if (arg_type in self.__bindings or arg_type in self.__singleton_cache) and not (
+            arg_type is str and argument.module_name == "typing"
+        ):
+            return await self.make(arg_type)
+        return await self.__resolveArgument(argument)
+
+    async def __resolveSignature(
         self: Self,
         arguments: tuple[Argument, ...],
         args: tuple[object, ...],
         kwargs: dict[str, object],
+        *,
+        positional_only: frozenset[str],
     ) -> tuple[list[Any], dict[str, Any]]:
         """
         Resolve arguments for a callable signature using dependency injection.
@@ -1489,6 +1534,8 @@ class Container(IContainer):
             Positional arguments to pass to the callable.
         kwargs : dict[str, object]
             Invocation-owned keyword mapping, consumed during resolution.
+        positional_only : frozenset[str]
+            Parameter names whose values cannot be supplied by keyword.
 
         Returns
         -------
@@ -1504,80 +1551,28 @@ class Container(IContainer):
         final_args: list[Any] = []
         final_kwargs: dict[str, Any] = {}
 
-        # Read deferred registrations for the current argument sequence.
-        deferred = self._deferred_providers
-
-        # Read current bindings so overrides apply to previously compiled plans.
-        _bindings = self.__bindings
-        _singleton = self.__singleton_cache
-
         # Iterate over arguments in definition order
         for argument in arguments:
             name = argument.name
 
-            # Handle positional or positional-or-keyword arguments
-            if not argument.is_keyword_only:
-                # Use next positional argument if available
-                if position < positional_count:
-                    final_args.append(args[position])
-                    position += 1
-                    continue
+            if not argument.is_keyword_only and position < positional_count:
+                final_args.append(args[position])
+                position += 1
+                continue
 
-                # Use provided keyword argument if available
-                provided = remaining_kwargs.pop(name, _MISSING)
-                if provided is not _MISSING:
-                    final_args.append(provided)
-                    continue
-
-                # Resolve deferred registrations for this parameter.
-                if deferred and argument.full_class_path in deferred:
-                    await self.__resolveDeferredProvider(argument.full_class_path)
-
-                # Read request data for a schema parameter.
-                if argument.is_schema:
-                    final_args.append(await self.__resolveSchemaArgument(argument))
-                    continue
-
-                # Resolve a dependency registered by type.
-                arg_type = argument.type
-                if (arg_type in _bindings or arg_type in _singleton) and not (
-                    arg_type is str and argument.module_name == "typing"
-                ):
-                    final_args.append(await self.make(arg_type))
-                    continue
-
-                # Fallback to automatic resolution if no explicit value
-                resolved = await self.__resolveArgument(argument)
-                final_args.append(resolved)
-
-            else:
-                # Use provided keyword argument if available
-                provided = remaining_kwargs.pop(name, _MISSING)
-                if provided is not _MISSING:
-                    final_kwargs[name] = provided
-                    continue
-
-                # Resolve deferred registrations for this parameter.
-                if deferred and argument.full_class_path in deferred:
-                    await self.__resolveDeferredProvider(argument.full_class_path)
-
-                # Read request data for a schema parameter.
-                if argument.is_schema:
-                    final_kwargs[name] = await self.__resolveSchemaArgument(argument)
-                    continue
-
-                # Resolve keyword-only arguments registered by type.
-                arg_type = argument.type
-                if (arg_type in _bindings or arg_type in _singleton) and not (
-                    arg_type is str and argument.module_name == "typing"
-                ):
-                    resolved = await self.make(arg_type)
-                    final_kwargs[name] = resolved
-                    continue
-
-                # Fallback to automatic resolution for keyword-only argument
-                resolved = await self.__resolveArgument(argument)
+            # Positional-only names remain in kwargs for Python to capture in
+            # **kwargs or reject through the callable's own argument binding.
+            resolved = (
+                _MISSING
+                if name in positional_only
+                else remaining_kwargs.pop(name, _MISSING)
+            )
+            if resolved is _MISSING:
+                resolved = await self.__resolveMissingParameter(argument)
+            if argument.is_keyword_only:
                 final_kwargs[name] = resolved
+            else:
+                final_args.append(resolved)
 
         # Append any remaining positional arguments
         if position < positional_count:
@@ -1651,6 +1646,10 @@ class Container(IContainer):
                 f"for parameter '{argument.name}'."
             )
             raise TypeError(error_msg)
+
+        scope = get_current_scope()
+        if scope is not None and argument.type in scope:
+            return scope[argument.type]
 
         if not argument.resolved:
             # Do not auto-resolve built-in or typing types

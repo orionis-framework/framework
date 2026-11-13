@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from orionis.http.default.contracts.responses import IDefaultResponses
     from orionis.http.responses import Response
 
+
 class SecurityMiddleware:
     """
     Enforce baseline HTTP security policies on every request.

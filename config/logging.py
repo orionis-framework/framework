@@ -14,9 +14,9 @@ from orionis.foundation.config.logging import (
     Weekly,
 )
 
+
 @dataclass(frozen=True, kw_only=True)
 class BootstrapLogging(Logging):
-
     # ----------------------------------------------------------------------------------
     # queue_capacity : int, optional
     # --- The capacity of the logging queue.
@@ -44,7 +44,6 @@ class BootstrapLogging(Logging):
     # ----------------------------------------------------------------------------------
     channels: Channels | dict = field(
         default_factory=lambda: Channels(
-
             # --------------------------------------------------------------------------
             # stack : Stack, optional
             # --- Log file for entries without time or size rotation.
@@ -57,7 +56,6 @@ class BootstrapLogging(Logging):
                 ),
                 level=Env.get("LOG_LEVEL", Level.INFO),
             ),
-
             # --------------------------------------------------------------------------
             # hourly : Hourly, optional
             # --- Hourly log rotation with retention measured in hours.
@@ -75,7 +73,6 @@ class BootstrapLogging(Logging):
                     else 24
                 ),
             ),
-
             # --------------------------------------------------------------------------
             # daily : Daily, optional
             # --- Daily log rotation with a configurable time and retention in days.
@@ -94,7 +91,6 @@ class BootstrapLogging(Logging):
                 ),
                 at=Env.get("LOG_ROTATION_TIME", time(hour=0, minute=0, second=0)),
             ),
-
             # --------------------------------------------------------------------------
             # weekly : Weekly, optional
             # --- Weekly log rotation with retention measured in weeks.
@@ -112,7 +108,6 @@ class BootstrapLogging(Logging):
                     else 4
                 ),
             ),
-
             # --------------------------------------------------------------------------
             # monthly : Monthly, optional
             # --- Monthly log rotation with retention measured in months.
@@ -130,7 +125,6 @@ class BootstrapLogging(Logging):
                     else 4
                 ),
             ),
-
             # --------------------------------------------------------------------------
             # chunked : Chunked, optional
             # --- Rotation by file size, with a size limit and a retained file count.

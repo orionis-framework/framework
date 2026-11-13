@@ -1,3 +1,5 @@
+# ruff: noqa: C901, PLR0912, PLR0915
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Represent a command-line argument definition."""
 
 from __future__ import annotations
@@ -16,15 +18,18 @@ _VALID_NARGS: set[str] = {"?", "*", "+"}
 """Valid nargs values for argparse."""
 
 # Actions that do not support type conversion and should not have a 'type_' parameter
-_ACTIONS_WITHOUT_TYPE: frozenset[str] = frozenset({
-    "store_true",
-    "store_false",
-    "append_const",
-    "store_const",
-})
+_ACTIONS_WITHOUT_TYPE: frozenset[str] = frozenset(
+    {
+        "store_true",
+        "store_false",
+        "append_const",
+        "store_const",
+    },
+)
 """
 Actions that do not support type conversion and should not have a '``type_``' parameter.
 """
+
 
 @dataclass(kw_only=True, frozen=True, slots=True)
 class Argument(BaseEntity):
@@ -64,8 +69,6 @@ class Argument(BaseEntity):
         Additional parameters forwarded to ``add_argument``.
     """
 
-    # ruff: noqa: C901, PLR0915, PLR0912
-
     name_or_flags: str | Iterable[str]
 
     action: str | ArgumentAction | None = None
@@ -92,7 +95,7 @@ class Argument(BaseEntity):
 
     extra: dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self) -> None: # NOSONAR
+    def __post_init__(self) -> None:  # NOSONAR
         """
         Validate and normalize the argument definition.
 
@@ -131,7 +134,8 @@ class Argument(BaseEntity):
 
         # Validate action type
         if self.action is not None and not isinstance(
-            self.action, (str, ArgumentAction),
+            self.action,
+            (str, ArgumentAction),
         ):
             error_msg = "'action' must be a string, ArgumentAction, or None."
             raise TypeError(error_msg)
@@ -143,9 +147,7 @@ class Argument(BaseEntity):
                 raise TypeError(error_msg)
 
             if isinstance(self.nargs, str) and self.nargs not in _VALID_NARGS:
-                error_msg = (
-                    f"'nargs' must be one of {_VALID_NARGS} or an integer."
-                )
+                error_msg = f"'nargs' must be one of {_VALID_NARGS} or an integer."
                 raise ValueError(error_msg)
 
         # Validate type_ is callable if provided
@@ -198,9 +200,7 @@ class Argument(BaseEntity):
                     error_msg = "'metavar' tuple must contain only strings."
                     raise TypeError(error_msg)
             elif not isinstance(self.metavar, str):
-                error_msg = (
-                    "'metavar' must be a string, tuple[str,...], or None."
-                )
+                error_msg = "'metavar' must be a string, tuple[str,...], or None."
                 raise TypeError(error_msg)
 
         # Validate dest is string if provided
@@ -220,7 +220,8 @@ class Argument(BaseEntity):
 
         # Consistency check for version action
         action_value = (
-            self.action.value if isinstance(self.action, ArgumentAction)
+            self.action.value
+            if isinstance(self.action, ArgumentAction)
             else self.action
         )
 
@@ -229,7 +230,7 @@ class Argument(BaseEntity):
             error_msg = "'version' must be provided when action='version'."
             raise ValueError(error_msg)
 
-    def addToParser(self, parser: argparse.ArgumentParser) -> None: # NOSONAR
+    def addToParser(self, parser: argparse.ArgumentParser) -> None:  # NOSONAR
         """
         Add this argument to an ArgumentParser.
 

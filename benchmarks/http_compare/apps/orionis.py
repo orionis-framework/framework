@@ -1,6 +1,7 @@
 from pathlib import Path
 from orionis import Application
 
+
 def create_application() -> Application:
     """Create Orionis using the routes staged by the benchmark runner."""
     return (

@@ -1,3 +1,6 @@
+# ruff: noqa: ARG001, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# The replacement action retains the method receiver required by its descriptor.
 import asyncio
 import gc
 import weakref
@@ -10,11 +13,14 @@ from orionis.http.request import Request
 from orionis.schemas.schema import Schema
 from orionis.test import TestCase
 
+
 class _Service:
     """Represent an injectable service."""
 
+
 class _Replacement(_Service):
     """Represent a replacement service registration."""
+
 
 class _Controller:
     """Receive a service in an action with explicit arguments."""
@@ -36,10 +42,12 @@ class _Controller:
         """
         return service, count
 
+
 class _Payload(Schema):
     """Represent a schema requiring an asynchronous body read."""
 
     value: int
+
 
 class _ScopedService:
     """Suspend DI while obtaining a payload."""
@@ -55,9 +63,10 @@ class _ScopedService:
         Returns
         -------
         None
-            The payload is assigned to the service.
+            No return value.
         """
         self.payload = payload
+
 
 class _Request(Request):
     """Gate body reads using events controlled by a test."""
@@ -75,7 +84,7 @@ class _Request(Request):
         Returns
         -------
         None
-            The request is ready for schema injection.
+            No return value.
         """
         self.entered = entered
         self.release = release
@@ -92,6 +101,7 @@ class _Request(Request):
         await self.release.wait()
         return {"value": 1}
 
+
 class _MultiProvider:
     """Publish two services while boot remains under test control."""
 
@@ -107,7 +117,7 @@ class _MultiProvider:
         Returns
         -------
         None
-            Services are registered once per provider instance.
+            No return value.
         """
         type(self).registrations += 1
         self.container.singleton(None, _Service, alias="first")
@@ -119,37 +129,24 @@ class _MultiProvider:
         Returns
         -------
         None
-            The provider is ready after the event is released.
+            No return value.
         """
         type(self).boots += 1
         await asyncio.gather(self.container.make("first"))
         self.entered.set()
         await self.release.wait()
 
+
 class TestDispatchPlans(TestCase):
     """Keep metadata reusable while dependencies and lifetimes stay dynamic."""
 
-    def setUp(self: Self) -> None:
-        """Create an isolated container outside the runner's scope.
-
-        Returns
-        -------
-        None
-            Registrations belong to this test's container.
-        """
-        self.token = ScopedContext.setCurrentScope(None)
+    def setUp(self) -> None:
+        """Isolate the active scope and restore its original value during cleanup."""
+        super().setUp()
+        token = ScopedContext.setCurrentScope(None)
+        self.addCleanup(ScopedContext.reset, token)
         self.container = object.__new__(Container)
         Container.__init__(self.container)
-
-    def tearDown(self: Self) -> None:
-        """Restore the caller's scope.
-
-        Returns
-        -------
-        None
-            The test's context is released.
-        """
-        ScopedContext.reset(self.token)
 
     async def testPlansDoNotRetainControllers(self: Self) -> None:
         """Release controllers after invoking a shared method plan.
@@ -157,7 +154,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            No receiver survives solely through the metadata cache.
+            No return value.
         """
         self.container.singleton(None, _Service)
         references = []
@@ -175,7 +172,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Warm plans use replacements without modifying caller dictionaries.
+            No return value.
         """
         first = _Service()
         self.container.instance(_Service, first)
@@ -187,7 +184,8 @@ class TestDispatchPlans(TestCase):
         self.assertEqual(count, 9)
         arguments = {"service": first, "count": 8}
         self.assertEqual(
-            await self.container.call(controller, "handle", **arguments), (first, 8),
+            await self.container.call(controller, "handle", **arguments),
+            (first, 8),
         )
         self.assertEqual(arguments, {"service": first, "count": 8})
 
@@ -197,7 +195,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Invocation succeeds without checking the callable again.
+            No return value.
         """
         controller = _Controller()
         callable_plan(controller.handle)
@@ -216,7 +214,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Cached metadata retains neither service instances nor request scopes.
+            No return value.
         """
         controller = _Controller()
         original = _Service()
@@ -252,7 +250,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Overrides remain per-call and invalid inputs are not discarded.
+            No return value.
         """
         controller = _Controller()
         explicit = _Service()
@@ -279,7 +277,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Supplied values reach a positional-only callable unchanged.
+            No return value.
         """
 
         def action(service: _Service, /, *extra: object) -> tuple:
@@ -313,7 +311,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            New constructor and action defaults are honored immediately.
+            No return value.
         """
 
         class MutableController:
@@ -335,7 +333,8 @@ class TestDispatchPlans(TestCase):
                 return value
 
         def replacement_action(
-            self: MutableController, value: int = 9,  # noqa: ARG001
+            self: MutableController,
+            value: int = 9,
         ) -> int:
             """Return the replacement action value.
 
@@ -366,7 +365,7 @@ class TestDispatchPlans(TestCase):
             Returns
             -------
             None
-                The constructor value is stored on the instance.
+                No return value.
             """
             self.value = value
 
@@ -383,7 +382,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Separate scopes overlap and receive distinct services.
+            No return value.
         """
         entered = asyncio.Queue()
         release = asyncio.Event()
@@ -418,7 +417,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            A later resolver builds and caches the service within the same scope.
+            No return value.
         """
         entered = asyncio.Queue()
         release = asyncio.Event()
@@ -440,13 +439,19 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Both aliases refer to the same provider identity.
+            No return value.
         """
-        _MultiProvider.container = self.container
-        _MultiProvider.entered = asyncio.Event()
-        _MultiProvider.release = asyncio.Event()
-        _MultiProvider.registrations = 0
-        _MultiProvider.boots = 0
+        self.enterContext(
+            patch.multiple(
+                _MultiProvider,
+                create=True,
+                container=self.container,
+                entered=asyncio.Event(),
+                release=asyncio.Event(),
+                registrations=0,
+                boots=0,
+            ),
+        )
         metadata = {"module": __name__, "class": "_MultiProvider"}
         self.container._deferred_providers = {
             "first": metadata,
@@ -461,7 +466,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Both contracts resolve after exactly one register and boot.
+            No return value.
         """
         self._configureProvider()
         async with asyncio.TaskGroup() as group:
@@ -488,7 +493,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            Positional specialization preserves deferred-provider coordination.
+            No return value.
         """
         self._configureProvider()
         controller = _Controller()
@@ -512,7 +517,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            The next contract resolver completes the same provider instance.
+            No return value.
         """
         self._configureProvider()
         task = asyncio.create_task(self.container.make("first"))
@@ -531,7 +536,7 @@ class TestDispatchPlans(TestCase):
         Returns
         -------
         None
-            The alias cannot expose a service before its provider is ready.
+            No return value.
         """
         self._configureProvider()
         del self.container._deferred_providers["second"]

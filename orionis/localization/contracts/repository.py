@@ -1,19 +1,19 @@
+# ruff: noqa: TC001
+# Resolve the public mapping annotation during runtime introspection.
 """Define the contract for the in-memory translation cache."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.localization.types import TranslationMap
 
-if TYPE_CHECKING:
-    from orionis.localization.types import TranslationMap
 
 class ITranslationRepository(ABC):
     """
     Define the contract for the in-memory translation cache.
 
-    The repository guarantees that each locale is read from disk at
-    most once, keeping every subsequent lookup fully in memory with
-    O(1) access.
+    A repository loads locale maps on demand and retains them according
+    to its cache policy. Invalidation, expiration, or capacity limits may
+    require a locale to be loaded again.
 
     Notes
     -----
@@ -81,7 +81,7 @@ class ITranslationRepository(ABC):
         Returns
         -------
         None
-            Discard every cached translation map.
+            No return value.
         """
 
     @abstractmethod

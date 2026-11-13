@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from inspect import iscoroutinefunction
+from typing import get_type_hints
 from unittest.mock import patch
 from orionis.schemas.contracts.constraint import IRule
 from orionis.schemas.entities.failure import ValidationFailure
@@ -9,6 +12,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 # Concrete Rule subclasses used to exercise the abstract base
 # ---------------------------------------------------------------------------
+
 
 class _AlwaysValidRule(Rule):
     """Concrete Rule that always passes."""
@@ -41,6 +45,7 @@ class _AlwaysValidRule(Rule):
         """
         return True
 
+
 class _AlwaysInvalidRule(Rule):
     """Concrete Rule that always fails."""
 
@@ -72,6 +77,7 @@ class _AlwaysInvalidRule(Rule):
         """
         return False
 
+
 class _BareRule(Rule):
     """Concrete Rule declaring neither ``__code__`` nor ``__message__``."""
 
@@ -100,6 +106,7 @@ class _BareRule(Rule):
         """
         return False
 
+
 class _DelegatingRule(Rule):
     """Concrete Rule delegating ``enforce`` back to the abstract base."""
 
@@ -127,6 +134,7 @@ class _DelegatingRule(Rule):
             Never returns; the base implementation raises.
         """
         return await super().enforce(field, value, instance)
+
 
 class _NativeAsyncRule(Rule):
     """Require awaiting enforcement on the caller's event loop."""
@@ -160,7 +168,21 @@ class _NativeAsyncRule(Rule):
         await asyncio.sleep(0)
         return value == "allowed"
 
+
 class TestRuleContract(TestCase):
+    def testRuntimeAnnotationsDescribeTheValidationContract(self) -> None:
+        """Resolve public rule annotations for runtime dependency inspection."""
+        for owner in (IRule, Rule):
+            for name, result in (
+                ("__init__", type(None)),
+                ("enforce", bool),
+                ("validate", ValidationFailure | None),
+            ):
+                with self.subTest(owner=owner.__name__, method=name):
+                    self.assertEqual(
+                        get_type_hints(getattr(owner, name))["return"],
+                        result,
+                    )
 
     def testEnforceIsAlwaysAsync(self) -> None:
         """
@@ -169,7 +191,7 @@ class TestRuleContract(TestCase):
         Returns
         -------
         None
-            Assert coroutine enforcement in the rule interface and base class.
+            No return value.
         """
         self.assertTrue(iscoroutinefunction(IRule.enforce))
         self.assertTrue(iscoroutinefunction(Rule.enforce))
@@ -181,7 +203,7 @@ class TestRuleContract(TestCase):
         Returns
         -------
         None
-            Assert asynchronous validation in the interface and implementation.
+            No return value.
         """
         self.assertTrue(iscoroutinefunction(IRule.validate))
         self.assertTrue(iscoroutinefunction(Rule.validate))
@@ -193,7 +215,7 @@ class TestRuleContract(TestCase):
         Returns
         -------
         None
-            Assert a single validation entry point for custom rules.
+            No return value.
         """
         self.assertFalse(hasattr(Rule, "validateAsync"))
         self.assertFalse(hasattr(Rule, "enforceAsync"))
@@ -205,12 +227,16 @@ class TestRuleContract(TestCase):
         Returns
         -------
         None
-            Assert rejection of synchronous enforcement at class declaration.
+            No return value.
         """
         with self.assertRaisesRegex(TypeError, r"\.enforce must.*async def"):
+
             class _SynchronousRule(Rule):
                 def enforce(
-                    self, _field: str, _value: object, _instance: object,
+                    self,
+                    _field: str,
+                    _value: object,
+                    _instance: object,
                 ) -> bool:
                     """
                     Declare an invalid synchronous predicate.
@@ -238,8 +264,9 @@ class TestRuleContract(TestCase):
         Returns
         -------
         None
-            Assert inheritance of an asynchronous enforcement implementation.
+            No return value.
         """
+
         class _InheritedRule(_AlwaysValidRule):
             pass
 
@@ -254,7 +281,7 @@ class TestRuleContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(_AlwaysValidRule(), IRule)
 
@@ -266,12 +293,15 @@ class TestRuleContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(Rule.__slots__, ("_code", "_message"))
+        instance = Rule()
+        self.assertFalse(hasattr(instance, "__dict__"))
+        with self.assertRaises(AttributeError):
+            instance.undeclared = "unsupported"
+
 
 class TestRuleEnforce(TestCase):
-
     async def testBaseEnforceRaisesNotImplementedError(self) -> None:
         """Raise NotImplementedError when the base enforce is reached.
 
@@ -281,14 +311,14 @@ class TestRuleEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = _DelegatingRule()
         with self.assertRaises(NotImplementedError):
             await rule.enforce("field", "value", object())
 
-class TestRuleValidate(TestCase):
 
+class TestRuleValidate(TestCase):
     async def testNativeAsyncEnforcementIsAwaited(self) -> None:
         """
         Use native enforcement for both accepted and rejected values.
@@ -296,7 +326,7 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assert awaited enforcement for accepted and rejected values.
+            No return value.
         """
         rule = _NativeAsyncRule(message="Custom async error.")
         self.assertIsNone(await rule.validate("field", "allowed", object()))
@@ -313,7 +343,7 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assert pure-rule execution on the caller's thread.
+            No return value.
         """
         with patch("asyncio.to_thread") as offload:
             self.assertIsNone(
@@ -328,12 +358,14 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assert propagation of unexpected asynchronous rule errors.
+            No return value.
         """
         message = "Native service failed."
         with (
             patch.object(
-                _NativeAsyncRule, "enforce", side_effect=RuntimeError(message),
+                _NativeAsyncRule,
+                "enforce",
+                side_effect=RuntimeError(message),
             ),
             self.assertRaisesRegex(RuntimeError, message),
         ):
@@ -347,7 +379,7 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = _AlwaysValidRule()
         self.assertIsNone(await rule.validate("field", "any_value", object()))
@@ -360,7 +392,7 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await _AlwaysInvalidRule().validate("age", 0, object())
         self.assertIsInstance(result, ValidationFailure)
@@ -375,7 +407,7 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await _AlwaysInvalidRule().validate("field", "value", object())
         self.assertEqual(result.message, "Value is always invalid.")
@@ -388,7 +420,7 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = _AlwaysInvalidRule(message="Custom error.")
         result = await rule.validate("field", "value", object())
@@ -402,7 +434,7 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await _BareRule().validate("field", "value", object())
         self.assertIsNone(result.message)
@@ -415,7 +447,7 @@ class TestRuleValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await _BareRule().validate("field", "value", object())
         self.assertEqual(result.rule, "_barerule")

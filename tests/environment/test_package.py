@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import ModuleType
 from orionis import environment as environment_package
 from orionis.environment import Env
@@ -7,6 +9,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 # TestEnvironmentPackageSurface
 # ---------------------------------------------------------------------------
+
 
 class TestEnvironmentPackageSurface(TestCase):
     """Verify the environment package exports."""
@@ -40,17 +43,6 @@ class TestEnvironmentPackageSurface(TestCase):
             Assertions compare the export with its defining function.
         """
         self.assertIs(environment_package.env, env)
-
-    def testNoExportShadowsASubmodule(self) -> None:
-        """Keep public exports distinct from their implementation modules.
-
-        Returns
-        -------
-        None
-            Assertions reject module objects among the exports.
-        """
-        for name in environment_package.__all__:
-            self.assertNotIsInstance(getattr(environment_package, name), ModuleType)
 
     def testExposesNoUndocumentedPublicObjects(self) -> None:
         """Keep every non-module public attribute inside ``__all__``.

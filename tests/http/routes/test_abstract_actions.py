@@ -1,6 +1,9 @@
+# ruff: noqa: PT009, PT027, SLF001, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import json
 from abc import ABC, abstractmethod
-from orionis.http.responses import Response  # noqa: TC001 (runtime reflection)
+from orionis.http.responses import Response  # (runtime reflection)
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.fluent import FluentRoute
 from orionis.http.routes.functions import is_valid_handler, parse_action
@@ -16,6 +19,7 @@ from tests.http.routes.test_nested_routing import (
 from tests.http.test_kernel import boot_kernel, dispatch
 
 _VERBS = ("get", "post", "put", "patch", "delete", "query")
+
 
 class _AbstractActionController(ABC):
     """Expose a concrete handler on a controller that cannot be instantiated."""
@@ -52,6 +56,7 @@ class _AbstractActionController(ABC):
         """
         return self.index()
 
+
 class _ConcreteActionController(_AbstractActionController):
     """Complete the abstract controller while retaining its inherited handler."""
 
@@ -65,6 +70,7 @@ class _ConcreteActionController(_AbstractActionController):
         None
             Completes the operation described above.
         """
+
 
 class TestAbstractRouteActions(TestCase):
     """Reject abstract action owners before registration and compilation."""
@@ -118,7 +124,9 @@ class TestAbstractRouteActions(TestCase):
         self.assertIs(pending.export()["class"], _ConcreteActionController)
 
         existing = FluentRoute(
-            "GET", "/existing", [_ConcreteActionController, "index"],
+            "GET",
+            "/existing",
+            [_ConcreteActionController, "index"],
         )
         view = FluentRoute("GET", "/view", view="pages.home")
         for route in (existing, view):
@@ -136,7 +144,9 @@ class TestAbstractRouteActions(TestCase):
             Assertions verify the behavior described above.
         """
         raw = FluentRoute(
-            "GET", "/raw", [_ConcreteActionController, "index"],
+            "GET",
+            "/raw",
+            [_ConcreteActionController, "index"],
         ).export()
         raw["class"] = _AbstractActionController
         with self.assertRaises(TypeError):
@@ -166,9 +176,14 @@ class TestAbstractRouteActions(TestCase):
         router.fallback([_ConcreteActionController, "index"])
         compiled = compile_router(router)
         cache = RouteCache()
-        snapshot = json.loads(json.dumps(cache.toCache(
-            compiled, router.export()["fallback"],
-        )))
+        snapshot = json.loads(
+            json.dumps(
+                cache.toCache(
+                    compiled,
+                    router.export()["fallback"],
+                ),
+            ),
+        )
         restored, fallback = cache.fromCache(snapshot)
         self.assertEqual(fallback, (_ConcreteActionController, "index"))
         for tables in (compiled, restored):
@@ -177,11 +192,14 @@ class TestAbstractRouteActions(TestCase):
                 resolved = resolver.resolve("GET", f"/concrete/{label}")
                 self.assertEqual(resolved.route.type, RouteType.CONTROLLER)
                 self.assertEqual(resolved.route.name, f"concrete.{label}")
-                self.assertEqual(resolved.route.action, {
-                    "module": _ConcreteActionController.__module__,
-                    "class": _ConcreteActionController.__qualname__,
-                    "method": "index",
-                })
+                self.assertEqual(
+                    resolved.route.action,
+                    {
+                        "module": _ConcreteActionController.__module__,
+                        "class": _ConcreteActionController.__qualname__,
+                        "method": "index",
+                    },
+                )
         kernel, _, _, catch = await boot_kernel(routes=restored, fallback=fallback)
         for path in ("/concrete/list", "/concrete/tuple", "/missing"):
             response = await dispatch(kernel, path)

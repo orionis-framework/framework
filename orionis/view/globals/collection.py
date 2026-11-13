@@ -1,24 +1,28 @@
+# ruff: noqa: ANN401
+# Preserve heterogeneous template payload values.
 """Provide view globals operations through ``_global_collect``."""
 
 from __future__ import annotations
-from collections.abc import Iterable
+
+from collections.abc import Callable, Iterable
 from typing import Any
+
 from orionis.support.types.collection import Collection
 
-# ruff: noqa: ANN401
 
-def _global_collect() -> Any:
+def _global_collect() -> Callable[..., Collection]:
     """
     Build the ``collect`` template global.
 
     Returns
     -------
-    typing.Any
-        Callable wrapping a value in a :class:`collections.abc.Collection` instance.
+    collections.abc.Callable
+        Callable wrapping a value in the framework collection type.
     """
+
     def collect(value: Any = None) -> Collection:
         """
-        Wrap a value in a fluent :class:`collections.abc.Collection` instance.
+        Wrap a value in a fluent framework collection.
 
         Parameters
         ----------
@@ -29,7 +33,7 @@ def _global_collect() -> Any:
 
         Returns
         -------
-        collections.abc.Collection
+        orionis.support.types.collection.Collection
             Fluent collection exposing the collection helper API.
         """
         if value is None:

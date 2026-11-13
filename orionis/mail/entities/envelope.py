@@ -1,13 +1,12 @@
+# ruff: noqa: PLR0913
+# Preserve the public envelope fields as independent keyword arguments.
 """Store normalized immutable headers and intended recipients."""
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
-from orionis.mail.entities.address import Address, addresses, one_address
+from orionis.mail.entities.address import Address, Recipients, addresses, one_address
 from orionis.mail.exceptions import MailCompositionException
 from orionis.mail.functions import header_value
 
-if TYPE_CHECKING:
-    from orionis.mail.types import Recipients
 
 @dataclass(frozen=True, slots=True, init=False)
 class Envelope:
@@ -43,7 +42,7 @@ class Envelope:
     reply_to: tuple[Address, ...]
     """Reply destinations, not transport recipients."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         *,
         subject: str = "",

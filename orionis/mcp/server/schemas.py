@@ -1,9 +1,36 @@
+# ruff: noqa: PLC0415
+# Keep schema runtime imports deferred until conversion is requested.
 """Provide mcp server operations through ``compile_schema``, ``convert_payload``."""
 
+from collections.abc import Mapping
 from typing import Annotated, cast, get_args, get_origin
 import msgspec
+from orionis.schemas.coercion import _coerce_value, _requires_preparation
+from orionis.schemas.rules_executor import (
+    _SchemaPlan,
+    _schema_plans,
+    _validate_schemas,
+)
 
-# ruff: noqa: PLC0415
+type _ConversionPlan = tuple[bool, Mapping[type, _SchemaPlan]]
+"""Preparation requirement and schema rules retained by a compiled primitive."""
+
+
+def compile_conversion(annotation: object) -> _ConversionPlan:
+    """Prepare conversion metadata once for a compiled tool declaration.
+
+    Parameters
+    ----------
+    annotation : object
+        Trusted input or output annotation.
+
+    Returns
+    -------
+    orionis.mcp.server.schemas._ConversionPlan
+        Copy-on-write preparation flag and immutable nested rule plans.
+    """
+    return _requires_preparation(annotation), _schema_plans(annotation)
+
 
 _META_FIELDS = (
     "gt",
@@ -40,6 +67,7 @@ _DIALECT = "https://json-schema.org/draft/2020-12/schema"
 _DEFINITIONS = "$defs"
 """Definitions identifier: ``$defs``."""
 
+
 def _schema_hook(annotation: type) -> dict[str, object]:
     """
     Represent an unconstrained JSON value without inventing custom type schemas.
@@ -58,6 +86,7 @@ def _schema_hook(annotation: type) -> dict[str, object]:
         return {"$comment": "Any JSON value."}
     message = f"Unsupported native MCP schema type {annotation!r}."
     raise TypeError(message)
+
 
 def _check_metadata(annotation: object) -> None:
     """
@@ -93,8 +122,10 @@ def _check_metadata(annotation: object) -> None:
     native = msgspec.json.schema(Annotated[tuple(clean)], schema_hook=_schema_hook)
     _validate_schema_additions(native, additions)
 
+
 def _validate_schema_additions(
-    native: dict[str, object], additions: list[dict[str, object]],
+    native: dict[str, object],
+    additions: list[dict[str, object]],
 ) -> None:
     """
     Require additional schema keywords to match native validation behavior.
@@ -129,6 +160,7 @@ def _validate_schema_additions(
                 )
                 raise ValueError(message)
 
+
 def _check_type(annotation: object, visited: set[object]) -> None:
     """
     Inspect metadata across nested fields and recursive type declarations.
@@ -157,8 +189,11 @@ def _check_type(annotation: object, visited: set[object]) -> None:
             if not isinstance(item, msgspec.Meta):
                 _check_type(item, visited)
 
+
 def compile_schema(
-    annotation: object, *, input_schema: bool = False,
+    annotation: object,
+    *,
+    input_schema: bool = False,
 ) -> dict[str, object]:
     """
     Produce the native JSON Schema, preserving local references and constraints.
@@ -179,7 +214,8 @@ def compile_schema(
     schema = msgspec.json.schema(annotation, schema_hook=_schema_hook)
     if input_schema:
         if not isinstance(annotation, type) or not issubclass(
-            annotation, msgspec.Struct,
+            annotation,
+            msgspec.Struct,
         ):
             message = (
                 "MCP tool inputs must be Orionis Schema or msgspec.Struct classes."
@@ -196,6 +232,7 @@ def compile_schema(
             message = "MCP input schemas must encode objects, not array-like structs."
             raise TypeError(message)
     return schema
+
 
 def _inline(
     value: object,
@@ -232,13 +269,20 @@ def _inline(
         if name in ancestors:
             referenced.add(name)
             return dict(value)
-        expanded = cast("dict[str, object]", _inline(
-            definitions[name], definitions, (*ancestors, name), referenced,
-        ))
+        expanded = cast(
+            "dict[str, object]",
+            _inline(
+                definitions[name],
+                definitions,
+                (*ancestors, name),
+                referenced,
+            ),
+        )
         return {
             **expanded,
             **{
-                key: item for key, item in value.items()
+                key: item
+                for key, item in value.items()
                 if key not in ("$ref", _DEFINITIONS)
             },
         }
@@ -248,7 +292,13 @@ def _inline(
         if key != _DEFINITIONS
     }
 
-async def convert_payload(value: object, annotation: object) -> object:
+
+async def convert_payload(
+    value: object,
+    annotation: object,
+    *,
+    plan: _ConversionPlan | None = None,
+) -> object:
     """
     Validate and convert a payload to its declared native type.
 
@@ -258,6 +308,8 @@ async def convert_payload(value: object, annotation: object) -> object:
         Raw payload value to validate and convert.
     annotation : object
         Declared Schema subclass or msgspec-compatible target type.
+    plan : orionis.mcp.server.schemas._ConversionPlan | None, optional
+        Compiled conversion metadata, or None for a standalone conversion.
 
     Returns
     -------
@@ -268,5 +320,14 @@ async def convert_payload(value: object, annotation: object) -> object:
 
     if isinstance(annotation, type) and issubclass(annotation, Schema):
         from orionis.schemas.validator import Schema as Validator
+
         return await Validator.validate(value, annotation)
-    return msgspec.convert(value, type=annotation, strict=True)
+    requires_preparation, rules = (
+        compile_conversion(annotation) if plan is None else plan
+    )
+    if requires_preparation:
+        value = _coerce_value(value, annotation, enabled=False)
+    converted = msgspec.convert(value, type=annotation, strict=True)
+    if rules:
+        await _validate_schemas(converted, rules)
+    return converted

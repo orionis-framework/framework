@@ -1,7 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema strict int behavior."""
+
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.orm.schema.types.strict_int import StrictInt
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestStrictIntOptions(TestCase):
     """Verify StrictInt constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestStrictIntOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = StrictInt()
         assert_column_options(

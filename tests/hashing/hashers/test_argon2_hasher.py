@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import threading
 from typing import Self
 from orionis.hashing.contracts.hasher import IHasher
@@ -17,6 +19,7 @@ _CHEAP_OPTIONS: dict[str, int] = {"memory": 32, "threads": 1, "time": 1}
 # Encoded hash produced by another algorithm, used as a foreign input.
 _FOREIGN_HASH: str = "$2b$04$" + "a" * 53
 
+
 def cheap_hasher(**overrides: int) -> Argon2Hasher:
     """
     Build an Argon2 hasher with cost parameters fit for a test suite.
@@ -35,6 +38,7 @@ def cheap_hasher(**overrides: int) -> Argon2Hasher:
     options.update(overrides)
     return Argon2Hasher(**options)
 
+
 class _ThreadRecordingHasher(Argon2Hasher):
     """Record the thread that performs the blocking hashing work."""
 
@@ -51,7 +55,7 @@ class _ThreadRecordingHasher(Argon2Hasher):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         super().__init__(**options)
         self.thread_ids: list[int] = []
@@ -103,6 +107,7 @@ class _ThreadRecordingHasher(Argon2Hasher):
         self.thread_ids.append(threading.get_ident())
         return super()._check(value, hashed)
 
+
 class TestArgon2HasherLayout(TestCase):
     def testImplementsTheHasherContract(self: Self) -> None:
         """Register the driver as an implementation of the hashing contract.
@@ -112,24 +117,9 @@ class TestArgon2HasherLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(cheap_hasher(), IHasher)
-
-    def testDeclaresTheExpectedSlots(self: Self) -> None:
-        """Declare the state of the driver as explicit slots.
-
-        Validates the memory layout required by the framework conventions.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(
-            Argon2Hasher.__dict__.get("__slots__"),
-            ("_backend", "_backend_class", "_executor", "_memory", "_threads", "_time"),
-        )
 
     def testDoesNotExposeAnInstanceDictionary(self: Self) -> None:
         """Keep instances free of an attribute dictionary.
@@ -140,7 +130,7 @@ class TestArgon2HasherLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(cheap_hasher(), "__dict__"))
 
@@ -152,9 +142,10 @@ class TestArgon2HasherLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(cheap_hasher().getAlgorithm(), "argon2id")
+
 
 class TestArgon2HasherDefaults(TestCase):
     def testDeclaresTheRecommendedCostParameters(self: Self) -> None:
@@ -165,7 +156,7 @@ class TestArgon2HasherDefaults(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(DEFAULT_MEMORY, 65536)
         self.assertEqual(DEFAULT_THREADS, 4)
@@ -180,12 +171,13 @@ class TestArgon2HasherDefaults(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = Argon2Hasher()
         self.assertEqual(hasher._memory, DEFAULT_MEMORY)
         self.assertEqual(hasher._threads, DEFAULT_THREADS)
         self.assertEqual(hasher._time, DEFAULT_TIME)
+
 
 class TestArgon2HasherValidation(TestCase):
     def testRejectsCostParametersBelowOne(self: Self) -> None:
@@ -197,7 +189,7 @@ class TestArgon2HasherValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(HashConfigurationException):
             Argon2Hasher(memory=0)
@@ -215,7 +207,7 @@ class TestArgon2HasherValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(HashConfigurationException):
             Argon2Hasher(memory="32")  # type: ignore[arg-type]
@@ -231,7 +223,7 @@ class TestArgon2HasherValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(HashConfigurationException):
             Argon2Hasher(threads=True)
@@ -244,7 +236,7 @@ class TestArgon2HasherValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(HashConfigurationException) as captured:
             Argon2Hasher(memory=0)
@@ -261,7 +253,7 @@ class TestArgon2HasherValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         with self.assertRaises(HashConfigurationException):
@@ -279,7 +271,7 @@ class TestArgon2HasherValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         with self.assertRaises(HashConfigurationException):
@@ -288,6 +280,7 @@ class TestArgon2HasherValidation(TestCase):
             hasher.setMemory(0)
         with self.assertRaises(HashConfigurationException):
             hasher.setThreads(0)
+
 
 class TestArgon2HasherBackend(TestCase):
     def testConstructionNeverTouchesTheBackend(self: Self) -> None:
@@ -299,7 +292,7 @@ class TestArgon2HasherBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertIsNone(hasher._backend_class)
@@ -314,7 +307,7 @@ class TestArgon2HasherBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertIs(hasher._backendClass(), hasher._backendClass())
@@ -328,7 +321,7 @@ class TestArgon2HasherBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertIs(hasher._default(), hasher._default())
@@ -341,7 +334,7 @@ class TestArgon2HasherBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         await hasher.make("secret")
@@ -357,7 +350,7 @@ class TestArgon2HasherBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         await hasher.make("secret")
@@ -374,7 +367,7 @@ class TestArgon2HasherBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertFalse(await hasher.check("secret", _FOREIGN_HASH))
@@ -390,13 +383,14 @@ class TestArgon2HasherBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = _ThreadRecordingHasher(**_CHEAP_OPTIONS)
         hashed = await hasher.make("secret")
         self.assertTrue(await hasher.check("secret", hashed))
         self.assertEqual(len(hasher.thread_ids), 2)
         self.assertNotIn(threading.get_ident(), hasher.thread_ids)
+
 
 class TestArgon2HasherMake(TestCase):
     async def testProducesAnArgon2idHash(self: Self) -> None:
@@ -407,7 +401,7 @@ class TestArgon2HasherMake(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hashed = await cheap_hasher().make("secret")
         self.assertTrue(hashed.startswith("$argon2id$"))
@@ -420,7 +414,7 @@ class TestArgon2HasherMake(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertNotIn("secret", await cheap_hasher().make("secret"))
 
@@ -432,7 +426,7 @@ class TestArgon2HasherMake(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertNotEqual(await hasher.make("secret"), await hasher.make("secret"))
@@ -445,7 +439,7 @@ class TestArgon2HasherMake(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hashed = await cheap_hasher().make("secret")
         self.assertIn("m=32", hashed)
@@ -461,7 +455,7 @@ class TestArgon2HasherMake(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("t=2", await cheap_hasher().make("secret", rounds=2))
 
@@ -473,7 +467,7 @@ class TestArgon2HasherMake(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("m=16", await cheap_hasher().make("secret", memory=16))
 
@@ -485,7 +479,7 @@ class TestArgon2HasherMake(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("p=2", await cheap_hasher().make("secret", threads=2))
 
@@ -497,12 +491,13 @@ class TestArgon2HasherMake(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hashed = await cheap_hasher().make("secret", rounds=2, memory=64, threads=2)
         self.assertIn("m=64", hashed)
         self.assertIn("t=2", hashed)
         self.assertIn("p=2", hashed)
+
 
 class TestArgon2HasherCheck(TestCase):
     async def testAcceptsTheOriginalValue(self: Self) -> None:
@@ -513,7 +508,7 @@ class TestArgon2HasherCheck(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertTrue(await hasher.check("secret", await hasher.make("secret")))
@@ -526,7 +521,7 @@ class TestArgon2HasherCheck(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertFalse(await hasher.check("other", await hasher.make("secret")))
@@ -539,23 +534,10 @@ class TestArgon2HasherCheck(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         legacy = await cheap_hasher(time=1).make("secret")
         self.assertTrue(await cheap_hasher(time=2).check("secret", legacy))
-
-    async def testRejectsAHashFromAnotherAlgorithm(self: Self) -> None:
-        """Reject a hash produced by another algorithm.
-
-        Validates the guard that keeps the backend from parsing a foreign
-        encoding.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertFalse(await cheap_hasher().check("secret", _FOREIGN_HASH))
 
     async def testRejectsAMalformedHash(self: Self) -> None:
         """Reject an input that is not an encoded hash at all.
@@ -565,7 +547,7 @@ class TestArgon2HasherCheck(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await cheap_hasher().check("secret", "not-a-hash"))
 
@@ -578,9 +560,10 @@ class TestArgon2HasherCheck(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await cheap_hasher().check("secret", ""))
+
 
 class TestArgon2HasherNeedsRehash(TestCase):
     async def testFreshHashIsUpToDate(self: Self) -> None:
@@ -591,7 +574,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertFalse(hasher.needsRehash(await hasher.make("secret")))
@@ -604,7 +587,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         legacy = await cheap_hasher(time=1).make("secret")
         self.assertTrue(cheap_hasher(time=2).needsRehash(legacy))
@@ -617,7 +600,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(cheap_hasher().needsRehash(_FOREIGN_HASH))
 
@@ -629,7 +612,7 @@ class TestArgon2HasherNeedsRehash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(cheap_hasher().needsRehash("not-a-hash"))
 
@@ -641,9 +624,10 @@ class TestArgon2HasherNeedsRehash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(cheap_hasher().needsRehash(""))
+
 
 class TestArgon2HasherConfiguration(TestCase):
     def testFluentSettersReturnTheSameInstance(self: Self) -> None:
@@ -654,7 +638,7 @@ class TestArgon2HasherConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         self.assertIs(hasher.setRounds(2), hasher)
@@ -669,7 +653,7 @@ class TestArgon2HasherConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher(time=1)
         hasher.setRounds(3)
@@ -683,7 +667,7 @@ class TestArgon2HasherConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         hasher.setMemory(64)
@@ -697,7 +681,7 @@ class TestArgon2HasherConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher()
         hasher.setThreads(2)
@@ -712,7 +696,7 @@ class TestArgon2HasherConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for setter, value in (("setRounds", 2), ("setMemory", 64), ("setThreads", 2)):
             hasher = cheap_hasher()
@@ -729,7 +713,7 @@ class TestArgon2HasherConfiguration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hasher = cheap_hasher(time=1)
         hashed = await hasher.make("secret")

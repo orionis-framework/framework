@@ -1,8 +1,12 @@
-"""Coordinates the session lifecycle for every HTTP request."""
+# ruff: noqa: PLC0415, SLF001, TC001, TC003
+# Retain runtime types, lazy backend selection, and session lifecycle helpers.
+"""Coordinate the session lifecycle for every HTTP request."""
 
 import re
 from datetime import UTC, datetime, timedelta
-from typing import TYPE_CHECKING
+from pathlib import Path
+import orionis.http as _http
+from orionis.session.contracts.store import ISessionStore
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.foundation.config.session.enums.drivers import SessionDriver
 from orionis.foundation.config.session.entities.session import Session as SessionConfig
@@ -11,18 +15,13 @@ from orionis.session.contracts.session import ISession
 from orionis.session.entities.record import SessionRecord
 from orionis.session.session import Session
 
-if TYPE_CHECKING:
-    from pathlib import Path
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
-    from orionis.session.contracts.store import ISessionStore
-
 _VALID_SESSION_ID = re.compile(r"[A-Za-z0-9_-]{1,255}\Z")
 """Compiled pattern used to recognize valid session id."""
 
+
 class SessionManager:
     """
-    Coordinates the session lifecycle for every HTTP request.
+    Coordinate the session lifecycle for every HTTP request.
 
     This class is a **coordinator only**.  It never stores session data,
     never interprets the session payload, and never duplicates logic that
@@ -35,8 +34,6 @@ class SessionManager:
     cache : orionis.cache.contracts.ICacheManager
         Cache manager used when the configured session store is cache-backed.
     """
-
-    # ruff: noqa: PLC0415, SLF001, TC001
 
     __slots__ = (
         "_app",
@@ -76,7 +73,7 @@ class SessionManager:
         Returns
         -------
         None
-            Initialise the manager, pre-computing all request-invariant values.
+            No return value.
         """
         self._app = app
         """The application instance."""
@@ -93,12 +90,14 @@ class SessionManager:
         """Lifetime delta produced by ``timedelta``."""
         self._renewal_delta = (
             timedelta(seconds=config.renewal_interval)
-            if config.renewal_interval else None
+            if config.renewal_interval
+            else None
         )
         """Interval used to calculate the next session renewal deadline."""
         self._renewal_window = (
             self._lifetime_delta - self._renewal_delta
-            if self._renewal_delta is not None else None
+            if self._renewal_delta is not None
+            else None
         )
         """Window during which a session becomes eligible for renewal."""
         self._track_previous_url = config.track_previous_url
@@ -118,7 +117,9 @@ class SessionManager:
         self._cookie_http_only: bool = config.http_only
         """Cookie http only obtained from ``config.http_only``."""
         self._cookie_same_site: str = getattr(
-            config.same_site, "value", config.same_site,
+            config.same_site,
+            "value",
+            config.same_site,
         )
         """Cookie same site produced by ``getattr``."""
         self._cookie_partitioned: bool = config.partitioned
@@ -138,7 +139,7 @@ class SessionManager:
         """
         return self._track_previous_url
 
-    async def start(self, request: Request) -> Session:
+    async def start(self, request: _http.Request) -> Session:
         """
         Restore or create a session for the incoming request.
 
@@ -167,7 +168,7 @@ class SessionManager:
         # the request handler.
         return session
 
-    async def save(self, response: Response, session: Session) -> None:
+    async def save(self, response: _http.Response, session: Session) -> None:
         """
         Persist the session and set the cookie on *response*.
 
@@ -186,7 +187,7 @@ class SessionManager:
         Returns
         -------
         None
-            Persist the session and set the cookie on *response*.
+            No return value.
         """
         if session.invalidated:
             await self.__invalidateSession(response, session)
@@ -195,9 +196,8 @@ class SessionManager:
         if not session.started:
             return
 
-        if (
-            self._renewal_delta is not None
-            and not session._needsPersistence(datetime.now(UTC))
+        if self._renewal_delta is not None and not session._needsPersistence(
+            datetime.now(UTC),
         ):
             return
 
@@ -223,11 +223,9 @@ class SessionManager:
         Returns
         -------
         None
-            Invalidated or superseded IDs are deleted; no new session is issued.
+            No return value.
         """
-        if session.id is not None and (
-            session.invalidated or session.wantsRegenerate
-        ):
+        if session.id is not None and (session.invalidated or session.wantsRegenerate):
             await self._store.delete(session.id)
 
     def __register(self, session: Session) -> None:
@@ -242,7 +240,7 @@ class SessionManager:
         Returns
         -------
         None
-            Register the session in the application container.
+            No return value.
         """
         # Bind the request-scoped session under its contract so any service
         # (and the Session facade) can resolve it through the container.
@@ -273,19 +271,19 @@ class SessionManager:
         """
         driver = config.driver
         if driver == SessionDriver.FILE:
-
             from orionis.session.stores.file import FileSessionStore
+
             return FileSessionStore(directory=base_path / config.files)
 
         if driver == SessionDriver.CACHE:
-
             from orionis.session.stores.cache import CacheSessionStore
+
             return CacheSessionStore(cache=cache, store=config.cache)
 
         if driver == SessionDriver.DATABASE:
-
             from orionis.orm.resolver import ConnectionResolver
             from orionis.session.stores.database import DatabaseSessionStore
+
             return DatabaseSessionStore(
                 connection=ConnectionResolver.connection(config.connection),
                 table=config.table or "sessions",
@@ -384,7 +382,7 @@ class SessionManager:
 
     async def __invalidateSession(
         self,
-        response: Response,
+        response: _http.Response,
         session: Session,
     ) -> None:
         """
@@ -400,13 +398,19 @@ class SessionManager:
         Returns
         -------
         None
-            Remove the session record and expire the cookie on *response*.
+            No return value.
         """
         if session.id is not None:
             await self._store.delete(session.id)
         self.__deleteCookie(response)
 
-    def __setCookie(self, response: Response, session_id: str) -> None:
+    def __setCookie(
+        self,
+        response: _http.Response,
+        session_id: str,
+        *,
+        expired: bool = False,
+    ) -> None:
         """
         Attach the session identifier cookie to *response*.
 
@@ -416,16 +420,19 @@ class SessionManager:
             The outgoing response.
         session_id : str
             The session identifier to embed in the cookie value.
+        expired : bool, optional
+            Whether to expire the cookie while preserving its configured policy.
 
         Returns
         -------
         None
-            Attach the session identifier cookie to *response*.
+            No return value.
         """
         response.setCookie(
             self._cookie_name,
             session_id,
-            max_age=self._cookie_max_age,
+            max_age=0 if expired else self._cookie_max_age,
+            expires=datetime(1970, 1, 1, tzinfo=UTC) if expired else None,
             path=self._cookie_path,
             domain=self._cookie_domain,
             secure=self._cookie_secure,
@@ -434,7 +441,7 @@ class SessionManager:
             partitioned=self._cookie_partitioned,
         )
 
-    def __deleteCookie(self, response: Response) -> None:
+    def __deleteCookie(self, response: _http.Response) -> None:
         """
         Set an expired cookie to instruct the browser to clear it.
 
@@ -446,10 +453,6 @@ class SessionManager:
         Returns
         -------
         None
-            Set an expired cookie to instruct the browser to clear it.
+            No return value.
         """
-        response.deleteCookie(
-            self._cookie_name,
-            path=self._cookie_path,
-            domain=self._cookie_domain,
-        )
+        self.__setCookie(response, "", expired=True)

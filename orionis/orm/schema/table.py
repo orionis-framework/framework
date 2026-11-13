@@ -1,16 +1,16 @@
+# Resolve public dataclass field and constructor annotations at runtime.
+# ruff: noqa: TC001
 """Framework-agnostic description of a database table."""
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from orionis.orm.schema.column import ColumnDefinition
+from orionis.orm.schema.constraints import (
+    CompositeForeignKey,
+    TableIndex,
+    UniqueConstraint,
+)
 
-if TYPE_CHECKING:
-    from orionis.orm.schema.column import ColumnDefinition
-    from orionis.orm.schema.constraints import (
-        CompositeForeignKey,
-        TableIndex,
-        UniqueConstraint,
-    )
 
 @dataclass(frozen=True, slots=True, eq=False)
 class TableDefinition:

@@ -1,18 +1,20 @@
 # Identities and browser authentication
 
-An identity model must implement `IAuthenticatable`. Usually combine `Model` with `Authenticatable`; add `Authorizable` for permissions, roles or tokens. Mixins avoid direct ABC inheritance, which would conflict with the ORM metaclass.
+The native identity provider requires a concrete Orionis model implementing `IAuthenticatable`. Usually combine `Model` with `Authenticatable`; add `Authorizable` for permissions, roles or tokens. Mixins avoid direct ABC inheritance, which would conflict with the ORM metaclass.
 
 ```python
 from orionis.auth import Authenticatable, Authorizable
-from orionis.orm import Integer, Model, String
+from orionis.orm import Boolean, Integer, Model, String
+
 
 class User(Model, Authenticatable, Authorizable):
     id = Integer().primary().autoIncrement()
     email = String(255).unique()
     password = String(255)
+    active = Boolean().default(True)
 ```
 
-Place it in an application module and set `AUTH_MODEL` to its path, defaulting to `app.models.user.User`. `AUTH_USERNAME` defaults to `email`. `Authenticatable` reads the key from ORM metadata and the hash from `AUTH_PASSWORD="password"`; override that class variable for another column. Persist hashes through [hashing](../../../hashing/docs/en/README.md), never submitted passwords.
+Place it in an application module and set `AUTH_MODEL` to its path, defaulting to `app.models.user.User`. `AUTH_USERNAME` defaults to `email`. `Authenticatable` reads the key from ORM metadata and the hash from `AUTH_PASSWORD="password"`; override that class variable for another column. Password login also requires `active` to be exactly `True`; missing, null, or false status denies authentication. Persist hashes through [hashing](../../../hashing/docs/en/README.md), never submitted passwords.
 
 ## Login and logout
 
@@ -20,12 +22,14 @@ Place it in an application module and set `AUTH_MODEL` to its path, defaulting t
 from orionis.http import Request, response
 from orionis.support.facades import Auth
 
+
 async def login(request: Request):
     values = await request.data()
     credentials = {"email": values.get("email"), "password": values.get("password")}
     if not await Auth.attempt(credentials):
         return response.json({"message": "Invalid credentials"}, 401)
     return response.redirect("/home", 303)
+
 
 async def logout():
     await Auth.logout()

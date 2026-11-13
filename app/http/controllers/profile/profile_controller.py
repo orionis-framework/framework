@@ -1,13 +1,16 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 from app.http.schemas.profile.change_password import ChangePasswordSchema
 from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.http import HTMLResponse, RedirectResponse
-from orionis.http.default.controllers.profile_controller import \
-    ProfileController as BaseProfileController
+from orionis.http.default.controllers.profile_controller import (
+    ProfileController as BaseProfileController,
+)
+
 
 class ProfileController(BaseProfileController):
-
     async def index(self, auth: IAuthManager) -> HTMLResponse:
         """
         Render the profile page with the authenticated account data.

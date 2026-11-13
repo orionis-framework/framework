@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Handle the built-in sign-in and sign-out endpoints."""
 
 from typing import Any
@@ -8,9 +10,8 @@ from orionis.http.base import BaseController
 from orionis.http.default.schemas.login import LoginSchema
 from orionis.http.request import Request
 
-class LoginController(BaseController):
 
-    # ruff: noqa: TC001
+class LoginController(BaseController):
     """Handle the built-in sign-in and sign-out endpoints."""
 
     HOME_REDIRECT_PATH: str = "/home"
@@ -89,18 +90,24 @@ class LoginController(BaseController):
         credentials: dict[str, Any] = await request.data()
 
         # Delegate the credential verification to the session guard.
-        authenticated: bool = await auth.attempt({
-            "email": payload.email, "password": payload.password,
-        }, remember=credentials.get("remember") == "on")
+        authenticated: bool = await auth.attempt(
+            {
+                "email": payload.email,
+                "password": payload.password,
+            },
+            remember=credentials.get("remember") == "on",
+        )
 
         # Report a generic error so existing emails are never disclosed.
         if not authenticated:
             return (
                 response.redirect(self.DEFAULT_LOGIN_PATH)
-                        .withInput(credentials)
-                        .withErrors({
-                            "email": "These credentials do not match our records.",
-                        })
+                .withInput(credentials)
+                .withErrors(
+                    {
+                        "email": "These credentials do not match our records.",
+                    },
+                )
             )
 
         # The authentication middleware emits the credential's HttpOnly cookie.

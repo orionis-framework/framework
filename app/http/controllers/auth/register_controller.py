@@ -1,13 +1,16 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 from app.http.schemas.auth.register import RegisterSchema
 from app.models.user import User
 from orionis.http import HttpResponse
-from orionis.http.default.controllers.register_controller import \
-    RegisterController as BaseRegisterController
+from orionis.http.default.controllers.register_controller import (
+    RegisterController as BaseRegisterController,
+)
 from orionis.http.request import Request
 from orionis.mail.entities.result import MailResult
 
-class RegisterController(BaseRegisterController):
 
+class RegisterController(BaseRegisterController):
     async def index(
         self,
     ) -> HttpResponse:

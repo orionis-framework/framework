@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     import argparse
     from orionis.console.args.argument import Argument
 
+
 @dataclass(kw_only=True)
 class Command(BaseEntity):
     """

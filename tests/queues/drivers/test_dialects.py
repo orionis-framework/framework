@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from sqlalchemy.dialects import mssql, mysql, oracle, postgresql, sqlite
 from orionis.database.compiler import SQLCompiler
 from orionis.orm.query.expressions import (
@@ -26,27 +28,35 @@ class TestQueueDialectPlans(TestCase):
         """
         definition = build_jobs_table("jobs")
         compiler = SQLCompiler("q_")
-        select = compiler.compileSelect(SelectPlan(
-            table=definition,
-            wheres=eligible_clauses("high", 10.25),
-            orders=[OrderClause("available_at"), OrderClause("id")],
-            limit_value=1,
-        ))
-        update = compiler.compileUpdate(UpdatePlan(
-            table=definition,
-            values={
-                "attempts": 2, "reservation_token": "owner",
-                "reserved_until": 100.25,
-            },
-            wheres=[
-                WhereClause("id", value="id"),
-                WhereClause("attempts", value=1),
-                *eligible_clauses("high", 10.25),
-            ],
-        ))
+        select = compiler.compileSelect(
+            SelectPlan(
+                table=definition,
+                wheres=eligible_clauses("high", 10.25),
+                orders=[OrderClause("available_at"), OrderClause("id")],
+                limit_value=1,
+            ),
+        )
+        update = compiler.compileUpdate(
+            UpdatePlan(
+                table=definition,
+                values={
+                    "attempts": 2,
+                    "reservation_token": "owner",
+                    "reserved_until": 100.25,
+                },
+                wheres=[
+                    WhereClause("id", value="id"),
+                    WhereClause("attempts", value=1),
+                    *eligible_clauses("high", 10.25),
+                ],
+            ),
+        )
         for dialect in (
-            sqlite.dialect(), mysql.dialect(), postgresql.dialect(),
-            oracle.dialect(), mssql.dialect(),
+            sqlite.dialect(),
+            mysql.dialect(),
+            postgresql.dialect(),
+            oracle.dialect(),
+            mssql.dialect(),
         ):
             selected = str(select.compile(dialect=dialect)).lower()
             claimed = str(update.compile(dialect=dialect)).lower()
@@ -69,12 +79,16 @@ class TestQueueDialectPlans(TestCase):
         """
         compiler = SQLCompiler("q_")
         for definition in (
-            build_jobs_table("jobs"), build_failed_jobs_table("failed_jobs"),
+            build_jobs_table("jobs"),
+            build_failed_jobs_table("failed_jobs"),
         ):
             statement = compiler.compileCreateTable(definition)
             for dialect in (
-                sqlite.dialect(), mysql.dialect(), postgresql.dialect(),
-                oracle.dialect(), mssql.dialect(),
+                sqlite.dialect(),
+                mysql.dialect(),
+                postgresql.dialect(),
+                oracle.dialect(),
+                mssql.dialect(),
             ):
                 compiled = str(statement.compile(dialect=dialect)).lower()
                 self.assertIn(f"q_{definition.name}", compiled)

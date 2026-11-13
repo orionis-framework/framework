@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import fields, is_dataclass
 from orionis.console.entities.scheduler_event import SchedulerEvent
@@ -5,8 +7,8 @@ from orionis.console.enums.events import SchedulerEvent as SchedulerEventEnum
 from orionis.support.entities.base import BaseEntity
 from orionis.test import TestCase
 
-class TestSchedulerEventEntity(TestCase):
 
+class TestSchedulerEventEntity(TestCase):
     # ------------------------------------------------------------------ #
     #  Inheritance & type                                                #
     # ------------------------------------------------------------------ #

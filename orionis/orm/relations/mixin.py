@@ -1,14 +1,14 @@
+# ruff: noqa: ANN401, PLR0913
+# Preserve heterogeneous relation values, explicit keys, and runtime model types.
 """Relationship factories and loaded-relation storage for every model."""
 
-from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+import orionis.orm as _orm
+from typing import Any
 from orionis.orm.relations.belongs_to import BelongsToRelation
 from orionis.orm.relations.belongs_to_many import BelongsToManyRelation
 from orionis.orm.relations.has_many import HasManyRelation
 from orionis.orm.relations.has_one import HasOneRelation
 
-if TYPE_CHECKING:
-    from orionis.orm.model import Model
 
 class RelationsMixin:
     """
@@ -42,7 +42,7 @@ class RelationsMixin:
 
     # ── Relationship factories ──────────────────────────────────────────────
 
-    def hasOne[TRelated: "Model"](
+    def hasOne[TRelated: _orm.Model](
         self,
         related: type[TRelated],
         foreign_key: str | None = None,
@@ -69,7 +69,7 @@ class RelationsMixin:
         """
         return HasOneRelation(self, related, foreign_key, local_key)
 
-    def hasMany[TRelated: "Model"](
+    def hasMany[TRelated: _orm.Model](
         self,
         related: type[TRelated],
         foreign_key: str | None = None,
@@ -96,7 +96,7 @@ class RelationsMixin:
         """
         return HasManyRelation(self, related, foreign_key, local_key)
 
-    def belongsTo[TRelated: "Model"](
+    def belongsTo[TRelated: _orm.Model](
         self,
         related: type[TRelated],
         foreign_key: str | None = None,
@@ -123,7 +123,7 @@ class RelationsMixin:
         """
         return BelongsToRelation(self, related, foreign_key, owner_key)
 
-    def belongsToMany[TRelated: "Model"](  # noqa: PLR0913
+    def belongsToMany[TRelated: _orm.Model](
         self,
         related: type[TRelated],
         table: str | None = None,
@@ -173,7 +173,7 @@ class RelationsMixin:
 
     # ── Loaded relation storage ──────────────────────────────────────────────
 
-    def setRelation(self, name: str, value: Any) -> Model:  # noqa: ANN401
+    def setRelation(self, name: str, value: Any) -> _orm.Model:
         """
         Store an already-resolved relationship result.
 
@@ -193,7 +193,7 @@ class RelationsMixin:
         self._relations[name] = value
         return self
 
-    def getRelation(self, name: str, default: Any = None) -> Any:  # noqa: ANN401
+    def getRelation(self, name: str, default: Any = None) -> Any:
         """
         Return an already-resolved relationship result.
 

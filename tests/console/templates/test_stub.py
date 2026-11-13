@@ -1,9 +1,12 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Barrier
 from orionis.console.templates.stub import Stub
 from orionis.test import TestCase
+
 
 def _create_stub_at_barrier(
     output: Path,
@@ -29,6 +32,7 @@ def _create_stub_at_barrier(
         return Stub("console_command", "sample", postfix="Command").create(output)
     except FileExistsError as error:
         return error
+
 
 class TestStub(TestCase):
     """Verify console stub generation and validation behavior."""
@@ -175,6 +179,30 @@ class TestStub(TestCase):
 
             self.assertEqual(target.read_text(encoding="utf-8"), "original")
 
+    def testKeywordsCannotProduceInvalidPythonComponents(self) -> None:
+        """
+        Reject keyword class and module names before creating output paths.
+
+        Returns
+        -------
+        None
+            Preserve validation on repeated use without leaving generated files.
+        """
+        for name in ("None", "True", "for", "class/service"):
+            with self.subTest(name=name), TemporaryDirectory() as temporary:
+                output = Path(temporary) / "generated"
+                stub = Stub("service", name)
+                for _ in range(2):
+                    with self.assertRaises(ValueError):
+                        stub.create(output)
+                self.assertFalse(output.exists())
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            path = Stub("service", "for", postfix="Service").create(output)
+            source = Path(path).read_text(encoding="utf-8")
+            compile(source, path, "exec")
+            self.assertIn("class ForService", source)
+
     def testConcurrentCreatesAllowOnlyOneWriter(self) -> None:
         """Allow only one of two simultaneous writers to create the file.
 
@@ -195,8 +223,7 @@ class TestStub(TestCase):
 
             created = [result for result in results if isinstance(result, str)]
             rejected = [
-                result for result in results
-                if isinstance(result, FileExistsError)
+                result for result in results if isinstance(result, FileExistsError)
             ]
             self.assertEqual(len(created), 1)
             self.assertEqual(len(rejected), 1)
@@ -210,8 +237,11 @@ class TestStub(TestCase):
         None
             Assertions verify that missing templates raise ``FileNotFoundError``.
         """
-        with TemporaryDirectory() as temporary, self.assertRaises(
-            FileNotFoundError,
+        with (
+            TemporaryDirectory() as temporary,
+            self.assertRaises(
+                FileNotFoundError,
+            ),
         ):
             Stub("missing", "sample").create(Path(temporary))
 

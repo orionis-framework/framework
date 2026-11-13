@@ -1,19 +1,19 @@
+# ruff: noqa: PLR0911, TC001
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Store expiring token digests and rotate them on persistent login."""
 
 import re
 import secrets
 import time
-from typing import TYPE_CHECKING
 from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.exceptions import AuthException
 from orionis.auth.tokens.functions import hash_token_secret
 from orionis.foundation.config.auth.entities.remember import RememberAuth
 from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
+import orionis.http as _http
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+
 
 _MAX_COOKIE_LENGTH = 512
 """Max cookie length value used by ``remember``."""
@@ -22,10 +22,9 @@ _COOKIE_STATE = "_auth_remember_cookie"
 _COOKIE_PATTERN = re.compile(r"(.{1,255})\|(\d{1,12})\|([A-Za-z0-9_-]{43})")
 """Compiled pattern used to recognize cookie pattern."""
 
+
 class RememberMe:
     """Store expiring token digests and rotate them on persistent login."""
-
-    # ruff: noqa: TC001, PLR0911 (Dependency injection and fail-closed validation)
 
     # Load remember-me settings and retain the stateless identity provider.
     def __init__(self, app: IApplication, identities: IIdentityProvider) -> None:
@@ -42,7 +41,7 @@ class RememberMe:
         Returns
         -------
         None
-            Settings and the identity provider are retained on the instance.
+            No return value.
 
         Raises
         ------
@@ -81,7 +80,7 @@ class RememberMe:
         return f"v1:{expiry}:{digest}"
 
     # Store cookie changes until the response can emit a Set-Cookie header.
-    def _queue(self, request: Request, value: str, max_age: int) -> None:
+    def _queue(self, request: _http.Request, value: str, max_age: int) -> None:
         """
         Queue a cookie change on the current request.
 
@@ -97,21 +96,25 @@ class RememberMe:
         Returns
         -------
         None
-            Cookie attributes are stored on the request state.
+            No return value.
         """
-        setattr(request.state, _COOKIE_STATE, {
-            "key": self.settings.cookie,
-            "value": value,
-            "max_age": max_age,
-            "expires": 0 if max_age == 0 else None,
-            "path": "/",
-            "http_only": True,
-            "secure": self.settings.secure,
-            "same_site": "lax",
-        })
+        setattr(
+            request.state,
+            _COOKIE_STATE,
+            {
+                "key": self.settings.cookie,
+                "value": value,
+                "max_age": max_age,
+                "expires": 0 if max_age == 0 else None,
+                "path": "/",
+                "http_only": True,
+                "secure": self.settings.secure,
+                "same_site": "lax",
+            },
+        )
 
     # Queue expiration of this browser's credential without changing others.
-    def clearCookie(self, request: Request) -> None:
+    def clearCookie(self, request: _http.Request) -> None:
         """
         Queue expiration of the current browser's persistent credential.
 
@@ -123,12 +126,12 @@ class RememberMe:
         Returns
         -------
         None
-            An expired cookie is queued on the request state.
+            No return value.
         """
         self._queue(request, "", 0)
 
     # Replace the stored credential only after the caller verifies a password.
-    async def issue(self, request: Request, identity: IAuthenticatable) -> None:
+    async def issue(self, request: _http.Request, identity: IAuthenticatable) -> None:
         """
         Issue a persistent credential after password verification.
 
@@ -142,7 +145,7 @@ class RememberMe:
         Returns
         -------
         None
-            The stored token is updated and its cookie is queued.
+            No return value.
 
         Raises
         ------
@@ -150,20 +153,18 @@ class RememberMe:
             If HTTPS is required but unavailable, or token persistence fails.
         """
         if self.settings.secure and getattr(request, "scheme", "") != "https":
-            error_msg = (
-                "Remember-me requires HTTPS with auth.remember.secure=True."
-            )
+            error_msg = "Remember-me requires HTTPS with auth.remember.secure=True."
             raise AuthException(error_msg)
         expiry = int(time.time()) + self.settings.lifetime * 60
         cookie = self._generate(identity, expiry)
         stored = self._stored(cookie, identity, expiry)
         updated = await self.identities.updateRememberToken(
-            identity, getattr(identity, "remember_token", None), stored,
+            identity,
+            getattr(identity, "remember_token", None),
+            stored,
         )
         if not updated:
-            error_msg = (
-                "The identity provider could not persist a remembered login."
-            )
+            error_msg = "The identity provider could not persist a remembered login."
             raise AuthException(error_msg)
         self._queue(request, cookie, self.settings.lifetime * 60)
 
@@ -188,7 +189,7 @@ class RememberMe:
         return f"{identity.getAuthIdentifier()}|{expiry}|{secrets.token_urlsafe(32)}"
 
     # Validate and rotate a presented credential without extending its deadline.
-    async def restore(self, request: Request) -> IAuthenticatable | None:
+    async def restore(self, request: _http.Request) -> IAuthenticatable | None:
         """
         Restore an identity by validating and rotating its cookie.
 
@@ -210,7 +211,8 @@ class RememberMe:
             return None
         match = (
             _COOKIE_PATTERN.fullmatch(cookie)
-            if len(cookie) <= _MAX_COOKIE_LENGTH else None
+            if len(cookie) <= _MAX_COOKIE_LENGTH
+            else None
         )
         if match is None:
             self.clearCookie(request)
@@ -226,14 +228,18 @@ class RememberMe:
             return None
         stored = getattr(identity, "remember_token", None)
         expected = self._stored(cookie, identity, expiry)
-        if not isinstance(stored, str) or not secrets.compare_digest(
-            stored.encode("utf-8"), expected.encode("ascii"),
+        if (
+            not isinstance(stored, str)
+            or not stored.isascii()
+            or not secrets.compare_digest(stored, expected)
         ):
             return None
         # Keep the original deadline. Browsing cannot extend it indefinitely.
         replacement = self._generate(identity, expiry)
         rotated = await self.identities.updateRememberToken(
-            identity, stored, self._stored(replacement, identity, expiry),
+            identity,
+            stored,
+            self._stored(replacement, identity, expiry),
         )
         if not rotated:
             # Another request may have won. Do not clear its replacement cookie.
@@ -246,7 +252,7 @@ class RememberMe:
         return identity
 
     # Revoke the identity's token before queuing removal of the browser cookie.
-    async def revoke(self, request: Request, identifier: object) -> None:
+    async def revoke(self, request: _http.Request, identifier: object) -> None:
         """
         Revoke a remembered credential and clear the browser cookie.
 
@@ -260,7 +266,7 @@ class RememberMe:
         Returns
         -------
         None
-            The server-side token is revoked when its identity still exists.
+            No return value.
         """
         if identifier is not None:
             identity = await self.identities.retrieveById(identifier)
@@ -269,7 +275,7 @@ class RememberMe:
         self.clearCookie(request)
 
     # Disable persistent login for an identity already verified by the caller.
-    async def forget(self, request: Request, identity: IAuthenticatable) -> None:
+    async def forget(self, request: _http.Request, identity: IAuthenticatable) -> None:
         """
         Forget an identity's persistent credential.
 
@@ -283,15 +289,16 @@ class RememberMe:
         Returns
         -------
         None
-            The server-side token is cleared when present and the cookie expires.
+            No return value.
         """
         stored = getattr(identity, "remember_token", None)
         if stored is not None:
             await self.identities.updateRememberToken(identity, stored, None)
         self.clearCookie(request)
 
+
 # Apply pending remember-cookie changes to the outgoing web response.
-def apply_remember_cookie(request: Request, response: Response) -> None:
+def apply_remember_cookie(request: _http.Request, response: _http.Response) -> None:
     """
     Apply a queued remember-cookie change to the outgoing response.
 
@@ -305,7 +312,7 @@ def apply_remember_cookie(request: Request, response: Response) -> None:
     Returns
     -------
     None
-        The response is updated only when a cookie change is pending.
+        No return value.
     """
     cookie = getattr(request.state, _COOKIE_STATE, None)
     if cookie is not None:

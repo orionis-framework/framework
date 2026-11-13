@@ -21,23 +21,32 @@ Este programa crea datos únicamente en memoria. Los valores del usuario se enla
 
 ```python
 import asyncio
+
 from orionis.database import Connection
 
 
 async def main() -> None:
+    """Create and query an isolated in-memory database."""
+
     db = Connection("docs", {"driver": "sqlite", "database": ":memory:"})
+
     try:
         await db.statement(
             "CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT NOT NULL)"
         )
+
         affected = await db.execute(
             "INSERT INTO notes (body) VALUES (:body)", {"body": "Hello"}
         )
+
         rows = await db.select(
             "SELECT id, body FROM notes WHERE body = :body", {"body": "Hello"}
         )
+
         assert affected == 1
+
         assert rows == [{"id": 1, "body": "Hello"}]
+
     finally:
         await db.disconnect()
 
@@ -55,15 +64,21 @@ Tras el arranque, utiliza la facade; no construyas y desconectes una conexión e
 from orionis.support.facades import DB
 
 
-async def find_note(body: str):
+async def find_note(body: str) -> dict[str, object] | None:
+    """Find the first note matching the supplied body."""
+
     return await DB.table("notes").where("body", body).first()
 
 
-async def count_notes():
+async def count_notes() -> list[dict[str, object]]:
+    """Return the note count as a materialized result row."""
+
     return await DB.select("SELECT COUNT(*) AS total FROM notes")
 ```
 
 `DB.connection("reporting")` devuelve un gateway nuevo. `DB.connection("reporting").table("notes")` dirige esa consulta a la conexión registrada; no cambia la conexión de otros consumidores. El gestor ofrece `connection(name)`, `hasConnection(name)`, `configFor(name)`, `addConnection(name, config)` y `setDefaultName(name)`. Cambiar el predeterminado sí afecta a futuros consumidores sin selección explícita: hazlo durante configuración, no como mecanismo de aislamiento por petición.
+
+Los nombres registrados conservan sus mayúsculas y minúsculas. La selección predeterminada busca primero el nombre exacto; si no existe, conserva el fallback histórico a minúsculas (por ejemplo, `SQLITE` puede seleccionar `sqlite`). Las resoluciones concurrentes del gestor publican un único objeto por nombre configurado; esto no convierte una conexión asíncrona en un recurso compartible entre bucles de eventos.
 
 ## Valores de configuración y fallos frecuentes
 

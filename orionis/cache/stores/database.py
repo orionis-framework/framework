@@ -1,20 +1,26 @@
-"""Cache backend that stores entries in a relational database table."""
+# ruff: noqa: ANN401, PLC0415, TC001
+# Preserve arbitrary cache payload types and defer failure-runtime imports.
+# Expose connection annotations to runtime dependency reflection.
+"""Store cache entries and atomic lock owners in relational tables."""
 
 from __future__ import annotations
 import asyncio
 import time
-from typing import TYPE_CHECKING, Any
+from typing import Any
 import msgspec
 import msgspec.json as _msgjson
 from orionis.database.exceptions import QueryException
+from orionis.database.contracts.connection import IConnection
 from orionis.orm.query.expressions import (
-    DeletePlan, InsertPlan, SelectPlan, UpdatePlan, WhereClause, WhereType,
+    DeletePlan,
+    InsertPlan,
+    SelectPlan,
+    UpdatePlan,
+    WhereClause,
+    WhereType,
 )
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Double, String, Text
-
-if TYPE_CHECKING:
-    from orionis.database.contracts.connection import IConnection
 
 # Sentinel object to distinguish "key not found" from a stored None value.
 _MISSING = object()
@@ -27,6 +33,7 @@ _DEFAULT_LOCK_TABLE = "cache_locks"
 # Compare-and-swap rounds allowed before an increment gives up on contention.
 _INCREMENT_ATTEMPTS = 25
 """Compare-and-swap rounds allowed before an increment gives up on contention."""
+
 
 def _build_entries_table(table: str) -> TableDefinition:
     """
@@ -64,6 +71,7 @@ def _build_entries_table(table: str) -> TableDefinition:
         primary_key="cache_key",
     )
 
+
 def _build_locks_table(table: str) -> TableDefinition:
     """
     Build the table definition for the atomic-locks table.
@@ -99,6 +107,7 @@ def _build_locks_table(table: str) -> TableDefinition:
         primary_key="cache_key",
     )
 
+
 class DatabaseCacheBackend:
     """
     Cache backend that stores entries in a relational database table.
@@ -111,11 +120,14 @@ class DatabaseCacheBackend:
     require Redis or Memcached to support locking.
     """
 
-    # ruff: noqa: ANN401, PLC0415
-
     __slots__ = (
-        "_connection", "_entry_definition", "_lock_definition", "_lock_table",
-        "_ready", "_ready_lock", "_table",
+        "_connection",
+        "_entry_definition",
+        "_lock_definition",
+        "_lock_table",
+        "_ready",
+        "_ready_lock",
+        "_table",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -141,7 +153,7 @@ class DatabaseCacheBackend:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         if not connection.supportsUniqueConstraints():
             message = (
@@ -176,7 +188,7 @@ class DatabaseCacheBackend:
         Returns
         -------
         None
-            Create missing tables from the definitions used by this backend.
+            No return value.
 
         Raises
         ------
@@ -192,7 +204,7 @@ class DatabaseCacheBackend:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         if self._ready:
             return
@@ -242,6 +254,7 @@ class DatabaseCacheBackend:
             return _msgjson.decode(data)
         except msgspec.DecodeError as error:
             from orionis.failure.runtime import capture_nowait
+
             capture_nowait(
                 error,
                 flow="cache",
@@ -285,7 +298,15 @@ class DatabaseCacheBackend:
         row = rows[0]
         expiration = row.get("expiration")
         if expiration is not None and time.time() >= expiration:
-            await self.delete(key)
+            await self._connection.delete(
+                DeletePlan(
+                    table=self._entry_definition,
+                    wheres=[
+                        WhereClause("cache_key", value=key),
+                        WhereClause("expiration", operator="<=", value=time.time()),
+                    ],
+                ),
+            )
             return default
 
         return self.__decode(row.get("cache_value"))
@@ -311,6 +332,11 @@ class DatabaseCacheBackend:
         -------
         bool
             Always True.
+
+        Raises
+        ------
+        orionis.database.exceptions.QueryException
+            If the row cannot be inserted or updated.
         """
         await self._ensureSchema()
         encoded = self.__encode(value)
@@ -348,28 +374,34 @@ class DatabaseCacheBackend:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         try:
             await self._connection.insert(
                 InsertPlan(
                     table=self._entry_definition,
-                    values=[{
-                        "cache_key": key, "cache_value": encoded,
-                        "expiration": expiration,
-                    }],
+                    values=[
+                        {
+                            "cache_key": key,
+                            "cache_value": encoded,
+                            "expiration": expiration,
+                        },
+                    ],
                 ),
             )
         except QueryException as error:
             # Another writer inserted the row first; retry as an update.
-            await self._connection.update(
+            updated = await self._connection.update(
                 UpdatePlan(
                     table=self._entry_definition,
                     values={"cache_value": encoded, "expiration": expiration},
                     wheres=[WhereClause("cache_key", value=key)],
                 ),
             )
+            if not updated:
+                raise
             from orionis.failure.runtime import capture
+
             await capture(
                 error,
                 flow="cache",
@@ -407,12 +439,19 @@ class DatabaseCacheBackend:
                 },
                 wheres=[
                     WhereClause("cache_key", value=key),
-                    WhereClause("", where_type=WhereType.NESTED, value=[
-                        WhereClause("expiration", where_type=WhereType.NULL),
-                        WhereClause(
-                            "expiration", operator=">", value=now, boolean="or",
-                        ),
-                    ]),
+                    WhereClause(
+                        "",
+                        where_type=WhereType.NESTED,
+                        value=[
+                            WhereClause("expiration", where_type=WhereType.NULL),
+                            WhereClause(
+                                "expiration",
+                                operator=">",
+                                value=now,
+                                boolean="or",
+                            ),
+                        ],
+                    ),
                 ],
             ),
         )
@@ -483,7 +522,7 @@ class DatabaseCacheBackend:
         Returns
         -------
         list[typing.Any]
-            Cached values in key order, with None for missing or expired entries.
+            Cached values in key order, using the supplied default for misses.
         """
         return [await self.get(k, default) for k in keys]
 
@@ -564,10 +603,13 @@ class DatabaseCacheBackend:
             await self._connection.insert(
                 InsertPlan(
                     table=self._entry_definition,
-                    values=[{
-                        "cache_key": key, "cache_value": self.__encode(value),
-                        "expiration": expiration,
-                    }],
+                    values=[
+                        {
+                            "cache_key": key,
+                            "cache_value": self.__encode(value),
+                            "expiration": expiration,
+                        },
+                    ],
                 ),
             )
         except QueryException as exc:
@@ -694,6 +736,11 @@ class DatabaseCacheBackend:
         -------
         bool
             True when the lock was acquired.
+
+        Raises
+        ------
+        orionis.database.exceptions.QueryException
+            If insertion fails without an existing competing lock row.
         """
         await self._ensureSchema()
         now = time.time()
@@ -702,9 +749,13 @@ class DatabaseCacheBackend:
             await self._connection.insert(
                 InsertPlan(
                     table=self._lock_definition,
-                    values=[{
-                        "cache_key": key, "owner": owner, "expiration": expiration,
-                    }],
+                    values=[
+                        {
+                            "cache_key": key,
+                            "owner": owner,
+                            "expiration": expiration,
+                        },
+                    ],
                 ),
             )
         except QueryException as error:
@@ -714,16 +765,34 @@ class DatabaseCacheBackend:
                     values={"owner": owner, "expiration": expiration},
                     wheres=[
                         WhereClause("cache_key", value=key),
-                        WhereClause("", where_type=WhereType.NESTED, value=[
-                            WhereClause("owner", value=owner),
-                            WhereClause(
-                                "expiration", operator="<=", value=now, boolean="or",
-                            ),
-                        ]),
+                        WhereClause(
+                            "",
+                            where_type=WhereType.NESTED,
+                            value=[
+                                WhereClause("owner", value=owner),
+                                WhereClause(
+                                    "expiration",
+                                    operator="<=",
+                                    value=now,
+                                    boolean="or",
+                                ),
+                            ],
+                        ),
                     ],
                 ),
             )
+            if not updated:
+                rows = await self._connection.select(
+                    SelectPlan(
+                        table=self._lock_definition,
+                        columns=("cache_key",),
+                        wheres=[WhereClause("cache_key", value=key)],
+                    ),
+                )
+                if not rows:
+                    raise
             from orionis.failure.runtime import capture
+
             await capture(
                 error,
                 flow="cache",
@@ -748,7 +817,7 @@ class DatabaseCacheBackend:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         await self._connection.delete(
             DeletePlan(

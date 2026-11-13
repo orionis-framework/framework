@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import re
 from contextlib import redirect_stdout
 from io import StringIO
@@ -26,6 +28,7 @@ _COMMANDS = (
     BootstrapLifespanCommand,
 )
 _ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*m")
+
 
 class TestBootstrapOutput(IsolatedAsyncioTestCase):
     """Verify aligned action rows without duplicate console severity badges."""
@@ -100,7 +103,8 @@ class TestBootstrapOutput(IsolatedAsyncioTestCase):
         output = StringIO()
         with (
             patch.object(
-                command, "_execute",
+                command,
+                "_execute",
                 return_value=[("EXISTS", resource) for resource in resources],
             ),
             redirect_stdout(output),
@@ -111,8 +115,7 @@ class TestBootstrapOutput(IsolatedAsyncioTestCase):
         self.assertEqual(result, 0)
         self.assertEqual(
             _ANSI_ESCAPE.sub("", output.getvalue()),
-            "\n" + "".join(f"  EXISTS   {resource}\n" for resource in resources)
-            + "\n",
+            "\n" + "".join(f"  EXISTS   {resource}\n" for resource in resources) + "\n",
         )
 
     async def testFailuresKeepNativeErrorReporting(self) -> None:
@@ -142,7 +145,8 @@ class TestBootstrapOutput(IsolatedAsyncioTestCase):
                 text = _ANSI_ESCAPE.sub("", output.getvalue())
                 self.assertEqual(result, 1)
                 report.assert_called_once_with(
-                    f"{command.signature}: {error_msg}", timestamp=False,
+                    f"{command.signature}: {error_msg}",
+                    timestamp=False,
                 )
                 self.assertIn("ERROR", text)
                 self.assertIn(error_msg, text)

@@ -42,25 +42,32 @@ __all__ = [
     "TokenException",
 ]
 
+_EXCEPTIONS_MODULE = "orionis.auth.exceptions"
+"""Locate the shared module defining authentication failures."""
+
 _EXPORTS = {
     "AccessToken": ("orionis.auth.entities.access_token", "AccessToken"),
-    "AuthConfigurationException": ("orionis.auth.exceptions", "AuthConfigurationException"),  # NOSONAR
-    "AuthException": ("orionis.auth.exceptions", "AuthException"),
+    "AuthConfigurationException": (_EXCEPTIONS_MODULE, "AuthConfigurationException"),
+    "AuthException": (_EXCEPTIONS_MODULE, "AuthException"),
     "Authenticatable": ("orionis.auth.concerns.authenticatable", "Authenticatable"),
     "AuthenticationContext": ("orionis.auth.context.context", "AuthenticationContext"),
-    "AuthenticationException": ("orionis.auth.exceptions", "AuthenticationException"),
+    "AuthenticationException": (_EXCEPTIONS_MODULE, "AuthenticationException"),
     "Authorizable": ("orionis.auth.concerns.authorizable", "Authorizable"),
-    "AuthorizationException": ("orionis.auth.exceptions", "AuthorizationException"),
-    "AuthorizationSnapshot": ("orionis.auth.authorization.snapshot", "AuthorizationSnapshot"),
-    "GuardNotFoundException": ("orionis.auth.exceptions", "GuardNotFoundException"),
-    "IdentityProviderException": ("orionis.auth.exceptions", "IdentityProviderException"),
+    "AuthorizationException": (_EXCEPTIONS_MODULE, "AuthorizationException"),
+    "AuthorizationSnapshot": (
+        "orionis.auth.authorization.snapshot",
+        "AuthorizationSnapshot",
+    ),
+    "GuardNotFoundException": (_EXCEPTIONS_MODULE, "GuardNotFoundException"),
+    "IdentityProviderException": (_EXCEPTIONS_MODULE, "IdentityProviderException"),
     "MustVerifyEmail": ("orionis.auth.concerns.must_verify_email", "MustVerifyEmail"),
     "NewAccessToken": ("orionis.auth.entities.new_access_token", "NewAccessToken"),
     "Policy": ("orionis.auth.authorization.policy", "Policy"),
-    "PolicyNotFoundException": ("orionis.auth.exceptions", "PolicyNotFoundException"),
-    "TokenException": ("orionis.auth.exceptions", "TokenException"),
+    "PolicyNotFoundException": (_EXCEPTIONS_MODULE, "PolicyNotFoundException"),
+    "TokenException": (_EXCEPTIONS_MODULE, "TokenException"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -82,6 +89,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

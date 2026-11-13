@@ -1,3 +1,7 @@
+# ruff: noqa: ANN401, BLE001, PLC0415, PLR0913, SLF001
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Keep established public and external protocol names and signatures.
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Configure the container and serve requests within one worker event loop."""
 
 from __future__ import annotations
@@ -25,7 +29,11 @@ from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.failure.contracts.handler import IBaseExceptionHandler
 from orionis.failure.runtime import (
-    _handler_dependencies, _reporting, capture, operation, prepare,
+    _handler_dependencies,
+    _reporting,
+    capture,
+    operation,
+    prepare,
 )
 from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.core_config import get_core_config_mapping
@@ -83,6 +91,7 @@ Error text for not configured: ``Application configuration is not initialized.
 Please call create() first.``.
 """
 
+
 @lru_cache(maxsize=_CONFIG_KEY_CACHE_SIZE)
 def _parse_config_key(key: str) -> tuple[str, ...]:
     """
@@ -99,6 +108,7 @@ def _parse_config_key(key: str) -> tuple[str, ...]:
         Cached components independent of application configuration values.
     """
     return tuple(key.split("."))
+
 
 def _create_http_handler_task(
     loop: asyncio.AbstractEventLoop,
@@ -120,12 +130,17 @@ def _create_http_handler_task(
         Scheduled handler, started eagerly only on a native loop without a
         custom task factory.
     """
-    if (
-        type(loop).create_task is asyncio.BaseEventLoop.create_task
-        and loop.get_task_factory() is None
-    ):
-        return loop.create_task(coroutine, eager_start=True)
-    return loop.create_task(coroutine)
+    try:
+        if (
+            type(loop).create_task is asyncio.BaseEventLoop.create_task
+            and loop.get_task_factory() is None
+        ):
+            return loop.create_task(coroutine, eager_start=True)
+        return loop.create_task(coroutine)
+    except BaseException:
+        coroutine.close()
+        raise
+
 
 async def _asgi_receive_dispatcher(
     receive: Callable[[], Awaitable[dict[str, Any]]],
@@ -165,6 +180,7 @@ async def _asgi_receive_dispatcher(
         handler_task.cancel()
         raise
 
+
 async def _rsgi_disconnect_watcher(
     protocol: HTTPProtocol,
     handler_task: asyncio.Task,
@@ -193,6 +209,7 @@ async def _rsgi_disconnect_watcher(
         handler_task.cancel()
         raise
     return handler_task.cancel("client_disconnect")
+
 
 async def _await_http_tasks(
     handler_task: asyncio.Task,
@@ -262,6 +279,57 @@ async def _await_http_tasks(
             if primary_error is None and not parent_task.cancelling():
                 raise
 
+
+async def _monitor_http_handler(
+    loop: asyncio.AbstractEventLoop,
+    handler_task: asyncio.Task,
+    monitor: Coroutine,
+    transport: str,
+) -> Any:
+    """
+    Admit a disconnect monitor or roll back the already admitted handler.
+
+    Parameters
+    ----------
+    loop : asyncio.AbstractEventLoop
+        Loop owning both request tasks.
+    handler_task : asyncio.Task
+        Already admitted kernel handler.
+    monitor : collections.abc.Coroutine
+        Disconnect monitor awaiting admission.
+    transport : str
+        Transport identifier for cleanup diagnostics.
+
+    Returns
+    -------
+    typing.Any
+        Handler result after normal monitor admission.
+
+    Raises
+    ------
+    BaseException
+        Original admission or request failure after owned cleanup.
+    """
+    try:
+        disconnect_task = loop.create_task(monitor)
+    except BaseException:
+        monitor.close()
+        handler_task.cancel()
+        outcomes = await complete_on_cancel(
+            asyncio.gather(handler_task, return_exceptions=True),
+        )
+        for error in outcomes:
+            if isinstance(error, Exception):
+                await capture(
+                    error,
+                    flow="http",
+                    phase="cleanup",
+                    metadata={"transport": transport},
+                )
+        raise
+    return await _await_http_tasks(handler_task, disconnect_task, transport)
+
+
 def _retire_shared_runtime(
     runtime: FailureRuntime | None,
     owner: object | None,
@@ -286,6 +354,7 @@ def _retire_shared_runtime(
     if owner is not None:
         runtime.deactivate(owner)
     return True
+
 
 class Application(Container, IApplication):
     """
@@ -363,8 +432,6 @@ class Application(Container, IApplication):
     _Application__initialized
         Mark the Application as initialized to enforce singleton behavior.
     """
-
-    # ruff: noqa: SLF001, ANN401, BLE001, PLC0415, PLR0913
 
     # --- ASGI Application Handling ---
 
@@ -449,8 +516,11 @@ class Application(Container, IApplication):
             started = True
 
     async def __handleLifespanEvent(
-        self: Self, event: Lifespan,
-        send: Callable[[dict], Awaitable[None]], *, started: bool,
+        self: Self,
+        event: Lifespan,
+        send: Callable[[dict], Awaitable[None]],
+        *,
+        started: bool,
     ) -> bool:
         """
         Process one ASGI lifespan event and report its outcome.
@@ -485,7 +555,9 @@ class Application(Container, IApplication):
                     self._failure_runtime.deactivate(_HTTP_FAILURE_OWNER)
 
     async def __runLifespanEvent(
-        self: Self, event: Lifespan, send: Callable[[dict], Awaitable[None]],
+        self: Self,
+        event: Lifespan,
+        send: Callable[[dict], Awaitable[None]],
     ) -> None:
         """
         Run lifespan callbacks and acknowledge successful completion.
@@ -513,13 +585,18 @@ class Application(Container, IApplication):
                     failure_runtime.activate(_HTTP_FAILURE_OWNER)
                 return
         else:
-            await complete_on_cancel(self.__onShutdown(
-                runtime=Runtime.HTTP, owner_task=asyncio.current_task(),
-            ))
+            await complete_on_cancel(
+                self.__onShutdown(
+                    runtime=Runtime.HTTP,
+                    owner_task=asyncio.current_task(),
+                ),
+            )
         await send({"type": f"{event.value}.complete"})
 
     async def __sendLifespanFailure(
-        self: Self, event: Lifespan, send: Callable[[dict], Awaitable[None]],
+        self: Self,
+        event: Lifespan,
+        send: Callable[[dict], Awaitable[None]],
         error: Exception,
     ) -> bool:
         """
@@ -541,7 +618,9 @@ class Application(Container, IApplication):
             separately so the caller can propagate the original lifecycle error.
         """
         await capture(
-            error, app=self, flow="lifecycle",
+            error,
+            app=self,
+            flow="lifecycle",
             phase="startup" if event is Lifespan.STARTUP else "shutdown",
         )
         try:
@@ -605,13 +684,18 @@ class Application(Container, IApplication):
                 )
                 if handler_task.done():
                     return handler_task.result()
-                dispatcher_task = loop.create_task(
+                return await _monitor_http_handler(
+                    loop,
+                    handler_task,
                     _asgi_receive_dispatcher(receive, request_queue, handler_task),
+                    "asgi",
                 )
-                return await _await_http_tasks(handler_task, dispatcher_task, "asgi")
             except Exception as error:
                 await capture(
-                    error, app=self, flow="http", phase="dispatch",
+                    error,
+                    app=self,
+                    flow="http",
+                    phase="dispatch",
                     metadata={"transport": "asgi"},
                 )
                 raise
@@ -714,9 +798,12 @@ class Application(Container, IApplication):
         """
         try:
             with operation(self, flow="lifecycle", operation="http.shutdown"):
-                await complete_on_cancel(self.__onShutdown(
-                    runtime=Runtime.HTTP, owner_task=asyncio.current_task(),
-                ))
+                await complete_on_cancel(
+                    self.__onShutdown(
+                        runtime=Runtime.HTTP,
+                        owner_task=asyncio.current_task(),
+                    ),
+                )
         finally:
             if self._failure_runtime is not None:
                 self._failure_runtime.deactivate(_HTTP_FAILURE_OWNER)
@@ -770,13 +857,18 @@ class Application(Container, IApplication):
                 handler_task = _create_http_handler_task(loop, handler(scope, protocol))
                 if handler_task.done():
                     return handler_task.result()
-                disconnect_task = loop.create_task(
+                return await _monitor_http_handler(
+                    loop,
+                    handler_task,
                     _rsgi_disconnect_watcher(protocol, handler_task),
+                    "rsgi",
                 )
-                return await _await_http_tasks(handler_task, disconnect_task, "rsgi")
             except Exception as error:
                 await capture(
-                    error, app=self, flow="http", phase="dispatch",
+                    error,
+                    app=self,
+                    flow="http",
+                    phase="dispatch",
                     metadata={"transport": "rsgi"},
                 )
                 raise
@@ -784,7 +876,10 @@ class Application(Container, IApplication):
     # --- Kernel Handling Methods ---
 
     async def __initializeHttpKernel(
-        self: Self, interface: str, *, start_runtime: bool = False,
+        self: Self,
+        interface: str,
+        *,
+        start_runtime: bool = False,
     ) -> None:
         """
         Initialize both HTTP handlers under a shared startup lock.
@@ -940,23 +1035,31 @@ class Application(Container, IApplication):
                         primary_error = error
                         if isinstance(error, Exception):
                             primary_receipt = await capture(
-                                error, app=self, flow="cli", phase="execution",
+                                error,
+                                app=self,
+                                flow="cli",
+                                phase="execution",
                             )
                         raise
                     finally:
                         try:
                             shutdown = self.__onShutdown(
-                                runtime=Runtime.CLI, failure_owner=failure_owner,
+                                runtime=Runtime.CLI,
+                                failure_owner=failure_owner,
                                 owner_task=asyncio.current_task(),
                                 parent_event_id=(
                                     primary_receipt.event_id
-                                    if primary_receipt is not None else None
+                                    if primary_receipt is not None
+                                    else None
                                 ),
                             )
                             await complete_on_cancel(shutdown)
                         except Exception as error:
                             await capture(
-                                error, app=self, flow="lifecycle", phase="shutdown",
+                                error,
+                                app=self,
+                                flow="lifecycle",
+                                phase="shutdown",
                             )
                             if primary_error is None:
                                 raise
@@ -1413,9 +1516,9 @@ class Application(Container, IApplication):
         Raises
         ------
         TypeError
-            If ``lifespan`` is not a ``Lifespan`` or a callback is not callable.
+            If the event/runtime type is invalid or a callback is not callable.
         ValueError
-            If no callbacks are provided.
+            If no callbacks are provided or the runtime selector is unknown.
 
         Notes
         -----
@@ -1440,11 +1543,15 @@ class Application(Container, IApplication):
                 error_msg = f"{cb!r} is not callable."
                 raise TypeError(error_msg)
 
-        # Use None as runtime if not provided or invalid
-        rt: Runtime | None = runtime if runtime in self.__hook_events else None
+        if runtime is not None and not isinstance(runtime, str):
+            error_msg = "Runtime must be a Runtime value or None."
+            raise TypeError(error_msg)
+        if runtime not in self.__hook_events:
+            error_msg = f"Unknown runtime: {runtime!r}."
+            raise ValueError(error_msg)
 
         # Register callbacks in the appropriate set for the event and runtime
-        self.__hook_events[rt][lifespan].update(callbacks)
+        self.__hook_events[runtime][lifespan].update(callbacks)
 
         # Return self to allow method chaining
         return self
@@ -1545,19 +1652,26 @@ class Application(Container, IApplication):
                     ).shutdown_orionis_generator(self)
                     next(shutdown_gen)
                     await Application.__runShutdownCallbacks(
-                        self, callbacks, parent_event_id,
+                        self,
+                        callbacks,
+                        parent_event_id,
                     )
                     with suppress(StopIteration):
                         next(shutdown_gen)
                 elif runtime == Runtime.CLI:
                     await Application.__runShutdownCallbacks(
-                        self, callbacks, parent_event_id,
+                        self,
+                        callbacks,
+                        parent_event_id,
                     )
             except BaseException as error:
                 primary_error = error
                 if isinstance(error, Exception):
                     await capture(
-                        error, app=self, flow="lifecycle", phase="shutdown",
+                        error,
+                        app=self,
+                        flow="lifecycle",
+                        phase="shutdown",
                         parent_event_id=parent_event_id,
                     )
                 raise
@@ -1566,7 +1680,9 @@ class Application(Container, IApplication):
                     failure_owner = _HTTP_FAILURE_OWNER
                 try:
                     await Application.__closeRuntimeResources(
-                        self, failure_owner, owner_task=owner_task,
+                        self,
+                        failure_owner,
+                        owner_task=owner_task,
                         parent_event_id=parent_event_id,
                     )
                 except Exception:
@@ -1574,7 +1690,9 @@ class Application(Container, IApplication):
                         raise
 
     async def __runShutdownCallbacks(
-        self: Self, callbacks: set[Callable], parent_event_id: str | None,
+        self: Self,
+        callbacks: set[Callable],
+        parent_event_id: str | None,
     ) -> None:
         """
         Attempt every shutdown callback and propagate its first failure.
@@ -1602,7 +1720,10 @@ class Application(Container, IApplication):
                 await self.invoke(callback)
             except Exception as error:
                 await capture(
-                    error, app=self, flow="lifecycle", phase="shutdown",
+                    error,
+                    app=self,
+                    flow="lifecycle",
+                    phase="shutdown",
                     parent_event_id=parent_event_id,
                 )
                 if primary_error is None:
@@ -1611,8 +1732,10 @@ class Application(Container, IApplication):
             raise primary_error
 
     async def __closeRuntimeResources(
-        self: Self, owner: object | None = None,
-        *, owner_task: asyncio.Task | None = None,
+        self: Self,
+        owner: object | None = None,
+        *,
+        owner_task: asyncio.Task | None = None,
         parent_event_id: str | None = None,
     ) -> None:
         """
@@ -1643,12 +1766,16 @@ class Application(Container, IApplication):
                 await failure_runtime.shutdown(exclude=owner_task)
             except Exception as error:
                 await capture(
-                    error, app=self, flow="lifecycle", phase="cleanup",
+                    error,
+                    app=self,
+                    flow="lifecycle",
+                    phase="cleanup",
                     parent_event_id=parent_event_id,
                 )
                 raise
         lifecycle_lock = (
-            failure_runtime.lifecycle_lock if failure_runtime is not None
+            failure_runtime.lifecycle_lock
+            if failure_runtime is not None
             else nullcontext()
         )
         try:
@@ -1660,7 +1787,10 @@ class Application(Container, IApplication):
                 await Application.__closeRuntimeLogger(self, failure_runtime)
         except Exception as error:
             await capture(
-                error, app=self, flow="logging", phase="shutdown",
+                error,
+                app=self,
+                flow="logging",
+                phase="shutdown",
                 parent_event_id=parent_event_id,
             )
             raise
@@ -1669,7 +1799,8 @@ class Application(Container, IApplication):
                 await failure_runtime.drain()
 
     async def __closeRuntimeLogger(
-        self: Self, failure_runtime: FailureRuntime | None,
+        self: Self,
+        failure_runtime: FailureRuntime | None,
     ) -> None:
         """
         Close the bound logger under the final owner's lifecycle lock.
@@ -3084,6 +3215,8 @@ class Application(Container, IApplication):
         ------
         RuntimeError
             If bootstrap configuration is locked.
+        TypeError
+            If a known directory override is not a string, path, or ``None``.
         """
         # Return early if configuration is already cached
         if self.__is_compiled:
@@ -3105,8 +3238,11 @@ class Application(Container, IApplication):
                 final_paths[key] = path.resolve()
             elif isinstance(path, str):
                 final_paths[key] = (base_path / path).resolve()
-            else:
+            elif path is None:
                 final_paths[key] = (base_path / default).resolve()
+            else:
+                error_msg = f"Path override {key!r} must be a string, Path, or None."
+                raise TypeError(error_msg)
 
         # Store the resolved paths in the application configuration
         self.__bootstrap["paths"] = final_paths

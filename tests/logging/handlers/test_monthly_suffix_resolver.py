@@ -1,6 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import UTC, datetime, time
 from orionis.logging.handlers.monthly_suffix_resolver import MonthlySuffixResolver
 from orionis.test import TestCase
+
 
 def _make_resolver(at_time: time | None = None) -> MonthlySuffixResolver:
     """Return a monthly resolver pinned to UTC.
@@ -19,8 +22,8 @@ def _make_resolver(at_time: time | None = None) -> MonthlySuffixResolver:
     resolver.tz = UTC
     return resolver
 
-class TestMonthlySuffixResolverSuffix(TestCase):
 
+class TestMonthlySuffixResolverSuffix(TestCase):
     def testSuffixUsesTheMonthlyPattern(self) -> None:
         """Build the suffix from the year and month of the given datetime.
 
@@ -29,7 +32,7 @@ class TestMonthlySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = datetime(2025, 3, 15, 10, 0, 0, tzinfo=UTC)
         self.assertEqual(_make_resolver().getSuffix(dt=moment), "2025-03")
@@ -43,12 +46,12 @@ class TestMonthlySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertRegex(_make_resolver().getSuffix(), r"^\d{4}-\d{2}$")
 
-class TestMonthlySuffixResolverRotation(TestCase):
 
+class TestMonthlySuffixResolverRotation(TestCase):
     def testDefaultRotationTimeIsMidnight(self) -> None:
         """Rotate at midnight when no time is configured.
 
@@ -57,7 +60,7 @@ class TestMonthlySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_make_resolver().at_time, time(0, 0, 0))
 
@@ -69,7 +72,7 @@ class TestMonthlySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 3, 15, 12, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -85,7 +88,7 @@ class TestMonthlySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 12, 20, 8, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -101,7 +104,7 @@ class TestMonthlySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 5, 10, 0, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -109,15 +112,18 @@ class TestMonthlySuffixResolverRotation(TestCase):
             datetime(2025, 6, 1, 3, 30, 0, tzinfo=UTC),
         )
 
-    def testNextRotationIsAlwaysInTheFuture(self) -> None:
-        """Schedule the next rotation after the supplied moment.
+    def testNextRotationCrossesTheLastInstantOfALongMonth(self) -> None:
+        """Resolve the next month's midnight after the final instant of August.
 
         Validates the invariant on the last instant of a long month.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 8, 31, 23, 59, 59, tzinfo=UTC)
-        self.assertGreater(_make_resolver().getNextRotationTime(current), current)
+        self.assertEqual(
+            _make_resolver().getNextRotationTime(current),
+            datetime(2025, 9, 1, tzinfo=UTC),
+        )

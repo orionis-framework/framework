@@ -1,6 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.orm.query.expressions import JoinCondition
 from orionis.orm.query.join_clause import JoinClause
 from orionis.test import TestCase
+
 
 class TestJoinClause(TestCase):
     """Verify fluent ON accumulation and the compiler's condition ordering."""
@@ -11,7 +14,7 @@ class TestJoinClause(TestCase):
         Returns
         -------
         None
-            Verify fluent identity and ordered AND and OR comparisons.
+            No return value.
         """
         join = JoinClause()
         self.assertIs(join.on("posts.user_id", "=", "users.id"), join)
@@ -30,7 +33,7 @@ class TestJoinClause(TestCase):
         Returns
         -------
         None
-            Verify later additions reach the same accumulator only.
+            No return value.
         """
         first = JoinClause()
         second = JoinClause()

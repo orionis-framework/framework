@@ -42,25 +42,41 @@ __all__ = [
     "UnsupportedDriverException",
 ]
 
+_EXCEPTIONS_MODULE = "orionis.database.exceptions"
+"""Module defining the exported database exception types."""
+
 _EXPORTS = {
     "Connection": ("orionis.database.connection", "Connection"),
     "ConnectionManager": ("orionis.database.connection_manager", "ConnectionManager"),
-    "ConnectionNotFoundException": ("orionis.database.exceptions", "ConnectionNotFoundException"), # NOSONAR
-    "DatabaseException": ("orionis.database.exceptions", "DatabaseException"),
+    "ConnectionNotFoundException": (
+        _EXCEPTIONS_MODULE,
+        "ConnectionNotFoundException",
+    ),
+    "DatabaseException": (_EXCEPTIONS_MODULE, "DatabaseException"),
     "Migration": ("orionis.database.contracts.migration", "Migration"),
-    "MigrationNotFoundException": ("orionis.database.exceptions", "MigrationNotFoundException"),
+    "MigrationNotFoundException": (
+        _EXCEPTIONS_MODULE,
+        "MigrationNotFoundException",
+    ),
     "Migrator": ("orionis.database.migrations.migrator", "Migrator"),
-    "MissingDatabaseDependencyException": ("orionis.database.exceptions", "MissingDatabaseDependencyException"),
-    "QueryException": ("orionis.database.exceptions", "QueryException"),
+    "MissingDatabaseDependencyException": (
+        _EXCEPTIONS_MODULE,
+        "MissingDatabaseDependencyException",
+    ),
+    "QueryException": (_EXCEPTIONS_MODULE, "QueryException"),
     "SQLCompiler": ("orionis.database.compiler", "SQLCompiler"),
     "Seeder": ("orionis.database.seeders.seeder", "Seeder"),
     "SeederEvents": ("orionis.database.seeders.events", "SeederEvents"),
     "SeederRunner": ("orionis.database.seeders.runner", "SeederRunner"),
     "Transaction": ("orionis.database.transaction", "Transaction"),
-    "TransactionException": ("orionis.database.exceptions", "TransactionException"),
-    "UnsupportedDriverException": ("orionis.database.exceptions", "UnsupportedDriverException"),
+    "TransactionException": (_EXCEPTIONS_MODULE, "TransactionException"),
+    "UnsupportedDriverException": (
+        _EXCEPTIONS_MODULE,
+        "UnsupportedDriverException",
+    ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -82,6 +98,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

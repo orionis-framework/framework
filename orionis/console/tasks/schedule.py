@@ -1,3 +1,6 @@
+# ruff: noqa: BLE001, PLC0415, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Register scheduled tasks and coordinate their scheduler integration."""
 
 import asyncio
@@ -26,11 +29,12 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
     from apscheduler.events import JobEvent as APJobEvent
     from apscheduler.events import SchedulerEvent as APSchedulerEvent
-    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+    from orionis.console.tasks._backend import SchedulerBackend
     from orionis.console.entities.task import Task as TaskEntity
     from orionis.foundation.config.scheduler.entities.scheduler import (
         Scheduler as ConfigScheduler,
     )
+
 
 async def _execute_scheduled_command(
     signature: str,
@@ -58,11 +62,12 @@ async def _execute_scheduled_command(
     """
     return await Reactor.call(signature, args or [])
 
+
 # Preserve the callable path stored by earlier persistent scheduler entries.
 globals()["_executeScheduledCommand"] = _execute_scheduled_command
 
+
 class Schedule(ISchedule):
-    # ruff: noqa: BLE001, PLC0415, TC001
     """Register scheduled tasks and coordinate their scheduler integration."""
 
     _SCHEDULER_NOT_STARTED_ERROR = "The Orionis task scheduler has not been started."
@@ -106,7 +111,7 @@ class Schedule(ISchedule):
         """Available command signatures produced by ``set``."""
         self.__job_store: str = self.__config.store
         """Job store obtained from ``self.__config.store``."""
-        self.__scheduler: AsyncIOScheduler | None = None
+        self.__scheduler: SchedulerBackend | None = None
         """Scheduler instance responsible for registering and running tasks."""
         self.__scheduler_listeners: dict[SchedulerEvent, Callable] = {}
         """Callbacks subscribed to scheduler lifecycle events."""
@@ -132,6 +137,8 @@ class Schedule(ISchedule):
         """Failure retained for the caller awaiting shutdown completion."""
         self.__shutdown_task: asyncio.Task | None = None
         """Single shutdown operation owned by the current scheduler cycle."""
+        self.__boot_lock = asyncio.Lock()
+        """Serialize native scheduler creation and closure."""
         self.__failure_runtime = None
         """Application runtime retained for callbacks outside the starting context."""
         self.__wait_to_shutdown: float = 0.5
@@ -279,6 +286,14 @@ class Schedule(ISchedule):
         """
         # Select the listener registered for this event code.
         code = event.code
+        state = {
+            SchedulerEvent.STARTED: ScheduleStates.RUNNING,
+            SchedulerEvent.SHUTDOWN: ScheduleStates.STOPPED,
+            SchedulerEvent.PAUSED: ScheduleStates.PAUSED,
+            SchedulerEvent.RESUMED: ScheduleStates.RUNNING,
+        }.get(code)
+        if state is not None:
+            self.__state = state
         listener = self.__scheduler_listeners.get(code)
         if listener is None:
             return
@@ -473,13 +488,21 @@ class Schedule(ISchedule):
                     )
 
         pending = self.__pending_listener_tasks
-        task = asyncio.create_task(supervise())
+        supervisor = supervise()
+        try:
+            task = asyncio.create_task(supervisor)
+        except BaseException:
+            supervisor.close()
+            coroutine.close()
+            raise
         pending.add(task)
         task.add_done_callback(completed)
         return task
 
     async def __handleTaskException(
-        self: Self, exception: BaseException, signature: str,
+        self: Self,
+        exception: BaseException,
+        signature: str,
     ) -> None:
         """
         Report a task execution failure independently of event listeners.
@@ -627,7 +650,50 @@ class Schedule(ISchedule):
             If a task signature is unavailable in the reactor.
         RuntimeError
             If a selected job store lacks required configuration or a supported
-            backend.
+            backend, or shutdown is still in progress.
+        """
+        if self.__shutdown_task is not None and not self.__shutdown_task.done():
+            error_msg = "The scheduler is still shutting down."
+            raise RuntimeError(error_msg)
+        async with self.__boot_lock:
+            if self.__shutdown_task is not None and not self.__shutdown_task.done():
+                error_msg = "The scheduler is still shutting down."
+                raise RuntimeError(error_msg)
+            if not self.isStopped():
+                return
+            self.__scheduler = None
+            self.__tasks.clear()
+            self.__tasks_listeners.clear()
+            self.__running_tasks.clear()
+            self.__paused_tasks.clear()
+            self.__removed_tasks.clear()
+            try:
+                await self.__startScheduler()
+            except BaseException as error:
+                scheduler, self.__scheduler = self.__scheduler, None
+                self.__state = ScheduleStates.STOPPED
+                self.__running_tasks.clear()
+                if scheduler is not None:
+                    scheduler.abortStart(error)
+                    await self.__drainTasks(scheduler.takePending())
+                pending = tuple(
+                    task
+                    for task in self.__pending_listener_tasks
+                    if task is not self.__shutdown_task
+                )
+                for task in pending:
+                    task.cancel()
+                await self.__drainTasks(pending)
+                raise
+
+    async def __startScheduler(self) -> None:
+        """
+        Build and start one native backend under the lifecycle lock.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.__failure_runtime = get_runtime()
         self.__shutdown_error = None
@@ -640,10 +706,10 @@ class Schedule(ISchedule):
         await self.__validateAndLoadFluentTasks()
 
         # Get the current asyncio event loop for scheduling async tasks
-        from apscheduler.schedulers.asyncio import AsyncIOScheduler
+        from orionis.console.tasks._backend import SchedulerBackend
 
         loop = asyncio.get_running_loop()
-        self.__scheduler = AsyncIOScheduler(
+        self.__scheduler = SchedulerBackend(
             event_loop=loop,
             timezone=DateTime.getZoneInfo(),
         )
@@ -1273,54 +1339,86 @@ class Schedule(ISchedule):
 
     async def __finishShutdown(self: Self) -> None:
         """
-        Drain listeners and request scheduler shutdown off the event loop.
+        Await native shutdown, job cleanup and late lifecycle listeners.
 
         Wait for the configured grace period before draining pending listeners.
-        Submit the shutdown request with ``wait=True`` to an executor.
+        The worker bridge returns only after the native loop callback finishes.
 
         Returns
         -------
         None
-            Complete listener cleanup and the scheduler shutdown request.
+            Complete native shutdown and owned asynchronous cleanup.
         """
-        # Get the current event loop for executing shutdown in a separate thread
         loop = asyncio.get_running_loop()
-
-        # Sleep briefly to allow any pending tasks to complete cleanup
-        # before signaling shutdown completion
         await asyncio.sleep(self.__wait_to_shutdown)
+        async with self.__boot_lock:
+            scheduler = self.__scheduler
+            if scheduler is None:
+                raise RuntimeError(self._SCHEDULER_NOT_STARTED_ERROR)
+            await self.__drainListeners()
+            from orionis.support.concurrency import complete_on_cancel
 
-        # Give any in-flight listener tasks (scheduler/task event callbacks)
-        # a chance to finish before the scheduler and event loop are torn
-        # down, instead of abandoning them mid-execution. The currently
-        # running task (this very shutdown coroutine) is excluded to avoid
-        # awaiting on itself.
+            try:
+                await complete_on_cancel(
+                    loop.run_in_executor(
+                        None,
+                        functools.partial(scheduler.shutdown, wait=True),
+                    ),
+                )
+            finally:
+                await self.__drainTasks(scheduler.takePending())
+                await self.__drainListeners()
+                self.__state = ScheduleStates.STOPPED
+                self.__running_tasks.clear()
+                self.__paused_tasks.clear()
+
+    async def __drainListeners(self) -> None:
+        """
+        Await the current listener snapshot without awaiting its shutdown owner.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
         current_task = asyncio.current_task()
-        pending = tuple(
-            task
-            for task in self.__pending_listener_tasks
-            if not task.done() and task is not current_task
-        )
-        if pending:
-            outcomes = await asyncio.gather(*pending, return_exceptions=True)
-            for error in outcomes:
-                if isinstance(error, BaseException):
-                    await capture(
-                        error,
-                        runtime=self.__failure_runtime,
-                        flow="scheduler",
-                        phase="drain",
-                    )
-
-        # Execute scheduler shutdown without blocking the main thread
-        from orionis.support.concurrency import complete_on_cancel
-
-        await complete_on_cancel(
-            loop.run_in_executor(
-                None,
-                functools.partial(self.__scheduler.shutdown, wait=True),
+        await self.__drainTasks(
+            tuple(
+                task
+                for task in self.__pending_listener_tasks
+                if not task.done() and task is not current_task
             ),
         )
+
+    async def __drainTasks(self, pending: tuple[asyncio.Future[object], ...]) -> None:
+        """
+        Collect owned futures and observe failures without abandoning cleanup.
+
+        Parameters
+        ----------
+        pending : tuple of asyncio.Future
+            Owned jobs or listeners whose completion must be collected.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if not pending:
+            return
+        from orionis.support.concurrency import complete_on_cancel
+
+        outcomes = await complete_on_cancel(
+            asyncio.gather(*pending, return_exceptions=True),
+        )
+        for error in outcomes:
+            if isinstance(error, BaseException):
+                await capture(
+                    error,
+                    runtime=self.__failure_runtime,
+                    flow="scheduler",
+                    phase="drain",
+                )
 
     async def wait(self: Self) -> None:
         """

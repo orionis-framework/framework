@@ -8,7 +8,11 @@ if _TYPE_CHECKING:
     from orionis.mcp.context import McpContext, McpRequest
     from orionis.mcp.protocol.constants import MCP_PROTOCOL_VERSION
     from orionis.mcp.protocol.metadata import (
-        CacheHint, ContentAnnotations, Icon, PromptArgument, ToolAnnotations,
+        CacheHint,
+        ContentAnnotations,
+        Icon,
+        PromptArgument,
+        ToolAnnotations,
     )
     from orionis.mcp.protocol.results import Completion, InputRequiredResult
     from orionis.mcp.responses import McpResponse
@@ -39,12 +43,17 @@ __all__ = [
     "ToolCatalog",
 ]
 
+_METADATA_MODULE = "orionis.mcp.protocol.metadata"
+"""Module defining metadata values exported by this package."""
+_PRIMITIVES_MODULE = "orionis.mcp.server.primitives"
+"""Module defining the public tool, resource, prompt, and server primitives."""
+
 _EXPORTS = {
     "MCP_PROTOCOL_VERSION": ("orionis.mcp.protocol.constants", "MCP_PROTOCOL_VERSION"),
-    "CacheHint": ("orionis.mcp.protocol.metadata", "CacheHint"),
+    "CacheHint": (_METADATA_MODULE, "CacheHint"),
     "Completion": ("orionis.mcp.protocol.results", "Completion"),
-    "ContentAnnotations": ("orionis.mcp.protocol.metadata", "ContentAnnotations"),
-    "Icon": ("orionis.mcp.protocol.metadata", "Icon"),
+    "ContentAnnotations": (_METADATA_MODULE, "ContentAnnotations"),
+    "Icon": (_METADATA_MODULE, "Icon"),
     "InputRequiredResult": ("orionis.mcp.protocol.results", "InputRequiredResult"),
     "McpConfig": ("orionis.mcp.config", "McpConfig"),
     "McpContext": ("orionis.mcp.context", "McpContext"),
@@ -52,15 +61,16 @@ _EXPORTS = {
     "McpRequest": ("orionis.mcp.context", "McpRequest"),
     "McpResponse": ("orionis.mcp.responses", "McpResponse"),
     "McpState": ("orionis.mcp.state", "McpState"),
-    "Prompt": ("orionis.mcp.server.primitives", "Prompt"),
-    "PromptArgument": ("orionis.mcp.protocol.metadata", "PromptArgument"),
-    "Resource": ("orionis.mcp.server.primitives", "Resource"),
-    "Server": ("orionis.mcp.server.primitives", "Server"),
-    "Tool": ("orionis.mcp.server.primitives", "Tool"),
-    "ToolAnnotations": ("orionis.mcp.protocol.metadata", "ToolAnnotations"),
+    "Prompt": (_PRIMITIVES_MODULE, "Prompt"),
+    "PromptArgument": (_METADATA_MODULE, "PromptArgument"),
+    "Resource": (_PRIMITIVES_MODULE, "Resource"),
+    "Server": (_PRIMITIVES_MODULE, "Server"),
+    "Tool": (_PRIMITIVES_MODULE, "Tool"),
+    "ToolAnnotations": (_METADATA_MODULE, "ToolAnnotations"),
     "ToolCatalog": ("orionis.mcp.server.catalog", "ToolCatalog"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -82,6 +92,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

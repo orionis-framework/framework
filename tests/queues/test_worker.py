@@ -1,3 +1,5 @@
+# ruff: noqa: ANN201, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import traceback
 from dataclasses import dataclass, replace
@@ -15,7 +17,9 @@ from orionis.queues.entities.envelope import JobEnvelope
 from orionis.queues.entities.failed_job import FailedJob
 from orionis.queues.entities.reserved_job import ReservedJob
 from orionis.queues.exceptions import (
-    QueueConfigurationError, QueueLeaseError, QueueStorageError,
+    QueueConfigurationError,
+    QueueLeaseError,
+    QueueStorageError,
 )
 from orionis.queues.functions import current_time
 from orionis.queues.job import BaseJob
@@ -25,6 +29,7 @@ from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
 
 class FakeApp(Container):
     """Expose queue configuration while retaining the real DI container."""
@@ -84,11 +89,13 @@ class FakeApp(Container):
         self.settings = {} if settings is None else settings
         self.basePath = (
             Path(__file__).resolve().parent / "missing_application"
-            if base_path is None else base_path
+            if base_path is None
+            else base_path
         )
         self._paths = {
             "app_jobs": self.basePath / CORE_APP_PATHS["app_jobs"]
-            if jobs_path is None else jobs_path,
+            if jobs_path is None
+            else jobs_path,
         }
         self.isBooted = True
         self.hooks: dict[object, set[Callable]] = {}
@@ -163,6 +170,7 @@ class FakeApp(Container):
             return self
         return await super().make(key, *args, **kwargs)
 
+
 class State:
     """Collect DI identities, attempt counts and concurrency observations."""
 
@@ -182,10 +190,12 @@ class State:
         self.entered = asyncio.Event()
         self.gate = asyncio.Event()
 
+
 class ScopedService:
     """Represent a dependency that must be isolated between jobs."""
 
     __slots__ = ()
+
 
 class SlowApp(FakeApp):
     """Suspend scoped-service resolution to exercise timeout coverage of DI."""
@@ -213,6 +223,7 @@ class SlowApp(FakeApp):
             await asyncio.sleep(0.1)
         return await super().make(key, *args, **kwargs)
 
+
 class RecordJob(BaseJob):
     """Record an injected scope, context and value."""
 
@@ -229,8 +240,12 @@ class RecordJob(BaseJob):
         """
         self.value = value
 
-    async def handle(self, context: JobContext, service: ScopedService,
-                     state: State) -> None:
+    async def handle(
+        self,
+        context: JobContext,
+        service: ScopedService,
+        state: State,
+    ) -> None:
         """Record context and dependency identity across concurrent jobs.
 
         Parameters
@@ -250,13 +265,18 @@ class RecordJob(BaseJob):
         finally:
             state.active -= 1
 
+
 class FailJob(RecordJob):
     """Raise an original application exception on each attempt."""
 
     __slots__ = ()
 
-    async def handle(self, context: JobContext, service: ScopedService,
-                     state: State) -> None:
+    async def handle(
+        self,
+        context: JobContext,
+        service: ScopedService,
+        state: State,
+    ) -> None:
         """Record the attempt and raise an application failure.
 
         Parameters
@@ -272,13 +292,18 @@ class FailJob(RecordJob):
         message = "Application job failure"
         raise ValueError(message)
 
+
 class ReleaseJob(RecordJob):
     """Release the first attempt explicitly and complete the next."""
 
     __slots__ = ()
 
-    async def handle(self, context: JobContext, service: ScopedService,
-                     state: State) -> None:
+    async def handle(
+        self,
+        context: JobContext,
+        service: ScopedService,
+        state: State,
+    ) -> None:
         """Record execution and release an unready job.
 
         Parameters
@@ -294,13 +319,18 @@ class ReleaseJob(RecordJob):
         if context.attempts == 1:
             await context.release()
 
+
 class GateJob(RecordJob):
     """Wait for the test to release an in-flight job."""
 
     __slots__ = ()
 
-    async def handle(self, context: JobContext, service: ScopedService,
-                     state: State) -> None:
+    async def handle(
+        self,
+        context: JobContext,
+        service: ScopedService,
+        state: State,
+    ) -> None:
         """Signal job entry and wait before completing.
 
         Parameters
@@ -316,6 +346,7 @@ class GateJob(RecordJob):
         await state.gate.wait()
         await super().handle(context, service, state)
 
+
 @dataclass(slots=True)
 class Entry:
     """Retain mutable reservation state in the contractual fake backend."""
@@ -325,6 +356,7 @@ class Entry:
     available: float = 0.0
     reserved_until: float = 0.0
     token: str = ""
+
 
 class MemoryDriver(IQueueDriver):
     """Implement atomic task-local transitions for lifecycle tests."""
@@ -359,12 +391,14 @@ class MemoryDriver(IQueueDriver):
         str
             Dispatch identifier.
         """
-        self.entries[envelope.id] = Entry(envelope,
-                                         available=current_time() + delay)
+        self.entries[envelope.id] = Entry(envelope, available=current_time() + delay)
         return envelope.id
 
-    async def reserve(self, queues: tuple[str, ...],
-                      retry_after: float) -> ReservedJob | None:
+    async def reserve(
+        self,
+        queues: tuple[str, ...],
+        retry_after: float,
+    ) -> ReservedJob | None:
         """Claim one ready job in priority order.
 
         Parameters
@@ -382,13 +416,18 @@ class MemoryDriver(IQueueDriver):
         now = current_time()
         for queue in queues:
             for entry in self.entries.values():
-                if (entry.envelope.queue == queue and entry.available <= now
-                        and entry.reserved_until <= now):
+                if (
+                    entry.envelope.queue == queue
+                    and entry.available <= now
+                    and entry.reserved_until <= now
+                ):
                     entry.attempts += 1
                     entry.token = uuid4().hex
                     entry.reserved_until = now + retry_after
                     return ReservedJob(
-                        id=entry.envelope.id, queue=queue, token=entry.token,
+                        id=entry.envelope.id,
+                        queue=queue,
+                        token=entry.token,
                         payload=self.serializer.encodeEnvelope(entry.envelope),
                         attempts=entry.attempts,
                         reserved_until=entry.reserved_until,
@@ -468,8 +507,9 @@ class MemoryDriver(IQueueDriver):
         int
             Number of removed jobs.
         """
-        identifiers = [key for key, entry in self.entries.items()
-                       if entry.envelope.queue == queue]
+        identifiers = [
+            key for key, entry in self.entries.items() if entry.envelope.queue == queue
+        ]
         for key in identifiers:
             del self.entries[key]
         return len(identifiers)
@@ -484,6 +524,7 @@ class MemoryDriver(IQueueDriver):
             Mark the fake driver's owned resources as closed.
         """
         self.closed = True
+
 
 class FailedRepository(IFailedJobRepository):
     """Preserve original exceptions without an external database."""
@@ -502,8 +543,12 @@ class FailedRepository(IFailedJobRepository):
         self.items: dict[str, FailedJob] = {}
         self.closed = self.broken = False
 
-    async def record(self, reserved: ReservedJob, connection: str,
-                     exception: Exception) -> FailedJob:
+    async def record(
+        self,
+        reserved: ReservedJob,
+        connection: str,
+        exception: Exception,
+    ) -> FailedJob:
         """Preserve a terminal error and its retryable envelope.
 
         Parameters
@@ -525,12 +570,15 @@ class FailedRepository(IFailedJobRepository):
             raise QueueStorageError(message)
         failure = FailedJob(
             id=str(uuid5(NAMESPACE_URL, reserved.id + ":" + reserved.token)),
-            job_id=reserved.id, connection=connection,
-            queue=reserved.queue, payload=reserved.payload,
+            job_id=reserved.id,
+            connection=connection,
+            queue=reserved.queue,
+            payload=reserved.payload,
             exception_type=type(exception).__qualname__,
             exception_message=str(exception),
             traceback="".join(traceback.format_exception(exception)),
-            failed_at=current_time(), attempts=reserved.attempts,
+            failed_at=current_time(),
+            attempts=reserved.attempts,
         )
         self.items[failure.id] = failure
         return failure
@@ -586,9 +634,15 @@ class FailedRepository(IFailedJobRepository):
         """
         self.closed = True
 
-def envelope(serializer: JobSerializer, job: BaseJob, *, tries: int = 3,
-             timeout: float = 0.5,
-             options: dict | None = None) -> JobEnvelope:
+
+def envelope(
+    serializer: JobSerializer,
+    job: BaseJob,
+    *,
+    tries: int = 3,
+    timeout: float = 0.5,
+    options: dict | None = None,
+) -> JobEnvelope:
     """Build real immutable wire metadata for a contractual test job.
 
     Parameters
@@ -611,10 +665,18 @@ def envelope(serializer: JobSerializer, job: BaseJob, *, tries: int = 3,
     """
     identity, payload = serializer.encode(job)
     settings = {} if options is None else options
-    return JobEnvelope(id=str(uuid4()), job=identity, payload=payload,
-                       connection="database", queue="default", max_tries=tries,
-                       timeout=timeout, backoff=settings.get("backoff", (0.0,)),
-                       retry_until=settings.get("retry_until"))
+    return JobEnvelope(
+        id=str(uuid4()),
+        job=identity,
+        payload=payload,
+        connection="database",
+        queue="default",
+        max_tries=tries,
+        timeout=timeout,
+        backoff=settings.get("backoff", (0.0,)),
+        retry_until=settings.get("retry_until"),
+    )
+
 
 class TestWorker(TestCase):
     """Verify scoped execution and resilient reservation completion."""
@@ -639,8 +701,13 @@ class TestWorker(TestCase):
         self.serializer = JobSerializer()
         self.driver = MemoryDriver(self.serializer)
         self.failed = FailedRepository()
-        self.worker = Worker(self.app, self.driver, self.serializer,
-                             WorkerOptions("database", sleep=0.001), self.failed)
+        self.worker = Worker(
+            self.app,
+            self.driver,
+            self.serializer,
+            WorkerOptions("database", sleep=0.001),
+            self.failed,
+        )
 
     async def testSuccessUsesDistinctDependencyScopes(self) -> None:
         """
@@ -669,9 +736,15 @@ class TestWorker(TestCase):
         None
             Assert retry backoff and persistence of the final original error.
         """
-        await self.driver.push(envelope(self.serializer, FailJob(1), options={
-            "backoff": (0.0, 0.001, 0.1),
-        }))
+        await self.driver.push(
+            envelope(
+                self.serializer,
+                FailJob(1),
+                options={
+                    "backoff": (0.0, 0.001, 0.1),
+                },
+            ),
+        )
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
             self.assertEqual(await self.worker.run(max_jobs=3), 3)
         self.assertEqual([event[2] for event in self.state.events], [1, 2, 3])
@@ -728,8 +801,10 @@ class TestWorker(TestCase):
             self.assertEqual(await self.worker.run(stop_when_empty=True), 2)
         self.assertTrue(any("Cannot complete" in log for log in logs.output))
         self.assertEqual(await self.driver.size("default"), 1)
-        self.assertGreater(next(iter(self.driver.entries.values())).reserved_until,
-                           current_time())
+        self.assertGreater(
+            next(iter(self.driver.entries.values())).reserved_until,
+            current_time(),
+        )
 
     async def testRepositoryFailureRetainsLeaseAndContinues(self) -> None:
         """
@@ -756,12 +831,12 @@ class TestWorker(TestCase):
         None
             Assert cooperative timeout cleanup and failure persistence.
         """
-        await self.driver.push(envelope(self.serializer, GateJob(1), tries=1,
-                                        timeout=0.01))
+        await self.driver.push(
+            envelope(self.serializer, GateJob(1), tries=1, timeout=0.01),
+        )
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
             self.assertEqual(await self.worker.run(stop_when_empty=True), 1)
-        self.assertEqual((await self.failed.all())[0].exception_type,
-                         "TimeoutError")
+        self.assertEqual((await self.failed.all())[0].exception_type, "TimeoutError")
         self.assertNotIn(JobContext, self.app.getCurrentScope() or {})
 
     async def testNearExpiredLeaseBoundsExecutionTimeout(self) -> None:
@@ -799,15 +874,20 @@ class TestWorker(TestCase):
             app.scoped(None, ScopedService)
         finally:
             ScopedContext.reset(token)
-        worker = Worker(app, self.driver, self.serializer,
-                        WorkerOptions("database"), self.failed)
-        await self.driver.push(envelope(self.serializer, RecordJob(1), tries=1,
-                                        timeout=0.01))
+        worker = Worker(
+            app,
+            self.driver,
+            self.serializer,
+            WorkerOptions("database"),
+            self.failed,
+        )
+        await self.driver.push(
+            envelope(self.serializer, RecordJob(1), tries=1, timeout=0.01),
+        )
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
             await worker.run(stop_when_empty=True)
         self.assertEqual(self.state.events, [])
-        self.assertEqual((await self.failed.all())[0].exception_type,
-                         "TimeoutError")
+        self.assertEqual((await self.failed.all())[0].exception_type, "TimeoutError")
         self.assertNotIn(JobContext, app.getCurrentScope() or {})
 
     async def testExpiredLeaseNeverExecutesSideEffects(self) -> None:
@@ -821,10 +901,10 @@ class TestWorker(TestCase):
         """
         await self.driver.push(envelope(self.serializer, RecordJob(1)))
         reserved = await self.driver.reserve(("default",), 1)
-        expired = ReservedJob(**{
-            field: getattr(reserved, field)
-            for field in reserved.__struct_fields__
-        } | {"reserved_until": current_time() - 1})
+        expired = ReservedJob(
+            **{field: getattr(reserved, field) for field in reserved.__struct_fields__}
+            | {"reserved_until": current_time() - 1},
+        )
         with self.assertLogs("orionis.queues.worker", level="WARNING"):
             await self.worker.execute(expired)
         self.assertEqual(self.state.events, [])
@@ -846,8 +926,7 @@ class TestWorker(TestCase):
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
             await self.worker.execute(reserved)
         self.assertEqual(self.state.events, [])
-        self.assertEqual((await self.failed.all())[0].exception_type,
-                         "QueueRetryError")
+        self.assertEqual((await self.failed.all())[0].exception_type, "QueueRetryError")
 
     async def testRetryDeadlineFailsBeforeInvocation(self) -> None:
         """
@@ -858,9 +937,15 @@ class TestWorker(TestCase):
         None
             Assert deadline rejection before invoking job side effects.
         """
-        await self.driver.push(envelope(self.serializer, RecordJob(1), options={
-            "retry_until": current_time() - 1,
-        }))
+        await self.driver.push(
+            envelope(
+                self.serializer,
+                RecordJob(1),
+                options={
+                    "retry_until": current_time() - 1,
+                },
+            ),
+        )
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
             await self.worker.run(stop_when_empty=True)
         self.assertEqual(self.state.events, [])
@@ -877,8 +962,13 @@ class TestWorker(TestCase):
         """
         for value in range(20):
             await self.driver.push(envelope(self.serializer, RecordJob(value)))
-        worker = Worker(self.app, self.driver, self.serializer,
-                        WorkerOptions("database", concurrency=3), self.failed)
+        worker = Worker(
+            self.app,
+            self.driver,
+            self.serializer,
+            WorkerOptions("database", concurrency=3),
+            self.failed,
+        )
         self.assertEqual(await worker.run(max_jobs=5), 5)
         self.assertEqual(len(self.state.events), 5)
         self.assertGreater(self.state.maximum, 1)
@@ -989,10 +1079,10 @@ class TestWorker(TestCase):
         queued = envelope(self.serializer, RecordJob(1))
         await self.driver.push(queued)
         reserved = await self.driver.reserve(("default",), 90)
-        corrupt = ReservedJob(**{
-            field: getattr(reserved, field)
-            for field in reserved.__struct_fields__
-        } | {"payload": b"malformed"})
+        corrupt = ReservedJob(
+            **{field: getattr(reserved, field) for field in reserved.__struct_fields__}
+            | {"payload": b"malformed"},
+        )
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
             await self.worker.execute(corrupt)
         self.assertEqual(self.state.events, [])
@@ -1011,8 +1101,10 @@ class TestWorker(TestCase):
         await self.driver.push(payload)
         reserved = await self.driver.reserve(("default",), 1)
         context = JobContext(self.driver, reserved, "database", self.worker._fail)
-        self.assertEqual((context.id, context.queue, context.connection),
-                         (payload.id, "default", "database"))
+        self.assertEqual(
+            (context.id, context.queue, context.connection),
+            (payload.id, "default", "database"),
+        )
         await context.delete()
         with self.assertRaises(QueueLeaseError):
             await context.release()
@@ -1027,8 +1119,15 @@ class TestWorker(TestCase):
             Assert early validation of direct worker settings.
         """
         base = WorkerOptions("database")
-        for changes in ({"concurrency": True}, {"retry_after": float("nan")},
-                        {"sleep": -1}, {"queues": ()}, {"queues": ("bad key",)}):
-            with self.subTest(changes=changes), self.assertRaises(
-                    QueueConfigurationError):
+        for changes in (
+            {"concurrency": True},
+            {"retry_after": float("nan")},
+            {"sleep": -1},
+            {"queues": ()},
+            {"queues": ("bad key",)},
+        ):
+            with (
+                self.subTest(changes=changes),
+                self.assertRaises(QueueConfigurationError),
+            ):
                 replace(base, **changes)

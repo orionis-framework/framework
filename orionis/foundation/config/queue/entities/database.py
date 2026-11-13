@@ -4,9 +4,12 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.queue.enums.drivers import Drivers
 from orionis.foundation.config.validation import (
-    validate_driver, validate_name, validate_seconds,
+    validate_driver,
+    validate_name,
+    validate_seconds,
 )
 from orionis.support.entities.base import BaseEntity
+
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Database(BaseEntity):

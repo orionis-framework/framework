@@ -1,9 +1,11 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 from orionis.console.base import BaseScheduler
 from orionis.console.contracts import ISchedule
 from orionis.console.entities import SchedulerEvent
 
-class Scheduler(BaseScheduler):
 
+class Scheduler(BaseScheduler):
     def tasks(
         self,
         schedule: ISchedule,
@@ -25,10 +27,9 @@ class Scheduler(BaseScheduler):
             This method does not return any value.
         """
         # Register the inspire command to run every fifteen seconds.
-        schedule.command("app:inspire")\
-            .purpose("Test Inspire Command")\
-            .maxInstances(1)\
-            .everySeconds(15)
+        schedule.command("app:inspire").purpose("Test Inspire Command").maxInstances(
+            1,
+        ).everySeconds(15)
 
     async def onStarted(self, event: SchedulerEvent) -> None:
         """

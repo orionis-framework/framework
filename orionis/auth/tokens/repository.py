@@ -1,7 +1,9 @@
+# ruff: noqa: PLC0415, S105, TC001, TC003
+# Keep runtime types; token is a column name and lookup loads lazily.
 """Persist personal access tokens through the Orionis query builder."""
 
 from datetime import UTC, datetime, timedelta
-from typing import TYPE_CHECKING, Self
+from typing import Self
 import msgspec
 from orionis.auth.concerns.functions import authorizable_key
 from orionis.auth.contracts.token_repository import IAccessTokenRepository
@@ -12,10 +14,10 @@ from orionis.auth.tokens.functions import generate_token_secret, hash_token_secr
 from orionis.foundation.contracts.application import IApplication
 from orionis.orm.contracts.query_builder import IQueryBuilder
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-    from orionis.auth.contracts.authorizable import IAuthorizable
-    from orionis.orm.query.base_builder import QueryBuilderBase
+from collections.abc import Iterable
+from orionis.auth.contracts.authorizable import IAuthorizable
+from orionis.orm.query.base_builder import QueryBuilderBase
+
 
 # Fallbacks applied when the configuration section is absent.
 _DEFAULT_TABLE: str = "personal_access_tokens"
@@ -30,8 +32,9 @@ _MAX_ABILITIES: int = 256
 """Max abilities value used by ``repository``."""
 
 # Column holding the digest of the presented secret.
-_TOKEN_COLUMN: str = "token"  # noqa: S105
+_TOKEN_COLUMN: str = "token"
 """Column holding the digest of the presented secret."""
+
 
 class AccessTokenRepository(IAccessTokenRepository):
     """
@@ -50,8 +53,6 @@ class AccessTokenRepository(IAccessTokenRepository):
     concurrent timestamps are last-writer-wins. Purging uses two deletes.
     """
 
-    # ruff: noqa: TC001 (Dependency Injection)
-
     __slots__ = ("__db", "__expiration", "__secret_bytes", "__table")
     """Declare the instance attribute slots reserved by this class."""
 
@@ -69,7 +70,7 @@ class AccessTokenRepository(IAccessTokenRepository):
         Returns
         -------
         None
-            Only configuration values and the gateway are retained.
+            No return value.
         """
         self.__db = db
         """Gateway used to build queries over the token table."""
@@ -227,7 +228,7 @@ class AccessTokenRepository(IAccessTokenRepository):
         object
             (token, identity), None for no match, or NotImplemented for fallback.
         """
-        from orionis.auth.tokens.lookup import lookup_owner  # noqa: PLC0415
+        from orionis.auth.tokens.lookup import lookup_owner
 
         if type(self).findByPlainText is not AccessTokenRepository.findByPlainText:
             return NotImplemented
@@ -384,6 +385,7 @@ class AccessTokenRepository(IAccessTokenRepository):
         )
         return expired + revoked
 
+
 def _utc_now() -> datetime:
     """
     Return the current UTC moment as a naive datetime.
@@ -398,6 +400,7 @@ def _utc_now() -> datetime:
         Current UTC moment without timezone information.
     """
     return datetime.now(UTC).replace(tzinfo=None)
+
 
 def _as_datetime(value: object) -> datetime | None:
     """
@@ -438,6 +441,7 @@ def _as_datetime(value: object) -> datetime | None:
         value = value.astimezone(UTC).replace(tzinfo=None)
     return value
 
+
 def _unexpired_tokens(query: QueryBuilderBase) -> None:
     """
     Group the nullable expiration constraint for token use.
@@ -450,9 +454,10 @@ def _unexpired_tokens(query: QueryBuilderBase) -> None:
     Returns
     -------
     None
-        The group accepts only unexpired tokens or SQL NULL deadlines.
+        No return value.
     """
     query.whereNull("expires_at").orWhere("expires_at", ">", _utc_now())
+
 
 def _is_expired(value: datetime | None) -> bool:
     """
@@ -476,6 +481,7 @@ def _is_expired(value: datetime | None) -> bool:
     moment = value if value.tzinfo is not None else value.replace(tzinfo=UTC)
     return moment <= datetime.now(UTC)
 
+
 def _encode_abilities(abilities: frozenset[str] | None) -> str | None:
     """
     Serialise the abilities of a token for storage.
@@ -493,6 +499,7 @@ def _encode_abilities(abilities: frozenset[str] | None) -> str | None:
     if abilities is None:
         return None
     return msgspec.json.encode(sorted(abilities)).decode("utf-8")
+
 
 def _decode_abilities(value: object) -> frozenset[str] | None:
     """
@@ -525,6 +532,7 @@ def _decode_abilities(value: object) -> frozenset[str] | None:
         error_msg = "Invalid stored token abilities."
         raise TokenException(error_msg)
     return _normalize_abilities(value)
+
 
 def _normalize_abilities(abilities: Iterable[str] | None) -> frozenset[str] | None:
     """

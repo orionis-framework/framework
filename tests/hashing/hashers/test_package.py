@@ -1,10 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.hashing import hashers as hashers_package
 from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
 from orionis.hashing.hashers.bcrypt_hasher import BcryptHasher
 from orionis.test import TestCase
 
-class TestHashersPackage(TestCase):
 
+class TestHashersPackage(TestCase):
     def testDeclaresTheDocumentedPublicSurface(self) -> None:
         """Declare exactly the two shipped drivers as public exports.
 
@@ -13,7 +15,7 @@ class TestHashersPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             hashers_package.__all__,
@@ -29,7 +31,7 @@ class TestHashersPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(hashers_package.Argon2Hasher, Argon2Hasher)
         self.assertIs(hashers_package.BcryptHasher, BcryptHasher)

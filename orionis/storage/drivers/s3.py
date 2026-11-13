@@ -1,16 +1,25 @@
+# ruff: noqa: ANN401, PLC0415, SIM115, TC003
+# Keep optional SDK payloads dynamic and defer failure-runtime imports.
+# Preserve temporary-buffer ownership and runtime reflection of public annotations.
 """Storage driver backed by Amazon S3 (or S3-compatible services)."""
 
 from __future__ import annotations
 import asyncio
+from collections.abc import AsyncIterable, AsyncIterator
+from pathlib import Path
 import hashlib
 import mimetypes
 import tempfile
+from threading import Lock
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Self
+from typing import Any, BinaryIO, Self
 from urllib.parse import quote
-from orionis.storage.buffering import spool_stream
+from orionis.storage.buffering import _close_buffer, read_chunks, spool_stream
+from orionis.support.concurrency import complete_on_cancel
 from orionis.storage.contracts.driver import IStorageDriver
 from orionis.storage.drivers.functions import (
+    _ModeBuffer,
+    _close_failed_buffer,
     assertBinaryMode,
     deriveDirectories,
     filterFiles,
@@ -26,10 +35,6 @@ from orionis.storage.exceptions import (
 from orionis.storage.paths import normalizeFilePath, normalizePath
 from orionis.storage.stream import AsyncStream
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterable, AsyncIterator
-    from pathlib import Path
-    from typing import Any, BinaryIO
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
@@ -57,12 +62,13 @@ _ACL_MAP: dict[str, str] = {
 # Grantee URI identifying anonymous users in S3 ACL grants. This is the
 # canonical identifier defined by AWS, not a network endpoint, so the
 # scheme must remain exactly as documented.
-_ALL_USERS_URI: str = "http://acs.amazonaws.com/groups/global/AllUsers"  # NOSONAR
+_ALL_USERS_URI = "http://acs.amazonaws.com/groups/global/AllUsers"  # NOSONAR(S5332)
 """
 Grantee URI identifying anonymous users in S3 ACL grants. This is the canonical
 identifier defined by AWS, not a network endpoint, so the scheme must remain exactly
 as documented.
 """
+
 
 class S3StorageDriver(IStorageDriver):
     """
@@ -74,6 +80,7 @@ class S3StorageDriver(IStorageDriver):
 
         uv add 'orionis[s3]'
 
+    Cancellation waits for active SDK work before resources are released.
     The SDK is imported lazily on first operation, and every blocking
     call runs on a worker thread via :func:`asyncio.to_thread` so the
     event loop stays responsive. Directories are virtual: prefixes are
@@ -81,13 +88,12 @@ class S3StorageDriver(IStorageDriver):
     zero-byte ``path/`` marker objects.
     """
 
-    # ruff: noqa: ANN401
-
     __slots__ = (
         "_base_url",
         "_bucket",
         "_client",
         "_client_error",
+        "_client_lock",
         "_endpoint",
         "_key",
         "_region",
@@ -113,7 +119,7 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Initialize the driver from an S3 disk configuration entity.
+            No return value.
         """
         self._bucket: str = str(getattr(config, "bucket", "") or "")
         """Cloud-storage bucket containing the driver resources."""
@@ -134,6 +140,8 @@ class S3StorageDriver(IStorageDriver):
         self._base_url: str | None = base_url.rstrip("/") if base_url else None
         """Base URL used when constructing public resource URLs."""
 
+        self._client_lock = Lock()
+        """Serialize lazy SDK initialization across worker threads."""
         self._client: Any = None
         """Client used to communicate with the configured backend."""
         self._client_error: type[Exception] = Exception
@@ -158,36 +166,41 @@ class S3StorageDriver(IStorageDriver):
         if self._client is not None:
             return self._client
 
-        # Import the official SDK lazily; it is an optional dependency.
-        boto3 = importDriverDependency("boto3", "boto3", "s3")
-        botocore_config = importDriverDependency(
-            "botocore.config",
-            "boto3",
-            "s3",
-        )
-        botocore_exceptions = importDriverDependency(
-            "botocore.exceptions",
-            "boto3",
-            "s3",
-        )
+        with self._client_lock:
+            if self._client is not None:
+                return self._client
 
-        params: dict[str, Any] = {
-            "region_name": self._region or None,
-            "endpoint_url": self._endpoint,
-        }
-
-        # Explicit credentials win; otherwise boto3 uses its own chain.
-        if self._key and self._secret:
-            params["aws_access_key_id"] = self._key
-            params["aws_secret_access_key"] = self._secret
-        if self._use_path_style:
-            params["config"] = botocore_config.Config(
-                s3={"addressing_style": "path"},
+            # Import the official SDK lazily; it is an optional dependency.
+            boto3 = importDriverDependency("boto3", "boto3", "s3")
+            botocore_config = importDriverDependency(
+                "botocore.config",
+                "boto3",
+                "s3",
+            )
+            botocore_exceptions = importDriverDependency(
+                "botocore.exceptions",
+                "boto3",
+                "s3",
             )
 
-        self._client = boto3.client("s3", **params)
-        self._client_error = botocore_exceptions.ClientError
-        return self._client
+            params: dict[str, Any] = {
+                "region_name": self._region or None,
+                "endpoint_url": self._endpoint,
+            }
+
+            # Explicit credentials win; otherwise boto3 uses its own chain.
+            if self._key and self._secret:
+                params["aws_access_key_id"] = self._key
+                params["aws_secret_access_key"] = self._secret
+            if self._use_path_style:
+                params["config"] = botocore_config.Config(
+                    s3={"addressing_style": "path"},
+                )
+
+            client = boto3.client("s3", **params)
+            self._client_error = botocore_exceptions.ClientError
+            self._client = client
+            return self._client
 
     def __isMissing(self: Self, exc: Exception) -> bool:
         """
@@ -431,7 +444,7 @@ class S3StorageDriver(IStorageDriver):
             with body:
                 return body.read()
 
-        return await asyncio.to_thread(_read)
+        return await complete_on_cancel(asyncio.to_thread(_read))
 
     async def readStream(
         self: Self,
@@ -480,8 +493,6 @@ class S3StorageDriver(IStorageDriver):
                     raise
                 raise self.__missing(normalized) from exc
 
-        from orionis.storage.buffering import read_chunks  # noqa: PLC0415
-
         chunks = read_chunks(_open, chunk_size)
         try:
             async for chunk in chunks:
@@ -520,7 +531,7 @@ class S3StorageDriver(IStorageDriver):
                 return False
             return True
 
-        return await asyncio.to_thread(_exists)
+        return await complete_on_cancel(asyncio.to_thread(_exists))
 
     # ── Write operations ─────────────────────────────────────────────────────
 
@@ -545,9 +556,11 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Write *contents* to *path*, replacing any existing object.
+            No return value.
         """
         normalized = normalizeFilePath(path)
+        if visibility is not None:
+            self.__aclFor(visibility)
         data = (
             contents.encode("utf-8") if isinstance(contents, str) else bytes(contents)
         )
@@ -559,7 +572,7 @@ class S3StorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after writing the object.
+                No return value.
             """
             client = self.__client()
             client.put_object(
@@ -569,7 +582,7 @@ class S3StorageDriver(IStorageDriver):
                 **self.__putArgs(normalized, visibility),
             )
 
-        await asyncio.to_thread(_write)
+        await complete_on_cancel(asyncio.to_thread(_write))
 
     async def writeStream(
         self: Self,
@@ -597,9 +610,11 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Write the chunks produced by *stream* to *path*.
+            No return value.
         """
         normalized = normalizeFilePath(path)
+        if visibility is not None:
+            self.__aclFor(visibility)
         buffer = await spool_stream(stream, max_size=_SPOOL_THRESHOLD)
 
         def _upload() -> None:
@@ -609,7 +624,7 @@ class S3StorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after uploading the file.
+                No return value.
             """
             client = self.__client()
             client.upload_fileobj(
@@ -619,10 +634,14 @@ class S3StorageDriver(IStorageDriver):
                 ExtraArgs=self.__putArgs(normalized, visibility),
             )
 
+        primary: BaseException | None = None
         try:
-            await asyncio.to_thread(_upload)
+            await complete_on_cancel(asyncio.to_thread(_upload))
+        except BaseException as error:
+            primary = error
+            raise
         finally:
-            await asyncio.to_thread(buffer.close)
+            await _close_buffer(buffer.close, primary)
 
     async def delete(self: Self, path: str) -> bool:
         """
@@ -659,7 +678,7 @@ class S3StorageDriver(IStorageDriver):
             )
             return True
 
-        return await asyncio.to_thread(_delete)
+        return await complete_on_cancel(asyncio.to_thread(_delete))
 
     async def copy(self: Self, source: str, target: str) -> None:
         """
@@ -675,7 +694,7 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Copy the object at *source* to *target* server-side.
+            No return value.
 
         Raises
         ------
@@ -692,7 +711,7 @@ class S3StorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after copying the object.
+                No return value.
             """
             client = self.__client()
             try:
@@ -706,7 +725,7 @@ class S3StorageDriver(IStorageDriver):
                     raise
                 raise self.__missing(origin) from exc
 
-        await asyncio.to_thread(_copy)
+        await complete_on_cancel(asyncio.to_thread(_copy))
 
     async def move(self: Self, source: str, target: str) -> None:
         """
@@ -725,19 +744,26 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Move the object at *source* to *target*.
+            No return value.
 
         Raises
         ------
         orionis.storage.exceptions.StorageFileNotFoundException
             If the source object does not exist.
         """
-        await self.copy(source, target)
         normalized = normalizeFilePath(source)
-        await asyncio.to_thread(
-            lambda: self.__client().delete_object(
-                Bucket=self._bucket,
-                Key=normalized,
+        destination = normalizeFilePath(target)
+        if normalized == destination:
+            if not await self.exists(normalized):
+                raise self.__missing(normalized)
+            return
+        await self.copy(normalized, destination)
+        await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: self.__client().delete_object(
+                    Bucket=self._bucket,
+                    Key=normalized,
+                ),
             ),
         )
 
@@ -763,7 +789,7 @@ class S3StorageDriver(IStorageDriver):
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
-        head = await asyncio.to_thread(self.__headSync, normalized)
+        head = await complete_on_cancel(asyncio.to_thread(self.__headSync, normalized))
         return int(head.get("ContentLength", 0))
 
     async def mimeType(self: Self, path: str) -> str | None:
@@ -789,7 +815,7 @@ class S3StorageDriver(IStorageDriver):
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
-        head = await asyncio.to_thread(self.__headSync, normalized)
+        head = await complete_on_cancel(asyncio.to_thread(self.__headSync, normalized))
         return head.get("ContentType") or mimetypes.guess_type(normalized)[0]
 
     async def lastModified(self: Self, path: str) -> datetime:
@@ -812,7 +838,7 @@ class S3StorageDriver(IStorageDriver):
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
-        head = await asyncio.to_thread(self.__headSync, normalized)
+        head = await complete_on_cancel(asyncio.to_thread(self.__headSync, normalized))
         stamp = head.get("LastModified")
         return stamp if stamp is not None else datetime.now(tz=UTC)
 
@@ -836,7 +862,9 @@ class S3StorageDriver(IStorageDriver):
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
-        return await asyncio.to_thread(self.__visibilitySync, normalized)
+        return await complete_on_cancel(
+            asyncio.to_thread(self.__visibilitySync, normalized),
+        )
 
     async def setVisibility(self: Self, path: str, visibility: str) -> None:
         """
@@ -852,7 +880,7 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Change the visibility of the object at *path*.
+            No return value.
 
         Raises
         ------
@@ -871,7 +899,7 @@ class S3StorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after updating visibility.
+                No return value.
             """
             client = self.__client()
             try:
@@ -885,7 +913,7 @@ class S3StorageDriver(IStorageDriver):
                     raise
                 raise self.__missing(normalized) from exc
 
-        await asyncio.to_thread(_apply)
+        await complete_on_cancel(asyncio.to_thread(_apply))
 
     async def hash(self: Self, path: str, algorithm: str = "sha256") -> str:
         """
@@ -899,7 +927,7 @@ class S3StorageDriver(IStorageDriver):
         path : str
             Root-relative file path.
         algorithm : str
-            Any algorithm name accepted by ``hashlib.new``.
+            Fixed-length digest algorithm accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -911,7 +939,7 @@ class S3StorageDriver(IStorageDriver):
         orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         orionis.storage.exceptions.UnsupportedStorageOperationException
-            If *algorithm* is not available.
+            If *algorithm* is unavailable or requires an explicit digest length.
         """
         normalized = normalizeFilePath(path)
 
@@ -930,6 +958,10 @@ class S3StorageDriver(IStorageDriver):
                 error_msg = f"Unsupported hash algorithm [{algorithm}]."
                 raise UnsupportedStorageOperationException(error_msg) from exc
 
+            if hasher.digest_size == 0:
+                error_msg = f"Unsupported hash algorithm [{algorithm}]."
+                raise UnsupportedStorageOperationException(error_msg)
+
             client = self.__client()
             try:
                 body = client.get_object(
@@ -945,7 +977,7 @@ class S3StorageDriver(IStorageDriver):
                     hasher.update(chunk)
             return hasher.hexdigest()
 
-        return await asyncio.to_thread(_hash)
+        return await complete_on_cancel(asyncio.to_thread(_hash))
 
     async def info(self: Self, path: str) -> FileInfo:
         """
@@ -987,7 +1019,8 @@ class S3StorageDriver(IStorageDriver):
                 visibility = self.__visibilitySync(normalized)
             except self._client_error as error:
                 # ACL access may be disabled on the bucket.
-                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                from orionis.failure.runtime import capture_nowait
+
                 capture_nowait(
                     error,
                     flow="storage",
@@ -1011,7 +1044,7 @@ class S3StorageDriver(IStorageDriver):
                 url=self.__urlFor(normalized),
             )
 
-        return await asyncio.to_thread(_info)
+        return await complete_on_cancel(asyncio.to_thread(_info))
 
     # ── Directory operations ─────────────────────────────────────────────────
 
@@ -1027,17 +1060,19 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Create a zero-byte directory marker at *path*.
+            No return value.
         """
         normalized = normalizePath(path)
         if not normalized:
             return
 
-        await asyncio.to_thread(
-            lambda: self.__client().put_object(
-                Bucket=self._bucket,
-                Key=f"{normalized}/",
-                Body=b"",
+        await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: self.__client().put_object(
+                    Bucket=self._bucket,
+                    Key=f"{normalized}/",
+                    Body=b"",
+                ),
             ),
         )
 
@@ -1055,6 +1090,12 @@ class S3StorageDriver(IStorageDriver):
         -------
         bool
             ``True`` if at least one object was removed.
+
+        Raises
+        ------
+        botocore.exceptions.ClientError
+            If a batch reports a per-object failure. The exception retains
+            the complete response, including successful deletions and errors.
         """
         normalized = normalizePath(path)
         prefix = f"{normalized}/" if normalized else ""
@@ -1074,13 +1115,19 @@ class S3StorageDriver(IStorageDriver):
             client = self.__client()
             for start in range(0, len(keys), _DELETE_BATCH):
                 batch = keys[start : start + _DELETE_BATCH]
-                client.delete_objects(
+                response = client.delete_objects(
                     Bucket=self._bucket,
                     Delete={"Objects": [{"Key": key} for key in batch]},
                 )
+                errors = response.get("Errors")
+                if errors:
+                    raise self._client_error(
+                        {**response, "Error": errors[0]},
+                        "DeleteObjects",
+                    )
             return True
 
-        return await asyncio.to_thread(_purge)
+        return await complete_on_cancel(asyncio.to_thread(_purge))
 
     async def directoryExists(self: Self, path: str) -> bool:
         """
@@ -1117,7 +1164,7 @@ class S3StorageDriver(IStorageDriver):
             )
             return int(response.get("KeyCount", 0)) > 0
 
-        return await asyncio.to_thread(_exists)
+        return await complete_on_cancel(asyncio.to_thread(_exists))
 
     async def files(
         self: Self,
@@ -1142,7 +1189,7 @@ class S3StorageDriver(IStorageDriver):
         """
         normalized = normalizePath(path)
         prefix = f"{normalized}/" if normalized else ""
-        keys = await asyncio.to_thread(self.__listKeysSync, prefix)
+        keys = await complete_on_cancel(asyncio.to_thread(self.__listKeysSync, prefix))
         return filterFiles(keys, normalized, recursive=recursive)
 
     async def directories(
@@ -1168,7 +1215,7 @@ class S3StorageDriver(IStorageDriver):
         """
         normalized = normalizePath(path)
         prefix = f"{normalized}/" if normalized else ""
-        keys = await asyncio.to_thread(self.__listKeysSync, prefix)
+        keys = await complete_on_cancel(asyncio.to_thread(self.__listKeysSync, prefix))
         return deriveDirectories(keys, normalized, recursive=recursive)
 
     # ── URLs and transfers ───────────────────────────────────────────────────
@@ -1228,7 +1275,7 @@ class S3StorageDriver(IStorageDriver):
                 ExpiresIn=expires_in,
             )
 
-        return await asyncio.to_thread(_sign)
+        return await complete_on_cancel(asyncio.to_thread(_sign))
 
     async def download(self: Self, path: str, destination: str | Path) -> Path:
         """
@@ -1273,7 +1320,7 @@ class S3StorageDriver(IStorageDriver):
                 raise self.__missing(normalized) from exc
             return target.resolve()
 
-        return await asyncio.to_thread(_download)
+        return await complete_on_cancel(asyncio.to_thread(_download))
 
     def open(self: Self, path: str, mode: str = "rb") -> AsyncStream:
         """
@@ -1313,33 +1360,39 @@ class S3StorageDriver(IStorageDriver):
             typing.BinaryIO
                 Stream handle for reading or writing.
             """
-            buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
+            buffer = tempfile.SpooledTemporaryFile(
                 max_size=_SPOOL_THRESHOLD,
             )
 
-            # Seed the buffer for modes that read existing content.
-            if mode in ("rb", "rb+", "ab", "ab+"):
-                self.__seedStream(buffer, normalized, mode)
-            return buffer
+            try:
+                # Seed the buffer for modes that read existing content.
+                if mode in ("rb", "rb+", "ab", "ab+"):
+                    self.__seedStream(buffer, normalized, mode)
+                return _ModeBuffer(buffer, mode)
+            except BaseException as error:
+                _close_failed_buffer(buffer, error)
+                raise
 
-        def flush(handle: BinaryIO) -> None:
+        def flush(handle: _ModeBuffer) -> None:
             """
             Persist the writable stream content to storage.
 
             Parameters
             ----------
-            handle : typing.BinaryIO
-                Buffered stream being closed.
+            handle : _ModeBuffer
+                Owned stream wrapper being closed.
 
             Returns
             -------
             None
-                Completes after writing the content.
+                No return value.
             """
             # Persist the buffered content back to S3 on close.
-            handle.seek(0)
+            handle.flush()
+            buffer = handle.raw
+            buffer.seek(0)
             self.__client().upload_fileobj(
-                handle,
+                buffer,
                 self._bucket,
                 normalized,
                 ExtraArgs=self.__putArgs(normalized, None),
@@ -1373,7 +1426,7 @@ class S3StorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Seed *buffer* with the current object content for a stream.
+            No return value.
 
         Raises
         ------
@@ -1385,10 +1438,8 @@ class S3StorageDriver(IStorageDriver):
             client.download_fileobj(self._bucket, normalized, buffer)
         except self._client_error as exc:
             if not self.__isMissing(exc):
-                buffer.close()
                 raise
             if mode in ("rb", "rb+"):
-                buffer.close()
                 raise self.__missing(normalized) from exc
         if mode.startswith("a"):
             buffer.seek(0, 2)

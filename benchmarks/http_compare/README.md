@@ -16,6 +16,11 @@ Todas responden `200 OK` con el texto exacto `Hello World` (11 bytes).
 Cada configuración se ejecuta con **1, 2, 3 y 4 workers**, HTTP/1.1 con
 keep-alive y event loop `asyncio`.
 
+El servidor solicita un puerto efímero al sistema operativo (`--port 0`).
+El runner obtiene el puerto del listener de sus propios procesos, sin liberar
+una reserva para volver a enlazarla ni adivinar un puerto ajeno. Esto no añade
+peticiones HTTP de preparación: solo Orionis recibe precalentamiento.
+
 En Linux, el lanzador de Uvicorn activa `TCP_NODELAY` en el socket TCP antes
 de compartirlo entre workers. Así conserva la política usada por `asyncio`
 con un solo worker y evita el retardo de Nagle y ACK diferido en respuestas

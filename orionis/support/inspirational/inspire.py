@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Retain the console annotation for dependency injection at runtime.
 """Select inspirational quotations for console output."""
 
 import secrets
@@ -6,12 +8,11 @@ from orionis.console.output.console import Console
 from orionis.support.inspirational.contracts.inspire import IInspire
 from orionis.support.inspirational.quotes import INSPIRATIONAL_QUOTES
 
-class Inspire(IInspire):
 
-    # ruff: noqa: TC001
+class Inspire(IInspire):
     """Select inspirational quotations for console output."""
 
-    __slots__ = ("_count", "_quotes")
+    __slots__ = ("_quotes",)
     """Declare the instance attribute slots reserved by this class."""
 
     _FALLBACK: ClassVar[dict] = {
@@ -36,7 +37,7 @@ class Inspire(IInspire):
         Returns
         -------
         None
-            Store the quotes and their count.
+            No return value.
 
         Raises
         ------
@@ -62,8 +63,6 @@ class Inspire(IInspire):
                     )
                     raise ValueError(msg)
             self._quotes = quotes
-        self._count = len(self._quotes)
-        """Count produced by ``len``."""
 
     def random(self) -> dict:
         """
@@ -74,7 +73,7 @@ class Inspire(IInspire):
         dict
             Quote dictionary containing ``quote`` and ``author`` keys.
         """
-        if self._count == 0:
+        if not self._quotes:
             return self._FALLBACK
         return secrets.choice(self._quotes)
 
@@ -90,7 +89,7 @@ class Inspire(IInspire):
         Returns
         -------
         None
-            Write the quote and its author.
+            No return value.
         """
         quote = self.random()
         console.writeLine(f'"{quote["quote"]}" - {quote["author"]}')

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import threading
 from types import SimpleNamespace
@@ -7,21 +9,22 @@ from orionis.hashing.hashers.bcrypt_hasher import BcryptHasher
 from orionis.support.concurrency import BoundedExecutor, WorkQueueFullError
 from orionis.test import TestCase
 
+
 class TestHashAdmission(TestCase):
     """Check shared algorithm admission without weakening cryptographic parameters."""
 
     async def testAlgorithmsShareDedicatedBudgetAndKeepLoopResponsive(
         self: Self,
     ) -> None:
-        """
-        Retain hashing capacity until native completion across algorithms.
+        """Retain hashing capacity until native completion across algorithms.
 
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         pool = BoundedExecutor(1, max_pending=0, name="hash-test")
+        self.addAsyncCleanup(pool.aclose)
         entered, released = threading.Event(), threading.Event()
         threads = []
 
@@ -61,4 +64,3 @@ class TestHashAdmission(TestCase):
         finally:
             released.set()
             self.assertEqual(await running, "encoded")
-            await pool.aclose()

@@ -1,3 +1,5 @@
+# ruff: noqa: PLR2004, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import ast
 import importlib.util
 from asyncio import CancelledError, gather
@@ -39,6 +41,7 @@ from orionis.realtime.metadata import compile_hub
 from orionis.schemas.rule import Rule
 from orionis.test import TestCase
 from tests.http.test_websocket import _ASGIPeer
+
 
 class _RecordedMakeCommand(MakeStubCommand):
     """Record output and file creation while retaining each command's behavior."""
@@ -142,9 +145,13 @@ class _RecordedMakeCommand(MakeStubCommand):
         """
         self.creation_threads.append(get_ident())
         return super().createFile(
-            app, name, template_name=template_name,
-            extension=extension, replacements=replacements,
+            app,
+            name,
+            template_name=template_name,
+            extension=extension,
+            replacements=replacements,
         )
+
 
 def _record_command(command_type: type[MakeStubCommand]) -> _RecordedMakeCommand:
     """Instantiate a recording subclass that preserves command overrides.
@@ -165,6 +172,7 @@ def _record_command(command_type: type[MakeStubCommand]) -> _RecordedMakeCommand
         {"__slots__": ()},
     )
     return recorded_type()
+
 
 class _Clock:
     """Supply successive fixed timestamps to the migration generator."""
@@ -196,6 +204,7 @@ class _Clock:
         """
         self.calls += 1
         return datetime(2026, 9, 30, 12, 22, self.calls, tzinfo=UTC)
+
 
 class _Application:
     """Resolve core application paths inside a temporary project directory."""
@@ -259,6 +268,7 @@ class _Application:
             "mail.from_address.name": "Example Notifications",
         }.get(key)
 
+
 class _Reactor:
     """Report that custom command signatures are available."""
 
@@ -289,6 +299,7 @@ class _Reactor:
         """
         return signature in self.registered
 
+
 def _get_python_sources(root: Path) -> set[Path]:
     """Collect Python source and interface files recursively.
 
@@ -304,6 +315,7 @@ def _get_python_sources(root: Path) -> set[Path]:
     """
     return set(root.rglob("*.py")) | set(root.rglob("*.pyi"))
 
+
 class TestMakeCommands(TestCase):
     """Verify built-in make command registration and file generation."""
 
@@ -317,7 +329,10 @@ class TestMakeCommands(TestCase):
         """
         self.clock = _Clock()
         self.addCleanup(
-            setattr, migration_module, "DateTime", migration_module.DateTime,
+            setattr,
+            migration_module,
+            "DateTime",
+            migration_module.DateTime,
         )
         migration_module.DateTime = self.clock
 
@@ -331,9 +346,12 @@ class TestMakeCommands(TestCase):
         """
         with TemporaryDirectory() as temporary:
             command = _record_command(MakeConsoleCommand)
-            command.setArguments({
-                "name": "worker", "signature": "generated:worker",
-            })
+            command.setArguments(
+                {
+                    "name": "worker",
+                    "signature": "generated:worker",
+                },
+            )
             await command.handle(_Application(Path(temporary)), _Reactor())
             self.assertEqual(len(command.creation_threads), 1)
             self.assertNotEqual(command.creation_threads[0], get_ident())
@@ -358,7 +376,7 @@ class TestMakeCommands(TestCase):
             for signature in ("INVALID", "generated:taken", None):
                 command = _record_command(MakeConsoleCommand)
                 command.setArguments({"name": "rejected", "signature": signature})
-                await command.handle(app, reactor)
+                self.assertEqual(await command.handle(app, reactor), 1)
                 self.assertEqual(command.creation_threads, [])
                 self.assertEqual(command.successes, [])
                 self.assertEqual(len(command.errors), 1)
@@ -383,7 +401,8 @@ class TestMakeCommands(TestCase):
             for index, command in enumerate(commands):
                 target = app.basePath / f"app/services/worker_{index}.py"
                 self.assertIn(
-                    f"class Worker{index}", target.read_text(encoding="utf-8"),
+                    f"class Worker{index}",
+                    target.read_text(encoding="utf-8"),
                 )
                 self.assertEqual(len(command.successes), 1)
                 self.assertEqual(command.errors, [])
@@ -603,8 +622,7 @@ class TestMakeCommands(TestCase):
                 )
                 self.assertTrue(
                     any(
-                        isinstance(node, ast.AsyncFunctionDef)
-                        and node.name == "run"
+                        isinstance(node, ast.AsyncFunctionDef) and node.name == "run"
                         for node in generated_class.body
                     ),
                 )
@@ -699,8 +717,7 @@ class TestMakeCommands(TestCase):
             await command.handle(app)
 
             target = (
-                root / "app" / "http" / "controllers" / "api"
-                / "invoice_controller.py"
+                root / "app" / "http" / "controllers" / "api" / "invoice_controller.py"
             )
             content = target.read_text(encoding="utf-8")
             module = ast.parse(content)
@@ -795,13 +812,10 @@ class TestMakeCommands(TestCase):
 
                 await command.handle(app)
 
-                relative_path = (
-                    Path("app") / "providers" / "cache_provider.py"
-                )
+                relative_path = Path("app") / "providers" / "cache_provider.py"
                 if index:
                     relative_path = (
-                        Path("app") / "providers" / "billing"
-                        / "cache_provider.py"
+                        Path("app") / "providers" / "billing" / "cache_provider.py"
                     )
                 content = (root / relative_path).read_text(encoding="utf-8")
                 self.assertIn("class CacheProvider", content)
@@ -896,9 +910,7 @@ class TestMakeCommands(TestCase):
                     self.assertEqual(_get_python_sources(root), {target})
                     module = ast.parse(target.read_text(encoding="utf-8"))
                     generated_class = next(
-                        node
-                        for node in module.body
-                        if isinstance(node, ast.ClassDef)
+                        node for node in module.body if isinstance(node, ast.ClassDef)
                     )
                     self.assertEqual(generated_class.name, f"Chat{suffix}")
                     self.assertEqual(command.errors, [])
@@ -906,7 +918,8 @@ class TestMakeCommands(TestCase):
                     self.assertEqual(command.lines, 2)
                     self.assertEqual(len(command.creation_threads), 1)
                     self.assertNotEqual(
-                        command.creation_threads[0], get_ident(),
+                        command.creation_threads[0],
+                        get_ident(),
                     )
 
     async def testMakeRealtimeUsesCustomPathsWithoutOverwritingFiles(self) -> None:
@@ -955,8 +968,13 @@ class TestMakeCommands(TestCase):
             with TemporaryDirectory() as temporary:
                 root = Path(temporary)
                 for name in (
-                    None, "", "..\\chat", "rooms\\..\\chat", "\\chat",
-                    "C:\\chat", "invalid-name",
+                    None,
+                    "",
+                    "..\\chat",
+                    "rooms\\..\\chat",
+                    "\\chat",
+                    "C:\\chat",
+                    "invalid-name",
                 ):
                     with self.subTest(command=command_type.signature, name=name):
                         command = _record_command(command_type)
@@ -981,20 +999,25 @@ class TestMakeCommands(TestCase):
             command = MakeRealtimeSocket()
             target = root / command.createFile(_Application(root), "chat")
             spec = importlib.util.spec_from_file_location(
-                "generated_chat_socket", target,
+                "generated_chat_socket",
+                target,
             )
             if spec is None or spec.loader is None:
                 self.fail("Generated socket module must be importable.")
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             self.assertIs(
-                module.ChatSocket.__call__.__annotations__["socket"], WebSocket,
+                module.ChatSocket.__call__.__annotations__["socket"],
+                WebSocket,
             )
             peer = _ASGIPeer()
             for message in ("Hello", "Realtime"):
-                peer.events.put_nowait({
-                    "type": "websocket.receive", "text": message,
-                })
+                peer.events.put_nowait(
+                    {
+                        "type": "websocket.receive",
+                        "text": message,
+                    },
+                )
             peer.events.put_nowait({"type": "websocket.disconnect", "code": 1000})
             socket = peer.socket()
 
@@ -1006,7 +1029,8 @@ class TestMakeCommands(TestCase):
                 ["websocket.accept", "websocket.send", "websocket.send"],
             )
             self.assertEqual(
-                [event["text"] for event in peer.sent[1:]], ["Hello", "Realtime"],
+                [event["text"] for event in peer.sent[1:]],
+                ["Hello", "Realtime"],
             )
             for failure in (RuntimeError("Receive failed"), CancelledError()):
                 with self.subTest(failure=type(failure).__name__):
@@ -1033,7 +1057,8 @@ class TestMakeCommands(TestCase):
             command = MakeRealtimeHub()
             target = root / command.createFile(_Application(root), "chat")
             spec = importlib.util.spec_from_file_location(
-                "generated_chat_hub", target,
+                "generated_chat_hub",
+                target,
             )
             if spec is None or spec.loader is None:
                 self.fail("Generated hub module must be importable.")
@@ -1062,7 +1087,8 @@ class TestMakeCommands(TestCase):
             command = MakeHttpSchemaRule()
             target = root / command.createFile(_Application(root), "availability")
             spec = importlib.util.spec_from_file_location(
-                "generated_availability_rule", target,
+                "generated_availability_rule",
+                target,
             )
             if spec is None or spec.loader is None:
                 self.fail("Generated rule module must be importable.")
@@ -1075,7 +1101,8 @@ class TestMakeCommands(TestCase):
             self.assertEqual(rule._code, "custom_rule")
             self.assertEqual(rule._message, "The value is invalid.")
             with self.assertRaisesRegex(
-                NotImplementedError, "Implement the custom validation rule",
+                NotImplementedError,
+                "Implement the custom validation rule",
             ):
                 await rule.validate("quantity", 1, object())
 
@@ -1141,9 +1168,7 @@ class TestMakeCommands(TestCase):
                     self.assertNotIn("TYPE_CHECKING", content)
                     module = ast.parse(content)
                     classes = [
-                        node
-                        for node in module.body
-                        if isinstance(node, ast.ClassDef)
+                        node for node in module.body if isinstance(node, ast.ClassDef)
                     ]
                     if command_type is MakeDatabaseSchema:
                         self.assertEqual(classes, [])
@@ -1208,7 +1233,6 @@ class TestMakeCommands(TestCase):
         self.assertEqual(len(signatures), len(CORE_COMMANDS))
         self.assertNotIn("make:database-seader", signatures)
         seeder_count = sum(
-            command.signature == "make:database-seeder"
-            for command in CORE_COMMANDS
+            command.signature == "make:database-seeder" for command in CORE_COMMANDS
         )
         self.assertEqual(seeder_count, 1)

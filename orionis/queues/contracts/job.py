@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IJob(ABC):
     """Declare the asynchronous entry point of a persistent job."""
 

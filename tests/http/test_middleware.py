@@ -1,12 +1,16 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.layer.contracts.middleware import IBaseMiddleware
 from orionis.http.middleware import BaseMiddleware, NextCallable
 from orionis.http.responses import Response
 from orionis.test import TestCase
 
+
 class _BareMiddleware(BaseMiddleware):
     """Middleware that forgets to override the request hook."""
 
     __slots__ = ()
+
 
 class _PassThroughMiddleware(BaseMiddleware):
     """Middleware that simply advances the pipeline."""
@@ -37,6 +41,7 @@ class _PassThroughMiddleware(BaseMiddleware):
         response.setHeader("x-visited", "1")
         return response
 
+
 async def terminal() -> Response:
     """
     Return the response produced at the end of the pipeline.
@@ -48,8 +53,8 @@ async def terminal() -> Response:
     """
     return Response(content="handler")
 
-class TestBaseMiddlewareContract(TestCase):
 
+class TestBaseMiddlewareContract(TestCase):
     def testImplementsTheMiddlewareContract(self) -> None:
         """Derive the base class from the middleware contract.
 
@@ -76,8 +81,8 @@ class TestBaseMiddlewareContract(TestCase):
         """
         self.assertFalse(hasattr(_PassThroughMiddleware(), "__dict__"))
 
-class TestBaseMiddlewareHandle(TestCase):
 
+class TestBaseMiddlewareHandle(TestCase):
     async def testRejectsASubclassThatDoesNotOverrideHandle(self) -> None:
         """Refuse to serve a middleware without a request hook.
 

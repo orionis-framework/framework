@@ -1,3 +1,8 @@
+# ruff: noqa: FBT003, PLC0415, PT009, PT027, S603, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Keep established public and external protocol names and signatures.
+# Run a fixed probe in the active interpreter to bound the deadlock regression.
 import asyncio
 import concurrent.futures
 import contextvars
@@ -13,25 +18,25 @@ from orionis.aio.loop import Loop
 from orionis.test import TestCase
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
+    from collections.abc import AsyncIterator, Awaitable, Callable, Generator
 
-# Seconds slept by the helper coroutine that is meant to stay pending.
-_SLEEP_SECONDS = 3600
-
-_NESTED_SYNC_PROBE = """\
+_NESTED_SYNC_PROBE = '''\
 from orionis.aio import Loop
 
-async def leaf():
+async def leaf() -> str:
+    """Return the nested probe's sentinel value."""
     return "leaf"
 
-async def middle():
+async def middle() -> str:
+    """Attempt a forbidden nested entry and close its rejected coroutine."""
     coro = leaf()
     try:
         return Loop.runSync(coro)
     finally:
         coro.close()
 
-async def outer():
+async def outer() -> str:
+    """Attempt the outer nested entry without leaving an unawaited coroutine."""
     coro = middle()
     try:
         return Loop.runSync(coro)
@@ -44,7 +49,8 @@ except RuntimeError as error:
     print(error)
 else:
     raise AssertionError("Nested runSync calls were not rejected")
-"""
+'''
+
 
 def call_off_loop[T](target: Callable[..., T], *args: object) -> T:
     """Run a callable in a worker thread without an active event loop.
@@ -63,6 +69,7 @@ def call_off_loop[T](target: Callable[..., T], *args: object) -> T:
     """
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
         return pool.submit(target, *args).result()
+
 
 def new_loop_probe(**overrides: object) -> type[Loop]:
     """Build an isolated ``Loop`` subclass with independent class state.
@@ -87,9 +94,11 @@ def new_loop_probe(**overrides: object) -> type[Loop]:
         _loop_lock = threading.Lock()
         _loop_factory_resolved = False
         _loop_factory_cached = None
+
     for attribute, value in overrides.items():
         setattr(LoopProbe, attribute, value)
     return LoopProbe
+
 
 def new_fake_uvloop_module() -> types.ModuleType:
     """Build a stand-in ``uvloop`` module exposing a loop factory.
@@ -102,6 +111,7 @@ def new_fake_uvloop_module() -> types.ModuleType:
     module = types.ModuleType("uvloop")
     module.__dict__["new_event_loop"] = asyncio.new_event_loop
     return module
+
 
 async def coroutine_returning(value: object) -> object:
     """Return a value from an asynchronous context.
@@ -117,6 +127,7 @@ async def coroutine_returning(value: object) -> object:
         The received value.
     """
     return value
+
 
 async def coroutine_joining(first: str, second: str) -> str:
     """Join two fragments from an asynchronous context.
@@ -135,6 +146,7 @@ async def coroutine_joining(first: str, second: str) -> str:
     """
     return f"{first}-{second}"
 
+
 async def coroutine_raising(exception: type[BaseException], message: str) -> None:
     """Raise an exception from an asynchronous context.
 
@@ -152,6 +164,7 @@ async def coroutine_raising(exception: type[BaseException], message: str) -> Non
     """
     raise exception(message)
 
+
 async def coroutine_interrupted() -> None:
     """Emulate a ``Ctrl+C`` received while the entry point is running.
 
@@ -162,14 +175,11 @@ async def coroutine_interrupted() -> None:
     """
     raise KeyboardInterrupt
 
-async def coroutine_sleeping() -> None:
-    """Wait long enough for the caller to cancel the resulting task.
 
-    Notes
-    -----
-    The long delay keeps the task pending until it is cancelled.
-    """
-    await asyncio.sleep(_SLEEP_SECONDS)
+async def coroutine_pending() -> None:
+    """Remain pending until the caller cancels the resulting task."""
+    await asyncio.Event().wait()
+
 
 def sync_returning(value: object) -> object:
     """Return a value from a synchronous context.
@@ -185,6 +195,7 @@ def sync_returning(value: object) -> object:
         The received value.
     """
     return value
+
 
 def sync_joining(first: str, second: str) -> str:
     """Join two fragments from a synchronous context.
@@ -203,6 +214,7 @@ def sync_joining(first: str, second: str) -> str:
     """
     return f"{first}-{second}"
 
+
 def sync_raising(exception: type[Exception], message: str) -> None:
     """Raise an exception from a synchronous context.
 
@@ -220,6 +232,7 @@ def sync_raising(exception: type[Exception], message: str) -> None:
     """
     raise exception(message)
 
+
 def sync_returning_awaitable(value: object) -> object:
     """Return a coroutine instead of an already computed value.
 
@@ -235,6 +248,7 @@ def sync_returning_awaitable(value: object) -> object:
     """
     return coroutine_returning(value)
 
+
 def acquire_thread_loop() -> asyncio.AbstractEventLoop:
     """Acquire the loop provided for the calling thread.
 
@@ -244,6 +258,7 @@ def acquire_thread_loop() -> asyncio.AbstractEventLoop:
         Event loop provided by ``Loop``.
     """
     return Loop.getEventLoop()
+
 
 def acquire_thread_loop_twice() -> tuple[
     asyncio.AbstractEventLoop,
@@ -257,6 +272,7 @@ def acquire_thread_loop_twice() -> tuple[
         The two loop references.
     """
     return Loop.getEventLoop(), Loop.getEventLoop()
+
 
 def replace_closed_thread_loop() -> tuple[
     asyncio.AbstractEventLoop,
@@ -272,6 +288,7 @@ def replace_closed_thread_loop() -> tuple[
     first = Loop.getEventLoop()
     first.close()
     return first, Loop.getEventLoop()
+
 
 def acquire_probe_loop(
     probe: type[Loop],
@@ -291,6 +308,7 @@ def acquire_probe_loop(
     loop = probe.getEventLoop()
     return loop, asyncio.get_event_loop() is loop
 
+
 def context_without_pending_tasks() -> tuple[asyncio.AbstractEventLoop, bool]:
     """Use a loop context without creating pending tasks.
 
@@ -303,6 +321,7 @@ def context_without_pending_tasks() -> tuple[asyncio.AbstractEventLoop, bool]:
         open_inside = not loop.is_closed()
     return loop, open_inside
 
+
 def context_cancelling_pending_task() -> asyncio.Task[None]:
     """Create a task that the managed context cancels on exit.
 
@@ -312,7 +331,8 @@ def context_cancelling_pending_task() -> asyncio.Task[None]:
         The cancelled task.
     """
     with Loop.eventLoopContext() as loop:
-        return loop.create_task(coroutine_sleeping())
+        return loop.create_task(coroutine_pending())
+
 
 def context_with_a_closed_loop() -> None:
     """Close an owned loop before its context can clean up.
@@ -324,6 +344,7 @@ def context_with_a_closed_loop() -> None:
     """
     with Loop.eventLoopContext() as loop:
         loop.close()
+
 
 class _MarkingLock:
     """Lock double publishing a value the moment it is acquired."""
@@ -356,13 +377,7 @@ class _MarkingLock:
         self.owner = owner
 
     def __enter__(self) -> None:
-        """Publish the value as if a competing thread had produced it.
-
-        Returns
-        -------
-        None
-            Updates the owner's configured attribute.
-        """
+        """Publish the value as if a competing thread had produced it."""
         self.entries += 1
         setattr(self.owner, self.attribute, self.value)
 
@@ -381,8 +396,8 @@ class _MarkingLock:
         """
         return False
 
-class TestRunningLoopDetection(TestCase):
 
+class TestRunningLoopDetection(TestCase):
     def testReturnsTheLoopDrivingTheCallingThread(self) -> None:
         """
         Return the loop currently running in the calling thread.
@@ -390,10 +405,6 @@ class TestRunningLoopDetection(TestCase):
         Validates that the helper reports exactly the object handed out by
         ``asyncio.get_running_loop``.
 
-        Returns
-        -------
-        None
-            Asserts that the running loop is returned unchanged.
         """
         self.assertIs(Loop._getRunningLoop(), asyncio.get_running_loop())
 
@@ -404,15 +415,11 @@ class TestRunningLoopDetection(TestCase):
         Validates that the ``RuntimeError`` raised by asyncio is translated
         into a plain ``None`` result.
 
-        Returns
-        -------
-        None
-            Asserts that a thread without a loop produces ``None``.
         """
         self.assertIsNone(call_off_loop(Loop._getRunningLoop))
 
-class TestLoopRunningFlag(TestCase):
 
+class TestLoopRunningFlag(TestCase):
     def testReportsTheLoopDrivingTheCallingThread(self) -> None:
         """
         Report an active loop while the test runner drives the call.
@@ -420,10 +427,6 @@ class TestLoopRunningFlag(TestCase):
         Validates the boolean shortcut used by callers that only need to
         know whether they are inside a loop.
 
-        Returns
-        -------
-        None
-            Asserts that the active loop is reported.
         """
         self.assertTrue(Loop.isLoopRunning())
 
@@ -434,40 +437,19 @@ class TestLoopRunningFlag(TestCase):
         Validates that the flag mirrors the absence of a running loop
         instead of the mere existence of a cached one.
 
-        Returns
-        -------
-        None
-            Asserts that a plain thread has no active loop.
         """
         self.assertFalse(call_off_loop(Loop.isLoopRunning))
+
 
 class TestUvloopDetectionWhenImportable(TestCase):
     """Detection performed while a ``uvloop`` module can be imported."""
 
     def setUp(self) -> None:
-        """Publish a stand-in module in the import cache.
-
-        Returns
-        -------
-        None
-            Installs the fake module for this test.
-        """
-        self.previous = sys.modules.get("uvloop")
+        """Publish a stand-in module in the import cache."""
         self.module = new_fake_uvloop_module()
-        sys.modules["uvloop"] = self.module
-
-    def tearDown(self) -> None:
-        """Restore the original import cache contents.
-
-        Returns
-        -------
-        None
-            Restores or removes the fake module.
-        """
-        if self.previous is None:
-            sys.modules.pop("uvloop", None)
-        else:
-            sys.modules["uvloop"] = self.previous
+        module_patch = patch.dict(sys.modules, {"uvloop": self.module})
+        module_patch.start()
+        self.addCleanup(module_patch.stop)
 
     def testCachesTheUvloopFactoryOutsideWindows(self) -> None:
         """
@@ -476,10 +458,6 @@ class TestUvloopDetectionWhenImportable(TestCase):
         Validates that the detected callable is returned and cached so the
         import is never repeated.
 
-        Returns
-        -------
-        None
-            Asserts that the detected factory is cached.
         """
         probe = new_loop_probe()
         detected = probe._detectUvloop()
@@ -494,41 +472,20 @@ class TestUvloopDetectionWhenImportable(TestCase):
         Validates that the platform guard runs before the import so an
         unsupported loop implementation is never selected.
 
-        Returns
-        -------
-        None
-            Asserts that Windows skips the optional factory.
         """
         probe = new_loop_probe(_IS_WIN32=True)
         self.assertIsNone(probe._detectUvloop())
         self.assertTrue(probe._uvloop_checked)
 
+
 class TestUvloopDetectionWhenMissing(TestCase):
     """Detection performed while the ``uvloop`` import is blocked."""
 
     def setUp(self) -> None:
-        """Block the ``uvloop`` import for the test.
-
-        Returns
-        -------
-        None
-            Marks the optional module as unavailable.
-        """
-        self.previous = sys.modules.get("uvloop")
-        sys.modules["uvloop"] = None  # type: ignore[assignment]
-
-    def tearDown(self) -> None:
-        """Restore the original import cache contents.
-
-        Returns
-        -------
-        None
-            Restores or removes the unavailable-module marker.
-        """
-        if self.previous is None:
-            sys.modules.pop("uvloop", None)
-        else:
-            sys.modules["uvloop"] = self.previous
+        """Block the ``uvloop`` import for the test."""
+        module_patch = patch.dict(sys.modules, {"uvloop": None})
+        module_patch.start()
+        self.addCleanup(module_patch.stop)
 
     def testReturnsNoFactoryWhenTheImportFails(self) -> None:
         """
@@ -537,18 +494,14 @@ class TestUvloopDetectionWhenMissing(TestCase):
         Validates that the ``ImportError`` is swallowed and the detection
         is still marked as completed.
 
-        Returns
-        -------
-        None
-            Asserts that failed detection is cached as unavailable.
         """
         probe = new_loop_probe()
         self.assertIsNone(probe._detectUvloop())
         self.assertIsNone(probe._uvloop_factory)
         self.assertTrue(probe._uvloop_checked)
 
-class TestUvloopDetectionCaching(TestCase):
 
+class TestUvloopDetectionCaching(TestCase):
     def testReturnsTheCachedFactoryWithoutAcquiringTheLock(self) -> None:
         """
         Return the cached factory once the detection already ran.
@@ -556,10 +509,6 @@ class TestUvloopDetectionCaching(TestCase):
         Validates that the guarded fast path answers before the lock is
         acquired, keeping repeated calls free of contention.
 
-        Returns
-        -------
-        None
-            Asserts that the cached result avoids lock acquisition.
         """
         lock = _MarkingLock("_uvloop_checked", True)
         probe = new_loop_probe(
@@ -578,10 +527,6 @@ class TestUvloopDetectionCaching(TestCase):
         Validates the second half of the double-checked locking: the state
         is re-read inside the critical section before importing.
 
-        Returns
-        -------
-        None
-            Asserts that a competing result prevents another import.
         """
         lock = _MarkingLock("_uvloop_checked", True)
         probe = new_loop_probe(_loop_lock=lock)
@@ -590,20 +535,14 @@ class TestUvloopDetectionCaching(TestCase):
         self.assertIsNone(probe._uvloop_factory)
         self.assertEqual(lock.entries, 1)
 
+
 @skipIf(sys.platform == "win32", "uvloop is not supported on Windows")
 class TestRealUvloopIntegration(TestCase):
     """Exercise the installed uvloop without substituting its factory."""
 
     def testRunsOnUvloopAndRestoresThePreviousLoop(self) -> None:
-        """
-        Execute work on uvloop and preserve the caller's registered loop.
-
-        Returns
-        -------
-        None
-            Assert uvloop execution and restoration of the caller's loop.
-        """
-        import uvloop # pyright: ignore[reportMissingImports]
+        """Execute work on uvloop and preserve the caller's registered loop."""
+        import uvloop  # pyright: ignore[reportMissingImports]
 
         probe = new_loop_probe()
 
@@ -624,14 +563,7 @@ class TestRealUvloopIntegration(TestCase):
             return running
 
         def check_runner() -> None:
-            """
-            Restore an idle external loop after closing the owned uvloop.
-
-            Returns
-            -------
-            None
-                Verify that the owned loop closes and the previous loop stays open.
-            """
+            """Restore an idle external loop after closing the owned uvloop."""
             previous = asyncio.new_event_loop()
             asyncio.set_event_loop(previous)
             try:
@@ -647,31 +579,17 @@ class TestRealUvloopIntegration(TestCase):
         call_off_loop(check_runner)
 
     def testOwnsUvloopAndCancelsPendingTasksOnContextExit(self) -> None:
-        """
-        Close a real uvloop and drain its pending tasks through Runner.
-
-        Returns
-        -------
-        None
-            Assert cancellation and cleanup of tasks on an owned uvloop.
-        """
-        import uvloop # pyright: ignore[reportMissingImports]
+        """Close a real uvloop and drain its pending tasks through Runner."""
+        import uvloop  # pyright: ignore[reportMissingImports]
 
         probe = new_loop_probe()
 
         def check_context() -> None:
-            """
-            Verify registration, task cancellation, and loop cleanup.
-
-            Returns
-            -------
-            None
-                Check loop registration, task cancellation, and final closure.
-            """
+            """Verify registration, task cancellation, and loop cleanup."""
             with probe.eventLoopContext() as loop:
                 self.assertIsInstance(loop, uvloop.Loop)
                 self.assertIs(asyncio.get_event_loop(), loop)
-                task = loop.create_task(coroutine_sleeping())
+                task = loop.create_task(coroutine_pending())
                 loop.run_until_complete(asyncio.sleep(0))
             self.assertTrue(task.cancelled())
             self.assertTrue(loop.is_closed())
@@ -680,8 +598,8 @@ class TestRealUvloopIntegration(TestCase):
 
         call_off_loop(check_context)
 
-class TestLoopFactoryResolution(TestCase):
 
+class TestLoopFactoryResolution(TestCase):
     def testAdoptsTheUvloopFactoryWhenDetected(self) -> None:
         """
         Prefer uvloop over every other loop implementation.
@@ -689,10 +607,6 @@ class TestLoopFactoryResolution(TestCase):
         Validates that a successful detection short-circuits the platform
         specific branches and is cached for later calls.
 
-        Returns
-        -------
-        None
-            Asserts that the detected factory becomes the cached result.
         """
         probe = new_loop_probe(
             _uvloop_checked=True,
@@ -710,10 +624,6 @@ class TestLoopFactoryResolution(TestCase):
         Validates the platform branch, including the guard that tolerates
         interpreters where the Proactor loop is not exposed.
 
-        Returns
-        -------
-        None
-            Asserts that Windows selects its available factory.
         """
         probe = new_loop_probe(_IS_WIN32=True, _uvloop_checked=True)
         expected = getattr(asyncio, "ProactorEventLoop", None)
@@ -727,10 +637,6 @@ class TestLoopFactoryResolution(TestCase):
         Validates that callers are told to fall back to the asyncio
         default loop implementation.
 
-        Returns
-        -------
-        None
-            Asserts that no optimized factory is selected.
         """
         probe = new_loop_probe(_uvloop_checked=True)
         self.assertIsNone(probe._getLoopFactory())
@@ -743,10 +649,6 @@ class TestLoopFactoryResolution(TestCase):
         Validates that the cached answer is served before any uvloop lookup
         is attempted.
 
-        Returns
-        -------
-        None
-            Asserts that the cached factory is returned directly.
         """
         lock = _MarkingLock("_uvloop_checked", True)
         probe = new_loop_probe(
@@ -758,27 +660,16 @@ class TestLoopFactoryResolution(TestCase):
         self.assertIs(probe._getLoopFactory(), asyncio.new_event_loop)
         self.assertEqual(lock.entries, 0)
 
+
 class TestLoopFactoryWithoutTheProactorLoop(TestCase):
     """Windows resolution on a runtime that hides the Proactor loop."""
 
     def setUp(self) -> None:
-        """Hide the Proactor loop exported by asyncio.
-
-        Returns
-        -------
-        None
-            Removes the optional factory for this test.
-        """
+        """Hide the Proactor loop exported by asyncio."""
         self.proactor = vars(asyncio).pop("ProactorEventLoop", None)
 
     def tearDown(self) -> None:
-        """Restore the Proactor loop exported by asyncio.
-
-        Returns
-        -------
-        None
-            Restores the optional factory when it was present.
-        """
+        """Restore the Proactor loop exported by asyncio."""
         if self.proactor is not None:
             vars(asyncio)["ProactorEventLoop"] = self.proactor
 
@@ -789,17 +680,13 @@ class TestLoopFactoryWithoutTheProactorLoop(TestCase):
         Validates the guard that keeps the Windows branch working on
         runtimes where the optimised loop implementation is absent.
 
-        Returns
-        -------
-        None
-            Asserts that a missing Proactor factory is tolerated.
         """
         probe = new_loop_probe(_IS_WIN32=True, _uvloop_checked=True)
         self.assertIsNone(probe._getLoopFactory())
         self.assertTrue(probe._loop_factory_resolved)
 
-class TestEventLoopRetrieval(TestCase):
 
+class TestEventLoopRetrieval(TestCase):
     def testReturnsTheLoopAlreadyRunningInTheThread(self) -> None:
         """
         Return the running loop without creating another one.
@@ -807,10 +694,6 @@ class TestEventLoopRetrieval(TestCase):
         Validates the fast path that prevents a second loop from being
         created inside asynchronous code.
 
-        Returns
-        -------
-        None
-            Asserts that the current running loop is returned.
         """
         self.assertIs(Loop.getEventLoop(), asyncio.get_running_loop())
 
@@ -821,10 +704,6 @@ class TestEventLoopRetrieval(TestCase):
         Validates that asyncio's registration avoids rebuilding a loop that
         is still usable.
 
-        Returns
-        -------
-        None
-            Asserts that repeated calls reuse the thread's open loop.
         """
         first, second = call_off_loop(acquire_thread_loop_twice)
         try:
@@ -840,10 +719,6 @@ class TestEventLoopRetrieval(TestCase):
         Validates the isolation guarantee that keeps a loop from being
         shared across threads.
 
-        Returns
-        -------
-        None
-            Asserts that distinct threads receive distinct loops.
         """
         first = call_off_loop(acquire_thread_loop)
         second = call_off_loop(acquire_thread_loop)
@@ -859,10 +734,6 @@ class TestEventLoopRetrieval(TestCase):
 
         Validates that a stale entry never leaks back to the caller.
 
-        Returns
-        -------
-        None
-            Asserts that a closed cached loop is replaced.
         """
         closed, replacement = call_off_loop(replace_closed_thread_loop)
         try:
@@ -879,10 +750,6 @@ class TestEventLoopRetrieval(TestCase):
         Validates the fallback branch taken on platforms where neither
         uvloop nor the Proactor loop can be used.
 
-        Returns
-        -------
-        None
-            Asserts that asyncio creates and registers the fallback loop.
         """
         probe = new_loop_probe(
             _loop_factory_resolved=True,
@@ -896,23 +763,10 @@ class TestEventLoopRetrieval(TestCase):
             loop.close()
 
     def testFollowsAnExternallyReplacedRegistration(self) -> None:
-        """
-        Use the replacement registered through asyncio.set_event_loop.
+        """Use the replacement registered through asyncio.set_event_loop."""
 
-        Returns
-        -------
-        None
-            Assert that loop lookup follows an external replacement.
-        """
         def check_registration() -> None:
-            """
-            Replace an open loop in the same thread.
-
-            Returns
-            -------
-            None
-                Check that the newly registered loop replaces the cached loop.
-            """
+            """Replace an open loop in the same thread."""
             first = Loop.getEventLoop()
             replacement = asyncio.new_event_loop()
             try:
@@ -928,23 +782,10 @@ class TestEventLoopRetrieval(TestCase):
         call_off_loop(check_registration)
 
     def testDoesNotReuseAnUnregisteredLoop(self) -> None:
-        """
-        Create a fresh loop after the caller clears the registration.
+        """Create a fresh loop after the caller clears the registration."""
 
-        Returns
-        -------
-        None
-            Assert that an unregistered loop is not reused.
-        """
         def check_registration() -> None:
-            """
-            Clear the registry without closing its previous loop.
-
-            Returns
-            -------
-            None
-                Check that clearing registration forces a fresh loop lookup.
-            """
+            """Clear the registry without closing its previous loop."""
             first = Loop.getEventLoop()
             asyncio.set_event_loop(None)
             replacement = Loop.getEventLoop()
@@ -959,8 +800,8 @@ class TestEventLoopRetrieval(TestCase):
 
         call_off_loop(check_registration)
 
-class TestRunEntryPoint(TestCase):
 
+class TestRunEntryPoint(TestCase):
     def testRunsTheCoroutineAndReturnsItsValue(self) -> None:
         """
         Drive the coroutine to completion and surface its result.
@@ -968,10 +809,6 @@ class TestRunEntryPoint(TestCase):
         Validates the nominal entry-point usage from a thread with no
         running loop.
 
-        Returns
-        -------
-        None
-            Asserts that the coroutine result is returned from the worker.
         """
         self.assertEqual(call_off_loop(Loop.run, coroutine_returning(42)), 42)
 
@@ -982,10 +819,6 @@ class TestRunEntryPoint(TestCase):
         Validates that both a coroutine function and a plain value are
         refused before any loop is created.
 
-        Returns
-        -------
-        None
-            Asserts that non-coroutine inputs raise ``TypeError``.
         """
         with self.assertRaises(TypeError):
             Loop.run(coroutine_returning)  # type: ignore[arg-type]
@@ -999,10 +832,6 @@ class TestRunEntryPoint(TestCase):
         Validates that the entry point preserves the coroutine's result type
         and lets the application choose its interruption policy.
 
-        Returns
-        -------
-        None
-            Asserts that interruption reaches the caller.
         """
         with self.assertRaises(KeyboardInterrupt):
             call_off_loop(Loop.run, coroutine_interrupted())
@@ -1014,10 +843,6 @@ class TestRunEntryPoint(TestCase):
         Validates that application failures are not masked by the entry
         point wrapper.
 
-        Returns
-        -------
-        None
-            Asserts that the coroutine's exception reaches the caller.
         """
         with self.assertRaises(ValueError):
             call_off_loop(Loop.run, coroutine_raising(ValueError, "boom"))
@@ -1029,10 +854,6 @@ class TestRunEntryPoint(TestCase):
         Validates the documented failure mode, including that no runner is
         opened and the coroutine stays the caller's to close.
 
-        Returns
-        -------
-        None
-            Asserts that a second loop is rejected and closes the coroutine.
         """
         self.assertTrue(Loop.isLoopRunning())
         coro = coroutine_returning("never started")
@@ -1049,27 +870,17 @@ class TestRunEntryPoint(TestCase):
             coro.close()
 
     def testRegistersFactoryLoopsBeforeExecutionAndClearsThemAfterward(self) -> None:
-        """
-        Register both optimal and fallback loops before Runner.run starts.
+        """Register both optimal and fallback loops before Runner.run starts."""
 
-        Returns
-        -------
-        None
-            Assert registration before execution and cleanup after execution.
-        """
         def check_registration() -> None:
-            """
-            Observe the current loop before entering asynchronous code.
-
-            Returns
-            -------
-            None
-                Check registration for both default and explicit loop factories.
-            """
+            """Observe the current loop before entering asynchronous code."""
             run = asyncio.Runner.run
             created = []
 
-            def run_registered(runner, coro):
+            def run_registered(
+                runner: asyncio.Runner,
+                coro: Awaitable[object],
+            ) -> object:
                 """
                 Check the loop registry before running the coroutine.
 
@@ -1104,23 +915,10 @@ class TestRunEntryPoint(TestCase):
         call_off_loop(check_registration)
 
     def testRestoresThePreviousLoopAfterResultsAndExceptions(self) -> None:
-        """
-        Restore a borrowed registration on success, failure and interruption.
+        """Restore a borrowed registration on success, failure and interruption."""
 
-        Returns
-        -------
-        None
-            Assert restoration after normal results and exceptional exits.
-        """
         def check_restoration() -> None:
-            """
-            Keep the outer owner's loop usable across nested entry points.
-
-            Returns
-            -------
-            None
-                Check that nested entry points preserve the outer loop.
-            """
+            """Keep the outer owner's loop usable across nested entry points."""
             with asyncio.Runner() as owner:
                 previous = owner.get_loop()
                 for factory in (None, asyncio.new_event_loop):
@@ -1131,7 +929,9 @@ class TestRunEntryPoint(TestCase):
                     self.assertEqual(probe.run(coroutine_returning(42)), 42)
                     self.assertIs(asyncio.get_event_loop(), previous)
                     for exception in (
-                        ValueError, KeyboardInterrupt, asyncio.CancelledError,
+                        ValueError,
+                        KeyboardInterrupt,
+                        asyncio.CancelledError,
                     ):
                         with self.assertRaises(exception):
                             probe.run(coroutine_raising(exception, "interrupted"))
@@ -1141,35 +941,16 @@ class TestRunEntryPoint(TestCase):
         call_off_loop(check_restoration)
 
     def testDoesNotRestoreAPreviousLoopClosedDuringExecution(self) -> None:
-        """
-        Clear the registry if the previous loop has been closed.
+        """Clear the registry if the previous loop has been closed."""
 
-        Returns
-        -------
-        None
-            Assert that a closed previous loop is not registered again.
-        """
         def check_restoration() -> None:
-            """
-            Close the previous idle loop while the owned loop runs.
-
-            Returns
-            -------
-            None
-                Check registry cleanup when execution closes the previous loop.
-            """
+            """Close the previous idle loop while the owned loop runs."""
             previous = asyncio.new_event_loop()
             asyncio.set_event_loop(previous)
             try:
-                async def close_previous() -> None:
-                    """
-                    Close the previous registration from a separate loop.
 
-                    Returns
-                    -------
-                    None
-                        Close the previous loop while another loop is active.
-                    """
+                async def close_previous() -> None:
+                    """Close the previous registration from a separate loop."""
                     previous.close()
 
                 Loop.run(close_previous())
@@ -1181,78 +962,37 @@ class TestRunEntryPoint(TestCase):
 
         call_off_loop(check_restoration)
 
-class TestRunWithoutAnOptimalFactory(TestCase):
-    """Entry point exercised while no optimal loop factory is resolved."""
-
-    def setUp(self) -> None:
-        """Force the resolution cache to report no optimal factory.
-
-        Returns
-        -------
-        None
-            Sets the shared factory cache to its fallback state.
-        """
-        self.resolved = Loop._loop_factory_resolved
-        self.cached = Loop._loop_factory_cached
-        Loop._loop_factory_resolved = True
-        Loop._loop_factory_cached = None
-
-    def tearDown(self) -> None:
-        """Restore the resolution cache shared by the process.
-
-        Returns
-        -------
-        None
-            Restores both cached factory values.
-        """
-        Loop._loop_factory_resolved = self.resolved
-        Loop._loop_factory_cached = self.cached
-
-    def testFallsBackToTheStandardAsyncioRunner(self) -> None:
-        """
-        Run the coroutine with the standard Runner when no factory exists.
-
-        Validates the fallback branch used on platforms without uvloop or
-        the Proactor loop.
-
-        Returns
-        -------
-        None
-            Asserts that the stdlib runner returns the coroutine result.
-        """
-        result = call_off_loop(Loop.run, coroutine_returning("stdlib"))
-        self.assertEqual(result, "stdlib")
 
 class TestExecuteBridge(TestCase):
-
     async def testOffloadsSynchronousCallablesToTheExecutor(self) -> None:
         """
         Run a blocking callable outside the loop thread.
 
-        Validates that the returned value reaches the awaiting coroutine
-        untouched.
+        Validate that the synchronous callable runs on a worker thread.
 
-        Returns
-        -------
-        None
-            Asserts that the synchronous result reaches the caller.
         """
-        self.assertEqual(await Loop.execute(sync_returning, 7), 7)
+        worker_thread = await Loop.execute(threading.get_ident)
+        self.assertNotEqual(worker_thread, threading.get_ident())
 
     async def testAwaitsCoroutineFunctionsDirectly(self) -> None:
         """
         Await a coroutine function without using the executor.
 
-        Validates that asynchronous callables keep running on the loop
-        that invoked them.
+        Validate that the coroutine body runs on the invoking loop.
 
-        Returns
-        -------
-        None
-            Asserts that the coroutine result is awaited directly.
         """
-        result = await Loop.execute(coroutine_returning, "hello")
-        self.assertEqual(result, "hello")
+
+        async def running_loop() -> asyncio.AbstractEventLoop:
+            """Return the loop used to execute this coroutine.
+
+            Returns
+            -------
+            asyncio.AbstractEventLoop
+                Loop running the coroutine body.
+            """
+            return asyncio.get_running_loop()
+
+        self.assertIs(await Loop.execute(running_loop), asyncio.get_running_loop())
 
     async def testForwardsKeywordArgumentsToSynchronousCallables(self) -> None:
         """
@@ -1261,10 +1001,6 @@ class TestExecuteBridge(TestCase):
         Validates that to_thread forwards keywords without changing the
         calling convention.
 
-        Returns
-        -------
-        None
-            Asserts that keyword arguments reach the synchronous callable.
         """
         result = await Loop.execute(sync_joining, first="a", second="b")
         self.assertEqual(result, "a-b")
@@ -1276,10 +1012,6 @@ class TestExecuteBridge(TestCase):
         Validates that the direct await path preserves the full calling
         convention.
 
-        Returns
-        -------
-        None
-            Asserts that keyword arguments reach the coroutine function.
         """
         result = await Loop.execute(coroutine_joining, first="a", second="b")
         self.assertEqual(result, "a-b")
@@ -1291,22 +1023,11 @@ class TestExecuteBridge(TestCase):
         Validates that a factory returning a coroutine is resolved instead
         of being handed back to the caller.
 
-        Returns
-        -------
-        None
-            Asserts that a returned awaitable is awaited.
         """
         self.assertEqual(await Loop.execute(sync_returning_awaitable, 3), 3)
 
     async def testAwaitsGeneratorBasedCoroutines(self) -> None:
-        """
-        Resolve generator-based coroutines on the calling event loop.
-
-        Returns
-        -------
-        None
-            Assert that generator-based coroutines run on the calling loop.
-        """
+        """Resolve generator-based coroutines on the calling event loop."""
         running = asyncio.get_running_loop()
 
         @types.coroutine
@@ -1334,14 +1055,8 @@ class TestExecuteBridge(TestCase):
         )
 
     async def testPropagatesGeneratorBasedCoroutineFailures(self) -> None:
-        """
-        Propagate errors raised after a generator-based coroutine suspends.
+        """Propagate errors raised after a generator-based coroutine suspends."""
 
-        Returns
-        -------
-        None
-            Assert propagation of an error raised after suspension.
-        """
         @types.coroutine
         def failing_coroutine() -> Generator[None]:
             """
@@ -1365,14 +1080,8 @@ class TestExecuteBridge(TestCase):
             await Loop.execute(failing_coroutine)
 
     async def testReturnsOrdinaryGeneratorsWithoutAwaitingThem(self) -> None:
-        """
-        Preserve generators that do not implement the awaitable protocol.
+        """Preserve generators that do not implement the awaitable protocol."""
 
-        Returns
-        -------
-        None
-            Assert that ordinary generators are returned without awaiting them.
-        """
         def values() -> Generator[str]:
             """
             Yield an ordinary synchronous value.
@@ -1398,10 +1107,6 @@ class TestExecuteBridge(TestCase):
 
         Validates that the guard runs before any scheduling attempt.
 
-        Returns
-        -------
-        None
-            Asserts that non-callable inputs raise ``TypeError``.
         """
         with self.assertRaises(TypeError):
             await Loop.execute(42)  # type: ignore[arg-type]
@@ -1413,10 +1118,6 @@ class TestExecuteBridge(TestCase):
         Validates that errors crossing the thread boundary are not
         swallowed by the executor future.
 
-        Returns
-        -------
-        None
-            Asserts that executor failures reach the awaiting caller.
         """
         with self.assertRaises(ValueError):
             await Loop.execute(sync_raising, ValueError, "boom")
@@ -1427,28 +1128,17 @@ class TestExecuteBridge(TestCase):
 
         Validates that the direct await path re-raises the original error.
 
-        Returns
-        -------
-        None
-            Asserts that coroutine failures reach the awaiting caller.
         """
         with self.assertRaises(RuntimeError):
             await Loop.execute(coroutine_raising, RuntimeError, "boom")
 
     async def testCopiesContextIntoTheWorkerWithoutLeakingChanges(self) -> None:
-        """
-        Preserve request context while isolating worker-side modifications.
-
-        Returns
-        -------
-        None
-            Assert context inheritance without leaking worker modifications.
-        """
+        """Preserve request context while isolating worker-side modifications."""
         marker = contextvars.ContextVar("execute-request", default="missing")
         caller_thread = threading.get_ident()
         token = marker.set("request-id")
 
-        def read_and_modify_context():
+        def read_and_modify_context() -> tuple[str, int]:
             """
             Read the inherited context and modify only the worker copy.
 
@@ -1469,8 +1159,8 @@ class TestExecuteBridge(TestCase):
         finally:
             marker.reset(token)
 
-class TestEventLoopContextManager(TestCase):
 
+class TestEventLoopContextManager(TestCase):
     def testClosesTheLoopItCreates(self) -> None:
         """
         Hand out a usable loop and close it after the block.
@@ -1478,10 +1168,6 @@ class TestEventLoopContextManager(TestCase):
         Validates that a context without a registered loop owns and closes
         the loop it creates, even without pending tasks.
 
-        Returns
-        -------
-        None
-            Asserts that the owned loop is closed after the context.
         """
         loop, open_inside = call_off_loop(context_without_pending_tasks)
         self.assertTrue(open_inside)
@@ -1494,10 +1180,6 @@ class TestEventLoopContextManager(TestCase):
         Validates the cooperative cleanup that prevents orphan tasks from
         outliving the context.
 
-        Returns
-        -------
-        None
-            Asserts that the pending task is cancelled on context exit.
         """
         task = call_off_loop(context_cancelling_pending_task)
         self.assertTrue(task.cancelled())
@@ -1509,10 +1191,6 @@ class TestEventLoopContextManager(TestCase):
         Validates that lifecycle violations are not silently swallowed and
         cleanup does not create unawaited shutdown coroutines.
 
-        Returns
-        -------
-        None
-            Asserts that premature closure raises an explicit error.
         """
         with self.assertRaisesRegex(RuntimeError, "closed before cleanup"):
             call_off_loop(context_with_a_closed_loop)
@@ -1524,13 +1202,9 @@ class TestEventLoopContextManager(TestCase):
         Validates that a context opened inside asynchronous code never
         cancels the tasks driving the caller.
 
-        Returns
-        -------
-        None
-            Asserts that the active caller loop remains open.
         """
         running = asyncio.get_running_loop()
-        task = asyncio.create_task(coroutine_sleeping())
+        task = asyncio.create_task(coroutine_pending())
         try:
             with Loop.eventLoopContext() as loop:
                 self.assertIs(loop, running)
@@ -1542,25 +1216,12 @@ class TestEventLoopContextManager(TestCase):
             await asyncio.gather(task, return_exceptions=True)
 
     def testNestedContextsLeaveOuterTasksUntouched(self) -> None:
-        """
-        Let only the owning outer context cancel its pending tasks.
+        """Let only the owning outer context cancel its pending tasks."""
 
-        Returns
-        -------
-        None
-            Assert that nested contexts leave outer tasks alive.
-        """
         def check_nested_contexts() -> None:
-            """
-            Borrow the registered loop from a nested idle context.
-
-            Returns
-            -------
-            None
-                Check that only the owning context cancels pending tasks.
-            """
+            """Borrow the registered loop from a nested idle context."""
             with Loop.eventLoopContext() as loop:
-                task = loop.create_task(coroutine_sleeping())
+                task = loop.create_task(coroutine_pending())
                 loop.run_until_complete(asyncio.sleep(0))
                 with Loop.eventLoopContext() as inner:
                     self.assertIs(inner, loop)
@@ -1572,26 +1233,13 @@ class TestEventLoopContextManager(TestCase):
         call_off_loop(check_nested_contexts)
 
     def testBorrowsAnIdleLoopWithoutCancellingItsTasks(self) -> None:
-        """
-        Leave a loop owned by an external Runner open and untouched.
+        """Leave a loop owned by an external Runner open and untouched."""
 
-        Returns
-        -------
-        None
-            Assert that a borrowed idle loop and its tasks remain usable.
-        """
         def check_borrowed_context() -> None:
-            """
-            Keep the external owner's tasks alive after context exit.
-
-            Returns
-            -------
-            None
-                Check that context exit preserves externally owned tasks.
-            """
+            """Keep the external owner's tasks alive after context exit."""
             with asyncio.Runner() as owner:
                 external = owner.get_loop()
-                task = external.create_task(coroutine_sleeping())
+                task = external.create_task(coroutine_pending())
                 external.run_until_complete(asyncio.sleep(0))
                 with Loop.eventLoopContext() as loop:
                     self.assertIs(loop, external)
@@ -1604,23 +1252,10 @@ class TestEventLoopContextManager(TestCase):
         call_off_loop(check_borrowed_context)
 
     def testBorrowsAPreviouslyRetrievedLoopWithoutTakingOwnership(self) -> None:
-        """
-        Leave a loop acquired through getEventLoop owned by its caller.
+        """Leave a loop acquired through getEventLoop owned by its caller."""
 
-        Returns
-        -------
-        None
-            Assert that borrowing a retrieved loop does not transfer ownership.
-        """
         def check_borrowed_context() -> None:
-            """
-            Close the retrieved loop explicitly after the borrowing context.
-
-            Returns
-            -------
-            None
-                Check that the caller remains responsible for closing the loop.
-            """
+            """Close the retrieved loop explicitly after the borrowing context."""
             retrieved = Loop.getEventLoop()
             try:
                 with Loop.eventLoopContext() as current:
@@ -1634,27 +1269,14 @@ class TestEventLoopContextManager(TestCase):
         call_off_loop(check_borrowed_context)
 
     def testFinalizesAsyncGeneratorsAndShutsDownTheDefaultExecutor(self) -> None:
-        """
-        Drain async generators and executor work before closing an owned loop.
+        """Drain async generators and executor work before closing an owned loop."""
 
-        Returns
-        -------
-        None
-            Assert generator finalization and executor shutdown before closure.
-        """
         def check_cleanup() -> None:
-            """
-            Release executor work from an async generator's finalizer.
-
-            Returns
-            -------
-            None
-                Check that generator finalization unblocks and completes the worker.
-            """
+            """Release executor work from an async generator's finalizer."""
             released = threading.Event()
             completed = threading.Event()
 
-            async def values():
+            async def values() -> AsyncIterator[str]:
                 """
                 Yield once and release the worker when finalized.
 
@@ -1708,28 +1330,15 @@ class TestEventLoopContextManager(TestCase):
         call_off_loop(check_cleanup)
 
     def testCleansUpWhenTheContextBodyRaises(self) -> None:
-        """
-        Close the owned loop and clear its registry when the body fails.
+        """Close the owned loop and clear its registry when the body fails."""
 
-        Returns
-        -------
-        None
-            Assert task cancellation and loop cleanup after a context failure.
-        """
         def check_cleanup() -> None:
-            """
-            Raise an application error inside an owning context.
-
-            Returns
-            -------
-            None
-                Assert cleanup after catching the simulated application error.
-            """
+            """Raise an application error inside an owning context."""
             with (
                 self.assertRaisesRegex(ValueError, "context failure"),
                 Loop.eventLoopContext() as loop,
             ):
-                task = loop.create_task(coroutine_sleeping())
+                task = loop.create_task(coroutine_pending())
                 error_msg = "context failure"
                 raise ValueError(error_msg)
             self.assertTrue(task.cancelled())
@@ -1739,8 +1348,8 @@ class TestEventLoopContextManager(TestCase):
 
         call_off_loop(check_cleanup)
 
-class TestTaskCreation(TestCase):
 
+class TestTaskCreation(TestCase):
     async def testSchedulesTheCoroutineAsATask(self) -> None:
         """
         Schedule the coroutine on the running loop.
@@ -1748,10 +1357,6 @@ class TestTaskCreation(TestCase):
         Validates that the returned object is a task that resolves to the
         coroutine result.
 
-        Returns
-        -------
-        None
-            Asserts that the scheduled task resolves to the coroutine value.
         """
         task = Loop.createTask(coroutine_returning(5))
         self.assertIsInstance(task, asyncio.Task)
@@ -1764,26 +1369,16 @@ class TestTaskCreation(TestCase):
         Validates that the optional name reaches the underlying asyncio
         call so tasks stay identifiable while debugging.
 
-        Returns
-        -------
-        None
-            Asserts that the task receives the requested name.
         """
         task = Loop.createTask(
-            coroutine_returning(None), name="orionis-task",
+            coroutine_returning(None),
+            name="orionis-task",
         )
         self.assertEqual(task.get_name(), "orionis-task")
         await task
 
     async def testSchedulesImmediatelyAndCapturesTheCreationContext(self) -> None:
-        """
-        Start the task before it is awaited using its creation-time context.
-
-        Returns
-        -------
-        None
-            Assert immediate scheduling and capture of the creation context.
-        """
+        """Start the task before it is awaited using its creation-time context."""
         marker = contextvars.ContextVar("task-context", default="missing")
         observed = []
 
@@ -1813,8 +1408,8 @@ class TestTaskCreation(TestCase):
                 task.cancel()
             await asyncio.gather(task, return_exceptions=True)
 
-class TestRunSyncBridge(TestCase):
 
+class TestRunSyncBridge(TestCase):
     def testRunsTheCoroutineDirectlyWithoutARunningLoop(self) -> None:
         """
         Drive the coroutine in place when no loop is running.
@@ -1822,10 +1417,6 @@ class TestRunSyncBridge(TestCase):
         Validates that the synchronous bridge avoids the worker thread
         whenever the caller owns the thread.
 
-        Returns
-        -------
-        None
-            Asserts that the coroutine result is returned directly.
         """
         result = call_off_loop(Loop.runSync, coroutine_returning("direct"))
         self.assertEqual(result, "direct")
@@ -1837,10 +1428,6 @@ class TestRunSyncBridge(TestCase):
         Validates that the caller receives an actionable error before a
         Runner or worker starts, retaining ownership of the coroutine.
 
-        Returns
-        -------
-        None
-            Asserts that the running loop is rejected without consuming work.
         """
         self.assertTrue(Loop.isLoopRunning())
         coro = coroutine_returning("not consumed")
@@ -1860,36 +1447,18 @@ class TestRunSyncBridge(TestCase):
         Validates that the synchronous entry point re-raises the original
         error in the calling thread.
 
-        Returns
-        -------
-        None
-            Asserts that coroutine failures reach the calling thread.
         """
         with self.assertRaisesRegex(RuntimeError, "boom"):
             call_off_loop(Loop.runSync, coroutine_raising(RuntimeError, "boom"))
 
     def testRejectsInvalidInputsBeforeCheckingForARunningLoop(self) -> None:
-        """
-        Preserve coroutine validation even when the calling loop is active.
-
-        Returns
-        -------
-        None
-            Assert input validation before active-loop rejection.
-        """
+        """Preserve coroutine validation even when the calling loop is active."""
         with self.assertRaises(TypeError):
             Loop.runSync(42)  # type: ignore[arg-type]
 
     def testRejectsNestedCallsInsteadOfDeadlocking(self) -> None:
-        """
-        Bound the nested single-worker deadlock regression in a subprocess.
-
-        Returns
-        -------
-        None
-            Assert that nested synchronous calls fail without hanging.
-        """
-        result = subprocess.run(  # noqa: S603
+        """Bound the nested single-worker deadlock regression in a subprocess."""
+        result = subprocess.run(
             [sys.executable, "-B", "-c", _NESTED_SYNC_PROBE],
             cwd=Path(__file__).resolve().parents[2],
             capture_output=True,
@@ -1902,18 +1471,11 @@ class TestRunSyncBridge(TestCase):
         self.assertNotIn("was never awaited", result.stderr)
 
     async def testPreservesContextWhenExplicitlyOffloaded(self) -> None:
-        """
-        Carry request context through execute into a worker's sync entry point.
-
-        Returns
-        -------
-        None
-            Assert context propagation to the worker's synchronous entry point.
-        """
+        """Carry request context through execute into a worker's sync entry point."""
         marker = contextvars.ContextVar("sync-request", default="missing")
         caller_thread = threading.get_ident()
 
-        async def read_context():
+        async def read_context() -> tuple[str, int]:
             """
             Read context from the worker's owned loop.
 
@@ -1934,16 +1496,11 @@ class TestRunSyncBridge(TestCase):
             marker.reset(token)
 
     async def testSupportsConcurrentIndependentSynchronousCallers(self) -> None:
-        """
-        Run independent synchronous entry points without shared worker state.
-
-        Returns
-        -------
-        None
-            Assert that concurrent callers keep independent execution state.
-        """
-        results = await asyncio.gather(*(
-            Loop.execute(Loop.runSync, coroutine_returning(value))
-            for value in range(4)
-        ))
+        """Run independent synchronous entry points without shared worker state."""
+        results = await asyncio.gather(
+            *(
+                Loop.execute(Loop.runSync, coroutine_returning(value))
+                for value in range(4)
+            ),
+        )
         self.assertEqual(results, list(range(4)))

@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 type WebSocketNext = Callable[[], Awaitable[None]]
 """Type alias for ``Callable[[], Awaitable[None]]``."""
 
+
 class WebSocketMiddleware(ABC):
     """Define a connection middleware resolved inside each WebSocket scope."""
 
@@ -18,7 +19,9 @@ class WebSocketMiddleware(ABC):
 
     @abstractmethod
     async def handle(
-        self, socket: WebSocket, call_next: WebSocketNext,
+        self,
+        socket: WebSocket,
+        call_next: WebSocketNext,
     ) -> None:
         """
         Inspect the handshake or wrap the connection handler.

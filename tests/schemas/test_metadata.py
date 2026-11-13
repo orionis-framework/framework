@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.schemas.meta.document import DocumentMetadata
 from orionis.schemas.meta.validation import ValidationMetadata
 from orionis.schemas.metadata import (
@@ -10,8 +12,8 @@ from orionis.schemas.metadata import (
 )
 from orionis.test import TestCase
 
-class TestTitleMetadata(TestCase):
 
+class TestTitleMetadata(TestCase):
     def testTitleStoresValue(self) -> None:
         """Instantiate Title and verify the value attribute.
 
@@ -21,7 +23,7 @@ class TestTitleMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         t = Title("My Field")
         self.assertEqual(t.value, "My Field")
@@ -34,7 +36,7 @@ class TestTitleMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Title("x"), DocumentMetadata)
         self.assertIsInstance(Title("x"), ValidationMetadata)
@@ -48,7 +50,7 @@ class TestTitleMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         t = Title("label")
         with self.assertRaises(AttributeError):
@@ -62,13 +64,13 @@ class TestTitleMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Title("A"), Title("A"))
         self.assertNotEqual(Title("A"), Title("B"))
 
-class TestDescriptionMetadata(TestCase):
 
+class TestDescriptionMetadata(TestCase):
     def testDescriptionStoresValue(self) -> None:
         """Instantiate Description and verify the value attribute.
 
@@ -78,7 +80,7 @@ class TestDescriptionMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = Description("A descriptive text.")
         self.assertEqual(d.value, "A descriptive text.")
@@ -91,7 +93,7 @@ class TestDescriptionMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Description("x"), DocumentMetadata)
 
@@ -104,14 +106,14 @@ class TestDescriptionMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = Description("text")
         with self.assertRaises(AttributeError):
             d.value = "changed"  # type: ignore[misc]
 
-class TestExamplesMetadata(TestCase):
 
+class TestExamplesMetadata(TestCase):
     def testExamplesStoresValues(self) -> None:
         """Instantiate Examples and verify the values attribute.
 
@@ -121,7 +123,7 @@ class TestExamplesMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         e = Examples([1, "two", 3.0])
         self.assertEqual(e.values, [1, "two", 3.0])
@@ -134,7 +136,7 @@ class TestExamplesMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Examples([]), DocumentMetadata)
 
@@ -147,13 +149,13 @@ class TestExamplesMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         e = Examples([])
         self.assertEqual(e.values, [])
 
-class TestExtraJsonSchemaMetadata(TestCase):
 
+class TestExtraJsonSchemaMetadata(TestCase):
     def testExtraJsonSchemaStoresData(self) -> None:
         """Instantiate ExtraJsonSchema and verify the data attribute.
 
@@ -163,7 +165,7 @@ class TestExtraJsonSchemaMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"readOnly": True, "deprecated": False}
         e = ExtraJsonSchema(payload)
@@ -177,7 +179,7 @@ class TestExtraJsonSchemaMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(ExtraJsonSchema({}), DocumentMetadata)
 
@@ -189,13 +191,13 @@ class TestExtraJsonSchemaMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         e = ExtraJsonSchema({})
         self.assertEqual(e.data, {})
 
-class TestExtraMetadata(TestCase):
 
+class TestExtraMetadata(TestCase):
     def testExtraStoresData(self) -> None:
         """Instantiate Extra and verify the data attribute.
 
@@ -205,7 +207,7 @@ class TestExtraMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"custom_key": "custom_value"}
         e = Extra(payload)
@@ -219,12 +221,12 @@ class TestExtraMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Extra({}), DocumentMetadata)
 
-class TestMessageMetadata(TestCase):
 
+class TestMessageMetadata(TestCase):
     def testMessageStoresText(self) -> None:
         """Instantiate Message and verify the text attribute.
 
@@ -234,7 +236,7 @@ class TestMessageMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         m = Message("Must be a string.")
         self.assertEqual(m.text, "Must be a string.")
@@ -247,7 +249,7 @@ class TestMessageMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Message("x"), DocumentMetadata)
         self.assertIsInstance(Message("x"), ValidationMetadata)
@@ -261,7 +263,7 @@ class TestMessageMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         m = Message("error")
         with self.assertRaises(AttributeError):
@@ -275,7 +277,7 @@ class TestMessageMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Message("a"), Message("a"))
         self.assertNotEqual(Message("a"), Message("b"))

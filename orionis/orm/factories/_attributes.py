@@ -9,6 +9,7 @@ from orionis.orm.factories.exceptions import FactoryDefinitionException
 _ATOMIC_TYPES = frozenset({NoneType, bool, bytes, complex, float, int, str})
 """Atomic types used by ``_attributes``."""
 
+
 def copy_attributes(value: object, source: str) -> dict[str, Any]:
     """
     Validate and detach attributes from caller-owned mutable data.
@@ -40,9 +41,7 @@ def copy_attributes(value: object, source: str) -> dict[str, Any]:
         return value.copy() if atomic else deepcopy(value)
     if iscoroutine(value):
         value.close()
-    if not isinstance(value, dict) or any(
-        not isinstance(key, str) for key in value
-    ):
+    if not isinstance(value, dict) or any(not isinstance(key, str) for key in value):
         error_msg = f"{source} must return a dictionary with string keys."
         raise FactoryDefinitionException(error_msg)
     return deepcopy(value)

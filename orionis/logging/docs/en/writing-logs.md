@@ -72,7 +72,10 @@ class App:
             "default": "stack",
             "channels": {
                 "stack": {"path": "storage/logs/stack.log", "level": "INFO"},
-                "daily": {"path": "storage/logs/daily_{suffix}.log", "level": "WARNING"},
+                "daily": {
+                    "path": "storage/logs/daily_{suffix}.log",
+                    "level": "WARNING",
+                },
             },
         }
 
@@ -98,7 +101,7 @@ Log.error("Job failed")
 
 `LoggerProvider` binds `ILogger` to `Logger` as a singleton with alias `x-orionis-ILogger`, then pins `Log` during boot. Failure handling injects `ILogger`; background tasks use the facade to report success/failure. Other framework code can depend on the contract without knowing rotation details.
 
-The standard logger name is shared process-wide. Creating or initializing another Orionis `Logger` closes and replaces handlers on that same logger, so application code should use the provider singleton.
+The standard logger name is shared process-wide. Initializing another Orionis `Logger` closes and replaces handlers on that same logger, so application code should use the provider singleton.
 
 
 
@@ -109,6 +112,7 @@ The standard logger name is shared process-wide. Creating or initializing anothe
 - `switchChannel(name)` replaces the handler and returns whether it succeeded.
 - `reloadConfiguration()` closes handlers, rereads `app.config("logging")`, rebuilds, and records a success message.
 - `close()` releases file handles and permits later lazy reconstruction.
+- `await aclose()` runs cleanup outside the event loop, including draining queued records.
 - `getActiveChannels()` / `getActiveChannel()` report handler-cache state.
 - `getAvailableChannels()` reports names in configuration without initializing I/O.
 

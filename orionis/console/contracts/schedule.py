@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from orionis.console.enums.events import SchedulerEvent
     from orionis.console.fluent.contracts.task import ITask
 
+
 class ISchedule(ABC):
     """Define the contract for schedule implementations."""
 

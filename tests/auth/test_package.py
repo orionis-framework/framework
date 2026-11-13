@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import types
 from orionis import auth as package
 from orionis.auth import __all__ as auth_exports
@@ -53,6 +55,7 @@ _HEAVY_SERVICES = (
     "AccessTokenRepository",
 )
 
+
 class TestPackageSurface(TestCase):
     """Validate the public surface of the authentication package."""
 
@@ -65,7 +68,7 @@ class TestPackageSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(set(auth_exports), set(_EXPECTED_EXPORTS))
 
@@ -78,7 +81,7 @@ class TestPackageSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name, expected in _EXPECTED_EXPORTS.items():
             self.assertIs(getattr(package, name), expected, name)
@@ -92,7 +95,7 @@ class TestPackageSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(list(auth_exports), sorted(auth_exports))
 
@@ -105,7 +108,7 @@ class TestPackageSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in auth_exports:
             self.assertNotIsInstance(getattr(package, name), types.ModuleType)
@@ -120,7 +123,7 @@ class TestPackageSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in _HEAVY_SERVICES:
             self.assertNotIn(name, auth_exports)

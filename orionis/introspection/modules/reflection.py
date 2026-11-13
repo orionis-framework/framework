@@ -4,11 +4,12 @@ from __future__ import annotations
 import importlib
 import inspect
 import keyword
-from pathlib import Path
+import tokenize
 from types import FunctionType as _FunctionType, ModuleType as _ModuleType
 from orionis.introspection.modules.contracts.reflection import (
     IReflectionModule,
 )
+
 
 class ReflectionModule(IReflectionModule):
     """Inspect Python modules and the definitions they contain."""
@@ -177,9 +178,10 @@ class ReflectionModule(IReflectionModule):
 
         Raises
         ------
+        TypeError
+            If ``cls`` is not a class type.
         ValueError
-            If ``cls`` is not a class type, if ``class_name`` is not a valid identifier,
-            or if ``class_name`` is a reserved keyword.
+            If ``class_name`` is not a valid identifier or is a reserved keyword.
 
         Returns
         -------
@@ -198,9 +200,9 @@ class ReflectionModule(IReflectionModule):
         if keyword.iskeyword(class_name):
             error_msg = f"Class name '{class_name}' is a reserved keyword."
             raise ValueError(error_msg)
-        # Set the class in the module and invalidate the classes cache
+        # Replacing an attribute can change every categorized module view.
         setattr(self.__module, class_name, cls)
-        del self["classes"]
+        self.clearCache()
         return True
 
     def removeClass(self, class_name: str) -> bool:
@@ -231,7 +233,7 @@ class ReflectionModule(IReflectionModule):
             raise ValueError(error_msg)
         # Remove the class attribute from the module and invalidate cache
         delattr(self.__module, class_name)
-        del self["classes"]
+        self.clearCache()
         return True
 
     def getClasses(self) -> dict:
@@ -250,9 +252,7 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect all type objects from the module namespace
         classes = {
-            k: v
-            for k, v in self.__module.__dict__.items()
-            if isinstance(v, type)
+            k: v for k, v in self.__module.__dict__.items() if isinstance(v, type)
         }
         _cache["classes"] = classes
         return classes
@@ -294,7 +294,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect classes whose names start with exactly one underscore
         protected_classes = {
-            k: v for k, v in self.getClasses().items()
+            k: v
+            for k, v in self.getClasses().items()
             if k.startswith("_") and not k.startswith("__")
         }
         _cache["protected_classes"] = protected_classes
@@ -316,7 +317,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect classes with double-underscore prefix that are not dunder names
         private_classes = {
-            k: v for k, v in self.getClasses().items()
+            k: v
+            for k, v in self.getClasses().items()
             if k.startswith("__") and not k.endswith("__")
         }
         _cache["private_classes"] = private_classes
@@ -359,7 +361,8 @@ class ReflectionModule(IReflectionModule):
         # Collect non-callable all-uppercase attributes; keywords are always lowercase
         # so the isupper() check already excludes them, making iskeyword() redundant
         constants = {
-            k: v for k, v in self.__module.__dict__.items()
+            k: v
+            for k, v in self.__module.__dict__.items()
             if k.isupper() and not callable(v)
         }
         _cache["constants"] = constants
@@ -402,7 +405,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect constants whose names start with exactly one underscore
         protected_constants = {
-            k: v for k, v in self.getConstants().items()
+            k: v
+            for k, v in self.getConstants().items()
             if k.startswith("_") and not k.startswith("__")
         }
         _cache["protected_constants"] = protected_constants
@@ -424,7 +428,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect constants with double-underscore prefix that are not dunder names
         private_constants = {
-            k: v for k, v in self.getConstants().items()
+            k: v
+            for k, v in self.getConstants().items()
             if k.startswith("__") and not k.endswith("__")
         }
         _cache["private_constants"] = private_constants
@@ -491,7 +496,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect public functions that are not coroutine functions
         sync_functions = {
-            k: v for k, v in self.getPublicFunctions().items()
+            k: v
+            for k, v in self.getPublicFunctions().items()
             if not inspect.iscoroutinefunction(v)
         }
         _cache["public_sync_functions"] = sync_functions
@@ -513,7 +519,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect public functions that are coroutine functions
         async_functions = {
-            k: v for k, v in self.getPublicFunctions().items()
+            k: v
+            for k, v in self.getPublicFunctions().items()
             if inspect.iscoroutinefunction(v)
         }
         _cache["public_async_functions"] = async_functions
@@ -535,7 +542,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect functions whose names start with exactly one underscore
         protected_functions = {
-            k: v for k, v in self.getFunctions().items()
+            k: v
+            for k, v in self.getFunctions().items()
             if k.startswith("_") and not k.startswith("__")
         }
         _cache["protected_functions"] = protected_functions
@@ -557,7 +565,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect protected functions that are not coroutine functions
         sync_functions = {
-            k: v for k, v in self.getProtectedFunctions().items()
+            k: v
+            for k, v in self.getProtectedFunctions().items()
             if not inspect.iscoroutinefunction(v)
         }
         _cache["protected_sync_functions"] = sync_functions
@@ -579,7 +588,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect protected functions that are coroutine functions
         async_functions = {
-            k: v for k, v in self.getProtectedFunctions().items()
+            k: v
+            for k, v in self.getProtectedFunctions().items()
             if inspect.iscoroutinefunction(v)
         }
         _cache["protected_async_functions"] = async_functions
@@ -601,7 +611,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect functions with double-underscore prefix that are not dunder names
         private_functions = {
-            k: v for k, v in self.getFunctions().items()
+            k: v
+            for k, v in self.getFunctions().items()
             if k.startswith("__") and not k.endswith("__")
         }
         _cache["private_functions"] = private_functions
@@ -623,7 +634,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect private functions that are not coroutine functions
         sync_functions = {
-            k: v for k, v in self.getPrivateFunctions().items()
+            k: v
+            for k, v in self.getPrivateFunctions().items()
             if not inspect.iscoroutinefunction(v)
         }
         _cache["private_sync_functions"] = sync_functions
@@ -645,7 +657,8 @@ class ReflectionModule(IReflectionModule):
             return _cached
         # Collect private functions that are coroutine functions
         async_functions = {
-            k: v for k, v in self.getPrivateFunctions().items()
+            k: v
+            for k, v in self.getPrivateFunctions().items()
             if inspect.iscoroutinefunction(v)
         }
         _cache["private_async_functions"] = async_functions
@@ -714,12 +727,12 @@ class ReflectionModule(IReflectionModule):
 
         try:
             # Read the module source file from its resolved path
-            with Path.open(self.getFile(), encoding="utf-8") as file:
+            with tokenize.open(self.getFile()) as file:
                 source = file.read()
             _cache["source_code"] = source
             return source
         except Exception as e:
-            error_msg = (
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Failed to read source code for module '{self.__module.__name__}': {e}"
             )
             raise ValueError(error_msg) from e

@@ -1,11 +1,11 @@
+# ruff: noqa: TC001, TC003
+# Keep the public service contract resolvable by runtime reflection.
 """Publish server changes without retaining identities or requests."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import AsyncIterator
+from orionis.mcp.protocol.requests import SubscriptionFilter
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from orionis.mcp.protocol.requests import SubscriptionFilter
 
 class IMcpEventBus(ABC):
     """Publish server changes without retaining identities or requests."""

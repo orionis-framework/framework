@@ -1,4 +1,6 @@
-from datetime import datetime
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
@@ -8,6 +10,7 @@ from orionis.console.entities.task import Task as TaskEntity
 from orionis.console.enums.events import TaskEvent
 from orionis.console.fluent.task import Task
 from orionis.test import TestCase
+
 
 def _make_task(signature="test:sig", args=None, purpose=None):
     """Create a Task instance with minimal required arguments.
@@ -28,10 +31,94 @@ def _make_task(signature="test:sig", args=None, purpose=None):
     """
     return Task(signature=signature, args=args, purpose=purpose)
 
+
 class _ConcreteListener(BaseTaskListener):
     """Minimal concrete listener for testing registerListener."""
 
+
 class TestTask(TestCase):
+    def testSchedulerJitterDefaultsAffectIndependentTriggerSnapshots(self) -> None:
+        """
+        Apply inherited jitter to firing times without changing retained entities.
+
+        Returns
+        -------
+        None
+            Preserve each trigger's configured delay across later entity creation.
+        """
+        task = _make_task()
+        task.everySeconds(1)
+        task.dailyAt(0)
+        first = task.entity(random_delay=5)
+        second = task.entity(random_delay=9)
+        now = datetime(2030, 1, 1, tzinfo=first.trigger.timezone)
+        with patch("apscheduler.triggers.base.random.uniform", return_value=4):
+            self.assertEqual(
+                first.trigger.get_next_fire_time(None, now),
+                now + timedelta(seconds=4),
+            )
+        self.assertEqual(first.trigger.jitter, 5)
+        self.assertEqual(second.trigger.jitter, 9)
+
+    def testExactSchedulesDoNotInheritJitter(self) -> None:
+        """
+        Preserve exact schedules and reject conflicting explicit delays.
+
+        Returns
+        -------
+        None
+            Keep exact trigger times unchanged by scheduler defaults.
+        """
+        cases = (
+            ("onceAt", (2030, 1, 1)),
+            ("everySeconds", (5,)),
+            ("everyMinuteAt", (10,)),
+            ("everyMinutesAt", (5, 10)),
+            ("hourlyAt", (10,)),
+            ("everyHoursAt", (2, 10)),
+        )
+        for method, arguments in cases:
+            with self.subTest(method=method):
+                task = _make_task()
+                getattr(task, method)(*arguments)
+                base = task.entity(random_delay=0)
+                inherited = task.entity(random_delay=20)
+                now = (
+                    datetime(2030, 1, 1, tzinfo=inherited.start_date.tzinfo)
+                    if (method == "onceAt")
+                    else datetime(2030, 1, 1, tzinfo=inherited.trigger.timezone)
+                )
+                with patch("apscheduler.triggers.base.random.uniform", return_value=4):
+                    self.assertEqual(
+                        inherited.trigger.get_next_fire_time(None, now),
+                        base.trigger.get_next_fire_time(None, now),
+                    )
+                self.assertEqual(inherited.random_delay, 0)
+                with (
+                    patch(
+                        "orionis.console.fluent.task.secrets.randbelow",
+                        return_value=4,
+                    ),
+                    self.assertRaises(ValueError),
+                ):
+                    task.randomDelay(10)
+
+    def testExplicitZeroJitterOverridesSchedulerDefault(self) -> None:
+        """
+        Keep an explicit zero delay effective when a scheduler default is positive.
+
+        Returns
+        -------
+        None
+            Fire at the configured time without applying inherited jitter.
+        """
+        task = _make_task()
+        task.randomDelay(0)
+        task.dailyAt(0)
+        entity = task.entity(random_delay=20)
+        now = datetime(2030, 1, 1, tzinfo=entity.trigger.timezone)
+        self.assertEqual(entity.trigger.get_next_fire_time(None, now), now)
+        self.assertEqual(entity.random_delay, 0)
 
     # -------------------------------------------------------------------------#
     # __init__                                                                 #

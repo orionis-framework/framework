@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027, SLF001, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Schema annotations resolve these imports at runtime.
+
 import asyncio
 from collections.abc import Collection, Mapping, Sequence
 from collections.abc import Set as AbstractSet
@@ -13,9 +17,6 @@ from orionis.schemas.metadata import Title
 from orionis.schemas.rule import Rule
 from orionis.schemas.validator import Schema as Validator
 from orionis.test import TestCase
-
-# Schema annotations are evaluated at runtime by the metaclass.
-# ruff: noqa: TC001
 
 
 class _Contact(Schema):
@@ -59,7 +60,10 @@ class _WaitingRule(Rule):
     __message__ = "Rejected after yielding."
 
     async def enforce(
-        self, _field: str, _value: object, instance: object,
+        self,
+        _field: str,
+        _value: object,
+        instance: object,
     ) -> bool:
         """
         Yield before checking a sibling on the converted child instance.
@@ -106,7 +110,7 @@ class _SchemaRequest(Request):
         Returns
         -------
         None
-            Store the supplied request body without converting it.
+            No return value.
         """
         self._data = data
 
@@ -166,7 +170,7 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert rule execution for a directly nested schema.
+            No return value.
         """
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({"contact": {"email": "invalid"}}, _Account)
@@ -179,17 +183,22 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert indexed validation errors for each invalid list child.
+            No return value.
         """
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": [{"email": "invalid"}, {"email": "also-invalid"}],
-            }, _ListAccount)
+            await Validator.validate(
+                {
+                    "contacts": [{"email": "invalid"}, {"email": "also-invalid"}],
+                },
+                _ListAccount,
+            )
         self.assertEqual(
-            set(caught.exception.errors), {"contacts[0].email", "contacts[1].email"},
+            set(caught.exception.errors),
+            {"contacts[0].email", "contacts[1].email"},
         )
         self.assertEqual(
-            [f.rule for f in caught.exception.failures], ["email", "email"],
+            [f.rule for f in caught.exception.failures],
+            ["email", "email"],
         )
 
     async def testDictRunsRulesWithActualKeys(self) -> None:
@@ -199,12 +208,15 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert validation paths containing the actual dictionary keys.
+            No return value.
         """
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": {"primary": {"email": "invalid"}},
-            }, _DictAccount)
+            await Validator.validate(
+                {
+                    "contacts": {"primary": {"email": "invalid"}},
+                },
+                _DictAccount,
+            )
         self.assertEqual(set(caught.exception.errors), {"contacts['primary'].email"})
 
     async def testValidCollectionsPreserveConversionAndInput(self) -> None:
@@ -214,14 +226,17 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert typed conversion without mutation of caller containers.
+            No return value.
         """
         payload = {"contacts": [{"email": "ada@example.com"}]}
         result = await Validator.validate(payload, _ListAccount)
         self.assertIsInstance(result.contacts[0], _Contact)
-        self.assertEqual(result.toDict()["contacts"], [
-            {"email": "ada@example.com", "nickname": "guest"},
-        ])
+        self.assertEqual(
+            result.toDict()["contacts"],
+            [
+                {"email": "ada@example.com", "nickname": "guest"},
+            ],
+        )
         self.assertEqual(payload, {"contacts": [{"email": "ada@example.com"}]})
         self.assertIsNot(result.contacts, payload["contacts"])
 
@@ -232,14 +247,16 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert acceptance of empty and absent optional collections.
+            No return value.
         """
+
         class _Optional(Schema):
             contacts: list[_Contact | None] | None = None
 
         for payload in ({}, {"contacts": None}, {"contacts": []}, {"contacts": [None]}):
             self.assertIsInstance(
-                await Validator.validate(payload, _Optional), _Optional,
+                await Validator.validate(payload, _Optional),
+                _Optional,
             )
 
     async def testNestedAnnotatedCollectionsAreTraversed(self) -> None:
@@ -249,22 +266,33 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert traversal through annotated nested collection types.
+            No return value.
         """
+
         class _Nested(Schema):
             contacts: Annotated[
-                list[dict[str, tuple[
-                    Annotated[_Contact, Title("Contact")] | None, ...,
-                ]]],
+                list[
+                    dict[
+                        str,
+                        tuple[
+                            Annotated[_Contact, Title("Contact")] | None,
+                            ...,
+                        ],
+                    ]
+                ],
                 Title("Contacts"),
             ]
 
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": [{"main": [None, {"email": "invalid"}]}],
-            }, _Nested)
+            await Validator.validate(
+                {
+                    "contacts": [{"main": [None, {"email": "invalid"}]}],
+                },
+                _Nested,
+            )
         self.assertEqual(
-            set(caught.exception.errors), {"contacts[0]['main'][1].email"},
+            set(caught.exception.errors),
+            {"contacts[0]['main'][1].email"},
         )
 
     async def testEverySupportedCollectionRunsChildRules(self) -> None:
@@ -274,21 +302,28 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert child-rule execution for every supported collection form.
+            No return value.
         """
         for annotation in (
-            tuple[_FrozenContact, ...], set[_FrozenContact],
-            frozenset[_FrozenContact], Sequence[_FrozenContact],
-            Collection[_FrozenContact], AbstractSet[_FrozenContact],
+            tuple[_FrozenContact, ...],
+            set[_FrozenContact],
+            frozenset[_FrozenContact],
+            Sequence[_FrozenContact],
+            Collection[_FrozenContact],
+            AbstractSet[_FrozenContact],
         ):
             with self.subTest(annotation=annotation):
+
                 class _CollectionSchema(Schema):
                     contacts: annotation  # pyright: ignore[reportInvalidTypeForm]
 
                 with self.assertRaises(ValidationException) as caught:
-                    await Validator.validate({
-                        "contacts": [{"email": "invalid"}],
-                    }, _CollectionSchema)
+                    await Validator.validate(
+                        {
+                            "contacts": [{"email": "invalid"}],
+                        },
+                        _CollectionSchema,
+                    )
                 self.assertEqual(set(caught.exception.errors), {"contacts[0].email"})
 
     async def testMappingAliasAndCollectionUnionRunChildRules(self) -> None:
@@ -298,8 +333,9 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert traversal of the selected runtime collection type.
+            No return value.
         """
+
         class _UnionAccount(Schema):
             contacts: list[_Contact] | Mapping[str, _Contact]
 
@@ -321,7 +357,7 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert collection-rule execution after a sibling conversion error.
+            No return value.
         """
         for schema, contacts, path in (
             (_ListAccount, [{"email": "invalid"}], "contacts[0].email"),
@@ -341,16 +377,19 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert indexed field paths and structured constraint details.
+            No return value.
         """
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": [
-                    {"email": 42},
-                    {"email": "invalid"},
-                    {"email": "ada@example.com", "nickname": "x"},
-                ],
-            }, _ListAccount)
+            await Validator.validate(
+                {
+                    "contacts": [
+                        {"email": 42},
+                        {"email": "invalid"},
+                        {"email": "ada@example.com", "nickname": "x"},
+                    ],
+                },
+                _ListAccount,
+            )
         self.assertEqual(
             {(f.field, f.rule) for f in caught.exception.failures},
             {
@@ -371,23 +410,29 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert indexed key paths and the custom constraint code and message.
+            No return value.
         """
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": {
-                    "a.b']": {"email": "ada@example.com", "nickname": "x"},
-                    "wrong_type": {"email": 42},
-                    "invalid": {"email": "invalid"},
+            await Validator.validate(
+                {
+                    "contacts": {
+                        "a.b']": {"email": "ada@example.com", "nickname": "x"},
+                        "wrong_type": {"email": 42},
+                        "invalid": {"email": "invalid"},
+                    },
                 },
-            }, _DictAccount)
-        self.assertEqual(set(caught.exception.errors), {
-            "contacts[\"a.b']\"].nickname",
-            "contacts['wrong_type'].email",
-            "contacts['invalid'].email",
-        })
+                _DictAccount,
+            )
         self.assertEqual(
-            caught.exception.errors["contacts[\"a.b']\"].nickname"],
+            set(caught.exception.errors),
+            {
+                'contacts["a.b\']"].nickname',
+                "contacts['wrong_type'].email",
+                "contacts['invalid'].email",
+            },
+        )
+        self.assertEqual(
+            caught.exception.errors['contacts["a.b\']"].nickname'],
             [{"rule": "min_length", "message": "Nickname is too short."}],
         )
 
@@ -398,21 +443,29 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert member-specific error paths, rule codes, and custom messages.
+            No return value.
         """
+
         class _TupleAccount(Schema):
             contacts: tuple[_PlainChild, _Contact]
 
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": [
-                    {"label": "plain"},
-                    {"email": "invalid", "nickname": "x"},
-                ],
-            }, _TupleAccount)
-        self.assertEqual(set(caught.exception.errors), {
-            "contacts[1].nickname", "contacts[1].email",
-        })
+            await Validator.validate(
+                {
+                    "contacts": [
+                        {"label": "plain"},
+                        {"email": "invalid", "nickname": "x"},
+                    ],
+                },
+                _TupleAccount,
+            )
+        self.assertEqual(
+            set(caught.exception.errors),
+            {
+                "contacts[1].nickname",
+                "contacts[1].email",
+            },
+        )
         self.assertEqual(
             caught.exception.errors["contacts[1].nickname"],
             [{"rule": "min_length", "message": "Nickname is too short."}],
@@ -425,20 +478,30 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert the collection's structured length error and nested failures.
+            No return value.
         """
+
         class _Bounded(Schema):
             contacts: Field[
-                list[_Contact], MinLength(3, message="Three contacts required."),
+                list[_Contact],
+                MinLength(3, message="Three contacts required."),
             ]
 
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": [{"email": 42}, {"email": "invalid"}],
-            }, _Bounded)
-        self.assertEqual(set(caught.exception.errors), {
-            "contacts", "contacts[0].email", "contacts[1].email",
-        })
+            await Validator.validate(
+                {
+                    "contacts": [{"email": 42}, {"email": "invalid"}],
+                },
+                _Bounded,
+            )
+        self.assertEqual(
+            set(caught.exception.errors),
+            {
+                "contacts",
+                "contacts[0].email",
+                "contacts[1].email",
+            },
+        )
         self.assertEqual(
             caught.exception.errors["contacts"],
             [{"rule": "min_length", "message": "Three contacts required."}],
@@ -451,15 +514,17 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert tuple-length errors alongside child-rule failures.
+            No return value.
         """
+
         class _Tuple(Schema):
             contacts: tuple[_Contact, _PlainChild]
 
         with self.assertRaises(ValidationException) as caught:
             await Validator.validate({"contacts": [{"email": "invalid"}]}, _Tuple)
         self.assertEqual(
-            set(caught.exception.errors), {"contacts", "contacts[0].email"},
+            set(caught.exception.errors),
+            {"contacts", "contacts[0].email"},
         )
 
     async def testTaggedChildUnionsKeepTheSelectedSchema(self) -> None:
@@ -469,21 +534,30 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert discriminator-based selection of partially converted children.
+            No return value.
         """
+
         class _Tagged(Schema):
             contacts: list[_TaggedPlainContact | _TaggedEmailContact]
 
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": [
-                    {"type": "plain", "label": 42},
-                    {"type": "email", "email": "invalid", "count": "bad"},
-                ],
-            }, _Tagged)
-        self.assertEqual(set(caught.exception.errors), {
-            "contacts[0].label", "contacts[1].email", "contacts[1].count",
-        })
+            await Validator.validate(
+                {
+                    "contacts": [
+                        {"type": "plain", "label": 42},
+                        {"type": "email", "email": "invalid", "count": "bad"},
+                    ],
+                },
+                _Tagged,
+            )
+        self.assertEqual(
+            set(caught.exception.errors),
+            {
+                "contacts[0].label",
+                "contacts[1].email",
+                "contacts[1].count",
+            },
+        )
 
     async def testUnexpectedChildRuleErrorsPropagate(self) -> None:
         """
@@ -492,11 +566,15 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert propagation of unexpected errors from child services.
+            No return value.
         """
+
         class _FailingRule(Rule):
             async def enforce(
-                self, _field: str, _value: object, _instance: object,
+                self,
+                _field: str,
+                _value: object,
+                _instance: object,
             ) -> bool:
                 """
                 Simulate an unavailable application service.
@@ -527,9 +605,13 @@ class TestSchemaCollections(TestCase):
 
         for count in (1, "bad"):
             with self.assertRaisesRegex(RuntimeError, "Child service unavailable"):
-                await Validator.validate({
-                    "contacts": [{"value": "any"}], "count": count,
-                }, _FailingCollection)
+                await Validator.validate(
+                    {
+                        "contacts": [{"value": "any"}],
+                        "count": count,
+                    },
+                    _FailingCollection,
+                )
 
     async def testUnionChildrenUseTheirOwnConstraintMessages(self) -> None:
         """
@@ -538,8 +620,9 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert the selected member's code and message in lists and mappings.
+            No return value.
         """
+
         class _First(Schema, tag="first"):
             label: Field[str, MinLength(3, message="First child label is too short.")]
 
@@ -550,9 +633,12 @@ class TestSchemaCollections(TestCase):
             contacts: list[_First | _Second]
 
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": [{"type": "second", "label": "x"}],
-            }, _TaggedCollection)
+            await Validator.validate(
+                {
+                    "contacts": [{"type": "second", "label": "x"}],
+                },
+                _TaggedCollection,
+            )
         self.assertEqual(
             caught.exception.errors["contacts[0].label"],
             [{"rule": "min_length", "message": "Second child label is too short."}],
@@ -562,9 +648,12 @@ class TestSchemaCollections(TestCase):
             contacts: list[_First] | dict[str, _Second]
 
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "contacts": {"main": {"type": "second", "label": "x"}},
-            }, _CollectionUnion)
+            await Validator.validate(
+                {
+                    "contacts": {"main": {"type": "second", "label": "x"}},
+                },
+                _CollectionUnion,
+            )
         self.assertEqual(
             caught.exception.errors["contacts['main'].label"],
             [{"rule": "min_length", "message": "Second child label is too short."}],
@@ -577,8 +666,9 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert sibling-field checks against each converted child instance.
+            No return value.
         """
+
         class _Confirmation(Schema):
             original: str
             confirmation: Field[str, ConfirmPassword("original")]
@@ -592,10 +682,13 @@ class TestSchemaCollections(TestCase):
                 self.subTest(count=count),
                 self.assertRaises(ValidationException) as caught,
             ):
-                await Validator.validate({
-                    "contacts": [{"original": "first", "confirmation": "second"}],
-                    "count": count,
-                }, _Confirmations)
+                await Validator.validate(
+                    {
+                        "contacts": [{"original": "first", "confirmation": "second"}],
+                        "count": count,
+                    },
+                    _Confirmations,
+                )
             self.assertIn("contacts[0].confirmation", caught.exception.errors)
             self.assertEqual("count" in caught.exception.errors, count == "bad")
 
@@ -606,8 +699,9 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert awaited child rules on both conversion paths.
+            No return value.
         """
+
         class _AsyncCollection(Schema):
             contacts: list[_AsyncChild]
             count: int
@@ -617,9 +711,13 @@ class TestSchemaCollections(TestCase):
                 self.subTest(count=count),
                 self.assertRaises(ValidationException) as caught,
             ):
-                await Validator.validate({
-                    "contacts": [{"value": "any", "allowed": False}], "count": count,
-                }, _AsyncCollection)
+                await Validator.validate(
+                    {
+                        "contacts": [{"value": "any", "allowed": False}],
+                        "count": count,
+                    },
+                    _AsyncCollection,
+                )
             self.assertIn("contacts[0].value", caught.exception.errors)
 
     async def testContainerAwaitsDirectAndCollectedControllerSchemas(self) -> None:
@@ -629,17 +727,19 @@ class TestSchemaCollections(TestCase):
         Returns
         -------
         None
-            Assert validated controller schemas through real request injection.
+            No return value.
         """
         container = _SchemaContainer()
         try:
             for controller, payload, path in (
                 (
-                    _AccountController(), {"contact": {"email": "invalid"}},
+                    _AccountController(),
+                    {"contact": {"email": "invalid"}},
                     "contact.email",
                 ),
                 (
-                    _ListController(), {"contacts": [{"email": "invalid"}]},
+                    _ListController(),
+                    {"contacts": [{"email": "invalid"}]},
                     "contacts[0].email",
                 ),
             ):

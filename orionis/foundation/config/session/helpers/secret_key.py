@@ -2,6 +2,7 @@
 
 import secrets
 
+
 class SecretKey:
     """Resolve and validate the key used to protect session data."""
 

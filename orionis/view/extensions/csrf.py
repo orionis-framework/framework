@@ -1,19 +1,21 @@
+# ruff: noqa: TC002
+# Keep the Jinja parser type available for runtime annotation resolution.
+
 """Provide the ``{% csrf %}`` statement tag."""
 
 from __future__ import annotations
 import inspect
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 from jinja2 import nodes
 from jinja2.ext import Extension
+from jinja2.parser import Parser
 from markupsafe import Markup, escape
 from orionis.view.exceptions import ViewRenderException
-
-if TYPE_CHECKING:
-    from jinja2.parser import Parser
 
 # Template global the tag delegates to; registered by ViewServiceProvider.
 _CSRF_FIELD_GLOBAL = "csrf_field"
 """Template global the tag delegates to; registered by ViewServiceProvider."""
+
 
 class CsrfExtension(Extension):
     """
@@ -33,7 +35,7 @@ class CsrfExtension(Extension):
 
         Parameters
         ----------
-        parser : orionis.support.formatter.serializer.Parser
+        parser : ``jinja2.parser.Parser``
             Jinja2 parser positioned on the tag name token.
 
         Returns

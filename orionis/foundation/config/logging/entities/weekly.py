@@ -10,6 +10,7 @@ from orionis.support.entities.base import BaseEntity
 _DEFAULT_PATH: str = "storage/logs/weekly_{suffix}.log"
 """Default path identifier: ``storage/logs/weekly_{suffix}.log``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Weekly(BaseEntity):
     """
@@ -50,7 +51,8 @@ class Weekly(BaseEntity):
     retention_weeks: int = field(
         default_factory=lambda: (
             Env.get("LOG_RETENTION", 4)
-            if Env.get("LOG_CHANNEL", "stack") == "weekly" else 4
+            if Env.get("LOG_CHANNEL", "stack") == "weekly"
+            else 4
         ),
         metadata={
             "description": ("The number of weeks to retain log files before deletion."),

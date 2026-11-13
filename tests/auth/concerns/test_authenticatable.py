@@ -1,6 +1,13 @@
+# ruff: noqa: PT009, S105
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# AUTH_PASSWORD selects a fixture attribute and is not a credential.
+
+"""Verify authentication authenticatable contracts and behavior."""
+
 from orionis.auth.concerns.authenticatable import Authenticatable
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 from orionis.test import TestCase
+
 
 class _Meta:
     """Model metadata double publishing a primary key name."""
@@ -18,9 +25,10 @@ class _Meta:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.primary_key = primary_key
+
 
 class _Identity(Authenticatable):
     """Identity using the default ``id`` and ``password`` attributes."""
@@ -40,10 +48,11 @@ class _Identity(Authenticatable):
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.id = identifier
         self.password = stored_hash
+
 
 class _CustomKeyIdentity(Authenticatable):
     """Identity whose key and hash columns carry non default names."""
@@ -52,7 +61,7 @@ class _CustomKeyIdentity(Authenticatable):
 
     __meta__ = _Meta("uuid")
 
-    AUTH_PASSWORD = "credential_hash"  # noqa: S105
+    AUTH_PASSWORD = "credential_hash"
 
     def __init__(self, uuid: str, stored_hash: str) -> None:
         """Store the custom key and the custom hash column.
@@ -67,15 +76,17 @@ class _CustomKeyIdentity(Authenticatable):
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.uuid = uuid
         self.credential_hash = stored_hash
+
 
 class _UnsavedIdentity(Authenticatable):
     """Identity that was never persisted, so it holds no key."""
 
     __slots__ = ()
+
 
 class TestAuthenticatableLayout(TestCase):
     """Validate how the mixin is attached to an application model."""
@@ -90,7 +101,7 @@ class TestAuthenticatableLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(Authenticatable, IAuthenticatable))
         self.assertNotIn(IAuthenticatable, Authenticatable.__mro__)
@@ -104,10 +115,11 @@ class TestAuthenticatableLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Authenticatable.__slots__, ())
         self.assertFalse(hasattr(_Identity(7, "hashed"), "__dict__"))
+
 
 class TestAuthenticatableAccessors(TestCase):
     """Validate the values the guards read from an identity."""
@@ -121,7 +133,7 @@ class TestAuthenticatableAccessors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         identity = _Identity(7, "hashed")
         self.assertEqual(identity.getAuthIdentifierName(), "id")
@@ -136,7 +148,7 @@ class TestAuthenticatableAccessors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_Identity(7, "hashed").getAuthPassword(), "hashed")
 
@@ -149,7 +161,7 @@ class TestAuthenticatableAccessors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         identity = _CustomKeyIdentity("abc", "hashed")
         self.assertEqual(identity.getAuthIdentifierName(), "uuid")
@@ -165,7 +177,7 @@ class TestAuthenticatableAccessors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(_UnsavedIdentity().getAuthIdentifier())
 
@@ -178,7 +190,7 @@ class TestAuthenticatableAccessors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_Identity(7, None).getAuthPassword(), "")
         self.assertEqual(_Identity(7, 1234).getAuthPassword(), "")

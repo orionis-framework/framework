@@ -1,8 +1,8 @@
 from orionis.http import HTMLResponse, JSONResponse, response
 from orionis.http.base import BaseController
 
-class HomeController(BaseController):
 
+class HomeController(BaseController):
     async def home(self) -> HTMLResponse:
         """
         Render the authenticated home page response.
@@ -23,7 +23,9 @@ class HomeController(BaseController):
         JSONResponse
             A JSON response containing the queried data from the "vigia.rates" table.
         """
-        return response.json({
-            "message": "Orionis API is working",
-            "status": "healthy",
-        })
+        return response.json(
+            {
+                "message": "Orionis API is working",
+                "status": "healthy",
+            },
+        )

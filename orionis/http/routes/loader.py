@@ -1,3 +1,5 @@
+# ruff: noqa: SLF001, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Load route declarations from configured application modules."""
 
 import importlib
@@ -14,10 +16,8 @@ if TYPE_CHECKING:
     from orionis.cache.contracts.file_based_cache import IFileBasedCache
     from orionis.http.layer.contracts.middleware import IBaseMiddleware
 
+
 class RouteLoader(IRouteLoader):
-
-    # ruff: noqa: TC001, SLF001
-
     # Keep a deterministic import order so route registration is stable.
     """Load route declarations from configured application modules."""
 
@@ -143,9 +143,7 @@ class RouteLoader(IRouteLoader):
         routes_path: list[Path] | Path = self.__app.routingPaths(kind)
         if not routes_path:
             return
-        routes_path = (
-            routes_path if isinstance(routes_path, list) else [routes_path]
-        )
+        routes_path = routes_path if isinstance(routes_path, list) else [routes_path]
         app_root: Path = self.__app.path("root")
         for route_file in routes_path:
             relative_path = route_file.relative_to(app_root)

@@ -1,10 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from enum import IntEnum
 from orionis.console.enums.events import SchedulerEvent, TaskEvent
 from orionis.test import TestCase
 
-class TestTaskEvent(TestCase):
 
+class TestTaskEvent(TestCase):
     # ------------------------------------------------------------------ #
     #  Type & membership                                                 #
     # ------------------------------------------------------------------ #
@@ -62,7 +64,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(TaskEvent.ADDED, 2 ** 9)
+        self.assertEqual(TaskEvent.ADDED, 2**9)
 
     def testRemovedValue(self) -> None:
         """Verify that REMOVED equals 2**10.
@@ -74,7 +76,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(TaskEvent.REMOVED, 2 ** 10)
+        self.assertEqual(TaskEvent.REMOVED, 2**10)
 
     def testModifiedValue(self) -> None:
         """Verify that MODIFIED equals 2**11.
@@ -86,7 +88,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(TaskEvent.MODIFIED, 2 ** 11)
+        self.assertEqual(TaskEvent.MODIFIED, 2**11)
 
     def testExecutedValue(self) -> None:
         """Verify that EXECUTED equals 2**12.
@@ -98,7 +100,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(TaskEvent.EXECUTED, 2 ** 12)
+        self.assertEqual(TaskEvent.EXECUTED, 2**12)
 
     def testErrorValue(self) -> None:
         """Verify that ERROR equals 2**13.
@@ -110,7 +112,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(TaskEvent.ERROR, 2 ** 13)
+        self.assertEqual(TaskEvent.ERROR, 2**13)
 
     def testMissedValue(self) -> None:
         """Verify that MISSED equals 2**14.
@@ -122,7 +124,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(TaskEvent.MISSED, 2 ** 14)
+        self.assertEqual(TaskEvent.MISSED, 2**14)
 
     def testSubmittedValue(self) -> None:
         """Verify that SUBMITTED equals 2**15.
@@ -134,7 +136,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(TaskEvent.SUBMITTED, 2 ** 15)
+        self.assertEqual(TaskEvent.SUBMITTED, 2**15)
 
     def testMaxInstancesValue(self) -> None:
         """Verify that MAX_INSTANCES equals 2**16.
@@ -146,7 +148,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(TaskEvent.MAX_INSTANCES, 2 ** 16)
+        self.assertEqual(TaskEvent.MAX_INSTANCES, 2**16)
 
     # ------------------------------------------------------------------ #
     #  Lookup & uniqueness                                               #
@@ -163,7 +165,7 @@ class TestTaskEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertIs(TaskEvent(2 ** 12), TaskEvent.EXECUTED)
+        self.assertIs(TaskEvent(2**12), TaskEvent.EXECUTED)
 
     def testLookupInvalidValueRaisesValueError(self) -> None:
         """Verify that looking up an unknown integer raises ValueError.
@@ -208,6 +210,7 @@ class TestTaskEvent(TestCase):
             v = int(member)
             self.assertGreater(v, 0)
             self.assertEqual(v & (v - 1), 0)
+
 
 class TestSchedulerEvent(TestCase):
     """Test suite for the SchedulerEvent IntEnum."""
@@ -255,7 +258,7 @@ class TestSchedulerEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(SchedulerEvent.STARTED, 2 ** 0)
+        self.assertEqual(SchedulerEvent.STARTED, 2**0)
 
     def testShutdownValue(self) -> None:
         """Verify that SHUTDOWN equals 2**1 (2).
@@ -267,7 +270,7 @@ class TestSchedulerEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(SchedulerEvent.SHUTDOWN, 2 ** 1)
+        self.assertEqual(SchedulerEvent.SHUTDOWN, 2**1)
 
     def testPausedValue(self) -> None:
         """Verify that PAUSED equals 2**2 (4).
@@ -279,7 +282,7 @@ class TestSchedulerEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(SchedulerEvent.PAUSED, 2 ** 2)
+        self.assertEqual(SchedulerEvent.PAUSED, 2**2)
 
     def testResumedValue(self) -> None:
         """Verify that RESUMED equals 2**3 (8).
@@ -291,7 +294,7 @@ class TestSchedulerEvent(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.assertEqual(SchedulerEvent.RESUMED, 2 ** 3)
+        self.assertEqual(SchedulerEvent.RESUMED, 2**3)
 
     # ------------------------------------------------------------------ #
     #  Lookup & uniqueness                                               #

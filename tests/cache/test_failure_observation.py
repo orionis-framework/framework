@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Observe recovered file-cache failures without changing cache results."""
 
 import asyncio
@@ -15,6 +17,7 @@ class TestCacheFailureObservation(TestCase):
     async def testPermissionFailureIsObservedFromWorkerThread(self) -> None:
         """Verify permission failure is observed from worker thread."""
         app, runtime, handler = activate_runtime()
+        self.addAsyncCleanup(runtime.shutdown)
         error = PermissionError("denied")
         with operation(app), patch.object(Path, "read_bytes", side_effect=error):
             result = await asyncio.to_thread(
@@ -29,6 +32,7 @@ class TestCacheFailureObservation(TestCase):
     async def testMissingEntryRemainsAnExpectedCacheMiss(self) -> None:
         """Verify missing entry remains an expected cache miss."""
         app, runtime, handler = activate_runtime()
+        self.addAsyncCleanup(runtime.shutdown)
         with (
             operation(app),
             patch.object(Path, "read_bytes", side_effect=FileNotFoundError),
@@ -44,6 +48,7 @@ class TestCacheFailureObservation(TestCase):
     async def testCorruptEntryIsObservedAndStillReturnsCacheMiss(self) -> None:
         """Verify corrupt entry is observed and still returns cache miss."""
         app, runtime, handler = activate_runtime()
+        self.addAsyncCleanup(runtime.shutdown)
         with (
             operation(app),
             patch.object(Path, "read_bytes", return_value=b"invalid json"),

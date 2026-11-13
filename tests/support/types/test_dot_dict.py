@@ -1,11 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.support.types.dot_dict import DotDict
 from orionis.test import TestCase
 
-class TestDotDict(TestCase):
 
+class TestDotDict(TestCase):
     # ------------------------------------------------ __getattr__
 
-    def testGetAttrReturnsValue(self):
+    def testGetAttrReturnsValue(self) -> None:
         """Return value for an existing key via attribute access.
 
         Validates that attribute-style access retrieves the correct
@@ -14,12 +16,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"name": "orionis"})
         self.assertEqual(d.name, "orionis")
 
-    def testGetAttrReturnsNoneForMissingKey(self):
+    def testGetAttrReturnsNoneForMissingKey(self) -> None:
         """Return None when the key does not exist.
 
         Validates that accessing a nonexistent attribute returns None
@@ -28,12 +30,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1})
         self.assertIsNone(d.missing_key)
 
-    def testGetAttrConvertsNestedDictToDotDict(self):
+    def testGetAttrConvertsNestedDictToDotDict(self) -> None:
         """Convert nested plain dict to DotDict on access.
 
         Validates that a nested dict value is automatically wrapped
@@ -42,14 +44,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"nested": {"key": "value"}})
         result = d.nested
         self.assertIsInstance(result, DotDict)
         self.assertEqual(result.key, "value")
 
-    def testGetAttrPreservesExistingDotDict(self):
+    def testGetAttrPreservesExistingDotDict(self) -> None:
         """Preserve already-wrapped DotDict on access.
 
         Validates that accessing a value that is already a DotDict
@@ -58,13 +60,13 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         inner = DotDict({"x": 10})
         d = DotDict({"inner": inner})
         self.assertIs(d.inner, inner)
 
-    def testGetAttrCachesConvertedDotDict(self):
+    def testGetAttrCachesConvertedDotDict(self) -> None:
         """Cache the converted DotDict in the underlying dict.
 
         Validates that after the first attribute access converts a
@@ -73,30 +75,16 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"child": {"a": 1}})
         first = d.child
         second = d.child
         self.assertIs(first, second)
 
-    def testGetAttrWithNonStringKey(self):
-        """Return None for attribute names not present as keys.
-
-        Validates that arbitrary attribute names that were never set
-        return None gracefully.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        d = DotDict()
-        self.assertIsNone(d.anything)
-
     # ------------------------------------------------ __setattr__
 
-    def testSetAttrStoresValue(self):
+    def testSetAttrStoresValue(self) -> None:
         """Store a value via attribute-style assignment.
 
         Validates that setting an attribute stores it as a dictionary
@@ -105,13 +93,13 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         d.name = "test"
         self.assertEqual(d["name"], "test")
 
-    def testSetAttrConvertsDictToDotDict(self):
+    def testSetAttrConvertsDictToDotDict(self) -> None:
         """Convert plain dict to DotDict on attribute assignment.
 
         Validates that assigning a plain dict via attribute syntax
@@ -120,14 +108,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         d.config = {"debug": True}
         self.assertIsInstance(d["config"], DotDict)
         self.assertTrue(d.config.debug)
 
-    def testSetAttrPreservesDotDict(self):
+    def testSetAttrPreservesDotDict(self) -> None:
         """Preserve DotDict instances on attribute assignment.
 
         Validates that assigning a DotDict value does not double-wrap
@@ -136,14 +124,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         inner = DotDict({"z": 42})
         d = DotDict()
         d.inner = inner
         self.assertIs(d["inner"], inner)
 
-    def testSetAttrOverwritesExistingKey(self):
+    def testSetAttrOverwritesExistingKey(self) -> None:
         """Overwrite an existing key via attribute assignment.
 
         Validates that re-assigning an attribute replaces the
@@ -152,13 +140,13 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"key": "old"})
         d.key = "new"
         self.assertEqual(d.key, "new")
 
-    def testSetAttrWithNoneValue(self):
+    def testSetAttrWithNoneValue(self) -> None:
         """Store None via attribute assignment.
 
         Validates that None can be stored and retrieved correctly
@@ -167,7 +155,7 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         d.value = None
@@ -176,7 +164,7 @@ class TestDotDict(TestCase):
 
     # ------------------------------------------------ __delattr__
 
-    def testDelAttrRemovesKey(self):
+    def testDelAttrRemovesKey(self) -> None:
         """Remove an existing key via attribute deletion.
 
         Validates that deleting an attribute removes the key from
@@ -185,13 +173,13 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"key": "value"})
         del d.key
         self.assertNotIn("key", d)
 
-    def testDelAttrRaisesAttributeErrorForMissingKey(self):
+    def testDelAttrRaisesAttributeErrorForMissingKey(self) -> None:
         """Raise AttributeError when deleting a nonexistent attribute.
 
         Validates that attempting to delete a key that does not exist
@@ -200,14 +188,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         with self.assertRaises(AttributeError) as ctx:
             del d.nonexistent
         self.assertIn("nonexistent", str(ctx.exception))
 
-    def testDelAttrErrorMessageContainsClassName(self):
+    def testDelAttrErrorMessageContainsClassName(self) -> None:
         """Include class name in the AttributeError message.
 
         Validates that the error message references the DotDict
@@ -216,7 +204,7 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         with self.assertRaises(AttributeError) as ctx:
@@ -225,7 +213,7 @@ class TestDotDict(TestCase):
 
     # ------------------------------------------------ get
 
-    def testGetReturnsValueForExistingKey(self):
+    def testGetReturnsValueForExistingKey(self) -> None:
         """Return the value for an existing key.
 
         Validates that the get method retrieves the correct value
@@ -234,12 +222,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"x": 5})
         self.assertEqual(d.get("x"), 5)
 
-    def testGetReturnsDefaultForMissingKey(self):
+    def testGetReturnsDefaultForMissingKey(self) -> None:
         """Return the default value when the key is absent.
 
         Validates that get falls back to the provided default
@@ -248,12 +236,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         self.assertEqual(d.get("missing", 42), 42)
 
-    def testGetReturnsNoneWhenNoDefault(self):
+    def testGetReturnsNoneWhenNoDefault(self) -> None:
         """Return None when key is absent and no default is given.
 
         Validates that get returns None by default for missing keys
@@ -262,12 +250,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         self.assertIsNone(d.get("absent"))
 
-    def testGetConvertsNestedDictToDotDict(self):
+    def testGetConvertsNestedDictToDotDict(self) -> None:
         """Convert nested dict to DotDict on retrieval via get.
 
         Validates that get automatically wraps a plain dict value
@@ -276,14 +264,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"cfg": {"level": 3}})
         result = d.get("cfg")
         self.assertIsInstance(result, DotDict)
         self.assertEqual(result.level, 3)
 
-    def testGetCachesConvertedDotDict(self):
+    def testGetCachesConvertedDotDict(self) -> None:
         """Cache converted DotDict after get call.
 
         Validates that the plain dict is replaced in the underlying
@@ -292,7 +280,7 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"data": {"a": 1}})
         d.get("data")
@@ -300,7 +288,7 @@ class TestDotDict(TestCase):
 
     # ------------------------------------------------ export
 
-    def testExportReturnsPlainDict(self):
+    def testExportReturnsPlainDict(self) -> None:
         """Export DotDict as a standard dictionary.
 
         Validates that export returns a plain dict, not a DotDict
@@ -309,14 +297,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1})
         result = d.export()
         self.assertIsInstance(result, dict)
         self.assertNotIsInstance(result, DotDict)
 
-    def testExportConvertsNestedDotDict(self):
+    def testExportConvertsNestedDotDict(self) -> None:
         """Recursively convert nested DotDict to plain dicts.
 
         Validates that all nested DotDict instances are converted
@@ -325,7 +313,7 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"outer": DotDict({"inner": DotDict({"v": 1})})})
         result = d.export()
@@ -333,7 +321,7 @@ class TestDotDict(TestCase):
         self.assertNotIsInstance(result["outer"]["inner"], DotDict)
         self.assertEqual(result["outer"]["inner"]["v"], 1)
 
-    def testExportPreservesNonDictValues(self):
+    def testExportPreservesNonDictValues(self) -> None:
         """Preserve non-dict values unchanged during export.
 
         Validates that string, int, list, and other non-dict values
@@ -342,7 +330,7 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"s": "text", "n": 42, "lst": [1, 2, 3]})
         result = d.export()
@@ -350,7 +338,7 @@ class TestDotDict(TestCase):
         self.assertEqual(result["n"], 42)
         self.assertEqual(result["lst"], [1, 2, 3])
 
-    def testExportEmptyDotDict(self):
+    def testExportEmptyDotDict(self) -> None:
         """Export an empty DotDict as an empty dict.
 
         Validates that exporting a DotDict with no entries returns
@@ -359,14 +347,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         self.assertEqual(d.export(), {})
 
     # ------------------------------------------------ copy
 
-    def testCopyReturnsDotDict(self):
+    def testCopyReturnsDotDict(self) -> None:
         """Return a DotDict instance from copy.
 
         Validates that the copy method produces a new DotDict
@@ -375,13 +363,13 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1})
         c = d.copy()
         self.assertIsInstance(c, DotDict)
 
-    def testCopyIsDeepCopy(self):
+    def testCopyIsDeepCopy(self) -> None:
         """Create a deep copy of nested structures.
 
         Validates that modifying the copied DotDict does not affect
@@ -390,14 +378,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"nested": DotDict({"x": 10})})
         c = d.copy()
         c.nested.x = 99
         self.assertEqual(d.nested.x, 10)
 
-    def testCopyIsNotSameObject(self):
+    def testCopyIsNotSameObject(self) -> None:
         """Ensure copy returns a distinct object.
 
         Validates that the copied DotDict is not the same object
@@ -406,13 +394,13 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1})
         c = d.copy()
         self.assertIsNot(d, c)
 
-    def testCopyConvertsPlainDictValues(self):
+    def testCopyConvertsPlainDictValues(self) -> None:
         """Convert plain dict values to DotDict during copy.
 
         Validates that plain dict values within the DotDict are
@@ -421,14 +409,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"child": {"k": "v"}})
         c = d.copy()
         self.assertIsInstance(c["child"], DotDict)
         self.assertEqual(c.child.k, "v")
 
-    def testCopyPreservesValues(self):
+    def testCopyPreservesValues(self) -> None:
         """Preserve all values in the copied DotDict.
 
         Validates that the copy retains the same key-value pairs
@@ -437,7 +425,7 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1, "b": "two", "c": [3]})
         c = d.copy()
@@ -447,7 +435,7 @@ class TestDotDict(TestCase):
 
     # ------------------------------------------------ __repr__
 
-    def testReprReturnsString(self):
+    def testReprReturnsString(self) -> None:
         """Return a string from repr.
 
         Validates that calling repr on a DotDict produces a string
@@ -456,12 +444,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1})
         self.assertIsInstance(repr(d), str)
 
-    def testReprMatchesDictFormat(self):
+    def testReprMatchesDictFormat(self) -> None:
         """Match standard dict repr format.
 
         Validates that the DotDict repr output matches the format
@@ -470,12 +458,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1})
         self.assertEqual(repr(d), repr({"a": 1}))
 
-    def testReprEmptyDotDict(self):
+    def testReprEmptyDotDict(self) -> None:
         """Return empty dict repr for an empty DotDict.
 
         Validates that an empty DotDict produces the same repr
@@ -484,14 +472,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         self.assertEqual(repr(d), "{}")
 
     # ---------------------------------------- dict compatibility
 
-    def testBracketAccessStillWorks(self):
+    def testBracketAccessStillWorks(self) -> None:
         """Support standard bracket-style dictionary access.
 
         Validates that DotDict retains standard dict bracket
@@ -500,12 +488,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"key": "value"})
         self.assertEqual(d["key"], "value")
 
-    def testInOperatorWorks(self):
+    def testInOperatorWorks(self) -> None:
         """Support the `in` membership operator.
 
         Validates that the `in` keyword correctly checks for key
@@ -514,13 +502,13 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"present": True})
         self.assertIn("present", d)
         self.assertNotIn("absent", d)
 
-    def testIterationOverKeys(self):
+    def testIterationOverKeys(self) -> None:
         """Iterate over DotDict keys like a standard dict.
 
         Validates that iterating over a DotDict yields its keys
@@ -529,14 +517,14 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1, "b": 2})
         keys = list(d)
         self.assertIn("a", keys)
         self.assertIn("b", keys)
 
-    def testLenReturnsCorrectCount(self):
+    def testLenReturnsCorrectCount(self) -> None:
         """Return the correct number of entries.
 
         Validates that len on a DotDict returns the number of
@@ -545,12 +533,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"x": 1, "y": 2, "z": 3})
         self.assertEqual(len(d), 3)
 
-    def testEmptyDotDictHasZeroLength(self):
+    def testEmptyDotDictHasZeroLength(self) -> None:
         """Return zero length for an empty DotDict.
 
         Validates that an empty DotDict correctly reports a
@@ -559,12 +547,12 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict()
         self.assertEqual(len(d), 0)
 
-    def testInitFromKeywordArgs(self):
+    def testInitFromKeywordArgs(self) -> None:
         """Initialize DotDict from keyword arguments.
 
         Validates that DotDict can be constructed using keyword
@@ -573,13 +561,13 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict(name="test", value=42)
         self.assertEqual(d.name, "test")
         self.assertEqual(d.value, 42)
 
-    def testUpdateMergesData(self):
+    def testUpdateMergesData(self) -> None:
         """Merge data using the update method.
 
         Validates that the dict update method correctly merges
@@ -588,7 +576,7 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": 1})
         d.update({"b": 2})
@@ -597,7 +585,7 @@ class TestDotDict(TestCase):
 
     # ---------------------------------------- deep nesting
 
-    def testDeeplyNestedAccess(self):
+    def testDeeplyNestedAccess(self) -> None:
         """Access deeply nested values via chained attributes.
 
         Validates that attribute-style access works correctly
@@ -606,18 +594,20 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        d = DotDict({
-            "level1": {
-                "level2": {
-                    "level3": "deep",
+        d = DotDict(
+            {
+                "level1": {
+                    "level2": {
+                        "level3": "deep",
+                    },
                 },
             },
-        })
+        )
         self.assertEqual(d.level1.level2.level3, "deep")
 
-    def testSetDeeplyNestedValue(self):
+    def testSetDeeplyNestedValue(self) -> None:
         """Set a value in a deeply nested DotDict.
 
         Validates that attribute assignment works correctly
@@ -626,7 +616,7 @@ class TestDotDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         d = DotDict({"a": {"b": {"c": 0}}})
         d.a.b.c = 99

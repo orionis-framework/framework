@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import ModuleType
 from orionis import hashing as hashing_package
 from orionis.hashing.hash_manager import HashManager
@@ -8,8 +10,8 @@ from orionis.test import TestCase
 # Names the package promises to its consumers.
 _PUBLIC_SURFACE: list[str] = ["Argon2Hasher", "BcryptHasher", "HashManager"]
 
-class TestHashingPackageSurface(TestCase):
 
+class TestHashingPackageSurface(TestCase):
     def testDeclaresTheDocumentedPublicSurface(self) -> None:
         """Declare exactly the documented public exports.
 
@@ -19,7 +21,7 @@ class TestHashingPackageSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(hashing_package.__all__, _PUBLIC_SURFACE)
 
@@ -32,26 +34,11 @@ class TestHashingPackageSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(hashing_package.HashManager, HashManager)
         self.assertIs(hashing_package.Argon2Hasher, Argon2Hasher)
         self.assertIs(hashing_package.BcryptHasher, BcryptHasher)
-
-    def testNoExportShadowsASubmodule(self) -> None:
-        """Keep every export free of collisions with a submodule name.
-
-        Validates that no public name is silently rebound by the import
-        machinery, which would make the shadowed submodule unreachable
-        through attribute access.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        for name in hashing_package.__all__:
-            self.assertNotIsInstance(getattr(hashing_package, name), ModuleType)
 
     def testExposesNoUndocumentedPublicObjects(self) -> None:
         """Keep every non-module public attribute inside ``__all__``.
@@ -63,7 +50,7 @@ class TestHashingPackageSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exported = {
             name

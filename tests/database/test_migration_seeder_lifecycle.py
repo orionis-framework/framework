@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+from unittest.mock import patch
 import tempfile
 from pathlib import Path
 from orionis.database.connection_manager import ConnectionManager
@@ -7,6 +10,7 @@ from orionis.database.seeders.runner import SeederRunner
 from orionis.database.seeders.seeder import Seeder
 from orionis.orm.resolver import ConnectionResolver
 from orionis.test import TestCase
+
 
 class _StubApp:
     """Provide two SQLite databases to both runners."""
@@ -22,7 +26,7 @@ class _StubApp:
         Returns
         -------
         None
-            Store the app paths and database configuration.
+            No return value.
         """
         self.basePath = Path.cwd()
         self._database = database
@@ -42,7 +46,7 @@ class _StubApp:
         """
         return target()
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Return isolated default and secondary connections.
 
         Parameters
@@ -55,6 +59,8 @@ class _StubApp:
         dict
             Default connection name and both SQLite configurations.
         """
+        if key != "database":
+            raise KeyError(key)
         return {
             "default": "sqlite",
             "connections": {
@@ -71,6 +77,7 @@ class _StubApp:
             },
         }
 
+
 class _CreateEntries(Migration):
     """Own the application table populated by the test seeder."""
 
@@ -80,7 +87,7 @@ class _CreateEntries(Migration):
         Returns
         -------
         None
-            Create the entries table on the selected connection.
+            No return value.
         """
         await ConnectionResolver.connection().statement(
             "CREATE TABLE entries (id INTEGER PRIMARY KEY, label VARCHAR(50))",
@@ -92,9 +99,10 @@ class _CreateEntries(Migration):
         Returns
         -------
         None
-            Drop the entries table from the selected connection.
+            No return value.
         """
         await ConnectionResolver.connection().statement("DROP TABLE entries")
+
 
 class _CreateAudit(Migration):
     """Create a separate table that does not hold seeded data."""
@@ -105,7 +113,7 @@ class _CreateAudit(Migration):
         Returns
         -------
         None
-            Create the audit table on the selected connection.
+            No return value.
         """
         await ConnectionResolver.connection().statement(
             "CREATE TABLE audit (id INTEGER PRIMARY KEY)",
@@ -117,9 +125,10 @@ class _CreateAudit(Migration):
         Returns
         -------
         None
-            Drop the audit table from the selected connection.
+            No return value.
         """
         await ConnectionResolver.connection().statement("DROP TABLE audit")
+
 
 class _SeedEntry(Seeder):
     """Insert one record into the migrated application table."""
@@ -130,12 +139,13 @@ class _SeedEntry(Seeder):
         Returns
         -------
         None
-            Insert the seeded label into the entries table.
+            No return value.
         """
         await ConnectionResolver.connection().execute(
             "INSERT INTO entries (label) VALUES (:label)",
             {"label": "seeded"},
         )
+
 
 class TestMigrationSeederLifecycle(TestCase):
     """Keep seeder history consistent with the migrated schema."""
@@ -146,12 +156,14 @@ class TestMigrationSeederLifecycle(TestCase):
         Returns
         -------
         None
-            Prepare the connections, migration runner, and seeder runner.
+            No return value.
         """
         self._workspace = tempfile.TemporaryDirectory()
+        self.addCleanup(self._workspace.cleanup)
         app = _StubApp(str(Path(self._workspace.name) / "lifecycle.sqlite"))
         self._manager = ConnectionManager(app)
-        ConnectionResolver.setManager(self._manager)
+        self.enterContext(patch.object(ConnectionResolver, "_manager", self._manager))
+        self.addAsyncCleanup(self._manager.disconnect)
         self._migrator = Migrator(app, self._manager)
         self._migrator._Migrator__discovered_cache = {
             "m01_entries": _CreateEntries,
@@ -160,18 +172,6 @@ class TestMigrationSeederLifecycle(TestCase):
         self._seeders._SeederRunner__discovered_cache = {
             "s01_entry": _SeedEntry,
         }
-
-    async def asyncTearDown(self) -> None:
-        """Close both connections and remove their files.
-
-        Returns
-        -------
-        None
-            Disconnect the manager and clean the temporary workspace.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
-        self._workspace.cleanup()
 
     async def _tableExists(self, table: str, connection: str = "sqlite") -> bool:
         """Check the selected SQLite catalog for a table.
@@ -238,7 +238,7 @@ class TestMigrationSeederLifecycle(TestCase):
         Returns
         -------
         None
-            Verify rollback clears history and reseeding succeeds after migration.
+            No return value.
         """
         self.assertEqual(await self._migrator.migrate(), ["m01_entries"])
         self.assertEqual(await self._seeders.seed(), ["s01_entry"])
@@ -261,7 +261,7 @@ class TestMigrationSeederLifecycle(TestCase):
         Returns
         -------
         None
-            Verify rollback and reseeding affect only the selected connection.
+            No return value.
         """
         await self._migrator.migrate()
         await self._seeders.seed()
@@ -295,7 +295,7 @@ class TestMigrationSeederLifecycle(TestCase):
         Returns
         -------
         None
-            Verify partial rollback preserves valid seeder history.
+            No return value.
         """
         await self._migrator.migrate()
         await self._seeders.seed()
@@ -324,7 +324,7 @@ class TestMigrationSeederLifecycle(TestCase):
         Returns
         -------
         None
-            Verify fresh migration clears stale history and allows reseeding.
+            No return value.
         """
         await self._migrator.migrate()
         await self._seeders.seed()

@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 from orionis.database.connection_manager import ConnectionManager
 from orionis.orm.exceptions import InvalidQueryException
@@ -8,18 +11,19 @@ from orionis.orm.schema.types import Boolean, Integer, String
 from orionis.support.facades.db import DB
 from orionis.test import TestCase
 
+
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
     __slots__ = ()
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, _key: str) -> dict:
         """Run the config helper.
 
         Parameters
         ----------
-        key : str
-            Value supplied for ``key``.
+        _key : str
+            Unused configuration section requested by the manager.
 
         Returns
         -------
@@ -36,6 +40,7 @@ class _StubApp:
                 },
             },
         }
+
 
 def _users_table() -> TableDefinition:
     """Build the physical "users" table used by every test.
@@ -54,6 +59,7 @@ def _users_table() -> TableDefinition:
         column.name = key
     return TableDefinition(name="users", columns=columns, primary_key="id")
 
+
 def _posts_table() -> TableDefinition:
     """Build the physical "posts" table used by the join test.
 
@@ -71,6 +77,7 @@ def _posts_table() -> TableDefinition:
         column.name = key
     return TableDefinition(name="posts", columns=columns, primary_key="id")
 
+
 class TestRawQueryBuilder(TestCase):
     """
     Integration tests for ``DB.table()`` against a real sqlite connection.
@@ -85,28 +92,18 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         previous_manager = ConnectionResolver._manager
         self.addCleanup(ConnectionResolver.setManager, previous_manager)
         self.addCleanup(setattr, DB, "_pinned_instance", DB._pinned_instance)
         self._manager = ConnectionManager(_StubApp())
+        self.addAsyncCleanup(self._manager.disconnect)
         ConnectionResolver.setManager(self._manager)
         DB._pinned_instance = QueryBuilder(self._manager)
         connection = self._manager.connection()
         await connection.createTable(_users_table())
         await connection.createTable(_posts_table())
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
 
     async def testInsertAndGetReturnPlainDictionaries(self) -> None:
         """Insert a row and read it back as a plain dictionary.
@@ -116,7 +113,7 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await DB.table("users").insert({"name": "John", "active": True})
         rows = await DB.table("users").get()
@@ -131,7 +128,7 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await DB.table("users").insert(
             [
@@ -151,7 +148,7 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         row = await DB.table("users").where("name", "Ghost").first()
         self.assertIsNone(row)
@@ -164,7 +161,7 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await DB.table("users").insert(
             [
@@ -184,7 +181,7 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await DB.table("users").insert({"name": "John", "active": True})
         affected = (
@@ -203,7 +200,7 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await DB.table("users").insert({"name": "John", "active": True})
         await DB.table("posts").insert({"user_id": 1, "title": "Hello"})
@@ -225,7 +222,7 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await DB.table("users").insert(
             [
@@ -244,7 +241,7 @@ class TestRawQueryBuilder(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             await DB.table("users").insert([])

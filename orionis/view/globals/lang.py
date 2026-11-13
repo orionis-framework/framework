@@ -1,3 +1,6 @@
+# ruff: noqa: ANN401, TC003
+# Keep public callback and application annotations resolvable at runtime.
+# Preserve heterogeneous template payload values.
 """Provide view globals operations.
 
 Includes ``_global_trans``, ``_global_choice``, ``_global_locale``,
@@ -5,20 +8,23 @@ Includes ``_global_trans``, ``_global_choice``, ``_global_locale``,
 """
 
 from __future__ import annotations
+
+from collections.abc import Callable
 from typing import Any
+
 from orionis.support.facades.lang import Lang
 
-# ruff: noqa: ANN401
 
-def _global_trans() -> Any:
+def _global_trans() -> Callable[..., str]:
     """
     Build the ``trans`` (and ``__``) template global.
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable that translates a key for a given or the active locale.
     """
+
     def trans(key: str, locale: str | None = None, **replace: Any) -> str:
         """
         Translate a key for the active or an explicit locale.
@@ -41,15 +47,17 @@ def _global_trans() -> Any:
 
     return trans
 
-def _global_choice() -> Any:
+
+def _global_choice() -> Callable[..., str]:
     """
     Build the ``choice`` template global.
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable that translates a pluralized key based on a quantity.
     """
+
     def choice(
         key: str,
         count: int,
@@ -79,15 +87,17 @@ def _global_choice() -> Any:
 
     return choice
 
-def _global_locale() -> Any:
+
+def _global_locale() -> Callable[[], str]:
     """
     Build the ``locale`` template global.
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable that returns the active application locale.
     """
+
     def locale() -> str:
         """
         Return the active application locale.
@@ -101,15 +111,17 @@ def _global_locale() -> Any:
 
     return locale
 
-def _global_locales() -> Any:
+
+def _global_locales() -> Callable[[], tuple[str, ...]]:
     """
     Build the ``locales`` template global.
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable that returns every locale with a translation source.
     """
+
     def locales() -> tuple[str, ...]:
         """
         Return every locale with at least one translation source.

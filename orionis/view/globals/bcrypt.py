@@ -1,15 +1,16 @@
+# ruff: noqa: TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
 """Provide view globals operations through ``_global_encrypt``, ``_global_decrypt``."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from collections.abc import Awaitable, Callable
+
 from orionis.encrypter.contracts.encrypter import IEncrypter
+from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
 
-# ruff: noqa: ANN401
-
-def _global_encrypt(app: IApplication) -> Any:
+def _global_encrypt(app: IApplication) -> Callable[[str], Awaitable[str]]:
     """
     Build the ``encrypt`` template global.
 
@@ -20,8 +21,8 @@ def _global_encrypt(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
-        Callable returning the application instance.
+    collections.abc.Callable
+        Async callable encrypting plaintext through the configured encrypter.
     """
 
     async def encrypt(plaintext: str) -> str:
@@ -43,7 +44,8 @@ def _global_encrypt(app: IApplication) -> Any:
 
     return encrypt
 
-def _global_decrypt(app: IApplication) -> Any:
+
+def _global_decrypt(app: IApplication) -> Callable[[str], Awaitable[str]]:
     """
     Build the ``decrypt`` template global.
 
@@ -54,8 +56,8 @@ def _global_decrypt(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
-        Callable returning the application instance.
+    collections.abc.Callable
+        Async callable decrypting payloads through the configured encrypter.
     """
 
     async def decrypt(payload: str) -> str:

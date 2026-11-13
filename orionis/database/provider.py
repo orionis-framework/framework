@@ -1,12 +1,13 @@
+# ruff: noqa: PLC0415
+# Import database and ORM services only when the provider is activated.
 """Register connection manager services in the application container."""
 
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.database.contracts.connection_manager import IConnectionManager
 
-class ConnectionManagerProvider(ServiceProvider):
 
-    # ruff: noqa: PLC0415
+class ConnectionManagerProvider(ServiceProvider):
     """Register connection manager services in the application container."""
 
     def register(self) -> None:
@@ -16,9 +17,10 @@ class ConnectionManagerProvider(ServiceProvider):
         Returns
         -------
         None
-            Register the connection manager binding.
+            No return value.
         """
         from orionis.database import ConnectionManager
+
         self.app.singleton(IConnectionManager, ConnectionManager)
 
     async def boot(self) -> None:
@@ -28,7 +30,7 @@ class ConnectionManagerProvider(ServiceProvider):
         Returns
         -------
         None
-            Install the resolved manager in the ORM resolver.
+            No return value.
         """
         from orionis.orm.resolver import ConnectionResolver
 

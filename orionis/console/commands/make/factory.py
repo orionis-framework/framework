@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Generate an explicitly imported factory for an application model."""
 
 import keyword
@@ -6,7 +8,7 @@ from pathlib import Path
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.make._base import MakeStubCommand
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
 
 _NAME_RE: re.Pattern[str] = re.compile(r"[A-Za-z]\w*", re.ASCII)
 """Compiled pattern used to recognize name re."""
@@ -14,6 +16,7 @@ _ACRONYM_RE: re.Pattern[str] = re.compile(r"([A-Z]+)([A-Z][a-z])")
 """Compiled pattern used to recognize acronym re."""
 _CAMEL_RE: re.Pattern[str] = re.compile(r"([a-z0-9])([A-Z])")
 """Compiled pattern used to recognize camel re."""
+
 
 def _parse_name(name: str) -> tuple[tuple[str, ...], str]:
     """
@@ -57,6 +60,7 @@ def _parse_name(name: str) -> tuple[tuple[str, ...], str]:
         error_msg = f"Invalid Python class name '{class_name}'."
         raise ValueError(error_msg)
     return modules, class_name
+
 
 class MakeFactory(MakeStubCommand):
     """Generate an explicitly imported factory for an application model."""
@@ -128,10 +132,12 @@ class MakeFactory(MakeStubCommand):
             factory_class += "Factory"
         model_name = self.getArgument("model")
         if model_name is None:
-            model_name = "/".join((
-                *factory_parts[:-1],
-                factory_class.removesuffix("Factory"),
-            ))
+            model_name = "/".join(
+                (
+                    *factory_parts[:-1],
+                    factory_class.removesuffix("Factory"),
+                ),
+            )
         model_parts, model_class = _parse_name(model_name)
         model_directory = app.path("app_models")
         if not isinstance(model_directory, Path):
@@ -139,8 +145,7 @@ class MakeFactory(MakeStubCommand):
             raise TypeError(error_msg)
         package_parts = model_directory.relative_to(app.basePath).parts
         if any(
-            not part.isidentifier() or keyword.iskeyword(part)
-            for part in package_parts
+            not part.isidentifier() or keyword.iskeyword(part) for part in package_parts
         ):
             error_msg = "The configured models path is not a Python package."
             raise ValueError(error_msg)

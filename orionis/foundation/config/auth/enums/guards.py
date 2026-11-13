@@ -1,6 +1,9 @@
+# ruff: noqa: S105
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Enumerate the authentication guards shipped with the framework."""
 
 from enum import StrEnum
+
 
 class Guards(StrEnum):
     """
@@ -20,4 +23,4 @@ class Guards(StrEnum):
     """
 
     SESSION = "session"
-    TOKEN = "token"  # noqa: S105
+    TOKEN = "token"

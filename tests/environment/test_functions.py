@@ -1,3 +1,6 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+from unittest.mock import patch
 from orionis.environment import functions as functions_module
 from orionis.environment.functions import env
 from orionis.test import TestCase
@@ -5,6 +8,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 # Test doubles
 # ---------------------------------------------------------------------------
+
 
 class _RecordingEnv:
     """Env facade double recording every lookup it receives."""
@@ -22,7 +26,7 @@ class _RecordingEnv:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.value: object = value
         self.calls: list[tuple[str, object]] = []
@@ -45,12 +49,13 @@ class _RecordingEnv:
         self.calls.append((key, default))
         return self.value
 
+
 # ---------------------------------------------------------------------------
 # TestEnvHelperDelegation
 # ---------------------------------------------------------------------------
 
-class TestEnvHelperDelegation(TestCase):
 
+class TestEnvHelperDelegation(TestCase):
     def setUp(self) -> None:
         """Replace the Env facade with a controllable double.
 
@@ -60,24 +65,11 @@ class TestEnvHelperDelegation(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_facade = functions_module.Env
+        super().setUp()
         self._facade = _RecordingEnv("recorded")
-        functions_module.Env = self._facade
-
-    def tearDown(self) -> None:
-        """Restore the original Env facade after each test.
-
-        Guarantees that module-level state is never leaked to other test
-        cases running in the same process.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        functions_module.Env = self._original_facade
+        self.enterContext(patch.object(functions_module, "Env", self._facade))
 
     def testForwardsTheRequestedKey(self) -> None:
         """Forward the requested key to the facade unchanged.
@@ -88,24 +80,10 @@ class TestEnvHelperDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         env("APP_NAME")
         self.assertEqual(self._facade.calls, [("APP_NAME", None)])
-
-    def testForwardsNoneAsTheImplicitDefault(self) -> None:
-        """Forward ``None`` when the caller omits a default.
-
-        Validates that the helper always supplies the second positional
-        argument expected by the facade.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        env("MISSING_KEY")
-        self.assertIsNone(self._facade.calls[0][1])
 
     def testForwardsTheExplicitDefault(self) -> None:
         """Forward the caller-supplied default to the facade.
@@ -115,7 +93,7 @@ class TestEnvHelperDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         env("MISSING_KEY", "fallback")
         self.assertEqual(self._facade.calls, [("MISSING_KEY", "fallback")])
@@ -129,7 +107,7 @@ class TestEnvHelperDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         expected = [1, 2, 3]
         self._facade.value = expected
@@ -144,7 +122,7 @@ class TestEnvHelperDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._facade.value = None
         self.assertIsNone(env("MISSING_KEY"))
@@ -158,7 +136,7 @@ class TestEnvHelperDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         env("FIRST_KEY")
         env("SECOND_KEY")

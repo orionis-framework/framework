@@ -5,6 +5,7 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
+
 class LargeBinary(ColumnDefinition):
     """A type for large binary byte data, such as ``BLOB``/``BYTEA``."""
 
@@ -29,9 +30,11 @@ class LargeBinary(ColumnDefinition):
         Raises
         ------
         ValueError
-            If the length is not a positive integer or None.
+            If the length is not a positive non-boolean integer or None.
         """
-        if length is not None and (not isinstance(length, int) or length <= 0):
+        if length is not None and (
+            not isinstance(length, int) or isinstance(length, bool) or length <= 0
+        ):
             error_msg = "LargeBinary length must be a positive integer or None."
             raise ValueError(error_msg)
         super().__init__(ColumnType.LARGE_BINARY, ColumnOptions(length=length))

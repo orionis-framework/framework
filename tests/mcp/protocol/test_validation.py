@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import msgspec
 
 from orionis.mcp.context import McpRequest
@@ -23,6 +25,7 @@ from orionis.mcp.protocol.results import (
 )
 from orionis.mcp.protocol.validation import validate_result
 from orionis.test import TestCase
+
 
 class TestMetadata(TestCase):
     """Check native request decoders preserve extensibility with strict known fields."""
@@ -137,8 +140,31 @@ class TestMetadata(TestCase):
             with self.subTest(meta=meta), self.assertRaises(McpInvalidParams):
                 self.decode({}, **meta)
 
+
 class TestOutputValidation(TestCase):
     """A typed Struct constructor must not bypass protocol validation."""
+
+    def testResultMetadataRejectsNonfiniteValuesInsteadOfEncodingNull(self) -> None:
+        """Apply finite JSON checks to direct result metadata before serialization.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for value in (float("nan"), float("inf"), float("-inf")):
+            for result, method in (
+                (CallToolResult(content=()), "tools/call"),
+                (ReadResourceResult(contents=()), "resources/read"),
+                (CompleteResult(), "subscriptions/listen"),
+            ):
+                with self.subTest(value=value, method=method):
+                    invalid = msgspec.structs.replace(
+                        result,
+                        meta={"example.org/value": {"nested": [value]}},
+                    )
+                    with self.assertRaisesRegex(ValueError, "finite JSON"):
+                        validate_result(invalid, method)
 
     def testValidContentVariantsAndExplicitNull(self):
         """Preserve valid embedded resources, prompt messages, and JSON null output.
@@ -194,7 +220,7 @@ class TestOutputValidation(TestCase):
             {"type": "resource_link", "name": "x", "uri": "test:x", "size": -1},
         )
         for content in invalid:
-            with ( # NOSONAR
+            with (  # NOSONAR
                 self.subTest(content=content),
                 self.assertRaises((ValueError, TypeError)),
             ):
@@ -240,6 +266,7 @@ class TestOutputValidation(TestCase):
             ):
                 validate_result(result, method)
         validate_result(CompleteResult(), "subscriptions/listen")
+
 
 class TestMultiRoundTrip(TestCase):
     """Exercise explicit MRTR request and response forms, including wire-only legacy."""
@@ -302,16 +329,16 @@ class TestMultiRoundTrip(TestCase):
                 "requestedSchema": {"type": "object", "properties": {}},
             },
         )
-        with self.assertRaises(McpProtocolException) as caught: # NOSONAR
+        with self.assertRaises(McpProtocolException) as caught:  # NOSONAR
             validate_input_required(result, self.request())
         self.assertEqual(caught.exception.code, -32021)
         validate_input_required(result, self.request({"elicitation": {}}))
-        with self.assertRaises(McpInvalidParams): # NOSONAR
+        with self.assertRaises(McpInvalidParams):  # NOSONAR
             validate_input_required(
                 result,
                 self.request({"elicitation": {}}, "tools/list"),
             )
-        with self.assertRaises(McpInvalidParams): # NOSONAR
+        with self.assertRaises(McpInvalidParams):  # NOSONAR
             validate_input_required(InputRequiredResult(), self.request())
 
     def testFormSchemasRejectNestingAndInvalidEnumerations(self):
@@ -328,7 +355,10 @@ class TestMultiRoundTrip(TestCase):
             {"type": "string", "minLength": -1},
             {"type": "boolean", "default": "true"},
         ):
-            with self.subTest(field=field), self.assertRaises(McpInvalidParams): # NOSONAR # noqa: E501
+            with (
+                self.subTest(field=field),
+                self.assertRaises(McpInvalidParams),
+            ):  # NOSONAR
                 validate_input_required(
                     self.result(
                         "elicitation/create",
@@ -383,7 +413,7 @@ class TestMultiRoundTrip(TestCase):
             "maxTokens": 10,
             "tools": [],
         }
-        with self.assertRaises(McpProtocolException): # NOSONAR
+        with self.assertRaises(McpProtocolException):  # NOSONAR
             validate_input_required(
                 self.result("sampling/createMessage", sampling),
                 self.request({"sampling": {}}),

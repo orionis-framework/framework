@@ -1,15 +1,15 @@
+# ruff: noqa: TC001
+# Preserve the failure entity annotation for runtime constructor inspection.
 """Carry structured schema-validation failures."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from orionis.schemas.entities.failure import ValidationFailure
+from collections.abc import Sequence
+from orionis.schemas.entities.failure import ValidationFailure
 
 # Fallback used when the exception is built without any failure.
 _DEFAULT_MESSAGE = "The given data was invalid."
 """Fallback used when the exception is built without any failure."""
+
 
 class ValidationException(Exception):
     """Carry structured schema-validation failures."""
@@ -24,7 +24,7 @@ class ValidationException(Exception):
 
         Parameters
         ----------
-        failures
+        failures : ValidationFailure or collections.abc.Sequence[ValidationFailure]
             Single failure or collected payload failures in reporting order.
         message : str | None, optional
             Override the summary message reported to the client.
@@ -32,11 +32,11 @@ class ValidationException(Exception):
         Returns
         -------
         None
-            Store failures, group rule codes and messages, and set the summary.
+            No return value.
         """
-        # Accept a single failure for convenience without importing the entity.
+        # Preserve order for every declared sequence implementation.
         collected: tuple[ValidationFailure, ...] = (
-            tuple(failures) if isinstance(failures, (list, tuple)) else (failures,)
+            tuple(failures) if isinstance(failures, Sequence) else (failures,)
         )
 
         # Preserve the public rule code alongside every field message.
@@ -55,7 +55,7 @@ class ValidationException(Exception):
         """Failure retained for propagation or reporting."""
         self.errors = errors
         """Errors supplied through ``errors``."""
-        self.message = message or self._summary(collected)
+        self.message = self._summary(collected) if message is None else message
         """Override the summary message reported to the client."""
 
         super().__init__(self.message)

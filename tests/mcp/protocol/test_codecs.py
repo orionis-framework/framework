@@ -1,9 +1,12 @@
+# ruff: noqa: ANN001, ANN201, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import msgspec
 
 from orionis.mcp.exceptions import McpProtocolException
 from orionis.mcp.protocol.codecs import decode_envelope, decode_params, encode_error
 from orionis.mcp.protocol.constants import CLIENT_CAPABILITIES, PROTOCOL_VERSION
 from orionis.test import TestCase
+
 
 class TestCodecs(TestCase):
     """Reject malformed envelopes and legacy negotiation consistently."""
@@ -119,7 +122,7 @@ class TestCodecs(TestCase):
         None
             Complete the documented checks or setup without a return value.
         """
-        with self.assertRaises(McpProtocolException) as caught: # NOSONAR
+        with self.assertRaises(McpProtocolException) as caught:  # NOSONAR
             decode_params(self.request("initialize"))
         self.assertEqual(caught.exception.code, -32601)
         self.assertIn("2026-07-28", caught.exception.message)
@@ -137,7 +140,7 @@ class TestCodecs(TestCase):
             {PROTOCOL_VERSION: "2026-07-28"},
             {PROTOCOL_VERSION: "2026-07-28", CLIENT_CAPABILITIES: []},
         ):
-            with ( # NOSONAR
+            with (  # NOSONAR
                 self.subTest(meta=meta),
                 self.assertRaises(McpProtocolException) as caught,
             ):
@@ -152,7 +155,7 @@ class TestCodecs(TestCase):
         None
             Complete the documented checks or setup without a return value.
         """
-        with self.assertRaises(McpProtocolException): # NOSONAR
+        with self.assertRaises(McpProtocolException):  # NOSONAR
             decode_params(self.request("prompts/get", name="x", arguments={"tone": 1}))
 
     def testNotificationsHaveNoId(self):

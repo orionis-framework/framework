@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Write a runtime-visible maintenance state for HTTP workers."""
 
 from contextlib import suppress
@@ -13,10 +15,9 @@ from orionis.foundation.contracts.application import IApplication
 _REPLACE_ATTEMPTS = 6
 """Replace attempts value used by ``maintenance``."""
 
+
 class MaintenanceModeCommand(BaseCommand):
     """Write a runtime-visible maintenance state for HTTP workers."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = False
     """Timestamps flag used by ``MaintenanceModeCommand``."""
@@ -62,7 +63,9 @@ class MaintenanceModeCommand(BaseCommand):
                     except PermissionError:
                         if attempt == _REPLACE_ATTEMPTS - 1:
                             raise
-                        sleep(0.005 * (1 << attempt))
+                        sleep(
+                            0.005 * (1 << attempt),  # NOSONAR(S1110)
+                        )  # Shift the integer before multiplying by a float.
                     else:
                         break
         except OSError as error:

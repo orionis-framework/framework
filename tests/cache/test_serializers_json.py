@@ -1,9 +1,12 @@
+# ruff: noqa: FBT003, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 from orionis.cache.serializers.json import MsgspecSerializer
 from orionis.test import TestCase
 
-class TestMsgspecSerializer(TestCase):
 
+class TestMsgspecSerializer(TestCase):
     def setUp(self) -> None:
         """Create a fresh MsgspecSerializer instance before each test.
 
@@ -13,7 +16,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._ser = MsgspecSerializer()
 
@@ -26,7 +29,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.dumps("hello")
         self.assertIsInstance(result, bytes)
@@ -40,7 +43,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.dumps(42)
         self.assertIsInstance(result, bytes)
@@ -55,7 +58,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.dumps({"key": "value"})
         self.assertIsInstance(result, bytes)
@@ -68,7 +71,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps("world"))
         self.assertEqual(result, "world")
@@ -82,7 +85,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         raw_bytes = self._ser.dumps(99)
         result = self._ser.loads(raw_bytes.decode())
@@ -97,7 +100,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(self._ser.loads(None))
 
@@ -111,7 +114,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._ser.loads(7), 7)
 
@@ -123,7 +126,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertAlmostEqual(self._ser.loads(1.5), 1.5)
 
@@ -136,7 +139,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(bytearray(self._ser.dumps("buffered")))
         self.assertEqual(result, "buffered")
@@ -150,7 +153,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps(1234))
         self.assertEqual(result, 1234)
@@ -163,7 +166,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps(-7))
         self.assertEqual(result, -7)
@@ -177,7 +180,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps(3.14))
         self.assertAlmostEqual(result, 3.14)
@@ -191,7 +194,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps(True))
         self.assertIs(result, True)
@@ -205,7 +208,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps(False))
         self.assertIs(result, False)
@@ -219,7 +222,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps(None))
         self.assertIsNone(result)
@@ -233,7 +236,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = {"key": "value", "n": 7, "flag": True}
         result = self._ser.loads(self._ser.dumps(data))
@@ -248,7 +251,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = [1, "two", 3.0, None]
         result = self._ser.loads(self._ser.dumps(data))
@@ -263,7 +266,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps({}))
         self.assertEqual(result, {})
@@ -277,7 +280,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = self._ser.loads(self._ser.dumps([]))
         self.assertEqual(result, [])
@@ -292,7 +295,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         data = {"outer": {"inner": [1, 2, {"deep": True}]}}
         result = self._ser.loads(self._ser.dumps(data))
@@ -307,7 +310,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(MsgspecSerializer.DEFAULT_ENCODING)
 
@@ -320,7 +323,7 @@ class TestMsgspecSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for value in ["x", 0, False, [], {}]:
             with self.subTest(value=value):

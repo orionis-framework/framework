@@ -1,16 +1,18 @@
+# ruff: noqa: ARG002, TC003
 """Storage driver keeping every object in process memory."""
 
 from __future__ import annotations
 import asyncio
+from collections.abc import AsyncIterable, AsyncIterator
 import hashlib
 import io
 import mimetypes
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import TYPE_CHECKING
 from urllib.parse import quote
 from orionis.storage.contracts.driver import IStorageDriver
+from orionis.storage.drivers.functions import _ModeBuffer
 from orionis.storage.entities.file_info import FileInfo
 from orionis.storage.enums.visibility import Visibility
 from orionis.storage.exceptions import (
@@ -19,10 +21,7 @@ from orionis.storage.exceptions import (
 )
 from orionis.storage.paths import normalizeFilePath, normalizePath
 from orionis.storage.stream import AsyncStream
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterable, AsyncIterator
-    from typing import BinaryIO
+from orionis.support.concurrency import complete_on_cancel
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
@@ -34,6 +33,7 @@ _ALLOWED_MODES: frozenset[str] = frozenset(
 )
 """Binary modes accepted by open()."""
 
+
 def _now() -> datetime:
     """
     Return the current timezone-aware UTC timestamp.
@@ -44,6 +44,7 @@ def _now() -> datetime:
         Current time in UTC.
     """
     return datetime.now(tz=UTC)
+
 
 @dataclass(slots=True)
 class _MemoryEntry:
@@ -66,6 +67,7 @@ class _MemoryEntry:
     visibility: str = Visibility.PRIVATE.value
     created_at: datetime = field(default_factory=_now)
     modified_at: datetime = field(default_factory=_now)
+
 
 class MemoryStorageDriver(IStorageDriver):
     """
@@ -104,7 +106,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Initialize an empty in-memory disk.
+            No return value.
         """
         self._files: dict[str, _MemoryEntry] = {}
         """File contents retained by the in-memory storage backend."""
@@ -164,8 +166,10 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Persist *data* under *normalized*, preserving creation time.
+            No return value.
         """
+        if visibility is not None:
+            self.__validateVisibility(visibility)
         existing = self._files.get(normalized)
         if existing is None:
             self._files[normalized] = _MemoryEntry(
@@ -245,15 +249,13 @@ class MemoryStorageDriver(IStorageDriver):
             Sorted root-relative entry paths.
         """
         prefix = f"{normalized}/" if normalized else ""
-        candidates = (
-            self.__allDirectories() if want_dirs else set(self._files)
-        )
+        candidates = self.__allDirectories() if want_dirs else set(self._files)
 
         results: list[str] = []
         for candidate in candidates:
             if not candidate.startswith(prefix) or candidate == normalized:
                 continue
-            remainder = candidate[len(prefix):]
+            remainder = candidate[len(prefix) :]
             if recursive or "/" not in remainder:
                 results.append(candidate)
 
@@ -302,6 +304,9 @@ class MemoryStorageDriver(IStorageDriver):
         except ValueError as exc:
             error_msg = f"Unsupported hash algorithm [{algorithm}]."
             raise UnsupportedStorageOperationException(error_msg) from exc
+        if hasher.digest_size == 0:
+            error_msg = f"Hash algorithm [{algorithm}] requires an output length."
+            raise UnsupportedStorageOperationException(error_msg)
         hasher.update(data)
         return hasher.hexdigest()
 
@@ -353,9 +358,16 @@ class MemoryStorageDriver(IStorageDriver):
         orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
+        if (
+            isinstance(chunk_size, bool)
+            or not isinstance(chunk_size, int)
+            or chunk_size < 1
+        ):
+            error_msg = "Stream chunk size must be a positive integer."
+            raise ValueError(error_msg)
         content = self.__entryOrFail(normalizeFilePath(path)).content
         for start in range(0, len(content), chunk_size):
-            yield content[start:start + chunk_size]
+            yield content[start : start + chunk_size]
 
     async def exists(self, path: str) -> bool:
         """
@@ -396,12 +408,10 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Write *contents* to *path*, replacing any existing file.
+            No return value.
         """
         data = (
-            contents.encode("utf-8")
-            if isinstance(contents, str)
-            else bytes(contents)
+            contents.encode("utf-8") if isinstance(contents, str) else bytes(contents)
         )
         self.__storeSync(normalizeFilePath(path), data, visibility)
 
@@ -426,12 +436,15 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Write the chunks produced by *stream* to *path*.
+            No return value.
         """
+        normalized = normalizeFilePath(path)
+        if visibility is not None:
+            self.__validateVisibility(visibility)
         buffer = bytearray()
         async for chunk in stream:
             buffer.extend(chunk)
-        self.__storeSync(normalizeFilePath(path), bytes(buffer), visibility)
+        self.__storeSync(normalized, bytes(buffer), visibility)
 
     async def delete(self, path: str) -> bool:
         """
@@ -463,7 +476,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Copy the file at *source* to *target*.
+            No return value.
 
         Raises
         ------
@@ -490,7 +503,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Move the file at *source* to *target*.
+            No return value.
 
         Raises
         ------
@@ -499,8 +512,10 @@ class MemoryStorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(source)
         entry = self.__entryOrFail(normalized)
-        self._files[normalizeFilePath(target)] = entry
-        del self._files[normalized]
+        destination = normalizeFilePath(target)
+        if destination != normalized:
+            self._files[destination] = entry
+            del self._files[normalized]
 
     # ── Metadata operations ──────────────────────────────────────────────────
 
@@ -597,7 +612,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Change the visibility of the file at *path*.
+            No return value.
 
         Raises
         ------
@@ -606,6 +621,29 @@ class MemoryStorageDriver(IStorageDriver):
         orionis.storage.exceptions.UnsupportedStorageOperationException
             If *visibility* is not a supported level.
         """
+        normalized_visibility = self.__validateVisibility(visibility)
+        entry = self.__entryOrFail(normalizeFilePath(path))
+        entry.visibility = normalized_visibility
+
+    @staticmethod
+    def __validateVisibility(visibility: str) -> str:
+        """Return a supported visibility value or reject it before mutation.
+
+        Parameters
+        ----------
+        visibility : str
+            Public or private visibility requested by the caller.
+
+        Returns
+        -------
+        str
+            Normalized visibility name.
+
+        Raises
+        ------
+        orionis.storage.exceptions.UnsupportedStorageOperationException
+            If the value is not a supported visibility level.
+        """
         normalized_visibility = str(visibility)
         if normalized_visibility not in (
             Visibility.PUBLIC.value,
@@ -613,8 +651,7 @@ class MemoryStorageDriver(IStorageDriver):
         ):
             error_msg = f"Unsupported visibility level [{visibility}]."
             raise UnsupportedStorageOperationException(error_msg)
-        entry = self.__entryOrFail(normalizeFilePath(path))
-        entry.visibility = normalized_visibility
+        return normalized_visibility
 
     async def hash(self, path: str, algorithm: str = "sha256") -> str:
         """
@@ -690,7 +727,7 @@ class MemoryStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Create the directory at *path*, including missing parents.
+            No return value.
         """
         normalized = normalizePath(path)
         if normalized:
@@ -719,9 +756,7 @@ class MemoryStorageDriver(IStorageDriver):
             return existed
 
         prefix = f"{normalized}/"
-        existed = (
-            normalized in self.__allDirectories()
-        )
+        existed = normalized in self.__allDirectories()
 
         # Drop every nested file and explicit directory entry.
         self._files = {
@@ -833,13 +868,11 @@ class MemoryStorageDriver(IStorageDriver):
         """
         normalized = normalizeFilePath(path)
         if self._base_url is None:
-            error_msg = (
-                f"This disk does not expose public URLs for [{normalized}]."
-            )
+            error_msg = f"This disk does not expose public URLs for [{normalized}]."
             raise UnsupportedStorageOperationException(error_msg)
         return self.__buildUrl(normalized)
 
-    async def temporaryUrl(self, path: str, expires_in: int) -> str:  # noqa: ARG002
+    async def temporaryUrl(self, path: str, expires_in: int) -> str:
         """
         Build a signed, time-limited URL for the file at *path*.
 
@@ -863,9 +896,7 @@ class MemoryStorageDriver(IStorageDriver):
         orionis.storage.exceptions.UnsupportedStorageOperationException
             Always, since memory disks cannot sign URLs.
         """
-        error_msg = (
-            f"The memory driver does not support temporary URLs for [{path}]."
-        )
+        error_msg = f"The memory driver does not support temporary URLs for [{path}]."
         raise UnsupportedStorageOperationException(error_msg)
 
     async def download(self, path: str, destination: str | Path) -> Path:
@@ -910,7 +941,7 @@ class MemoryStorageDriver(IStorageDriver):
             target.write_bytes(entry.content)
             return target.resolve()
 
-        return await asyncio.to_thread(_persist)
+        return await complete_on_cancel(asyncio.to_thread(_persist))
 
     def open(self, path: str, mode: str = "rb") -> AsyncStream:
         """
@@ -939,13 +970,13 @@ class MemoryStorageDriver(IStorageDriver):
             error_msg = f"Unsupported stream mode [{mode}]."
             raise UnsupportedStorageOperationException(error_msg)
 
-        def opener() -> BinaryIO:
+        def opener() -> _ModeBuffer:
             """
             Open the binary stream backing this object.
 
             Returns
             -------
-            typing.BinaryIO
+            orionis.storage.drivers.functions._ModeBuffer
                 Stream handle for reading or writing.
             """
             # Read-oriented modes require the file to already exist.
@@ -957,25 +988,27 @@ class MemoryStorageDriver(IStorageDriver):
                 buffer.seek(0, io.SEEK_END)
             else:
                 buffer = io.BytesIO()
-            return buffer
+            return _ModeBuffer(buffer, mode)
 
-        def flush(handle: BinaryIO) -> None:
+        def flush(handle: _ModeBuffer) -> None:
             """
             Persist the writable stream content to storage.
 
             Parameters
             ----------
-            handle : typing.BinaryIO
+            handle : orionis.storage.drivers.functions._ModeBuffer
                 Buffered stream being closed.
 
             Returns
             -------
             None
-                Completes after writing the content.
+                No return value.
             """
             # Persist the buffered content back into the store on close.
-            handle.seek(0)
-            self.__storeSync(normalized, handle.read(), None)
+            handle.flush()
+            buffer = handle.raw
+            buffer.seek(0)
+            self.__storeSync(normalized, buffer.read(), None)
 
         # Only writable modes need the flush-on-close callback.
         on_close = None if mode == "rb" else flush

@@ -1,12 +1,16 @@
+# ruff: noqa: FBT003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from orionis.support.types.stringable import Stringable
 from orionis.test import TestCase
+
 
 class TestStringableConditionals(TestCase):
     """Unit tests for Stringable conditional (when*) callback methods."""
 
     # ------------------------------------------------------------------- when
 
-    def testWhenExecutesCallbackWhenConditionIsTrue(self):
+    def testWhenExecutesCallbackWhenConditionIsTrue(self) -> None:
         """Execute the callback when the boolean condition is True.
 
         Validates that `when` invokes the callback and returns its result
@@ -15,12 +19,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").when(True, lambda s: s.upper())
         self.assertEqual(result, Stringable("HELLO"))
 
-    def testWhenSkipsCallbackWhenConditionIsFalse(self):
+    def testWhenSkipsCallbackWhenConditionIsFalse(self) -> None:
         """Return self when the boolean condition is False and no default.
 
         Validates that `when` returns the original Stringable unchanged
@@ -29,12 +33,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").when(False, lambda s: s.upper())
         self.assertEqual(result, Stringable("hello"))
 
-    def testWhenExecutesDefaultCallbackWhenFalse(self):
+    def testWhenExecutesDefaultCallbackWhenFalse(self) -> None:
         """Execute the default callback when the condition is False.
 
         Validates that `when` invokes the default callback and returns
@@ -43,7 +47,7 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").when(
             False,
@@ -52,7 +56,7 @@ class TestStringableConditionals(TestCase):
         )
         self.assertEqual(result, Stringable("hello"))
 
-    def testWhenAcceptsCallableCondition(self):
+    def testWhenAcceptsCallableCondition(self) -> None:
         """Accept a callable as the condition argument.
 
         Validates that `when` evaluates a callable condition by passing
@@ -61,14 +65,15 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").when(
-            lambda s: s.isNotEmpty(), lambda s: s.upper(),
+            lambda s: s.isNotEmpty(),
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("HELLO"))
 
-    def testWhenRaisesTypeErrorOnInvalidCondition(self):
+    def testWhenRaisesTypeErrorOnInvalidCondition(self) -> None:
         """Raise TypeError when condition is neither bool nor callable.
 
         Ensures `when` validates the condition argument type before
@@ -77,12 +82,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").when("not-a-bool", lambda s: s)
 
-    def testWhenRaisesTypeErrorOnNonCallableCallback(self):
+    def testWhenRaisesTypeErrorOnNonCallableCallback(self) -> None:
         """Raise TypeError when callback is not callable.
 
         Ensures `when` validates that the callback argument is callable
@@ -91,12 +96,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").when(True, "not-callable")
 
-    def testWhenRaisesTypeErrorOnNonCallableDefault(self):
+    def testWhenRaisesTypeErrorOnNonCallableDefault(self) -> None:
         """Raise TypeError when default is provided but not callable.
 
         Ensures `when` validates that the optional default argument is
@@ -105,14 +110,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").when(False, lambda s: s, "not-callable")
 
     # ------------------------------------------------------------- whenContains
 
-    def testWhenContainsExecutesCallbackWhenNeedleFound(self):
+    def testWhenContainsExecutesCallbackWhenNeedleFound(self) -> None:
         """Execute callback when the string contains the needle.
 
         Validates that `whenContains` triggers the callback when the
@@ -121,14 +126,15 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenContains(
-            "world", lambda s: s.upper(),
+            "world",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("HELLO WORLD"))
 
-    def testWhenContainsSkipsCallbackWhenNeedleAbsent(self):
+    def testWhenContainsSkipsCallbackWhenNeedleAbsent(self) -> None:
         """Return self when the string does not contain the needle.
 
         Ensures `whenContains` is a no-op when the needle is not found
@@ -137,16 +143,17 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenContains(
-            "xyz", lambda s: s.upper(),
+            "xyz",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("hello world"))
 
     # ---------------------------------------------------------- whenContainsAll
 
-    def testWhenContainsAllExecutesWhenAllNeedlesPresent(self):
+    def testWhenContainsAllExecutesWhenAllNeedlesPresent(self) -> None:
         """Execute callback when all needles are found in the string.
 
         Validates that `whenContainsAll` triggers the callback only when
@@ -155,14 +162,15 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenContainsAll(
-            ["hello", "world"], lambda s: s.upper(),
+            ["hello", "world"],
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("HELLO WORLD"))
 
-    def testWhenContainsAllSkipsCallbackWhenAnyNeedleMissing(self):
+    def testWhenContainsAllSkipsCallbackWhenAnyNeedleMissing(self) -> None:
         """Return self when any needle is absent from the string.
 
         Ensures `whenContainsAll` does not invoke the callback when at
@@ -171,16 +179,17 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenContainsAll(
-            ["hello", "xyz"], lambda s: s.upper(),
+            ["hello", "xyz"],
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("hello world"))
 
     # --------------------------------------------------------------- whenEmpty
 
-    def testWhenEmptyExecutesCallbackOnEmptyString(self):
+    def testWhenEmptyExecutesCallbackOnEmptyString(self) -> None:
         """Execute callback when the string is empty.
 
         Validates that `whenEmpty` triggers the callback and returns its
@@ -189,12 +198,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("").whenEmpty(lambda _: Stringable("default"))
         self.assertEqual(result, Stringable("default"))
 
-    def testWhenEmptySkipsCallbackOnNonEmptyString(self):
+    def testWhenEmptySkipsCallbackOnNonEmptyString(self) -> None:
         """Return self when the string is not empty.
 
         Ensures `whenEmpty` is a no-op when the Stringable instance
@@ -203,14 +212,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").whenEmpty(lambda _: Stringable("default"))
         self.assertEqual(result, Stringable("hello"))
 
     # ----------------------------------------------------------- whenNotEmpty
 
-    def testWhenNotEmptyExecutesCallbackOnNonEmptyString(self):
+    def testWhenNotEmptyExecutesCallbackOnNonEmptyString(self) -> None:
         """Execute callback when the string is not empty.
 
         Validates that `whenNotEmpty` triggers the callback when the
@@ -219,12 +228,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").whenNotEmpty(lambda s: s.upper())
         self.assertEqual(result, Stringable("HELLO"))
 
-    def testWhenNotEmptySkipsCallbackOnEmptyString(self):
+    def testWhenNotEmptySkipsCallbackOnEmptyString(self) -> None:
         """Return self when the string is empty.
 
         Ensures `whenNotEmpty` does not invoke the callback when the
@@ -233,14 +242,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("").whenNotEmpty(lambda s: s.upper())
         self.assertEqual(result, Stringable(""))
 
     # ------------------------------------------------------------- whenEndsWith
 
-    def testWhenEndsWithExecutesCallbackWhenMatching(self):
+    def testWhenEndsWithExecutesCallbackWhenMatching(self) -> None:
         """Execute callback when the string ends with the needle.
 
         Validates that `whenEndsWith` triggers the callback when the
@@ -249,12 +258,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello.py").whenEndsWith(".py", lambda s: s.upper())
         self.assertEqual(result, Stringable("HELLO.PY"))
 
-    def testWhenEndsWithSkipsCallbackWhenNotMatching(self):
+    def testWhenEndsWithSkipsCallbackWhenNotMatching(self) -> None:
         """Return self when the string does not end with the needle.
 
         Ensures `whenEndsWith` is a no-op when the string does not
@@ -263,16 +272,17 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello.py").whenEndsWith(
-            ".txt", lambda s: s.upper(),
+            ".txt",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("hello.py"))
 
     # --------------------------------------------------------- whenDoesntEndWith
 
-    def testWhenDoesntEndWithExecutesCallbackWhenNotMatching(self):
+    def testWhenDoesntEndWithExecutesCallbackWhenNotMatching(self) -> None:
         """Execute callback when the string does not end with the needle.
 
         Validates that `whenDoesntEndWith` triggers the callback when
@@ -281,14 +291,15 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello.txt").whenDoesntEndWith(
-            ".py", lambda s: s.upper(),
+            ".py",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("HELLO.TXT"))
 
-    def testWhenDoesntEndWithSkipsCallbackWhenMatching(self):
+    def testWhenDoesntEndWithSkipsCallbackWhenMatching(self) -> None:
         """Return self when the string does end with the needle.
 
         Ensures `whenDoesntEndWith` is a no-op when the string actually
@@ -297,16 +308,17 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello.py").whenDoesntEndWith(
-            ".py", lambda s: s.upper(),
+            ".py",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("hello.py"))
 
     # -------------------------------------------------------------- whenExactly
 
-    def testWhenExactlyExecutesCallbackOnExactMatch(self):
+    def testWhenExactlyExecutesCallbackOnExactMatch(self) -> None:
         """Execute callback when the string exactly matches the value.
 
         Validates that `whenExactly` triggers the callback when the
@@ -315,12 +327,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").whenExactly("hello", lambda s: s.upper())
         self.assertEqual(result, Stringable("HELLO"))
 
-    def testWhenExactlySkipsCallbackOnNoMatch(self):
+    def testWhenExactlySkipsCallbackOnNoMatch(self) -> None:
         """Return self when the string does not exactly match.
 
         Ensures `whenExactly` is a no-op when the string differs from
@@ -329,14 +341,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").whenExactly("HELLO", lambda s: s.upper())
         self.assertEqual(result, Stringable("hello"))
 
     # ----------------------------------------------------------- whenNotExactly
 
-    def testWhenNotExactlyExecutesCallbackWhenNoMatch(self):
+    def testWhenNotExactlyExecutesCallbackWhenNoMatch(self) -> None:
         """Execute callback when the string does not exactly match.
 
         Validates that `whenNotExactly` triggers the callback when the
@@ -345,12 +357,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").whenNotExactly("world", lambda s: s.upper())
         self.assertEqual(result, Stringable("HELLO"))
 
-    def testWhenNotExactlySkipsCallbackOnExactMatch(self):
+    def testWhenNotExactlySkipsCallbackOnExactMatch(self) -> None:
         """Return self when the string exactly matches the value.
 
         Ensures `whenNotExactly` is a no-op when the string is identical
@@ -359,16 +371,17 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").whenNotExactly(
-            "hello", lambda s: s.upper(),
+            "hello",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("hello"))
 
     # ----------------------------------------------------------- whenStartsWith
 
-    def testWhenStartsWithExecutesCallbackWhenMatching(self):
+    def testWhenStartsWithExecutesCallbackWhenMatching(self) -> None:
         """Execute callback when the string starts with the needle.
 
         Validates that `whenStartsWith` triggers the callback when the
@@ -377,14 +390,15 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenStartsWith(
-            "hello", lambda s: s.upper(),
+            "hello",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("HELLO WORLD"))
 
-    def testWhenStartsWithSkipsCallbackWhenNotMatching(self):
+    def testWhenStartsWithSkipsCallbackWhenNotMatching(self) -> None:
         """Return self when the string does not start with the needle.
 
         Ensures `whenStartsWith` is a no-op when the string does not
@@ -393,16 +407,17 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenStartsWith(
-            "world", lambda s: s.upper(),
+            "world",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("hello world"))
 
     # ------------------------------------------------------- whenDoesntStartWith
 
-    def testWhenDoesntStartWithExecutesCallbackWhenNotMatching(self):
+    def testWhenDoesntStartWithExecutesCallbackWhenNotMatching(self) -> None:
         """Execute callback when the string does not start with the needle.
 
         Validates that `whenDoesntStartWith` triggers the callback when
@@ -411,14 +426,15 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenDoesntStartWith(
-            "world", lambda s: s.upper(),
+            "world",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("HELLO WORLD"))
 
-    def testWhenDoesntStartWithSkipsCallbackWhenMatching(self):
+    def testWhenDoesntStartWithSkipsCallbackWhenMatching(self) -> None:
         """Return self when the string does start with the needle.
 
         Ensures `whenDoesntStartWith` is a no-op when the string
@@ -427,16 +443,17 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenDoesntStartWith(
-            "hello", lambda s: s.upper(),
+            "hello",
+            lambda s: s.upper(),
         )
         self.assertEqual(result, Stringable("hello world"))
 
     # -------------------------------------------------------------- whenTest
 
-    def testWhenTestExecutesCallbackWhenPatternMatches(self):
+    def testWhenTestExecutesCallbackWhenPatternMatches(self) -> None:
         """Execute callback when the string matches the regex pattern.
 
         Validates that `whenTest` triggers the callback when the string
@@ -445,12 +462,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello123").whenTest(r"\d+", lambda s: s.upper())
         self.assertEqual(result, Stringable("HELLO123"))
 
-    def testWhenTestSkipsCallbackWhenPatternDoesNotMatch(self):
+    def testWhenTestSkipsCallbackWhenPatternDoesNotMatch(self) -> None:
         """Return self when the string does not match the regex.
 
         Ensures `whenTest` is a no-op when the regular expression does
@@ -459,14 +476,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").whenTest(r"\d+", lambda s: s.upper())
         self.assertEqual(result, Stringable("hello"))
 
     # --------------------------------------------------------------- whenIs
 
-    def testWhenIsExecutesCallbackWhenPatternMatches(self):
+    def testWhenIsExecutesCallbackWhenPatternMatches(self) -> None:
         """Execute callback when the string matches the wildcard pattern.
 
         Validates that `whenIs` triggers the callback when the string
@@ -475,12 +492,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenIs("hello*", lambda s: s.upper())
         self.assertEqual(result, Stringable("HELLO WORLD"))
 
-    def testWhenIsSkipsCallbackWhenPatternDoesNotMatch(self):
+    def testWhenIsSkipsCallbackWhenPatternDoesNotMatch(self) -> None:
         """Return self when the string does not match the wildcard pattern.
 
         Ensures `whenIs` is a no-op when the string does not match any
@@ -489,14 +506,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").whenIs("foo*", lambda s: s.upper())
         self.assertEqual(result, Stringable("hello world"))
 
     # ----------------------------------------------------------- whenIsAscii
 
-    def testWhenIsAsciiExecutesCallbackForAsciiString(self):
+    def testWhenIsAsciiExecutesCallbackForAsciiString(self) -> None:
         """Execute callback when the string is pure ASCII.
 
         Validates that `whenIsAscii` triggers the callback when the
@@ -505,12 +522,12 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").whenIsAscii(lambda s: s.upper())
         self.assertEqual(result, Stringable("HELLO"))
 
-    def testWhenIsAsciiSkipsCallbackForNonAsciiString(self):
+    def testWhenIsAsciiSkipsCallbackForNonAsciiString(self) -> None:
         """Return self when the string contains non-ASCII characters.
 
         Ensures `whenIsAscii` is a no-op when the string includes
@@ -519,14 +536,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("héllo").whenIsAscii(lambda s: s.upper())
         self.assertEqual(result, Stringable("héllo"))
 
     # ----------------------------------------------------------- whenIsUuid
 
-    def testWhenIsUuidExecutesCallbackForValidUuid(self):
+    def testWhenIsUuidExecutesCallbackForValidUuid(self) -> None:
         """Execute callback when the string is a valid UUID.
 
         Validates that `whenIsUuid` triggers the callback when the
@@ -535,14 +552,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         uuid_str = "550e8400-e29b-41d4-a716-446655440000"
         called = []
         Stringable(uuid_str).whenIsUuid(lambda _: called.append(True))
         self.assertTrue(called)
 
-    def testWhenIsUuidSkipsCallbackForInvalidUuid(self):
+    def testWhenIsUuidSkipsCallbackForInvalidUuid(self) -> None:
         """Return self when the string is not a valid UUID.
 
         Ensures `whenIsUuid` is a no-op when the string cannot be
@@ -551,7 +568,7 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         called = []
         Stringable("not-a-uuid").whenIsUuid(
@@ -561,7 +578,7 @@ class TestStringableConditionals(TestCase):
 
     # ---------------------------------------------------------- whenIsUlid
 
-    def testWhenIsUlidExecutesCallbackForValidUlid(self):
+    def testWhenIsUlidExecutesCallbackForValidUlid(self) -> None:
         """Execute callback when the string is a valid ULID.
 
         Validates that `whenIsUlid` triggers the callback when the
@@ -570,14 +587,14 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         valid_ulid = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
         called = []
         Stringable(valid_ulid).whenIsUlid(lambda _: called.append(True))
         self.assertTrue(called)
 
-    def testWhenIsUlidSkipsCallbackForInvalidUlid(self):
+    def testWhenIsUlidSkipsCallbackForInvalidUlid(self) -> None:
         """Return self when the string is not a valid ULID.
 
         Ensures `whenIsUlid` is a no-op when the string does not conform
@@ -586,7 +603,7 @@ class TestStringableConditionals(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         called = []
         Stringable("not-a-ulid").whenIsUlid(lambda _: called.append(True))

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from abc import ABC
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
@@ -20,6 +22,7 @@ _SHIPPED_RESOLVERS = (
     WeeklySuffixResolver,
 )
 
+
 class _IncompleteResolver(SuffixResolver):
     """Resolver implementing a single member of the contract on purpose."""
 
@@ -40,8 +43,8 @@ class _IncompleteResolver(SuffixResolver):
         """
         return "suffix"
 
-class TestSuffixResolverContract(TestCase):
 
+class TestSuffixResolverContract(TestCase):
     def testIsAnAbstractContract(self) -> None:
         """Expose the rotation contract as a non instantiable abstraction.
 
@@ -51,7 +54,7 @@ class TestSuffixResolverContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(SuffixResolver, ABC))
         self.assertTrue(inspect.isabstract(SuffixResolver))
@@ -66,7 +69,7 @@ class TestSuffixResolverContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(SuffixResolver.__abstractmethods__, _ABSTRACT_MEMBERS)
 
@@ -79,7 +82,7 @@ class TestSuffixResolverContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(SuffixResolver.__slots__, ())
 
@@ -92,7 +95,7 @@ class TestSuffixResolverContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for member in sorted(_ABSTRACT_MEMBERS):
             self.assertTrue(inspect.getdoc(getattr(SuffixResolver, member)))
@@ -105,7 +108,7 @@ class TestSuffixResolverContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             _IncompleteResolver()
@@ -119,7 +122,7 @@ class TestSuffixResolverContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for resolver_class in _SHIPPED_RESOLVERS:
             self.assertIsInstance(resolver_class(), SuffixResolver)
@@ -133,7 +136,7 @@ class TestSuffixResolverContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for resolver_class in _SHIPPED_RESOLVERS:
             self.assertFalse(hasattr(resolver_class(), "__dict__"))
@@ -147,14 +150,21 @@ class TestSuffixResolverContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for member in sorted(_ABSTRACT_MEMBERS):
-            expected = inspect.signature(getattr(SuffixResolver, member))
+            expected = inspect.signature(getattr(SuffixResolver, member), eval_str=True)
             for resolver_class in _SHIPPED_RESOLVERS:
-                actual = inspect.signature(getattr(resolver_class, member))
-                self.assertEqual(
-                    list(actual.parameters),
-                    list(expected.parameters),
-                    msg=f"Signature drift on {resolver_class.__name__}.{member}.",
-                )
+                with self.subTest(resolver=resolver_class.__name__, member=member):
+                    actual = inspect.signature(
+                        getattr(resolver_class, member),
+                        eval_str=True,
+                    )
+                    self.assertEqual(
+                        list(actual.parameters.values())[1:],
+                        list(expected.parameters.values())[1:],
+                    )
+                    self.assertEqual(
+                        actual.return_annotation,
+                        expected.return_annotation,
+                    )

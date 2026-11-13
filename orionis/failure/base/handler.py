@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Preserve concrete handler dependencies and callback types for runtime reflection.
 """Select default logging and deferred presentation for application failures."""
 
 from functools import partial
@@ -36,10 +38,9 @@ _HTTP_STATUS_MAP: dict[type[BaseException], tuple[int, str]] = {
 }
 """Map handled exception types to their public HTTP status and message."""
 
+
 class BaseExceptionHandler(IBaseExceptionHandler):
     """Select logging and protocol presentation through one failure hook."""
-
-    # ruff: noqa: TC001
 
     dont_catch: ClassVar[frozenset[type[BaseException]]] = frozenset()
     """Exceptions that should not be caught by the handler."""
@@ -101,7 +102,8 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         return FailureHandling(
             logging=(
                 partial(self.__log, exception)
-                if not context.expected and context.reporting_allowed else None
+                if not context.expected and context.reporting_allowed
+                else None
             ),
             presentation=partial(self.__present, exception),
         )
@@ -124,7 +126,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         Returns
         -------
         None
-            Preserve the original result and its protocol behavior.
+            No return value.
 
         Notes
         -----
@@ -151,14 +153,13 @@ class BaseExceptionHandler(IBaseExceptionHandler):
             Structured Throwable object containing class, message, arguments,
             and traceback.
         """
-        # Extract and stringify exception arguments
-        args = exception.args or ("",)
-        str_args = tuple(map(str, args))
+        # Preserve the original argument count while exposing text values.
+        str_args = tuple(map(str, exception.args))
 
         # Create and return the Throwable object
         return Throwable(
             classtype=type(exception),
-            message=str_args[0],
+            message=str(exception),
             args=str_args,
             traceback=exception.__traceback__,
         )
@@ -179,12 +180,15 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         -------
         bool
             True if the exception should be ignored, otherwise False.
+
+        Raises
+        ------
+        TypeError
+            If the supplied value is not an exception instance.
         """
         # Ensure the input is an exception instance
         if not isinstance(exception, BaseException):
-            error_msg = (
-                f"Expected BaseException, got {type(exception).__name__}"
-            )
+            error_msg = f"Expected BaseException, got {type(exception).__name__}"
             raise TypeError(error_msg)
 
         # Check whether the exact exception class is configured to be ignored.
@@ -205,7 +209,7 @@ class BaseExceptionHandler(IBaseExceptionHandler):
         Returns
         -------
         None
-            Preserve the original traceback in one logging record.
+            No return value.
         """
         # Convert the exception into a structured Throwable object
         throwable = self.toThrowable(exception)

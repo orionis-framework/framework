@@ -15,6 +15,7 @@ from orionis.support.entities.base import BaseEntity
 _MAX_PORT = 65535
 """Max port value used by ``redis``."""
 
+
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Redis(BaseEntity):
     """

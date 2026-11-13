@@ -1,10 +1,12 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import sys
 from importlib import import_module
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.context.scope import ScopedContext
@@ -18,7 +20,10 @@ from orionis.foundation.enums.lifespan import Lifespan
 from orionis.queues.contracts.manager import IQueueManager
 from orionis.queues.drivers.sync import SyncQueueDriver
 from orionis.queues.exceptions import (
-    QueueConfigurationError, QueueDispatchError, QueueRetryError, QueueStorageError,
+    QueueConfigurationError,
+    QueueDispatchError,
+    QueueRetryError,
+    QueueStorageError,
     UnknownJobError,
 )
 from orionis.queues.manager import QueueManager
@@ -30,8 +35,15 @@ from orionis.support.facades.queue import Queue
 from orionis.test import TestCase
 from tests.queues.drivers.test_database import make_envelope
 from tests.queues.test_worker import (
-    FailJob, FailedRepository, FakeApp, GateJob, MemoryDriver, RecordJob, ScopedService,
-    State, envelope,
+    FailJob,
+    FailedRepository,
+    FakeApp,
+    GateJob,
+    MemoryDriver,
+    RecordJob,
+    ScopedService,
+    State,
+    envelope,
 )
 
 if TYPE_CHECKING:
@@ -39,13 +51,18 @@ if TYPE_CHECKING:
 
 _CREDENTIAL = "test:@/credential"
 
+
 class FastFailureDriver(MemoryDriver):
     """Execute a requeued job before administrative retry finishes."""
 
     __slots__ = ("_worker",)
 
-    def __init__(self, serializer: JobSerializer, app: FakeApp,
-                 failed: FailedRepository) -> None:
+    def __init__(
+        self,
+        serializer: JobSerializer,
+        app: FakeApp,
+        failed: FailedRepository,
+    ) -> None:
         """Prepare a worker that immediately processes each pushed envelope.
 
         Parameters
@@ -58,8 +75,7 @@ class FastFailureDriver(MemoryDriver):
             Failure event repository.
         """
         super().__init__(serializer)
-        self._worker = Worker(app, self, serializer, WorkerOptions("database"),
-                              failed)
+        self._worker = Worker(app, self, serializer, WorkerOptions("database"), failed)
 
     async def push(self, envelope: JobEnvelope, delay: float = 0.0) -> str:
         """Process a new claim before the caller forgets its earlier failure.
@@ -80,6 +96,7 @@ class FastFailureDriver(MemoryDriver):
         reserved = await self.reserve((envelope.queue,), 90)
         await self._worker.execute(reserved)
         return dispatch_id
+
 
 class TestQueueManager(TestCase):
     """Verify lazy canonical dispatch, provider pinning and administration."""
@@ -133,8 +150,10 @@ class TestQueueManager(TestCase):
         None
             Assert preservation of the original synchronous job exception.
         """
-        with self.assertLogs("orionis.queues.worker", level="ERROR"), \
-                self.assertRaisesRegex(ValueError, "Application job failure"):
+        with (
+            self.assertLogs("orionis.queues.worker", level="ERROR"),
+            self.assertRaisesRegex(ValueError, "Application job failure"),
+        ):
             await self.manager.dispatch(FailJob(1))
         self.assertEqual(len(await self.failed.all()), 1)
         self.assertEqual((await self.failed.all())[0].attempts, 1)
@@ -181,9 +200,14 @@ class TestQueueManager(TestCase):
         """
         driver = MemoryDriver(self.serializer)
         self.manager._drivers["database"] = driver
-        await self.manager.dispatch(RecordJob(1)).onConnection("database").onQueue(
-            "high",
-        ).delay(0.1)
+        await (
+            self.manager.dispatch(RecordJob(1))
+            .onConnection("database")
+            .onQueue(
+                "high",
+            )
+            .delay(0.1)
+        )
         await self.manager.dispatch(RecordJob(2)).onConnection("database")
         self.assertIs(await self.manager.connection("database"), driver)
         self.assertEqual(await driver.size("high"), 1)
@@ -211,15 +235,20 @@ class TestQueueManager(TestCase):
         None
             Assert lazy Redis client creation with structured connection fields.
         """
-        app = FakeApp({
-            "default": "redis",
-            "connections": {
-                "redis": RedisConfig(
-                    endpoint="redis.example.test", port=6380, db=2,
-                    password=_CREDENTIAL, prefix="queues:structured",
-                ),
+        app = FakeApp(
+            {
+                "default": "redis",
+                "connections": {
+                    "redis": RedisConfig(
+                        endpoint="redis.example.test",
+                        port=6380,
+                        db=2,
+                        password=_CREDENTIAL,
+                        prefix="queues:structured",
+                    ),
+                },
             },
-        })
+        )
         manager = QueueManager(app, self.serializer)
         try:
             driver = await manager.connection()
@@ -246,16 +275,26 @@ class TestQueueManager(TestCase):
         None
             Assert propagation of custom defaults into envelopes and workers.
         """
-        app = FakeApp({"default": "database", "worker": {
-            "concurrency": 3, "tries": 4, "timeout": 10.0, "backoff": (1.0, 2.0),
-        }})
+        app = FakeApp(
+            {
+                "default": "database",
+                "worker": {
+                    "concurrency": 3,
+                    "tries": 4,
+                    "timeout": 10.0,
+                    "backoff": (1.0, 2.0),
+                },
+            },
+        )
         manager = QueueManager(app, self.serializer)
         driver = MemoryDriver(self.serializer)
         manager._drivers["database"] = driver
         await manager.dispatch(RecordJob(1))
         queued = next(iter(driver.entries.values())).envelope
-        self.assertEqual((queued.max_tries, queued.timeout, queued.backoff),
-                         (4, 10.0, (1.0, 2.0)))
+        self.assertEqual(
+            (queued.max_tries, queued.timeout, queued.backoff),
+            (4, 10.0, (1.0, 2.0)),
+        )
         worker = await manager.worker(queues=("high", "default"))
         self.assertEqual(worker._concurrency, 3)
         self.assertEqual(worker._queues, ("high", "default"))
@@ -297,7 +336,9 @@ class TestQueueManager(TestCase):
         reserved = await original.reserve(("default",), 90)
         failure = await self.failed.record(reserved, "database", ValueError("Old"))
         self.manager._drivers["database"] = FastFailureDriver(
-            self.serializer, self.app, self.failed,
+            self.serializer,
+            self.app,
+            self.failed,
         )
         with self.assertLogs("orionis.queues.worker", level="ERROR"):
             await self.manager.retryFailed(failure.id)
@@ -323,6 +364,186 @@ class TestQueueManager(TestCase):
         self.assertTrue(self.failed.closed)
         self.assertEqual(self.manager._drivers, {})
 
+    async def testCloseAttemptsAllResourcesAndPreservesTheFirstError(self) -> None:
+        """Close all owned resources while retaining and observing failures.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        first = MemoryDriver(self.serializer)
+        second = MemoryDriver(self.serializer)
+        self.manager._drivers.update(first=first, second=second)
+        primary = RuntimeError("first client close failed")
+        cause = OSError("original cause")
+        primary.__cause__ = cause
+        secondary = RuntimeError("second client close failed")
+        closed = []
+
+        async def close_driver(driver: MemoryDriver) -> None:
+            """Record closure and raise the selected client failure.
+
+            Parameters
+            ----------
+            driver : MemoryDriver
+                Driver whose close boundary is controlled.
+
+            Returns
+            -------
+            None
+                No return value.
+            """
+            closed.append(driver)
+            raise primary if driver is first else secondary
+
+        observed = AsyncMock()
+        with (
+            patch.object(MemoryDriver, "close", close_driver),
+            patch("orionis.failure.runtime.capture", new=observed),
+            self.assertRaises(RuntimeError) as caught,
+        ):
+            await self.manager.close()
+        self.assertIs(caught.exception, primary)
+        self.assertIs(caught.exception.__cause__, cause)
+        self.assertEqual(closed, [first, second])
+        self.assertTrue(self.failed.closed)
+        self.assertEqual(self.manager._drivers, {})
+        self.assertIsNone(self.manager._failed)
+        observed.assert_awaited_once()
+        self.assertIs(observed.await_args.args[0], secondary)
+
+    async def testCloseWaitsForAnAdmittedDriverInitialization(self) -> None:
+        """Close a driver already being initialized instead of losing ownership.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        entered = asyncio.Event()
+        release = asyncio.Event()
+        driver = MemoryDriver(self.serializer)
+
+        async def create_driver(_manager: QueueManager, _name: str) -> MemoryDriver:
+            """Pause an admitted initialization until the test releases it.
+
+            Parameters
+            ----------
+            _manager : QueueManager
+                Manager constructing the driver.
+            _name : str
+                Selected connection name.
+
+            Returns
+            -------
+            MemoryDriver
+                Initialized test-owned driver.
+            """
+            entered.set()
+            await release.wait()
+            return driver
+
+        with patch.object(QueueManager, "_createDriver", create_driver):
+            resolving = asyncio.create_task(self.manager.connection("database"))
+            await entered.wait()
+            closing = asyncio.create_task(self.manager.close())
+            try:
+                await asyncio.sleep(0)
+                self.assertFalse(closing.done())
+                release.set()
+                self.assertIs(await resolving, driver)
+                await closing
+                self.assertTrue(driver.closed)
+                self.assertEqual(self.manager._drivers, {})
+            finally:
+                release.set()
+                await asyncio.gather(resolving, closing, return_exceptions=True)
+                await driver.close()
+
+    async def testCancelledCloseDrainsOwnedResources(self) -> None:
+        """Finish owned cleanup before propagating repeated caller cancellation.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        entered = asyncio.Event()
+        release = asyncio.Event()
+        driver = MemoryDriver(self.serializer)
+        self.manager._drivers["database"] = driver
+
+        async def close_driver(resource: MemoryDriver) -> None:
+            """Wait until cleanup can finish and mark the owned driver closed.
+
+            Parameters
+            ----------
+            resource : MemoryDriver
+                Driver whose cleanup is controlled.
+
+            Returns
+            -------
+            None
+                No return value.
+            """
+            entered.set()
+            await release.wait()
+            resource.closed = True
+
+        with patch.object(MemoryDriver, "close", close_driver):
+            closing = asyncio.create_task(self.manager.close())
+            try:
+                await entered.wait()
+                closing.cancel()
+                await asyncio.sleep(0)
+                closing.cancel()
+                release.set()
+                with self.assertRaises(asyncio.CancelledError):
+                    await closing
+                self.assertTrue(driver.closed)
+                self.assertTrue(self.failed.closed)
+                self.assertEqual(self.manager._drivers, {})
+                self.assertIsNone(self.manager._failed)
+            finally:
+                release.set()
+                await asyncio.gather(closing, return_exceptions=True)
+
+    async def testCloseRejectsReentryFromDriverInitialization(self) -> None:
+        """Reject self-dependent shutdown without deadlocking initialization.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        driver = MemoryDriver(self.serializer)
+
+        async def create_driver(manager: QueueManager, _name: str) -> MemoryDriver:
+            """Request shutdown from the initialization that it would await.
+
+            Parameters
+            ----------
+            manager : QueueManager
+                Manager currently constructing this driver.
+            _name : str
+                Selected connection name.
+
+            Returns
+            -------
+            MemoryDriver
+                Unpublished driver if shutdown were incorrectly accepted.
+            """
+            await manager.close()
+            return driver
+
+        with (
+            patch.object(QueueManager, "_createDriver", create_driver),
+            self.assertRaises(QueueConfigurationError),
+        ):
+            await self.manager.connection("database")
+        self.assertEqual(self.manager._drivers, {})
+
     async def testEagerProviderPinsImmediateFluentFacade(self) -> None:
         """
         Expose PendingDispatch directly after eager provider startup.
@@ -332,12 +553,12 @@ class TestQueueManager(TestCase):
         None
             Assert immediate fluent dispatch through the eagerly pinned facade.
         """
-        previous = Queue._application
-        previous_pin = Queue._pinned_instance
-        Queue._application = self.app # NOSONAR
-        provider = QueueProvider(self.app)
-        self.assertNotIsInstance(provider, DeferrableProvider)
-        try:
+        with (
+            patch.object(Queue, "_application", self.app),
+            patch.object(Queue, "_pinned_instance", Queue._pinned_instance),
+        ):
+            provider = QueueProvider(self.app)
+            self.assertNotIsInstance(provider, DeferrableProvider)
             provider.register()
             await provider.boot()
             manager = await self.app.make(IQueueManager)
@@ -352,9 +573,7 @@ class TestQueueManager(TestCase):
             for callback in self.app.hooks[Lifespan.SHUTDOWN]:
                 await callback()
             self.assertTrue(driver.closed)
-        finally:
-            Queue._pinned_instance = previous_pin # NOSONAR
-            Queue._application = previous # NOSONAR
+
 
 class TestQueueMigrations(TestCase):
     """Prepare real isolated databases without constructing queue clients."""
@@ -370,35 +589,45 @@ class TestQueueMigrations(TestCase):
         """
         self.directory = TemporaryDirectory()
         directory = Path(self.directory.name)
-        self.databases = ConnectionManager(FakeApp({
-            "default": "primary",
-            "connections": {
-                name: {
-                    "driver": "sqlite",
-                    "database": str(directory / f"{name}.sqlite"),
-                    "prefix": prefix,
-                }
-                for name, prefix in (
-                    ("primary", "q_"), ("reports", "r_"), ("failures", "f_"),
-                )
-            },
-        }))
-        self.app = FakeApp({
-            "default": "sync",
-            "connections": {
-                "sync": {"driver": "sync"},
-                "database": {
-                    "driver": "database", "connection": None,
-                    "table": "pending_jobs",
+        self.databases = ConnectionManager(
+            FakeApp(
+                {
+                    "default": "primary",
+                    "connections": {
+                        name: {
+                            "driver": "sqlite",
+                            "database": str(directory / f"{name}.sqlite"),
+                            "prefix": prefix,
+                        }
+                        for name, prefix in (
+                            ("primary", "q_"),
+                            ("reports", "r_"),
+                            ("failures", "f_"),
+                        )
+                    },
                 },
-                "reports": {
-                    "driver": "database", "connection": "reports",
-                    "table": "report_jobs",
+            ),
+        )
+        self.app = FakeApp(
+            {
+                "default": "sync",
+                "connections": {
+                    "sync": {"driver": "sync"},
+                    "database": {
+                        "driver": "database",
+                        "connection": None,
+                        "table": "pending_jobs",
+                    },
+                    "reports": {
+                        "driver": "database",
+                        "connection": "reports",
+                        "table": "report_jobs",
+                    },
+                    "redis": {"driver": "redis", "endpoint": "redis.invalid"},
                 },
-                "redis": {"driver": "redis", "endpoint": "redis.invalid"},
+                "failed": {"connection": "failures", "table": "queue_failures"},
             },
-            "failed": {"connection": "failures", "table": "queue_failures"},
-        })
+        )
         token = ScopedContext.setCurrentScope(None)
         try:
             self.app.instance(IConnectionManager, self.databases)
@@ -430,12 +659,24 @@ class TestQueueMigrations(TestCase):
         """
         await self.manager.migrate()
         expected = (
-            ("primary", "q_pending_jobs", build_jobs_table("pending_jobs"),
-             ("queue", "available_at", "reserved_until")),
-            ("reports", "r_report_jobs", build_jobs_table("report_jobs"),
-             ("queue", "available_at", "reserved_until")),
-            ("failures", "f_queue_failures",
-             build_failed_jobs_table("queue_failures"), ("failed_at",)),
+            (
+                "primary",
+                "q_pending_jobs",
+                build_jobs_table("pending_jobs"),
+                ("queue", "available_at", "reserved_until"),
+            ),
+            (
+                "reports",
+                "r_report_jobs",
+                build_jobs_table("report_jobs"),
+                ("queue", "available_at", "reserved_until"),
+            ),
+            (
+                "failures",
+                "f_queue_failures",
+                build_failed_jobs_table("queue_failures"),
+                ("failed_at",),
+            ),
         )
         for name, table, definition, index_columns in expected:
             with self.subTest(connection=name, table=table):
@@ -445,10 +686,12 @@ class TestQueueMigrations(TestCase):
                 )
                 self.assertEqual({row["name"] for row in tables}, {table})
                 columns = await connection.select(
-                    "SELECT name FROM pragma_table_info(:table)", {"table": table},
+                    "SELECT name FROM pragma_table_info(:table)",
+                    {"table": table},
                 )
                 self.assertEqual(
-                    {row["name"] for row in columns}, set(definition.columns),
+                    {row["name"] for row in columns},
+                    set(definition.columns),
                 )
                 indexes = await connection.select(
                     "SELECT name FROM pragma_index_list(:table) WHERE origin = 'c'",
@@ -460,7 +703,8 @@ class TestQueueMigrations(TestCase):
                     {"index_name": indexes[0]["name"]},
                 )
                 self.assertEqual(
-                    tuple(row["name"] for row in indexed), index_columns,
+                    tuple(row["name"] for row in indexed),
+                    index_columns,
                 )
         self.assertEqual(self.manager._drivers, {})
         self.assertIsNone(self.manager._failed)
@@ -481,7 +725,9 @@ class TestQueueMigrations(TestCase):
         reserved = await driver.reserve(("default",), 90)
         repository = await self.manager.failed()
         failure = await repository.record(
-            reserved, "database", ValueError("Preserved failure"),
+            reserved,
+            "database",
+            ValueError("Preserved failure"),
         )
         await self.manager.migrate()
         await self.manager.migrate()
@@ -505,13 +751,15 @@ class TestQueueMigrations(TestCase):
         self.manager = QueueManager(self.app, JobSerializer())
         await self.manager.migrate()
         self.assertEqual(
-            set(self.databases._cached_connections), {"failures"},
+            set(self.databases._cached_connections),
+            {"failures"},
         )
         tables = await self.databases.connection("failures").select(
             "SELECT name FROM sqlite_master WHERE type = 'table'",
         )
         self.assertEqual(
-            {row["name"] for row in tables}, {"f_queue_failures"},
+            {row["name"] for row in tables},
+            {"f_queue_failures"},
         )
         self.assertEqual(self.manager._drivers, {})
         self.assertIsNone(self.manager._failed)
@@ -526,8 +774,10 @@ class TestQueueMigrations(TestCase):
             Assert propagation of database errors during migration.
         """
         error = QueryException("Queue schema creation failed.")
-        with patch.object(Connection, "createTable", side_effect=error), \
-                self.assertRaises(QueryException) as raised:
+        with (
+            patch.object(Connection, "createTable", side_effect=error),
+            self.assertRaises(QueryException) as raised,
+        ):
             await self.manager.migrate()
         self.assertIs(raised.exception, error)
 
@@ -545,6 +795,7 @@ class TestQueueMigrations(TestCase):
             self.assertRaisesRegex(QueueStorageError, "unique constraints"),
         ):
             await self.manager.migrate()
+
 
 class TestQueueJobDiscovery(TestCase):
     """Discover jobs from resolved paths without queue module configuration."""
@@ -658,7 +909,8 @@ class TestQueueJobDiscovery(TestCase):
             Assert preservation of the original job-module import failure.
         """
         (self.jobs_path / "broken.py").write_text(
-            "import orionis_queue_missing_dependency\n", encoding="utf-8",
+            "import orionis_queue_missing_dependency\n",
+            encoding="utf-8",
         )
         with self.assertRaises(QueueConfigurationError) as raised:
             await self.manager.boot()

@@ -1,8 +1,13 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema strict array behavior."""
+
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.orm.schema.types.integer import Integer
 from orionis.orm.schema.types.strict_array import StrictArray
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestStrictArrayOptions(TestCase):
     """Verify StrictArray constructor metadata consumed by the compiler."""
@@ -13,7 +18,7 @@ class TestStrictArrayOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         item = Integer()
         default = StrictArray(item)

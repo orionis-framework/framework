@@ -12,6 +12,7 @@ from orionis.support.entities.base import BaseEntity
 _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
 """Define the supported scheduler driver names."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Scheduler(BaseEntity):
     """

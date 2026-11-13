@@ -1,17 +1,15 @@
+# ruff: noqa: ANN401, TC001, TC003
+# DI returns arbitrary values; public callable and scope hints resolve at runtime.
 """Define the contract for container implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import Callable
 from typing import Any
+from orionis.container.context.manager import ScopeManager
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.container.context.manager import ScopeManager
 
 class IContainer(ABC):
-
-    # ruff: noqa: ANN401
     """Define the contract for container implementations."""
 
     @abstractmethod
@@ -24,7 +22,7 @@ class IContainer(ABC):
         override: bool = False,
     ) -> bool:
         """
-        Register an object instance as a singleton in the container.
+        Register an existing object globally or in the active scope.
 
         Parameters
         ----------
@@ -201,19 +199,22 @@ class IContainer(ABC):
     async def make(
         self,
         key: type[Any] | str,
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Resolve and return a service instance by key.
+
+        An explicitly registered scoped instance takes precedence over a cached
+        global singleton. The global instance remains available after scope exit.
 
         Parameters
         ----------
         key : type[typing.Any] | str
             The abstract type or alias to resolve.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for instantiation.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for instantiation.
 
         Returns
@@ -230,20 +231,20 @@ class IContainer(ABC):
     @abstractmethod
     async def build(
         self,
-        type_: Callable[..., Any],
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        type_: type[Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Build and return an instance of the specified type.
 
         Parameters
         ----------
-        ``type_`` : collections.abc.Callable[``...``, typing.Any]
+        ``type_`` : type[typing.Any]
             The class to instantiate.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for the constructor.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for the constructor.
 
         Returns
@@ -265,8 +266,8 @@ class IContainer(ABC):
     async def invoke(
         self,
         fn: Callable[..., Any],
-        *args: tuple[Any, ...],
-        **kwargs: dict[str, Any],
+        *args: object,
+        **kwargs: object,
     ) -> Any:
         """
         Invoke a callable with automatic dependency injection.
@@ -275,9 +276,9 @@ class IContainer(ABC):
         ----------
         fn : collections.abc.Callable[``...``, typing.Any]
             The callable to invoke. Must not be a class or type.
-        *args : tuple[typing.Any, ``...``]
+        *args : object
             Positional arguments for the callable.
-        **kwargs : dict[str, typing.Any]
+        **kwargs : object
             Keyword arguments for the callable.
 
         Returns

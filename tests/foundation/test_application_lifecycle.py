@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from collections import deque
 from pathlib import Path
@@ -6,6 +8,7 @@ from orionis.foundation.application import Application
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
 from orionis.test import TestCase
+
 
 def make_application() -> Application:
     """
@@ -19,6 +22,7 @@ def make_application() -> Application:
     app = object.__new__(Application)
     app.__init__(Path.cwd())
     return app
+
 
 class _Provider:
     __slots__ = ("calls", "entered", "error", "release")
@@ -55,6 +59,7 @@ class _Provider:
         await self.release.wait()
         if self.error is not None:
             raise self.error
+
 
 class _CliKernel:
     __slots__ = ("args", "provider")
@@ -108,7 +113,32 @@ class _CliKernel:
         self.args.append(args)
         return 0
 
+
 class TestApplicationLifecycle(TestCase):
+    def testUnknownRuntimeDoesNotRegisterGlobalCallbacks(self) -> None:
+        """
+        Reject invalid runtime selectors without widening callback ownership.
+
+        Returns
+        -------
+        None
+            Preserve global hooks and the accepted HTTP string selector.
+        """
+        app = make_application()
+        global_hooks = app._Application__hook_events[None][Lifespan.STARTUP].copy()
+        for runtime, error in (("htpp", ValueError), (False, TypeError)):
+            with self.subTest(runtime=runtime), self.assertRaises(error):
+                app.on(Lifespan.STARTUP, self.fail, runtime=runtime)
+        self.assertEqual(
+            app._Application__hook_events[None][Lifespan.STARTUP],
+            global_hooks,
+        )
+        app.on(Lifespan.STARTUP, self.fail, runtime="http")
+        self.assertIn(
+            self.fail,
+            app._Application__hook_events[Runtime.HTTP][Lifespan.STARTUP],
+        )
+
     async def testConcurrentProviderBootWaitsForTheSameProvider(self) -> None:
         """
         Serialize startup and retain provider registration order.
@@ -331,7 +361,8 @@ class TestApplicationLifecycle(TestCase):
         provider = _Provider()
         kernel = _CliKernel(provider)
         synchronous_kernel = SimpleNamespace(
-            boot=kernel.args.append, handle=kernel.handle,
+            boot=kernel.args.append,
+            handle=kernel.handle,
         )
 
         async def load_kernel() -> SimpleNamespace:

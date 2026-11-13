@@ -1,7 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from abc import ABC
 from orionis.container.contracts.deferrable_provider import IDeferrableProvider
 from orionis.test import TestCase
+
 
 class _ConcreteProvider(IDeferrableProvider):
     """Minimal IDeferrableProvider implementation for structural tests."""
@@ -17,8 +20,8 @@ class _ConcreteProvider(IDeferrableProvider):
         """
         return [int, "x-orionis-probe"]
 
-class TestIDeferrableProvider(TestCase):
 
+class TestIDeferrableProvider(TestCase):
     def testContractIsAnAbstractBaseClass(self) -> None:
         """
         Declare IDeferrableProvider as an ABC that cannot be instantiated.
@@ -26,7 +29,7 @@ class TestIDeferrableProvider(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertTrue(issubclass(IDeferrableProvider, ABC))
         with self.assertRaises(TypeError):
@@ -39,7 +42,7 @@ class TestIDeferrableProvider(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(
             IDeferrableProvider.__abstractmethods__,
@@ -53,7 +56,7 @@ class TestIDeferrableProvider(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsInstance(_ConcreteProvider(), IDeferrableProvider)
         self.assertEqual(

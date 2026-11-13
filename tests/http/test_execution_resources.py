@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 from dataclasses import FrozenInstanceError, replace
@@ -35,6 +37,7 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Awaitable, Callable
     from tests.http.test_kernel import _StubApp
 
+
 class _HookResponse(Response):
     """Expose a background hook independent of the optional task attribute."""
 
@@ -50,6 +53,7 @@ class _HookResponse(Response):
         """
         await asyncio.sleep(0)
         self.calls += 1
+
 
 class _CountingAdapter(ASGITransportAdapter):
     """Record the number of materialized scope snapshots."""
@@ -82,6 +86,7 @@ class _CountingAdapter(ASGITransportAdapter):
         """
         self.calls += 1
         return super().getScope()
+
 
 class TestExecutionResources(TestCase):
     """Cover lazy allocations, immutable templates, and continuation isolation."""
@@ -116,10 +121,13 @@ class TestExecutionResources(TestCase):
 
         with replace_attribute(kernel_module, "normalize_request_path", normalize):
             asgi = await kernel.handleASGI(
-                make_asgi_scope("/api"), receive_empty, send_noop,
+                make_asgi_scope("/api"),
+                receive_empty,
+                send_noop,
             )
             rsgi = await kernel.handleRSGI(
-                _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                _StubRsgiScope("/api"),
+                _StubRsgiProtocol(),
             )
         self.assertEqual((asgi.getStatusCode(), rsgi.getStatusCode()), (200, 200))
         self.assertEqual(paths, [])
@@ -204,7 +212,10 @@ class TestExecutionResources(TestCase):
                 response.calls = 0
                 if interface == "asgi":
                     await ASGIResponseAdapter().send(
-                        adapter, response, receive_empty, send_noop,
+                        adapter,
+                        response,
+                        receive_empty,
+                        send_noop,
                     )
                 else:
                     await RSGIResponseAdapter().send(adapter, response, protocol)
@@ -280,16 +291,22 @@ class TestExecutionResources(TestCase):
         self.assertEqual(response.getRawHeaders()[-1], (b"server", b"Orionis ASGI"))
         response.getHeader("x-one").append("c")
         self.assertEqual(
-            response.getRawHeaders()[:2], [(b"x-one", b"a"), (b"x-one", b"c")],
+            response.getRawHeaders()[:2],
+            [(b"x-one", b"a"), (b"x-one", b"c")],
         )
         response.removeHeader("x-two")
         response.addHeader("x-one", "d")
         response.setHeader("x-one", "replaced")
-        self.assertEqual(response.getRawHeaders(), [
-            (b"x-one", b"replaced"), (b"server", b"Orionis ASGI"),
-        ])
         self.assertEqual(
-            template.make().getRawHeaders(), [(b"x-one", b"a"), (b"x-two", b"b")],
+            response.getRawHeaders(),
+            [
+                (b"x-one", b"replaced"),
+                (b"server", b"Orionis ASGI"),
+            ],
+        )
+        self.assertEqual(
+            template.make().getRawHeaders(),
+            [(b"x-one", b"a"), (b"x-two", b"b")],
         )
 
     async def testConcurrentNextCannotSkipSuspendedMiddleware(self) -> None:
@@ -315,7 +332,8 @@ class TestExecutionResources(TestCase):
             return Response(b"done")
 
         async def inner(
-            _request: Request, call_next: Callable[[], Awaitable[Response]],
+            _request: Request,
+            call_next: Callable[[], Awaitable[Response]],
         ) -> Response:
             """Suspend before advancing to the terminal.
 
@@ -336,7 +354,8 @@ class TestExecutionResources(TestCase):
             return await call_next()
 
         async def outer(
-            _request: Request, call_next: Callable[[], Awaitable[Response]],
+            _request: Request,
+            call_next: Callable[[], Awaitable[Response]],
         ) -> Response:
             """Race a duplicate continuation against the waiting inner layer.
 
@@ -365,7 +384,8 @@ class TestExecutionResources(TestCase):
 
         pipeline = kernel_module._MiddlewarePipeline(
             (SimpleNamespace(handle=outer), SimpleNamespace(handle=inner)),
-            None, terminal,
+            None,
+            terminal,
         )
         self.assertEqual((await pipeline()).getBody(), b"done")
         self.assertEqual(terminals, [1])
@@ -431,6 +451,7 @@ class TestExecutionResources(TestCase):
                 await pipeline()
         self.assertEqual(terminals, [1, 1])
 
+
 class TestPublicRouteProfile(TestCase):
     """Exercise stateless profiles without weakening existing route defaults."""
 
@@ -474,10 +495,13 @@ class TestPublicRouteProfile(TestCase):
 
         with replace_attribute(type(app), "invoke", invoke):
             asgi = await kernel.handleASGI(
-                make_asgi_scope("/public"), receive_empty, send_noop,
+                make_asgi_scope("/public"),
+                receive_empty,
+                send_noop,
             )
             rsgi = await kernel.handleRSGI(
-                _StubRsgiScope("/public"), _StubRsgiProtocol(),
+                _StubRsgiScope("/public"),
+                _StubRsgiProtocol(),
             )
         self.assertEqual((asgi.getBody(), rsgi.getBody()), (b"web", b"web"))
         self.assertEqual(invoked, [web_handler, web_handler])
@@ -531,14 +555,19 @@ class TestPublicRouteProfile(TestCase):
             Route middleware still runs and request scope stays available.
         """
         for kind in ("web", "api"):
-            route = replace(make_route(
-                "/public", kind=kind, function="web_handler",
-                middlewares=(_RecordingMiddleware,),
-            ), public=True)
+            route = replace(
+                make_route(
+                    "/public",
+                    kind=kind,
+                    function="web_handler",
+                    middlewares=(_RecordingMiddleware,),
+                ),
+                public=True,
+            )
             routes = {"GET": {"static": {"/public": route}, "dynamic": []}}
             kernel, app, _, _ = await boot_kernel(routes=routes, csrf_enabled=True)
-            _RecordingMiddleware.calls = [] # NOSONAR
-            _SessionMiddlewareDouble.calls = [] # NOSONAR
+            self.enterContext(replace_attribute(_RecordingMiddleware, "calls", []))
+            self.enterContext(replace_attribute(_SessionMiddlewareDouble, "calls", []))
             result = await dispatch(kernel, "/public")
             self.assertEqual(result.getBody(), b"web")
             self.assertEqual(result.getHeader("x-route-middleware"), ["1"])
@@ -559,10 +588,12 @@ class TestPublicRouteProfile(TestCase):
         route = router.get("/public", web_handler)
         router.group(routes=[route], public=True)
         routes, _ = RouteCompiler().compile(
-            [route.export()], None, app_middleware=[_RecordingMiddleware],
+            [route.export()],
+            None,
+            app_middleware=[_RecordingMiddleware],
         )
         kernel, _, _, _ = await boot_kernel(routes=routes)
-        _RecordingMiddleware.calls = [] # NOSONAR
+        self.enterContext(replace_attribute(_RecordingMiddleware, "calls", []))
         result = await dispatch(kernel, "/public")
         self.assertEqual(result.getHeader("x-route-middleware"), ["1"])
         self.assertEqual(_RecordingMiddleware.calls, ["/public"])

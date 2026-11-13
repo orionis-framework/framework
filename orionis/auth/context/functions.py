@@ -1,3 +1,5 @@
+# ruff: noqa: SLF001
+# Bind the concrete context through its framework-owned lifecycle hook.
 """Provide auth context operations.
 
 Includes ``authentication_lock``, ``current_auth_context``, ``bind_auth_context``.
@@ -12,6 +14,7 @@ from orionis.container.context.scope import ScopedContext
 
 _AUTH_LOCK = object()
 """Sentinel distinguishing auth lock from ordinary values."""
+
 
 def authentication_lock() -> asyncio.Lock:
     """
@@ -37,6 +40,7 @@ def authentication_lock() -> asyncio.Lock:
         scope[_AUTH_LOCK] = lock
     return lock
 
+
 def current_auth_context() -> IAuthenticationContext:
     """
     Return the authentication context bound to the current scope.
@@ -61,6 +65,7 @@ def current_auth_context() -> IAuthenticationContext:
         return GUEST_CONTEXT
     return context
 
+
 def bind_auth_context(context: IAuthenticationContext) -> None:
     """
     Bind an authentication context to the current scope.
@@ -73,7 +78,7 @@ def bind_auth_context(context: IAuthenticationContext) -> None:
     Returns
     -------
     None
-        The scope is updated as a side effect.
+        No return value.
 
     Raises
     ------
@@ -90,5 +95,5 @@ def bind_auth_context(context: IAuthenticationContext) -> None:
         raise AuthException(error_msg)
 
     if isinstance(context, AuthenticationContext) and context is not GUEST_CONTEXT:
-        context._bindToScope(scope)  # noqa: SLF001
+        context._bindToScope(scope)
     scope[IAuthenticationContext] = context

@@ -1,17 +1,15 @@
+# ruff: noqa: TC001, TC003
+# Resolve public reflection signatures during runtime contract inspection.
 """Define the contract for reflection callable implementations."""
 
 from __future__ import annotations
+import inspect
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import Callable
+from orionis.introspection.dependencies.entities.signature import Signature
 
-if TYPE_CHECKING:
-    import inspect
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
 
 class IReflectionCallable(ABC):
-
     # Empty slots so subclasses can define __slots__ without inheriting __dict__
     """Define the contract for reflection callable implementations."""
 
@@ -19,13 +17,13 @@ class IReflectionCallable(ABC):
     """Empty slots so subclasses can define __slots__ without inheriting __dict__."""
 
     @abstractmethod
-    def getCallable(self) -> callable:
+    def getCallable(self) -> Callable:
         """
         Return the callable function associated with this instance.
 
         Returns
         -------
-        callable
+        collections.abc.Callable
             The function object encapsulated by this instance.
         """
 
@@ -144,8 +142,8 @@ class IReflectionCallable(ABC):
         """
         Clear all cached reflection data.
 
-        Removes all cached entries stored in the reflection instance. Forces
-        fresh computation on subsequent method calls.
+        Refresh local metadata and invalidate shared dependency signatures and
+        registered consumer plans before subsequent reflection calls.
 
         Returns
         -------

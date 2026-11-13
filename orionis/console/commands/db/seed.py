@@ -2,6 +2,7 @@
 
 from orionis.console.commands.seed.seed import SeedCommand
 
+
 class DbSeedCommand(SeedCommand):
     """Run pending seeders through the ``db:seed`` command."""
 

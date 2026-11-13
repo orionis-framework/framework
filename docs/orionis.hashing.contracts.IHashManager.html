@@ -275,7 +275,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9665"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9707"> 
                     
                 </input>
 
@@ -321,7 +321,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9666"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9708"> 
                     
                 </input>
 
@@ -373,11 +373,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9667"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9709"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId9667">
+                <label class="lbl-toggle" for="expandableItemId9709">
                     
                     
                 </label>
@@ -485,7 +485,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9668"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9710"> 
                     
                 </input>
 
@@ -683,7 +683,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IHashManager</span>(<a href="orionis.hashing.contracts.IHasher.html" class="internal-link" title="orionis.hashing.contracts.IHasher">IHasher</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/hashing/contracts/hash_manager.py#L7" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.hashing.HashManager.html" class="internal-link">orionis.hashing.HashManager</a></code></p><p><a href="classIndex.html#orionis.hashing.contracts.IHashManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IHashManager</span>(<a href="orionis.hashing.contracts.IHasher.html" class="internal-link" title="orionis.hashing.contracts.IHasher">IHasher</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/hashing/contracts/hash_manager.py#L8" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.hashing.HashManager.html" class="internal-link">orionis.hashing.HashManager</a></code></p><p><a href="classIndex.html#orionis.hashing.contracts.IHashManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -695,7 +695,7 @@ algorithm.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id957">
+          <table class="children sortable" id="id967">
   
   
   <tr class="method">
@@ -719,7 +719,7 @@ algorithm.</p>
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.hashing.contracts.IHasher.html" class="internal-link" title="orionis.hashing.contracts.IHasher">IHasher</a></code>:
             </p>
-            <table class="children sortable" id="id958">
+            <table class="children sortable" id="id968">
   
   
   <tr class="basemethod">
@@ -768,7 +768,7 @@ algorithm.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">driver</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.hashing.contracts.IHasher.html" class="internal-link" title="orionis.hashing.contracts.IHasher">IHasher</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/hashing/contracts/hash_manager.py#L19">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/hashing/contracts/hash_manager.py#L20">
       
       (source)
     </a>
@@ -781,7 +781,7 @@ algorithm.</p>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.hashing.HashManager.html" class="internal-link">orionis.hashing.HashManager</a></code></div>
     <div><p>Return the hasher bound to the named (or default) driver.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code>str | None</code></td><td class="fieldArgDesc">Driver name (<tt class="rst-docutils rst-literal">'argon2'</tt> or <tt class="rst-docutils rst-literal">'bcrypt'</tt>). <tt class="rst-docutils rst-literal">None</tt> selects
-the configured default driver.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.contracts.IHasher.html" class="internal-link">orionis.hashing.contracts.IHasher</a></code></td><td class="fieldArgDesc">Hasher instance for the requested driver.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashDriverNotSupportedException.html" class="internal-link">orionis.hashing.exceptions.HashDriverNotSupportedException</a></code></td><td>If the requested driver is not supported.</td></tr></table></div>
+the configured default driver. An empty string also selects it.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.contracts.IHasher.html" class="internal-link">orionis.hashing.contracts.IHasher</a></code></td><td class="fieldArgDesc">Hasher instance for the requested driver.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.hashing.exceptions.HashDriverNotSupportedException.html" class="internal-link">orionis.hashing.exceptions.HashDriverNotSupportedException</a></code></td><td>If the requested driver is not supported.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -796,7 +796,7 @@ the configured default driver.</td></tr></table><table class="fieldTable"><tr cl
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getDefaultDriver</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/hashing/contracts/hash_manager.py#L41">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/hashing/contracts/hash_manager.py#L42">
       
       (source)
     </a>
@@ -822,7 +822,7 @@ the configured default driver.</td></tr></table><table class="fieldTable"><tr cl
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/hashing/contracts/hash_manager.py#L16">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/hashing/contracts/hash_manager.py#L17">
       
       (source)
     </a>
@@ -848,7 +848,7 @@ the configured default driver.</td></tr></table><table class="fieldTable"><tr cl
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

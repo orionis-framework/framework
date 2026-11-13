@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.localization.exceptions import (
     InvalidLocaleException,
     TranslationException,
@@ -13,6 +15,7 @@ _SPECIALIZED_EXCEPTIONS: tuple[type[TranslationException], ...] = (
     TranslationSyntaxException,
 )
 
+
 class TestTranslationExceptionHierarchy(TestCase):
     """Validate the inheritance chain of the localization errors."""
 
@@ -25,7 +28,7 @@ class TestTranslationExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(TranslationException, Exception))
 
@@ -38,7 +41,7 @@ class TestTranslationExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for exception_type in _SPECIALIZED_EXCEPTIONS:
             self.assertTrue(
@@ -55,9 +58,10 @@ class TestTranslationExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(len(set(_SPECIALIZED_EXCEPTIONS)), 3)
+
 
 class TestTranslationExceptionBehaviour(TestCase):
     """Validate message preservation and exception chaining."""
@@ -71,7 +75,7 @@ class TestTranslationExceptionBehaviour(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error_msg = "Invalid locale code: '../etc'"
         self.assertEqual(str(InvalidLocaleException(error_msg)), error_msg)
@@ -84,7 +88,7 @@ class TestTranslationExceptionBehaviour(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -104,7 +108,7 @@ class TestTranslationExceptionBehaviour(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------

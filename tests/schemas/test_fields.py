@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Schema annotations resolve these imports at runtime.
+
 import typing
 import msgspec
 from orionis.schemas import fields
@@ -5,20 +9,18 @@ from orionis.schemas.constraints import MinLength
 from orionis.schemas.schema import Schema
 from orionis.test import TestCase
 
-# Schema annotations are resolved at run time by the metaclass, so the imports
-# above must stay outside a type-checking block.
-# ruff: noqa: TC001
 
 # Literal alias declared outside the class body so the metaclass resolves it.
 _Role = fields.Choice["admin", "user"]
+
 
 class _AliasedSchema(Schema):
     name: fields.Field[str, MinLength(2)]
     role: _Role
     nickname: fields.Nullable[str] = None
 
-class TestFieldAliases(TestCase):
 
+class TestFieldAliases(TestCase):
     def testFieldIsAnnotated(self) -> None:
         """Alias ``Field`` to the annotated type constructor.
 
@@ -27,7 +29,7 @@ class TestFieldAliases(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(fields.Field, typing.Annotated)
 
@@ -39,7 +41,7 @@ class TestFieldAliases(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(fields.Choice, typing.Literal)
 
@@ -51,7 +53,7 @@ class TestFieldAliases(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(fields.Nullable, typing.Optional)
 
@@ -63,19 +65,19 @@ class TestFieldAliases(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(fields.AnyOf, typing.Union)
 
     def testConstantIsFinal(self) -> None:
         """Alias ``Constant`` to the final type qualifier.
 
-        Validates the alias used to forbid reassignment.
+        Validates the alias used to signal final bindings to type checkers.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(fields.Constant, typing.Final)
 
@@ -87,7 +89,7 @@ class TestFieldAliases(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(fields.Alias, typing.TypeAlias)
 
@@ -99,12 +101,12 @@ class TestFieldAliases(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(fields.Static, typing.ClassVar)
 
-class TestFieldAliasesInSchemas(TestCase):
 
+class TestFieldAliasesInSchemas(TestCase):
     def testAliasedAnnotationsBuildAUsableSchema(self) -> None:
         """Declare a schema entirely through the field aliases.
 
@@ -114,7 +116,7 @@ class TestFieldAliasesInSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _AliasedSchema(name="Alice", role="admin")
         self.assertEqual(instance.name, "Alice")
@@ -130,7 +132,7 @@ class TestFieldAliasesInSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         declared = {f.name: f.type for f in msgspec.structs.fields(_AliasedSchema)}
         metas = [
@@ -148,7 +150,7 @@ class TestFieldAliasesInSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(msgspec.ValidationError):
             msgspec.convert({"name": "Alice", "role": "root"}, type=_AliasedSchema)

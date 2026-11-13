@@ -3,6 +3,7 @@
 from typing import ClassVar
 from orionis.queues.contracts.job import IJob
 
+
 class BaseJob(IJob):
     """
     Declare serializable job fields and asynchronous service dependencies.

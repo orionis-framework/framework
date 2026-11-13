@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IReflectionModule(ABC):
     """Define the contract for reflection module implementations."""
 
@@ -62,9 +63,10 @@ class IReflectionModule(ABC):
 
         Raises
         ------
+        TypeError
+            If ``cls`` is not a class type.
         ValueError
-            If ``cls`` is not a class type, if ``class_name`` is not a valid identifier,
-            or if ``class_name`` is a reserved keyword.
+            If ``class_name`` is not a valid identifier or is a reserved keyword.
 
         Returns
         -------

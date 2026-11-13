@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import argparse
 import ast
 import asyncio
@@ -15,7 +17,9 @@ from orionis.console.commands.queue.work import QueueWorkCommand
 from orionis.console.core.commands import CORE_COMMANDS
 from orionis.console.core.loader import Loader
 from orionis.database.exceptions import (
-    ConnectionNotFoundException, DatabaseException, QueryException,
+    ConnectionNotFoundException,
+    DatabaseException,
+    QueryException,
 )
 from orionis.queues.entities.failed_job import FailedJob
 from orionis.queues.exceptions import QueueConfigurationError
@@ -109,7 +113,10 @@ class _Worker:
         self.stopped = False
 
     async def run(
-        self, *, stop_when_empty: bool = False, max_jobs: int | None = None,
+        self,
+        *,
+        stop_when_empty: bool = False,
+        max_jobs: int | None = None,
     ) -> int:
         """Record worker stopping options and return a processed attempt count.
 
@@ -221,7 +228,12 @@ class _Manager:
     """Provide queue administration services with controllable errors."""
 
     __slots__ = (
-        "driver", "error", "migrations", "repository", "retried", "selected",
+        "driver",
+        "error",
+        "migrations",
+        "repository",
+        "retried",
+        "selected",
         "worker_object",
     )
 
@@ -387,9 +399,16 @@ def _failure() -> FailedJob:
         Stored job routing and original exception details.
     """
     return FailedJob(
-        id="failed-id", job_id="job-id", connection="database", queue="emails",
-        payload=b"payload", exception_type="ValueError", exception_message="broken",
-        traceback="original traceback", failed_at=1.0, attempts=3,
+        id="failed-id",
+        job_id="job-id",
+        connection="database",
+        queue="emails",
+        payload=b"payload",
+        exception_type="ValueError",
+        exception_message="broken",
+        traceback="original traceback",
+        failed_at=1.0,
+        attempts=3,
     )
 
 
@@ -408,8 +427,13 @@ class TestQueueCommands(TestCase):
             Assert discovery of every canonical queue command.
         """
         expected = {
-            "make:job", "queue:work", "queue:failed", "queue:retry",
-            "queue:forget", "queue:clear", "queue:migrate",
+            "make:job",
+            "queue:work",
+            "queue:failed",
+            "queue:retry",
+            "queue:forget",
+            "queue:clear",
+            "queue:migrate",
         }
         self.assertTrue(expected <= {command.signature for command in CORE_COMMANDS})
         with TemporaryDirectory() as directory:
@@ -432,9 +456,12 @@ class TestQueueCommands(TestCase):
         command = _record(QueueMigrateCommand)
         self.assertEqual(await command.handle(manager), 0)
         self.assertEqual(manager.migrations, 1)
-        self.assertEqual(command.messages, [
-            ("success", "Queue tables migrated successfully.", False),
-        ])
+        self.assertEqual(
+            command.messages,
+            [
+                ("success", "Queue tables migrated successfully.", False),
+            ],
+        )
 
     async def testMigrateReportsDatabaseErrors(self) -> None:
         """
@@ -455,9 +482,12 @@ class TestQueueCommands(TestCase):
                 command = _record(QueueMigrateCommand)
                 self.assertEqual(await command.handle(manager), 1)
                 self.assertEqual(manager.migrations, 0)
-                self.assertEqual(command.messages, [
-                    ("error", str(error), False),
-                ])
+                self.assertEqual(
+                    command.messages,
+                    [
+                        ("error", str(error), False),
+                    ],
+                )
 
     def testWorkArgumentsPreservePriorityAndFlags(self) -> None:
         """
@@ -471,14 +501,27 @@ class TestQueueCommands(TestCase):
         parser = argparse.ArgumentParser()
         for argument in QueueWorkCommand.arguments:
             argument.addToParser(parser)
-        parsed = vars(parser.parse_args([
-            "redis", "--queue=high,default", "--concurrency=50",
-            "--stop-when-empty", "--max-jobs=5",
-        ]))
-        self.assertEqual(parsed, {
-            "connection": "redis", "queue": "high,default", "concurrency": 50,
-            "stop_when_empty": True, "max_jobs": 5,
-        })
+        parsed = vars(
+            parser.parse_args(
+                [
+                    "redis",
+                    "--queue=high,default",
+                    "--concurrency=50",
+                    "--stop-when-empty",
+                    "--max-jobs=5",
+                ],
+            ),
+        )
+        self.assertEqual(
+            parsed,
+            {
+                "connection": "redis",
+                "queue": "high,default",
+                "concurrency": 50,
+                "stop_when_empty": True,
+                "max_jobs": 5,
+            },
+        )
 
     async def testWorkRunsWithSelectedOptions(self) -> None:
         """
@@ -491,17 +534,31 @@ class TestQueueCommands(TestCase):
         """
         manager = _Manager()
         command = _record(QueueWorkCommand)
-        command.setArguments({
-            "connection": "redis", "queue": "high, default", "concurrency": 50,
-            "stop_when_empty": True, "max_jobs": 5,
-        })
+        command.setArguments(
+            {
+                "connection": "redis",
+                "queue": "high, default",
+                "concurrency": 50,
+                "stop_when_empty": True,
+                "max_jobs": 5,
+            },
+        )
         self.assertEqual(await command.handle(manager), 0)
-        self.assertEqual(manager.selected, {
-            "connection": "redis", "queues": ("high", "default"), "concurrency": 50,
-        })
-        self.assertEqual(manager.worker_object.options, {
-            "stop_when_empty": True, "max_jobs": 5,
-        })
+        self.assertEqual(
+            manager.selected,
+            {
+                "connection": "redis",
+                "queues": ("high", "default"),
+                "concurrency": 50,
+            },
+        )
+        self.assertEqual(
+            manager.worker_object.options,
+            {
+                "stop_when_empty": True,
+                "max_jobs": 5,
+            },
+        )
         self.assertIn("4 attempt(s)", command.messages[0][1])
 
     async def testFailureListingAndEmptyOutput(self) -> None:
@@ -566,8 +623,12 @@ class TestQueueCommands(TestCase):
         manager = _Manager()
         manager.error = QueueConfigurationError("Unknown connection 'missing'.")
         command_types = (
-            QueueWorkCommand, QueueFailedCommand, QueueRetryCommand,
-            QueueForgetCommand, QueueClearCommand, QueueMigrateCommand,
+            QueueWorkCommand,
+            QueueFailedCommand,
+            QueueRetryCommand,
+            QueueForgetCommand,
+            QueueClearCommand,
+            QueueMigrateCommand,
         )
         for command_type in command_types:
             with self.subTest(command=command_type.signature):
@@ -596,7 +657,8 @@ class TestQueueCommands(TestCase):
             tree = ast.parse(source)
             job = next(node for node in tree.body if isinstance(node, ast.ClassDef))
             methods = {
-                node.name: node for node in job.body
+                node.name: node
+                for node in job.body
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
             }
             self.assertEqual(job.name, "SendWelcomeJob")
@@ -605,7 +667,8 @@ class TestQueueCommands(TestCase):
                 ["self", "record_id"],
             )
             self.assertEqual(
-                [arg.arg for arg in methods["handle"].args.args], ["self", "logger"],
+                [arg.arg for arg in methods["handle"].args.args],
+                ["self", "logger"],
             )
             self.assertNotIn("from __future__", source)
             self.assertNotIn("NotImplementedError", source)
@@ -619,25 +682,25 @@ class TestQueueCommands(TestCase):
         None
             Assert graceful worker shutdown and restoration of signal handlers.
         """
+        # Keep test-discovery imports outside the subprocess's signal-delivery budget.
         script = '''
 import asyncio
 import signal
-from tests.queues.console.test_commands import _Worker
 from orionis.console.commands.queue._signals import WorkerSignals
 
-class SignalWorker(_Worker):
+class SignalWorker:
     """Expose an explicit notification when the signal handler runs."""
 
-    __slots__ = ("stopped_event",)
+    __slots__ = ("stopped", "stopped_event")
 
     def __init__(self) -> None:
         """Create the worker and its shutdown notification."""
-        super().__init__()
+        self.stopped = False
         self.stopped_event = asyncio.Event()
 
     def stop(self) -> None:
         """Notify the probe after requesting graceful shutdown."""
-        super().stop()
+        self.stopped = True
         self.stopped_event.set()
 
 async def probe() -> None:
@@ -659,9 +722,14 @@ async def probe() -> None:
 asyncio.run(probe())
 '''
         process = await asyncio.create_subprocess_exec(
-            sys.executable, "-X", "utf8", "-c", script,
+            sys.executable,
+            "-X",
+            "utf8",
+            "-c",
+            script,
             cwd=_REPOSITORY_ROOT,
-            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
         try:
             async with asyncio.timeout(15):

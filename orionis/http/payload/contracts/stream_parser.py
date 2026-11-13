@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.http.payload.form_data import FormData
 
+
 class IMultipartStreamParser(ABC):
     """
     Define the contract for parsing a multipart byte stream.

@@ -1,3 +1,5 @@
+# ruff: noqa: PLR2004, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -17,6 +19,7 @@ from orionis.console.commands.support.up import UpCommand
 from orionis.console.core.commands import CORE_COMMANDS
 from orionis.database.exceptions import QueryException
 from orionis.test import TestCase
+
 
 class _Application:
     """Provide configuration and paths required by support commands."""
@@ -77,6 +80,7 @@ class _Application:
             raise KeyError(key)
         return self.basePath / "storage" / "framework"
 
+
 class _CacheManager:
     """Record clearing of the configured application cache store."""
 
@@ -108,6 +112,7 @@ class _CacheManager:
         """
         self.clear_calls += 1
         return self.result
+
 
 class TestSupportCommands(TestCase):
     """Verify support command registration and cache operations."""
@@ -160,7 +165,7 @@ class TestSupportCommands(TestCase):
         None
             Assertions verify both the protected and forced paths.
         """
-        app = _Application(Path(), {"app.cipher": "AES-256-CBC"})
+        app = _Application(Path(), {"app.cipher": "AES-256-GCM"})
         console = Mock()
         command = KeyGenerateCommand()
         with (
@@ -184,7 +189,7 @@ class TestSupportCommands(TestCase):
             command.setArguments({"force": True})
             self.assertEqual(command.handle(app, console), 0)
 
-        generate_key.assert_called_once_with("AES-256-CBC")
+        generate_key.assert_called_once_with("AES-256-GCM")
         save_key.assert_called_once_with("APP_KEY", "base64:new-key")
 
     def testGeneratesAndSavesAKeyWhenNoKeyExists(self) -> None:

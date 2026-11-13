@@ -1,8 +1,12 @@
+# ruff: noqa: PLC0415, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 from types import MappingProxyType
 from orionis.http.routes.entities.compiled_route import CompiledRoute
 from orionis.http.routes.entities.resolved_route import ResolvedRoute
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.test import TestCase
+
 
 def _make_compiled_route(
     path: str = "/users",
@@ -39,6 +43,7 @@ def _make_compiled_route(
         priority_score=10,
         kind=kind,
     )
+
 
 class TestCompiledRoute(TestCase):
     """Unit tests for the CompiledRoute frozen dataclass."""
@@ -135,6 +140,7 @@ class TestCompiledRoute(TestCase):
         """
         route = _make_compiled_route()
         self.assertIsNone(route.regex)
+
 
 class TestResolvedRoute(TestCase):
     """Unit tests for the ResolvedRoute frozen dataclass."""

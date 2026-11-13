@@ -1,14 +1,12 @@
+# ruff: noqa: SLF001
+# Bind module helpers directly to the context variable owned by ScopedContext.
 """Store the active dependency-injection scope in a context variable."""
 
 from __future__ import annotations
 import contextvars
 
+
 class ScopedContext:
-
-    # ruff: noqa: SLF001
-
-    # Define a context variable to hold the active scope.
-    # The default value is None, indicating no active scope.
     """Store the active dependency-injection scope in a context variable."""
 
     _active_scope: contextvars.ContextVar[object | None] = contextvars.ContextVar(
@@ -69,7 +67,8 @@ class ScopedContext:
         # Reset the active scope context variable to the state represented by token.
         cls._active_scope.reset(token)
 
+
 # Define module-level functions for easier access to the ScopedContext methods.
 get_current_scope = ScopedContext._active_scope.get
 set_current_scope = ScopedContext._active_scope.set
-reset_scope       = ScopedContext._active_scope.reset
+reset_scope = ScopedContext._active_scope.reset

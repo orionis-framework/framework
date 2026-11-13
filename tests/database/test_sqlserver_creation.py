@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Cancellation safety of the SQL Server native client creation boundary."""
 
 import asyncio
@@ -6,6 +8,11 @@ from unittest.mock import patch
 
 from orionis.database.dialect import _AsyncNativeCreator, configure_engine
 from orionis.test import TestCase
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class TestSQLServerNativeCreation(TestCase):
@@ -18,7 +25,7 @@ class TestSQLServerNativeCreation(TestCase):
         Returns
         -------
         None
-            Confirm unchanged ODBC arguments and the original client instance.
+            No return value.
         """
         observed = []
         client = object()
@@ -43,11 +50,14 @@ class TestSQLServerNativeCreation(TestCase):
             return client
 
         returned = await _AsyncNativeCreator(create)(
-            "owned-dsn", timeout=5, autocommit=True,
+            "owned-dsn",
+            timeout=5,
+            autocommit=True,
         )
         self.assertIs(returned, client)
         self.assertEqual(
-            observed, [(("owned-dsn",), {"timeout": 5, "autocommit": True})],
+            observed,
+            [(("owned-dsn",), {"timeout": 5, "autocommit": True})],
         )
 
     async def testRepeatedCancellationDrainsCreationAndLateClientClose(self) -> None:
@@ -57,7 +67,7 @@ class TestSQLServerNativeCreation(TestCase):
         Returns
         -------
         None
-            Confirm cancellation propagates only after asynchronous close ends.
+            No return value.
         """
         entered, connected, closing, closed = [asyncio.Event() for _ in range(4)]
 
@@ -68,7 +78,7 @@ class TestSQLServerNativeCreation(TestCase):
             Returns
             -------
             None
-                Signal close entry and finish when the release event is set.
+                No return value.
             """
             closing.set()
             await closed.wait()
@@ -112,14 +122,17 @@ class TestSQLServerNativeCreation(TestCase):
         Returns
         -------
         None
-            Confirm cancellation takes precedence without unhandled task errors.
+            No return value.
         """
         entered, release = asyncio.Event(), asyncio.Event()
         loop = asyncio.get_running_loop()
         previous = loop.get_exception_handler()
         errors = []
 
-        def capture_error(current_loop, context):
+        def capture_error(
+            current_loop: asyncio.AbstractEventLoop,
+            context: dict[str, object],
+        ) -> None:
             """
             Record the exception context and delegate to the active handler.
 
@@ -133,7 +146,7 @@ class TestSQLServerNativeCreation(TestCase):
             Returns
             -------
             None
-                Invoke the previous handler or the loop's default handler.
+                No return value.
             """
             errors.append(context)
             if previous:
@@ -178,14 +191,17 @@ class TestSQLServerNativeCreation(TestCase):
         Returns
         -------
         None
-            Confirm wrapper identity and unchanged timeout and autocommit values.
+            No return value.
         """
         engine = SimpleNamespace(
             sync_engine=SimpleNamespace(dialect=SimpleNamespace(driver="aioodbc")),
         )
         listeners = []
 
-        def capture(_engine: object, name: str):
+        def capture(
+            _engine: object,
+            name: str,
+        ) -> Callable[[Callable[..., object]], Callable[..., object]]:
             """
             Build a recording decorator for the requested engine event.
 
@@ -202,7 +218,7 @@ class TestSQLServerNativeCreation(TestCase):
                 Decorator that records and returns the supplied callback.
             """
 
-            def decorate(callback):
+            def decorate(callback: Callable[..., object]) -> Callable[..., object]:
                 """
                 Record the listener without replacing its callback.
 
@@ -218,6 +234,7 @@ class TestSQLServerNativeCreation(TestCase):
                 """
                 listeners.append((name, callback))
                 return callback
+
             return decorate
 
         async def custom() -> object:
@@ -242,4 +259,4 @@ class TestSQLServerNativeCreation(TestCase):
         self.assertIs(parameters["async_creator_fn"], wrapped)
         self.assertIs(wrapped._creator, custom)
         self.assertEqual(parameters["timeout"], 5)
-        self.assertIs(parameters["autocommit"], True)
+        self.assertIs(parameters["autocommit"], expr2=True)

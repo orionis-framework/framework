@@ -1,6 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import hashlib
+from typing import TYPE_CHECKING
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,8 +16,11 @@ from orionis.storage.exceptions import (
 )
 from orionis.test import TestCase
 
-class TestLocalStorageDriver(TestCase):
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
 
+
+class TestLocalStorageDriver(TestCase):
     def setUp(self) -> None:
         """Create a temporary root and a local driver before each test.
 
@@ -24,24 +30,12 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._root = Path(self._tmpdir.name)
         self._driver = LocalStorageDriver(self._root)
-
-    def tearDown(self) -> None:
-        """Remove the temporary root after each test.
-
-        Ensures all files created during the test are cleaned up
-        regardless of the test outcome.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     # ── write / read ─────────────────────────────────────────────────────────
 
@@ -54,7 +48,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("nested/dir/a.bin", b"hello")
         self.assertEqual(await self._driver.read("nested/dir/a.bin"), b"hello")
@@ -67,7 +61,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("a.txt", "café")
         self.assertEqual((self._root / "a.txt").read_bytes(), "café".encode())
@@ -80,7 +74,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("clean.txt", b"x")
         leftovers = [p.name for p in self._root.iterdir()]
@@ -98,14 +92,11 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payloads = [bytes([index]) * 4096 for index in range(1, 9)]
         results = await asyncio.gather(
-            *[
-                self._driver.write("shared.bin", payload)
-                for payload in payloads
-            ],
+            *[self._driver.write("shared.bin", payload) for payload in payloads],
             return_exceptions=True,
         )
 
@@ -116,7 +107,8 @@ class TestLocalStorageDriver(TestCase):
         self.assertIn(None, results)
         self.assertIn(await self._driver.read("shared.bin"), payloads)
         self.assertEqual(
-            [p.name for p in self._root.iterdir()], ["shared.bin"],
+            [p.name for p in self._root.iterdir()],
+            ["shared.bin"],
         )
 
     async def testFailedWriteRemovesItsTempFile(self) -> None:
@@ -128,7 +120,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         (self._root / "busy").mkdir()
         with self.assertRaises(OSError):
@@ -143,7 +135,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._driver.read("absent.txt")
@@ -156,7 +148,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StoragePathException):
             await self._driver.write("../evil.txt", b"x")
@@ -173,12 +165,11 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("big.bin", b"abcdefghij")
         chunks = [
-            chunk
-            async for chunk in self._driver.readStream("big.bin", chunk_size=4)
+            chunk async for chunk in self._driver.readStream("big.bin", chunk_size=4)
         ]
         self.assertEqual(b"".join(chunks), b"abcdefghij")
         self.assertEqual(len(chunks), 3)
@@ -192,16 +183,16 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
-        async def producer():
+        async def producer() -> AsyncIterator[bytes]:
             """Yield the next storage payload chunk.
 
             Yields
             ------
-            object
-                Value produced by the helper.
+            bytes
+                The next payload chunk.
             """
             yield b"one"
             yield b"two"
@@ -221,16 +212,16 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
-        async def producer():
+        async def producer() -> AsyncIterator[bytes]:
             """Yield the next storage payload chunk.
 
             Yields
             ------
-            object
-                Value produced by the helper.
+            bytes
+                The next payload chunk.
 
             Raises
             ------
@@ -255,7 +246,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         async with self._driver.open("s.bin", "wb") as stream:
             await stream.write(b"streamed")
@@ -270,7 +261,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(UnsupportedStorageOperationException):
             self._driver.open("a.txt", "w")
@@ -285,7 +276,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await self._driver.exists("f.txt"))
         await self._driver.write("f.txt", b"x")
@@ -299,7 +290,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         self.assertTrue(await self._driver.delete("f.txt"))
@@ -313,7 +304,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("src.txt", b"data")
         await self._driver.copy("src.txt", "copies/dst.txt")
@@ -328,7 +319,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("src.txt", b"data")
         await self._driver.move("src.txt", "moved/dst.txt")
@@ -345,7 +336,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.bin", b"12345")
         self.assertEqual(await self._driver.size("f.bin"), 5)
@@ -358,7 +349,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         stamp = await self._driver.lastModified("f.txt")
@@ -374,7 +365,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         self.assertIn(
@@ -390,7 +381,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -404,7 +395,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.bin", b"payload")
         expected = hashlib.sha256(b"payload").hexdigest()
@@ -418,7 +409,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("docs/f.txt", b"abc")
         info = await self._driver.info("docs/f.txt")
@@ -439,7 +430,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.createDirectory("up/loads")
         self.assertTrue(await self._driver.directoryExists("up/loads"))
@@ -456,7 +447,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("d/one.txt", b"1")
         await self._driver.write("d/sub/two.txt", b"2")
@@ -474,7 +465,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("d/sub/deep/f.txt", b"x")
         self.assertEqual(await self._driver.directories("d"), ["d/sub"])
@@ -493,7 +484,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -507,7 +498,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = LocalStorageDriver(self._root, base_url="/static")
         await driver.write("img/a b.png", b"x")
@@ -521,7 +512,7 @@ class TestLocalStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -530,12 +521,12 @@ class TestLocalStorageDriver(TestCase):
     async def testDownloadCopiesToLocalDestination(self) -> None:
         """Copy the stored file to a local destination path.
 
-        Validates download() with both file and directory targets.
+        Validate a directory destination and preserve the original file name.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("docs/report.pdf", b"pdf-bytes")
         with tempfile.TemporaryDirectory() as destination:

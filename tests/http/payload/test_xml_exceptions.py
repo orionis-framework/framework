@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from xml.etree.ElementTree import ParseError
 from defusedxml.common import DefusedXmlException, EntitiesForbidden
 from orionis.http.payload.parsers import parse_xml
 from orionis.test import TestCase
 from tests.http.test_request import make_asgi_request
+
 
 class TestXmlExceptionContract(TestCase):
     """Distinguish prohibited entity declarations from malformed XML."""

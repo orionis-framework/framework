@@ -1,3 +1,5 @@
+# ruff: noqa: PLR0913, TC001
+# Preserve existing factory options and runtime column-type annotations.
 """
 Create column definitions for database schema declarations.
 
@@ -5,19 +7,49 @@ Factories return :class:`orionis.orm.schema.column.ColumnDefinition` builders.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from orionis.orm.schema.column import ColumnDefinition
 from orionis.orm.schema.types import (
-    BigInteger, Boolean, Date, DateTime, Double, Enum, Float, Integer,
-    Interval, LargeBinary, MatchType, Numeric, NumericCommon, PickleType,
-    SchemaType, SmallInteger, String, Text, Time, Unicode, UnicodeText, Uuid,
-    StrictArray, StrictBigInt, StrictBinary, StrictBlob, StrictChar, StrictClob,
-    StrictDecimal, StrictDoublePrecision, StrictInt, StrictJson, StrictNChar,
-    StrictNVarChar, StrictReal, StrictSmallInt, StrictTimestamp, StrictVarBinary,
+    BigInteger,
+    Boolean,
+    Date,
+    DateTime,
+    Double,
+    Enum,
+    Float,
+    Integer,
+    Interval,
+    LargeBinary,
+    MatchType,
+    Numeric,
+    NumericCommon,
+    PickleType,
+    SchemaType,
+    SmallInteger,
+    String,
+    Text,
+    Time,
+    Unicode,
+    UnicodeText,
+    Uuid,
+    StrictArray,
+    StrictBigInt,
+    StrictBinary,
+    StrictBlob,
+    StrictChar,
+    StrictClob,
+    StrictDecimal,
+    StrictDoublePrecision,
+    StrictInt,
+    StrictJson,
+    StrictNChar,
+    StrictNVarChar,
+    StrictReal,
+    StrictSmallInt,
+    StrictTimestamp,
+    StrictVarBinary,
     StrictVarChar,
 )
 
-if TYPE_CHECKING:
-    from orionis.orm.schema.column import ColumnDefinition
 
 class Column:
     """
@@ -179,7 +211,7 @@ class Column:
         return column
 
     @staticmethod
-    def enum(  # noqa: PLR0913
+    def enum(
         name: str,
         *enums: str,
         constraint_name: str | None = None,

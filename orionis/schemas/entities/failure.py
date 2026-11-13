@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(slots=True, frozen=True)
 class ValidationFailure(BaseEntity):
     """
@@ -32,10 +33,8 @@ class ValidationFailure(BaseEntity):
         """
         Return the failure as a plain dictionary.
 
-        Overrides ``BaseEntity.toDict`` to bypass the generic ``asdict``
-        machinery (deep-copy, lambda, enum serializer) that would cost 5X
-        more for a three-string struct.  All fields are plain ``str``, so
-        no conversion is needed.
+        Serialize the three string fields directly without the recursive
+        conversion performed by ``BaseEntity.toDict``.
 
         Returns
         -------

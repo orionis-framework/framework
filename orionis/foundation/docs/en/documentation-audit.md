@@ -103,12 +103,12 @@ Compiling a block or executing a function/class definition does not execute its 
 - `SeederRunner.seed()` has no class-selection or `force` arguments; timestamps and soft deletes require explicit columns. `Model.create()` returns an instance even when an event vetoes `save()`.
 - Bulk update/delete do not run per-instance events or apply read limits. Pivot has no `updateExistingPivot`; `sync()` does not automatically open a transaction.
 - MIME preparation and attachment reads are sequential and complete in memory; file transport STORED is not SMTP delivery.
-- `Tool` handlers return `McpResponse`; a raw return value may compile without working in dispatch. The default email verification link encrypts identity without a dedicated expiry, and default registration may expose `str(exception)`; both need application policy.
+- `Tool` handlers return `McpResponse`; a raw return value may compile without working in dispatch. The default email verification link encrypts identity without a dedicated expiry and needs application policy. Registration now reports backend failures centrally and shows a generic form message; see [default HTTP responses](../../../http/docs/en/default-responses.md).
 - Locale is shared state; select it explicitly per request. Default Realtime and MCP event buses are worker-local.
-- CBC and GCM have different guarantees; locks/leases, file expiry, cloud spooling, scheduler, and retries have limits explained in their manuals.
+- Application encryption accepts authenticated AES-GCM and rejects legacy CBC; operational limits for locks, expiry, cloud spooling, scheduling and retries are documented in their respective manuals.
 - `Stringable.toHtmlString()` uses `html.escape`; `forPage(page, number)` normalizes page values below 1. Tests do not automatically roll back cache or database data.
 
-Potential implementation issue for tools: `inspect.signature(AuthorizationSnapshot)` fails because `Iterable` is imported only under `TYPE_CHECKING` in [snapshot.py](../../../auth/authorization/snapshot.py). The `NameError` was reproduced; `annotation_format=annotationlib.Format.STRING` and direct construction work. The implementation was not changed.
+The previously observed `AuthorizationSnapshot` reflection issue is no longer present in the source: [snapshot.py](../../../auth/authorization/snapshot.py) keeps `Iterable` available at runtime for its public constructor annotation.
 
 ## Navigation and Phase 2 readiness
 

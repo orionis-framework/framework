@@ -1,20 +1,24 @@
-"""Implement asynchronous cache operations over filesystem entries."""
+# ruff: noqa: ANN401, PLC0415, TC003
+# Preserve arbitrary cache payload types and defer failure-runtime imports.
+# Expose pathlib annotations to runtime dependency reflection.
+"""Implement asynchronous cache operations over filesystem entries.
+
+Wait for active worker operations before propagating caller cancellation.
+Persist expiration deadlines as epoch seconds so they survive system restarts.
+"""
 
 import asyncio
 import hashlib
 import secrets
 import threading
 import time
-from typing import TYPE_CHECKING, Any, Self
+from pathlib import Path
+from typing import Any, Self
 from zlib import crc32
 import msgspec
 import msgspec.json as _msgjson
-from filelock import FileLock
+from filelock import BaseFileLock, FileLock
 from orionis.support.concurrency import complete_on_cancel
-
-if TYPE_CHECKING:
-    from pathlib import Path
-    from filelock import BaseFileLock
 
 # Sentinel object to distinguish "key not found" from a stored None value.
 _MISSING = object()
@@ -28,10 +32,9 @@ _REPLACE_BACKOFF_SECONDS: float = 0.005
 _LOCK_STRIPES: int = 64
 """Lock stripes value used by ``file``."""
 
+
 class FileCacheBackend:
     """Implement asynchronous cache operations over filesystem entries."""
-
-    # ruff: noqa: ANN401, PLC0415
 
     __slots__ = ("_counter_lock", "_locks", "_path", "_rename_lock")
     """Declare the instance attribute slots reserved by this class."""
@@ -48,7 +51,7 @@ class FileCacheBackend:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         path = path.resolve()
         self._path: Path = path
@@ -143,7 +146,7 @@ class FileCacheBackend:
         Returns
         -------
         dict | None
-            Decoded entry, or ``None`` on any error.
+            Live entry, or None when absent, expired, unreadable or malformed.
         """
         with self.__lock(file):
             return self.__readEntryUnlocked(file)
@@ -169,12 +172,15 @@ class FileCacheBackend:
             return None
         except (OSError, msgspec.DecodeError) as error:
             from orionis.failure.runtime import capture_nowait
+
             capture_nowait(error, flow="cache", phase="read", operation="file_cache")
             return None
-        if not isinstance(entry, dict):
+        if not isinstance(entry, dict) or "v" not in entry:
             return None
         expiration = entry.get("e")
-        if expiration is not None and time.monotonic() >= expiration:
+        if expiration is not None and not isinstance(expiration, int | float):
+            return None
+        if expiration is not None and time.time() >= expiration:
             file.unlink(missing_ok=True)
             return None
         return entry
@@ -193,7 +199,7 @@ class FileCacheBackend:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
 
         Raises
         ------
@@ -217,7 +223,7 @@ class FileCacheBackend:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
 
         Raises
         ------
@@ -234,6 +240,7 @@ class FileCacheBackend:
                 tmp.unlink(missing_ok=True)
             except OSError as cleanup_error:
                 from orionis.failure.runtime import capture_nowait
+
                 capture_nowait(
                     cleanup_error,
                     flow="cache",
@@ -256,7 +263,7 @@ class FileCacheBackend:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
 
         Raises
         ------
@@ -273,6 +280,7 @@ class FileCacheBackend:
                 if attempt == last:
                     raise
                 from orionis.failure.runtime import capture_nowait
+
                 capture_nowait(
                     error,
                     flow="cache",
@@ -287,7 +295,7 @@ class FileCacheBackend:
 
     def __createSync(self: Self, file: Path, entry: dict) -> bool:
         """
-        Write *entry* to *file* only when the file does not exist yet.
+        Publish *entry* atomically only when its locked path is absent.
 
         Parameters
         ----------
@@ -303,11 +311,9 @@ class FileCacheBackend:
             when another writer got there first.
         """
         with self.__lock(file):
-            try:
-                with file.open("xb") as handle:
-                    handle.write(_msgjson.encode(entry))
-            except FileExistsError:
+            if file.exists():
                 return False
+            self.__writeEntryUnlocked(file, entry)
             return True
 
     def __unlinkSync(self: Self, file: Path) -> int:
@@ -374,14 +380,17 @@ class FileCacheBackend:
             Stored value or *default*.
         """
         file = self.__file(key)
-        entry = await asyncio.to_thread(self.__readSync, file)
+        entry = await complete_on_cancel(asyncio.to_thread(self.__readSync, file))
         if entry is None:
             return default
 
         return entry.get("v")
 
     async def replace(
-        self: Self, key: str, value: Any, ttl: float | None = None,
+        self: Self,
+        key: str,
+        value: Any,
+        ttl: float | None = None,
     ) -> bool:
         """
         Replace an existing live key without recreating a deleted entry.
@@ -402,12 +411,10 @@ class FileCacheBackend:
         """
         entry = {
             "v": value,
-            "e": time.monotonic() + ttl if ttl is not None else None,
+            "e": time.time() + ttl if ttl is not None else None,
         }
-        return await asyncio.to_thread(
-            self.__replaceIfPresent,
-            self.__file(key),
-            entry,
+        return await complete_on_cancel(
+            asyncio.to_thread(self.__replaceIfPresent, self.__file(key), entry),
         )
 
     async def set(self: Self, key: str, value: Any, ttl: float | None = None) -> bool:
@@ -430,10 +437,10 @@ class FileCacheBackend:
         """
         entry: dict[str, Any] = {
             "v": value,
-            "e": time.monotonic() + ttl if ttl is not None else None,
+            "e": time.time() + ttl if ttl is not None else None,
         }
         file = self.__file(key)
-        await asyncio.to_thread(self.__writeSync, file, entry)
+        await complete_on_cancel(asyncio.to_thread(self.__writeSync, file, entry))
         return True
 
     async def exists(self: Self, key: str) -> bool:
@@ -467,7 +474,7 @@ class FileCacheBackend:
             1 if the key existed, 0 otherwise.
         """
         file = self.__file(key)
-        return await asyncio.to_thread(self.__unlinkSync, file)
+        return await complete_on_cancel(asyncio.to_thread(self.__unlinkSync, file))
 
     async def clear(self: Self) -> bool:
         """
@@ -486,7 +493,7 @@ class FileCacheBackend:
             Returns
             -------
             None
-                Removes matching files from the backend directory.
+                No return value.
             """
             for f in self._path.glob("*.json"):
                 self.__unlinkSync(f)
@@ -499,11 +506,13 @@ class FileCacheBackend:
                 else:
                     f.unlink(missing_ok=True)
 
-        await asyncio.to_thread(_clear_all)
+        await complete_on_cancel(asyncio.to_thread(_clear_all))
         return True
 
     async def multiGet(
-        self: Self, keys: list[str], default: Any | None = None,
+        self: Self,
+        keys: list[str],
+        default: Any | None = None,
     ) -> list[Any]:
         """
         Return a list of values for *keys* in the same order.
@@ -518,7 +527,7 @@ class FileCacheBackend:
         Returns
         -------
         list[typing.Any]
-            Cached values in key order, with None for missing or expired entries.
+            Cached values in key order, using the supplied default for misses.
         """
         stopped = threading.Event()
 
@@ -573,14 +582,14 @@ class FileCacheBackend:
             Returns
             -------
             None
-                Complete the operation without returning a value.
+                No return value.
             """
             for key, value in pairs:
                 if stopped.is_set():
                     break
                 entry = {
                     "v": value,
-                    "e": time.monotonic() + ttl if ttl is not None else None,
+                    "e": time.time() + ttl if ttl is not None else None,
                 }
                 self.__writeSync(self.__file(key), entry)
 
@@ -598,9 +607,8 @@ class FileCacheBackend:
         """
         Store *value* under *key* only if the key does not already exist.
 
-        The entry is created with an exclusive open, so concurrent callers
-        never both succeed and the operation is safe as a mutual-exclusion
-        primitive.
+        Hold the cross-process file lock while checking absence and atomically
+        publishing a staged entry. Concurrent callers cannot both succeed.
 
         Parameters
         ----------
@@ -623,14 +631,18 @@ class FileCacheBackend:
         """
         entry: dict[str, Any] = {
             "v": value,
-            "e": time.monotonic() + ttl if ttl is not None else None,
+            "e": time.time() + ttl if ttl is not None else None,
         }
         file = self.__file(key)
-        created = await asyncio.to_thread(self.__createSync, file, entry)
+        created = await complete_on_cancel(
+            asyncio.to_thread(self.__createSync, file, entry),
+        )
 
         # exists() evicts an expired entry, releasing the slot for a retry.
         if not created and not await self.exists(key):
-            created = await asyncio.to_thread(self.__createSync, file, entry)
+            created = await complete_on_cancel(
+                asyncio.to_thread(self.__createSync, file, entry),
+            )
 
         if not created:
             error_msg = f"Key {key!r} already exists in the cache."
@@ -658,10 +670,8 @@ class FileCacheBackend:
             New value after increment.
         """
         async with self._counter_lock:
-            return await asyncio.to_thread(
-                self.__incrementSync,
-                self.__file(key),
-                delta,
+            return await complete_on_cancel(
+                asyncio.to_thread(self.__incrementSync, self.__file(key), delta),
             )
 
     def __incrementSync(self: Self, file: Path, delta: int) -> int:
@@ -687,7 +697,7 @@ class FileCacheBackend:
 
             if entry is not None:
                 stored_expiry: float | None = entry.get("e")
-                if stored_expiry is None or time.monotonic() <= stored_expiry:
+                if stored_expiry is None or time.time() <= stored_expiry:
                     current = entry.get("v") or 0
                     expiration = stored_expiry
 

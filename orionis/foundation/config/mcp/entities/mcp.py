@@ -9,6 +9,7 @@ from orionis.foundation.config.validation import (
 )
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class McpConfig(BaseEntity):
     """
@@ -70,7 +71,8 @@ class McpConfig(BaseEntity):
 
     max_request_size: int = field(
         default_factory=lambda: Env.get(
-            "MCP_MAX_REQUEST_SIZE", Env.get("HTTP_MAX_BODY_SIZE", 1024 * 1024),
+            "MCP_MAX_REQUEST_SIZE",
+            Env.get("HTTP_MAX_BODY_SIZE", 1024 * 1024),
         ),
         metadata={
             "description": "Maximum serialized MCP request size in bytes.",
@@ -96,7 +98,8 @@ class McpConfig(BaseEntity):
 
     max_concurrent_requests: int = field(
         default_factory=lambda: Env.get(
-            "MCP_MAX_CONCURRENT_REQUESTS", Env.get("HTTP_MAX_CONCURRENT_REQUESTS", 32),
+            "MCP_MAX_CONCURRENT_REQUESTS",
+            Env.get("HTTP_MAX_CONCURRENT_REQUESTS", 32),
         ),
         metadata={
             "description": "Maximum concurrent MCP requests.",
@@ -206,16 +209,24 @@ class McpConfig(BaseEntity):
             If a budget or duration is invalid, or an origin is malformed.
         """
         for name in (
-            "max_request_size", "default_page_size", "max_page_size",
-            "max_concurrent_requests", "subscription_buffer_size",
-            "max_subscriptions", "max_resource_subscriptions",
-            "tool_search_max_results", "tool_search_max_calls",
-            "tool_search_max_output_bytes", "max_response_size",
+            "max_request_size",
+            "default_page_size",
+            "max_page_size",
+            "max_concurrent_requests",
+            "subscription_buffer_size",
+            "max_subscriptions",
+            "max_resource_subscriptions",
+            "tool_search_max_results",
+            "tool_search_max_calls",
+            "tool_search_max_output_bytes",
+            "max_response_size",
             "max_metadata_size",
         ):
             validate_integer(getattr(self, name), name, minimum=1)
         validate_seconds(
-            self.subscription_keepalive, "subscription_keepalive", positive=True,
+            self.subscription_keepalive,
+            "subscription_keepalive",
+            positive=True,
         )
         if self.default_page_size > self.max_page_size:
             message = "default_page_size must not exceed max_page_size"

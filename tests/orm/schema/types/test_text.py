@@ -1,7 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema text behavior."""
+
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.orm.schema.types.text import Text
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestTextOptions(TestCase):
     """Verify Text constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestTextOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = Text()
         assert_column_options(

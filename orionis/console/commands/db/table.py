@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Render a table schema summary."""
 
 from typing import ClassVar
@@ -7,10 +9,9 @@ from orionis.console.commands.db.show import format_bytes
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.contracts.connection_manager import IConnectionManager
 
+
 class DbTableCommand(MigrationCommand):
     """Render a table schema summary."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = False
     """Timestamps flag used by ``DbTableCommand``."""

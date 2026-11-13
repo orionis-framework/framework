@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.localization.contracts.loader import ITranslationLoader
 from orionis.localization.loader import TranslationLoader
@@ -6,23 +8,6 @@ from orionis.test import TestCase
 # Methods every translation loader must implement.
 _ABSTRACT_METHODS: frozenset[str] = frozenset({"availableLocales", "load"})
 
-def parameter_names(owner: type, method: str) -> list[str]:
-    """
-    Return the parameter names declared by *method* on *owner*.
-
-    Parameters
-    ----------
-    owner : type
-        Class owning the inspected method.
-    method : str
-        Name of the method to inspect.
-
-    Returns
-    -------
-    list[str]
-        Ordered parameter names of the method signature.
-    """
-    return list(inspect.signature(getattr(owner, method)).parameters)
 
 class TestTranslationLoaderContract(TestCase):
     """Validate the loader interface and its implementation parity."""
@@ -36,7 +21,7 @@ class TestTranslationLoaderContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ITranslationLoader.__abstractmethods__, _ABSTRACT_METHODS)
 
@@ -49,7 +34,7 @@ class TestTranslationLoaderContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ITranslationLoader.__slots__, ())
 
@@ -62,7 +47,7 @@ class TestTranslationLoaderContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(TranslationLoader, ITranslationLoader))
 
@@ -75,11 +60,20 @@ class TestTranslationLoaderContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for method in sorted(_ABSTRACT_METHODS):
-            self.assertEqual(
-                parameter_names(TranslationLoader, method),
-                parameter_names(ITranslationLoader, method),
-                method,
-            )
+            with self.subTest(method=method):
+                expected = inspect.signature(
+                    getattr(ITranslationLoader, method),
+                    eval_str=True,
+                )
+                actual = inspect.signature(
+                    getattr(TranslationLoader, method),
+                    eval_str=True,
+                )
+                self.assertEqual(
+                    list(actual.parameters.values())[1:],
+                    list(expected.parameters.values())[1:],
+                )
+                self.assertEqual(actual.return_annotation, expected.return_annotation)

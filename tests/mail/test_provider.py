@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import ast
 import inspect
 from pathlib import Path
@@ -17,19 +19,22 @@ from orionis.support.facades.mail import Mail
 from orionis.test import TestCase
 
 # Operations the facade stub publishes for application code.
-_CONSUMER_SURFACE = frozenset({
-    "attach",
-    "bcc",
-    "cc",
-    "fromAddress",
-    "html",
-    "mailer",
-    "raw",
-    "replyTo",
-    "send",
-    "subject",
-    "to",
-})
+_CONSUMER_SURFACE = frozenset(
+    {
+        "attach",
+        "bcc",
+        "cc",
+        "fromAddress",
+        "html",
+        "mailer",
+        "raw",
+        "replyTo",
+        "send",
+        "subject",
+        "to",
+    },
+)
+
 
 class AlertService:
     """Consume the manager through constructor injection."""
@@ -51,6 +56,7 @@ class AlertService:
         """
         self.mail = mail
 
+
 def stub_methods() -> list[ast.FunctionDef | ast.AsyncFunctionDef]:
     """
     Parse the facade stub and return its declared methods.
@@ -71,8 +77,8 @@ def stub_methods() -> list[ast.FunctionDef | ast.AsyncFunctionDef]:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
     ]
 
-class TestMailProvider(TestCase):
 
+class TestMailProvider(TestCase):
     def testIsAnEagerCoreProvider(self) -> None:
         """Ship as an eager core provider instead of a deferred one.
 
@@ -125,8 +131,8 @@ class TestMailProvider(TestCase):
             [(MailComposer, MailComposer), (IMailManager, MailManager)],
         )
 
-class TestMailFacade(TestCase):
 
+class TestMailFacade(TestCase):
     def setUp(self) -> None:
         """Keep test-time resolutions out of the ambient runner scope.
 
@@ -221,8 +227,8 @@ class TestMailFacade(TestCase):
         }
         self.assertEqual(own_methods, {"getFacadeAccessor"})
 
-class TestMailFacadeStub(TestCase):
 
+class TestMailFacadeStub(TestCase):
     def testDeclaresOnlyTheConsumerSurface(self) -> None:
         """Publish composition and delivery operations only.
 

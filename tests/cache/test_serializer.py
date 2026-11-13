@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import datetime as dt
 import decimal
@@ -9,12 +11,13 @@ from orionis.cache.serializer import Serializer
 from orionis.support.types.sentinel import MISSING
 from orionis.test import TestCase
 
+
 class _Color(enum.Enum):
     RED = 1
     GREEN = 2
 
-class TestSerializer(TestCase):
 
+class TestSerializer(TestCase):
     def testDumpsAndLoadsPrimitives(self) -> None:
         """Round-trip primitive scalar values through the serializer.
 
@@ -24,7 +27,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cases = ["hello", "", 0, -1, 42, 3.14, -0.5, True, False, None]
         for value in cases:
@@ -42,7 +45,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = Path("some/nested/path")
         result = Serializer.loads(Serializer.dumps(original))
@@ -58,7 +61,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = b"\x00\xff\xab\xcd\x00"
         result = Serializer.loads(Serializer.dumps(original))
@@ -73,7 +76,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Serializer.loads(Serializer.dumps(b""))
         self.assertEqual(result, b"")
@@ -87,10 +90,16 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = dt.datetime(
-            2024, 6, 15, 12, 30, 45, tzinfo=dt.UTC,
+            2024,
+            6,
+            15,
+            12,
+            30,
+            45,
+            tzinfo=dt.UTC,
         )
         result = Serializer.loads(Serializer.dumps(original))
         self.assertEqual(result, original)
@@ -104,7 +113,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = dt.date(2024, 6, 15)
         result = Serializer.loads(Serializer.dumps(original))
@@ -121,7 +130,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = dt.time(12, 30, 45)
         result = Serializer.loads(Serializer.dumps(original))
@@ -137,7 +146,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = dt.timedelta(days=3, seconds=7200, microseconds=500)
         result = Serializer.loads(Serializer.dumps(original))
@@ -153,7 +162,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = decimal.Decimal("3.141592653589793238")
         result = Serializer.loads(Serializer.dumps(original))
@@ -168,7 +177,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = uuid.UUID("12345678-1234-5678-1234-567812345678")
         result = Serializer.loads(Serializer.dumps(original))
@@ -183,7 +192,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = complex(3.0, -4.5)
         result = Serializer.loads(Serializer.dumps(original))
@@ -199,7 +208,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = (1, "a", 3.0, None)
         result = Serializer.loads(Serializer.dumps(original))
@@ -214,7 +223,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Serializer.loads(Serializer.dumps(()))
         self.assertEqual(result, ())
@@ -228,7 +237,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = {1, 2, 3, 4}
         result = Serializer.loads(Serializer.dumps(original))
@@ -244,7 +253,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = frozenset([10, 20, 30])
         result = Serializer.loads(Serializer.dumps(original))
@@ -260,7 +269,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Serializer.loads(Serializer.dumps(MISSING))
         self.assertIs(result, MISSING)
@@ -274,7 +283,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = {"a": {"b": {"c": 42}}, "x": [1, 2, 3], "flag": True}
         result = Serializer.loads(Serializer.dumps(original))
@@ -288,7 +297,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = [[1, 2], [3, [4, 5]], []]
         result = Serializer.loads(Serializer.dumps(original))
@@ -303,7 +312,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result_dict = Serializer.loads(Serializer.dumps({}))
         self.assertEqual(result_dict, {})
@@ -322,7 +331,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = 10**50
         result = Serializer.loads(Serializer.dumps(original))
@@ -337,7 +346,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = _Color.GREEN
         result = Serializer.loads(Serializer.dumps(original))
@@ -353,7 +362,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Serializer.loads(Serializer.dumps(Path))
         self.assertIs(result, Path)
@@ -367,7 +376,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         output = Serializer.dumps({"key": "value", "num": 1}, indent=2)
         self.assertIn("\n", output)
@@ -381,7 +390,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         output = Serializer.dumps({"key": "value"})
         self.assertNotIn("\n", output)
@@ -395,7 +404,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Serializer.dumps(object())
@@ -409,7 +418,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         raw = '{"__type__":"unsupported_xyz","__value__":null}'
         with self.assertRaises(ValueError):
@@ -424,30 +433,16 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             file_path = Path(tmp) / "payload.bin"
             data = {"x": 1, "y": [1, 2, 3], "z": True, "w": None}
             Serializer.dumpToFile(data, file_path)
+            self.assertTrue(file_path.is_file())
+            self.assertGreater(file_path.stat().st_size, 0)
             result = Serializer.loadFromFile(file_path)
             self.assertEqual(result, data)
-
-    def testDumpToFileCreatesFile(self) -> None:
-        """Create the target file after a successful dumpToFile call.
-
-        Validates that dumpToFile produces a non-empty file on disk.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with tempfile.TemporaryDirectory() as tmp:
-            file_path = Path(tmp) / "out.bin"
-            Serializer.dumpToFile({"a": 1}, file_path)
-            self.assertTrue(file_path.exists())
-            self.assertGreater(file_path.stat().st_size, 0)
 
     def testDumpToFileLeavesNoStagingFileBehind(self) -> None:
         """Remove the staging file once the payload is published.
@@ -458,7 +453,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
@@ -474,7 +469,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
@@ -495,7 +490,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             missing = Path(tmp) / "nonexistent.bin"
@@ -511,7 +506,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             empty = Path(tmp) / "empty.bin"
@@ -528,7 +523,7 @@ class TestSerializer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         raw = Serializer.dumps({"k": 99})
         result = Serializer.loads(raw.encode())

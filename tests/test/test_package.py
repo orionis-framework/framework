@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Run fixed Python snippets in the active interpreter to check import boundaries.
 import subprocess
 import sys
 from pathlib import Path
@@ -5,6 +8,7 @@ import orionis.test as test_package
 from orionis.test import TestCase
 from orionis.test.cases.case import TestCase as CoreTestCase
 from orionis.test.clients.mcp import McpTestClient, McpTestResponse
+
 
 class TestPackage(TestCase):
     """Verify the public testing API and its deferred protocol imports."""
@@ -41,7 +45,7 @@ class TestPackage(TestCase):
             "assert not any(name == 'orionis.mcp' "
             "or name.startswith('orionis.mcp.') for name in sys.modules)\n"
         )
-        result = subprocess.run(  # noqa: S603
+        result = subprocess.run(
             [sys.executable, "-B", "-c", source],
             cwd=Path(__file__).resolve().parents[2],
             capture_output=True,

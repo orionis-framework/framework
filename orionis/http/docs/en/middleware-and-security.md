@@ -6,6 +6,7 @@ HTTP middleware receives `Request` and a no-argument continuation. It may return
 from uuid import uuid4
 from orionis.http import BaseMiddleware, Request, Response
 
+
 class RequestIdMiddleware(BaseMiddleware):
     async def handle(self, request: Request, call_next) -> Response:
         request_id = uuid4().hex
@@ -31,10 +32,14 @@ Single-host proxy addresses are indexed when the middleware is initialized, avoi
 
 CORS uses `CORS_ALLOW_ORIGINS`, `CORS_ALLOW_ORIGIN_REGEX`, `CORS_ALLOW_METHODS`, `CORS_ALLOW_HEADERS`, `CORS_EXPOSE_HEADERS`, `CORS_ALLOW_CREDENTIALS` and `CORS_MAX_AGE` (600 seconds). Credentials are disabled by default. Use explicit origins for cookies. CORS is browser policy, not server authentication. WebSocket and MCP read the same bootstrap `CORS_ALLOW_ORIGINS` but apply their own validation rules; MCP rejects wildcards.
 
+An origin regex must match the complete origin, not merely a trusted-looking prefix. Wildcard methods include the supported HTTP `QUERY` verb.
+
 ## Capacity and rate limiting
 
 `RATE_LIMIT_ENABLED` defaults to false. Once enabled, the initial budget is 100 requests per 60 seconds (`RATE_LIMIT_REQUESTS`, `RATE_LIMIT_WINDOW`). The key is the resolved client IP. `RATE_LIMIT_STORE` selects worker-local memory or Redis. `RATE_LIMIT_MAX_KEYS` and `RATE_LIMIT_MAX_EVENTS` bound memory; `RATE_LIMIT_REDIS_PREFIX` and `RATE_LIMIT_REDIS_TIMEOUT` configure Redis. Connection settings share `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB` and `REDIS_PASSWORD`.
 
 Excess requests receive 429 with `Retry-After`; recognized Redis errors receive 503 and a short retry interval. Memory storage is worker-local and does not enforce a global quota. HTTP concurrency admission includes response delivery and rejects excess work instead of building an unbounded queue.
+
+Redis failures are observed through the central failure runtime before returning 503; no local quota store is substituted.
 
 Evidence: [kernel](../../kernel.py), [CSRF](../../layer/web/csrf_token.py), [proxies](../../layer/shared/proxies.py), [rate limiting](../../layer/shared/rate_limit.py), [config](../../../../config/http.py). Tests: [pipeline](../../../../tests/http/test_middleware.py), [security](../../../../tests/http/layer/shared/test_security.py), [proxies](../../../../tests/http/layer/shared/test_proxies.py), [CORS](../../../../tests/http/layer/shared/test_cors.py), [CSRF](../../../../tests/http/layer/web/test_csrf_token.py). Identity protection: [Auth](../../../auth/docs/en/README.md).

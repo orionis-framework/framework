@@ -12,6 +12,7 @@ from orionis.queues.exceptions import QueueConfigurationError
 _TABLE_NAME = re.compile(r"[A-Za-z_]\w*", re.ASCII)
 """Compiled pattern used to recognize table name."""
 
+
 def validate_table_name(table: str) -> str:
     """
     Validate a logical table identifier.
@@ -35,6 +36,7 @@ def validate_table_name(table: str) -> str:
         message = "Queue table names must be valid SQL identifiers."
         raise QueueConfigurationError(message)
     return table
+
 
 def build_jobs_table(table: str) -> TableDefinition:
     """
@@ -63,10 +65,9 @@ def build_jobs_table(table: str) -> TableDefinition:
             "created_at": Double(),
         },
         primary_key="id",
-        indexes=(
-            TableIndex(columns=("queue", "available_at", "reserved_until")),
-        ),
+        indexes=(TableIndex(columns=("queue", "available_at", "reserved_until")),),
     )
+
 
 def build_failed_jobs_table(table: str) -> TableDefinition:
     """

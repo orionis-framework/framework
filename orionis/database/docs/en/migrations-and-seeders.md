@@ -30,17 +30,24 @@ Each file should contain its local `Migration` subclass; use zero-padded sequent
 
 ```python
 from orionis.database import Migration
+
 from orionis.support.facades import Schema
 
 
 class CreateFlags(Migration):
     async def up(self) -> None:
+        """Create the flags table and its unique name constraint."""
+
         async with Schema.create("flags") as table:
             table.id()
+
             table.string("name", 80)
+
             table.unique("name")
 
     async def down(self) -> None:
+        """Remove the flags table."""
+
         await Schema.drop("flags")
 ```
 
@@ -75,11 +82,14 @@ Service equivalents are `Migrator(app, manager).migrate(...)`, `.rollback(steps=
 
 ```python
 from orionis.database import Seeder
+
 from orionis.support.facades import DB
 
 
 class DefaultFlags(Seeder):
     async def run(self) -> None:
+        """Insert the initial enabled flag."""
+
         await DB.table("flags").insert({"name": "enabled"})
 ```
 
@@ -91,6 +101,10 @@ The recorded identity is the filename stem, rather than the class name. Files ru
 
 ## Failures and deployment
 
+The contextual connection expires when its owning migration scope ends, including copies inherited by child tasks. Discovery skips package initializer modules and treats aliases of the same class as one candidate. Filesystem access failures propagate instead of appearing as an empty migration or seeder list. If an error callback fails while reporting an operation failure, the original failure remains primary and the reporting failure reaches the central failure runtime.
+
 Discovery validates local classes, duplicates, and files; a missing previously recorded migration can cause `MigrationNotFoundException` during reversal. Do not rename files already applied. `MigrationEvents` and `SeederEvents` report start, success, and failure without coupling data logic to console output.
+
+If a seeder claim fails and its recovery read also fails, the original claim error retains precedence and its original cause. The recovery read error is reported centrally.
 
 Transactional tracking does not make email or external calls reversible. Keep those effects out of tracked seeders or make them idempotent. Redshift rejects `SeederRunner.seed()` before access because it does not enforce uniqueness. [Factories](../../../orm/docs/en/factories-and-testing.md) generate models; they neither replace seeder history nor open a transaction for a batch.

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from collections import deque
 from typing import TYPE_CHECKING, Self
@@ -11,11 +13,19 @@ from orionis.test import TestCase
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-class _Producer:
 
+class _Producer:
     __slots__ = (
-        "close_error", "closed", "closing", "error", "gate", "history",
-        "items", "pulls", "release_close", "started",
+        "close_error",
+        "closed",
+        "closing",
+        "error",
+        "gate",
+        "history",
+        "items",
+        "pulls",
+        "release_close",
+        "started",
     )
 
     def __init__(self, history: list[str]) -> None:
@@ -97,12 +107,23 @@ class _Producer:
         if self.close_error is not None:
             raise self.close_error
 
-class _Wire:
 
+class _Wire:
     __slots__ = (
-        "block_send", "chunks", "disconnected", "error", "error_stage",
-        "headers", "history", "messages", "receive_error", "requests",
-        "sending", "status", "watcher_closed", "watching",
+        "block_send",
+        "chunks",
+        "disconnected",
+        "error",
+        "error_stage",
+        "headers",
+        "history",
+        "messages",
+        "receive_error",
+        "requests",
+        "sending",
+        "status",
+        "watcher_closed",
+        "watching",
     )
 
     def __init__(self) -> None:
@@ -282,10 +303,13 @@ class _Wire:
     response_empty = responseEmpty
     send_bytes = sendBytes
 
-class TestSSETransport(TestCase):
 
+class TestSSETransport(TestCase):
     async def deliver(
-        self, name: str, wire: _Wire, response: EventStreamResponse,
+        self,
+        name: str,
+        wire: _Wire,
+        response: EventStreamResponse,
         method: str = "GET",
     ) -> None:
         """Deliver through either real adapter using equivalent metadata.
@@ -320,10 +344,14 @@ class TestSSETransport(TestCase):
         None
             Assert that no named SSE tasks remain active.
         """
-        self.assertEqual([
-            task.get_name() for task in asyncio.all_tasks()
-            if task.get_name().startswith("orionis.sse.")
-        ], [])
+        self.assertEqual(
+            [
+                task.get_name()
+                for task in asyncio.all_tasks()
+                if task.get_name().startswith("orionis.sse.")
+            ],
+            [],
+        )
 
     async def testNormalDeliveryHeadersFramingAndBackground(self) -> None:
         """Send each event and close before background work on both protocols.
@@ -338,25 +366,40 @@ class TestSSETransport(TestCase):
                 wire = _Wire()
                 source = _Producer(wire.history)
                 response = EventStreamResponse(
-                    source, status_code=201, background=BackgroundTask(wire.background),
+                    source,
+                    status_code=201,
+                    background=BackgroundTask(wire.background),
                 )
                 await self.deliver(name, wire, response)
                 self.assertEqual(wire.status, 201)
-                self.assertEqual(wire.chunks, [
-                    b"data: first\n\n", b"id: 2\ndata: second\n\n",
-                ])
-                self.assertEqual(dict(wire.headers)["content-type"],
-                                 "text/event-stream; charset=utf-8")
+                self.assertEqual(
+                    wire.chunks,
+                    [
+                        b"data: first\n\n",
+                        b"id: 2\ndata: second\n\n",
+                    ],
+                )
+                self.assertEqual(
+                    dict(wire.headers)["content-type"],
+                    "text/event-stream; charset=utf-8",
+                )
                 self.assertNotIn("content-length", dict(wire.headers))
                 self.assertNotIn("connection", dict(wire.headers))
                 self.assertEqual(source.closed, 1)
-                self.assertLess(wire.history.index("close"),
-                                wire.history.index("background"))
+                self.assertLess(
+                    wire.history.index("close"),
+                    wire.history.index("background"),
+                )
                 self.assertEqual(wire.watcher_closed, 1)
                 if name == "asgi":
-                    self.assertEqual(wire.messages[-1], {
-                        "type": "http.response.body", "body": b"", "more_body": False,
-                    })
+                    self.assertEqual(
+                        wire.messages[-1],
+                        {
+                            "type": "http.response.body",
+                            "body": b"",
+                            "more_body": False,
+                        },
+                    )
                 self.assertNoTasks()
 
     async def testDisconnectStopsIdleProducerAndSkipsBackground(self) -> None:
@@ -373,7 +416,8 @@ class TestSSETransport(TestCase):
                 source = _Producer(wire.history)
                 source.gate = asyncio.Event()
                 response = EventStreamResponse(
-                    source, background=BackgroundTask(wire.background),
+                    source,
+                    background=BackgroundTask(wire.background),
                 )
                 task = asyncio.create_task(self.deliver(name, wire, response))
                 async with asyncio.timeout(2):
@@ -400,7 +444,8 @@ class TestSSETransport(TestCase):
             wire.block_send = asyncio.Event()
             source = _Producer(wire.history)
             response = EventStreamResponse(
-                source, background=BackgroundTask(wire.background),
+                source,
+                background=BackgroundTask(wire.background),
             )
             task = asyncio.create_task(self.deliver(name, wire, response))
             async with asyncio.timeout(2):
@@ -440,7 +485,8 @@ class TestSSETransport(TestCase):
                         source.gate = asyncio.Event()
                         wire.receive_error = error
                     response = EventStreamResponse(
-                        source, background=BackgroundTask(wire.background),
+                        source,
+                        background=BackgroundTask(wire.background),
                     )
                     with self.assertRaises(RuntimeError) as caught:
                         await self.deliver(name, wire, response)
@@ -462,7 +508,8 @@ class TestSSETransport(TestCase):
             source = _Producer(wire.history)
             source.gate = asyncio.Event()
             response = EventStreamResponse(
-                source, background=BackgroundTask(wire.background),
+                source,
+                background=BackgroundTask(wire.background),
             )
             task = asyncio.create_task(self.deliver(name, wire, response))
             async with asyncio.timeout(2):
@@ -489,7 +536,8 @@ class TestSSETransport(TestCase):
             source.gate = asyncio.Event()
             source.release_close = asyncio.Event()
             response = EventStreamResponse(
-                source, background=BackgroundTask(wire.background),
+                source,
+                background=BackgroundTask(wire.background),
             )
             task = asyncio.create_task(self.deliver(name, wire, response))
             async with asyncio.timeout(2):
@@ -518,7 +566,8 @@ class TestSSETransport(TestCase):
             source = _Producer(wire.history)
             source.release_close = asyncio.Event()
             response = EventStreamResponse(
-                source, background=BackgroundTask(wire.background),
+                source,
+                background=BackgroundTask(wire.background),
             )
             task = asyncio.create_task(self.deliver(name, wire, response))
             async with asyncio.timeout(2):
@@ -562,7 +611,8 @@ class TestSSETransport(TestCase):
                 yield "forbidden"
 
             response = EventStreamResponse(
-                events(), background=BackgroundTask(wire.background),
+                events(),
+                background=BackgroundTask(wire.background),
             )
             await self.deliver(name, wire, response, "HEAD")
             self.assertEqual(started, [])
@@ -586,7 +636,8 @@ class TestSSETransport(TestCase):
             source.release_close = asyncio.Event()
             source.close_error = RuntimeError("cleanup failed after disconnect")
             response = EventStreamResponse(
-                source, background=BackgroundTask(wire.background),
+                source,
+                background=BackgroundTask(wire.background),
             )
             task = asyncio.create_task(self.deliver(name, wire, response))
             async with asyncio.timeout(2):
@@ -633,10 +684,12 @@ class TestSSETransport(TestCase):
             Verify request-body messages are drained before watching disconnect.
         """
         wire = _Wire()
-        wire.requests.extend((
-            {"type": "http.request", "body": b"a", "more_body": True},
-            {"type": "http.request", "body": b"b", "more_body": False},
-        ))
+        wire.requests.extend(
+            (
+                {"type": "http.request", "body": b"a", "more_body": True},
+                {"type": "http.request", "body": b"b", "more_body": False},
+            ),
+        )
         source = _Producer(wire.history)
         source.gate = asyncio.Event()
         task = asyncio.create_task(
@@ -680,7 +733,8 @@ class TestSSETransport(TestCase):
             source = _Producer(wire.history)
             source.items = iter((b"ordinary",))
             response = StreamingResponse(
-                source, background=BackgroundTask(wire.background),
+                source,
+                background=BackgroundTask(wire.background),
             )
             with self.assertRaises(ConnectionError):
                 await self.deliver(name, wire, response)
@@ -703,7 +757,8 @@ class TestSSETransport(TestCase):
                     wire = _Wire()
                     source = _Producer(wire.history)
                     response = EventStreamResponse(
-                        source, headers={"x-invalid": object()},
+                        source,
+                        headers={"x-invalid": object()},
                         background=BackgroundTask(wire.background),
                     )
                     with self.assertRaises(TypeError):
@@ -726,7 +781,8 @@ class TestSSETransport(TestCase):
         wire = _Wire()
         source = _Producer(wire.history)
         response = EventStreamResponse(
-            source, headers={"x-invalid": "\u4e16\u754c"},
+            source,
+            headers={"x-invalid": "\u4e16\u754c"},
             background=BackgroundTask(wire.background),
         )
         with self.assertRaises(UnicodeEncodeError):

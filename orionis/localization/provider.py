@@ -7,6 +7,7 @@ from orionis.localization.contracts.translator import ITranslator
 from orionis.localization.manager import LocalizationManager
 from orionis.support.facades.lang import Lang as LangFacade
 
+
 class LocalizationProvider(ServiceProvider):
     """
     Service provider for the Orionis localization system.
@@ -33,7 +34,7 @@ class LocalizationProvider(ServiceProvider):
         Returns
         -------
         None
-            Bind ILocalizationManager to LocalizationManager as a singleton.
+            No return value.
         """
         self.app.singleton(ILocalizationManager, LocalizationManager)
 
@@ -44,7 +45,7 @@ class LocalizationProvider(ServiceProvider):
         Returns
         -------
         None
-            Bind the shared translator and pin the Lang facade.
+            No return value.
         """
         # Build the translator once from the application configuration.
         manager: ILocalizationManager = await self.app.make(ILocalizationManager)

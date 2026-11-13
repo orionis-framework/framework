@@ -1,10 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from enum import Enum
 from orionis.console.enums.states import ScheduleStates
 from orionis.test import TestCase
 
-class TestScheduleStates(TestCase):
 
+class TestScheduleStates(TestCase):
     # ------------------------------------------------------------------ #
     #  Type & membership                                                 #
     # ------------------------------------------------------------------ #

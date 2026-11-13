@@ -1,7 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema strict small int behavior."""
+
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.orm.schema.types.strict_small_int import StrictSmallInt
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestStrictSmallIntOptions(TestCase):
     """Verify StrictSmallInt constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestStrictSmallIntOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = StrictSmallInt()
         assert_column_options(

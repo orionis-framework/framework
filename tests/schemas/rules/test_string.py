@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import socket
 from unittest.mock import patch
 from orionis.schemas.rules.accepted import Accepted
@@ -26,8 +29,8 @@ _UUID_V1 = "c232ab00-9414-11ec-b3c8-9f6bdeced846"
 _UUID_NIL = "00000000-0000-0000-0000-000000000000"
 _ULID = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
 
-class TestAccepted(TestCase):
 
+class TestAccepted(TestCase):
     async def testAcceptsTruthyStrings(self) -> None:
         """Return True for every textual representation of an acceptance.
 
@@ -37,7 +40,7 @@ class TestAccepted(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Accepted()
         for value in ("yes", "on", "1", "true", "YES", "True"):
@@ -51,7 +54,7 @@ class TestAccepted(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Accepted()
         self.assertTrue(await rule.enforce("terms", True, _OWNER))
@@ -65,7 +68,7 @@ class TestAccepted(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Accepted()
         for value in (False, 0, 2, "no", "off", "", None, [], object()):
@@ -80,14 +83,15 @@ class TestAccepted(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = await Accepted().validate("terms", "no", _OWNER)
         self.assertIsNotNone(failure)
         self.assertEqual(failure.rule, "accepted")
+        self.assertEqual(failure.message, "Value must be accepted.")
+
 
 class TestActiveUrl(TestCase):
-
     async def testResolvableHostnamePasses(self) -> None:
         """Return True when the hostname resolves through the system resolver.
 
@@ -96,7 +100,7 @@ class TestActiveUrl(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = ActiveUrl()
         target = "orionis.schemas.rules.active_url.socket.getaddrinfo"
@@ -111,7 +115,7 @@ class TestActiveUrl(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = ActiveUrl()
         target = "orionis.schemas.rules.active_url.socket.getaddrinfo"
@@ -127,7 +131,7 @@ class TestActiveUrl(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = ActiveUrl()
         self.assertFalse(await rule.enforce("url", "/relative/path", _OWNER))
@@ -141,7 +145,7 @@ class TestActiveUrl(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = ActiveUrl()
         self.assertFalse(await rule.enforce("url", "http://[oops", _OWNER))
@@ -154,12 +158,12 @@ class TestActiveUrl(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await ActiveUrl().enforce("url", 123, _OWNER))
 
-class TestAlpha(TestCase):
 
+class TestAlpha(TestCase):
     async def testUnicodeLettersPass(self) -> None:
         """Return True for Unicode letters and combining marks.
 
@@ -169,7 +173,7 @@ class TestAlpha(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Alpha()
         self.assertTrue(await rule.enforce("name", "José", _OWNER))
@@ -183,7 +187,7 @@ class TestAlpha(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Alpha()
         for value in ("abc1", "ab c", "ab-c", ""):
@@ -198,7 +202,7 @@ class TestAlpha(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Alpha(ascii_only=True)
         self.assertTrue(await rule.enforce("name", "Jose", _OWNER))
@@ -212,12 +216,12 @@ class TestAlpha(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Alpha().enforce("name", 10, _OWNER))
 
-class TestAscii(TestCase):
 
+class TestAscii(TestCase):
     async def testSevenBitContentPasses(self) -> None:
         """Return True for content limited to the 7-bit ASCII range.
 
@@ -226,19 +230,19 @@ class TestAscii(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Ascii().enforce("tag", "abc-123_!", _OWNER))
 
     async def testNonAsciiContentFails(self) -> None:
         """Return False when the value carries characters beyond ASCII.
 
-        Validates that accented and emoji content is rejected.
+        Validates that accented letters and currency symbols are rejected.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Ascii()
         self.assertFalse(await rule.enforce("tag", "ñandú", _OWNER))
@@ -252,12 +256,12 @@ class TestAscii(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Ascii().enforce("tag", None, _OWNER))
 
-class TestEndsWith(TestCase):
 
+class TestEndsWith(TestCase):
     async def testMatchingSuffixPasses(self) -> None:
         """Return True when the value ends with one of the suffixes.
 
@@ -266,7 +270,7 @@ class TestEndsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = EndsWith(".png", ".jpg")
         self.assertTrue(await rule.enforce("file", "photo.png", _OWNER))
@@ -280,7 +284,7 @@ class TestEndsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await EndsWith(".png").enforce("file", "photo.gif", _OWNER))
 
@@ -292,7 +296,7 @@ class TestEndsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await EndsWith(".png").enforce("file", "photo.PNG", _OWNER))
 
@@ -304,7 +308,7 @@ class TestEndsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await EndsWith(".png").enforce("file", 5, _OWNER))
 
@@ -317,13 +321,13 @@ class TestEndsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             EndsWith()
 
-class TestDoesntEndWith(TestCase):
 
+class TestDoesntEndWith(TestCase):
     async def testForbiddenSuffixFails(self) -> None:
         """Return False when the value ends with a forbidden suffix.
 
@@ -332,7 +336,7 @@ class TestDoesntEndWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DoesntEndWith(".exe", ".bat")
         self.assertFalse(await rule.enforce("file", "setup.exe", _OWNER))
@@ -346,7 +350,7 @@ class TestDoesntEndWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await DoesntEndWith(".exe").enforce("file", "a.txt", _OWNER))
 
@@ -358,7 +362,7 @@ class TestDoesntEndWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await DoesntEndWith(".exe").enforce("file", None, _OWNER))
 
@@ -370,13 +374,13 @@ class TestDoesntEndWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             DoesntEndWith()
 
-class TestStartsWith(TestCase):
 
+class TestStartsWith(TestCase):
     async def testMatchingPrefixPasses(self) -> None:
         """Return True when the value starts with one of the prefixes.
 
@@ -385,7 +389,7 @@ class TestStartsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = StartsWith("https://", "http://")
         self.assertTrue(await rule.enforce("url", "https://a.test", _OWNER))
@@ -399,7 +403,7 @@ class TestStartsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await StartsWith("https://").enforce("url", "ftp://a", _OWNER))
 
@@ -411,7 +415,7 @@ class TestStartsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await StartsWith("a").enforce("url", 1, _OWNER))
 
@@ -423,13 +427,13 @@ class TestStartsWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             StartsWith()
 
-class TestDoesntStartWith(TestCase):
 
+class TestDoesntStartWith(TestCase):
     async def testForbiddenPrefixFails(self) -> None:
         """Return False when the value starts with a forbidden prefix.
 
@@ -438,7 +442,7 @@ class TestDoesntStartWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DoesntStartWith("tmp_", "draft_")
         self.assertFalse(await rule.enforce("name", "tmp_report", _OWNER))
@@ -452,7 +456,7 @@ class TestDoesntStartWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await DoesntStartWith("tmp_").enforce("name", "report", _OWNER))
 
@@ -464,7 +468,7 @@ class TestDoesntStartWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await DoesntStartWith("tmp_").enforce("name", 0, _OWNER))
 
@@ -476,13 +480,13 @@ class TestDoesntStartWith(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             DoesntStartWith()
 
-class TestIpAddress(TestCase):
 
+class TestIpAddress(TestCase):
     async def testDefaultsToVersionFour(self) -> None:
         """Return True only for IPv4 literals under the default configuration.
 
@@ -491,7 +495,7 @@ class TestIpAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = IpAddress()
         self.assertTrue(await rule.enforce("ip", "192.168.0.1", _OWNER))
@@ -505,7 +509,7 @@ class TestIpAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = IpAddress(6)
         self.assertTrue(await rule.enforce("ip", "2001:db8::1", _OWNER))
@@ -519,7 +523,7 @@ class TestIpAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = IpAddress(None)
         self.assertTrue(await rule.enforce("ip", "10.0.0.1", _OWNER))
@@ -533,7 +537,7 @@ class TestIpAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = IpAddress()
         self.assertFalse(await rule.enforce("ip", "999.1.1.1", _OWNER))
@@ -547,7 +551,7 @@ class TestIpAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             IpAddress(5)
@@ -560,12 +564,12 @@ class TestIpAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await IpAddress().enforce("ip", None, _OWNER))
 
-class TestJson(TestCase):
 
+class TestJson(TestCase):
     async def testValidDocumentsPass(self) -> None:
         """Return True for objects, arrays and scalars encoded as JSON.
 
@@ -574,7 +578,7 @@ class TestJson(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Json()
         for value in ('{"a": 1}', "[1, 2]", "123", '"text"', "null"):
@@ -588,7 +592,7 @@ class TestJson(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Json()
         for value in ("{", "{'a': 1}", "", "undefined"):
@@ -602,12 +606,12 @@ class TestJson(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Json().enforce("payload", {"a": 1}, _OWNER))
 
-class TestLowercase(TestCase):
 
+class TestLowercase(TestCase):
     async def testLowercaseContentPasses(self) -> None:
         """Return True when the value carries no uppercase character.
 
@@ -616,7 +620,7 @@ class TestLowercase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Lowercase()
         self.assertTrue(await rule.enforce("tag", "abc-123", _OWNER))
@@ -631,7 +635,7 @@ class TestLowercase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await Lowercase().enforce("tag", "Abc", _OWNER))
 
@@ -643,12 +647,12 @@ class TestLowercase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Lowercase().enforce("tag", 1, _OWNER))
 
-class TestUppercase(TestCase):
 
+class TestUppercase(TestCase):
     async def testUppercaseContentPasses(self) -> None:
         """Return True when the value carries no lowercase character.
 
@@ -657,7 +661,7 @@ class TestUppercase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Uppercase()
         self.assertTrue(await rule.enforce("code", "ABC-123", _OWNER))
@@ -671,7 +675,7 @@ class TestUppercase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await Uppercase().enforce("code", "ABc", _OWNER))
 
@@ -683,12 +687,12 @@ class TestUppercase(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Uppercase().enforce("code", 1, _OWNER))
 
-class TestMacAddress(TestCase):
 
+class TestMacAddress(TestCase):
     async def testEveryNotationPasses(self) -> None:
         """Return True for the colon, hyphen and dotted notations.
 
@@ -697,7 +701,7 @@ class TestMacAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = MacAddress()
         for value in ("00:1B:44:11:3A:B7", "00-1b-44-11-3a-b7", "001b.4411.3ab7"):
@@ -711,7 +715,7 @@ class TestMacAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = MacAddress()
         for value in ("00:1B:44:11:3A", "zz:1B:44:11:3A:B7", "001b44113ab7", ""):
@@ -725,12 +729,12 @@ class TestMacAddress(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await MacAddress().enforce("mac", None, _OWNER))
 
-class TestUuid(TestCase):
 
+class TestUuid(TestCase):
     async def testAnyVersionPassesByDefault(self) -> None:
         """Return True for every canonical identifier when no version is set.
 
@@ -739,7 +743,7 @@ class TestUuid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Uuid()
         for value in (_UUID_V4, _UUID_V1, _UUID_NIL):
@@ -753,7 +757,7 @@ class TestUuid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Uuid(4).enforce("ident", _UUID_V4, _OWNER))
         self.assertFalse(await Uuid(1).enforce("ident", _UUID_V4, _OWNER))
@@ -767,7 +771,7 @@ class TestUuid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await Uuid(4).enforce("ident", _UUID_NIL, _OWNER))
 
@@ -779,7 +783,7 @@ class TestUuid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Uuid()
         for value in ("not-a-uuid", _UUID_V4.replace("-", ""), ""):
@@ -793,7 +797,7 @@ class TestUuid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Uuid(2)
@@ -806,12 +810,12 @@ class TestUuid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Uuid().enforce("ident", None, _OWNER))
 
-class TestUlid(TestCase):
 
+class TestUlid(TestCase):
     async def testCanonicalIdentifierPasses(self) -> None:
         """Return True for a canonical identifier in either casing.
 
@@ -820,7 +824,7 @@ class TestUlid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Ulid()
         self.assertTrue(await rule.enforce("sortable", _ULID, _OWNER))
@@ -834,7 +838,7 @@ class TestUlid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Ulid()
         self.assertFalse(await rule.enforce("sortable", _ULID[:-1], _OWNER))
@@ -848,9 +852,13 @@ class TestUlid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertFalse(await Ulid().enforce("sortable", "I" + _ULID[1:], _OWNER))
+        rule = Ulid()
+        for character in "IiLlOoUu":
+            with self.subTest(character=character):
+                value = _ULID[0] + character + _ULID[2:]
+                self.assertFalse(await rule.enforce("sortable", value, _OWNER))
 
     async def testTimestampOverflowFails(self) -> None:
         """Return False when the leading character overflows the timestamp.
@@ -860,7 +868,7 @@ class TestUlid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await Ulid().enforce("sortable", "8" + _ULID[1:], _OWNER))
 
@@ -872,6 +880,6 @@ class TestUlid(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Ulid().enforce("sortable", None, _OWNER))

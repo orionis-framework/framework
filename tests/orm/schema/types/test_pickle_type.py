@@ -1,7 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema pickle type behavior."""
+
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.orm.schema.types.pickle_type import PickleType
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestPickleTypeOptions(TestCase):
     """Verify PickleType constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestPickleTypeOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         marker = object()
         default = PickleType()

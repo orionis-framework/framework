@@ -1056,7 +1056,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AccessTokenRepository</span>(IAccessTokenRepository): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L36" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.__init__">AccessTokenRepository(app, db)</a></code></p><p><a href="classIndex.html#orionis.auth.tokens.AccessTokenRepository">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AccessTokenRepository</span>(IAccessTokenRepository): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L39" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.tokens.AccessTokenRepository.__init__">AccessTokenRepository(app, db)</a></code></p><p><a href="classIndex.html#orionis.auth.tokens.AccessTokenRepository">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1170,7 +1170,7 @@ concurrent timestamps are last-writer-wins. Purging uses two deletes.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_fromRow</span><span class="function-signature">(<span class="rst-sig-param">row: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code>AccessToken | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L249">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L250">
       
       (source)
     </a>
@@ -1197,7 +1197,7 @@ concurrent timestamps are last-writer-wins. Purging uses two deletes.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">db: <code>IQueryBuilder</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L59">
       
       (source)
     </a>
@@ -1209,7 +1209,7 @@ concurrent timestamps are last-writer-wins. Purging uses two deletes.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialise the repository from the token configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application exposing the <tt class="rst-docutils rst-literal">auth.tokens</tt> configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">db:</span><code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder</a></code></td><td class="fieldArgDesc">Gateway used to build queries over the token table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Only configuration values and the gateway are retained.</td></tr></table></div>
+    <div><p>Initialise the repository from the token configuration.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application exposing the <tt class="rst-docutils rst-literal">auth.tokens</tt> configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">db:</span><code><a href="orionis.orm.contracts.query_builder.IQueryBuilder.html" class="internal-link">orionis.orm.contracts.query_builder.IQueryBuilder</a></code></td><td class="fieldArgDesc">Gateway used to build queries over the token table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1224,7 +1224,7 @@ concurrent timestamps are last-writer-wins. Purging uses two deletes.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">create</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">tokenable: <code>IAuthorizable</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">abilities: <code>Iterable[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">expires_at: <code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>NewAccessToken</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L86">
       
       (source)
     </a>
@@ -1252,7 +1252,7 @@ authorization of the identity.</td></tr><tr><td class="fieldArgContainer"><span 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">findByPlainText</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">plain_text: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>AccessToken | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L178">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L179">
       
       (source)
     </a>
@@ -1280,7 +1280,7 @@ been revoked or has already expired.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">findWithIdentity</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">plain_text: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">identities: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L210">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L211">
       
       (source)
     </a>
@@ -1307,7 +1307,7 @@ been revoked or has already expired.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">purgeExpired</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L366">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L367">
       
       (source)
     </a>
@@ -1334,7 +1334,7 @@ been revoked or has already expired.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">revoke</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">token_id: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L316">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L317">
       
       (source)
     </a>
@@ -1361,7 +1361,7 @@ been revoked or has already expired.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">revokeAll</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">tokenable: <code>IAuthorizable</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L342">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L343">
       
       (source)
     </a>
@@ -1388,7 +1388,7 @@ been revoked or has already expired.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">touch</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">token_id: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L289">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L290">
       
       (source)
     </a>
@@ -1415,7 +1415,7 @@ is the final validity check before a guard publishes identity.</td></tr></table>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L55">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L56">
       
       (source)
     </a>
@@ -1442,7 +1442,7 @@ is the final validity check before a guard publishes identity.</td></tr></table>
   <div class="functionHeader">
     
     <span class="py-defname">__db</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L74">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L75">
       
       (source)
     </a>
@@ -1469,7 +1469,7 @@ is the final validity check before a guard publishes identity.</td></tr></table>
   <div class="functionHeader">
     
     <span class="py-defname">__expiration</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L79">
       
       (source)
     </a>
@@ -1496,7 +1496,7 @@ is the final validity check before a guard publishes identity.</td></tr></table>
   <div class="functionHeader">
     
     <span class="py-defname">__secret_bytes</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L80">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L81">
       
       (source)
     </a>
@@ -1523,7 +1523,7 @@ is the final validity check before a guard publishes identity.</td></tr></table>
   <div class="functionHeader">
     
     <span class="py-defname">__table</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/tokens/repository.py#L76">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/tokens/repository.py#L77">
       
       (source)
     </a>
@@ -1549,7 +1549,7 @@ is the final validity check before a guard publishes identity.</td></tr></table>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

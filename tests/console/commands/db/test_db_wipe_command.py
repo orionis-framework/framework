@@ -1,3 +1,6 @@
+# ruff: noqa: PLR0913, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import argparse
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -7,6 +10,7 @@ from orionis.console.commands.db._inspection import DatabaseInspector
 from orionis.console.commands.db.wipe import DatabaseWiper, DbWipeCommand
 from orionis.database.connection_manager import ConnectionManager
 from orionis.test import TestCase
+
 
 class _ConfigApp:
     """Provide only the connection configuration needed by the manager."""
@@ -44,6 +48,7 @@ class _ConfigApp:
             raise ValueError(error_msg)
         return {"default": "primary", "connections": self._connections}
 
+
 class _Transaction:
     """Keep a fake connection's statements inside one apparent transaction."""
 
@@ -69,6 +74,7 @@ class _Transaction:
         None
             Finish the simulated transaction context.
         """
+
 
 class _UnresolvedManager:
     """Reject connection resolution before a wipe is confirmed."""
@@ -101,6 +107,7 @@ class _UnresolvedManager:
         message = "Database connection resolved before confirmation."
         raise AssertionError(message)
 
+
 class TestDbWipeCommand(TestCase):
     """Exercise the command against isolated SQLite files."""
 
@@ -115,15 +122,17 @@ class TestDbWipeCommand(TestCase):
         self._temporary = TemporaryDirectory()
         root = Path(self._temporary.name)
         self.manager = ConnectionManager(
-            _ConfigApp({
-                name: {
-                    "driver": "sqlite",
-                    "database": str(root / f"{name}.sqlite"),
-                    "prefix": "",
-                    "foreign_key_constraints": True,
-                }
-                for name in ("primary", "archive")
-            }),
+            _ConfigApp(
+                {
+                    name: {
+                        "driver": "sqlite",
+                        "database": str(root / f"{name}.sqlite"),
+                        "prefix": "",
+                        "foreign_key_constraints": True,
+                    }
+                    for name in ("primary", "archive")
+                },
+            ),
         )
 
     async def asyncTearDown(self) -> None:
@@ -268,6 +277,7 @@ class TestDbWipeCommand(TestCase):
         self.assertEqual(parsed.database, "archive")
         self.assertTrue(parsed.force)
 
+
 class TestDatabaseWiperDialects(TestCase):
     """Check generated DDL where server database drivers are unavailable."""
 
@@ -296,7 +306,7 @@ class TestDatabaseWiperDialects(TestCase):
             )
 
     @staticmethod
-    def _inspector(  # noqa: PLR0913
+    def _inspector(
         driver: str,
         *,
         tables: list[str] | None = None,
@@ -339,7 +349,9 @@ class TestDatabaseWiperDialects(TestCase):
             driver=driver,
             connection=connection,
             quoteIdentifier=lambda name, **kwargs: quote(
-                SimpleNamespace(driver=driver), name, **kwargs,
+                SimpleNamespace(driver=driver),
+                name,
+                **kwargs,
             ),
             listTables=AsyncMock(return_value=tables or []),
             listViews=AsyncMock(return_value=views or []),
@@ -367,13 +379,16 @@ class TestDatabaseWiperDialects(TestCase):
         result = await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
         self.assertEqual((result.tables, result.views, result.types), (1, 2, 2))
-        self.assertEqual(sql, [
-            'DROP MATERIALIZED VIEW IF EXISTS "app"."user_counts" CASCADE',
-            'DROP VIEW IF EXISTS "app"."active_users" CASCADE',
-            'DROP TABLE IF EXISTS "app"."users" CASCADE',
-            'DROP DOMAIN IF EXISTS "app"."email_address" CASCADE',
-            'DROP TYPE IF EXISTS "app"."user_state" CASCADE',
-        ])
+        self.assertEqual(
+            sql,
+            [
+                'DROP MATERIALIZED VIEW IF EXISTS "app"."user_counts" CASCADE',
+                'DROP VIEW IF EXISTS "app"."active_users" CASCADE',
+                'DROP TABLE IF EXISTS "app"."users" CASCADE',
+                'DROP DOMAIN IF EXISTS "app"."email_address" CASCADE',
+                'DROP TYPE IF EXISTS "app"."user_state" CASCADE',
+            ],
+        )
 
     async def testMySqlRestoresForeignKeyChecksAfterFailure(self) -> None:
         """Restore session checks even when a drop statement fails.
@@ -384,7 +399,9 @@ class TestDatabaseWiperDialects(TestCase):
             Verify foreign-key checks are re-enabled after a failed drop.
         """
         inspector = self._inspector(
-            "mysql", tables=["orders"], metadata=[{"enabled": 1}],
+            "mysql",
+            tables=["orders"],
+            metadata=[{"enabled": 1}],
         )
 
         async def statement(sql: str) -> bool:
@@ -414,11 +431,14 @@ class TestDatabaseWiperDialects(TestCase):
         with self.assertRaisesRegex(RuntimeError, "simulated drop failure"):
             await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
-        self.assertEqual(sql, [
-            "SET FOREIGN_KEY_CHECKS = 0",
-            "DROP TABLE IF EXISTS `orders`",
-            "SET FOREIGN_KEY_CHECKS = 1",
-        ])
+        self.assertEqual(
+            sql,
+            [
+                "SET FOREIGN_KEY_CHECKS = 0",
+                "DROP TABLE IF EXISTS `orders`",
+                "SET FOREIGN_KEY_CHECKS = 1",
+            ],
+        )
 
     async def testMySqlPreservesInitiallyDisabledForeignKeyChecks(self) -> None:
         """Preserve the session's initially disabled foreign-key setting.
@@ -429,7 +449,9 @@ class TestDatabaseWiperDialects(TestCase):
             Verify the wiper restores the setting observed before execution.
         """
         inspector = self._inspector(
-            "mysql", tables=["orders"], metadata=[{"enabled": 0}],
+            "mysql",
+            tables=["orders"],
+            metadata=[{"enabled": 0}],
         )
         await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
@@ -447,10 +469,12 @@ class TestDatabaseWiperDialects(TestCase):
         manager = Mock()
         manager.configFor.return_value = {"driver": "pgsql"}
         connection = Mock()
-        connection.select = AsyncMock(side_effect=[
-            [{"name": "app.custom_base"}],
-            [{"name": "app.email_address"}],
-        ])
+        connection.select = AsyncMock(
+            side_effect=[
+                [{"name": "app.custom_base"}],
+                [{"name": "app.email_address"}],
+            ],
+        )
         manager.connection.return_value = connection
         inspector = DatabaseInspector(manager, "reports")
 
@@ -495,29 +519,36 @@ class TestDatabaseWiperDialects(TestCase):
             if "sys.table_types" in sql:
                 return []
             if "sys.sql_expression_dependencies" in sql:
-                return [{
-                    "schema_name": "dbo",
-                    "view_name": "dependent_view",
-                    "referenced_schema": "dbo",
-                    "referenced_view": "base_view",
-                }]
+                return [
+                    {
+                        "schema_name": "dbo",
+                        "view_name": "dependent_view",
+                        "referenced_schema": "dbo",
+                        "referenced_view": "base_view",
+                    },
+                ]
             if "temporal_type" in sql:
                 return [{"schema_name": "dbo", "table_name": "parent"}]
-            return [{
-                "schema_name": "dbo",
-                "table_name": "child",
-                "constraint_name": "fk.child",
-            }]
+            return [
+                {
+                    "schema_name": "dbo",
+                    "table_name": "child",
+                    "constraint_name": "fk.child",
+                },
+            ]
 
         inspector.connection.select.side_effect = select
         await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
-        self.assertEqual(sql[:4], [
-            "DROP VIEW IF EXISTS [dbo].[dependent_view]",
-            "DROP VIEW IF EXISTS [dbo].[base_view]",
-            "ALTER TABLE [dbo].[parent] SET (SYSTEM_VERSIONING = OFF)",
-            "ALTER TABLE [dbo].[child] DROP CONSTRAINT [fk.child]",
-        ])
+        self.assertEqual(
+            sql[:4],
+            [
+                "DROP VIEW IF EXISTS [dbo].[dependent_view]",
+                "DROP VIEW IF EXISTS [dbo].[base_view]",
+                "ALTER TABLE [dbo].[parent] SET (SYSTEM_VERSIONING = OFF)",
+                "ALTER TABLE [dbo].[child] DROP CONSTRAINT [fk.child]",
+            ],
+        )
         self.assertIn("DROP TABLE IF EXISTS [dbo].[parent]", sql)
         self.assertEqual(sql[-1], "DROP TYPE IF EXISTS [dbo].[custom_type]")
 
@@ -530,7 +561,8 @@ class TestDatabaseWiperDialects(TestCase):
             Verify dependent SQL Server types are dropped before their aliases.
         """
         inspector = self._inspector(
-            "sqlserver", types=["dbo.alias_type", "dbo.row_type"],
+            "sqlserver",
+            types=["dbo.alias_type", "dbo.row_type"],
         )
 
         async def select(sql: str) -> list[dict[str, str]]:
@@ -547,19 +579,26 @@ class TestDatabaseWiperDialects(TestCase):
                 Type dependency rows, or an empty list for other queries.
             """
             if "sys.table_types" in sql:
-                return [{
-                    "dependent_schema": "dbo", "dependent_type": "row_type",
-                    "referenced_schema": "dbo", "referenced_type": "alias_type",
-                }]
+                return [
+                    {
+                        "dependent_schema": "dbo",
+                        "dependent_type": "row_type",
+                        "referenced_schema": "dbo",
+                        "referenced_type": "alias_type",
+                    },
+                ]
             return []
 
         inspector.connection.select.side_effect = select
         await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
-        self.assertEqual(sql, [
-            "DROP TYPE IF EXISTS [dbo].[row_type]",
-            "DROP TYPE IF EXISTS [dbo].[alias_type]",
-        ])
+        self.assertEqual(
+            sql,
+            [
+                "DROP TYPE IF EXISTS [dbo].[row_type]",
+                "DROP TYPE IF EXISTS [dbo].[alias_type]",
+            ],
+        )
 
     async def testSqlServerRejectsAmbiguousQualifiedNameBeforeDdl(self) -> None:
         """Reject dotted object names that could identify another database.
@@ -583,15 +622,21 @@ class TestDatabaseWiperDialects(TestCase):
             Verify views, tables, and types are dropped with Oracle syntax.
         """
         inspector = self._inspector(
-            "oracle", tables=["ORDERS"], views=["ORDER_VIEW"], types=["ORDER_KIND"],
+            "oracle",
+            tables=["ORDERS"],
+            views=["ORDER_VIEW"],
+            types=["ORDER_KIND"],
         )
         await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
-        self.assertEqual(sql, [
-            'DROP VIEW "ORDER_VIEW"',
-            'DROP TABLE "ORDERS" CASCADE CONSTRAINTS PURGE',
-            'DROP TYPE "ORDER_KIND"',
-        ])
+        self.assertEqual(
+            sql,
+            [
+                'DROP VIEW "ORDER_VIEW"',
+                'DROP TABLE "ORDERS" CASCADE CONSTRAINTS PURGE',
+                'DROP TYPE "ORDER_KIND"',
+            ],
+        )
 
     async def testOracleDropsDependentTypesFirst(self) -> None:
         """Order dependent Oracle types before their referenced types.
@@ -602,18 +647,27 @@ class TestDatabaseWiperDialects(TestCase):
             Verify referenced types remain until dependent types are dropped.
         """
         inspector = self._inspector(
-            "oracle", types=["PARENT_KIND", "CHILD_KIND"],
-            metadata=[{
-                "owner": "APP", "name": "CHILD_KIND", "object_type": "TYPE",
-                "referenced_owner": "APP", "referenced_name": "PARENT_KIND",
-            }],
+            "oracle",
+            types=["PARENT_KIND", "CHILD_KIND"],
+            metadata=[
+                {
+                    "owner": "APP",
+                    "name": "CHILD_KIND",
+                    "object_type": "TYPE",
+                    "referenced_owner": "APP",
+                    "referenced_name": "PARENT_KIND",
+                },
+            ],
         )
         await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
-        self.assertEqual(sql, [
-            'DROP TYPE "CHILD_KIND"',
-            'DROP TYPE "PARENT_KIND"',
-        ])
+        self.assertEqual(
+            sql,
+            [
+                'DROP TYPE "CHILD_KIND"',
+                'DROP TYPE "PARENT_KIND"',
+            ],
+        )
 
     async def testOracleDropsMaterializedViewAndItsPrebuiltTable(self) -> None:
         """Discover a prebuilt table exposed after dropping its materialized view.
@@ -624,15 +678,19 @@ class TestDatabaseWiperDialects(TestCase):
             Verify the newly exposed table is also removed.
         """
         inspector = self._inspector(
-            "oracle", materialized_views=["ORDER_CACHE"],
+            "oracle",
+            materialized_views=["ORDER_CACHE"],
         )
         inspector.listTables.side_effect = [[], ["ORDER_CACHE"]]
         result = await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
-        self.assertEqual(sql, [
-            'DROP MATERIALIZED VIEW "ORDER_CACHE"',
-            'DROP TABLE "ORDER_CACHE" CASCADE CONSTRAINTS PURGE',
-        ])
+        self.assertEqual(
+            sql,
+            [
+                'DROP MATERIALIZED VIEW "ORDER_CACHE"',
+                'DROP TABLE "ORDER_CACHE" CASCADE CONSTRAINTS PURGE',
+            ],
+        )
         self.assertEqual((result.tables, result.views), (1, 1))
 
     async def testOracleRejectsOutOfScopeTypeDependentsBeforeDropping(self) -> None:
@@ -644,11 +702,18 @@ class TestDatabaseWiperDialects(TestCase):
             Verify out-of-scope dependencies prevent all drop statements.
         """
         inspector = self._inspector(
-            "oracle", tables=["OWN_TABLE"], types=["OWN_KIND"],
-            metadata=[{
-                "owner": "OTHER", "name": "FOREIGN_TABLE", "object_type": "TABLE",
-                "referenced_owner": "APP", "referenced_name": "OWN_KIND",
-            }],
+            "oracle",
+            tables=["OWN_TABLE"],
+            types=["OWN_KIND"],
+            metadata=[
+                {
+                    "owner": "OTHER",
+                    "name": "FOREIGN_TABLE",
+                    "object_type": "TABLE",
+                    "referenced_owner": "APP",
+                    "referenced_name": "OWN_KIND",
+                },
+            ],
         )
         with self.assertRaisesRegex(RuntimeError, "outside the wipe scope"):
             await DatabaseWiper(inspector).wipe()
@@ -663,17 +728,22 @@ class TestDatabaseWiperDialects(TestCase):
             Qualified objects are quoted and materialized views are removed first.
         """
         inspector = self._inspector(
-            "redshift", tables=["analytics.events"], views=["analytics.active"],
+            "redshift",
+            tables=["analytics.events"],
+            views=["analytics.active"],
             materialized_views=["analytics.summary"],
         )
         result = await DatabaseWiper(inspector).wipe()
         sql = [call.args[0] for call in inspector.connection.statement.await_args_list]
         self.assertEqual((result.tables, result.views, result.types), (1, 2, 0))
-        self.assertEqual(sql, [
-            'DROP MATERIALIZED VIEW IF EXISTS "analytics"."summary" CASCADE',
-            'DROP VIEW IF EXISTS "analytics"."active" CASCADE',
-            'DROP TABLE IF EXISTS "analytics"."events" CASCADE',
-        ])
+        self.assertEqual(
+            sql,
+            [
+                'DROP MATERIALIZED VIEW IF EXISTS "analytics"."summary" CASCADE',
+                'DROP VIEW IF EXISTS "analytics"."active" CASCADE',
+                'DROP TABLE IF EXISTS "analytics"."events" CASCADE',
+            ],
+        )
         inspector.connection.transaction.assert_called_once()
 
     async def testRedshiftWipeRejectsAmbiguousNamesBeforeDdl(self) -> None:

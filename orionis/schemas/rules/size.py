@@ -1,7 +1,10 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value has an exact size."""
 
 from orionis.schemas.rules.measure import measure
 from orionis.schemas.rule import Rule
+
 
 class Size(Rule):
     """
@@ -10,8 +13,6 @@ class Size(Rule):
     Numbers are compared by magnitude, strings and collections by length,
     and uploaded files by their size in kilobytes.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_size",)
     """Declare the instance attribute slots reserved by this class."""
@@ -35,7 +36,7 @@ class Size(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------
@@ -45,8 +46,7 @@ class Size(Rule):
         super().__init__(message=message)
         if size < 0:
             error_msg = (
-                f"Invalid 'Size' value: {size!r}. The size must be "
-                "non-negative (>= 0)."
+                f"Invalid 'Size' value: {size!r}. The size must be non-negative (>= 0)."
             )
             raise ValueError(error_msg)
         self._size: float = size

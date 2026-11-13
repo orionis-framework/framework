@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Validate the account details required for user registration."""
 
 from orionis.schemas import Schema
@@ -11,9 +13,8 @@ from orionis.schemas.constraints import (
 from orionis.schemas.fields import Field
 from orionis.schemas.metadata import Message
 
-class RegisterSchema(Schema):
 
-    # ruff: noqa: TC001
+class RegisterSchema(Schema):
     """Validate the account details required for user registration."""
 
     name: Field[

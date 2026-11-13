@@ -5,6 +5,7 @@ from datetime import datetime, time, timedelta
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.support.facades.datetime import DateTime
 
+
 class WeeklySuffixResolver(SuffixResolver):
     """Resolve log suffixes for weekly rotation windows."""
 
@@ -58,20 +59,20 @@ class WeeklySuffixResolver(SuffixResolver):
         Parameters
         ----------
         current_time : datetime.datetime
-            The current datetime.
+            The current instant. Naive values use the resolver timezone.
 
         Returns
         -------
         datetime.datetime
             The datetime when the next rotation should occur.
         """
-        # Calculate days since last Monday (0 = Monday)
-        days_since_monday = current_time.weekday()
-        # Find the date for the next Monday
-        next_monday = current_time.date() + timedelta(days=7 - days_since_monday)
-        # Combine with the specified rotation time
-        next_rotation = datetime.combine(next_monday, self.at_time, tzinfo=self.tz)
-        # If the calculated rotation time is not in the future, add 7 days
-        if next_rotation <= current_time:
+        local_time = (
+            current_time.replace(tzinfo=self.tz)
+            if current_time.tzinfo is None
+            else current_time.astimezone(self.tz)
+        )
+        monday = local_time.date() - timedelta(days=local_time.weekday())
+        next_rotation = datetime.combine(monday, self.at_time, tzinfo=self.tz)
+        if next_rotation <= local_time:
             next_rotation += timedelta(days=7)
         return next_rotation

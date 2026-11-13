@@ -1,10 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.base.contracts.command import IBaseCommand
 from orionis.test import TestCase
 
-class TestIBaseCommand(TestCase):
 
+class TestIBaseCommand(TestCase):
     def testIsAbstractClass(self) -> None:
         """
         Verify that IBaseCommand is an abstract class.

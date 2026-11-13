@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.console import scheduler_provider as provider_module
 from orionis.console.contracts.schedule import ISchedule
@@ -10,6 +12,7 @@ from orionis.container.providers.service_provider import ServiceProvider
 from orionis.foundation.core_providers import CORE_PROVIDERS
 from orionis.support.facades.schedule import Schedule as ScheduleFacade
 from orionis.test import TestCase
+
 
 class _StubApp:
     """Application double capturing every binding it receives."""
@@ -43,6 +46,7 @@ class _StubApp:
         """
         self.singletons.append((abstract, concrete))
 
+
 class _StubScheduleFacade:
     """Facade double counting how many times it was pinned."""
 
@@ -68,8 +72,8 @@ class _StubScheduleFacade:
         """
         self.pinned += 1
 
-class TestScheduleProviderDefinition(TestCase):
 
+class TestScheduleProviderDefinition(TestCase):
     def testInheritsTheServiceProviderBase(self) -> None:
         """Extend the base ServiceProvider class.
 
@@ -133,8 +137,8 @@ class TestScheduleProviderDefinition(TestCase):
         """
         self.assertTrue(inspect.iscoroutinefunction(ScheduleProvider.boot))
 
-class TestScheduleProviderRegister(TestCase):
 
+class TestScheduleProviderRegister(TestCase):
     def testBindsTheStoreBeforeTheScheduleContract(self) -> None:
         """Bind both contracts, the store first.
 
@@ -169,8 +173,8 @@ class TestScheduleProviderRegister(TestCase):
         """
         self.assertIs(ScheduleFacade.getFacadeAccessor(), ISchedule)
 
-class TestScheduleProviderBoot(TestCase):
 
+class TestScheduleProviderBoot(TestCase):
     def setUp(self) -> None:
         """Replace the Schedule facade with a double before each test.
 

@@ -1,10 +1,12 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 from app.models.user import User
 from orionis.auth.authorization.registrar import PermissionRegistrar
 from orionis.database.seeders.seeder import Seeder
 from orionis.support.facades import Hash
 
-class CreateAdminAuthorizationSeeder(Seeder):
 
+class CreateAdminAuthorizationSeeder(Seeder):
     __slots__ = ("__registrar",)
 
     def __init__(
@@ -34,10 +36,12 @@ class CreateAdminAuthorizationSeeder(Seeder):
         await self.__registrar.createPermission("full_access")
         await self.__registrar.grantToRole("admin", "full_access")
 
-        administrator = await User.create({
-            "name": "Orionis Admin",
-            "email": "admin@example.com",
-            "active": True,
-            "password": await Hash.make("Orionis123*+"),
-        })
+        administrator = await User.create(
+            {
+                "name": "Orionis Admin",
+                "email": "admin@example.com",
+                "active": True,
+                "password": await Hash.make("Orionis123*+"),
+            },
+        )
         await self.__registrar.assignRole(administrator, "admin")

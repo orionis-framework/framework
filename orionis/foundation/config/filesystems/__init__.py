@@ -30,11 +30,15 @@ _EXPORTS = {
     "Azure": ("orionis.foundation.config.filesystems.entitites.azure", "Azure"),
     "DiskName": ("orionis.foundation.config.filesystems.enums.disk_name", "DiskName"),
     "Disks": ("orionis.foundation.config.filesystems.entitites.disks", "Disks"),
-    "Filesystems": ("orionis.foundation.config.filesystems.entitites.filesystems", "Filesystems"),
+    "Filesystems": (
+        "orionis.foundation.config.filesystems.entitites.filesystems",
+        "Filesystems",
+    ),
     "Local": ("orionis.foundation.config.filesystems.entitites.local", "Local"),
     "Public": ("orionis.foundation.config.filesystems.entitites.public", "Public"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -56,6 +60,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

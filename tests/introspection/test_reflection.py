@@ -1,13 +1,22 @@
+# ruff: noqa: B024, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# A nominal ABC with no abstract members is an intentional classification target.
+
 import abc
 import inspect
 import types
+import sys
 import typing
+
+if typing.TYPE_CHECKING:
+    from collections.abc import AsyncIterator, Iterator
 from orionis.introspection.reflection import Reflection
 from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 class _AbstractFixture(abc.ABC):
     """Abstract class fixture for isAbstract / isConcreteClass checks."""
@@ -19,8 +28,9 @@ class _AbstractFixture(abc.ABC):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
+
 
 class _ConcreteFixture:
     """Concrete user-defined class fixture."""
@@ -36,12 +46,14 @@ class _ConcreteFixture:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.value = value
 
-class _ABCDirectBase(abc.ABC):  # noqa: B024
+
+class _ABCDirectBase(abc.ABC):
     """Class that inherits directly from abc.ABC (used in isConcreteClass)."""
+
 
 class _ProtocolFixture(typing.Protocol):
     """Protocol fixture for isProtocol checks."""
@@ -56,10 +68,12 @@ class _ProtocolFixture(typing.Protocol):
         """
         ...
 
+
 class _SlottedFixture:
     """Class with __slots__ used to obtain a member descriptor."""
 
     __slots__ = ("slot_attr",)
+
 
 class _DescriptorFixture:
     """Class exposing a pure-Python property descriptor."""
@@ -76,32 +90,36 @@ class _DescriptorFixture:
         """
         return 0
 
+
 class _OriginFixture:
     """Class carrying a legacy __origin__ marker for isGeneric checks."""
 
     __origin__ = list
 
-def _sync_gen():
+
+def _sync_gen() -> Iterator[int]:
     """Yield integers as a synchronous generator fixture.
 
     Yields
     ------
-    object
-        Value produced by the helper.
+    int
+        The fixture value 1.
     """
     yield 1
 
-async def _async_gen():
+
+async def _async_gen() -> AsyncIterator[int]:
     """Yield integers as an asynchronous generator fixture.
 
     Yields
     ------
-    object
-        Value produced by the helper.
+    int
+        The fixture value 1.
     """
     yield 1
 
-async def _coroutine_fn() -> int: # NOSONAR
+
+async def _coroutine_fn() -> int:
     """Return 1 as an async coroutine fixture.
 
     Returns
@@ -110,6 +128,7 @@ async def _coroutine_fn() -> int: # NOSONAR
         Value produced by the helper.
     """
     return 1
+
 
 def _plain_fn() -> int:
     """Return 1 as a plain function fixture.
@@ -121,12 +140,13 @@ def _plain_fn() -> int:
     """
     return 1
 
+
 # ---------------------------------------------------------------------------
 # factory methods — instance, abstract, concrete, module, callable
 # ---------------------------------------------------------------------------
 
-class TestReflectionInstance(TestCase):
 
+class TestReflectionInstance(TestCase):
     def testInstanceReturnsWrappedObject(self) -> None:
         """
         Assert that instance() returns a reflection object for a class instance.
@@ -134,11 +154,11 @@ class TestReflectionInstance(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         obj = _ConcreteFixture(42)
         ri = Reflection.instance(obj)
-        self.assertIsNotNone(ri)
+        self.assertIs(ri.getInstance(), obj)
 
     def testInstanceRejectsBuiltinInstance(self) -> None:
         """
@@ -147,7 +167,7 @@ class TestReflectionInstance(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         # Built-in instances (str, list, int) are not user-defined objects
         for obj in ["hello", [1, 2], {"k": "v"}, 3.14]:
@@ -161,13 +181,13 @@ class TestReflectionInstance(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Reflection.instance(99)
 
-class TestReflectionAbstract(TestCase):
 
+class TestReflectionAbstract(TestCase):
     def testAbstractReturnsReflectionObject(self) -> None:
         """
         Assert that abstract() returns a reflection object for an ABC.
@@ -175,10 +195,10 @@ class TestReflectionAbstract(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ra = Reflection.abstract(_AbstractFixture)
-        self.assertIsNotNone(ra)
+        self.assertIs(ra.getClass(), _AbstractFixture)
 
     def testAbstractRaisesOnConcreteClass(self) -> None:
         """
@@ -187,13 +207,13 @@ class TestReflectionAbstract(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Reflection.abstract(_ConcreteFixture)
 
-class TestReflectionConcrete(TestCase):
 
+class TestReflectionConcrete(TestCase):
     def testConcreteReturnsReflectionObject(self) -> None:
         """
         Assert that concrete() returns a reflection object for a concrete class.
@@ -201,10 +221,10 @@ class TestReflectionConcrete(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = Reflection.concrete(_ConcreteFixture)
-        self.assertIsNotNone(rc)
+        self.assertIs(rc.getClass(), _ConcreteFixture)
 
     def testConcreteRaisesOnAbstractClass(self) -> None:
         """
@@ -213,13 +233,13 @@ class TestReflectionConcrete(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Reflection.concrete(_AbstractFixture)
 
-class TestReflectionModule(TestCase):
 
+class TestReflectionModule(TestCase):
     def testModuleReturnsReflectionObject(self) -> None:
         """
         Assert that module() returns a reflection object for a valid module.
@@ -227,10 +247,10 @@ class TestReflectionModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rm = Reflection.module("os")
-        self.assertIsNotNone(rm)
+        self.assertIs(rm.getModule(), sys.modules["os"])
 
     def testModuleWithBuiltinModuleName(self) -> None:
         """
@@ -239,10 +259,10 @@ class TestReflectionModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rm = Reflection.module("sys")
-        self.assertIsNotNone(rm)
+        self.assertIs(rm.getModule(), sys)
 
     def testModuleWithInvalidNameRaisesTypeError(self) -> None:
         """
@@ -251,7 +271,7 @@ class TestReflectionModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Reflection.module("this.module.does.not.exist.xyz")
@@ -263,13 +283,13 @@ class TestReflectionModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Reflection.module("")
 
-class TestReflectionCallable(TestCase):
 
+class TestReflectionCallable(TestCase):
     def testCallableReturnsReflectionObject(self) -> None:
         """
         Assert that callable() returns a reflection object for a plain function.
@@ -277,10 +297,10 @@ class TestReflectionCallable(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = Reflection.callable(_plain_fn)
-        self.assertIsNotNone(rc)
+        self.assertIs(rc.getCallable(), _plain_fn)
 
     def testCallableWithLambda(self) -> None:
         """
@@ -289,7 +309,7 @@ class TestReflectionCallable(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = Reflection.callable(lambda x: x)
         self.assertIsNotNone(rc)
@@ -301,18 +321,19 @@ class TestReflectionCallable(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         # ReflectionCallable only accepts functions, methods, and lambdas
         with self.assertRaises(TypeError):
             Reflection.callable(_ConcreteFixture)
 
+
 # ---------------------------------------------------------------------------
 # isAbstract
 # ---------------------------------------------------------------------------
 
-class TestIsAbstract(TestCase):
 
+class TestIsAbstract(TestCase):
     def testAbstractClassReturnsTrue(self) -> None:
         """
         Assert that isAbstract returns True for an ABC with abstract methods.
@@ -320,7 +341,7 @@ class TestIsAbstract(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isAbstract(_AbstractFixture))
 
@@ -331,7 +352,7 @@ class TestIsAbstract(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAbstract(_ConcreteFixture))
 
@@ -342,7 +363,7 @@ class TestIsAbstract(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAbstract(_plain_fn))
 
@@ -353,7 +374,7 @@ class TestIsAbstract(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAbstract(None))
 
@@ -364,16 +385,17 @@ class TestIsAbstract(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAbstract(42))
+
 
 # ---------------------------------------------------------------------------
 # isConcreteClass
 # ---------------------------------------------------------------------------
 
-class TestIsConcreteClass(TestCase):
 
+class TestIsConcreteClass(TestCase):
     def testConcreteClassReturnsTrue(self) -> None:
         """
         Assert that isConcreteClass returns True for a plain concrete class.
@@ -381,7 +403,7 @@ class TestIsConcreteClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isConcreteClass(_ConcreteFixture))
 
@@ -392,26 +414,15 @@ class TestIsConcreteClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isConcreteClass(_AbstractFixture))
 
-    def testBuiltinIntReturnsTrue(self) -> None:
-        """
-        Assert that isConcreteClass returns True for the built-in int type.
-
-        Notes
-        -----
-        isBuiltIn uses inspect.isbuiltin which detects builtin *functions*,
-        not builtin *types*. As a result, int passes all concrete checks.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        # inspect.isbuiltin(int) is False; int is therefore treated as concrete
-        self.assertTrue(Reflection.isConcreteClass(int))
+    def testBuiltinIntIsNotAUserDefinedConcreteClass(self) -> None:
+        """Reject builtin classes from the user-defined concrete wrapper."""
+        self.assertFalse(Reflection.isConcreteClass(int))
+        with self.assertRaises(TypeError):
+            Reflection.concrete(int)
 
     def testFunctionReturnsFalse(self) -> None:
         """
@@ -420,7 +431,7 @@ class TestIsConcreteClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isConcreteClass(_plain_fn))
 
@@ -431,7 +442,7 @@ class TestIsConcreteClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isConcreteClass(None))
 
@@ -442,7 +453,7 @@ class TestIsConcreteClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isConcreteClass(_ABCDirectBase))
 
@@ -453,7 +464,7 @@ class TestIsConcreteClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isConcreteClass("hello"))
 
@@ -464,28 +475,31 @@ class TestIsConcreteClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isConcreteClass(_ProtocolFixture))
+
 
 # ---------------------------------------------------------------------------
 # isAsyncGen / isAsyncGenFunction
 # ---------------------------------------------------------------------------
 
-class TestIsAsyncGen(TestCase):
 
-    def testAsyncGenObjectReturnsTrue(self) -> None:
+class TestIsAsyncGen(TestCase):
+    async def testAsyncGenObjectReturnsTrue(self) -> None:
         """
         Assert that isAsyncGen returns True for an async generator object.
 
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         gen = _async_gen()
-        self.assertTrue(Reflection.isAsyncGen(gen))
-        gen.aclose().close()
+        try:
+            self.assertTrue(Reflection.isAsyncGen(gen))
+        finally:
+            await gen.aclose()
 
     def testSyncGenObjectReturnsFalse(self) -> None:
         """
@@ -494,11 +508,11 @@ class TestIsAsyncGen(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         gen = _sync_gen()
+        self.addCleanup(gen.close)
         self.assertFalse(Reflection.isAsyncGen(gen))
-        gen.close()
 
     def testFunctionReturnsFalse(self) -> None:
         """
@@ -507,12 +521,12 @@ class TestIsAsyncGen(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAsyncGen(_plain_fn))
 
-class TestIsAsyncGenFunction(TestCase):
 
+class TestIsAsyncGenFunction(TestCase):
     def testAsyncGenFunctionReturnsTrue(self) -> None:
         """
         Assert that isAsyncGenFunction returns True for an async gen function.
@@ -520,7 +534,7 @@ class TestIsAsyncGenFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isAsyncGenFunction(_async_gen))
 
@@ -531,7 +545,7 @@ class TestIsAsyncGenFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAsyncGenFunction(_sync_gen))
 
@@ -542,16 +556,17 @@ class TestIsAsyncGenFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAsyncGenFunction(_plain_fn))
+
 
 # ---------------------------------------------------------------------------
 # isAwaitable
 # ---------------------------------------------------------------------------
 
-class TestIsAwaitable(TestCase):
 
+class TestIsAwaitable(TestCase):
     def testCoroutineObjectReturnsTrue(self) -> None:
         """
         Assert that isAwaitable returns True for a coroutine object.
@@ -559,11 +574,11 @@ class TestIsAwaitable(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         coro = _coroutine_fn()
+        self.addCleanup(coro.close)
         self.assertTrue(Reflection.isAwaitable(coro))
-        coro.close()
 
     def testPlainFunctionReturnsFalse(self) -> None:
         """
@@ -572,7 +587,7 @@ class TestIsAwaitable(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAwaitable(_plain_fn))
 
@@ -583,16 +598,17 @@ class TestIsAwaitable(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isAwaitable(123))
+
 
 # ---------------------------------------------------------------------------
 # isBuiltIn
 # ---------------------------------------------------------------------------
 
-class TestIsBuiltIn(TestCase):
 
+class TestIsBuiltIn(TestCase):
     def testBuiltinLenReturnsTrue(self) -> None:
         """
         Assert that isBuiltIn returns True for the built-in len function.
@@ -600,7 +616,7 @@ class TestIsBuiltIn(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isBuiltIn(len))
 
@@ -611,7 +627,7 @@ class TestIsBuiltIn(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isBuiltIn(print))
 
@@ -622,7 +638,7 @@ class TestIsBuiltIn(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isBuiltIn(_plain_fn))
 
@@ -633,16 +649,17 @@ class TestIsBuiltIn(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isBuiltIn(_ConcreteFixture))
+
 
 # ---------------------------------------------------------------------------
 # isClass
 # ---------------------------------------------------------------------------
 
-class TestIsClass(TestCase):
 
+class TestIsClass(TestCase):
     def testUserClassReturnsTrue(self) -> None:
         """
         Assert that isClass returns True for a user-defined class.
@@ -650,7 +667,7 @@ class TestIsClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isClass(_ConcreteFixture))
 
@@ -661,7 +678,7 @@ class TestIsClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isClass(int))
 
@@ -672,7 +689,7 @@ class TestIsClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isClass(_plain_fn))
 
@@ -683,7 +700,7 @@ class TestIsClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isClass(_ConcreteFixture()))
 
@@ -694,16 +711,17 @@ class TestIsClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isClass(None))
+
 
 # ---------------------------------------------------------------------------
 # isCode
 # ---------------------------------------------------------------------------
 
-class TestIsCode(TestCase):
 
+class TestIsCode(TestCase):
     def testCodeObjectReturnsTrue(self) -> None:
         """
         Assert that isCode returns True for a function's __code__ attribute.
@@ -711,7 +729,7 @@ class TestIsCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isCode(_plain_fn.__code__))
 
@@ -722,7 +740,7 @@ class TestIsCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isCode(_plain_fn))
 
@@ -733,16 +751,17 @@ class TestIsCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isCode(1))
+
 
 # ---------------------------------------------------------------------------
 # isCoroutine / isCoroutineFunction
 # ---------------------------------------------------------------------------
 
-class TestIsCoroutine(TestCase):
 
+class TestIsCoroutine(TestCase):
     def testCoroutineObjectReturnsTrue(self) -> None:
         """
         Assert that isCoroutine returns True for a running coroutine object.
@@ -750,11 +769,11 @@ class TestIsCoroutine(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         coro = _coroutine_fn()
+        self.addCleanup(coro.close)
         self.assertTrue(Reflection.isCoroutine(coro))
-        coro.close()
 
     def testCoroutineFunctionReturnsFalse(self) -> None:
         """
@@ -763,7 +782,7 @@ class TestIsCoroutine(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isCoroutine(_coroutine_fn))
 
@@ -774,12 +793,12 @@ class TestIsCoroutine(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isCoroutine(_plain_fn))
 
-class TestIsCoroutineFunction(TestCase):
 
+class TestIsCoroutineFunction(TestCase):
     def testAsyncFunctionReturnsTrue(self) -> None:
         """
         Assert that isCoroutineFunction returns True for an async function.
@@ -787,7 +806,7 @@ class TestIsCoroutineFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isCoroutineFunction(_coroutine_fn))
 
@@ -798,11 +817,11 @@ class TestIsCoroutineFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         coro = _coroutine_fn()
+        self.addCleanup(coro.close)
         self.assertFalse(Reflection.isCoroutineFunction(coro))
-        coro.close()
 
     def testPlainFunctionReturnsFalse(self) -> None:
         """
@@ -811,16 +830,17 @@ class TestIsCoroutineFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isCoroutineFunction(_plain_fn))
+
 
 # ---------------------------------------------------------------------------
 # isDataDescriptor
 # ---------------------------------------------------------------------------
 
-class TestIsDataDescriptor(TestCase):
 
+class TestIsDataDescriptor(TestCase):
     def testPropertyReturnsTrue(self) -> None:
         """
         Assert that isDataDescriptor returns True for a property object.
@@ -828,7 +848,7 @@ class TestIsDataDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         # property defines __get__ and __set__ — it is a data descriptor
         self.assertTrue(Reflection.isDataDescriptor(property()))
@@ -840,7 +860,7 @@ class TestIsDataDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isDataDescriptor(_plain_fn))
 
@@ -851,16 +871,17 @@ class TestIsDataDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isDataDescriptor(42))
+
 
 # ---------------------------------------------------------------------------
 # isFunction
 # ---------------------------------------------------------------------------
 
-class TestIsFunction(TestCase):
 
+class TestIsFunction(TestCase):
     def testUserFunctionReturnsTrue(self) -> None:
         """
         Assert that isFunction returns True for a user-defined function.
@@ -868,7 +889,7 @@ class TestIsFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isFunction(_plain_fn))
 
@@ -879,7 +900,7 @@ class TestIsFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isFunction(lambda: None))
 
@@ -890,7 +911,7 @@ class TestIsFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isFunction(len))
 
@@ -901,7 +922,7 @@ class TestIsFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isFunction(_ConcreteFixture))
 
@@ -912,16 +933,17 @@ class TestIsFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isFunction(_coroutine_fn))
+
 
 # ---------------------------------------------------------------------------
 # isGenerator / isGeneratorFunction
 # ---------------------------------------------------------------------------
 
-class TestIsGenerator(TestCase):
 
+class TestIsGenerator(TestCase):
     def testSyncGenObjectReturnsTrue(self) -> None:
         """
         Assert that isGenerator returns True for a sync generator object.
@@ -929,24 +951,26 @@ class TestIsGenerator(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         gen = _sync_gen()
+        self.addCleanup(gen.close)
         self.assertTrue(Reflection.isGenerator(gen))
-        gen.close()
 
-    def testAsyncGenObjectReturnsFalse(self) -> None:
+    async def testAsyncGenObjectReturnsFalse(self) -> None:
         """
         Assert that isGenerator returns False for an async generator object.
 
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         gen = _async_gen()
-        self.assertFalse(Reflection.isGenerator(gen))
-        gen.aclose().close()
+        try:
+            self.assertFalse(Reflection.isGenerator(gen))
+        finally:
+            await gen.aclose()
 
     def testFunctionReturnsFalse(self) -> None:
         """
@@ -955,12 +979,12 @@ class TestIsGenerator(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isGenerator(_plain_fn))
 
-class TestIsGeneratorFunction(TestCase):
 
+class TestIsGeneratorFunction(TestCase):
     def testSyncGenFunctionReturnsTrue(self) -> None:
         """
         Assert that isGeneratorFunction returns True for a sync gen function.
@@ -968,7 +992,7 @@ class TestIsGeneratorFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isGeneratorFunction(_sync_gen))
 
@@ -979,7 +1003,7 @@ class TestIsGeneratorFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isGeneratorFunction(_async_gen))
 
@@ -990,16 +1014,17 @@ class TestIsGeneratorFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isGeneratorFunction(_plain_fn))
+
 
 # ---------------------------------------------------------------------------
 # isMethod
 # ---------------------------------------------------------------------------
 
-class TestIsMethod(TestCase):
 
+class TestIsMethod(TestCase):
     def testBoundMethodReturnsTrue(self) -> None:
         """
         Assert that isMethod returns True for a bound method on an instance.
@@ -1007,7 +1032,7 @@ class TestIsMethod(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         obj = _ConcreteFixture()
         # __init__ bound to an instance is a bound method
@@ -1020,7 +1045,7 @@ class TestIsMethod(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         # Accessing via class gives a plain function in Python 3
         self.assertFalse(Reflection.isMethod(_ConcreteFixture.__init__))
@@ -1032,16 +1057,17 @@ class TestIsMethod(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isMethod(_plain_fn))
+
 
 # ---------------------------------------------------------------------------
 # isModule
 # ---------------------------------------------------------------------------
 
-class TestIsModule(TestCase):
 
+class TestIsModule(TestCase):
     def testRealModuleReturnsTrue(self) -> None:
         """
         Assert that isModule returns True for the built-in inspect module.
@@ -1049,7 +1075,7 @@ class TestIsModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isModule(inspect))
 
@@ -1060,7 +1086,7 @@ class TestIsModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         mod = types.ModuleType("_test_mod")
         self.assertTrue(Reflection.isModule(mod))
@@ -1072,7 +1098,7 @@ class TestIsModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isModule(_ConcreteFixture))
 
@@ -1083,16 +1109,17 @@ class TestIsModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isModule(None))
+
 
 # ---------------------------------------------------------------------------
 # isRoutine
 # ---------------------------------------------------------------------------
 
-class TestIsRoutine(TestCase):
 
+class TestIsRoutine(TestCase):
     def testUserFunctionReturnsTrue(self) -> None:
         """
         Assert that isRoutine returns True for a user-defined function.
@@ -1100,7 +1127,7 @@ class TestIsRoutine(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isRoutine(_plain_fn))
 
@@ -1111,7 +1138,7 @@ class TestIsRoutine(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isRoutine(len))
 
@@ -1122,7 +1149,7 @@ class TestIsRoutine(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         obj = _ConcreteFixture()
         self.assertTrue(Reflection.isRoutine(obj.__init__))
@@ -1134,7 +1161,7 @@ class TestIsRoutine(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isRoutine(_ConcreteFixture))
 
@@ -1145,16 +1172,17 @@ class TestIsRoutine(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isRoutine(42))
+
 
 # ---------------------------------------------------------------------------
 # isGeneric
 # ---------------------------------------------------------------------------
 
-class TestIsGeneric(TestCase):
 
+class TestIsGeneric(TestCase):
     def testListIntReturnsTrue(self) -> None:
         """
         Assert that isGeneric returns True for list[int] generic alias.
@@ -1162,7 +1190,7 @@ class TestIsGeneric(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isGeneric(list[int]))
 
@@ -1173,7 +1201,7 @@ class TestIsGeneric(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isGeneric(dict[str, int]))
 
@@ -1184,7 +1212,7 @@ class TestIsGeneric(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         T = typing.TypeVar("T")
         self.assertTrue(Reflection.isGeneric(T))
@@ -1196,7 +1224,7 @@ class TestIsGeneric(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -1213,7 +1241,7 @@ class TestIsGeneric(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isGeneric(_OriginFixture))
 
@@ -1224,7 +1252,7 @@ class TestIsGeneric(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isGeneric(_ConcreteFixture))
 
@@ -1235,7 +1263,7 @@ class TestIsGeneric(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isGeneric(int))
 
@@ -1246,16 +1274,17 @@ class TestIsGeneric(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isGeneric(None))
+
 
 # ---------------------------------------------------------------------------
 # isProtocol
 # ---------------------------------------------------------------------------
 
-class TestIsProtocol(TestCase):
 
+class TestIsProtocol(TestCase):
     def testProtocolSubclassReturnsTrue(self) -> None:
         """
         Assert that isProtocol returns True for a user-defined Protocol.
@@ -1263,7 +1292,7 @@ class TestIsProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isProtocol(_ProtocolFixture))
 
@@ -1274,7 +1303,7 @@ class TestIsProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isProtocol(_ConcreteFixture))
 
@@ -1285,7 +1314,7 @@ class TestIsProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isProtocol(typing.Protocol))
 
@@ -1296,7 +1325,7 @@ class TestIsProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isProtocol(_plain_fn))
 
@@ -1307,16 +1336,17 @@ class TestIsProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isProtocol(None))
+
 
 # ---------------------------------------------------------------------------
 # isInstance
 # ---------------------------------------------------------------------------
 
-class TestIsInstance(TestCase):
 
+class TestIsInstance(TestCase):
     def testUserDefinedInstanceReturnsTrue(self) -> None:
         """
         Assert that isInstance returns True for an instance of a user class.
@@ -1324,7 +1354,7 @@ class TestIsInstance(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         obj = _ConcreteFixture(5)
         self.assertTrue(Reflection.isInstance(obj))
@@ -1336,7 +1366,7 @@ class TestIsInstance(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isInstance(_ConcreteFixture))
 
@@ -1347,7 +1377,7 @@ class TestIsInstance(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isInstance("hello"))
 
@@ -1358,7 +1388,7 @@ class TestIsInstance(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isInstance(42))
 
@@ -1369,32 +1399,20 @@ class TestIsInstance(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isInstance(None))
+
 
 # ---------------------------------------------------------------------------
 # isTypingConstruct
 # ---------------------------------------------------------------------------
 
+
 class TestIsTypingConstruct(TestCase):
-
-    def testAnyReturnsFalse(self) -> None:
-        """
-        Assert that isTypingConstruct returns False for typing.Any.
-
-        Notes
-        -----
-        The method checks ``type(obj).__name__`` against a fixed list.
-        ``type(typing.Any).__name__`` resolves to ``_SpecialForm`` or ``type``
-        depending on Python version, neither of which is in the list.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertFalse(Reflection.isTypingConstruct(typing.Any))
+    def testAnyReturnsTrue(self) -> None:
+        """Recognize the public typing construct."""
+        self.assertTrue(Reflection.isTypingConstruct(typing.Any))
 
     def testTypeVarReturnsTrue(self) -> None:
         """
@@ -1403,27 +1421,14 @@ class TestIsTypingConstruct(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
-        # type(TypeVar("T")).__name__ == "TypeVar", which is in the list
         T = typing.TypeVar("T")
         self.assertTrue(Reflection.isTypingConstruct(T))
 
-    def testLiteralReturnsFalse(self) -> None:
-        """
-        Assert that isTypingConstruct returns False for typing.Literal[1].
-
-        Notes
-        -----
-        ``type(typing.Literal[1]).__name__`` is ``_LiteralGenericAlias`` or
-        ``_GenericAlias``, neither of which matches the entries in the list.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertFalse(Reflection.isTypingConstruct(typing.Literal[1]))
+    def testLiteralReturnsTrue(self) -> None:
+        """Recognize the public typing construct."""
+        self.assertTrue(Reflection.isTypingConstruct(typing.Literal[1]))
 
     def testConcreteClassReturnsFalse(self) -> None:
         """
@@ -1432,7 +1437,7 @@ class TestIsTypingConstruct(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isTypingConstruct(_ConcreteFixture))
 
@@ -1443,7 +1448,7 @@ class TestIsTypingConstruct(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isTypingConstruct(int))
 
@@ -1454,34 +1459,30 @@ class TestIsTypingConstruct(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isTypingConstruct(None))
+
 
 # ---------------------------------------------------------------------------
 # isTraceback
 # ---------------------------------------------------------------------------
 
-class TestIsTraceback(TestCase):
 
+class TestIsTraceback(TestCase):
     def testRealTracebackReturnsTrue(self) -> None:
         """Assert that isTraceback returns True for a live traceback object.
 
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised by this helper to exercise the failure path.
         """
         try:
             _err_msg = "fixture"
             raise RuntimeError(_err_msg)
         except RuntimeError:
-            import sys
             tb = sys.exc_info()[2]
         self.assertTrue(Reflection.isTraceback(tb))
 
@@ -1492,7 +1493,7 @@ class TestIsTraceback(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isTraceback(None))
 
@@ -1503,16 +1504,17 @@ class TestIsTraceback(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isTraceback(_plain_fn))
+
 
 # ---------------------------------------------------------------------------
 # isFrame
 # ---------------------------------------------------------------------------
 
-class TestIsFrame(TestCase):
 
+class TestIsFrame(TestCase):
     def testLiveFrameReturnsTrue(self) -> None:
         """
         Assert that isFrame returns True for a live frame object.
@@ -1520,9 +1522,13 @@ class TestIsFrame(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
-        self.assertTrue(Reflection.isFrame(inspect.currentframe()))
+        frame = inspect.currentframe()
+        try:
+            self.assertTrue(Reflection.isFrame(frame))
+        finally:
+            del frame
 
     def testFunctionReturnsFalse(self) -> None:
         """
@@ -1531,7 +1537,7 @@ class TestIsFrame(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isFrame(_plain_fn))
 
@@ -1542,16 +1548,17 @@ class TestIsFrame(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isFrame(None))
+
 
 # ---------------------------------------------------------------------------
 # isGetSetDescriptor
 # ---------------------------------------------------------------------------
 
-class TestIsGetSetDescriptor(TestCase):
 
+class TestIsGetSetDescriptor(TestCase):
     def testFunctionDunderDictReturnsTrue(self) -> None:
         """
         Assert that a getset descriptor is recognised.
@@ -1559,7 +1566,7 @@ class TestIsGetSetDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -1575,16 +1582,17 @@ class TestIsGetSetDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isGetSetDescriptor(_DescriptorFixture.value))
+
 
 # ---------------------------------------------------------------------------
 # isMemberDescriptor
 # ---------------------------------------------------------------------------
 
-class TestIsMemberDescriptor(TestCase):
 
+class TestIsMemberDescriptor(TestCase):
     def testSlotEntryReturnsTrue(self) -> None:
         """
         Assert that a slot descriptor is recognised as a member descriptor.
@@ -1592,7 +1600,7 @@ class TestIsMemberDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         descriptor = _SlottedFixture.__dict__["slot_attr"]
         self.assertTrue(Reflection.isMemberDescriptor(descriptor))
@@ -1604,16 +1612,17 @@ class TestIsMemberDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isMemberDescriptor(_DescriptorFixture.value))
+
 
 # ---------------------------------------------------------------------------
 # isMethodDescriptor
 # ---------------------------------------------------------------------------
 
-class TestIsMethodDescriptor(TestCase):
 
+class TestIsMethodDescriptor(TestCase):
     def testBuiltinMethodDescriptorReturnsTrue(self) -> None:
         """
         Assert that an unbound C method is recognised as a method descriptor.
@@ -1621,7 +1630,7 @@ class TestIsMethodDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(Reflection.isMethodDescriptor(str.upper))
 
@@ -1632,7 +1641,6 @@ class TestIsMethodDescriptor(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(Reflection.isMethodDescriptor(_plain_fn))
-

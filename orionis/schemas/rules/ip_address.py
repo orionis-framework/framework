@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string is a valid IP address."""
 
 import ipaddress
@@ -7,6 +9,7 @@ from orionis.schemas.rule import Rule
 _VERSIONS: frozenset[int] = frozenset({4, 6})
 """IP versions the rule is able to enforce."""
 
+
 class IpAddress(Rule):
     """
     Ensure a string is a valid IP address.
@@ -14,8 +17,6 @@ class IpAddress(Rule):
     Version 4 is enforced by default. Pass ``version=6`` to require IPv6, or
     ``version=None`` to accept either family.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_version",)
     """Declare the instance attribute slots reserved by this class."""
@@ -45,7 +46,7 @@ class IpAddress(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------

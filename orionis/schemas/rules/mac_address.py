@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string is a valid MAC address."""
 
 import re
@@ -11,6 +13,7 @@ _MAC_PATTERN = re.compile(
 )
 """Colon, hyphen and Cisco dotted notations for a 48-bit hardware address."""
 
+
 class MacAddress(Rule):
     """
     Ensure a string is a valid MAC address.
@@ -18,8 +21,6 @@ class MacAddress(Rule):
     Colon-separated, hyphen-separated and Cisco dotted notations are all
     accepted.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -57,4 +58,4 @@ class MacAddress(Rule):
         if not isinstance(value, str):
             return True
 
-        return _MAC_PATTERN.match(value) is not None
+        return _MAC_PATTERN.fullmatch(value) is not None

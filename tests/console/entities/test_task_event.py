@@ -1,3 +1,5 @@
+# ruff: noqa: ANN003, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import fields, is_dataclass
 from orionis.console.entities.task_event import TaskEvent
@@ -5,9 +7,9 @@ from orionis.console.enums.events import TaskEvent as TaskEventEnum
 from orionis.support.entities.base import BaseEntity
 from orionis.test import TestCase
 
-class TestTaskEventEntity(TestCase):
 
-    def _make(self, code: int = TaskEventEnum.EXECUTED, **kwargs) -> TaskEvent: # noqa: ANN003
+class TestTaskEventEntity(TestCase):
+    def _make(self, code: int = TaskEventEnum.EXECUTED, **kwargs) -> TaskEvent:
         """
         Build a minimal valid TaskEvent instance.
 

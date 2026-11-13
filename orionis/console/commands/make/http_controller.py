@@ -15,6 +15,7 @@ _RESOURCE_ACTIONS: tuple[tuple[str, str], ...] = (
 )
 """Resource actions definitions used by ``http_controller``."""
 
+
 class MakeHttpController(MakeStubCommand):
     """Generate an invokable or resource HTTP controller."""
 
@@ -67,29 +68,35 @@ class MakeHttpController(MakeStubCommand):
         api = self.getArgument("api", default=False)
         response_type = "JSONResponse" if api else "HttpResponse"
         if self.getArgument("invoke", default=False):
-            return "\n".join([
-                f"    async def __call__(self) -> {response_type}:",
-                '        """Handle the request for this controller.',
-                "",
-                "        Returns",
-                "        -------",
-                f"        {response_type}",
-                "            Response produced when this action is implemented.",
-                '        """',
-            ])
+            return "\n".join(
+                [
+                    f"    async def __call__(self) -> {response_type}:",
+                    '        """Handle the request for this controller.',
+                    "",
+                    "        Returns",
+                    "        -------",
+                    f"        {response_type}",
+                    "            Response produced by the implemented action.",
+                    '        """',
+                ],
+            )
 
         declarations: list[str] = []
         for action, description in _RESOURCE_ACTIONS:
-            declarations.append("\n".join([
-                f"    async def {action}(self) -> {response_type}:",
-                f'        """{description}.',
-                "",
-                "        Returns",
-                "        -------",
-                f"        {response_type}",
-                "            Response produced when this action is implemented.",
-                '        """',
-            ]))
+            declarations.append(
+                "\n".join(
+                    [
+                        f"    async def {action}(self) -> {response_type}:",
+                        f'        """{description}.',
+                        "",
+                        "        Returns",
+                        "        -------",
+                        f"        {response_type}",
+                        "            Response produced by the implemented action.",
+                        '        """',
+                    ],
+                ),
+            )
         return "\n\n".join(declarations)
 
     def getReplacements(self) -> dict[str, str]:
@@ -102,13 +109,10 @@ class MakeHttpController(MakeStubCommand):
             Template placeholders for response types and controller actions.
         """
         if self.getArgument("api", default=False):
-            response_import = (
-                "from orionis.http import JSONResponse"
-            )
+            response_import = "from orionis.http import JSONResponse"
         else:
             response_import = "from orionis.http import HttpResponse"
         return {
             "response_import": response_import,
             "methods": self.getControllerMethods(),
         }
-

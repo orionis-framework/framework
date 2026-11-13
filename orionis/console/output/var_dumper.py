@@ -1,3 +1,5 @@
+# ruff: noqa: T201
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Format Python values for structured console inspection."""
 
 from __future__ import annotations
@@ -51,7 +53,7 @@ _HTML_DUMP_FORMAT = (
     "background-color:var(--orionis-surface,#fff);"
     "color:var(--orionis-text,#182433);"
     "font-family:var(--orionis-mono,'Fira Code','Cascadia Code',Consolas,monospace);"
-    'font-size:13px;line-height:1.75;white-space:pre;overflow-wrap:normal;'
+    "font-size:13px;line-height:1.75;white-space:pre;overflow-wrap:normal;"
     'scrollbar-width:thin"><code style="font:inherit">{code}</code></pre>'
 )
 """
@@ -75,10 +77,10 @@ _HTML_DUMP_PANEL_FORMAT = (
     "font-family:var(--orionis-font,'Titillium Web',sans-serif);"
     'font-size:12px">'
     '<span class="code-filename" style="min-width:0;max-width:100%;'
-    'overflow-wrap:anywhere;color:var(--orionis-primary-hover,#1a569d);'
+    "overflow-wrap:anywhere;color:var(--orionis-primary-hover,#1a569d);"
     'font-weight:600">{source}</span>'
     '<span class="code-header-info" style="display:flex;align-items:center;'
-    'min-width:min-content;'
+    "min-width:min-content;"
     "gap:10px;color:var(--orionis-muted,#626e7f);"
     "font-family:var(--orionis-mono,'Fira Code','Cascadia Code',Consolas,monospace);"
     'overflow-wrap:anywhere">{title}</span></div>{code}</section>'
@@ -99,9 +101,8 @@ Code','Cascadia
 Code',Consolas,monospace);overflow-wrap:anywhere">{title}</span></div>{code}</section>``.
 """
 
-class VarDumper(IVarDumper):
 
-    # ruff: noqa: T201
+class VarDumper(IVarDumper):
     """Format Python values for structured console inspection."""
 
     def __init__(self) -> None:
@@ -186,7 +187,6 @@ class VarDumper(IVarDumper):
         """
         # Check if force exit is enabled
         if self.__force_exit:
-
             # Use os._exit for immediate termination if output is redirected
             if self.__redirect_output:
                 os._exit(1)
@@ -195,7 +195,7 @@ class VarDumper(IVarDumper):
             else:
                 sys.exit(1)
 
-    def __resolveCallerInfo(self, *, html: bool = False) -> None: # NOSONAR
+    def __resolveCallerInfo(self, *, html: bool = False) -> None:  # NOSONAR
         """
         Resolve and set the caller's module path and line number.
 
@@ -228,7 +228,8 @@ class VarDumper(IVarDumper):
             if caller_frame is not None:
                 if not module_path:
                     module_path = (
-                        caller_frame.f_code.co_filename if html
+                        caller_frame.f_code.co_filename
+                        if html
                         else caller_frame.f_globals.get("__name__", "unknown")
                     )
                 if not line_number:
@@ -264,11 +265,13 @@ class VarDumper(IVarDumper):
         # Configure the Console with a custom theme for variable dumping
         return Console(
             file=file,
-            theme=Theme({
-                "dump.index": "bold bright_blue",
-                "dump.type": "bold green",
-                "dump.rule": "bright_black",
-            }),
+            theme=Theme(
+                {
+                    "dump.index": "bold bright_blue",
+                    "dump.type": "bold green",
+                    "dump.rule": "bright_black",
+                },
+            ),
             record=True,
         )
 
@@ -293,10 +296,12 @@ class VarDumper(IVarDumper):
         """
         # Append a dictionary containing the deep-copied value
         # and its type name to the args list
-        self.__args.append({
-            "value": copy.deepcopy(value),
-            "type": value.__class__.__name__,
-        })
+        self.__args.append(
+            {
+                "value": copy.deepcopy(value),
+                "type": value.__class__.__name__,
+            },
+        )
 
     def __redirectOutput(self) -> None:
         """
@@ -312,15 +317,14 @@ class VarDumper(IVarDumper):
         None
             This method does not return a value.
         """
-        # Redirect output if enabled and not already redirected
-        if self.__redirect_output and self.__redirected_output is False:
+        if self.__redirected_output:
+            sys.stdout, sys.stderr = self.__original_stdout, self.__original_stderr
+            self.__original_stdout = self.__original_stderr = None
+            self.__redirected_output = False
+        elif self.__redirect_output:
             self.__original_stdout, self.__original_stderr = sys.stdout, sys.stderr
             sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
             self.__redirected_output = True
-
-        # Restore output if it was redirected
-        if self.__redirected_output:
-            sys.stdout, sys.stderr = self.__original_stdout, self.__original_stderr
 
     def __printLine(self, *, insert_line: bool = False) -> None:
         """
@@ -369,7 +373,11 @@ class VarDumper(IVarDumper):
         )
 
     def __makePanel(
-        self, value: type[T], _type: str, *, console: Console,
+        self,
+        value: type[T],
+        _type: str,
+        *,
+        console: Console,
     ) -> Panel:
         """
         Create a Rich Panel with a pretty-printed representation of the value.
@@ -453,7 +461,9 @@ class VarDumper(IVarDumper):
         for item in self.__args:
             _console_print(
                 _make_panel(
-                    value=item["value"], _type=item["type"], console=console,
+                    value=item["value"],
+                    _type=item["type"],
+                    console=console,
                 ),
             )
 
@@ -768,7 +778,6 @@ class VarDumper(IVarDumper):
             self.__forceExit()
 
         finally:
-
             # Restore stdout/stderr if they were redirected
             self.__redirectOutput()
 
@@ -816,12 +825,14 @@ class VarDumper(IVarDumper):
                 labels.append(f"#{index}")
             if self.__show_types:
                 labels.append(escape(item["type"]))
-            panels.append(_HTML_DUMP_PANEL_FORMAT.format(
-                source=source,
-                title=" &middot; ".join(labels),
-                code=code,
-            ))
+            panels.append(
+                _HTML_DUMP_PANEL_FORMAT.format(
+                    source=source,
+                    title=" &middot; ".join(labels),
+                    code=code,
+                ),
+            )
         return (
             '<div class="orionis-dump" style="display:grid;gap:16px;min-width:0">'
-            f'{"".join(panels)}</div>'
+            f"{''.join(panels)}</div>"
         )

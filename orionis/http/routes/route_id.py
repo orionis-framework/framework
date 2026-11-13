@@ -15,6 +15,7 @@ _next_id = itertools.count(1).__next__
 _pid = str(os.getpid())
 """Include the process identifier in generated route identifiers."""
 
+
 class RouteID:
     """Generate process-qualified identifiers for registered routes."""
 

@@ -1,32 +1,32 @@
+# ruff: noqa: TC001, TC003
+# Runtime endpoint contracts and dependency injection need these concrete annotations.
 """Provide mcp transport operations.
 
 Includes ``McpProtocolResponse``, ``origin_allowed``, ``McpHttpPolicy``.
 """
 
 from http import HTTPStatus
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
+from collections.abc import Mapping
 from orionis.auth.exceptions import AuthenticationException, AuthorizationException
 from orionis.failure.runtime import capture_result
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001 - Native DI.
+from orionis.foundation.contracts.application import IApplication
 from orionis.http.adapters.response.streams import close_stream
 from orionis.http.contracts.endpoint_policy import IHttpEndpointPolicy
 from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
 from orionis.http.payload.body import PayloadTooLargeException
-from orionis.http.request import UnsupportedMediaTypeException
+from orionis.http.request import Request, UnsupportedMediaTypeException
 from orionis.http.responses import EventStreamResponse, Response
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
-from orionis.mcp.config import McpConfig  # noqa: TC001 - Native DI.
+from orionis.mcp.config import McpConfig
 from orionis.mcp.exceptions import McpProtocolException
 from orionis.mcp.reporting import report
 from orionis.mcp.protocol.codecs import encode_error
 from orionis.schemas.exceptions.validation import ValidationException
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from orionis.http.adapters.request.contracts.transport import TransportAdapter
-    from orionis.http.payload.estructures.headers import Headers
-    from orionis.http.request import Request
+from orionis.http.adapters.request.contracts.transport import TransportAdapter
+from orionis.http.payload.estructures.headers import Headers
 
 _REDIRECTION_START = 300
 """Redirection start value used by ``policy``."""
@@ -52,6 +52,7 @@ _EXCEPTION_STATUS = {
 }
 """Exception status definitions used by ``policy``."""
 
+
 class McpProtocolResponse(Response):
     """Mark encoded protocol output to keep adaptation constant-time."""
 
@@ -59,8 +60,11 @@ class McpProtocolResponse(Response):
     """Declare that this class introduces no additional instance slots."""
 
     def __init__(
-        self, content: bytes, status_code: int = 200,
-        headers: Mapping[str, str] | None = None, media_type: str = _JSON_MEDIA_TYPE,
+        self,
+        content: bytes,
+        status_code: int = 200,
+        headers: Mapping[str, str] | None = None,
+        media_type: str = _JSON_MEDIA_TYPE,
     ) -> None:
         """
         Keep preencoded bytes while emitting mandatory JSON response metadata.
@@ -82,11 +86,14 @@ class McpProtocolResponse(Response):
             Complete the documented operation without returning a value.
         """
         super().__init__(
-            content=content, status_code=status_code, headers=headers,
+            content=content,
+            status_code=status_code,
+            headers=headers,
             media_type=media_type,
         )
         self.setHeader("Content-Type", _JSON_MEDIA_TYPE)
         self.setHeader("Content-Length", str(len(content)))
+
 
 def origin_allowed(headers: Headers, origins: frozenset[str]) -> bool:
     """
@@ -106,6 +113,7 @@ def origin_allowed(headers: Headers, origins: frozenset[str]) -> bool:
     """
     count = headers.count("origin")
     return count == 0 or (count == 1 and headers.get("origin") in origins)
+
 
 def _error(status: int) -> McpProtocolResponse:
     """
@@ -127,10 +135,12 @@ def _error(status: int) -> McpProtocolResponse:
         message = "Request failed"
     exception = McpProtocolException(
         -32603 if status >= _SERVER_ERROR_START else -32600,
-        message, status=status,
+        message,
+        status=status,
     )
     response = McpProtocolResponse(
-        content=encode_error(exception), status_code=status,
+        content=encode_error(exception),
+        status_code=status,
         media_type=_JSON_MEDIA_TYPE,
     )
     if status == HTTPStatus.METHOD_NOT_ALLOWED:
@@ -138,6 +148,7 @@ def _error(status: int) -> McpProtocolResponse:
     if status == HTTPStatus.UNAUTHORIZED:
         response.setHeader("WWW-Authenticate", "Bearer")
     return response
+
 
 class McpHttpPolicy(IHttpEndpointPolicy):
     """Enforce MCP origin and error rules around the existing HTTP pipeline."""
@@ -248,7 +259,9 @@ class McpHttpPolicy(IHttpEndpointPolicy):
         ) or any(ancestor in _EXCEPTION_STATUS for ancestor in type(exception).__mro__)
 
     async def exception(
-        self, exception: Exception, request: Request | TransportAdapter,
+        self,
+        exception: Exception,
+        request: Request | TransportAdapter,
     ) -> Response:
         """
         Report failures without calling the native HTML/debug presenter.
@@ -275,7 +288,8 @@ class McpHttpPolicy(IHttpEndpointPolicy):
         )
         if isinstance(exception, McpProtocolException):
             return McpProtocolResponse(
-                content=encode_error(exception), status_code=exception.status,
+                content=encode_error(exception),
+                status_code=exception.status,
                 media_type=_JSON_MEDIA_TYPE,
             )
         for ancestor in type(exception).__mro__:

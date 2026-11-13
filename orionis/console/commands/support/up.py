@@ -2,6 +2,7 @@
 
 from orionis.console.commands.support.maintenance import MaintenanceModeCommand
 
+
 class UpCommand(MaintenanceModeCommand):
     """Restore normal application traffic after maintenance."""
 

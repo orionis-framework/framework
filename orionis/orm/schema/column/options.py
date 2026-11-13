@@ -1,12 +1,12 @@
+# Resolve public field annotations without eager circular class imports.
+# ruff: noqa: TC001, TC003
 """Secondary, type-specific knobs mirroring SQLAlchemy constructor args."""
 
 from __future__ import annotations
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from orionis.orm.schema import column as column_module
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.orm.schema.column.definition import ColumnDefinition
 
 @dataclass(frozen=True, slots=True)
 class ColumnOptions:
@@ -92,7 +92,7 @@ class ColumnOptions:
     collation: str | None = None
     as_uuid: bool = True
     native_uuid: bool = True
-    item_type: ColumnDefinition | None = None
+    item_type: column_module.ColumnDefinition | None = None
     dimensions: int | None = None
     as_tuple: bool = False
     zero_indexes: bool = False

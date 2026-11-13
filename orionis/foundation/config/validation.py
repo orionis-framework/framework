@@ -28,6 +28,7 @@ _MAX_STORE_PORT = 65535
 _ENUM_SCALAR_TYPES = frozenset({str, bytes, int, float, complex, bool, type(None)})
 """Enum scalar types used by ``validation``."""
 
+
 def validate_integer(
     value: object,
     name: str,
@@ -72,6 +73,7 @@ def validate_integer(
         error_msg = error_msg + "."
         raise ValueError(error_msg)
 
+
 def validate_string(value: object, name: str, *, allow_empty: bool = False) -> None:
     """
     Validate a string and optionally allow blank values.
@@ -105,6 +107,7 @@ def validate_string(value: object, name: str, *, allow_empty: bool = False) -> N
         error_msg = f"'{name}' cannot be empty."
         raise ValueError(error_msg)
 
+
 def validate_boolean(value: object, name: str) -> None:
     """
     Require a boolean without coercing truthy values.
@@ -130,6 +133,7 @@ def validate_boolean(value: object, name: str) -> None:
     if not isinstance(value, bool):
         error_msg = f"'{name}' must be a boolean."
         raise TypeError(error_msg)
+
 
 @lru_cache(maxsize=64)
 def _enum_values(
@@ -159,6 +163,7 @@ def _enum_values(
         values.setdefault(member_name.casefold(), member.value)
         values.setdefault(str(member.value).casefold(), member.value)
     return MappingProxyType(values)
+
 
 def normalize_enum(value: object, enum_type: type[Enum], name: str) -> object:
     """
@@ -207,6 +212,7 @@ def normalize_enum(value: object, enum_type: type[Enum], name: str) -> object:
     error_msg = f"'{name}' must be one of {list(enum_type.__members__)}."
     raise ValueError(error_msg)
 
+
 def copy_string_list(value: object, name: str) -> list[str]:
     """
     Validate a list of non-empty strings and return an independent copy.
@@ -237,6 +243,7 @@ def copy_string_list(value: object, name: str) -> list[str]:
     for item in value:
         validate_string(item, name)
     return list(value)
+
 
 def validate_cookie_name(value: object, name: str) -> None:
     """
@@ -270,6 +277,7 @@ def validate_cookie_name(value: object, name: str) -> None:
         error_msg = f"'{name}' must be a valid cookie name."
         raise ValueError(error_msg) from exc
 
+
 def validate_name(value: object, name: str, *, table: bool = False) -> None:
     """
     Require a safe connection, queue, or SQL table identifier.
@@ -300,6 +308,7 @@ def validate_name(value: object, name: str, *, table: bool = False) -> None:
     if pattern.fullmatch(value) is None:
         error_msg = f"'{name}' must be a valid identifier."
         raise ValueError(error_msg)
+
 
 def validate_seconds(value: object, name: str, *, positive: bool = False) -> None:
     """
@@ -334,6 +343,7 @@ def validate_seconds(value: object, name: str, *, positive: bool = False) -> Non
         error_msg = f"'{name}' must contain finite {constraint} seconds."
         raise ValueError(error_msg)
 
+
 def validate_driver(value: object, expected: Drivers) -> None:
     """
     Require the driver implemented by a connection entity.
@@ -361,6 +371,7 @@ def validate_driver(value: object, expected: Drivers) -> None:
     if value != expected:
         error_msg = f"'driver' must be '{expected}' for this queue connection."
         raise ValueError(error_msg)
+
 
 def validate_http_origin(origin: str) -> None:
     """
@@ -411,6 +422,7 @@ def validate_http_origin(origin: str) -> None:
         error_msg = "allowed_origins entries must use a valid nonzero port"
         raise ValueError(error_msg)
 
+
 def validate_store_table(
     value: object,
     name: str = "table",
@@ -447,6 +459,7 @@ def validate_store_table(
         )
         raise ValueError(error_msg)
 
+
 def validate_store_port(value: object) -> None:
     """
     Validate Redis/Memcached ports using the existing store error messages.
@@ -468,6 +481,7 @@ def validate_store_port(value: object) -> None:
         error_msg = f"The 'port' property must be between 1 and {_MAX_STORE_PORT}."
         raise ValueError(error_msg)
 
+
 def validate_store_db(value: object) -> None:
     """
     Validate the Redis database index for cache and scheduler stores.
@@ -488,6 +502,7 @@ def validate_store_db(value: object) -> None:
     if value < 0:
         error_msg = "The 'db' property cannot be negative."
         raise ValueError(error_msg)
+
 
 def normalize_optional_store(owner: object, name: str, cls: type) -> None:
     """

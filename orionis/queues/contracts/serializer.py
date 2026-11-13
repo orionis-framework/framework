@@ -1,11 +1,11 @@
+# ruff: noqa: TC001
+# Keep public contract annotations available for runtime inspection.
 """Declare explicit state serialization and trusted job registration."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.queues.entities.envelope import JobEnvelope
+from orionis.queues.job import BaseJob
 
-if TYPE_CHECKING:
-    from orionis.queues.entities.envelope import JobEnvelope
-    from orionis.queues.job import BaseJob
 
 class IJobSerializer(ABC):
     """Declare explicit state serialization and trusted job registration."""

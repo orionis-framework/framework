@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401, TC001, TC002, TC003
+# Preserve dynamic SQL values and runtime reflection of public/native annotations.
 """Named database connection encapsulating the SQL engine."""
 
 from __future__ import annotations
@@ -6,7 +8,7 @@ from contextlib import asynccontextmanager
 from contextvars import ContextVar
 from functools import lru_cache
 from importlib import import_module
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import NoSuchModuleError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
@@ -23,29 +25,28 @@ from orionis.database.entities.result import InsertResult
 from orionis.database.exceptions import QueryException, TransactionException
 from orionis.database.threaded.connection import ThreadedConnection
 from orionis.database.threaded.engine import ThreadedEngine
-from orionis.database.threaded.worker import _wait_for_completion
+from orionis.database.threaded.worker import (
+    _complete_cleanup,
+    _rollback_or_invalidate,
+    _wait_for_completion,
+)
 from orionis.database.transaction import Transaction
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator, Mapping, Sequence
-    from contextlib import AbstractAsyncContextManager
-    from sqlalchemy.engine import CursorResult
-    from sqlalchemy.ext.asyncio import AsyncConnection, AsyncTransaction
-    from sqlalchemy.sql.elements import TextClause
-    from orionis.database.contracts.transaction import ITransaction
-    from orionis.database.threaded.result import ThreadedResult
-    from orionis.database.threaded.transaction import ThreadedTransaction
-    from orionis.orm.query.expressions import (
-        DeletePlan,
-        InsertPlan,
-        SelectPlan,
-        UpdatePlan,
-    )
-    from orionis.orm.schema.table import TableDefinition
+from collections.abc import AsyncGenerator, Mapping, Sequence
+from contextlib import AbstractAsyncContextManager
+from sqlalchemy.engine import CursorResult
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncTransaction
+from sqlalchemy.sql.elements import TextClause
+from orionis.database.contracts.transaction import ITransaction
+from orionis.database.threaded.result import ThreadedResult
+from orionis.database.threaded.transaction import ThreadedTransaction
+from orionis.orm.query.expressions import DeletePlan, InsertPlan, SelectPlan, UpdatePlan
+from orionis.orm.schema.table import TableDefinition
 
 # Error message used when transaction control has no active transaction.
 _NO_ACTIVE_TRANSACTION: str = "No active transaction on this connection."
 """Error message used when transaction control has no active transaction."""
+
 
 @lru_cache(maxsize=256)
 def _text_statement(sql: str) -> TextClause:
@@ -63,6 +64,7 @@ def _text_statement(sql: str) -> TextClause:
         SQLAlchemy textual statement with parsed bind parameters.
     """
     return text(sql)
+
 
 class _TransactionState:
     """Per-task stack of open transactions bound to one raw connection."""
@@ -88,7 +90,7 @@ class _TransactionState:
         Returns
         -------
         None
-            Store the connection, owning task, and transaction stack.
+            No return value.
         """
         self.connection = connection
         """Open connection shared by all transaction levels."""
@@ -120,8 +122,9 @@ class _TransactionState:
         Returns
         -------
         None
-            Leave the connection and transaction stack unchanged.
+            No return value.
         """
+
 
 class Connection(IConnection):
     """
@@ -135,8 +138,6 @@ class Connection(IConnection):
     blocking connector through a thread-backed Core engine; it does not
     support savepoints or returning server-generated identity values.
     """
-
-    # ruff: noqa: ANN401
 
     __slots__ = ("_compiler", "_config", "_engine", "_name", "_tx_state")
     """Declare the instance attribute slots reserved by this class."""
@@ -161,7 +162,7 @@ class Connection(IConnection):
         Returns
         -------
         None
-            Copy the settings and initialize the compiler and task-local state.
+            No return value.
 
         Raises
         ------
@@ -178,7 +179,8 @@ class Connection(IConnection):
         self._engine: AsyncEngine | ThreadedEngine | None = None
         """Database engine, created lazily when the connection is first used."""
         self._compiler = SQLCompiler(
-            str(self._config.get("prefix", "") or ""), driver=driver,
+            str(self._config.get("prefix", "") or ""),
+            driver=driver,
         )
         """Compiler produced by ``SQLCompiler``."""
         # Task-local transaction state keeps concurrent tasks isolated.
@@ -244,16 +246,19 @@ class Connection(IConnection):
                 dialect = self._engine.sync_engine.dialect
             else:
                 dialect = self._engine.dialect
-            return str(statement.compile(
-                dialect=dialect,
-                compile_kwargs={
-                    "literal_binds": literal_binds,
-                    "render_postcompile": True,
-                },
-            ))
+            return str(
+                statement.compile(
+                    dialect=dialect,
+                    compile_kwargs={
+                        "literal_binds": literal_binds,
+                        "render_postcompile": True,
+                    },
+                ),
+            )
         except (ImportError, NoSuchModuleError) as exc:
             raise missing_dependency_error(
-                resolve_driver(self._config), exc,
+                resolve_driver(self._config),
+                exc,
             ) from exc
         except SQLAlchemyError as exc:
             raise self._queryException(exc) from None
@@ -321,11 +326,10 @@ class Connection(IConnection):
         orionis.database.QueryException
             If compilation, execution, or connection cleanup fails.
         """
-        parameters = (
-            plan.values if self._compiler.supportsBatchInsert(plan) else None
-        )
+        parameters = plan.values if self._compiler.supportsBatchInsert(plan) else None
         statement = self._compiler.compileInsert(
-            plan, parameterized=parameters is not None,
+            plan,
+            parameterized=parameters is not None,
         )
         if resolve_driver(self._config) in {"oracle", "sqlserver", "redshift"}:
             # Oracle closes executemany cursors before lazy rowcount access;
@@ -528,7 +532,8 @@ class Connection(IConnection):
             If schema compilation, creation, or connection cleanup fails.
         """
         statement = self._compiler.compileCreateTable(
-            table, if_not_exists=if_not_exists,
+            table,
+            if_not_exists=if_not_exists,
         )
         async with self._acquire(sqlite_immediate=True) as connection:
             try:
@@ -573,7 +578,9 @@ class Connection(IConnection):
             If schema compilation, execution, or connection cleanup fails.
         """
         statement = self._compiler.compileDropTable(
-            name, schema, if_exists=if_exists,
+            name,
+            schema,
+            if_exists=if_exists,
         )
         async with self._acquire() as connection:
             await self._run(connection, statement)
@@ -588,7 +595,7 @@ class Connection(IConnection):
         Returns
         -------
         None
-            Push the new transaction level onto the current task's stack.
+            No return value.
 
         Raises
         ------
@@ -603,15 +610,16 @@ class Connection(IConnection):
                 raw = await self._getEngine().connect()
                 try:
                     transaction = (
-                        await raw.begin() if isinstance(raw, ThreadedConnection)
+                        await raw.begin()
+                        if isinstance(raw, ThreadedConnection)
                         else await _wait_for_completion(ensure_future(raw.begin()))
                     )
                 except BaseException as exc:
                     try:
                         if isinstance(exc, CancelledError):
-                            await _wait_for_completion(create_task(raw.invalidate()))
+                            await _complete_cleanup(raw.invalidate(), exc)
                     finally:
-                        await _wait_for_completion(create_task(raw.close()))
+                        await _complete_cleanup(raw.close(), exc)
                     raise
                 self._tx_state.set(_TransactionState(raw, transaction))
             else:
@@ -627,7 +635,7 @@ class Connection(IConnection):
                 )
                 state.transactions.append(savepoint)
         except SQLAlchemyError as exc:
-            error_msg = (
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Unable to begin transaction on connection '{self._name}' "
                 f"({type(exc).__name__})."
             )
@@ -640,7 +648,7 @@ class Connection(IConnection):
         Returns
         -------
         None
-            Close the connection when no transaction levels remain.
+            No return value.
 
         Raises
         ------
@@ -654,24 +662,31 @@ class Connection(IConnection):
             raise TransactionException(_NO_ACTIVE_TRANSACTION)
 
         transaction = state.transactions.pop()
+        primary: BaseException | None = None
         try:
             if isinstance(state.connection, ThreadedConnection):
                 await transaction.commit()
             else:
                 await _wait_for_completion(create_task(transaction.commit()))
-        except CancelledError:
-            await _wait_for_completion(create_task(state.connection.invalidate()))
+        except CancelledError as error:
+            primary = error
+            await _complete_cleanup(state.connection.invalidate(), error)
             raise
         except SQLAlchemyError as exc:
+            primary = exc
             if isinstance(state.connection, ThreadedConnection):
-                await state.connection.invalidate()
-            error_msg = (
+                await _complete_cleanup(state.connection.invalidate(), exc)
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Unable to commit transaction on connection '{self._name}' "
                 f"({type(exc).__name__})."
             )
-            raise TransactionException(error_msg) from None
+            primary = TransactionException(error_msg)
+            raise primary from None
+        except BaseException as error:
+            primary = error
+            raise
         finally:
-            await self._releaseIfSettled(state)
+            await self._releaseIfSettled(state, primary)
 
     async def rollback(self) -> None:
         """
@@ -680,7 +695,7 @@ class Connection(IConnection):
         Returns
         -------
         None
-            Close the connection when no transaction levels remain.
+            No return value.
 
         Raises
         ------
@@ -694,24 +709,31 @@ class Connection(IConnection):
             raise TransactionException(_NO_ACTIVE_TRANSACTION)
 
         transaction = state.transactions.pop()
+        primary: BaseException | None = None
         try:
             if isinstance(state.connection, ThreadedConnection):
                 await transaction.rollback()
             else:
                 await _wait_for_completion(create_task(transaction.rollback()))
-        except CancelledError:
-            await _wait_for_completion(create_task(state.connection.invalidate()))
+        except CancelledError as error:
+            primary = error
+            await _complete_cleanup(state.connection.invalidate(), error)
             raise
         except SQLAlchemyError as exc:
+            primary = exc
             if isinstance(state.connection, ThreadedConnection):
-                await state.connection.invalidate()
-            error_msg = (
+                await _complete_cleanup(state.connection.invalidate(), exc)
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Unable to roll back transaction on connection '{self._name}' "
                 f"({type(exc).__name__})."
             )
-            raise TransactionException(error_msg) from None
+            primary = TransactionException(error_msg)
+            raise primary from None
+        except BaseException as error:
+            primary = error
+            raise
         finally:
-            await self._releaseIfSettled(state)
+            await self._releaseIfSettled(state, primary)
 
     def transaction(self) -> ITransaction:
         """
@@ -750,7 +772,7 @@ class Connection(IConnection):
         Returns
         -------
         None
-            Clear the cached engine reference; skip disposal if no engine exists.
+            No return value.
 
         Raises
         ------
@@ -893,25 +915,38 @@ class Connection(IConnection):
             """
             try:
                 raw = await engine.connect()
+                primary: BaseException | None = None
                 try:
                     transaction = raw.begin()
                     await _wait_for_completion(create_task(transaction.__aenter__()))
                     try:
                         yield raw
                     except BaseException as exc:
-                        await _wait_for_completion(create_task(
-                            transaction.__aexit__(type(exc), exc, exc.__traceback__),
-                        ))
+                        await _complete_cleanup(
+                            _rollback_or_invalidate(
+                                transaction.__aexit__(
+                                    type(exc),
+                                    exc,
+                                    exc.__traceback__,
+                                ),
+                                raw.invalidate,
+                            ),
+                            exc,
+                        )
                         raise
                     else:
-                        await _wait_for_completion(create_task(
-                            transaction.__aexit__(None, None, None),
-                        ))
-                except CancelledError:
-                    await _wait_for_completion(create_task(raw.invalidate()))
+                        await _wait_for_completion(
+                            create_task(
+                                transaction.__aexit__(None, None, None),
+                            ),
+                        )
+                except BaseException as error:
+                    primary = error
+                    if isinstance(error, CancelledError):
+                        await _complete_cleanup(raw.invalidate(), error)
                     raise
                 finally:
-                    await _wait_for_completion(create_task(raw.close()))
+                    await _complete_cleanup(raw.close(), primary)
             except SQLAlchemyError as exc:
                 raise self._queryException(exc) from None
 
@@ -952,7 +987,8 @@ class Connection(IConnection):
                 # response racing with the next transaction-control message.
                 operation = create_task(
                     connection.execute(statement, parameters)
-                    if parameters else connection.execute(statement),
+                    if parameters
+                    else connection.execute(statement),
                 )
                 return await _wait_for_completion(operation)
             if parameters:
@@ -976,13 +1012,13 @@ class Connection(IConnection):
             Framework exception without SQL, parameters, or the driver message.
         """
         return QueryException(
-            f"Query failed on connection '{self._name}' "
-            f"({type(error).__name__}).",
+            f"Query failed on connection '{self._name}' ({type(error).__name__}).",
         )
 
     async def _releaseIfSettled(
         self,
         state: _TransactionState,
+        primary: BaseException | None,
     ) -> None:
         """
         Release the raw connection when its transaction stack becomes empty.
@@ -991,11 +1027,13 @@ class Connection(IConnection):
         ----------
         state : orionis.database.connection._TransactionState
             State whose remaining transaction levels determine whether to close.
+        primary : BaseException | None
+            Failure from the current control operation, not its caller's context.
 
         Returns
         -------
         None
-            Clear task-local state and close only a fully settled connection.
+            No return value.
 
         Raises
         ------
@@ -1005,6 +1043,6 @@ class Connection(IConnection):
         if not state.transactions:
             self._tx_state.set(None)
             try:
-                await _wait_for_completion(create_task(state.connection.close()))
+                await _complete_cleanup(state.connection.close(), primary)
             except SQLAlchemyError as exc:
                 raise self._queryException(exc) from None

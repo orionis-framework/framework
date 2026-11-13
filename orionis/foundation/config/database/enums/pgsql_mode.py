@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class PGSQLSSLMode(Enum):
     """
     Define SSL modes for PostgreSQL connections.
@@ -31,9 +32,9 @@ class PGSQLSSLMode(Enum):
         An enumeration member representing the SSL mode.
     """
 
-    DISABLE = "disable"          # No SSL (not secure)
-    ALLOW = "allow"              # Attempts SSL, silently falls back if unavailable
-    PREFER = "prefer"            # Uses SSL if available (common default)
-    REQUIRE = "require"          # Requires SSL (no certificate validation)
-    VERIFY_CA = "verify-ca"      # Validates the server certificate against the CA
+    DISABLE = "disable"  # No SSL (not secure)
+    ALLOW = "allow"  # Attempts SSL, silently falls back if unavailable
+    PREFER = "prefer"  # Uses SSL if available (common default)
+    REQUIRE = "require"  # Requires SSL (no certificate validation)
+    VERIFY_CA = "verify-ca"  # Validates the server certificate against the CA
     VERIFY_FULL = "verify-full"  # Validates both the certificate and the host name

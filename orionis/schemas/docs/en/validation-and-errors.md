@@ -4,6 +4,12 @@
 
 The container detects `Schema` parameters, selects route input, and awaits `validate`. The HTTP kernel renders `ValidationException` as structured validation errors. Realtime compiles schema parameter plans for remote methods, and MCP awaits schema validation for tool inputs and structured output, including streamed results.
 
+An instance of `Schema` returned directly from an HTTP controller is validated
+before JSON output, including mutated and nested instances. Invalid output
+produces a server error (`500`). A return annotation alone does not convert a
+dictionary, and wrapping the instance in `JSONResponse` does not trigger this
+automatic validation.
+
 Schema documentation metadata is consumed by JSON Schema/OpenAPI-related compilers without making those concerns part of instance validation.
 
 ## Errors and edge cases
@@ -11,20 +17,27 @@ Schema documentation metadata is consumed by JSON Schema/OpenAPI-related compile
 - Missing required fields, incompatible values, and structural bounds become `ValidationException` under `Validator`.
 - Direct `msgspec.convert` raises `msgspec.ValidationError`, not the grouped Orionis exception.
 - Direct construction does not run the full untrusted-payload validation pipeline.
+- Existing schema or `msgspec.Struct` instances inside input mappings and collections are revalidated, even without `Coerce()`, without mutating the originals.
 - Rule ordering follows field metadata order; failures are accumulated across fields and nested containers.
 - `Message` covers type mismatch, not every rule. Put `message=` on the exact constraint/rule being customized.
 - `ActiveUrl` performs network resolution; `Unique` performs database I/O; file/image rules require an uploaded-file-like object.
 - Conflicting metadata such as two `MinLength` values or mutually exclusive timezone constraints fails at class declaration.
 
+`ValidationException` accepts one `ValidationFailure` or a sequence of failures.
+An explicit summary, including an empty string, is preserved. Without one, the
+summary uses the first failure and counts all remaining failures, including
+several on one field. `failure` is the first entity, `failures` is an immutable
+tuple, and `errors[field]` contains dictionaries with `rule` and `message`.
+
 ## Performance and concurrency
 
-Structural metadata and rule traversal plans are compiled at class creation and cached by schema type. Schemas without `Coerce()` keep a single optimized `msgspec.convert` call on the successful path. Marked fields are first normalized using a bounded, cached traversal plan; the prepared payload is then used for both validation and failure reporting. Detailed field-by-field error inspection is reserved for rejected input.
+Structural metadata and rule traversal plans are compiled at class creation and cached by schema type. Flat inputs without `Coerce()` use native conversion without a coercion traversal. Existing nested instances are prepared for revalidation. Marked fields are first normalized using a bounded, cached traversal plan; the prepared payload is then used for both validation and failure reporting. Detailed field-by-field error inspection is reserved for rejected input.
 
 Schema instances and metadata plans are compact; validation itself retains no global request state. Asynchronous rules preserve the caller's event loop and transaction. Always await `validate`, even for schemas with no I/O rules. Every rule implements `async def enforce`; use native asynchronous I/O there to avoid blocking the loop. Pure checks do not require worker threads.
 
 ## Compatibility
 
-Schema classes are `msgspec.Struct` subclasses and can be encoded by supported `msgspec` codecs. Public declaration relies on Python 3.14 deferred annotations. Constraint semantics follow Orionis' compiler; application code should import Orionis metadata rather than constructing `msgspec.Meta` directly when it needs consistent messages and documentation.
+Schema classes are `msgspec.Struct` subclasses and can be encoded by supported `msgspec` codecs. Public declarations support Python 3.14 deferred annotations, string annotations, and explicit annotation mappings. Constraint semantics follow Orionis' compiler; application code should import Orionis metadata rather than constructing `msgspec.Meta` directly when it needs consistent messages and documentation.
 
 Validation now has only the asynchronous `validate` entry point. Migrate every caller to `await Validator.validate(...)`; synchronous calls and the former alternate entry point are no longer supported. Custom rules must implement `async def enforce`, and direct enforcement calls must also be awaited. Failure collection awaits rules on conversion-error paths.
 
@@ -33,15 +46,21 @@ Validation now has only the asynchronous `validate` entry point. Migrate every c
 Child schema rules run for direct nested fields and for schemas inside lists, dictionary values, tuples, sets and frozensets, including nested collections, optional values and supported collection aliases such as `Sequence` and `Mapping`. These are Orionis checks in addition to msgspec's type conversion and compiled structural constraints; no manual per-element validation is required.
 
 ```python
+from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.rules import Email
+
+
 class Contact(Schema):
     email: Field[str, Email()]
+
 
 class Accounts(Schema):
     contacts: list[Contact]
     by_name: dict[str, Contact]
 ```
 
-With the imports from the example below, `await Validator.validate(...)` rejects an invalid child email as `contacts[0].email` or `by_name['primary'].email`. Direct nesting still reports paths such as `contact.email`. Dictionary keys are represented with Python `repr`, so punctuation inside a key stays part of that key.
+Validation rejects an invalid child email as `contacts[0].email` or `by_name['primary'].email`. Direct nesting still reports paths such as `contact.email`. Dictionary keys are represented with Python `repr`, so punctuation inside a key stays part of that key.
 
 If a field or collection item fails conversion, rules still run on its successfully converted siblings, including valid fields of a partially converted child. The incompatible value does not run its own rules. Collection-level constraints are preserved alongside child failures. Cross-field rules receive the child instance, or its successfully converted fields on the error path, rather than the parent collection.
 
@@ -62,32 +81,42 @@ from orionis.schemas.rules import Email
 from orionis.schemas.validator import Schema as Validator
 from orionis.schemas.exceptions import ValidationException
 
+
 class Line(Schema):
     sku: Field[str, MinLength(3)]
     quantity: Field[int, GreaterThan(0)]
+
 
 class Order(Schema, forbid_unknown_fields=True):
     email: Field[str, Email()]
     lines: Field[list[Line], MinLength(1)]
     note: str | None = None
 
+
 async def main() -> None:
-    order = await Validator.validate({
-        "email": "ada@example.com",
-        "lines": [{"sku": "BK-1", "quantity": 2}],
-    }, Order)
+    order = await Validator.validate(
+        {
+            "email": "ada@example.com",
+            "lines": [{"sku": "BK-1", "quantity": 2}],
+        },
+        Order,
+    )
     assert order.lines[0].quantity == 2
     assert order.note is None
     try:
-        await Validator.validate({
-            "email": "ada@example.com",
-            "lines": [{"sku": "BK-1", "quantity": 0}],
-        }, Order)
+        await Validator.validate(
+            {
+                "email": "ada@example.com",
+                "lines": [{"sku": "BK-1", "quantity": 0}],
+            },
+            Order,
+        )
     except ValidationException as error:
         assert error.failures
         assert error.error()["errors"] == error.errors
     else:
         raise AssertionError("invalid order accepted")
+
 
 asyncio.run(main())
 ```

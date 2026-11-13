@@ -27,7 +27,7 @@ plan = Document.published().toPlan()
 assert len(plan.wheres) == 1
 ```
 
-En una aplicación, `await Document.published().get()` aplica el scope. `query.scope("published")` es una alternativa explícita; un nombre ausente produce `ScopeNotFoundException`. Los scopes globales se registran con `Document.addGlobalScope("policy", callback)` y se aplican antes de ejecutar. `withoutGlobalScope("policy")`, `withoutGlobalScopes(...)` y `removeGlobalScope("policy")` permiten omitirlos/eliminarlos según alcance. No cambies el registro global para resolver una sola petición concurrente: modifica únicamente su builder.
+En una aplicación, `await Document.published().get()` aplica el scope. `query.scope("published")` es una alternativa explícita; un nombre ausente produce `ScopeNotFoundException`. Los scopes globales se registran con `Document.addGlobalScope("policy", callback)` y se aplican antes de ejecutar. `withoutGlobalScope("policy")`, `withoutGlobalScopes(...)` y `removeGlobalScope("policy")` permiten omitirlos/eliminarlos según alcance. No cambies el registro global para resolver una sola petición concurrente: modifica únicamente su builder. Si un scope global lanza una excepción, se descartan sus cambios al plan de consulta y una ejecución posterior reintenta la preparación; no se revierten los efectos externos del callback.
 
 ## Escuchar y vetar persistencia
 
@@ -45,7 +45,7 @@ Solo `saving`, `creating`, `updating`, `deleting` y `restoring` admiten veto dev
 
 Un observer es un objeto con métodos nombrados como eventos; se registra con `Document.observe(observer)`. Si pasas una clase, se instancia sin argumentos: construye el objeto antes si necesita dependencias. `flushEvents(event=None)` limpia listeners y resulta útil para aislamiento de pruebas. El registro es por clase y se hereda al crear subclases; no registres listeners repetidamente durante cada petición.
 
-Los eventos posteriores ocurren después de la sentencia, no después de la confirmación de una transacción exterior. Un listener `created` que envía correo puede ejecutarse antes de un rollback posterior. Diseña efectos externos con identidad y reintentos deliberados. Las escrituras masivas de builder no ejecutan cada ciclo de instancia.
+Los eventos posteriores de éxito solo se ejecutan si la operación de instancia tiene éxito; una actualización, eliminación o restauración sin filas afectadas devuelve `False` sin esos eventos. Los atributos locales pueden reflejar todavía el cambio intentado, por lo que debes comprobar el resultado. Los eventos posteriores ocurren después de la sentencia, no después de la confirmación de una transacción exterior. Un listener `created` que envía correo puede ejecutarse antes de un rollback posterior. Diseña efectos externos con identidad y reintentos deliberados. Las escrituras masivas de builder no ejecutan cada ciclo de instancia.
 
 ## Eliminación lógica
 

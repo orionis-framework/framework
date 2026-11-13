@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IPolicy(ABC):
     """
     Define the contract shared by every resource policy.

@@ -1,39 +1,26 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.localization.contracts.translator import ITranslator
 from orionis.localization.translator import Translator
 from orionis.test import TestCase
 
 # Methods every translator must implement.
-_ABSTRACT_METHODS: frozenset[str] = frozenset({
-    "availableLocales",
-    "choice",
-    "flush",
-    "forget",
-    "get",
-    "getLocale",
-    "has",
-    "missing",
-    "reload",
-    "setLocale",
-})
+_ABSTRACT_METHODS: frozenset[str] = frozenset(
+    {
+        "availableLocales",
+        "choice",
+        "flush",
+        "forget",
+        "get",
+        "getLocale",
+        "has",
+        "missing",
+        "reload",
+        "setLocale",
+    },
+)
 
-def parameter_names(owner: type, method: str) -> list[str]:
-    """
-    Return the parameter names declared by *method* on *owner*.
-
-    Parameters
-    ----------
-    owner : type
-        Class owning the inspected method.
-    method : str
-        Name of the method to inspect.
-
-    Returns
-    -------
-    list[str]
-        Ordered parameter names of the method signature.
-    """
-    return list(inspect.signature(getattr(owner, method)).parameters)
 
 class TestTranslatorContract(TestCase):
     """Validate the translator interface and its implementation parity."""
@@ -47,7 +34,7 @@ class TestTranslatorContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ITranslator.__abstractmethods__, _ABSTRACT_METHODS)
 
@@ -60,7 +47,7 @@ class TestTranslatorContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ITranslator.__slots__, ())
 
@@ -73,7 +60,7 @@ class TestTranslatorContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(Translator, ITranslator))
 
@@ -86,14 +73,20 @@ class TestTranslatorContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for method in sorted(_ABSTRACT_METHODS):
-            self.assertEqual(
-                parameter_names(Translator, method),
-                parameter_names(ITranslator, method),
-                method,
-            )
+            with self.subTest(method=method):
+                expected = inspect.signature(
+                    getattr(ITranslator, method),
+                    eval_str=True,
+                )
+                actual = inspect.signature(getattr(Translator, method), eval_str=True)
+                self.assertEqual(
+                    list(actual.parameters.values())[1:],
+                    list(expected.parameters.values())[1:],
+                )
+                self.assertEqual(actual.return_annotation, expected.return_annotation)
 
     def testFallbackFlagStaysKeywordOnly(self) -> None:
         """Keep the existence fallback flag keyword-only.
@@ -104,7 +97,7 @@ class TestTranslatorContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for owner in (ITranslator, Translator):
             parameter = inspect.signature(owner.has).parameters["fallback"]

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import tempfile
 from pathlib import Path
@@ -23,8 +25,8 @@ _KEYS: list[str] = [
     "root.txt",
 ]
 
-class TestDriverFunctions(TestCase):
 
+class TestDriverFunctions(TestCase):
     def testImportDriverDependencyRaisesWithInstallHint(self) -> None:
         """Raise a descriptive error for a missing optional package.
 
@@ -33,7 +35,7 @@ class TestDriverFunctions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for package, extra in (
             ("boto3", "s3"),
@@ -55,7 +57,7 @@ class TestDriverFunctions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for mode in ("rb", "wb", "ab", "rb+", "wb+", "ab+"):
             assertBinaryMode(mode)
@@ -68,7 +70,7 @@ class TestDriverFunctions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(UnsupportedStorageOperationException):
             assertBinaryMode("r")
@@ -81,7 +83,7 @@ class TestDriverFunctions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             filterFiles(_KEYS, "docs", recursive=False),
@@ -104,7 +106,7 @@ class TestDriverFunctions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             deriveDirectories(_KEYS, "docs", recursive=False),
@@ -128,14 +130,15 @@ class TestDriverFunctions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             into_dir = resolveDownloadTarget("docs/report.pdf", tmp)
             self.assertEqual(into_dir, Path(tmp) / "report.pdf")
 
             explicit = resolveDownloadTarget(
-                "docs/report.pdf", Path(tmp) / "nested" / "out.pdf",
+                "docs/report.pdf",
+                Path(tmp) / "nested" / "out.pdf",
             )
             self.assertEqual(explicit.name, "out.pdf")
             self.assertTrue(explicit.parent.is_dir())

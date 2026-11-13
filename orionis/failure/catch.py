@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Preserve application and transport annotations for runtime dependency inspection.
 """Resolve exception handling and reporting for application failures."""
 
 from dataclasses import replace
@@ -5,21 +7,25 @@ from orionis.failure.contracts.catch import ICatch
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.failure.entities.context import FailureContext, FailureReceipt
 from orionis.failure.runtime import (
-    FailureRuntime, current_operation, get_runtime, operation,
+    FailureRuntime,
+    current_operation,
+    get_runtime,
+    operation,
 )
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.adapters.request.contracts.transport import TransportAdapter
 from orionis.http.request import Request
 from orionis.http.responses import Response
 
-class Catch(ICatch):
 
-    # ruff: noqa: TC001
+class Catch(ICatch):
     """Resolve the unified handling plan and request native presentation."""
 
     def __init__(self, app: IApplication) -> None:
         """
         Initialize exception handling for the application.
+
+        Store the application and defer standalone runtime creation.
 
         Parameters
         ----------
@@ -29,7 +35,7 @@ class Catch(ICatch):
         Returns
         -------
         None
-            Store the application and defer standalone runtime creation.
+            No return value.
         """
         self.__app: IApplication = app
         """The application instance used to resolve required services."""
@@ -37,7 +43,10 @@ class Catch(ICatch):
         """Inactive coordinator for explicitly invoked standalone handling."""
 
     async def capture(
-        self, exception: BaseException, *, context: FailureContext,
+        self,
+        exception: BaseException,
+        *,
+        context: FailureContext,
     ) -> FailureReceipt | None:
         """
         Observe an exception through the application's active failure runtime.
@@ -123,12 +132,15 @@ class Catch(ICatch):
         # Reuse the operation's selected plan, including in-flight callback
         # delivery. Presentation must not invoke application policy or log again.
         with operation(
-            app, flow=flow, operation=incident_context.operation,
+            app,
+            flow=flow,
+            operation=incident_context.operation,
             correlation_id=incident_context.correlation_id,
         ):
             if runtime is not None:
                 handling = await runtime.handlingFor(
-                    exception, context=incident_context,
+                    exception,
+                    context=incident_context,
                 )
             else:
                 # Preserve explicitly invoked standalone Catch behavior without
@@ -137,15 +149,21 @@ class Catch(ICatch):
                     self.__standalone_runtime = FailureRuntime(app)
                 runtime = self.__standalone_runtime
                 receipt, handling = await runtime.dispatchFailure(
-                    exception, context=incident_context,
+                    exception,
+                    context=incident_context,
                 )
                 incident_context = replace(
-                    incident_context, event_id=receipt.event_id,
+                    incident_context,
+                    event_id=receipt.event_id,
                 )
             if handling is None or context not in (
-                KernelContext.CONSOLE, KernelContext.HTTP,
+                KernelContext.CONSOLE,
+                KernelContext.HTTP,
             ):
                 return None
             return await runtime.presentHandling(
-                handling, exception, context=incident_context, request=request,
+                handling,
+                exception,
+                context=incident_context,
+                request=request,
             )

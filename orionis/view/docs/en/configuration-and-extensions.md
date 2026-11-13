@@ -73,8 +73,9 @@ assert config.autoescape is True
 
 ## Errors and edge cases
 
-- Missing templates preserve `ViewTemplateNotFoundException`; other pending-render failures are wrapped in `ViewRenderException` with the original cause.
-- Jinja template errors are wrapped in `ViewRenderException` by the engine.
+- Missing templates preserve `ViewTemplateNotFoundException`; an existing `ViewRenderException` passes through unchanged. Other unexpected pending-render failures are wrapped in `ViewRenderException` with the original cause.
+- Jinja template errors during loading, compilation, or rendering are wrapped once in `ViewRenderException`, preserving the native cause.
+- A full template-worker queue raises `WorkQueueFullError`; callers can apply their overload policy.
 - Unknown chained attributes on `PendingView` raise `AttributeError`; only callable `HTMLResponse` attributes may be queued.
 - Flash operations silently do nothing when no session service is available.
 - `errors.first()` returns the first available message and the error bag normalizes scalar messages to lists.
@@ -88,9 +89,9 @@ assert config.autoescape is True
 
 ## Performance and concurrency
 
-The environment, engine, and factory are singletons. Jinja keeps up to `cache_size` compiled templates in memory and optionally persists bytecode to disk. Cache filenames include a readable flattened template name plus an eight-character SHA-1 digest to prevent extension/path collisions.
+The environment, engine, and factory are singletons. Jinja keeps up to `cache_size` compiled templates in memory and optionally persists bytecode to disk. Cache filenames combine a readable flattened template name with an eight-character SHA-1 digest to distinguish names that flatten to the same stem. Windows-reserved characters and device names are sanitized so each generated name remains inside the configured directory. The truncated digest does not guarantee collision freedom.
 
-Template-name normalization uses a lock-protected LRU cache capped at 1,024 entries. Named-route interpolation plans are memoized; racing threads can only calculate and store the same deterministic value. Rendering is async, while the shared environment is mutated only during application boot. Register custom globals, filters, tests, and extensions during provider boot rather than during concurrent requests.
+Template-name normalization uses a cache capped at 1,024 entries, with insertion and eviction protected by a lock. It evicts the oldest inserted name (FIFO); cache hits do not change that order. Named-route interpolation plans use a separate LRU cache capped at 1,024 entries. Racing threads may compile the same missing plan more than once while the cache remains coherent; each plan is a pure function of its route template. Rendering is async, while the shared environment is mutated only during application boot. Register custom globals, filters, tests, and extensions during provider boot rather than during concurrent requests.
 
 
 
@@ -118,7 +119,7 @@ assert key != cache.getCacheKey("users/profile.j2")
 
 | Path | Responsibility |
 | --- | --- |
-| `cache.py` | Human-readable, collision-resistant Jinja2 bytecode cache names. |
+| `cache.py` | Portable, readable Jinja2 bytecode names with a disambiguating digest. |
 | `contracts/` | Environment, engine, and factory interfaces. |
 | `engine.py` | Async Jinja2 rendering and template-name normalization. |
 | `environment.py` | Loader, escaping, in-memory cache, and disk-cache setup. |

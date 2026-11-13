@@ -1,12 +1,13 @@
-"""Base for non-integer numeric types, such as ``NUMERIC``/``DECIMAL``."""
+"""Declare a non-integer numeric column using the logical ``NUMERIC`` kind."""
 
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
+
 class Numeric(ColumnDefinition):
-    """Base for non-integer numeric types, such as ``NUMERIC``/``DECIMAL``."""
+    """Declare a non-integer numeric column using the logical ``NUMERIC`` kind."""
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -25,7 +26,8 @@ class Numeric(ColumnDefinition):
         Parameters
         ----------
         precision : int or None, optional
-            Numeric precision for use in DDL ``CREATE TABLE``.
+            Numeric precision for DDL. Supply it together with scale, or
+            leave both values as None.
         scale : int or None, optional
             Numeric scale for use in DDL ``CREATE TABLE``.
         decimal_return_scale : int or None, optional
@@ -41,11 +43,17 @@ class Numeric(ColumnDefinition):
         Raises
         ------
         ValueError
-            If precision or scale are negative or inconsistent.
+            If the shape is incomplete, contains non-integers or booleans,
+            or has non-positive precision or scale outside its range.
         """
         # Validate the numeric shape early to fail fast at class definition.
         if precision is not None or scale is not None:
-            valid_types = isinstance(precision, int) and isinstance(scale, int)
+            valid_types = (
+                isinstance(precision, int)
+                and not isinstance(precision, bool)
+                and isinstance(scale, int)
+                and not isinstance(scale, bool)
+            )
             if not valid_types or precision <= 0 or scale < 0 or scale > precision:
                 error_msg = (
                     "Numeric requires a positive precision and a non-negative "

@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
+import sys
 from contextlib import redirect_stderr, redirect_stdout
 from html import escape
 from io import StringIO
@@ -8,7 +11,44 @@ from orionis.console.output.contracts.var_dumper import IVarDumper
 from orionis.console.output.var_dumper import VarDumper
 from orionis.test import TestCase
 
+
 class TestVarDumper(TestCase):
+    def testRedirectedPrintingRestoresEachBorrowedStream(self) -> None:
+        """
+        Use the original streams for printing and restore each caller's streams.
+
+        Returns
+        -------
+        None
+            Preserve redirection across repeated calls without stale references.
+        """
+        output, error_output = StringIO(), StringIO()
+        dumper = VarDumper().redirectOutput().modulePath("fixture").lineNumber(1)
+        dumper.value("redirect-probe")
+        with patch("sys.__stdout__", output), patch("sys.__stderr__", error_output):
+            for _ in range(2):
+                captured, errors = StringIO(), StringIO()
+                with redirect_stdout(captured), redirect_stderr(errors):
+                    dumper.print()
+                    self.assertIs(sys.stdout, captured)
+                    self.assertIs(sys.stderr, errors)
+                self.assertEqual(captured.getvalue(), "")
+                self.assertEqual(errors.getvalue(), "")
+            captured, errors = StringIO(), StringIO()
+            with (
+                redirect_stdout(captured),
+                redirect_stderr(errors),
+                patch.object(
+                    dumper,
+                    "_VarDumper__render",
+                    side_effect=ValueError("render failed"),
+                ),
+            ):
+                with self.assertRaisesRegex(ValueError, "render failed"):
+                    dumper.print()
+                self.assertIs(sys.stdout, captured)
+                self.assertIs(sys.stderr, errors)
+        self.assertEqual(output.getvalue().count("redirect-probe"), 2)
 
     # ------------------------------------------------------------------ #
     #  Helpers                                                           #
@@ -1190,8 +1230,7 @@ class TestVarDumper(TestCase):
         """
         dumper = self._make()
         result = (
-            dumper
-            .showTypes(show=True)
+            dumper.showTypes(show=True)
             .showIndex(show=True)
             .expandAll(expand=True)
             .maxDepth(5)

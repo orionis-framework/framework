@@ -174,6 +174,16 @@
         
 
         
+            <div class="itemName"><code><a href="#__executeSync" class="internal-link" title="orionis.background.BackgroundTask.__executeSync">__execute<wbr></wbr>Sync</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.background.BackgroundTask.__init__">__init__</a></code>
             </div>
         
@@ -482,6 +492,16 @@
         
 
         
+            <div class="itemName"><code><a href="#__executeSync" class="internal-link" title="orionis.background.BackgroundTask.__executeSync">__execute<wbr></wbr>Sync</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.background.BackgroundTask.__init__">__init__</a></code>
             </div>
         
@@ -635,6 +655,16 @@
         <ul>
     
     <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__executeSync" class="internal-link" title="orionis.background.BackgroundTask.__executeSync">__execute<wbr></wbr>Sync</a></code>
+            </div>
+        
+
+    </li><li class="">
         
         
         
@@ -831,7 +861,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BackgroundTask</span>(<a href="orionis.background.contracts.task.IBackgroundTask.html" class="internal-link" title="orionis.background.contracts.task.IBackgroundTask">IBackgroundTask</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L43" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.background.BackgroundTasks.html" class="internal-link">orionis.background.BackgroundTasks</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.background.BackgroundTask.__init__">BackgroundTask(func, *args, **kwargs)</a></code></p><p><a href="classIndex.html#orionis.background.BackgroundTask">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">BackgroundTask</span>(<a href="orionis.background.contracts.task.IBackgroundTask.html" class="internal-link" title="orionis.background.contracts.task.IBackgroundTask">IBackgroundTask</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L48" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.background.BackgroundTasks.html" class="internal-link">orionis.background.BackgroundTasks</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.background.BackgroundTask.__init__">BackgroundTask(func, *args, **kwargs)</a></code></p><p><a href="classIndex.html#orionis.background.BackgroundTask">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -847,6 +877,11 @@
     <td>Async Method</td>
     <td><code><a href="#__call__" class="internal-link" title="orionis.background.BackgroundTask.__call__">__call__</a></code></td>
     <td>Execute the background task, handling both sync and async functions.</td>
+  </tr><tr class="method">
+    
+    <td>Async Method</td>
+    <td><code><a href="#__executeSync" class="internal-link" title="orionis.background.BackgroundTask.__executeSync">__execute<wbr></wbr>Sync</a></code></td>
+    <td>Run synchronous work and release its result if the caller cancels.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -903,7 +938,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__call__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L92">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L132">
       
       (source)
     </a>
@@ -920,6 +955,33 @@
 </div><div class="basemethod">
   
   
+  <a name="orionis.background.BackgroundTask.__executeSync">
+    
+  </a>
+  <a name="__executeSync">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__executeSync</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L97">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__executeSync" title="orionis.background.BackgroundTask.__executeSync">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Run synchronous work and release its result if the caller cancels.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Worker result when the caller remains active.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>After the worker has finished and an abandoned awaitable is released.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></td><td>If the worker fails while the caller is still awaiting it.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.background.BackgroundTask.__init__">
     
   </a>
@@ -930,7 +992,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">func: <code>Callable</code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L65">
       
       (source)
     </a>
@@ -942,7 +1004,7 @@
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.background.BackgroundTasks.html" class="internal-link">orionis.background.BackgroundTasks</a></code></div>
-    <div><p>Initialize the BackgroundTask instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">func:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">The function to be executed in the background.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Positional arguments to pass to the function.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**kwargs:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Keyword arguments to pass to the function.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Initialize the BackgroundTask instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">func:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">The function to be executed in the background.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Positional arguments to pass to the function.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**kwargs:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Keyword arguments to pass to the function.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -957,7 +1019,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">run</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L135">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L179">
       
       (source)
     </a>
@@ -983,7 +1045,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L62">
       
       (source)
     </a>
@@ -1010,7 +1072,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__args</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L85">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L90">
       
       (source)
     </a>
@@ -1037,7 +1099,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__func</span>: <code>Callable[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr>Any]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L83">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L88">
       
       (source)
     </a>
@@ -1064,7 +1126,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__is_async</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L94">
       
       (source)
     </a>
@@ -1091,7 +1153,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__kwargs</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/background/task.py#L87">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/background/task.py#L92">
       
       (source)
     </a>
@@ -1117,7 +1179,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

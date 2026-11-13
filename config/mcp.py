@@ -2,17 +2,20 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.mcp.entities.mcp import McpConfig
 
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BootstrapMcp(McpConfig):
-
     # ----------------------------------------------------------------------------------
     # max_request_size : int, optional
     # --- Maximum serialized request size in bytes.
     # --- Uses MCP_MAX_REQUEST_SIZE, then HTTP_MAX_BODY_SIZE, or 1048576.
     # ----------------------------------------------------------------------------------
-    max_request_size: int = field(default_factory=lambda: Env.get(
-        "MCP_MAX_REQUEST_SIZE", Env.get("HTTP_MAX_BODY_SIZE", 1024 * 1024),
-    ))
+    max_request_size: int = field(
+        default_factory=lambda: Env.get(
+            "MCP_MAX_REQUEST_SIZE",
+            Env.get("HTTP_MAX_BODY_SIZE", 1024 * 1024),
+        ),
+    )
 
     # ----------------------------------------------------------------------------------
     # default_page_size : int, optional
@@ -38,9 +41,12 @@ class BootstrapMcp(McpConfig):
     # --- Maximum number of concurrent MCP requests.
     # --- Uses MCP_MAX_CONCURRENT_REQUESTS, then HTTP_MAX_CONCURRENT_REQUESTS, or 32.
     # ----------------------------------------------------------------------------------
-    max_concurrent_requests: int = field(default_factory=lambda: Env.get(
-        "MCP_MAX_CONCURRENT_REQUESTS", Env.get("HTTP_MAX_CONCURRENT_REQUESTS", 32),
-    ))
+    max_concurrent_requests: int = field(
+        default_factory=lambda: Env.get(
+            "MCP_MAX_CONCURRENT_REQUESTS",
+            Env.get("HTTP_MAX_CONCURRENT_REQUESTS", 32),
+        ),
+    )
 
     # ----------------------------------------------------------------------------------
     # subscription_buffer_size : int, optional
@@ -87,7 +93,8 @@ class BootstrapMcp(McpConfig):
     # ----------------------------------------------------------------------------------
     allowed_origins: list[str] = field(
         default_factory=lambda: Env.get(
-            "CORS_ALLOW_ORIGINS", ["https://inspector.orionis-framework.com"],
+            "CORS_ALLOW_ORIGINS",
+            ["https://inspector.orionis-framework.com"],
         ),
     )
 

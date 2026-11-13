@@ -1,12 +1,15 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Expose the configured application directories."""
 
 from typing import TYPE_CHECKING, cast
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.contracts.directory import IDirectory
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from pathlib import Path
+
 
 class Directory(IDirectory):
     """Expose the configured application directories."""

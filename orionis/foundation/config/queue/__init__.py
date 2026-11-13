@@ -25,7 +25,10 @@ __all__ = [
 ]
 
 _EXPORTS = {
-    "Connections": ("orionis.foundation.config.queue.entities.connections", "Connections"),
+    "Connections": (
+        "orionis.foundation.config.queue.entities.connections",
+        "Connections",
+    ),
     "Database": ("orionis.foundation.config.queue.entities.database", "Database"),
     "Drivers": ("orionis.foundation.config.queue.enums.drivers", "Drivers"),
     "Failed": ("orionis.foundation.config.queue.entities.failed", "Failed"),
@@ -35,6 +38,7 @@ _EXPORTS = {
     "Worker": ("orionis.foundation.config.queue.entities.worker", "Worker"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -56,6 +60,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

@@ -1,12 +1,14 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Accept dynamic pivot identities and retain runtime iterable annotations.
 """Contract for a many-to-many relationship backed by a pivot table."""
 
-from __future__ import annotations
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from orionis.orm.contracts.relation import IRelation
+from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable
+from collections.abc import Iterable
+
 
 class IBelongsToManyRelation(IRelation):
     """
@@ -21,10 +23,21 @@ class IBelongsToManyRelation(IRelation):
     """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
+    async def getResults(self) -> Collection:
+        """
+        Retrieve every related model linked to the bound parent.
+
+        Returns
+        -------
+        orionis.support.types.Collection
+            Related models selected by this pivot query.
+        """
+
+    @abstractmethod
     def wherePivot(
         self,
         column: str,
-        *args: Any,  # noqa: ANN401
+        *args: Any,
     ) -> IBelongsToManyRelation:
         """
         Filter the pivot rows considered by this relationship query.
@@ -45,7 +58,7 @@ class IBelongsToManyRelation(IRelation):
     @abstractmethod
     async def attach(
         self,
-        ids: Any,  # noqa: ANN401
+        ids: Any,
         attributes: dict[str, Any] | None = None,
     ) -> int:
         """
@@ -67,7 +80,7 @@ class IBelongsToManyRelation(IRelation):
         """
 
     @abstractmethod
-    async def detach(self, ids: Any = None) -> int:  # noqa: ANN401
+    async def detach(self, ids: Any = None) -> int:
         """
         Unlink the parent from the given related records.
 

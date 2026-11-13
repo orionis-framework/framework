@@ -6,6 +6,7 @@ Includes ``BootstrapApiCommand``, ``BootstrapAiCommand``,
 
 from orionis.console.commands.bootstrap._base import BootstrapCommand
 
+
 class BootstrapApiCommand(BootstrapCommand):
     """Enable API routes and their HTTP component directories."""
 
@@ -19,6 +20,7 @@ class BootstrapApiCommand(BootstrapCommand):
     """
     context = "api"
     """Context identifier: ``api``."""
+
 
 class BootstrapAiCommand(BootstrapCommand):
     """Enable AI routes and their MCP component directories."""
@@ -34,6 +36,7 @@ class BootstrapAiCommand(BootstrapCommand):
     context = "ai"
     """Context identifier: ``ai``."""
 
+
 class BootstrapConsoleCommand(BootstrapCommand):
     """Enable console routes and their command component directories."""
 
@@ -48,6 +51,7 @@ class BootstrapConsoleCommand(BootstrapCommand):
     context = "console"
     """Context identifier: ``console``."""
 
+
 class BootstrapWebCommand(BootstrapCommand):
     """Enable web routes and their HTTP component directories."""
 
@@ -61,6 +65,7 @@ class BootstrapWebCommand(BootstrapCommand):
     """
     context = "web"
     """Context identifier: ``web``."""
+
 
 class BootstrapWebsocketCommand(BootstrapCommand):
     """Enable WebSocket routes and their HTTP component directories."""

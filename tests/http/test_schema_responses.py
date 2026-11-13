@@ -1,12 +1,15 @@
+# ruff: noqa: PT009, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import asyncio
 from dataclasses import replace
 from typing import ClassVar
 import msgspec
 from orionis.http.exceptions.response_validation import ResponseValidationException
 from orionis.http.responses import JSONResponse, Response
-from orionis.schemas.constraints import GreaterThanOrEqual  # noqa: TC001
+from orionis.schemas.constraints import GreaterThanOrEqual
 from orionis.schemas.exceptions.validation import ValidationException
-from orionis.schemas.fields import Field  # noqa: TC001
+from orionis.schemas.fields import Field
 from orionis.schemas.rule import Rule
 from orionis.schemas.schema import Schema
 from orionis.schemas.validator import Schema as Validator
@@ -19,6 +22,7 @@ from tests.http.test_kernel import (
     make_route,
 )
 from tests.http.test_support import replace_attribute
+
 
 class _Ready(Rule):
     """Record asynchronous business validation of an output field."""
@@ -49,12 +53,15 @@ class _Ready(Rule):
         self.calls.append(value)
         return value == "ready"
 
+
 class _Output(Schema):
     quantity: Field[int, GreaterThanOrEqual(1)]
     state: Field[str, _Ready()] = "ready"
 
+
 class _NestedOutput(Schema):
     items: list[_Output]
+
 
 class _OutputController:
     """Return an output contract from an ordinary controller method."""
@@ -70,6 +77,7 @@ class _OutputController:
         """
         return _Output(quantity=2)
 
+
 def invalid_constraint() -> _Output:
     """
     Construct an output that violates its native quantity constraint.
@@ -80,6 +88,7 @@ def invalid_constraint() -> _Output:
         Schema containing a quantity of zero.
     """
     return _Output(quantity=0)
+
 
 def invalid_type() -> _Output:
     """
@@ -92,6 +101,7 @@ def invalid_type() -> _Output:
     """
     return _Output(quantity="bad")
 
+
 def invalid_rule() -> object:
     """
     Return a schema whose state fails its asynchronous rule.
@@ -102,6 +112,7 @@ def invalid_rule() -> object:
         Schema containing the rejected pending state.
     """
     return _Output(quantity=2, state="pending")
+
 
 def mutated_nested() -> _NestedOutput:
     """
@@ -116,6 +127,7 @@ def mutated_nested() -> _NestedOutput:
     item.quantity = 0
     return _NestedOutput(items=[item])
 
+
 def annotated_mapping() -> _Output:
     """
     Return a mapping to test validation based on the runtime value.
@@ -127,6 +139,7 @@ def annotated_mapping() -> _Output:
     """
     return {"quantity": "unvalidated"}
 
+
 def explicit_response() -> Response:
     """
     Wrap an invalid schema in an explicit JSON response.
@@ -137,6 +150,7 @@ def explicit_response() -> Response:
         Response whose content bypasses direct-schema output validation.
     """
     return JSONResponse(_Output(quantity=0))
+
 
 class TestSchemaResponses(TestCase):
     """Exercise schema output validation through HTTP transport entry points."""
@@ -154,7 +168,9 @@ class TestSchemaResponses(TestCase):
         route = replace(
             make_route("/output", controller="_OutputController"),
             action={
-                "module": __name__, "class": "_OutputController", "method": "show",
+                "module": __name__,
+                "class": "_OutputController",
+                "method": "show",
             },
         )
         kernel, _app, _responses, catch = await boot_kernel(
@@ -162,9 +178,11 @@ class TestSchemaResponses(TestCase):
         )
         for interface in ("asgi", "rsgi"):
             response = (
-                await dispatch(kernel, "/output") if interface == "asgi"
+                await dispatch(kernel, "/output")
+                if interface == "asgi"
                 else await kernel.handleRSGI(
-                    _StubRsgiScope("/output"), _StubRsgiProtocol(),
+                    _StubRsgiScope("/output"),
+                    _StubRsgiProtocol(),
                 )
             )
             self.assertEqual(response.getStatusCode(), 200)
@@ -202,7 +220,8 @@ class TestSchemaResponses(TestCase):
                     response = await dispatch(kernel, "/output")
                     self.assertEqual(response.getStatusCode(), 500)
                     self.assertEqual(
-                        response.getBody(), b"The response schema is invalid.",
+                        response.getBody(),
+                        b"The response schema is invalid.",
                     )
                     self.assertEqual(len(catch.handled), 1)
                     failure = catch.handled[0]

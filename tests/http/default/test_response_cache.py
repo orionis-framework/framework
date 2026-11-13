@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, S704
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import json
@@ -14,8 +16,8 @@ from orionis.view.environment import ViewEnvironment
 if TYPE_CHECKING:
     from orionis.http.responses import FileResponse
 
-class _DefaultFixture:
 
+class _DefaultFixture:
     __slots__ = ("basePath", "directory", "settings")
 
     def __init__(self, directory: Path) -> None:
@@ -35,11 +37,17 @@ class _DefaultFixture:
         self.directory = directory
         self.basePath = directory
         self.settings = {
-            "app.name": "Example", "app.locale": "en", "app.maintenance": False,
-            "app.debug": True, "app.env": "testing", "app.interface": "asgi",
+            "app.name": "Example",
+            "app.locale": "en",
+            "app.maintenance": False,
+            "app.debug": True,
+            "app.env": "testing",
+            "app.interface": "asgi",
             "view": {
-                "paths": [str(directory)], "cache_path": None,
-                "autoescape": True, "auto_reload": False,
+                "paths": [str(directory)],
+                "cache_path": None,
+                "autoescape": True,
+                "auto_reload": False,
             },
         }
 
@@ -80,8 +88,8 @@ class _DefaultFixture:
         """
         return self.directory
 
-class _Request:
 
+class _Request:
     __slots__ = ("wants_json",)
 
     def __init__(self, *, wants_json: bool) -> None:
@@ -110,6 +118,7 @@ class _Request:
             Whether JSON is requested.
         """
         return self.wants_json
+
 
 class _RecordingEngine:
     """Record awaited renders without using a second template implementation."""
@@ -150,6 +159,7 @@ class _RecordingEngine:
         self.calls.append((template, context))
         return self.content
 
+
 class _ErrorPage(HTMLParser):
     """Collect markup, description text and scripts from an error page."""
 
@@ -178,7 +188,9 @@ class _ErrorPage(HTMLParser):
         self.close()
 
     def handleStartTag(
-        self, tag: str, attrs: list[tuple[str, str | None]],
+        self,
+        tag: str,
+        attrs: list[tuple[str, str | None]],
     ) -> None:
         """Record element structure and the active text context.
 
@@ -248,6 +260,7 @@ class _ErrorPage(HTMLParser):
     handle_endtag = handleEndTag
     handle_data = handleData
 
+
 def _defaults(directory: Path) -> DefaultResponses:
     """
     Build the default response service with deterministic configuration.
@@ -265,8 +278,8 @@ def _defaults(directory: Path) -> DefaultResponses:
     fixture = _DefaultFixture(directory)
     return DefaultResponses(fixture, fixture, Jinja2Engine(ViewEnvironment(fixture)))
 
-class TestDefaultResponseCache(TestCase):
 
+class TestDefaultResponseCache(TestCase):
     async def testHealthResponseReadsCurrentMaintenanceState(self) -> None:
         """Report maintenance changes made after the response service boots.
 
@@ -326,7 +339,9 @@ class TestDefaultResponseCache(TestCase):
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             result = await defaults.error(
-                500, {"message": "Readable", "opaque": object()}, expects_json=False,
+                500,
+                {"message": "Readable", "opaque": object()},
+                expects_json=False,
             )
             self.assertIn(b"Readable", result.getBody())
 
@@ -349,7 +364,7 @@ class TestDefaultResponseCache(TestCase):
             )
             for content, expected in (
                 (payload, payload),
-                (Markup(payload), payload),  # noqa: S704 - Test caller trust markers.
+                (Markup(payload), payload),  # Test caller trust markers.
                 ({"message": payload, "opaque": object()}, payload),
                 ({"detail": payload}, json.dumps({"detail": payload})),
                 ("&lt;unchanged&gt;", "&lt;unchanged&gt;"),
@@ -393,13 +408,18 @@ class TestDefaultResponseCache(TestCase):
         with TemporaryDirectory() as directory:
             defaults = _defaults(Path(directory))
             for status, label in (
-                (100, "Continue"), (404, "Not Found"), (419, "Page Expired"),
-                (499, "HTTP 499"), (599, "HTTP 599"),
+                (100, "Continue"),
+                (404, "Not Found"),
+                (419, "Page Expired"),
+                (499, "HTTP 499"),
+                (599, "HTTP 599"),
             ):
                 with self.subTest(status=status):
                     for expects_json in (True, False, False):
                         result = await defaults.error(
-                            status, "Example", expects_json=expects_json,
+                            status,
+                            "Example",
+                            expects_json=expects_json,
                         )
                         self.assertEqual(result.getStatusCode(), status)
                         if not expects_json:
@@ -419,9 +439,14 @@ class TestDefaultResponseCache(TestCase):
             engine = _RecordingEngine()
             defaults = DefaultResponses(fixture, fixture, engine)
             for value, exception in (
-                ("400", TypeError), (400.0, TypeError), (None, TypeError),
-                (-1, ValueError), (99, ValueError), (600, ValueError),
-                (True, ValueError), (False, ValueError),
+                ("400", TypeError),
+                (400.0, TypeError),
+                (None, TypeError),
+                (-1, ValueError),
+                (99, ValueError),
+                (600, ValueError),
+                (True, ValueError),
+                (False, ValueError),
             ):
                 for expects_json in (True, False):
                     with (
@@ -429,7 +454,9 @@ class TestDefaultResponseCache(TestCase):
                         self.assertRaises(exception),
                     ):
                         await defaults.error(
-                            value, {"opaque": object()}, expects_json=expects_json,
+                            value,
+                            {"opaque": object()},
+                            expects_json=expects_json,
                         )
             self.assertEqual(engine.calls, [])
 
@@ -445,12 +472,18 @@ class TestDefaultResponseCache(TestCase):
             defaults = _defaults(Path(directory))
             headers = {"x-test": "value"}
             result = await defaults.error(
-                500, "Error", expects_json=True, headers=headers,
+                500,
+                "Error",
+                expects_json=True,
+                headers=headers,
             )
             self.assertEqual(headers, {"x-test": "value"})
             self.assertTrue(result.hasHeader("cache-control"))
             result = await defaults.error(
-                500, "Error", expects_json=True, headers={"Cache-Control": "custom"},
+                500,
+                "Error",
+                expects_json=True,
+                headers={"Cache-Control": "custom"},
             )
             self.assertEqual(result.getHeader("cache-control"), ["custom"])
 

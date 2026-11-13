@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import hashlib
 import json
@@ -21,10 +23,12 @@ from orionis.console.commands.bootstrap.config import BootstrapConfigCommand
 if TYPE_CHECKING:
     from urllib.request import Request
 
+
 class _Response(BytesIO):
     """Provide the response interface consumed by urllib's context manager."""
 
     status = 200
+
 
 def _file(path: str, content: bytes) -> dict[str, object]:
     """Construct GitHub's exact blob metadata for a fixture's byte content.
@@ -47,8 +51,12 @@ def _file(path: str, content: bytes) -> dict[str, object]:
         "type": "blob",
         "mode": "100644",
         "size": len(content),
-        "sha": hashlib.sha1(f"blob {len(content)}\0".encode() + content).hexdigest(),
+        "sha": hashlib.sha1(
+            f"blob {len(content)}\0".encode() + content,
+            usedforsecurity=False,
+        ).hexdigest(),
     }
+
 
 def _tree(entries: list[dict[str, object]]) -> bytes:
     """Serialize a complete GitHub tree response.
@@ -65,6 +73,7 @@ def _tree(entries: list[dict[str, object]]) -> bytes:
     """
     # Advertise a complete tree without making network requests.
     return json.dumps({"truncated": False, "tree": entries}).encode()
+
 
 class TestConfigBootstrapper(unittest.TestCase):
     """Exercise master downloads, idempotence, errors, and destination security."""
@@ -226,23 +235,27 @@ class TestConfigBootstrapper(unittest.TestCase):
             Complete the assertions without returning a value.
         """
         # Include other modules and support files to detect broader recovery.
-        self._fixtures({
-            "config/app.py": b"selected\r\n",
-            "config/auth.py": b"unselected",
-            "config/__init__.py": b"package",
-            "config/nested/app.py": b"nested",
-            "config/readme.txt": b"documentation",
-        })
+        self._fixtures(
+            {
+                "config/app.py": b"selected\r\n",
+                "config/auth.py": b"unselected",
+                "config/__init__.py": b"package",
+                "config/nested/app.py": b"nested",
+                "config/readme.txt": b"documentation",
+            },
+        )
 
         result = ConfigBootstrapper(self.app).bootstrap("app")
 
         self.assertEqual(self.urls, [_TREE_URL, _RAW_ROOT + "config/app.py"])
         self.assertEqual(
-            (self.base / "config" / "app.py").read_bytes(), b"selected\r\n",
+            (self.base / "config" / "app.py").read_bytes(),
+            b"selected\r\n",
         )
         self.assertIn(("CREATED", "config/app.py"), result)
         self.assertEqual(
-            {path.name for path in (self.base / "config").iterdir()}, {"app.py"},
+            {path.name for path in (self.base / "config").iterdir()},
+            {"app.py"},
         )
 
     def testSelectionAcceptsNewNamesFromRemoteTree(self) -> None:
@@ -254,15 +267,18 @@ class TestConfigBootstrapper(unittest.TestCase):
             Complete the assertions without returning a value.
         """
         # Advertise a future official module absent from the current defaults.
-        self._fixtures({
-            "config/app.py": b"unselected",
-            "config/observability.py": b"future configuration",
-        })
+        self._fixtures(
+            {
+                "config/app.py": b"unselected",
+                "config/observability.py": b"future configuration",
+            },
+        )
 
         result = ConfigBootstrapper(self.app).bootstrap("observability")
 
         self.assertEqual(
-            self.urls, [_TREE_URL, _RAW_ROOT + "config/observability.py"],
+            self.urls,
+            [_TREE_URL, _RAW_ROOT + "config/observability.py"],
         )
         self.assertEqual(
             (self.base / "config" / "observability.py").read_bytes(),
@@ -303,19 +319,22 @@ class TestConfigBootstrapper(unittest.TestCase):
             Complete the assertions without returning a value.
         """
         # Nested modules, package initializers and non-Python files are excluded.
-        self._fixtures({
-            "config/observability.py": b"future",
-            "config/__init__.py": b"package",
-            "config/cache.py": b"cache",
-            "config/nested/secret.py": b"nested",
-            "config/readme.txt": b"documentation",
-            "config/app.py": b"app",
-        })
+        self._fixtures(
+            {
+                "config/observability.py": b"future",
+                "config/__init__.py": b"package",
+                "config/cache.py": b"cache",
+                "config/nested/secret.py": b"nested",
+                "config/readme.txt": b"documentation",
+                "config/app.py": b"app",
+            },
+        )
         for selection in ["missing", "../app", "app.py", "", "__init__", "secret"]:
             with self.subTest(file=selection):
                 self.urls.clear()
+                bootstrapper = ConfigBootstrapper(self.app)
                 with self.assertRaises(ValueError) as raised:
-                    ConfigBootstrapper(self.app).bootstrap(selection)
+                    bootstrapper.bootstrap(selection)
                 message = str(raised.exception)
                 self.assertIn("does not exist", message)
                 self.assertRegex(
@@ -347,9 +366,9 @@ class TestConfigBootstrapper(unittest.TestCase):
                 self.assertEqual(run(command.handle(self.app)), 0)
                 error.assert_not_called()
                 rows = [call.args[0] for call in write.call_args_list]
-                self.assertTrue(any(
-                    status in row and "config/app.py" in row for row in rows
-                ))
+                self.assertTrue(
+                    any(status in row and "config/app.py" in row for row in rows),
+                )
         self.assertEqual((self.base / "config" / "app.py").read_bytes(), b"app")
         self.assertFalse((self.base / "config" / "auth.py").exists())
         self.assertEqual(self.urls.count(_RAW_ROOT + "config/app.py"), 1)
@@ -483,7 +502,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         error_msg = "offline"
         self.responses[_TREE_URL] = URLError(error_msg)
 
-        with self.assertRaisesRegex(RuntimeError, "offline"): # NOSONAR
+        with self.assertRaisesRegex(RuntimeError, "offline"):  # NOSONAR
             ConfigBootstrapper(self.app).bootstrap()
 
         self.assertEqual(list(self.base.iterdir()), [])
@@ -501,7 +520,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         error_msg = "missing blob"
         self.responses[_RAW_ROOT + "config/database.py"] = URLError(error_msg)
 
-        with self.assertRaisesRegex(RuntimeError, "database.py"): # NOSONAR
+        with self.assertRaisesRegex(RuntimeError, "database.py"):  # NOSONAR
             ConfigBootstrapper(self.app).bootstrap()
 
         self.assertEqual(list(self.base.iterdir()), [])
@@ -517,10 +536,15 @@ class TestConfigBootstrapper(unittest.TestCase):
         # Return a body with a failing HTTP status to verify status checks.
         response = _Response(b"not found")
         response.status = 404
-        with patch( # NOSONAR
-            "orionis.console.commands.bootstrap._config.urlopen", return_value=response,
-        ), self.assertRaisesRegex(RuntimeError, "HTTP 404"):
-            ConfigBootstrapper(self.app).bootstrap()
+        bootstrapper = ConfigBootstrapper(self.app)
+        with (
+            patch(
+                "orionis.console.commands.bootstrap._config.urlopen",
+                return_value=response,
+            ),
+            self.assertRaisesRegex(RuntimeError, "HTTP 404"),
+        ):
+            bootstrapper.bootstrap()
         self.assertFalse((self.base / "config").exists())
 
     def testIncorrectBlobBytesAreRejected(self) -> None:
@@ -535,7 +559,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self._fixtures({"config/app.py": b"valid"})
         self.responses[_RAW_ROOT + "config/app.py"] = b"wrong"
 
-        with self.assertRaisesRegex(RuntimeError, "verification failed"): # NOSONAR
+        with self.assertRaisesRegex(RuntimeError, "verification failed"):  # NOSONAR
             ConfigBootstrapper(self.app).bootstrap()
 
         self.assertFalse((self.base / "config").exists())
@@ -550,7 +574,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         """
         # Interrupt the HTTP body after response handling starts.
         error_msg = b"partial"
-        with ( # NOSONAR
+        with (  # NOSONAR
             patch(
                 "orionis.console.commands.bootstrap._config.urlopen",
                 side_effect=IncompleteRead(error_msg, 100),
@@ -570,14 +594,21 @@ class TestConfigBootstrapper(unittest.TestCase):
         """
         # Exercise invalid metadata fields before downloading any blobs.
         for invalid in [
-            {"size": -1}, {"size": "3"}, {"sha": "invalid"}, {"sha": "z" * 40},
+            {"size": -1},
+            {"size": "3"},
+            {"sha": "invalid"},
+            {"sha": "z" * 40},
         ]:
             with self.subTest(metadata=invalid):
                 entry = _file("config/app.py", b"app")
                 entry.update(invalid)
                 self.responses[_TREE_URL] = _tree([entry])
-                with self.assertRaisesRegex(RuntimeError, "Invalid metadata"): # NOSONAR
-                    ConfigBootstrapper(self.app).bootstrap()
+                bootstrapper = ConfigBootstrapper(self.app)
+                with self.assertRaisesRegex(
+                    RuntimeError,
+                    "Invalid metadata",
+                ):
+                    bootstrapper.bootstrap()
         self.assertEqual(self.urls, [_TREE_URL] * 4)
         self.assertEqual(list(self.base.iterdir()), [])
 
@@ -600,7 +631,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         for manifest in manifests:
             with self.subTest(manifest=manifest):
                 self.responses[_TREE_URL] = manifest
-                with self.assertRaises(RuntimeError): # NOSONAR
+                with self.assertRaises(RuntimeError):  # NOSONAR
                     ConfigBootstrapper(self.app).bootstrap()
         self.assertFalse((self.base / "config").exists())
 
@@ -625,14 +656,14 @@ class TestConfigBootstrapper(unittest.TestCase):
         for path in unsafe:
             with self.subTest(path=path):
                 self.responses[_TREE_URL] = _tree([_file(path, b"content")])
-                with self.assertRaisesRegex(RuntimeError, "Unsafe remote"): # NOSONAR
+                with self.assertRaisesRegex(RuntimeError, "Unsafe remote"):  # NOSONAR
                     ConfigBootstrapper(self.app).bootstrap()
         for kind, mode in [("blob", "120000"), ("commit", "160000")]:
             with self.subTest(mode=mode):
                 entry = _file("config/linked", b"outside")
                 entry.update(type=kind, mode=mode)
                 self.responses[_TREE_URL] = _tree([entry])
-                with self.assertRaisesRegex(RuntimeError, "Unsafe remote"): # NOSONAR
+                with self.assertRaisesRegex(RuntimeError, "Unsafe remote"):  # NOSONAR
                     ConfigBootstrapper(self.app).bootstrap()
         self.assertEqual(list(self.base.iterdir()), [])
 
@@ -652,7 +683,7 @@ class TestConfigBootstrapper(unittest.TestCase):
             ],
         )
 
-        with self.assertRaisesRegex(RuntimeError, "Unsafe remote"): # NOSONAR
+        with self.assertRaisesRegex(RuntimeError, "Unsafe remote"):  # NOSONAR
             ConfigBootstrapper(self.app).bootstrap()
 
         self.assertFalse((self.base / "config").exists())
@@ -669,7 +700,7 @@ class TestConfigBootstrapper(unittest.TestCase):
         self._fixtures({"config/app.py": b"official"})
         (self.base / "config" / "app.py").mkdir(parents=True)
 
-        with self.assertRaisesRegex(OSError, "not a regular file"): # NOSONAR
+        with self.assertRaisesRegex(OSError, "not a regular file"):  # NOSONAR
             ConfigBootstrapper(self.app).bootstrap()
 
         self.assertTrue((self.base / "config" / "app.py").is_dir())
@@ -694,10 +725,11 @@ class TestConfigBootstrapper(unittest.TestCase):
         except OSError as error:
             self.skipTest(f"Creating symlinks is unavailable: {error}")
 
-        with self.assertRaisesRegex(OSError, "Unsafe configuration path"): # NOSONAR
+        with self.assertRaisesRegex(OSError, "Unsafe configuration path"):  # NOSONAR
             ConfigBootstrapper(self.app).bootstrap()
 
         self.assertEqual(list(outside.iterdir()), [])
+
 
 if __name__ == "__main__":
     # Run this module directly with the standard unittest runner.

@@ -1,7 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Self
 from orionis.orm.exceptions import InvalidQueryException
 from tests.auth.test_identity_and_session import Account, accounts_table
 from tests.auth.test_tokens import _TokenCase
+
 
 class TestChunkedQueries(_TokenCase):
     """Use real SQLite queries to check bounded hydration and paging semantics."""
@@ -12,7 +15,7 @@ class TestChunkedQueries(_TokenCase):
         Returns
         -------
         None
-            Populate a temporary SQLite database.
+            No return value.
         """
         await super().asyncSetUp()
         await self.connection.createTable(accounts_table())
@@ -34,7 +37,7 @@ class TestChunkedQueries(_TokenCase):
         Returns
         -------
         None
-            Verify page contents, sizes and the unchanged original query.
+            No return value.
         """
         query = Account.query().orderBy("id").offset(3).limit(13)
         batches = [batch async for batch in query.chunks(5)]
@@ -53,7 +56,7 @@ class TestChunkedQueries(_TokenCase):
         Returns
         -------
         None
-            Verify early exit, invalid size and the required explicit order.
+            No return value.
         """
         query = self.db.table("accounts").orderBy("id")
         batches = query.chunks(4)

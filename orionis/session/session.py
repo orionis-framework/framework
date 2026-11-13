@@ -1,8 +1,14 @@
+# ruff: noqa: A002, ANN401, TC003
+# Preserve the public id keyword, arbitrary payloads, and runtime type annotations.
 """Runtime representation of a single HTTP session."""
 
 from __future__ import annotations
+
 import secrets
-from typing import TYPE_CHECKING, Any
+from collections.abc import Mapping
+from datetime import datetime
+from typing import Any
+
 from orionis.session.contracts.session import ISession
 from orionis.session.flash import (
     ERRORS_KEY,
@@ -12,13 +18,8 @@ from orionis.session.flash import (
     normalize_errors,
 )
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from datetime import datetime
-
-# Flash-bag keys defined at module level to avoid per-call string allocation.
 _FLASH_NEW: str = "_flash_new"
-"""Flash-bag keys defined at module level to avoid per-call string allocation."""
+"""Identify flash values written during the current request."""
 _FLASH_OLD: str = "_flash_old"
 """Flash old identifier: ``_flash_old``."""
 _MISSING: object = object()
@@ -26,14 +27,15 @@ _MISSING: object = object()
 _IMMUTABLE_VALUE_TYPES = frozenset({type(None), bool, bytes, float, int, str})
 """Immutable value types used by ``session``."""
 
+
 class Session(ISession):
     """
     Runtime representation of a single HTTP session.
 
     The session is **lazy**: no identifier is generated and no record is
-    persisted until the application writes at least one value via
-    ``put()`` or ``flash()``.  The ``SessionManager`` inspects the
-    ``started`` and ``dirty`` flags to decide whether persistence and a
+    persisted until the application writes a value via
+    ``put()`` or ``flash()``, or requests regeneration. The ``SessionManager``
+    inspects the ``started`` and ``dirty`` flags to decide whether persistence and a
     ``Set-Cookie`` header are required.
 
     Attributes
@@ -78,7 +80,7 @@ class Session(ISession):
 
     def __init__(
         self,
-        id: str | None = None,  # noqa: A002
+        id: str | None = None,
         data: dict[str, Any] | None = None,
         *,
         started: bool = False,
@@ -93,7 +95,7 @@ class Session(ISession):
             Session identifier.  Pass ``None`` for a brand-new session
             (lazy activation generates the ID on the first write).
         data : dict[str, typing.Any] | None, optional
-            Initial session data.  Defaults to an empty dictionary.
+            Initial payload retained by reference. Defaults to a new empty dictionary.
         started : bool, optional
             ``True`` when the session was loaded from a backing store.
         is_new : bool, optional
@@ -102,7 +104,7 @@ class Session(ISession):
         Returns
         -------
         None
-            Initialise a session instance.
+            No return value.
         """
         self._id: str | None = id
         self._data: dict[str, Any] = data if data is not None else {}
@@ -125,9 +127,9 @@ class Session(ISession):
         Returns
         -------
         None
-            Ensure the session has an identifier and is marked active.
+            No return value.
         """
-        # token_urlsafe(32) produces 43 URL-safe characters (~192 bits).
+        # token_urlsafe(32) produces 43 URL-safe characters (256 random bits).
         if self._id is None:
             self._id = secrets.token_urlsafe(32)
         self._started = True
@@ -208,7 +210,7 @@ class Session(ISession):
 
     # ── Public API ──────────────────────────────────────────────────────────────
 
-    def get(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+    def get(self, key: str, default: Any = None) -> Any:
         """
         Return the value for *key*, or *default* when absent.
 
@@ -226,7 +228,7 @@ class Session(ISession):
         """
         return self._data.get(key, default)
 
-    def put(self, key: str, value: Any) -> None:  # noqa: ANN401
+    def put(self, key: str, value: Any) -> None:
         """
         Store *value* under *key*, activating the session on the first call.
 
@@ -244,7 +246,7 @@ class Session(ISession):
         Returns
         -------
         None
-            Store *value* under *key*, activating the session on the first call.
+            No return value.
         """
         current = self._data.get(key, _MISSING)
         if current is not _MISSING and current == value:
@@ -282,7 +284,7 @@ class Session(ISession):
         Returns
         -------
         None
-            Remove *key* from session data (no-op when absent).
+            No return value.
         """
         if self._data.pop(key, _MISSING) is not _MISSING and self._started:
             self._dirty = True
@@ -294,14 +296,14 @@ class Session(ISession):
         Returns
         -------
         None
-            Remove all data from this session.
+            No return value.
         """
         if self._data:
             self._data.clear()
             if self._started:
                 self._dirty = True
 
-    def flash(self, key: str, value: Any) -> None:  # noqa: ANN401
+    def flash(self, key: str, value: Any) -> None:
         """
         Store *value* under *key* for exactly one subsequent request.
 
@@ -322,7 +324,7 @@ class Session(ISession):
         Returns
         -------
         None
-            Store *value* under *key* for exactly one subsequent request.
+            No return value.
         """
         flash_bag = self._data.get(_FLASH_NEW)
         if flash_bag is None:
@@ -340,7 +342,7 @@ class Session(ISession):
         flash_bag[key] = value
         self._dirty = True
 
-    def getFlash(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+    def getFlash(self, key: str, default: Any = None) -> Any:
         """
         Return the flash value for *key*.
 
@@ -414,14 +416,14 @@ class Session(ISession):
         Returns
         -------
         None
-            Flash a submitted form payload so the next request can repopulate it.
+            No return value.
         """
         self.flash(
             OLD_INPUT_KEY,
             self.__mergeReservedBag(OLD_INPUT_KEY, filter_input(values)),
         )
 
-    def getOldInput(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+    def getOldInput(self, key: str, default: Any = None) -> Any:
         """
         Return the value submitted for *key* in the previous request.
 
@@ -454,7 +456,7 @@ class Session(ISession):
         Returns
         -------
         None
-            Flash validation errors for the next request.
+            No return value.
         """
         self.flash(
             ERRORS_KEY,
@@ -485,7 +487,7 @@ class Session(ISession):
         Returns
         -------
         None
-            Remember the page the user is currently viewing.
+            No return value.
         """
         self.put(PREVIOUS_URL_KEY, url)
 
@@ -510,12 +512,12 @@ class Session(ISession):
         Request a session ID rotation (e.g. immediately after login).
 
         The actual ID swap is performed by the ``SessionManager`` during
-        the save phase so the old record can be deleted atomically.
+        the save phase, deleting the old record before persisting its replacement.
 
         Returns
         -------
         None
-            Request a session ID rotation (e.g. immediately after login).
+            No return value.
         """
         self._regenerate = True
         self._invalidated = False
@@ -533,7 +535,7 @@ class Session(ISession):
         Returns
         -------
         None
-            Mark the session for full deletion and clear in-memory data.
+            No return value.
         """
         self._data.clear()
         self._invalidated = True
@@ -569,7 +571,7 @@ class Session(ISession):
         Returns
         -------
         None
-            The session retains only the deadline, never request state.
+            No return value.
         """
         for value in self._data.values():
             if type(value) not in _IMMUTABLE_VALUE_TYPES:
@@ -592,8 +594,11 @@ class Session(ISession):
             Whether to persist this session and refresh its cookie.
         """
         return (
-            self._dirty or self._is_new or self._regenerate
-            or self._renew_at is None or now >= self._renew_at
+            self._dirty
+            or self._is_new
+            or self._regenerate
+            or self._renew_at is None
+            or now >= self._renew_at
         )
 
     def _ageFlashData(self) -> None:
@@ -606,18 +611,19 @@ class Session(ISession):
 
         Sets ``_dirty`` when the flash state changes so the aged layout
         is persisted even if the request handler makes no further writes.
+        Present null bags are removed and also mark the session dirty.
         Idle sessions without any flash data are not affected.
 
         Returns
         -------
         None
-            Advance the flash lifecycle: new → old; discard previous old.
+            No return value.
         """
-        new_flash = self._data.pop(_FLASH_NEW, None)
-        had_old = self._data.pop(_FLASH_OLD, None) is not None
-        if new_flash is not None:
+        new_flash = self._data.pop(_FLASH_NEW, _MISSING)
+        had_old = self._data.pop(_FLASH_OLD, _MISSING) is not _MISSING
+        if new_flash is not _MISSING and new_flash is not None:
             self._data[_FLASH_OLD] = new_flash
-        if new_flash is not None or had_old:
+        if new_flash is not _MISSING or had_old:
             self._dirty = True
 
     def _rotateId(self) -> str | None:
@@ -649,7 +655,7 @@ class Session(ISession):
         Returns
         -------
         None
-            Reset the dirty flag after a successful persistence operation.
+            No return value.
         """
         self._dirty = False
         self._is_new = False

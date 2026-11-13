@@ -1,7 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema big integer behavior."""
+
 from orionis.orm.schema.types.big_integer import BigInteger
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestBigIntegerOptions(TestCase):
     """Verify BigInteger constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestBigIntegerOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = BigInteger()
         assert_column_options(

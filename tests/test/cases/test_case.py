@@ -1,8 +1,12 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import contextvars
 import fnmatch
 import inspect
 import re
+import unittest
+from types import SimpleNamespace
 from orionis.foundation.contracts.application import IApplication
 from orionis.mcp.protocol.constants import MCP_PROTOCOL_VERSION
 from orionis.mcp.server.primitives import Server
@@ -19,14 +23,17 @@ from orionis.test.cases.case import TestCase as CoreTestCase
 _PROBE_RESULT: str = "probe-executed"
 
 # Lifecycle hook names that must never be wrapped by the application invoker.
-_EXPECTED_HOOKS: frozenset[str] = frozenset({
-    "setUp",
-    "tearDown",
-    "setUpClass",
-    "tearDownClass",
-    "asyncSetUp",
-    "asyncTearDown",
-})
+_EXPECTED_HOOKS: frozenset[str] = frozenset(
+    {
+        "setUp",
+        "tearDown",
+        "setUpClass",
+        "tearDownClass",
+        "asyncSetUp",
+        "asyncTearDown",
+    },
+)
+
 
 def _probe_method(_self: object) -> str:
     """
@@ -43,6 +50,7 @@ def _probe_method(_self: object) -> str:
         Sentinel proving that wrapped execution forwards the result.
     """
     return _PROBE_RESULT
+
 
 def _make_probe(name: str, member: object) -> type:
     """
@@ -62,14 +70,15 @@ def _make_probe(name: str, member: object) -> type:
     """
     return type("_Probe", (CoreTestCase,), {name: member})
 
+
 class _McpServer(Server):
     """Expose an empty server through the ordinary test case."""
 
     name = "test-case-mcp"
     version = "1.0.0"
 
-class TestTestCaseDefinition(TestCase):
 
+class TestTestCaseDefinition(TestCase):
     def testDerivesFromIsolatedAsyncioTestCase(self) -> None:
         """
         Derive from the asynchronous test case of the standard library.
@@ -142,8 +151,8 @@ class TestTestCaseDefinition(TestCase):
         """
         self.assertEqual(_LIFECYCLE_HOOKS, _EXPECTED_HOOKS)
 
-class TestTestCaseMethodPattern(TestCase):
 
+class TestTestCaseMethodPattern(TestCase):
     def testCustomPatternReplacesTheDefault(self) -> None:
         """
         Match method names against a freshly supplied glob pattern.
@@ -201,7 +210,34 @@ class TestTestCaseMethodPattern(TestCase):
         self.assertEqual(inner, fnmatch.translate("check*"))
         self.assertIsNone(_METHOD_PATTERN.get().match("checkSomething"))
 
+
 class TestTestCaseWrapping(TestCase):
+    async def testIndividualMethodDiscoveryPreservesInjection(self) -> None:
+        """Load an individual unittest method without mistaking it for a factory."""
+        calls = []
+
+        class _DiscoveryProbe(CoreTestCase):
+            """Expose one injectable method to the standard name loader."""
+
+            def testInjected(self, app: IApplication) -> None:
+                """Record the application supplied by the native container.
+
+                Parameters
+                ----------
+                app : IApplication
+                    Application injected while the selected test runs.
+                """
+                self.assertIsInstance(app, IApplication)
+                calls.append(app)
+
+        suite = unittest.TestLoader().loadTestsFromName(
+            "Case.testInjected",
+            SimpleNamespace(Case=_DiscoveryProbe),
+        )
+        result = await asyncio.to_thread(suite.run, unittest.TestResult())
+        self.assertEqual(result.testsRun, 1)
+        self.assertTrue(result.wasSuccessful(), result.errors)
+        self.assertEqual(len(calls), 1)
 
     def testMatchingMethodIsWrapped(self) -> None:
         """
@@ -288,8 +324,8 @@ class TestTestCaseWrapping(TestCase):
         probe = _make_probe("testProbe", _probe_method)()
         self.assertNotIn("testProbe", probe.__dict__)
 
-class TestTestCaseResolution(TestCase):
 
+class TestTestCaseResolution(TestCase):
     async def testMcpReusesTheRunnerApplication(self, app: IApplication) -> None:
         """Use MCP support through the standard test case and runner application.
 
@@ -310,7 +346,8 @@ class TestTestCaseResolution(TestCase):
         response.assertOk()
         self.assertEqual(response.message["result"]["resultType"], "complete")
         self.assertEqual(
-            response.message["result"]["supportedVersions"], [MCP_PROTOCOL_VERSION],
+            response.message["result"]["supportedVersions"],
+            [MCP_PROTOCOL_VERSION],
         )
 
     def testResolveTestReturnsCoroutineFunction(self) -> None:

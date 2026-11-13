@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from orionis.http.adapters.websocket.contracts.transport import IWebSocketTransport
 from orionis.http.adapters.websocket.failure import disconnected
 from orionis.http.exceptions.websocket import WebSocketDisconnected
+from orionis.http.payload.estructures.headers import _validate_header
 from orionis.http.websocket_message import WebSocketMessage, WebSocketMessageType
 
 if TYPE_CHECKING:
@@ -13,10 +14,7 @@ _HEADERS_VERSION = (2, 1)
 """Headers version definitions used by ``asgi``."""
 _REASON_VERSION = (2, 3)
 """Reason version definitions used by ``asgi``."""
-_HEADER_NAME_CHARACTERS = frozenset(
-    "!#$%&'*+-.^_`|~0123456789abcdefghijklmnopqrstuvwxyz",
-)
-"""Header name characters used by ``asgi``."""
+
 
 class ASGIWebSocketTransport(IWebSocketTransport):
     """Translate the ASGI WebSocket protocol into normalized operations."""
@@ -25,7 +23,9 @@ class ASGIWebSocketTransport(IWebSocketTransport):
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, scope: dict, receive: Callable[[], Awaitable[dict]],
+        self,
+        scope: dict,
+        receive: Callable[[], Awaitable[dict]],
         send: Callable[[dict], Awaitable[None]],
     ) -> None:
         """
@@ -78,7 +78,8 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         event = await self._receive()
         if event.get("type") == "websocket.disconnect":
             raise WebSocketDisconnected(
-                event.get("code", 1006), event.get("reason") or "",
+                event.get("code", 1006),
+                event.get("reason") or "",
             )
         if event.get("type") != "websocket.connect":
             error_msg = "Expected websocket.connect before the handshake"
@@ -86,7 +87,8 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         self._handshake_received = True
 
     def _acceptHeaders(
-        self, headers: Mapping[str, str] | None,
+        self,
+        headers: Mapping[str, str] | None,
     ) -> list[tuple[bytes, bytes]]:
         """
         Validate and encode handshake headers before sending any event.
@@ -115,19 +117,18 @@ class ASGIWebSocketTransport(IWebSocketTransport):
             raise NotImplementedError(error_msg)
         result = []
         for raw_name, value in headers.items():
+            _validate_header(raw_name, value)
             name = raw_name.lower()
-            if (
-                not name or any(char not in _HEADER_NAME_CHARACTERS for char in name)
-                or name == "sec-websocket-protocol"
-                or any(char in value for char in "\r\n\x00")
-            ):
+            if name == "sec-websocket-protocol":
                 error_msg = "Invalid WebSocket acceptance header"
                 raise ValueError(error_msg)
             result.append((name.encode("ascii"), value.encode("latin-1")))
         return result
 
     async def accept(
-        self, *, subprotocol: str | None = None,
+        self,
+        *,
+        subprotocol: str | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> None:
         """
@@ -152,9 +153,9 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         orionis.http.WebSocketDisconnected
             If the peer disappears during acceptance.
         """
-        if (
-            subprotocol is not None
-            and subprotocol not in self._scope.get("subprotocols", ())
+        if subprotocol is not None and subprotocol not in self._scope.get(
+            "subprotocols",
+            (),
         ):
             error_msg = "Selected WebSocket subprotocol was not offered by the client"
             raise ValueError(error_msg)
@@ -201,7 +202,8 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         if event.get("type") == "websocket.disconnect":
             return WebSocketMessage(
                 type=WebSocketMessageType.DISCONNECT,
-                code=event.get("code", 1006), reason=event.get("reason") or "",
+                code=event.get("code", 1006),
+                reason=event.get("reason") or "",
             )
         if event.get("type") == "websocket.receive":
             text, data = event.get("text"), event.get("bytes")
@@ -290,13 +292,19 @@ class ASGIWebSocketTransport(IWebSocketTransport):
         try:
             await self._connectEvent()
             if "websocket.http.response" in self._scope.get("extensions", {}):
-                await self._send({
-                    "type": "websocket.http.response.start",
-                    "status": status_code, "headers": [],
-                })
-                await self._send({
-                    "type": "websocket.http.response.body", "body": b"",
-                })
+                await self._send(
+                    {
+                        "type": "websocket.http.response.start",
+                        "status": status_code,
+                        "headers": [],
+                    },
+                )
+                await self._send(
+                    {
+                        "type": "websocket.http.response.body",
+                        "body": b"",
+                    },
+                )
             else:
                 await self._send({"type": "websocket.close", "code": 1008})
         except OSError as exc:

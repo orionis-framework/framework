@@ -7,6 +7,7 @@ from orionis.console.tasks.store import ScheduleStore
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.support.facades.schedule import Schedule as ScheduleFacade
 
+
 class ScheduleProvider(ServiceProvider):
     """Register schedule services in the application container."""
 

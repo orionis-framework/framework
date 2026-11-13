@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import ast
 from itertools import pairwise
 from pathlib import Path
@@ -26,6 +28,7 @@ _TYPE_NAMES = {
     "Tuple": "tuple",
     "Type": "type",
 }
+
 
 def _stub_methods(path: Path, class_name: str) -> dict[str, list[ast.FunctionDef]]:
     """Parse overloaded declarations from a selected stub class.
@@ -56,6 +59,7 @@ def _stub_methods(path: Path, class_name: str) -> dict[str, list[ast.FunctionDef
                 overloads = methods[node.name] = []
             overloads.append(node)
     return methods
+
 
 def _union_members(annotation: ast.expr) -> list[ast.expr]:
     """Flatten equivalent optional and union annotations without evaluating them.
@@ -89,6 +93,7 @@ def _union_members(annotation: ast.expr) -> list[ast.expr]:
             ]
     return [annotation]
 
+
 def _type_surface(annotation: ast.expr | None) -> str:
     """Normalize builtin names and union order for a symbolic type comparison.
 
@@ -114,6 +119,7 @@ def _type_surface(annotation: ast.expr | None) -> str:
     if isinstance(annotation, ast.Tuple):
         return ", ".join(_type_surface(item) for item in annotation.elts)
     return ast.unparse(annotation)
+
 
 def _parameter_surface(
     method: ast.FunctionDef,
@@ -181,6 +187,7 @@ def _parameter_surface(
             )
     return tuple(parameters)
 
+
 def _external_code(_provider: object, *, prefix: str = "external") -> str:
     """Supply a native provider function under its backend registration name.
 
@@ -198,6 +205,7 @@ def _external_code(_provider: object, *, prefix: str = "external") -> str:
     """
     return f"{prefix}-value"
 
+
 def _replacement_name(_provider: object) -> str:
     """Supply a replacement for the backend's native name formatter.
 
@@ -212,6 +220,7 @@ def _replacement_name(_provider: object) -> str:
         Recognizable replacement provider result.
     """
     return "Replacement name"
+
 
 class _CustomProvider(BaseProvider):
     """Exercise custom providers written with either naming convention."""
@@ -228,10 +237,12 @@ class _CustomProvider(BaseProvider):
         """
         return "framework-value"
 
+
 class _ReplacementProvider(BaseProvider):
     """Override a provider already resolved through each facade wrapper."""
 
     first_name = _replacement_name
+
 
 class _CollisionProvider(_ReplacementProvider):
     """Declare both spellings of a provider formatter."""
@@ -246,6 +257,7 @@ class _CollisionProvider(_ReplacementProvider):
         """
         return "CamelCase name"
 
+
 class TestFake(TestCase):
     """Verify Orionis naming while preserving real Faker behavior."""
 
@@ -255,7 +267,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         self.assertIsNone(fake._unique)
@@ -272,7 +284,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         fake.addProvider(_CollisionProvider)
@@ -286,7 +298,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         first = UserFactory(locale="en_US", seed=42).fake
         second = UserFactory(locale="en_US", seed=42).fake
@@ -308,7 +320,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         self.assertIsInstance(fake, Fake)
@@ -325,7 +337,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         for locale in ("en_US", "es_CO"):
             with self.subTest(locale=locale):
@@ -372,7 +384,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify provider results, return types, and normalized discovery.
+            No return value.
         """
         providers = (
             ("commune_name", "communeName"),
@@ -412,7 +424,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         first = UserFactory(locale="en_US", seed=42).fake
         second = UserFactory(locale="en_US", seed=42).fake
@@ -433,7 +445,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = UserFactory(locale="en_US", seed=42)
         unique = factory.fake.unique
@@ -452,7 +464,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         unique = UserFactory(locale="en_US", seed=42).fake.unique
         excluded = unique.excludeTypes([int])
@@ -471,7 +483,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         native = Faker("en_US")
@@ -490,7 +502,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         for view in (fake, fake.unique, fake.optional):
@@ -518,7 +530,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         for view in (fake, fake.unique, fake.optional):
@@ -536,7 +548,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         first = UserFactory(locale="en_US", seed=42).fake
         second = UserFactory(locale="en_US", seed=42).fake
@@ -559,7 +571,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         unique = fake.unique
@@ -581,7 +593,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         native = Faker("en_US")
@@ -600,7 +612,7 @@ class TestFake(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         fake = UserFactory(locale="en_US", seed=42).fake
         native = Faker("en_US")
@@ -617,6 +629,7 @@ class TestFake(TestCase):
             with self.assertRaises(AttributeError):
                 operation("first_name")
 
+
 class TestFakeStub(TestCase):
     """Keep provider signatures and IDE documentation aligned with Faker."""
 
@@ -626,7 +639,7 @@ class TestFakeStub(TestCase):
         Returns
         -------
         None
-            Preserve signature comparisons when upstream omits an annotation.
+            No return value.
         """
         self.assertEqual(_type_surface(None), "Any")
         self.assertEqual(
@@ -642,7 +655,7 @@ class TestFakeStub(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         root = Path(__file__).resolve().parents[3]
         stub_path = root / "orionis/orm/factories/fake.pyi"
@@ -690,7 +703,7 @@ class TestFakeStub(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         root = Path(__file__).resolve().parents[3]
         stub_path = root / "orionis/orm/factories/fake.pyi"
@@ -731,7 +744,7 @@ class TestFakeStub(TestCase):
         Returns
         -------
         None
-            Validate overload-specific parameter help and NumPy result sections.
+            No return value.
         """
         root = Path(__file__).resolve().parents[3]
         stub_path = root / "orionis/orm/factories/fake.pyi"
@@ -749,9 +762,9 @@ class TestFakeStub(TestCase):
             self.assertNotIn("Examples\n", documentation, method.name)
             for directive in (":sample", ":example", ":param ", ":meth:"):
                 self.assertNotIn(directive, documentation, method.name)
-            parameters = {
-                parameter[0] for parameter in _parameter_surface(method)
-            } - {"cls"}
+            parameters = {parameter[0] for parameter in _parameter_surface(method)} - {
+                "cls",
+            }
             for argument in parameters:
                 self.assertIn("Parameters\n----------\n", documentation)
                 self.assertIn(f"{argument} :", documentation, method.name)
@@ -762,7 +775,7 @@ class TestFakeStub(TestCase):
         Returns
         -------
         None
-            Validate probability limits, defaults, errors, and None results.
+            No return value.
         """
         root = Path(__file__).resolve().parents[3]
         stub_path = root / "orionis/orm/factories/fake.pyi"
@@ -783,7 +796,7 @@ class TestFakeStub(TestCase):
         Returns
         -------
         None
-            Validate integer bounds, placeholder behavior, and locale references.
+            No return value.
         """
         root = Path(__file__).resolve().parents[3]
         stub_path = root / "orionis/orm/factories/fake.pyi"
@@ -812,7 +825,7 @@ class TestFakeStub(TestCase):
         Returns
         -------
         None
-            Validate blank lines between classes, methods, and overloads.
+            No return value.
         """
         root = Path(__file__).resolve().parents[3]
         stub_path = root / "orionis/orm/factories/fake.pyi"
@@ -822,7 +835,8 @@ class TestFakeStub(TestCase):
             if not isinstance(scope, (ast.Module, ast.ClassDef)):
                 continue
             definitions = [
-                node for node in scope.body
+                node
+                for node in scope.body
                 if isinstance(node, (ast.ClassDef, ast.FunctionDef))
             ]
             for previous, current in pairwise(definitions):

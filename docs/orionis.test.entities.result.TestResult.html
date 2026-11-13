@@ -213,16 +213,6 @@
         
 
         
-            <div class="itemName"><code><a href="#source_code" class="internal-link" title="orionis.test.entities.result.TestResult.source_code">source<wbr></wbr>_code</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
             <div class="itemName"><code><a href="#class_name" class="internal-link" title="orionis.test.entities.result.TestResult.class_name">class<wbr></wbr>_name</a></code>
             </div>
         
@@ -333,6 +323,16 @@
         
 
         
+            <div class="itemName"><code><a href="#source_code" class="internal-link" title="orionis.test.entities.result.TestResult.source_code">source<wbr></wbr>_code</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#status" class="internal-link" title="orionis.test.entities.result.TestResult.status">status</a></code>
             </div>
         
@@ -388,7 +388,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36847"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36947"> 
                     
                 </input>
 
@@ -467,16 +467,6 @@
         
 
         
-            <div class="itemName"><code><a href="#source_code" class="internal-link" title="orionis.test.entities.result.TestResult.source_code">source<wbr></wbr>_code</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
             <div class="itemName"><code><a href="#class_name" class="internal-link" title="orionis.test.entities.result.TestResult.class_name">class<wbr></wbr>_name</a></code>
             </div>
         
@@ -578,6 +568,16 @@
 
         
             <div class="itemName"><code><a href="#name" class="internal-link" title="orionis.test.entities.result.TestResult.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#source_code" class="internal-link" title="orionis.test.entities.result.TestResult.source_code">source<wbr></wbr>_code</a></code>
             </div>
         
 
@@ -696,23 +696,18 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TestResult</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L11" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.test.entities.result.TestResult">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TestResult</span>(<a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L12" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.test.entities.result.TestResult">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Represent the outcome of a test execution.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This class does not return a value upon instantiation.</td></tr></table></div>
+          <div><p>Represent the outcome of a test execution.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2185">
+          <table class="children sortable" id="id2202">
   
   
-  <tr class="classvariable">
-    
-    <td>Class Variable</td>
-    <td><code><a href="#source_code" class="internal-link" title="orionis.test.entities.result.TestResult.source_code">source<wbr></wbr>_code</a></code></td>
-    <td>Source code produced by <tt class="rst-docutils rst-literal">field</tt>.</td>
-  </tr><tr class="instancevariable">
+  <tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#class_name" class="internal-link" title="orionis.test.entities.result.TestResult.class_name">class<wbr></wbr>_name</a></code></td>
@@ -751,7 +746,7 @@
     
     <td>Instance Variable</td>
     <td><code><a href="#line_no" class="internal-link" title="orionis.test.entities.result.TestResult.line_no">line<wbr></wbr>_no</a></code></td>
-    <td>Line number in the source file where the test is defined, if applicable.</td>
+    <td>Source line associated with the failure, if available.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
@@ -770,6 +765,11 @@
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
+    <td><code><a href="#source_code" class="internal-link" title="orionis.test.entities.result.TestResult.source_code">source<wbr></wbr>_code</a></code></td>
+    <td>Source line numbers and text surrounding the failure.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
     <td><code><a href="#status" class="internal-link" title="orionis.test.entities.result.TestResult.status">status</a></code></td>
     <td>Status of the test execution (e.g., passed, failed).</td>
   </tr><tr class="instancevariable">
@@ -783,7 +783,7 @@
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.support.entities.BaseEntity.html" class="internal-link" title="orionis.support.entities.BaseEntity">BaseEntity</a></code>:
             </p>
-            <table class="children sortable" id="id2186">
+            <table class="children sortable" id="id2203">
   
   
   <tr class="baseclassmethod">
@@ -819,34 +819,7 @@
         </div>
 
         <div id="child-list">
-          <div class="baseclassvariable">
-  
-  
-  <a name="orionis.test.entities.result.TestResult.source_code">
-    
-  </a>
-  <a name="source_code">
-    
-  </a>
-  <div class="functionHeader">
-    
-    <span class="py-defname">source_code</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L175">
-      
-      (source)
-    </a>
-    <a class="headerLink" href="#source_code" title="orionis.test.entities.result.TestResult.source_code">
-      
-      
-      ¶
-    </a>
-  </div>
-  <div class="functionBody">
-    
-    <div><p>Source code produced by <tt class="rst-docutils rst-literal">field</tt>.</p></div>
-    
-  </div>
-</div><div class="baseinstancevariable">
+          <div class="baseinstancevariable">
   
   
   <a name="orionis.test.entities.result.TestResult.class_name">
@@ -858,7 +831,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">class_name</span>: <code>str | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L96">
       
       (source)
     </a>
@@ -885,7 +858,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">doc_string</span>: <code>str | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L144">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L128">
       
       (source)
     </a>
@@ -912,7 +885,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">error_message</span>: <code>str | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L84">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L78">
       
       (source)
     </a>
@@ -939,7 +912,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">exception</span>: <code>str | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L154">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L136">
       
       (source)
     </a>
@@ -966,7 +939,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">execution_time</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L75">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L71">
       
       (source)
     </a>
@@ -993,7 +966,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">file_path</span>: <code>str | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L134">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L120">
       
       (source)
     </a>
@@ -1020,7 +993,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">id</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L50">
       
       (source)
     </a>
@@ -1047,7 +1020,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">line_no</span>: <code>int | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L165">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L147">
       
       (source)
     </a>
@@ -1059,7 +1032,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p>Line number in the source file where the test is defined, if applicable.</p></div>
+    <div><p>Source line associated with the failure, if available.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1074,7 +1047,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">method</span>: <code>str | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L114">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L104">
       
       (source)
     </a>
@@ -1101,7 +1074,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">module</span>: <code>str | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L124">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L112">
       
       (source)
     </a>
@@ -1128,7 +1101,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L57">
       
       (source)
     </a>
@@ -1146,6 +1119,33 @@
 </div><div class="baseinstancevariable">
   
   
+  <a name="orionis.test.entities.result.TestResult.source_code">
+    
+  </a>
+  <a name="source_code">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">source_code</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]] | None, <em>optional</em></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L154">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#source_code" title="orionis.test.entities.result.TestResult.source_code">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Source line numbers and text surrounding the failure.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
   <a name="orionis.test.entities.result.TestResult.status">
     
   </a>
@@ -1155,7 +1155,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">status</span>: <code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link">orionis.test.enums.status.TestStatus</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L64">
       
       (source)
     </a>
@@ -1182,7 +1182,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">traceback</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None, <em>optional</em></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/entities/result.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/entities/result.py#L86">
       
       (source)
     </a>
@@ -1208,7 +1208,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

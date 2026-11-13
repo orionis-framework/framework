@@ -1,24 +1,23 @@
-"""Render named templates and return :class:`orionis.http.HTMLResponse` objects."""
+# ruff: noqa: ANN401, TC001
+# Retain arbitrary template context and the engine's injectable runtime type.
+"""Prepare named templates for deferred rendering into HTML responses."""
 
 from typing import Any
 from orionis.view.contracts.engine import IViewEngine
 from orionis.view.contracts.factory import IViewFactory
 from orionis.view.pending import PendingView
 
+
 class ViewFactory(IViewFactory):
     """
-    Render named templates and return :class:`orionis.http.HTMLResponse` objects.
+    Prepare named templates for deferred rendering into HTML responses.
 
-    :class:`orionis.view.factory.ViewFactory` is the primary entry-point for controllers
-    and
-    other HTTP-layer code that needs to produce HTML responses from
-    templates.  It delegates all rendering work to the bound
-    :class:`orionis.view.contracts.engine.IViewEngine` and wraps the output in a
-    framework-native
+    Create one :class:`orionis.view.pending.PendingView` per rendering operation.
+    Call :meth:`make` synchronously to retain the context and queue response
+    mutations. Await the returned value to render through the injected
+    :class:`orionis.view.contracts.engine.IViewEngine` and obtain an
     :class:`orionis.http.HTMLResponse`.
     """
-
-    # ruff: noqa: ANN401, TC001
 
     __slots__ = ("_engine",)
     """Declare the instance attribute slots reserved by this class."""
@@ -35,7 +34,7 @@ class ViewFactory(IViewFactory):
         Returns
         -------
         None
-            Initialise the factory with a rendering engine.
+            No return value.
         """
         self._engine: IViewEngine = engine
         """The view engine used to render templates."""
@@ -60,11 +59,9 @@ class ViewFactory(IViewFactory):
             ``withErrors()``, ``withFlash()``, ``withCookie()`` or
             ``withoutCookie()``.
 
-        Raises
-        ------
-        orionis.view.exceptions.ViewTemplateNotFoundException
-            When the view file cannot be located.
-        orionis.view.exceptions.ViewRenderException
-            When rendering fails for any reason.
+        Notes
+        -----
+        Template lookup and rendering errors are raised when the returned value
+        is awaited, rather than when this method prepares it.
         """
         return PendingView(self._engine, template, context)

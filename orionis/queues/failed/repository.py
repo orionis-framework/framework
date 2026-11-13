@@ -1,9 +1,13 @@
+# ruff: noqa: PLC0415, TC001
+# Load failure observation only when insertion needs recovery.
+# Keep storage contract annotations resolvable at runtime.
 """Retain failed envelopes and diagnostics in framework-owned DB storage."""
 
 import asyncio
 import traceback
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from uuid import NAMESPACE_URL, uuid5
+from orionis.database.contracts.connection import IConnection
 from orionis.database.exceptions import QueryException
 from orionis.orm.query.expressions import (
     DeletePlan,
@@ -15,12 +19,10 @@ from orionis.orm.query.expressions import (
 from orionis.queues._database import _DatabaseStorage
 from orionis.queues.contracts.failed_repository import IFailedJobRepository
 from orionis.queues.entities.failed_job import FailedJob
+from orionis.queues.entities.reserved_job import ReservedJob
 from orionis.queues.functions import current_time
 from orionis.queues.schema import build_failed_jobs_table
 
-if TYPE_CHECKING:
-    from orionis.database.contracts.connection import IConnection
-    from orionis.queues.entities.reserved_job import ReservedJob
 
 class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
     """Retain failed envelopes and diagnostics in framework-owned DB storage."""
@@ -29,7 +31,9 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self: Self, connection: IConnection, table: str = "failed_jobs",
+        self: Self,
+        connection: IConnection,
+        table: str = "failed_jobs",
     ) -> None:
         """
         Bind failure storage to a framework database connection.
@@ -59,7 +63,7 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
         self: Self,
         reserved: ReservedJob,
         connection: str,
-        exception: Exception,
+        exception: BaseException,
     ) -> FailedJob:
         """
         Record a terminal failure once for this reservation token.
@@ -70,13 +74,19 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
             Reservation whose encoded envelope must remain retryable.
         connection : str
             Queue connection on which the job failed.
-        exception : Exception
+        exception : BaseException
             Original failure including its traceback.
 
         Returns
         -------
         orionis.queues.entities.failed_job.FailedJob
             Persisted failure or its existing idempotent record.
+
+        Raises
+        ------
+        orionis.database.QueryException
+            If insertion fails and recovery cannot confirm an existing record.
+            Preserve the insertion error and observe a failed recovery read.
         """
         await self._ensureSchema()
         failure = FailedJob(
@@ -111,10 +121,20 @@ class DatabaseFailedJobRepository(_DatabaseStorage, IFailedJobRepository):
                 ),
             )
         except QueryException as error:
-            existing = await self.find(failure.id)
+            from orionis.failure.runtime import capture
+
+            try:
+                existing = await self.find(failure.id)
+            except QueryException as recovery_error:
+                await capture(
+                    recovery_error,
+                    flow="queue",
+                    phase="recovery",
+                    operation="failed.record.lookup",
+                )
+                raise error from error.__cause__
             if existing is None:
                 raise
-            from orionis.failure.runtime import capture  # noqa: PLC0415
             await capture(
                 error,
                 flow="queue",

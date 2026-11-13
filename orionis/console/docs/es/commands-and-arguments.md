@@ -54,7 +54,9 @@ from orionis.console import Argument
 parser = argparse.ArgumentParser(add_help=False)
 Argument(
     name_or_flags=("-f", "--format"),
-    choices=["json", "csv"], default="json", dest="format_name",
+    choices=["json", "csv"],
+    default="json",
+    dest="format_name",
 ).addToParser(parser)
 assert vars(parser.parse_args(["--format", "csv"])) == {"format_name": "csv"}
 ```
@@ -62,6 +64,8 @@ assert vars(parser.parse_args(["--format", "csv"])) == {"format_name": "csv"}
 Orionis reserva `-h`/`--help`. `required` no vuelve opcional un posicional: para ello usa `nargs="?"` y un default. Acciones booleanas/const no admiten `type_`; `choices` debe ser una colección, no un string; la acción `version` necesita un texto `version`. Definiciones inválidas fallan al construir `Argument`, antes de ejecutar trabajo.
 
 `getArgument("missing", default)` usa el default solo si falta la clave: un `None` proporcionado explícitamente se conserva. `getArguments()` devuelve una copia superficial. No interpretes `bool("false")` como parsing de booleanos; usa acciones como `store_true`/`store_false`.
+
+La metadata de comandos conserva defaults y constantes literales, incluido `"__MISSING__"`, al pasar por la caché. Un `type_` restaurado debe resolver a un callable: convertidores ausentes, dependencias ausentes del convertidor y referencias no invocables fallan explícitamente, en lugar de desactivar silenciosamente la conversión.
 
 ## Registrar una operación fluida
 
@@ -87,3 +91,7 @@ Invoca `register_reports()` durante la carga de la ruta, antes de cachear metada
 ## Resultado y diagnóstico
 
 Devuelve un entero para controlar el exit code; otros resultados correctos se normalizan a 0. Un fallo normal del flujo Reactor se registra, se delega al capturador de errores y devuelve 1. La ayuda y los errores de parsing utilizan `SystemExit` internamente. Prueba tanto argumentos inválidos como retornos de negocio: que el proceso termine sin traceback no implica que su código de salida sea 0.
+
+Los resultados distintos de cero conservan su exit code y producen indicación de fallo, no un mensaje de finalización exitosa. Se reportan mediante el runtime de fallos activo, con un log de error alternativo si no hay runtime activo.
+
+El kernel reconoce el launcher por su nombre base, como `reactor` o `reactor.py`. Los comandos que solo contienen esa palabra, como `app:reactor-status`, conservan su nombre de comando.

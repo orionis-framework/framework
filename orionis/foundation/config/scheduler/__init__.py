@@ -25,10 +25,14 @@ _EXPORTS = {
     "Drivers": ("orionis.foundation.config.scheduler.enums.drivers", "Drivers"),
     "Memory": ("orionis.foundation.config.scheduler.entities.memory", "Memory"),
     "Redis": ("orionis.foundation.config.scheduler.entities.redis", "Redis"),
-    "Scheduler": ("orionis.foundation.config.scheduler.entities.scheduler", "Scheduler"),
+    "Scheduler": (
+        "orionis.foundation.config.scheduler.entities.scheduler",
+        "Scheduler",
+    ),
     "Stores": ("orionis.foundation.config.scheduler.entities.stores", "Stores"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -50,6 +54,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

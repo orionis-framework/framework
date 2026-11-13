@@ -41,6 +41,7 @@ _SECTION_MAP: tuple[tuple[str, type], ...] = (
 )
 """Dispatch table: maps each field name to its expected concrete type."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Configuration(BaseEntity):
     """

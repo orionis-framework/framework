@@ -1,9 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.exceptions.validation import ValidationException
 from orionis.test import TestCase
 
-class TestValidationException(TestCase):
 
+class TestValidationException(TestCase):
     def testInstantiationStoresFailure(self) -> None:
         """Instantiate ValidationException and verify the failure attribute.
 
@@ -13,7 +15,7 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = ValidationFailure(
             field="email",
@@ -32,7 +34,7 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = ValidationFailure(
             field="age",
@@ -49,7 +51,7 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assert the payload's type, summary, rule code, and field message.
+            No return value.
         """
         failure = ValidationFailure(
             field="name",
@@ -59,30 +61,15 @@ class TestValidationException(TestCase):
         exc = ValidationException(failure)
         result = exc.error()
         self.assertIsInstance(result, dict)
-        self.assertEqual(result["message"], "Name is required.")
-        self.assertEqual(result["errors"], {
-            "name": [{"rule": "required", "message": "Name is required."}],
-        })
-
-    def testErrorDictContainsExactlyTwoKeys(self) -> None:
-        """Ensure error() dict contains exactly the two expected keys.
-
-        Validates that no extra or missing keys appear in the dictionary
-        returned by the error() method.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        failure = ValidationFailure(
-            field="score",
-            rule="le",
-            message="Too high.",
+        self.assertEqual(
+            result,
+            {
+                "message": "Name is required.",
+                "errors": {
+                    "name": [{"rule": "required", "message": "Name is required."}],
+                },
+            },
         )
-        exc = ValidationException(failure)
-        result = exc.error()
-        self.assertEqual(set(result.keys()), {"message", "errors"})
 
     def testMultipleFailuresAreGroupedByField(self) -> None:
         """
@@ -91,13 +78,15 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assert grouped details, the summary count, and preserved failures.
+            No return value.
         """
-        exc = ValidationException([
-            ValidationFailure(field="email", rule="pattern", message="Bad."),
-            ValidationFailure(field="email", rule="min_length", message="Short."),
-            ValidationFailure(field="age", rule="ge", message="Too young."),
-        ])
+        exc = ValidationException(
+            [
+                ValidationFailure(field="email", rule="pattern", message="Bad."),
+                ValidationFailure(field="email", rule="min_length", message="Short."),
+                ValidationFailure(field="age", rule="ge", message="Too young."),
+            ],
+        )
         self.assertEqual(
             exc.errors,
             {
@@ -119,12 +108,14 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assert the remaining-error suffix for two failures on one field.
+            No return value.
         """
-        exc = ValidationException([
-            ValidationFailure(field="name", rule="min_length", message="Short."),
-            ValidationFailure(field="name", rule="pattern", message="Bad."),
-        ])
+        exc = ValidationException(
+            [
+                ValidationFailure(field="name", rule="min_length", message="Short."),
+                ValidationFailure(field="name", rule="pattern", message="Bad."),
+            ],
+        )
         self.assertEqual(str(exc), "Short. (and 1 more error)")
 
     def testEmptyFailuresUseDefaultMessage(self) -> None:
@@ -134,12 +125,16 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assert the default summary, empty errors, and absent first failure.
+            No return value.
         """
         exc = ValidationException([])
-        self.assertEqual(exc.error(), {
-            "message": "The given data was invalid.", "errors": {},
-        })
+        self.assertEqual(
+            exc.error(),
+            {
+                "message": "The given data was invalid.",
+                "errors": {},
+            },
+        )
         self.assertEqual(exc.failures, ())
         self.assertIsNone(exc.failure)
 
@@ -150,16 +145,19 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assert the custom summary alongside the field's rule and message.
+            No return value.
         """
         failure = ValidationFailure("name", "application_code", "Invalid.")
         exc = ValidationException(failure, message="Check this form.")
-        self.assertEqual(exc.error(), {
-            "message": "Check this form.",
-            "errors": {
-                "name": [{"rule": "application_code", "message": "Invalid."}],
+        self.assertEqual(
+            exc.error(),
+            {
+                "message": "Check this form.",
+                "errors": {
+                    "name": [{"rule": "application_code", "message": "Invalid."}],
+                },
             },
-        })
+        )
 
     def testSummaryMessageCountsRemainingErrors(self) -> None:
         """Suffix the summary message with the remaining error count.
@@ -170,13 +168,15 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        exc = ValidationException([
-            ValidationFailure(field="a", rule="type", message="First."),
-            ValidationFailure(field="b", rule="type", message="Second."),
-            ValidationFailure(field="c", rule="type", message="Third."),
-        ])
+        exc = ValidationException(
+            [
+                ValidationFailure(field="a", rule="type", message="First."),
+                ValidationFailure(field="b", rule="type", message="Second."),
+                ValidationFailure(field="c", rule="type", message="Third."),
+            ],
+        )
         self.assertEqual(str(exc), "First. (and 2 more errors)")
 
     def testIsInstanceOfException(self) -> None:
@@ -188,7 +188,7 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = ValidationFailure(
             field="x",
@@ -207,12 +207,8 @@ class TestValidationException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        ValidationException
-            Raised by this helper to exercise the failure path.
         """
         failure = ValidationFailure(
             field="token",

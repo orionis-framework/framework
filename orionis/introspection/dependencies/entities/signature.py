@@ -1,13 +1,14 @@
+# ruff: noqa: TC001, TC003
+# Entity fields and return annotations must resolve at runtime.
 """Represent the categorized dependency signature of a callable."""
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from collections.abc import ItemsView
 from orionis.support.entities.base import BaseEntity
 
-if TYPE_CHECKING:
-    from _collections_abc import dict_items
-    from orionis.introspection.dependencies.entities.argument import Argument
+from orionis.introspection.dependencies.entities.argument import Argument
+
 
 @dataclass(frozen=True, kw_only=True)
 class Signature(BaseEntity):
@@ -38,7 +39,7 @@ class Signature(BaseEntity):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
 
         Raises
         ------
@@ -46,22 +47,13 @@ class Signature(BaseEntity):
             If ``resolved``, ``unresolved``, or ``ordered`` is not a dict.
         """
         if not isinstance(self.resolved, dict):
-            msg = (
-                f"resolved must be a dict, "
-                f"got {type(self.resolved).__name__!r}"
-            )
+            msg = f"resolved must be a dict, got {type(self.resolved).__name__!r}"
             raise TypeError(msg)
         if not isinstance(self.unresolved, dict):
-            msg = (
-                f"unresolved must be a dict, "
-                f"got {type(self.unresolved).__name__!r}"
-            )
+            msg = f"unresolved must be a dict, got {type(self.unresolved).__name__!r}"
             raise TypeError(msg)
         if not isinstance(self.ordered, dict):
-            msg = (
-                f"ordered must be a dict, "
-                f"got {type(self.ordered).__name__!r}"
-            )
+            msg = f"ordered must be a dict, got {type(self.ordered).__name__!r}"
             raise TypeError(msg)
 
     # ------------------------------------------------------------------
@@ -147,9 +139,7 @@ class Signature(BaseEntity):
         dict[str, orionis.introspection.dependencies.entities.argument.Argument]
             Subset of ordered containing only positional arguments.
         """
-        return {
-            k: v for k, v in self.ordered.items() if not v.is_keyword_only
-        }
+        return {k: v for k, v in self.ordered.items() if not v.is_keyword_only}
 
     def getKeywordOnly(self) -> dict[str, Argument]:
         """
@@ -203,7 +193,7 @@ class Signature(BaseEntity):
     # Iteration helpers
     # ------------------------------------------------------------------
 
-    def arguments(self) -> dict_items[str, Argument]:
+    def arguments(self) -> ItemsView[str, Argument]:
         """
         Return an iterable view of all parameters in declaration order.
 

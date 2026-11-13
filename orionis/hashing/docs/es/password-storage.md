@@ -49,7 +49,7 @@ El driver `argon2` reporta `argon2id`; `bcrypt` reporta `bcrypt`. `HashManager.m
 
 ### Política de rehash
 
-`needsRehash()` compara hash y parámetros actuales. Los hashes vacíos y los que el backend seleccionado no identifica requieren rehash; otros formatos inválidos pueden propagar un error del backend. Tras login exitoso, genera y persiste reemplazo si retorna `True`.
+`needsRehash()` compara el hash con los parámetros actuales del driver. Los hashes vacíos, de otro algoritmo o malformados requieren rehash; la verificación los rechaza con `False`. Indicar rehash no autentica una contraseña ni repara un registro corrupto. Tras un login exitoso, genera y persiste un reemplazo si retorna `True`.
 
 ## Flujos de trabajo comunes
 
@@ -142,6 +142,7 @@ asyncio.run(main())
 ```python
 from orionis.support.facades import Hash
 
+
 async def verify_example() -> None:
     encoded = await Hash.make("secret")
     valid = await Hash.check("secret", encoded)
@@ -174,16 +175,18 @@ Autenticación, registro, password reset, seeders y modelos pueden usar fachada 
 - Costos inválidos lanzan `HashConfigurationException`; entidades config pueden lanzar `TypeError`/`ValueError` antes.
 - Driver desconocido lanza `HashDriverNotSupportedException` al resolverlo.
 - Backend ausente se convierte en `MissingHashDependencyException` con ayuda `uv add`.
-- `check` retorna `False` para hashes vacíos o no identificados por el backend; `needsRehash` retorna `True` para esos valores. Un formato identificado pero inválido aún puede propagar un error del backend.
+- `check` retorna `False` para hashes almacenados vacíos, de otro algoritmo o malformados; `needsRehash` retorna `True` para esos valores. bcrypt valida el coste codificado, alfabeto, longitud y bits finales Base64 antes de considerar actualizado un registro.
 - Overrides por llamada crean backend temporal y no mutan defaults.
 - `setRounds` muta el driver singleton para toda aplicación; prefiere config u override salvo intención global.
-- Persisten restricciones del backend, incluidas limitaciones prácticas de tamaño de password bcrypt.
+- bcrypt admite contraseñas de hasta 72 bytes UTF-8. Crear un hash con una entrada mayor lanza `ValueError` del backend; la verificación retorna `False` sin truncar el candidato. Las restricciones de tipo del backend siguen vigentes.
 
 ## Rendimiento y concurrencia
 
 Cada `make` y `check` usa el ejecutor dedicado de hashing, con dos llamadas activas y 14 pendientes por defecto, sin ocupar el pool predeterminado del loop. La saturación lanza `WorkQueueFullError`. Argon2 conserva sus costes de memoria y paralelismo; dimensiona un ejecutor propio según la capacidad del host.
 
-Managers cachean drivers y drivers cachean clase/instancia backend. No hay locks en primer fill: hilos nativos pueden crear equivalentes y gana última escritura. Tasks del loop no ven construcción síncrona parcial. Setters mutan estado compartido y no deben competir con requests.
+Los managers conservan drivers y estos cargan y conservan sus backends de forma diferida. Un lock breve protege la lectura conjunta de costes, la publicación en caché y las actualizaciones de setters. La construcción del backend y el hashing se ejecutan fuera del lock. Una operación ya iniciada puede terminar con los costes anteriores, pero no puede reinstalar un backend invalidado por un setter. Configura los drivers compartidos antes de atender solicitudes; los setters siguen cambiando la política de todos los llamadores que usan esa instancia.
+
+La cancelación espera a que termine el trabajo nativo activo antes de liberar su capacidad en el ejecutor; el trabajo en cola puede cancelarse antes de empezar. La verificación usa los costes codificados en el hash almacenado. Recibe hashes de un almacenamiento de credenciales confiable y considera esos costes al dimensionar el presupuesto de workers.
 
 ## API pública
 
@@ -191,13 +194,15 @@ Managers cachean drivers y drivers cachean clase/instancia backend. No hay locks
 
 Lee `hashing`, usando entidad nativa si falta. `driver(name=None)` retorna `IHasher` cacheado; `getDefaultDriver()` retorna `argon2` o `bcrypt`. `make`, `check`, `needsRehash`, `getAlgorithm` y `setRounds` del manager delegan al default.
 
-### `Argon2Hasher(memory=65536, threads=4, time=3)`
+### `Argon2Hasher(memory=65536, threads=4, time=3, executor=None)`
 
-Usa Argon2id. `memory` está en KiB, `threads` es paralelismo y `time` iteraciones. Deben ser enteros positivos; config validada además exige 8 KiB por thread. `rounds` por llamada corresponde a `time`. Setters cambian defaults y limpian backend cacheado.
+Usa Argon2id. `memory` está en KiB, `threads` es paralelismo y `time` son iteraciones. Los costes deben ser enteros positivos, con al menos 8 KiB de memoria por thread. El driver limita memoria y tiempo a `2**32 - 1`, y threads a `2**24 - 1`, según la representación nativa de los parámetros. Estos máximos son límites de validación, no presupuestos prácticos de recursos. La construcción, los overrides por llamada y los setters validan la combinación completa. Un setter inválido conserva la configuración anterior. `rounds` por llamada corresponde a `time`. Los setters cambian los valores predeterminados y limpian el backend en caché.
 
-### `BcryptHasher(rounds=12)`
+### `BcryptHasher(rounds=12, executor=None)`
 
 Acepta costos enteros de 4 a 31. Overrides `memory` y `threads` se ignoran porque bcrypt no los soporta. `setRounds` cambia el default y limpia backend.
+
+Ambos hashers aceptan un `BoundedExecutor` propio mediante `executor`. Compartirlo establece un límite de capacidad conjunto para los dos algoritmos. Ciérralo con `await executor.aclose()` al finalizar su propietario; si omites el argumento, se usa el ejecutor de hashing compartido por el proceso.
 
 ### Métodos compartidos
 

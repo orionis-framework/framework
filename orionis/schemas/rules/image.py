@@ -1,19 +1,21 @@
-"""Ensure an uploaded file is a raster image."""
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
+"""Ensure an uploaded file has a supported raster image header."""
 
 from orionis.schemas.rules.image_probe import probe_image
 from orionis.schemas.rules.measure import read_content
 from orionis.schemas.rule import Rule
 
+
 class Image(Rule):
     """
-    Ensure an uploaded file is a raster image.
+    Ensure an uploaded file has a supported raster image header.
 
     The format is detected from the file header, so a mislabelled extension
-    or content type never fools the check. JPEG, PNG, GIF, BMP and WebP are
-    recognized.
+    or content type does not determine the result. Recognize JPEG, PNG, GIF,
+    BMP and WebP headers with positive dimensions. Do not decode pixels or
+    validate checksums and compressed image data.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

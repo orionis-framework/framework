@@ -11,6 +11,7 @@ from orionis.support.entities.base import BaseEntity
 _DISK_NAMES: frozenset[str] = frozenset(DiskName._member_names_)
 """Define the supported filesystem disk names."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Filesystems(BaseEntity):
     """

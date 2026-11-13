@@ -1,14 +1,16 @@
+# ruff: noqa: PLC0415, TC001, TC003
+# Load failure observation only when schema creation needs recovery.
+# Keep inherited storage annotations resolvable at runtime.
 """Share concurrent schema bootstrap for queue and failed-job storage."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Self
+import asyncio
+from typing import Self
+from orionis.database.contracts.connection import IConnection
 from orionis.database.exceptions import QueryException
 from orionis.orm.query.expressions import SelectPlan
+from orionis.orm.schema.table import TableDefinition
 
-if TYPE_CHECKING:
-    import asyncio
-    from orionis.database.contracts.connection import IConnection
-    from orionis.orm.schema.table import TableDefinition
 
 class _DatabaseStorage:
     """Share concurrent schema bootstrap for queue and failed-job storage."""
@@ -32,6 +34,12 @@ class _DatabaseStorage:
         -------
         None
             Ensure the queue storage exists.
+
+        Raises
+        ------
+        orionis.database.QueryException
+            If creation fails and recovery cannot confirm a complete table.
+            Preserve the creation error and observe a failed recovery read.
         """
         if self._ready:
             return
@@ -42,15 +50,25 @@ class _DatabaseStorage:
                 except QueryException as error:
                     if self._connection.inTransaction():
                         raise
+                    from orionis.failure.runtime import capture
+
                     # Verify another worker created the complete table concurrently.
-                    await self._connection.select(
-                        SelectPlan(
-                            table=self._definition,
-                            columns=self._definition.columnNames(),
-                            limit_value=0,
-                        ),
-                    )
-                    from orionis.failure.runtime import capture  # noqa: PLC0415
+                    try:
+                        await self._connection.select(
+                            SelectPlan(
+                                table=self._definition,
+                                columns=self._definition.columnNames(),
+                                limit_value=0,
+                            ),
+                        )
+                    except QueryException as recovery_error:
+                        await capture(
+                            recovery_error,
+                            flow="queue",
+                            phase="recovery",
+                            operation="database.schema.lookup",
+                        )
+                        raise error from error.__cause__
                     await capture(
                         error,
                         flow="queue",

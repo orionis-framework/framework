@@ -1,13 +1,15 @@
+# ruff: noqa: PLC0415, TC001, TC003
+# Resolve runtime annotations and load failure capture only on recovery paths.
+
 """Create permissions and roles, and attach them to identities."""
 
-from typing import TYPE_CHECKING
+from collections.abc import Awaitable
 from orionis.auth.concerns.functions import authorizable_key
 from orionis.auth.exceptions import AuthException
 from orionis.database.exceptions import QueryException
 from orionis.orm.contracts.query_builder import IQueryBuilder
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.authorizable import IAuthorizable
+from orionis.auth.contracts.authorizable import IAuthorizable
 
 # Tables shipped by the framework migrations.
 _PERMISSIONS_TABLE: str = "permissions"
@@ -24,6 +26,7 @@ _ROLE_PERMISSIONS_TABLE: str = "role_has_permissions"
 _MAX_NAME_LENGTH: int = 255
 """Max name length value used by ``registrar``."""
 
+
 class PermissionRegistrar:
     """
     Create permissions and roles, and attach them to identities.
@@ -38,8 +41,6 @@ class PermissionRegistrar:
     lose against the primary or unique key and are resolved by reading the
     row that won.
     """
-
-    # ruff: noqa: TC001, PLC0415
 
     __slots__ = ("__db",)
     """Declare the instance attribute slots reserved by this class."""
@@ -56,7 +57,7 @@ class PermissionRegistrar:
         Returns
         -------
         None
-            The registrar keeps only the injected gateway.
+            No return value.
         """
         self.__db = db
         """Gateway used to build queries over the authorization tables."""
@@ -111,7 +112,7 @@ class PermissionRegistrar:
         Returns
         -------
         None
-            The pivot table is updated as a side effect.
+            No return value.
         """
         model_type, model_id = authorizable_key(authorizable)
         for permission in permissions:
@@ -143,7 +144,7 @@ class PermissionRegistrar:
         Returns
         -------
         None
-            The pivot table is updated as a side effect.
+            No return value.
         """
         model_type, model_id = authorizable_key(authorizable)
         for permission in permissions:
@@ -176,7 +177,7 @@ class PermissionRegistrar:
         Returns
         -------
         None
-            The pivot table is updated as a side effect.
+            No return value.
         """
         model_type, model_id = authorizable_key(authorizable)
         for role in roles:
@@ -208,7 +209,7 @@ class PermissionRegistrar:
         Returns
         -------
         None
-            The pivot table is updated as a side effect.
+            No return value.
         """
         model_type, model_id = authorizable_key(authorizable)
         for role in roles:
@@ -237,7 +238,7 @@ class PermissionRegistrar:
         Returns
         -------
         None
-            The pivot table is updated as a side effect.
+            No return value.
         """
         role_id = await self.createRole(role)
         for permission in permissions:
@@ -261,7 +262,7 @@ class PermissionRegistrar:
         Returns
         -------
         None
-            The pivot table is updated as a side effect.
+            No return value.
         """
         role_id = await self.__findId(_ROLES_TABLE, role)
         if role_id is None:
@@ -296,6 +297,39 @@ class PermissionRegistrar:
         """
         row = await self.__db.table(table).where("name", name).first()
         return None if row is None else row.get("id")
+
+    async def __recover(
+        self,
+        lookup: Awaitable[object],
+        operation: str,
+    ) -> object | None:
+        """Observe a failed recovery query while preserving the write failure.
+
+        Parameters
+        ----------
+        lookup : collections.abc.Awaitable[object]
+            Read that determines whether a concurrent writer created the row.
+        operation : str
+            Authorization operation associated with the recovery attempt.
+
+        Returns
+        -------
+        object or None
+            Lookup result, or None when an observed query failure prevents
+            duplicate confirmation and the caller must re-raise its write error.
+        """
+        try:
+            return await lookup
+        except QueryException as error:
+            from orionis.failure.runtime import capture
+
+            await capture(
+                error,
+                flow="auth",
+                phase="recovery",
+                operation=operation,
+            )
+            return None
 
     async def __firstOrCreate(
         self,
@@ -341,19 +375,21 @@ class PermissionRegistrar:
             return existing
 
         try:
-
             async with self.__db.transaction():
                 result = await self.__db.table(table).insert({"name": name})
 
         except QueryException as error:
-
             # Another caller inserted the very same row first.
-            existing = await self.__findId(table, name)
+            existing = await self.__recover(
+                self.__findId(table, name),
+                "authorization.create",
+            )
             if existing is None:
                 raise
 
             # Capture the failure
             from orionis.failure.runtime import capture
+
             await capture(
                 error,
                 flow="auth",
@@ -385,7 +421,7 @@ class PermissionRegistrar:
         Returns
         -------
         None
-            The row is inserted, or silently skipped when present.
+            No return value.
 
         Raises
         ------
@@ -393,19 +429,18 @@ class PermissionRegistrar:
             If insertion fails and no identical pivot row exists.
         """
         try:
-
             async with self.__db.transaction():
                 await self.__db.table(table).insert(values)
 
         except QueryException as error:
-
             query = self.__db.table(table)
             for column, value in values.items():
                 query.where(column, value)
-            if not await query.exists():
+            if not await self.__recover(query.exists(), "authorization.attach"):
                 raise
 
             from orionis.failure.runtime import capture
+
             await capture(
                 error,
                 flow="auth",

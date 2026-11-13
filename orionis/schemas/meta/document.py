@@ -2,6 +2,7 @@
 
 from orionis.schemas.meta.validation import ValidationMetadata
 
+
 class DocumentMetadata(ValidationMetadata):
     """
     Intermediate marker for documentation / JSON Schema metadata.

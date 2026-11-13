@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S102
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Execute the repository-owned extension example inside a test-owned directory.
 import re
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -9,6 +12,7 @@ from orionis.test import TestCase
 
 _DOCS = Path(__file__).resolve().parents[2] / "orionis/mail/docs"
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)\n```", re.DOTALL)
+
 
 class TestMailDocumentation(TestCase):
     def testBothManualsShareTheSameCompilableExamples(self) -> None:
@@ -39,23 +43,31 @@ class TestMailDocumentation(TestCase):
             Assertions verify the behavior described above.
         """
         source = (_DOCS / "README.md").read_text(encoding="utf-8")
-        example = next(block for block in _PYTHON_BLOCK.findall(source)
-                       if "async def archive_factory(" in block)
+        example = next(
+            block
+            for block in _PYTHON_BLOCK.findall(source)
+            if "async def archive_factory(" in block
+        )
         namespace = {"__name__": __name__}
-        exec(compile(example, "mail-archive-example", "exec"), namespace)  # noqa: S102
+        exec(compile(example, "mail-archive-example", "exec"), namespace)
         with TemporaryDirectory() as temporary:
             path = Path(temporary) / "archive"
             transport = await namespace["archive_factory"](
-                Application(), MappingProxyType({"path": str(path)}),
+                Application(),
+                MappingProxyType({"path": str(path)}),
             )
             self.assertIsInstance(transport, IMailTransport)
             prepared = PreparedMail(
-                message_id="<documented@example.com>", sender="a@example.com",
+                message_id="<documented@example.com>",
+                sender="a@example.com",
                 recipients=("b@example.com",),
-                mime=b"Subject: Documented factory\r\n\r\nExample\r\n", smtp_utf8=False,
+                mime=b"Subject: Documented factory\r\n\r\nExample\r\n",
+                smtp_utf8=False,
             )
             result = await transport.send(
-                prepared, mailer="archive", driver="custom_archive",
+                prepared,
+                mailer="archive",
+                driver="custom_archive",
             )
             self.assertEqual(result.file_path.parent, path)
             self.assertEqual(result.file_path.read_bytes(), prepared.mime)

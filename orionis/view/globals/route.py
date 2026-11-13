@@ -1,3 +1,7 @@
+# ruff: noqa: ANN401, PLC0415, TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
+# Preserve heterogeneous template payload values.
+# Load HTTP route discovery only when a named route is requested.
 """Provide view globals operations.
 
 Includes ``_compile_route_template``, ``_build_route_path``, ``_load_named_routes``,
@@ -5,16 +9,16 @@ Includes ``_compile_route_template``, ``_build_route_path``, ``_load_named_route
 """
 
 from __future__ import annotations
+
 import re
-from typing import TYPE_CHECKING, Any
+from collections.abc import Awaitable, Callable
+from functools import lru_cache
+from typing import Any
 from urllib.parse import quote
+
+from orionis.foundation.contracts.application import IApplication
 from orionis.view.exceptions import ViewRouteException
 from orionis.view.globals.url import _absolute_url
-
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
-
-# ruff: noqa: ANN401, PLC0415
 
 # Matches route path placeholders such as ``{id}`` or ``{id:int}``.
 _ROUTE_PARAM_RE: re.Pattern = re.compile(r"\{(\w+)(?::\w+)?\}")
@@ -24,16 +28,8 @@ _ROUTE_PARAM_RE: re.Pattern = re.compile(r"\{(\w+)(?::\w+)?\}")
 _MISSING: Any = object()
 """Sentinel telling a missing placeholder apart from a legitimate ``None`` value."""
 
-# Interpolation plans keyed by route template: (literal chunks, parameter names).
-# Lock-free on purpose: plans are pure functions of their key, so a racing
-# writer can only store the value another thread would have computed.
-_ROUTE_PLAN_CACHE: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {}
-"""
-Interpolation plans keyed by route template: (literal chunks, parameter names).
-Lock-free on purpose: plans are pure functions of their key, so a racing writer can
-only store the value another thread would have computed.
-"""
 
+@lru_cache(maxsize=1024)
 def _compile_route_template(
     template: str,
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -49,21 +45,21 @@ def _compile_route_template(
     -------
     tuple[tuple[str, ``...``], tuple[str, ``...``]]
         Literal chunks surrounding each placeholder and the ordered
-        placeholder names.  The result is memoised for later calls.
+        placeholder names. Cache at most 1,024 pure plans, evicting the
+        least recently used template when the cache reaches capacity.
     """
     literals: list[str] = []
     names: list[str] = []
     cursor = 0
 
     for match in _ROUTE_PARAM_RE.finditer(template):
-        literals.append(template[cursor:match.start()])
+        literals.append(template[cursor : match.start()])
         names.append(match.group(1))
         cursor = match.end()
 
     literals.append(template[cursor:])
-    plan = (tuple(literals), tuple(names))
-    _ROUTE_PLAN_CACHE[template] = plan
-    return plan
+    return tuple(literals), tuple(names)
+
 
 def _build_route_path(
     template: str,
@@ -90,9 +86,7 @@ def _build_route_path(
     orionis.view.exceptions.ViewRouteException
         If a placeholder has no matching value in *params*.
     """
-    literals, names = (
-        _ROUTE_PLAN_CACHE.get(template) or _compile_route_template(template)
-    )
+    literals, names = _compile_route_template(template)
 
     # Routes without placeholders need no interpolation at all.
     if not names:
@@ -113,6 +107,7 @@ def _build_route_path(
     pieces.append(literals[-1])
     extra = {key: value for key, value in params.items() if key not in names}
     return "".join(pieces), extra
+
 
 async def _load_named_routes(app: IApplication) -> dict[str, str]:
     """
@@ -143,7 +138,8 @@ async def _load_named_routes(app: IApplication) -> dict[str, str]:
 
     return named
 
-def _global_route(app: IApplication) -> Any:
+
+def _global_route(app: IApplication) -> Callable[..., Awaitable[str]]:
     """
     Build the async ``route`` template global bound to the application.
 
@@ -154,7 +150,7 @@ def _global_route(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that builds the URL of a named route.
     """
     named: dict[str, str] = {}

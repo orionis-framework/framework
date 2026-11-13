@@ -9,7 +9,7 @@ The logger records application events in UTF-8 files with one active channel and
 
 Related: [foundation](../../../foundation/docs/en/README.md) · [failure](../../../failure/docs/en/README.md)
 
-## Bounded execution and performance
+## Queued logging
 
 Set `LOG_QUEUE_CAPACITY=1024`, `Application(...).withConfigLogging(queue_capacity=1024)` or the `Logging` configuration field to move handler emission, file rotation and compression to bounded background queues. Zero (the default) retains synchronous emission. Capacity is per handler. A full queue raises `queue.Full` for every level, including critical; the framework neither silently drops nor falls back to blocking file I/O. Sink failures surface as `LoggingDeliveryError` on subsequent emission, flush or close.
 

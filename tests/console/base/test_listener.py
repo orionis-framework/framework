@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import inspect
@@ -9,8 +11,8 @@ from orionis.console.enums.events import TaskEvent as TaskEventEnum
 from orionis.console.output.console import Console
 from orionis.test import TestCase
 
-class TestBaseTaskListener(TestCase):
 
+class TestBaseTaskListener(TestCase):
     def setUp(self) -> None:
         """
         Set up test fixtures before each test method.
@@ -302,7 +304,8 @@ class TestBaseTaskListener(TestCase):
                 # module, so annotations must not be eagerly evaluated.
                 method = getattr(BaseTaskListener, method_name)
                 signature = inspect.signature(
-                    method, annotation_format=Format.FORWARDREF,
+                    method,
+                    annotation_format=Format.FORWARDREF,
                 )
 
                 # Check parameter count (self + event)

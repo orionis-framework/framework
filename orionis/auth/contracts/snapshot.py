@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IAuthorizationSnapshot(ABC):
     """
     Define the immutable authorization picture of a single request.

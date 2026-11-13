@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Define the contract for base command implementations."""
 
 from __future__ import annotations
@@ -7,10 +9,8 @@ from typing import TYPE_CHECKING, Any, ClassVar
 if TYPE_CHECKING:
     from orionis.console.args.argument import Argument
 
+
 class IBaseCommand(ABC):
-
-    # ruff: noqa: ANN401
-
     # Enable timestamps in console output by default
     """Define the contract for base command implementations."""
 

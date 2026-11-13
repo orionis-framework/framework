@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import UTC, datetime, time, timedelta, timezone
 from orionis.logging.handlers.weekly_suffix_resolver import WeeklySuffixResolver
 from orionis.test import TestCase
@@ -5,6 +7,7 @@ from orionis.test import TestCase
 # Extreme offsets used to prove the guard protecting the rotation schedule.
 _FAR_EAST = timezone(timedelta(hours=14))
 _FAR_WEST = timezone(timedelta(hours=-12))
+
 
 def _make_resolver(
     at_time: time | None = None,
@@ -28,8 +31,8 @@ def _make_resolver(
     resolver.tz = tz
     return resolver
 
-class TestWeeklySuffixResolverSuffix(TestCase):
 
+class TestWeeklySuffixResolverSuffix(TestCase):
     def testSuffixUsesTheIsoWeekPattern(self) -> None:
         """Build the suffix from the ISO year and week of the given datetime.
 
@@ -38,7 +41,7 @@ class TestWeeklySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = datetime(2025, 1, 6, 12, 0, 0, tzinfo=UTC)
         self.assertEqual(_make_resolver().getSuffix(dt=moment), "2025-week02")
@@ -52,7 +55,7 @@ class TestWeeklySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = datetime(2025, 12, 29, 12, 0, 0, tzinfo=UTC)
         self.assertEqual(_make_resolver().getSuffix(dt=moment), "2026-week01")
@@ -66,12 +69,12 @@ class TestWeeklySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertRegex(_make_resolver().getSuffix(), r"^\d{4}-week\d{2}$")
 
-class TestWeeklySuffixResolverRotation(TestCase):
 
+class TestWeeklySuffixResolverRotation(TestCase):
     def testDefaultRotationTimeIsMidnight(self) -> None:
         """Rotate at midnight when no time is configured.
 
@@ -80,7 +83,7 @@ class TestWeeklySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_make_resolver().at_time, time(0, 0, 0))
 
@@ -92,7 +95,7 @@ class TestWeeklySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 14, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -100,15 +103,15 @@ class TestWeeklySuffixResolverRotation(TestCase):
             datetime(2025, 4, 14, 0, 0, 0, tzinfo=UTC),
         )
 
-    def testNextRotationSkipsAFullWeekOnMonday(self) -> None:
-        """Schedule the next rotation a full week ahead when already on Monday.
+    def testNextRotationAdvancesAfterMondaysBoundary(self) -> None:
+        """Advance to the next Monday once today's boundary has passed.
 
         Validates that the rotation of the current week is never repeated.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 14, 14, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -124,7 +127,7 @@ class TestWeeklySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 3, 0, 0, tzinfo=UTC)
         self.assertEqual(
@@ -141,7 +144,7 @@ class TestWeeklySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         resolver = _make_resolver(tz=_FAR_EAST)
         current = datetime(2025, 4, 13, 23, 0, 0, tzinfo=_FAR_WEST)

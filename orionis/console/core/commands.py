@@ -76,6 +76,7 @@ from orionis.console.commands.support.optimize_clear import OptimizeClearCommand
 from orionis.console.commands.support.up import UpCommand
 from orionis.console.commands.test.test import TestCommand
 
+
 def get_core_commands_mapping() -> tuple[type, ...]:
     """
     Return the immutable collection of core command classes.
@@ -160,6 +161,7 @@ def get_core_commands_mapping() -> tuple[type, ...]:
         VersionCommand,
         ServerCommand,
     )
+
 
 CORE_COMMANDS: tuple = get_core_commands_mapping()
 """Core commands used by ``commands``."""

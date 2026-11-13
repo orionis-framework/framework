@@ -1,3 +1,5 @@
+# ruff: noqa: BLE001
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Provide http operations through ``validation_response``, ``previous_url``."""
 
 from __future__ import annotations
@@ -18,6 +20,7 @@ _FIRST_PRINTABLE_CODE: int = 32
 """First printable code value used by ``validation``."""
 _DELETE_CODE: int = 127
 """Delete code value used by ``validation``."""
+
 
 def _url_origin(url: str) -> tuple[str, str | None, int | None]:
     """
@@ -49,6 +52,7 @@ def _url_origin(url: str) -> tuple[str, str | None, int | None]:
         _DEFAULT_PORTS.get(parsed.scheme) if port is None else port,
     )
 
+
 def _is_local_reference(reference: str, base_url: str) -> bool:
     """
     Accept a local path or an absolute reference with the application origin.
@@ -76,6 +80,7 @@ def _is_local_reference(reference: str, base_url: str) -> bool:
         return _url_origin(reference) == _url_origin(base_url)
     except ValueError:
         return False
+
 
 async def validation_response(
     exc: ValidationException,
@@ -116,13 +121,14 @@ async def validation_response(
     # Repopulate the form with the submitted values, minus credentials.
     try:
         submitted = await request.data()
-    except Exception as error:  # noqa: BLE001
+    except Exception as error:
         await capture(error, flow="http", phase="validation.input", expected=True)
         submitted = None
     if submitted:
         response.withInput(submitted)
 
     return response
+
 
 def previous_url(request: Request) -> str:
     """

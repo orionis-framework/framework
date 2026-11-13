@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401, PLR0913
+# Keep established public and external protocol names and signatures.
 """Build every kind of HTTP response from a single entry-point."""
 
 from __future__ import annotations
@@ -22,6 +24,7 @@ if TYPE_CHECKING:
     from orionis.http.sse import ServerSentEvent
     from orionis.view.pending import PendingView
 
+
 class ResponseFactory:
     """
     Build every kind of HTTP response from a single entry-point.
@@ -33,8 +36,6 @@ class ResponseFactory:
         return response.json({"ok": True})
         return response.redirect("/login")
     """
-
-    # ruff: noqa: ANN401, PLR0913
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -430,6 +431,7 @@ class ResponseFactory:
             media_type=media_type,
             background=background,
         )
+
 
 # Stateless factory shared by every controller; safe to import directly.
 response: ResponseFactory = ResponseFactory()

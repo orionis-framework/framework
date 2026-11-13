@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pathlib import Path
 
+
 def clear_files(
     directory: Path,
     suffix: str | tuple[str, ...],

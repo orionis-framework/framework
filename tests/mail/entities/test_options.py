@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from dataclasses import replace
 from orionis.mail.entities.address import Address
 from orionis.mail.entities.attachment import Attachment
@@ -6,8 +8,8 @@ from orionis.mail.entities.options import MailOptions
 from orionis.mail.exceptions import MailCompositionException
 from orionis.test import TestCase
 
-class TestMailOptions(TestCase):
 
+class TestMailOptions(TestCase):
     def testEmptyOptionsProduceAnEmptyEnvelope(self) -> None:
         """Build an empty envelope when nothing was declared.
 

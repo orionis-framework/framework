@@ -1,3 +1,7 @@
+# ruff: noqa: BLE001, C901, PLR0912, PLR0913, PLR0915, SLF001, TC001, TRY400
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Keep established public and external protocol names and signatures.
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Resolve and execute registered console commands."""
 
 import argparse
@@ -19,10 +23,9 @@ from orionis.logging.contracts.logger import ILogger
 from orionis.support.performance.counter import PerformanceCounter
 from orionis.support.types.sentinel import MISSING
 
+
 class Reactor(IReactor):
     """Resolve and execute registered console commands."""
-
-    # ruff: noqa: PLR0913, SLF001, BLE001,TRY400, TC001, C901, PLR0912, PLR0915
 
     def __init__(
         self,
@@ -114,23 +117,20 @@ class Reactor(IReactor):
         parsed_args = None
 
         # Parse arguments only if the command expects them and has an ArgumentParser
-        if (
-            command.args is not None and
-            isinstance(command.args, argparse.ArgumentParser)
+        if command.args is not None and isinstance(
+            command.args,
+            argparse.ArgumentParser,
         ):
-
             # Use an empty list if no arguments are provided
             if args is None:
                 args = []
 
             # Try to parse the provided arguments using the command's ArgumentParser
             try:
-
                 # Parse the arguments and store the result in parsed_args
                 parsed_args = command.args.parse_args(args)
 
             except SystemExit as e:
-
                 # Print help information for the command when argparse raises
                 # SystemExit, which occurs on parsing errors or when help is requested
                 HelpCommand.printActions(
@@ -191,8 +191,7 @@ class Reactor(IReactor):
         """
         # Normalize handler to list format and register with loader
         normalized_handler = (
-            handler if isinstance(handler, list)
-            else [handler, "__call__"]
+            handler if isinstance(handler, list) else [handler, "__call__"]
         )
         return self.__loader.addFluentCommand(signature, normalized_handler)
 
@@ -237,20 +236,21 @@ class Reactor(IReactor):
 
         # Iterate through all registered commands in the internal registry
         for command in all_commands.values():
-
             # Skip internal commands (those with double underscores)
             if command.signature.startswith("__") and command.signature.endswith("__"):
                 continue
 
             # Append command information to the list
-            commands_info.append({
-                "timestamps": command.timestamps,
-                "signature": command.signature,
-                "description": command.description,
-                "arguments" : command.args,
-                "object": command.obj,
-                "method": command.method,
-            })
+            commands_info.append(
+                {
+                    "timestamps": command.timestamps,
+                    "signature": command.signature,
+                    "description": command.description,
+                    "arguments": command.args,
+                    "object": command.obj,
+                    "method": command.method,
+                },
+            )
 
         # Return the sorted list of command information by signature
         # Sort command metadata by its signature.
@@ -258,7 +258,9 @@ class Reactor(IReactor):
         return self.__cache_info
 
     async def call(
-        self, signature: str, args: list[str] | None = None,
+        self,
+        signature: str,
+        args: list[str] | None = None,
     ) -> int:
         """
         Execute a command in an isolated failure-reporting context.
@@ -295,7 +297,7 @@ class Reactor(IReactor):
                 )
                 raise
 
-    async def __call( # NOSONAR
+    async def __call(  # NOSONAR
         self,
         signature: str,
         args: list[str] | None = None,
@@ -328,7 +330,6 @@ class Reactor(IReactor):
         """
         # Create a new scope for the command execution context
         async with self.__app.beginScope() as scope:
-
             # Set the kernel type in the scope for contextual awareness
             # during command execution
             scope.set("kernel", KernelContext.CONSOLE)
@@ -343,11 +344,10 @@ class Reactor(IReactor):
             command = None
 
             # Initialize a variable to hold the target class name for logging purposes
-            target_class : str | None = None
-            target_method : str | None = None
+            target_class: str | None = None
+            target_method: str | None = None
 
             try:
-
                 # Validate that the command signature is a string
                 if not isinstance(signature, str):
                     error_msg: str = "Command signature must be a string."
@@ -377,9 +377,9 @@ class Reactor(IReactor):
                 # Use an empty argument sequence when none was provided.
                 _safe_args = args or []
                 timestamps = (
-                    command.timestamps and
-                    "-h" not in _safe_args and
-                    "--help" not in _safe_args
+                    command.timestamps
+                    and "-h" not in _safe_args
+                    and "--help" not in _safe_args
                 )
 
                 # Log the command execution start if timestamps are enabled
@@ -396,15 +396,15 @@ class Reactor(IReactor):
 
                 # If the command object is not an instance of IBaseCommand,
                 if not isinstance(instance, IBaseCommand):
-
                     # Call the specified method on the instance with parsed arguments
                     result = await self.__app.call(
-                        instance, command.method, **dict_args,
+                        instance,
+                        command.method,
+                        **dict_args,
                     )
 
                 # If the instance implements the IBaseCommand interface,
                 else:
-
                     # Inject the parsed arguments into the instance for use
                     # in command execution
                     instance.setArguments(dict_args)
@@ -415,6 +415,24 @@ class Reactor(IReactor):
                 # Stop the timer and log completion if timestamps are enabled
                 await self.__performance_counter.astop()
                 elapsed_time = round(await self.__performance_counter.agetSeconds(), 2)
+                exit_code = result if isinstance(result, int) else 0
+                if exit_code != 0:
+                    if timestamps:
+                        self.__executer.fail(program=signature, time=f"{elapsed_time}s")
+                    receipt = await capture_result(
+                        exit_code,
+                        app=self.__app,
+                        flow="console",
+                        phase="result",
+                        operation=signature,
+                    )
+                    if receipt is None:
+                        error_message = (
+                            f"Command '{signature}' failed with exit code {exit_code} "
+                            f"in ({elapsed_time}) seconds."
+                        )
+                        self.__logger.error(error_message)
+                    return exit_code
                 if timestamps:
                     self.__executer.done(program=signature, time=f"{elapsed_time}s")
 
@@ -426,19 +444,7 @@ class Reactor(IReactor):
                     )
                     self.__logger.info(info_msg)
 
-                # Return the result of the command execution, ensuring
-                # it is an integer exit code
-                if isinstance(result, int):
-                    if result != 0:
-                        await capture_result(
-                            result,
-                            app=self.__app,
-                            flow="console",
-                            phase="result",
-                            operation=signature,
-                        )
-                    return result
-                return 0
+                return exit_code
 
             except Exception as e:
                 target = signature
@@ -477,7 +483,8 @@ class Reactor(IReactor):
                 try:
                     await self.__performance_counter.astop()
                     elapsed_time = round(
-                        await self.__performance_counter.agetSeconds(), 2,
+                        await self.__performance_counter.agetSeconds(),
+                        2,
                     )
                     if command and command.timestamps:
                         self.__executer.fail(program=signature, time=f"{elapsed_time}s")

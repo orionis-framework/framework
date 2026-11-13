@@ -12,8 +12,10 @@ from orionis.mcp.server.compiler import compile_server
 from orionis.schemas import Schema
 from orionis.test import McpTestClient
 
+
 class GreetInput(Schema):
     name: str
+
 
 class GreetTool(Tool[GreetInput, str]):
     description = "Return a greeting."
@@ -22,18 +24,22 @@ class GreetTool(Tool[GreetInput, str]):
     def handle(self, payload: GreetInput) -> McpResponse:
         return McpResponse.structured(f"Hello, {payload.name}!")
 
+
 class DemoServer(Server):
     name = "Demo"
     version = "1.0.0"
     tools = (GreetTool,)
 
+
 assert tuple(compile_server(DemoServer).tools) == ("greet",)
+
 
 async def example():
     client = McpTestClient(Container(), DemoServer)
     result = await client.tool("greet", {"name": "Ada"})
     result.assertOk()
     result.assertTextContains("Hello, Ada!")
+
 
 asyncio.run(example())
 ```
@@ -43,6 +49,8 @@ Inferred names remove primitive suffixes and use kebab-case. Set `name` for a st
 ## Input, output and injection
 
 `Tool[Input, Output]` declares validation and JSON Schema; `input` and `output` attributes are also available. Handlers may be synchronous or asynchronous. Orionis converts payloads, validates schemas and separately resolves services and `McpRequest`. Client keys cannot replace injected services with matching names.
+
+Input and output conversion also applies explicit `Coerce` markers and framework schema rules inside nullable types, collections and native `msgspec.Struct` wrappers. Unmarked fields remain strict. Conversion does not mutate the supplied data; nested rules run once on the converted values.
 
 Declared output is validated before serialization. Return `McpResponse.structured(value)` containing a compatible value; handlers must return `McpResponse` or response sequences rather than raw strings/dicts. Contract failures become protocol failures. Do not promise a response structure incompatible with the generic output type. The test client passes bytes through the dispatcher, exercising actual serialization rather than calling the method directly.
 

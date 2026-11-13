@@ -3,6 +3,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
+
 class IPerformanceCounter(ABC):
     """Define the contract for performance counter implementations."""
 

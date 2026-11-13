@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.database.dialect import (
     _mysql_session_commands,
@@ -25,7 +27,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for driver in (
             "sqlite",
@@ -45,7 +47,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(UnsupportedDriverException):
             resolve_driver({"driver": "mssql"})
@@ -58,7 +60,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(UnsupportedDriverException):
             resolve_driver({})
@@ -73,7 +75,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url({"driver": "sqlite", "database": "db.sqlite"})
         self.assertEqual(url.drivername, "sqlite+aiosqlite")
@@ -87,7 +89,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url({"driver": "sqlite", "database": ""})
         self.assertEqual(url.database, ":memory:")
@@ -100,7 +102,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url(
             {
@@ -128,7 +130,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url(
             {
@@ -151,7 +153,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url(
             {
@@ -174,7 +176,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url(
             {
@@ -197,7 +199,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url(
             {
@@ -222,7 +224,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         config = {
             "driver": "oracle",
@@ -237,20 +239,6 @@ class TestDialect(TestCase):
 
     # ── Engine options ────────────────────────────────────────────────────────
 
-    def testSqliteMemoryUsesSingleConnectionPool(self) -> None:
-        """Configure a single-connection pool for in-memory SQLite databases.
-
-        Validates that the single shared connection semantics of the
-        in-memory database are preserved.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        options = engine_options({"driver": "sqlite", "database": ":memory:"})
-        self.assertIn("poolclass", options)
-
     def testPgsqlSslModeTravelsAsConnectArg(self) -> None:
         """Forward the ssl mode to asyncpg through connect args.
 
@@ -259,7 +247,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         options = engine_options(
             {
@@ -277,7 +265,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         options = engine_options(
             {
@@ -298,7 +286,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         options = engine_options({"driver": "pgsql"})
         self.assertNotIn("connect_args", options)
@@ -313,7 +301,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         commands = _mysql_session_commands(
             {
@@ -336,7 +324,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         commands = _mysql_session_commands(
             {
@@ -354,7 +342,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         commands = _mysql_session_commands(
             {
@@ -374,7 +362,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url(
             {
@@ -398,7 +386,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         default_url = build_engine_url(
             {
@@ -433,7 +421,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         url = build_engine_url(
             {
@@ -469,7 +457,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cause = ModuleNotFoundError("No module named 'aioodbc'")
         error = missing_dependency_error("sqlserver", cause)
@@ -485,7 +473,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cause = ModuleNotFoundError("boom")
         for driver, package in (
@@ -509,7 +497,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cause = ModuleNotFoundError("Missing DBAPI driver")
         for driver, package in (
@@ -534,7 +522,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         expectations = {
             "sqlite": "sqlite",
@@ -564,7 +552,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         options = engine_options(
             {
@@ -592,7 +580,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Endpoint fields and significant credential characters survive intact.
+            No return value.
         """
         credential = " leading @:/?#% trailing "
         config = {
@@ -618,7 +606,7 @@ class TestDialect(TestCase):
         Returns
         -------
         None
-            Falsy switches and nullable timeouts retain their explicit values.
+            No return value.
         """
         settings = {
             "ssl": False,

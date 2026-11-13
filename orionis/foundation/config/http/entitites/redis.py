@@ -6,6 +6,7 @@ from orionis.environment import Env
 from orionis.foundation.config.validation import validate_integer, validate_string
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Redis(BaseEntity):
     """

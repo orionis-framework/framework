@@ -1,19 +1,19 @@
-"""Provide schemas operations.
-
-Includes ``_cache_get``, ``_type_contains_nested``, ``_warm_child_plan``,
-``_collection_item_type``.
-"""
+# ruff: noqa: PLC0415
+# Resolve Schema only when compiling transport traversal, avoiding its import cycle.
+"""Compile bounded rule plans and collect nested validation failures."""
 
 from __future__ import annotations
 import operator
 import types
 from collections import OrderedDict
 from collections.abc import Collection, Mapping
+from dataclasses import dataclass
 from threading import RLock
 from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
 import msgspec.structs
 from orionis.schemas.meta.validation import ValidationMetadata
 from orionis.schemas.rule import Rule
+from orionis.schemas.exceptions.validation import ValidationException
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -33,6 +33,7 @@ _PLAN_LOCK = RLock()
 """Synchronization primitive controlling access to plan lock."""
 _BUILDING: set[type] = set()
 """Building used by ``rules_executor``."""
+
 
 def _cache_get(klass: type) -> tuple | None:
     """
@@ -54,6 +55,7 @@ def _cache_get(klass: type) -> tuple | None:
             _PLAN_CACHE.move_to_end(klass)
         return result
 
+
 # Shared empty mapping returned for schemas without Orionis metadata.
 # Reused instead of allocating a fresh dict on every plan build.
 _EMPTY_META: dict[str, list[object]] = {}
@@ -61,6 +63,7 @@ _EMPTY_META: dict[str, list[object]] = {}
 Shared empty mapping returned for schemas without Orionis metadata. Reused instead
 of allocating a fresh dict on every plan build.
 """
+
 
 def _type_contains_nested(tp: object, *, rules_only: bool = False) -> bool:
     """
@@ -106,6 +109,7 @@ def _type_contains_nested(tp: object, *, rules_only: bool = False) -> bool:
         and (not rules_only or _cache_get(tp) != ())
     )
 
+
 def _warm_child_plan(tp: object) -> None:
     """Eagerly populate ``_PLAN_CACHE`` for any nested Orionis schema type.
 
@@ -121,7 +125,7 @@ def _warm_child_plan(tp: object) -> None:
     Returns
     -------
     None
-        Complete the documented operation without returning a value.
+        No return value.
     """
     # Fast path for common case: a non-generic schema type.
     origin = get_origin(tp)
@@ -152,6 +156,7 @@ def _warm_child_plan(tp: object) -> None:
     ):
         _build_plan(tp)
 
+
 def _collection_item_type(tp: object, selector: str) -> object | None:
     """
     Resolve the element annotation selected from a concrete collection type.
@@ -181,6 +186,7 @@ def _collection_item_type(tp: object, selector: str) -> object | None:
     if isinstance(origin, type) and issubclass(origin, Collection):
         return args[0]
     return None
+
 
 def _field_rules(
     klass: type,
@@ -222,6 +228,7 @@ def _field_rules(
             raise TypeError(error_msg)
     return tuple(rules)
 
+
 def _build_plan(klass: type) -> tuple:
     """
     Compile under a reentrant lock, including recursive schema graphs.
@@ -242,6 +249,7 @@ def _build_plan(klass: type) -> tuple:
             return _compile_plan(klass)
         finally:
             _BUILDING.discard(klass)
+
 
 def _compile_plan(klass: type) -> tuple:
     """
@@ -301,6 +309,7 @@ def _compile_plan(klass: type) -> tuple:
         _warm_child_plan(field_type)
     return result
 
+
 async def _collect_nested(
     value: object,
     prefix: str,
@@ -321,7 +330,7 @@ async def _collect_nested(
     Returns
     -------
     None
-        Return ``None`` after running the nested plan, if any.
+        No return value.
     """
     if isinstance(value, Mapping):
         base = prefix[:-1]
@@ -347,6 +356,7 @@ async def _collect_nested(
     if child_plan:
         await _collect_with_plan(child_plan, value, prefix, failures)
 
+
 async def _collect_with_plan(
     plan: tuple,
     instance: object,
@@ -354,7 +364,7 @@ async def _collect_with_plan(
     failures: list,
 ) -> None:
     """
-    Inner validation loop: execute a pre-resolved plan against an instance.
+    Execute a pre-resolved validation plan against a schema instance.
 
     This function is the true hot path. It takes the plan as a parameter so
     that callers who already hold it (e.g. ``Schema.validate``) skip the
@@ -377,7 +387,7 @@ async def _collect_with_plan(
     Returns
     -------
     None
-        Return ``None`` after running every rule in the plan.
+        No return value.
     """
     # Bind the accumulator method once instead of resolving it per failure.
     append = failures.append
@@ -405,3 +415,126 @@ async def _collect_with_plan(
             # Keep going so sibling rules and fields are reported too.
             if failure is not None:
                 append(failure)
+
+
+@dataclass(frozen=True, slots=True)
+class _SchemaPlan:
+    """Retain trusted field names and local rules for one native Struct."""
+
+    fields: tuple[str, ...]
+    """Fields traversed after the local rules have completed."""
+    rules: tuple
+    """Local validation rules, without duplicate nested traversal."""
+
+
+def _visit_schema_plan(
+    hint: object,
+    plans: dict[type, _SchemaPlan],
+    schema_type: type[msgspec.Struct],
+) -> None:
+    """Visit each declared Struct once, including recursive references.
+
+    Parameters
+    ----------
+    hint : object
+        Trusted field or parameter annotation.
+    plans : dict
+        Plans owned by the current compilation.
+    schema_type : type
+        Base class supplying native local validation rules.
+
+    Returns
+    -------
+    None
+        No return value.
+    """
+    while get_origin(hint) is Annotated:
+        hint = get_args(hint)[0]
+    origin = get_origin(hint)
+    if origin in {Union, types.UnionType} or (
+        isinstance(origin, type) and issubclass(origin, Collection)
+    ):
+        for item in get_args(hint):
+            _visit_schema_plan(item, plans, schema_type)
+        return
+    if not isinstance(hint, type) or not issubclass(hint, msgspec.Struct):
+        return
+    if hint in plans:
+        return
+    plans[hint] = _SchemaPlan((), ())
+    fields = msgspec.structs.fields(hint)
+    for field in fields:
+        _visit_schema_plan(field.type, plans, schema_type)
+    rules = ()
+    if issubclass(hint, schema_type):
+        rules = tuple(
+            (name, prefix, getter, validators, False)
+            for name, prefix, getter, validators, _nested in _build_plan(hint)
+            if validators
+        )
+    plans[hint] = _SchemaPlan(tuple(field.name for field in fields), rules)
+
+
+def _schema_plans(annotation: object) -> Mapping[type, _SchemaPlan]:
+    """Compile immutable rule traversal for declared transport data.
+
+    Parameters
+    ----------
+    annotation : object
+        Trusted scalar, Struct, union or collection annotation.
+
+    Returns
+    -------
+    collections.abc.Mapping[type, orionis.schemas.rules_executor._SchemaPlan]
+        Plans owned by the caller's compiled declaration, not a global cache.
+    """
+    from orionis.schemas.schema import Schema
+
+    plans: dict[type, _SchemaPlan] = {}
+    _visit_schema_plan(annotation, plans, Schema)
+    return types.MappingProxyType(plans)
+
+
+async def _validate_schemas(
+    value: object,
+    plans: Mapping[type, _SchemaPlan],
+) -> None:
+    """Apply local schema rules once across converted transport data.
+
+    Parameters
+    ----------
+    value : object
+        Converted value whose native types and constraints already passed.
+    plans : collections.abc.Mapping[type, orionis.schemas.rules_executor._SchemaPlan]
+        Immutable traversal plans compiled from the declared annotation.
+
+    Returns
+    -------
+    None
+        No return value.
+
+    Raises
+    ------
+    orionis.schemas.exceptions.ValidationException
+        If a declared schema violates a framework rule.
+    """
+    if isinstance(value, msgspec.Struct):
+        plan = plans.get(type(value))
+        if plan is None:
+            return
+        if plan.rules:
+            failures = []
+            await _collect_with_plan(plan.rules, value, "", failures)
+            if failures:
+                raise ValidationException(failures)
+        for name in plan.fields:
+            await _validate_schemas(getattr(value, name), plans)
+        return
+    if isinstance(value, dict):
+        items = (item for pair in value.items() for item in pair)
+    elif isinstance(value, (list, tuple, set, frozenset)):
+        items = iter(value)
+    else:
+        return
+    for item in items:
+        await _validate_schemas(item, plans)

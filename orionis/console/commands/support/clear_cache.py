@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Clear entries from the application's configured default cache store."""
 
 import sys
@@ -7,10 +9,9 @@ from orionis.console.base.command import BaseCommand
 from orionis.console.output.console import Console
 from orionis.database.exceptions import DatabaseException
 
+
 class ClearCacheCommand(BaseCommand):
     """Clear entries from the application's configured default cache store."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = False
     """Timestamps flag used by ``ClearCacheCommand``."""
@@ -50,10 +51,14 @@ class ClearCacheCommand(BaseCommand):
                     ("redis.exceptions", "RedisError"),
                     ("sqlalchemy.exc", "SQLAlchemyError"),
                 )
-                if (module := sys.modules.get(module_name)) is not None
+                if (  # NOSONAR(S1110) - Assign before comparing with None.
+                    module := sys.modules.get(module_name)
+                )
+                is not None
             )
             if not isinstance(
-                error, (CacheException, DatabaseException, OSError, *backend_errors),
+                error,
+                (CacheException, DatabaseException, OSError, *backend_errors),
             ):
                 raise
             console.error(

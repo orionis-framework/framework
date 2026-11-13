@@ -1,6 +1,9 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 from typing import ClassVar
 from orionis.failure.base import BaseExceptionHandler
 from orionis.failure.entities import FailureContext, FailureHandling
+
 
 class ExceptionHandler(BaseExceptionHandler):
     """Select deferred logging and presentation for each application failure."""

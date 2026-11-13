@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from unittest.mock import patch
 from config.database import BootstrapDatabase
@@ -12,8 +14,14 @@ from orionis.test import TestCase
 
 # Every first-party connection declared by the configuration entities.
 _EXPECTED_CONNECTIONS = (
-    "sqlite", "mysql", "pgsql", "oracle", "sqlserver", "redshift",
+    "sqlite",
+    "mysql",
+    "pgsql",
+    "oracle",
+    "sqlserver",
+    "redshift",
 )
+
 
 def template_config() -> dict:
     """Build the application database template with its documented defaults.
@@ -27,10 +35,11 @@ def template_config() -> dict:
         environment.get.side_effect = lambda _key, default=None: default
         return BootstrapDatabase().toDict()
 
+
 class _EntityStubApp:
     """Application stub returning the Database entity (not a dict)."""
 
-    def config(self, key: str) -> Database:  # noqa: ARG002
+    def config(self, key: str) -> Database:
         """Return the requested database configuration.
 
         Parameters
@@ -43,10 +52,12 @@ class _EntityStubApp:
         Database
             Value produced by the helper.
         """
+        if key != "database":
+            raise KeyError(key)
         return Database()
 
-class TestConfigurationContract(TestCase):
 
+class TestConfigurationContract(TestCase):
     def testEveryDefaultConnectionSpeaksWithTheDialect(self) -> None:
         """Run every default connection entity through the dialect layer.
 
@@ -57,7 +68,7 @@ class TestConfigurationContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         config = Database().toDict()
         connections = config["connections"]
@@ -79,7 +90,7 @@ class TestConfigurationContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         config = Database().toDict()
         self.assertIn(config["default"], config["connections"])
@@ -93,7 +104,7 @@ class TestConfigurationContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = ConnectionManager(_EntityStubApp())
         for name in _EXPECTED_CONNECTIONS:
@@ -112,7 +123,7 @@ class TestConfigurationContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         config = template_config()
 
@@ -136,7 +147,7 @@ class TestConfigurationContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         config = template_config()
         sqlite = config["connections"]["sqlite"]
@@ -144,5 +155,6 @@ class TestConfigurationContract(TestCase):
 
         url = str(sqlite.get("url", ""))
         database = str(sqlite.get("database", ""))
-        if url.startswith("sqlite:///"):
-            self.assertTrue(url.endswith(database))
+        self.assertTrue(url.startswith("sqlite:///"), url)
+        self.assertTrue(database)
+        self.assertTrue(url.endswith(database))

@@ -1,3 +1,5 @@
+# ruff: noqa: BLE001, PLC0415, TC001
+# Resolve public annotations at runtime and report secondary cleanup failures.
 """Prepare all bodies and attachments before any transport side effect."""
 
 from contextlib import suppress
@@ -5,9 +7,10 @@ from email import policy
 from email.message import EmailMessage
 from email.utils import format_datetime, make_msgid
 from mimetypes import guess_type
-from typing import TYPE_CHECKING
 from orionis.aio import Loop
 from orionis.mail.entities.attachment import Attachment
+from orionis.mail.entities.content import Content
+from orionis.mail.entities.envelope import Envelope
 from orionis.mail.entities.prepared import PreparedMail
 from orionis.mail.exceptions import MailAttachmentException, MailCompositionException
 from orionis.mail.functions import attachment_name, media_type
@@ -17,16 +20,13 @@ from orionis.support.facades.datetime import DateTime
 from orionis.storage.exceptions import UnsupportedStorageOperationException
 from orionis.view.contracts.engine import IViewEngine
 
-if TYPE_CHECKING:
-    from orionis.mail.entities.content import Content
-    from orionis.mail.entities.envelope import Envelope
-
 # Attachment declaration paired with its payload and storage MIME metadata.
 type LoadedAttachment = tuple[Attachment, bytes, str | None]
 """Attachment declaration paired with its payload and storage MIME metadata."""
 
 _DEFAULT_MEDIA_TYPE = "application/octet-stream"
 """Default media type identifier: ``application/octet-stream``."""
+
 
 class MailComposer:
     """
@@ -35,8 +35,6 @@ class MailComposer:
     The composer is shared and stateless: every operation keeps its envelope,
     rendered bodies, and attachment payloads in local variables.
     """
-
-    # ruff: noqa: TC001
 
     __slots__ = ("_storage", "_view")
     """Declare the instance attribute slots reserved by this class."""
@@ -226,8 +224,9 @@ class MailComposer:
         except BaseException:
             try:
                 await stream.close()
-            except Exception as cleanup_error:  # noqa: BLE001
-                from orionis.failure.runtime import capture  # noqa: PLC0415
+            except Exception as cleanup_error:
+                from orionis.failure.runtime import capture
+
                 await capture(
                     cleanup_error,
                     flow="mail",

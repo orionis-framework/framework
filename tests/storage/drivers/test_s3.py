@@ -1,6 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import dataclasses
-import importlib.util
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
+from orionis.storage.drivers import functions as driver_functions
 from orionis.foundation.config.filesystems.entitites.aws import S3
 from orionis.storage.drivers.s3 import S3StorageDriver
 from orionis.storage.exceptions import (
@@ -11,19 +15,21 @@ from orionis.storage.exceptions import (
 from orionis.test import TestCase
 
 # Options the driver actually reads from the disk configuration.
-_CONSUMED_OPTIONS: frozenset[str] = frozenset({
-    "driver",
-    "key",
-    "secret",
-    "region",
-    "bucket",
-    "url",
-    "endpoint",
-    "use_path_style_endpoint",
-})
+_CONSUMED_OPTIONS: frozenset[str] = frozenset(
+    {
+        "driver",
+        "key",
+        "secret",
+        "region",
+        "bucket",
+        "url",
+        "endpoint",
+        "use_path_style_endpoint",
+    },
+)
+
 
 class TestS3StorageDriver(TestCase):
-
     def testEntityDeclaresOnlyConsumedOptions(self) -> None:
         """Declare exactly the options the S3 driver consumes.
 
@@ -33,7 +39,7 @@ class TestS3StorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             {field.name for field in dataclasses.fields(S3)},
@@ -48,7 +54,7 @@ class TestS3StorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = S3StorageDriver(S3(bucket="media", region="us-east-1"))
         self.assertEqual(
@@ -64,7 +70,7 @@ class TestS3StorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = S3StorageDriver(
             S3(bucket="media", url="https://cdn.example.com/"),
@@ -82,7 +88,7 @@ class TestS3StorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = S3StorageDriver(
             S3(bucket="media", endpoint="http://localhost:9000"),
@@ -100,7 +106,7 @@ class TestS3StorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = S3StorageDriver(S3(bucket="media"))
         with self.assertRaises(StoragePathException):
@@ -114,25 +120,26 @@ class TestS3StorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = S3StorageDriver(S3(bucket="media"))
         with self.assertRaises(UnsupportedStorageOperationException):
             driver.open("f.txt", "w")
 
     async def testOperationsRequireOptionalDependency(self) -> None:
-        """Surface the missing boto3 package with install instructions.
-
-        Only asserted when boto3 is absent from the environment, so
-        the test remains valid on machines that have it installed.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        if importlib.util.find_spec("boto3") is not None:
-            return
+        """Report controlled SDK absence even when the optional SDK is installed."""
+        missing = ModuleNotFoundError("Controlled optional SDK absence.")
+        importer = Mock(side_effect=missing)
         driver = S3StorageDriver(S3(bucket="media"))
-        with self.assertRaises(MissingStorageDependencyException):
+        with (
+            patch.object(
+                driver_functions,
+                "importlib",
+                SimpleNamespace(import_module=importer),
+            ),
+            self.assertRaises(MissingStorageDependencyException) as caught,
+        ):
             await driver.exists("f.txt")
+        importer.assert_called_once_with("boto3")
+        self.assertIs(caught.exception.__cause__, missing)
+        self.assertIn("orionis[s3]", str(caught.exception))

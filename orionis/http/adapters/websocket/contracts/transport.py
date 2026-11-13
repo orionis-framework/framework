@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from orionis.http.websocket_message import WebSocketMessage
 
+
 class IWebSocketTransport(ABC):
     """Normalize server operations without owning application lifecycle state."""
 
@@ -27,7 +28,9 @@ class IWebSocketTransport(ABC):
 
     @abstractmethod
     async def accept(
-        self, *, subprotocol: str | None = None,
+        self,
+        *,
+        subprotocol: str | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> None:
         """

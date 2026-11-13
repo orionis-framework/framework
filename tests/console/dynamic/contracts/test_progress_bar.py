@@ -1,10 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.dynamic.contracts.progress_bar import IProgressBar
 from orionis.test import TestCase
 
-class TestIProgressBar(TestCase):
 
+class TestIProgressBar(TestCase):
     def testIsAbstractClass(self) -> None:
         """Verify that IProgressBar is an abstract class.
 
@@ -122,7 +124,7 @@ class TestIProgressBar(TestCase):
         """
 
         class Partial(IProgressBar):
-            def start(self) -> None: # NOSONAR
+            def start(self) -> None:  # NOSONAR
                 """Accept the progress operation in the test double.
 
                 Returns
@@ -131,7 +133,7 @@ class TestIProgressBar(TestCase):
                     Completes the operation described above.
                 """
 
-            def advance(self, increment: int = 1) -> None: # NOSONAR
+            def advance(self, increment: int = 1) -> None:  # NOSONAR
                 """Accept a progress update in the test double.
 
                 Parameters
@@ -144,6 +146,7 @@ class TestIProgressBar(TestCase):
                 None
                     Completes the operation described above.
                 """
+
         with self.assertRaises(TypeError):
             Partial()
 
@@ -160,7 +163,7 @@ class TestIProgressBar(TestCase):
         """
 
         class Concrete(IProgressBar):
-            def start(self) -> None: # NOSONAR
+            def start(self) -> None:  # NOSONAR
                 """Accept the progress operation in the test double.
 
                 Returns
@@ -169,7 +172,7 @@ class TestIProgressBar(TestCase):
                     Completes the operation described above.
                 """
 
-            def advance(self, increment: int = 1) -> None: # NOSONAR
+            def advance(self, increment: int = 1) -> None:  # NOSONAR
                 """Accept a progress update in the test double.
 
                 Parameters
@@ -183,7 +186,7 @@ class TestIProgressBar(TestCase):
                     Completes the operation described above.
                 """
 
-            def finish(self) -> None: # NOSONAR
+            def finish(self) -> None:  # NOSONAR
                 """Accept the progress completion in the test double.
 
                 Returns

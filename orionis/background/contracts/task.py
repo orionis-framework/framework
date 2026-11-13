@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IBackgroundTask(ABC):
     """
     Define the interface for background task execution.

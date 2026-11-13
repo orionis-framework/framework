@@ -1,18 +1,24 @@
+# ruff: noqa: B027, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Optional empty methods exercise classification beside abstract members.
+
 import inspect
 from abc import ABC, ABCMeta, abstractmethod
 from orionis.introspection.abstract.reflection import ReflectionAbstract
+from orionis.introspection.dependencies.entities.signature import Signature
 from orionis.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Test fixtures
 # ---------------------------------------------------------------------------
 
+
 class SampleABC(ABC):
     """Fixture ABC with a variety of members for introspection testing."""
 
     public_attr: int = 10
     _protected_attr: str = "protected"
-    __private_attr: str = "private" # NOSONAR
+    __private_attr: str = "private"
 
     @abstractmethod
     def abstractMethod(self) -> str:
@@ -35,7 +41,7 @@ class SampleABC(ABC):
         """
         return 42
 
-    async def asyncMethod(self) -> str: # NOSONAR
+    async def asyncMethod(self) -> str:
         """
         Return a fixed async string.
 
@@ -57,17 +63,17 @@ class SampleABC(ABC):
         """
         return True
 
-    async def _protectedAsyncMethod(self) -> None:  # noqa: B027
+    async def _protectedAsyncMethod(self) -> None:
         """
         Execute an async no-op.
 
         Returns
         -------
         None
-            This coroutine has no return value.
+            No return value.
         """
 
-    def __privateMethod(self) -> str: # NOSONAR
+    def __privateMethod(self) -> str:
         """
         Return a fixed private string.
 
@@ -78,7 +84,7 @@ class SampleABC(ABC):
         """
         return "private"
 
-    async def __privateAsyncMethod(self) -> str: # NOSONAR
+    async def __privateAsyncMethod(self) -> str:
         """
         Return a fixed private string from an async context.
 
@@ -102,7 +108,7 @@ class SampleABC(ABC):
         return True
 
     @staticmethod
-    async def staticAsyncMethod() -> bool: # NOSONAR
+    async def staticAsyncMethod() -> bool:
         """
         Return a fixed boolean from an async static context.
 
@@ -126,7 +132,7 @@ class SampleABC(ABC):
         return 0
 
     @staticmethod
-    async def _protectedStaticAsyncMethod() -> int: # NOSONAR
+    async def _protectedStaticAsyncMethod() -> int:
         """
         Return a fixed integer from a protected async static context.
 
@@ -138,7 +144,7 @@ class SampleABC(ABC):
         return 0
 
     @staticmethod
-    def __privateStaticMethod() -> int: # NOSONAR
+    def __privateStaticMethod() -> int:
         """
         Return a fixed integer from a private static context.
 
@@ -150,7 +156,7 @@ class SampleABC(ABC):
         return 1
 
     @staticmethod
-    async def __privateStaticAsyncMethod() -> int: # NOSONAR
+    async def __privateStaticAsyncMethod() -> int:
         """
         Return a fixed integer from a private async static context.
 
@@ -174,7 +180,7 @@ class SampleABC(ABC):
         return cls.__name__
 
     @classmethod
-    async def classAsyncMethod(cls) -> str: # NOSONAR
+    async def classAsyncMethod(cls) -> str:
         """
         Return the name of the calling class from an async context.
 
@@ -185,7 +191,7 @@ class SampleABC(ABC):
         """
         return cls.__name__
 
-    @classmethod  # noqa: B027
+    @classmethod
     def _protectedClassMethod(cls) -> None:
         """
         Execute a protected class-level no-op.
@@ -193,11 +199,11 @@ class SampleABC(ABC):
         Returns
         -------
         None
-            This method has no return value.
+            No return value.
         """
 
     @classmethod
-    async def _protectedClassAsyncMethod(cls) -> str: # NOSONAR
+    async def _protectedClassAsyncMethod(cls) -> str:
         """
         Return the class name from a protected async class method.
 
@@ -209,7 +215,7 @@ class SampleABC(ABC):
         return cls.__name__
 
     @classmethod
-    def __privateClassMethod(cls) -> str: # NOSONAR
+    def __privateClassMethod(cls) -> str:
         """
         Return the class name from a private class method.
 
@@ -221,7 +227,7 @@ class SampleABC(ABC):
         return cls.__name__
 
     @classmethod
-    async def __privateClassAsyncMethod(cls) -> str: # NOSONAR
+    async def __privateClassAsyncMethod(cls) -> str:
         """
         Return the class name from a private async class method.
 
@@ -257,7 +263,7 @@ class SampleABC(ABC):
         return "protected_value"
 
     @property
-    def __privateProperty(self) -> str: # NOSONAR
+    def __privateProperty(self) -> str:
         """
         Return a fixed string from a private property.
 
@@ -267,6 +273,7 @@ class SampleABC(ABC):
             Always returns 'private_value'.
         """
         return "private_value"
+
 
 class _NoDocABC(ABC):
     """Provide an ABC intentionally without a runtime class docstring."""
@@ -278,12 +285,14 @@ class _NoDocABC(ABC):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         ...
 
+
 class _ConcreteClass:
     """Represent an ordinary non-abstract class fixture."""
+
 
 def _make_mutable_abc() -> type:
     """
@@ -327,6 +336,7 @@ def _make_mutable_abc() -> type:
 
     return _MutableABC
 
+
 def _make_private_method_abc() -> type:
     """
     Return a fresh ABC type exposing a deletable private method.
@@ -338,7 +348,6 @@ def _make_private_method_abc() -> type:
     """
 
     class _PrivateMethodABC(ABC):
-
         @abstractmethod
         def abstractMethod(self) -> str:
             """Run the abstract method helper.
@@ -350,7 +359,7 @@ def _make_private_method_abc() -> type:
             """
             ...
 
-        def __hiddenMethod(self) -> int: # NOSONAR
+        def __hiddenMethod(self) -> int:
             """
             Return a fixed integer.
 
@@ -363,6 +372,7 @@ def _make_private_method_abc() -> type:
 
     return _PrivateMethodABC
 
+
 def _make_sourceless_abc() -> type:
     """
     Return an ABC created dynamically, whose definition is not in any file.
@@ -373,13 +383,13 @@ def _make_sourceless_abc() -> type:
         A new abstract class whose source lines cannot be located.
     """
 
-    def _method(self) -> None:
+    def _method(self: object) -> None:
         """Do nothing.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     return ABCMeta(
@@ -387,6 +397,7 @@ def _make_sourceless_abc() -> type:
         (ABC,),
         {"__module__": __name__, "method": abstractmethod(_method)},
     )
+
 
 def _make_moduleless_abc() -> type:
     """
@@ -398,13 +409,13 @@ def _make_moduleless_abc() -> type:
         A new abstract class pointing at a module missing from sys.modules.
     """
 
-    def _method(self) -> None:
+    def _method(self: object) -> None:
         """Do nothing.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     return ABCMeta(
@@ -416,28 +427,13 @@ def _make_moduleless_abc() -> type:
         },
     )
 
+
 # ---------------------------------------------------------------------------
 # __init__ behaviour
 # ---------------------------------------------------------------------------
 
+
 class TestReflectionAbstractInit(TestCase):
-
-    def testInitWithAbstractClassSucceeds(self) -> None:
-        """
-        Assert that a valid ABC constructs ReflectionAbstract without error.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-
-        Notes
-        -----
-        SampleABC is abstract because abstractMethod is not implemented.
-        """
-        r = ReflectionAbstract(SampleABC)
-        self.assertIsNotNone(r)
-
     def testInitWithConcreteClassRaisesTypeError(self) -> None:
         """
         Assert that passing a non-abstract class raises TypeError.
@@ -445,7 +441,7 @@ class TestReflectionAbstractInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -461,26 +457,14 @@ class TestReflectionAbstractInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionAbstract(int)
 
-    def testInitWithNonTypeRaisesError(self) -> None:
-        """
-        Assert that passing a non-type raises TypeError or AttributeError.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-
-        Notes
-        -----
-        inspect.isabstract raises AttributeError for non-type objects when
-        accessing __abstractmethods__.
-        """
-        with self.assertRaises((TypeError, AttributeError)):
+    def testInitWithNonTypeRaisesTypeError(self) -> None:
+        """Reject a non-class target with the documented validation error."""
+        with self.assertRaises(TypeError):
             ReflectionAbstract("not_a_class")
 
     def testInstanceIsReflectionAbstract(self) -> None:
@@ -490,24 +474,25 @@ class TestReflectionAbstractInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         r = ReflectionAbstract(SampleABC)
         self.assertIsInstance(r, ReflectionAbstract)
+
 
 # ---------------------------------------------------------------------------
 # Internal cache protocol (__getitem__, __setitem__, __contains__, __delitem__)
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractCacheProtocol(TestCase):
 
+class TestReflectionAbstractCacheProtocol(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract instance for cache tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -518,7 +503,7 @@ class TestReflectionAbstractCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.r["my_key"] = "my_value"
         self.assertEqual(self.r["my_key"], "my_value")
@@ -530,7 +515,7 @@ class TestReflectionAbstractCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.r["cache_hit"] = 42
         self.assertIn("cache_hit", self.r)
@@ -542,7 +527,7 @@ class TestReflectionAbstractCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("no_such_key", self.r)
 
@@ -553,7 +538,7 @@ class TestReflectionAbstractCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.r["ghost_key"])
 
@@ -564,7 +549,7 @@ class TestReflectionAbstractCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.r["to_delete"] = "value"
         del self.r["to_delete"]
@@ -577,23 +562,24 @@ class TestReflectionAbstractCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         del self.r["nonexistent"]
+
 
 # ---------------------------------------------------------------------------
 # Identity methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractIdentity(TestCase):
 
+class TestReflectionAbstractIdentity(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract instance for identity tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -604,7 +590,7 @@ class TestReflectionAbstractIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.r.getClass(), SampleABC)
 
@@ -615,7 +601,7 @@ class TestReflectionAbstractIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getClassName(), str)
 
@@ -626,7 +612,7 @@ class TestReflectionAbstractIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.r.getClassName(), "SampleABC")
 
@@ -637,7 +623,7 @@ class TestReflectionAbstractIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getModuleName()
         self.assertIsInstance(result, str)
@@ -650,7 +636,7 @@ class TestReflectionAbstractIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         fqn = self.r.getModuleWithClassName()
         self.assertIn("SampleABC", fqn)
@@ -662,24 +648,25 @@ class TestReflectionAbstractIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         fqn = self.r.getModuleWithClassName()
         self.assertIn(self.r.getModuleName(), fqn)
+
 
 # ---------------------------------------------------------------------------
 # Metadata methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractMetadata(TestCase):
 
+class TestReflectionAbstractMetadata(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract instance for metadata tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -690,7 +677,7 @@ class TestReflectionAbstractMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getDocstring()
         self.assertIsInstance(result, str)
@@ -702,18 +689,18 @@ class TestReflectionAbstractMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
 
         class _Bare(ABC):
             @abstractmethod
-            def m(self):
+            def m(self) -> None:
                 """Run the m helper.
 
                 Returns
                 -------
                 None
-                    Completes the operation described above.
+                    No return value.
                 """
                 ...
 
@@ -729,7 +716,7 @@ class TestReflectionAbstractMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getBaseClasses(), list)
 
@@ -740,7 +727,7 @@ class TestReflectionAbstractMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(ABC, self.r.getBaseClasses())
 
@@ -751,7 +738,7 @@ class TestReflectionAbstractMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getSourceCode()
         self.assertIsInstance(result, str)
@@ -764,7 +751,7 @@ class TestReflectionAbstractMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getFile()
         self.assertIsInstance(result, str)
@@ -777,7 +764,7 @@ class TestReflectionAbstractMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getAnnotations(), dict)
 
@@ -788,24 +775,25 @@ class TestReflectionAbstractMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         annotations = self.r.getAnnotations()
         self.assertIn("public_attr", annotations)
+
 
 # ---------------------------------------------------------------------------
 # Attribute inspection
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractPublicAttributes(TestCase):
 
+class TestReflectionAbstractPublicAttributes(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for public attribute tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -816,7 +804,7 @@ class TestReflectionAbstractPublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getPublicAttributes(), dict)
 
@@ -827,7 +815,7 @@ class TestReflectionAbstractPublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("public_attr", self.r.getPublicAttributes())
 
@@ -838,7 +826,7 @@ class TestReflectionAbstractPublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("_protected_attr", self.r.getPublicAttributes())
 
@@ -849,7 +837,7 @@ class TestReflectionAbstractPublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(self.r.hasAttribute("public_attr"))
 
@@ -860,7 +848,7 @@ class TestReflectionAbstractPublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(self.r.hasAttribute("nonexistent_attr"))
 
@@ -871,7 +859,7 @@ class TestReflectionAbstractPublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.r.getAttribute("public_attr"), 10)
 
@@ -882,7 +870,7 @@ class TestReflectionAbstractPublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.r.getAttribute("does_not_exist"))
 
@@ -893,19 +881,19 @@ class TestReflectionAbstractPublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getAttributes(), dict)
 
-class TestReflectionAbstractProtectedAttributes(TestCase):
 
+class TestReflectionAbstractProtectedAttributes(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for protected attribute tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -916,7 +904,7 @@ class TestReflectionAbstractProtectedAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getProtectedAttributes(), dict)
 
@@ -927,7 +915,7 @@ class TestReflectionAbstractProtectedAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protected_attr", self.r.getProtectedAttributes())
 
@@ -938,19 +926,19 @@ class TestReflectionAbstractProtectedAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("public_attr", self.r.getProtectedAttributes())
 
-class TestReflectionAbstractPrivateAttributes(TestCase):
 
+class TestReflectionAbstractPrivateAttributes(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for private attribute tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -961,7 +949,7 @@ class TestReflectionAbstractPrivateAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getPrivateAttributes(), dict)
 
@@ -972,7 +960,7 @@ class TestReflectionAbstractPrivateAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -982,15 +970,15 @@ class TestReflectionAbstractPrivateAttributes(TestCase):
         private_attrs = self.r.getPrivateAttributes()
         self.assertIn("__private_attr", private_attrs)
 
-class TestReflectionAbstractDunderAttributes(TestCase):
 
+class TestReflectionAbstractDunderAttributes(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for dunder attribute tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1001,7 +989,7 @@ class TestReflectionAbstractDunderAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getDunderAttributes(), dict)
 
@@ -1012,19 +1000,20 @@ class TestReflectionAbstractDunderAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(
             self.r.getMagicAttributes(),
             self.r.getDunderAttributes(),
         )
 
+
 # ---------------------------------------------------------------------------
 # Attribute mutation
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractSetAttribute(TestCase):
 
+class TestReflectionAbstractSetAttribute(TestCase):
     def testSetAttributeAddsNewAttribute(self) -> None:
         """
         Assert that setAttribute returns True and the attribute becomes visible.
@@ -1032,16 +1021,14 @@ class TestReflectionAbstractSetAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         mutable_abc = _make_mutable_abc()
         r = ReflectionAbstract(mutable_abc)
         result = r.setAttribute("new_attr", 123)
         self.assertTrue(result)
-        # Verify visibility either via hasAttribute or direct hasattr
-        self.assertTrue(
-            r.hasAttribute("new_attr") or hasattr(mutable_abc, "new_attr"),
-        )
+        self.assertTrue(r.hasAttribute("new_attr"))
+        self.assertEqual(mutable_abc.new_attr, 123)
 
     def testSetAttributeInvalidNameRaisesValueError(self) -> None:
         """
@@ -1050,7 +1037,7 @@ class TestReflectionAbstractSetAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         r = ReflectionAbstract(SampleABC)
         with self.assertRaises(ValueError):
@@ -1063,7 +1050,7 @@ class TestReflectionAbstractSetAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         r = ReflectionAbstract(SampleABC)
         with self.assertRaises(ValueError):
@@ -1076,7 +1063,7 @@ class TestReflectionAbstractSetAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -1087,8 +1074,8 @@ class TestReflectionAbstractSetAttribute(TestCase):
         with self.assertRaises(TypeError):
             r.setAttribute("new_method", lambda: None)
 
-class TestReflectionAbstractRemoveAttribute(TestCase):
 
+class TestReflectionAbstractRemoveAttribute(TestCase):
     def testRemoveAttributeReturnsTrueOnSuccess(self) -> None:
         """
         Assert that removeAttribute returns True and the attribute is gone.
@@ -1096,7 +1083,7 @@ class TestReflectionAbstractRemoveAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         mutable_abc = _make_mutable_abc()
         r = ReflectionAbstract(mutable_abc)
@@ -1111,25 +1098,26 @@ class TestReflectionAbstractRemoveAttribute(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         r = ReflectionAbstract(SampleABC)
         with self.assertRaises(ValueError):
             r.removeAttribute("no_such_attribute_xyz")
 
+
 # ---------------------------------------------------------------------------
 # Method inspection
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractPublicMethods(TestCase):
 
+class TestReflectionAbstractPublicMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for public method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1140,7 +1128,7 @@ class TestReflectionAbstractPublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getPublicMethods(), list)
 
@@ -1151,7 +1139,7 @@ class TestReflectionAbstractPublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("concreteMethod", self.r.getPublicMethods())
 
@@ -1162,7 +1150,7 @@ class TestReflectionAbstractPublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("abstractMethod", self.r.getPublicMethods())
 
@@ -1173,7 +1161,7 @@ class TestReflectionAbstractPublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("_protectedMethod", self.r.getPublicMethods())
 
@@ -1184,7 +1172,7 @@ class TestReflectionAbstractPublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sync = self.r.getPublicSyncMethods()
         self.assertIsInstance(sync, list)
@@ -1197,7 +1185,7 @@ class TestReflectionAbstractPublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         async_methods = self.r.getPublicAsyncMethods()
         self.assertIsInstance(async_methods, list)
@@ -1210,7 +1198,7 @@ class TestReflectionAbstractPublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("asyncMethod", self.r.getPublicSyncMethods())
 
@@ -1221,19 +1209,19 @@ class TestReflectionAbstractPublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getMethods(), list)
 
-class TestReflectionAbstractProtectedMethods(TestCase):
 
+class TestReflectionAbstractProtectedMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for protected method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1244,7 +1232,7 @@ class TestReflectionAbstractProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getProtectedMethods(), list)
 
@@ -1255,7 +1243,7 @@ class TestReflectionAbstractProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protectedMethod", self.r.getProtectedMethods())
 
@@ -1266,7 +1254,7 @@ class TestReflectionAbstractProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("concreteMethod", self.r.getProtectedMethods())
 
@@ -1277,7 +1265,7 @@ class TestReflectionAbstractProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sync = self.r.getProtectedSyncMethods()
         self.assertIsInstance(sync, list)
@@ -1290,21 +1278,21 @@ class TestReflectionAbstractProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         async_methods = self.r.getProtectedAsyncMethods()
         self.assertIsInstance(async_methods, list)
         self.assertIn("_protectedAsyncMethod", async_methods)
 
-class TestReflectionAbstractPrivateMethods(TestCase):
 
+class TestReflectionAbstractPrivateMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for private method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1315,7 +1303,7 @@ class TestReflectionAbstractPrivateMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getPrivateMethods(), list)
 
@@ -1326,24 +1314,24 @@ class TestReflectionAbstractPrivateMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
-        Python mangles __privateMethod to _SampleABC__private_method.
+        Python mangles __privateMethod to _SampleABC__privateMethod.
         ReflectionAbstract strips '_SampleABC' leaving '__privateMethod'.
         """
         self.assertIn("__privateMethod", self.r.getPrivateMethods())
 
-class TestReflectionAbstractClassMethods(TestCase):
 
+class TestReflectionAbstractClassMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for class method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1354,7 +1342,7 @@ class TestReflectionAbstractClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPublicClassMethods()
         self.assertIsInstance(result, list)
@@ -1367,7 +1355,7 @@ class TestReflectionAbstractClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedClassMethod",
@@ -1381,7 +1369,7 @@ class TestReflectionAbstractClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getPrivateClassMethods(), list)
 
@@ -1392,7 +1380,7 @@ class TestReflectionAbstractClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getPublicClassSyncMethods(), list)
 
@@ -1403,19 +1391,19 @@ class TestReflectionAbstractClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getProtectedClassSyncMethods(), list)
 
-class TestReflectionAbstractStaticMethods(TestCase):
 
+class TestReflectionAbstractStaticMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for static method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1426,7 +1414,7 @@ class TestReflectionAbstractStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPublicStaticMethods()
         self.assertIsInstance(result, list)
@@ -1439,7 +1427,7 @@ class TestReflectionAbstractStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedStaticMethod",
@@ -1453,7 +1441,7 @@ class TestReflectionAbstractStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getPrivateStaticMethods(), list)
 
@@ -1464,7 +1452,7 @@ class TestReflectionAbstractStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getPublicStaticSyncMethods(), list)
 
@@ -1475,19 +1463,19 @@ class TestReflectionAbstractStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getProtectedStaticSyncMethods(), list)
 
-class TestReflectionAbstractDunderMethods(TestCase):
 
+class TestReflectionAbstractDunderMethods(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for dunder method tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1498,7 +1486,7 @@ class TestReflectionAbstractDunderMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getDunderMethods(), list)
 
@@ -1509,23 +1497,24 @@ class TestReflectionAbstractDunderMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.r.getMagicMethods(), self.r.getDunderMethods())
+
 
 # ---------------------------------------------------------------------------
 # Method operations: hasMethod, removeMethod, getMethodSignature
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractMethodOperations(TestCase):
 
+class TestReflectionAbstractMethodOperations(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for method operation tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1536,7 +1525,7 @@ class TestReflectionAbstractMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(self.r.hasMethod("concreteMethod"))
 
@@ -1547,7 +1536,7 @@ class TestReflectionAbstractMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(self.r.hasMethod("totally_fake_method"))
 
@@ -1558,7 +1547,7 @@ class TestReflectionAbstractMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -1578,7 +1567,7 @@ class TestReflectionAbstractMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         r = ReflectionAbstract(SampleABC)
         with self.assertRaises(ValueError):
@@ -1591,7 +1580,7 @@ class TestReflectionAbstractMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.r.getMethodSignature("concreteMethod")
         self.assertIsInstance(sig, inspect.Signature)
@@ -1603,24 +1592,25 @@ class TestReflectionAbstractMethodOperations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self.r.getMethodSignature("ghost_method")
+
 
 # ---------------------------------------------------------------------------
 # Property inspection
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractProperties(TestCase):
 
+class TestReflectionAbstractProperties(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for property tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1631,7 +1621,7 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.r.getProperties(), list)
 
@@ -1642,7 +1632,7 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("aProperty", self.r.getProperties())
 
@@ -1653,7 +1643,7 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPublicProperties()
         self.assertIsInstance(result, list)
@@ -1666,7 +1656,7 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getProtectedProperties()
         self.assertIsInstance(result, list)
@@ -1679,11 +1669,11 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
-        SampleABC has no name-mangled properties, so the list is empty.
+        SampleABC declares a private property alongside the public and protected ones.
         """
         self.assertIsInstance(self.r.getPrivateProperties(), list)
 
@@ -1694,7 +1684,7 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.r.getPropertySignature("aProperty")
         self.assertIsInstance(sig, inspect.Signature)
@@ -1706,7 +1696,7 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises((ValueError, TypeError)):
             self.r.getPropertySignature("nonexistent_prop")
@@ -1718,7 +1708,7 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         doc = self.r.getPropertyDocstring("aProperty")
         self.assertIsInstance(doc, str)
@@ -1730,24 +1720,25 @@ class TestReflectionAbstractProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises((ValueError, TypeError)):
             self.r.getPropertyDocstring("nonexistent_prop")
+
 
 # ---------------------------------------------------------------------------
 # Dependency signatures and cache
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractDependencies(TestCase):
 
+class TestReflectionAbstractDependencies(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for dependency tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1758,15 +1749,14 @@ class TestReflectionAbstractDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
-        The exact type is from
-        orionis.services.introspection.dependencies.entities.
+        The returned entity is the public dependency Signature type.
         """
         sig = self.r.constructorSignature()
-        self.assertIsNotNone(sig)
+        self.assertIsInstance(sig, Signature)
 
     def testMethodSignatureReturnsSignatureObject(self) -> None:
         """
@@ -1775,10 +1765,10 @@ class TestReflectionAbstractDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.r.methodSignature("concreteMethod")
-        self.assertIsNotNone(sig)
+        self.assertIsInstance(sig, Signature)
 
     def testMethodSignatureRaisesAttributeErrorForMissing(self) -> None:
         """
@@ -1787,20 +1777,20 @@ class TestReflectionAbstractDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.r.methodSignature("ghost_method_xyz")
 
-class TestReflectionAbstractClearCache(TestCase):
 
+class TestReflectionAbstractClearCache(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for clearCache tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1811,7 +1801,7 @@ class TestReflectionAbstractClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.r["some_cached_key"] = "value"
         self.r.clearCache()
@@ -1824,7 +1814,7 @@ class TestReflectionAbstractClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         # Populate the cache, then clear it to force fresh computation
         _ = self.r.getPublicMethods()
@@ -1839,24 +1829,25 @@ class TestReflectionAbstractClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.clearCache()
         self.assertIsNone(result)
+
 
 # ---------------------------------------------------------------------------
 # Asynchronous and private member classification
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractAsyncMembers(TestCase):
 
+class TestReflectionAbstractAsyncMembers(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for async member tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -1867,7 +1858,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPrivateSyncMethods()
         self.assertIn("__privateMethod", result)
@@ -1880,7 +1871,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPrivateAsyncMethods()
         self.assertIn("__privateAsyncMethod", result)
@@ -1893,7 +1884,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("classAsyncMethod", self.r.getPublicClassAsyncMethods())
 
@@ -1904,7 +1895,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedClassAsyncMethod",
@@ -1918,7 +1909,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPrivateClassMethods()
         self.assertIn("__privateClassMethod", result)
@@ -1931,7 +1922,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPrivateClassSyncMethods()
         self.assertIn("__privateClassMethod", result)
@@ -1944,7 +1935,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPrivateClassAsyncMethods()
         self.assertIn("__privateClassAsyncMethod", result)
@@ -1957,7 +1948,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sync_methods = self.r.getPublicStaticSyncMethods()
         async_methods = self.r.getPublicStaticAsyncMethods()
@@ -1972,7 +1963,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedStaticAsyncMethod",
@@ -1986,7 +1977,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPrivateStaticMethods()
         self.assertIn("__privateStaticMethod", result)
@@ -1999,7 +1990,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPrivateStaticSyncMethods()
         self.assertIn("__privateStaticMethod", result)
@@ -2012,7 +2003,7 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.r.getPrivateStaticAsyncMethods()
         self.assertIn("__privateStaticAsyncMethod", result)
@@ -2025,23 +2016,24 @@ class TestReflectionAbstractAsyncMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateProperty", self.r.getPrivateProperties())
+
 
 # ---------------------------------------------------------------------------
 # Private member access through name mangling
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractPrivateAccess(TestCase):
 
+class TestReflectionAbstractPrivateAccess(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for private access tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -2052,7 +2044,7 @@ class TestReflectionAbstractPrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         signature = self.r.getPropertySignature("__privateProperty")
         self.assertIsInstance(signature, inspect.Signature)
@@ -2064,7 +2056,7 @@ class TestReflectionAbstractPrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         signature = self.r.getMethodSignature("__privateMethod")
         self.assertIsInstance(signature, inspect.Signature)
@@ -2076,7 +2068,7 @@ class TestReflectionAbstractPrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         docstring = self.r.getPropertyDocstring("__privateProperty")
         self.assertIn("private property", docstring)
@@ -2088,7 +2080,7 @@ class TestReflectionAbstractPrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNotNone(self.r.methodSignature("__privateMethod"))
 
@@ -2099,7 +2091,7 @@ class TestReflectionAbstractPrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionAbstract(_make_mutable_abc())
         self.assertTrue(reflection.setAttribute("__hidden", 5))
@@ -2114,18 +2106,19 @@ class TestReflectionAbstractPrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionAbstract(_make_private_method_abc())
         self.assertTrue(reflection.removeMethod("__hiddenMethod"))
         self.assertFalse(reflection.hasMethod("__hiddenMethod"))
 
+
 # ---------------------------------------------------------------------------
 # Error branches
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractErrorBranches(TestCase):
 
+class TestReflectionAbstractErrorBranches(TestCase):
     def testGetSourceCodeRaisesValueErrorForDynamicClasses(self) -> None:
         """
         Assert that classes without locatable source raise ValueError.
@@ -2133,7 +2126,7 @@ class TestReflectionAbstractErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionAbstract(_make_sourceless_abc())
         with self.assertRaises(ValueError):
@@ -2146,7 +2139,7 @@ class TestReflectionAbstractErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionAbstract(_make_moduleless_abc())
         with self.assertRaises(ValueError):
@@ -2159,7 +2152,7 @@ class TestReflectionAbstractErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionAbstract(_make_moduleless_abc())
         with self.assertRaises(ValueError):
@@ -2172,7 +2165,7 @@ class TestReflectionAbstractErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -2193,7 +2186,7 @@ class TestReflectionAbstractErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionAbstract(SampleABC)
         with self.assertRaises(TypeError):
@@ -2206,25 +2199,26 @@ class TestReflectionAbstractErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionAbstract(SampleABC)
         with self.assertRaises(TypeError):
             reflection.getPropertyDocstring("concreteMethod")
 
+
 # ---------------------------------------------------------------------------
 # Memoization
 # ---------------------------------------------------------------------------
 
-class TestReflectionAbstractMemoization(TestCase):
 
+class TestReflectionAbstractMemoization(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionAbstract for memoization tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.r = ReflectionAbstract(SampleABC)
 
@@ -2235,7 +2229,7 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.r.getBaseClasses(), self.r.getBaseClasses())
 
@@ -2246,7 +2240,7 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.r.getSourceCode(), self.r.getSourceCode())
 
@@ -2257,7 +2251,7 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.r.getFile(), self.r.getFile())
 
@@ -2268,7 +2262,7 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.r.getAnnotations(), self.r.getAnnotations())
 
@@ -2279,7 +2273,7 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.r.getMethodSignature("concreteMethod"),
@@ -2293,7 +2287,7 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.r.getPropertySignature("aProperty"),
@@ -2307,7 +2301,7 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.r.getPropertyDocstring("aProperty"),
@@ -2321,7 +2315,7 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.r.constructorSignature(), self.r.constructorSignature())
 
@@ -2332,10 +2326,9 @@ class TestReflectionAbstractMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.r.methodSignature("concreteMethod"),
             self.r.methodSignature("concreteMethod"),
         )
-

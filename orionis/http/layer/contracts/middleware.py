@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
     from orionis.http.responses import Response
 
+
 class IBaseMiddleware(ABC):
     """Define the base contract for all HTTP middlewares in the pipeline.
 

@@ -1,7 +1,10 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a date string matches one of the accepted formats."""
 
 from orionis.support.facades.datetime import DateTime
 from orionis.schemas.rule import Rule
+
 
 class DateFormat(Rule):
     """
@@ -10,8 +13,6 @@ class DateFormat(Rule):
     Formats use the tokens understood by the ``DateTime`` facade, such as
     ``"YYYY-MM-DD"`` or ``"DD/MM/YYYY HH:mm"``.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_formats",)
     """Declare the instance attribute slots reserved by this class."""
@@ -37,7 +38,7 @@ class DateFormat(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------
@@ -82,7 +83,7 @@ class DateFormat(Rule):
         for fmt in self._formats:
             try:
                 DateTime.fromFormat(value, fmt)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 continue
             return True
 

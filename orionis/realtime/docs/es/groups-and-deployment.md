@@ -5,11 +5,13 @@ Los grupos seleccionan conexiones de un Hub, por ejemplo participantes de una sa
 ```python
 from orionis.realtime import Hub, remote
 
+
 class RoomHub(Hub):
     @remote
     async def join(self, room: str) -> None:
         if self.context.user is None:
             from orionis.realtime.errors import RPCError
+
             raise RPCError("unauthenticated", "Sign in first")
         await self.groups.join(room)
         await self.clients.group(room).send("joined", self.context.connection_id)
@@ -27,13 +29,16 @@ from orionis.realtime import ConnectionManager
 from orionis.realtime.config import RealtimeConfig
 from orionis.realtime import Hub
 
+
 class EmptyHub(Hub):
     pass
+
 
 async def example():
     manager = ConnectionManager(RealtimeConfig())
     result = await manager.hub(EmptyHub).all.send("refresh", {"version": 1})
     assert (result.sent, result.failed) == (0, 0)
+
 
 asyncio.run(example())
 ```
@@ -54,11 +59,15 @@ asyncio.run(example())
 
 Los límites son enteros positivos y los timeouts finitos positivos. `config/realtime.py` construye `RealtimeConfig`; el provider lo registra como configuración inmutable. Combínalos con límites WebSocket HTTP de mensajes y conexiones. No asumas que elevar el límite Realtime eleva automáticamente el del transporte.
 
+Solo una configuración ausente (`None`) selecciona los defaults. Valores falsy inválidos como `False`, `0` o una lista vacía fallan explícitamente antes de registrar servicios.
+
 ## Workers, orden y extensiones
 
 `ConnectionManager` y grupos son locales al worker. Dos procesos no ven conexiones del otro; reiniciar pierde registro/membresías. Para difusión entre workers necesitas un backplane propio y una implementación compatible de `IConnectionManager`. No se entrega Redis pub/sub o almacenamiento offline automáticamente por configurar Redis en otro módulo.
 
 Cada conexión serializa escrituras mediante lock y aplica backpressure; una escritura fallida cierra conexión y cancela su owner para evitar adelantamientos posteriores. El broadcast acota fan-out y codifica una vez por codec. Accede al manager en el event loop de la aplicación; no está diseñado como registry thread-safe global.
+
+Si el event loop rechaza crear una tarea, se cierra la coroutine no agendada y la admisión de escritura libera su lock. El rechazo no deja una invocación activa ficticia ni bloquea permanentemente escrituras posteriores.
 
 La reflexión remota se cachea para hasta 1024 clases Hub. Instancias y scopes se mantienen por invocación. No retengas recursos scoped en tareas que sobrevivan a la conexión; controla cancelación, join y cierre de cualquier tarea propia.
 

@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class Drivers(StrEnum):
     """Enumerate supported queue connection drivers."""
 

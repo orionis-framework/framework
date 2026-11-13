@@ -1,13 +1,14 @@
+# ruff: noqa: ANN401, TC001
+# Declare heterogeneous relation results and runtime-resolvable model types.
 """Contract for a query builder bound to a parent model instance."""
 
-from __future__ import annotations
+import orionis.orm as _orm
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from orionis.orm.contracts.builder import IModelQueryBuilder
 
-if TYPE_CHECKING:
-    from orionis.orm.model import Model
-    from orionis.support.types.collection import Collection
+from orionis.support.types.collection import Collection
+
 
 class IRelation(IModelQueryBuilder):
     """
@@ -33,11 +34,11 @@ class IRelation(IModelQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod
-    def addEagerConstraints(self, models: list[Model]) -> None:
+    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
         """
         Constrain the query to every parent instance of an eager batch.
 
@@ -49,18 +50,19 @@ class IRelation(IModelQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod
-    async def getResults(self) -> Any:  # noqa: ANN401
+    async def getResults(self) -> Any:
         """
         Execute the relationship query for its bound parent instance.
 
         Returns
         -------
         typing.Any
-            A single model, ``None``, or a :class:`collections.abc.Collection`,
+            A single model, ``None``, or an Orionis
+            :class:`orionis.support.types.Collection`,
             depending on the relationship kind.
         """
 
@@ -71,14 +73,14 @@ class IRelation(IModelQueryBuilder):
 
         Returns
         -------
-        collections.abc.Collection
+        orionis.support.types.Collection
             Every related row across the whole eager-loaded batch.
         """
 
     @abstractmethod
     def match(
         self,
-        models: list[Model],
+        models: list[_orm.Model],
         results: Collection,
         name: str,
     ) -> None:
@@ -89,7 +91,7 @@ class IRelation(IModelQueryBuilder):
         ----------
         models : list of orionis.orm.Model
             Parent instances being eager loaded together.
-        results : collections.abc.Collection
+        results : orionis.support.types.Collection
             Rows produced by :meth:`orionis.orm.contracts.relation.IRelation.getEager`.
         name : str
             Relationship name the results are stored under.
@@ -97,5 +99,5 @@ class IRelation(IModelQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """

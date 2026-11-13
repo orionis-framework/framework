@@ -1,12 +1,13 @@
+# ruff: noqa: TC003
+# Keep iterator and traceback annotations available for runtime reflection.
 """Define the contract for an asynchronous binary stream handle."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Self
+from typing import Self
+from collections.abc import AsyncIterator
+from types import TracebackType
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from types import TracebackType
 
 class IStorageStream(ABC):
     """
@@ -115,7 +116,7 @@ class IStorageStream(ABC):
         Returns
         -------
         None
-            Flush pending data and release the underlying handle.
+            No return value.
         """
 
     @abstractmethod
@@ -151,5 +152,5 @@ class IStorageStream(ABC):
         Returns
         -------
         None
-            Close the stream when leaving the async context.
+            No return value.
         """

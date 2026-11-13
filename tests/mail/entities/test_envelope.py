@@ -1,10 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.mail.entities.address import Address
 from orionis.mail.entities.envelope import Envelope
 from orionis.mail.exceptions import MailCompositionException
 from orionis.test import TestCase
 
-class TestEnvelope(TestCase):
 
+class TestEnvelope(TestCase):
     def testNormalizesEveryDeclaredCollection(self) -> None:
         """Convert each recipient declaration into a tuple of addresses.
 

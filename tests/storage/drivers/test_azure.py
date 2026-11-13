@@ -1,5 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
-import importlib.util
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
+from orionis.storage.drivers import functions as driver_functions
 from orionis.foundation.config.filesystems.entitites.azure import Azure
 from orionis.storage.drivers.azure import AzureStorageDriver
 from orionis.storage.exceptions import (
@@ -8,8 +12,8 @@ from orionis.storage.exceptions import (
 )
 from orionis.test import TestCase
 
-class TestAzureStorageDriver(TestCase):
 
+class TestAzureStorageDriver(TestCase):
     async def testUrlComposedFromAccountAndContainer(self) -> None:
         """Compose the canonical Azure Blob URL for the container.
 
@@ -18,7 +22,7 @@ class TestAzureStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = AzureStorageDriver(
             Azure(account_name="acct", container="media"),
@@ -36,7 +40,7 @@ class TestAzureStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = (
             "DefaultEndpointsProtocol=https;AccountName=demo;"
@@ -58,7 +62,7 @@ class TestAzureStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = AzureStorageDriver(Azure(container="media"))
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -72,7 +76,7 @@ class TestAzureStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = AzureStorageDriver(
             Azure(account_name="acct", container="media"),
@@ -81,18 +85,19 @@ class TestAzureStorageDriver(TestCase):
             await driver.temporaryUrl("f.txt", 60)
 
     async def testOperationsRequireOptionalDependency(self) -> None:
-        """Surface the missing Azure SDK with install instructions.
-
-        Only asserted when azure-storage-blob is absent from the
-        environment, so the test remains valid anywhere.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        if importlib.util.find_spec("azure") is not None:
-            return
+        """Report controlled SDK absence even when the optional SDK is installed."""
+        missing = ModuleNotFoundError("Controlled optional SDK absence.")
+        importer = Mock(side_effect=missing)
         driver = AzureStorageDriver(Azure(container="media"))
-        with self.assertRaises(MissingStorageDependencyException):
+        with (
+            patch.object(
+                driver_functions,
+                "importlib",
+                SimpleNamespace(import_module=importer),
+            ),
+            self.assertRaises(MissingStorageDependencyException) as caught,
+        ):
             await driver.exists("f.txt")
+        importer.assert_called_once_with("azure.storage.blob")
+        self.assertIs(caught.exception.__cause__, missing)
+        self.assertIn("orionis[azure]", str(caught.exception))

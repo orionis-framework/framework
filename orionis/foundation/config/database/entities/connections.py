@@ -21,6 +21,7 @@ _CONNECTION_ENTITIES: tuple[tuple[str, type], ...] = (
 )
 """Table-driven mapping between connection field names and their entities."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Connections(BaseEntity):
     """

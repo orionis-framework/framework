@@ -11,6 +11,7 @@ Pre-build allowed types list once — avoids repeated list comprehension in erro
 paths.
 """
 
+
 @functools.lru_cache(maxsize=64)
 def _normalize_type_hint(type_hint: str | EnvironmentValueType) -> str:
     """
@@ -40,7 +41,7 @@ def _normalize_type_hint(type_hint: str | EnvironmentValueType) -> str:
     try:
         return EnvironmentValueType[type_hint.upper()].value
     except KeyError:
-        error_msg = (
+        error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
             f"Invalid type hint: {type_hint}. "
             f"Allowed types are: {_ALLOWED_TYPE_HINT_VALUES}"
         )
@@ -80,8 +81,12 @@ class __ValidateTypes:
         RuntimeError
             If type_hint is not a valid EnvironmentValueType.
         """
-        # Validate that the value is of a supported type
-        if not isinstance(value, (str, int, float, bool, list, dict, tuple, set)):
+        # Normalize subclasses to a supported base type; bool precedes int.
+        for value_type in (str, bool, int, float, list, dict, tuple, set):
+            if isinstance(value, value_type):
+                inferred_type = value_type.__name__
+                break
+        else:
             error_msg = (
                 f"Unsupported value type: {type(value).__name__}. "
                 f"Allowed types are str, int, float, bool, list, dict, tuple, set."
@@ -90,9 +95,9 @@ class __ValidateTypes:
 
         # Validate type hint if provided (use 'is not None' to avoid skipping
         # validation for falsy but invalid values such as 0 or empty string)
-        if (
-            type_hint is not None and
-            not isinstance(type_hint, (str, EnvironmentValueType))
+        if type_hint is not None and not isinstance(
+            type_hint,
+            (str, EnvironmentValueType),
         ):
             error_msg = (
                 f"Type hint must be a string or EnvironmentValueType, "
@@ -102,13 +107,12 @@ class __ValidateTypes:
 
         # Process type hint if provided and not None
         if type_hint is not None:
-
             # Normalize the type hint through the shared cache.
             return _normalize_type_hint(type_hint)
 
-        # Use inferred type if no type hint provided
-        return type(value).__name__.lower()
+        return inferred_type
 
-# Instance to be used for key name validation
+
+# Shared callable for validating and inferring environment value types.
 ValidateTypes = __ValidateTypes()
-"""Instance to be used for key name validation."""
+"""Validate and infer the canonical type of an environment value."""

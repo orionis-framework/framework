@@ -1,52 +1,20 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.test import TestCase
 from orionis.test.enums.status import TestStatus
 
 # Canonical catalogue of statuses published by the enumeration.
-_EXPECTED_MEMBERS: frozenset[str] = frozenset({
-    "PASSED",
-    "FAILED",
-    "ERRORED",
-    "SKIPPED",
-})
+_EXPECTED_MEMBERS: frozenset[str] = frozenset(
+    {
+        "PASSED",
+        "FAILED",
+        "ERRORED",
+        "SKIPPED",
+    },
+)
+
 
 class TestTestStatusMembers(TestCase):
-
-    def testPassedMemberExists(self) -> None:
-        """
-        Confirm the PASSED member belongs to the enumeration.
-
-        Validates that the successful outcome is published as a
-        first-class member of TestStatus.
-        """
-        self.assertIn(TestStatus.PASSED, TestStatus)
-
-    def testFailedMemberExists(self) -> None:
-        """
-        Confirm the FAILED member belongs to the enumeration.
-
-        Validates that the assertion-failure outcome is published as a
-        first-class member of TestStatus.
-        """
-        self.assertIn(TestStatus.FAILED, TestStatus)
-
-    def testErroredMemberExists(self) -> None:
-        """
-        Confirm the ERRORED member belongs to the enumeration.
-
-        Validates that the unexpected-exception outcome is published as
-        a first-class member of TestStatus.
-        """
-        self.assertIn(TestStatus.ERRORED, TestStatus)
-
-    def testSkippedMemberExists(self) -> None:
-        """
-        Confirm the SKIPPED member belongs to the enumeration.
-
-        Validates that the intentionally-not-executed outcome is
-        published as a first-class member of TestStatus.
-        """
-        self.assertIn(TestStatus.SKIPPED, TestStatus)
-
     def testEnumerationExposesExactlyFourMembers(self) -> None:
         """
         Confirm the enumeration publishes exactly four members.
@@ -54,10 +22,10 @@ class TestTestStatusMembers(TestCase):
         Validates that no undocumented status has been added to the
         public contract consumed by the result processor.
         """
-        self.assertEqual({member.name for member in TestStatus}, _EXPECTED_MEMBERS)
+        self.assertEqual(set(TestStatus.__members__), _EXPECTED_MEMBERS)
+
 
 class TestTestStatusValues(TestCase):
-
     def testMemberNamesMatchValues(self) -> None:
         """
         Confirm every member name equals its underlying string value.
@@ -66,7 +34,8 @@ class TestTestStatusValues(TestCase):
         serialised into cached JSON reports.
         """
         for member in TestStatus:
-            self.assertEqual(member.name, member.value)
+            with self.subTest(member=member):
+                self.assertEqual(member.name, member.value)
 
     def testMembersAreStringInstances(self) -> None:
         """
@@ -76,7 +45,8 @@ class TestTestStatusValues(TestCase):
         rendered directly by the console reporter.
         """
         for member in TestStatus:
-            self.assertIsInstance(member, str)
+            with self.subTest(member=member):
+                self.assertIsInstance(member, str)
 
     def testMemberComparesEqualToPlainString(self) -> None:
         """
@@ -105,8 +75,8 @@ class TestTestStatusValues(TestCase):
         """
         self.assertEqual(TestStatus.FAILED.center(8), " FAILED ")
 
-class TestTestStatusLookup(TestCase):
 
+class TestTestStatusLookup(TestCase):
     def testLookupByValueReturnsMember(self) -> None:
         """
         Retrieve a member from its string value.

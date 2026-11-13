@@ -576,7 +576,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RememberMe</span>: <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L25" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.remember.RememberMe.__init__">RememberMe(app, identities)</a></code></p><p><a href="classIndex.html#orionis.auth.remember.RememberMe">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RememberMe</span>: <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L26" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.auth.remember.RememberMe.__init__">RememberMe(app, identities)</a></code></p><p><a href="classIndex.html#orionis.auth.remember.RememberMe">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -663,7 +663,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_generate</span><span class="function-signature">(<span class="rst-sig-param">identity: <code>IAuthenticatable</code>, </span><span class="rst-sig-param">expiry: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L171">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L172">
       
       (source)
     </a>
@@ -690,7 +690,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_stored</span><span class="function-signature">(<span class="rst-sig-param">cookie: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">identity: <code>IAuthenticatable</code>, </span><span class="rst-sig-param">expiry: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L60">
       
       (source)
     </a>
@@ -717,7 +717,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">app: <code>IApplication</code>, </span><span class="rst-sig-param">identities: <code>IIdentityProvider</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L31">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L30">
       
       (source)
     </a>
@@ -729,7 +729,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize persistent-login settings and dependencies.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application exposing the remember-me and session configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identities:</span><code><a href="orionis.auth.contracts.IIdentityProvider.html" class="internal-link">orionis.auth.contracts.IIdentityProvider</a></code></td><td class="fieldArgDesc">Provider used to retrieve identities and update remember tokens.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Settings and the identity provider are retained on the instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the remember cookie name matches the session cookie name.</td></tr></table></div>
+    <div><p>Initialize persistent-login settings and dependencies.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">app:</span><code><a href="orionis.IApplication.html" class="internal-link">orionis.IApplication</a></code></td><td class="fieldArgDesc">Application exposing the remember-me and session configuration.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identities:</span><code><a href="orionis.auth.contracts.IIdentityProvider.html" class="internal-link">orionis.auth.contracts.IIdentityProvider</a></code></td><td class="fieldArgDesc">Provider used to retrieve identities and update remember tokens.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the remember cookie name matches the session cookie name.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -743,8 +743,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">_queue</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">max_age: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L84">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_queue</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">_http.Request</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">max_age: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L83">
       
       (source)
     </a>
@@ -756,7 +756,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Queue a cookie change on the current request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that owns the pending response state.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Cookie value to issue, or an empty string to clear it.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_age:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Cookie lifetime in seconds; zero expires the cookie immediately.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Cookie attributes are stored on the request state.</td></tr></table></div>
+    <div><p>Queue a cookie change on the current request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that owns the pending response state.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Cookie value to issue, or an empty string to clear it.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">max<wbr></wbr>_age:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">Cookie lifetime in seconds; zero expires the cookie immediately.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -770,8 +770,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">clearCookie</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L114">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">clearCookie</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">_http.Request</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L117">
       
       (source)
     </a>
@@ -783,7 +783,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Queue expiration of the current browser's persistent credential.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that will emit the expired cookie.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">An expired cookie is queued on the request state.</td></tr></table></div>
+    <div><p>Queue expiration of the current browser's persistent credential.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that will emit the expired cookie.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -797,8 +797,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">forget</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">identity: <code>IAuthenticatable</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L272">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">forget</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">_http.Request</a></code>, </span><span class="rst-sig-param">identity: <code>IAuthenticatable</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L278">
       
       (source)
     </a>
@@ -810,7 +810,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Forget an identity's persistent credential.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that will emit the cleared cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link">orionis.auth.contracts.IAuthenticatable</a></code></td><td class="fieldArgDesc">Identity whose remember token should be removed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The server-side token is cleared when present and the cookie expires.</td></tr></table></div>
+    <div><p>Forget an identity's persistent credential.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that will emit the cleared cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link">orionis.auth.contracts.IAuthenticatable</a></code></td><td class="fieldArgDesc">Identity whose remember token should be removed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -824,8 +824,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">issue</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">identity: <code>IAuthenticatable</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L131">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">issue</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">_http.Request</a></code>, </span><span class="rst-sig-param">identity: <code>IAuthenticatable</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L134">
       
       (source)
     </a>
@@ -837,7 +837,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Issue a persistent credential after password verification.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that will receive the remember cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link">orionis.auth.contracts.IAuthenticatable</a></code></td><td class="fieldArgDesc">Active identity whose prior remembered credential is replaced.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The stored token is updated and its cookie is queued.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.AuthException.html" class="internal-link">orionis.auth.AuthException</a></code></td><td>If HTTPS is required but unavailable, or token persistence fails.</td></tr></table></div>
+    <div><p>Issue a persistent credential after password verification.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that will receive the remember cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identity:</span><code><a href="orionis.auth.contracts.IAuthenticatable.html" class="internal-link">orionis.auth.contracts.IAuthenticatable</a></code></td><td class="fieldArgDesc">Active identity whose prior remembered credential is replaced.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.auth.AuthException.html" class="internal-link">orionis.auth.AuthException</a></code></td><td>If HTTPS is required but unavailable, or token persistence fails.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -851,8 +851,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">restore</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code></span>) -&gt; <code>IAuthenticatable | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L191">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">restore</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">_http.Request</a></code></span>) -&gt; <code>IAuthenticatable | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L192">
       
       (source)
     </a>
@@ -879,8 +879,8 @@ stale, or could not be rotated.</td></tr></table></div>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">revoke</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code>Request</code>, </span><span class="rst-sig-param">identifier: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L249">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">revoke</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">request: <code><a href="orionis.http.Request.html" class="internal-link" title="orionis.http.Request">_http.Request</a></code>, </span><span class="rst-sig-param">identifier: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L255">
       
       (source)
     </a>
@@ -892,7 +892,7 @@ stale, or could not be rotated.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Revoke a remembered credential and clear the browser cookie.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that will emit the cleared cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identifier:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Persisted identity identifier associated with the current session.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The server-side token is revoked when its identity still exists.</td></tr></table></div>
+    <div><p>Revoke a remembered credential and clear the browser cookie.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">request:</span><code><a href="orionis.http.Request.html" class="internal-link">orionis.http.Request</a></code></td><td class="fieldArgDesc">Request that will emit the cleared cookie.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">identifier:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Persisted identity identifier associated with the current session.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="baseinstancevariable">
   
@@ -906,7 +906,7 @@ stale, or could not be rotated.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">identities</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L56">
       
       (source)
     </a>
@@ -933,7 +933,7 @@ stale, or could not be rotated.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">settings</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/auth/remember.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/auth/remember.py#L51">
       
       (source)
     </a>
@@ -959,7 +959,7 @@ stale, or could not be rotated.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

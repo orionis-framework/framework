@@ -2,6 +2,7 @@
 
 from enum import Enum, auto
 
+
 class KernelContext(Enum):
     """
     Define available kernel types in the system.

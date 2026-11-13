@@ -32,6 +32,8 @@ This program only constructs a job. In a real application replace printing with 
 
 The serializer collects public slots and non-`ClassVar` annotations across the hierarchy. `tries`, `timeout`, and `backoff` are class policy, rather than state. Supported values are strings, bytes, integers, finite floats, booleans, `None`, and nested lists/tuples/dictionaries with string keys. Arbitrary objects, private fields, and undeclared instance state are rejected.
 
+Postponed annotations, including `from __future__ import annotations`, are evaluated in the registered class's defining module. `ClassVar` declarations remain class policy rather than payload fields, and resolved persistent annotations retain strict type validation. This evaluates trusted application declarations, not type names supplied by a message.
+
 Payloads are limited to 1 MiB and state depth to 32. Store large documents separately and send a key. State uses MessagePack and preserves tuples through an extension; it neither loads pickle nor imports classes from an untrusted identity. Only registered classes can be decoded. The outer envelope uses JSON; version 1 carries identity, routing, and execution policy.
 
 Verify a round trip without executing work:

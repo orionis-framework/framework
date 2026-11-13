@@ -1,11 +1,41 @@
+# ruff: noqa: BLE001, PLC0415, TC003
+# Keep callback annotations resolvable when inspecting the public event contract.
+# Observe secondary progress failures centrally without replacing the body error.
 """Progress callbacks reported while migrations run."""
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from collections.abc import Callable
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
+
+def _report_failure(callback: Callable[[], None], primary: Exception) -> None:
+    """Deliver failure progress while preserving an existing execution error.
+
+    Parameters
+    ----------
+    callback : collections.abc.Callable
+        Bound progress callback with its arguments already supplied.
+    primary : Exception
+        Migration or seeder error that the runner will propagate.
+
+    Returns
+    -------
+    None
+        No return value.
+    """
+    try:
+        callback()
+    except Exception as secondary:
+        from orionis.failure.runtime import capture_nowait
+
+        capture_nowait(primary, flow="database", phase="execution")
+        capture_nowait(
+            secondary,
+            flow="database",
+            phase="report",
+            operation="progress",
+        )
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MigrationEvents:
@@ -43,7 +73,7 @@ class MigrationEvents:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         if self.on_start is not None:
             self.on_start(name)
@@ -62,7 +92,7 @@ class MigrationEvents:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         if self.on_success is not None:
             self.on_success(name, elapsed)
@@ -81,7 +111,7 @@ class MigrationEvents:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         if self.on_error is not None:
             self.on_error(name, elapsed)

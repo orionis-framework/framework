@@ -1,5 +1,6 @@
 """Validate logging paths without storing per-call state."""
 
+
 class __IsValidPath:
     """Validate logging paths without storing per-call state."""
 
@@ -57,6 +58,7 @@ class __IsValidPath:
                 f"got {value!r}."
             )
             raise ValueError(error_msg)
+
 
 # Exported singleton instance
 IsValidPath = __IsValidPath()

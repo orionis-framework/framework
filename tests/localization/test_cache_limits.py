@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Self
 from unittest.mock import patch
 from orionis.localization.repository import TranslationRepository
 from orionis.test import TestCase
 from tests.localization.test_repository import _RecordingLoader
+
 
 class TestTranslationCacheLimits(TestCase):
     """Bound negative entries and allow translations to appear after a miss."""

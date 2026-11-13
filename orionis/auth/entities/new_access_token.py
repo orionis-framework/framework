@@ -1,9 +1,10 @@
+# ruff: noqa: TC001
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Pair a freshly issued token with its plain text value."""
 
 from dataclasses import dataclass, field
 from orionis.auth.entities.access_token import AccessToken
 
-# ruff: noqa: TC001 (dataclass fields are introspected at runtime)
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class NewAccessToken:

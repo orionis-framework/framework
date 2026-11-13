@@ -16,9 +16,11 @@ _CONTEXTS = frozenset({"api", "ai", "console", "web", "websocket"})
 _COMMANDS = _CONTEXTS | {"config", "lifespan"}
 """Commands used by ``bootstrap``."""
 _RECOVERING: ContextVar[str | None] = ContextVar(
-    "orionis_bootstrap_route", default=None,
+    "orionis_bootstrap_route",
+    default=None,
 )
 """Context-local recovering isolated between asynchronous tasks."""
+
 
 @contextmanager
 def bootstrap_recovery(arguments: Sequence[str] | None) -> Generator[None]:
@@ -57,6 +59,7 @@ def bootstrap_recovery(arguments: Sequence[str] | None) -> Generator[None]:
     finally:
         _RECOVERING.reset(token)
 
+
 def recovering_route(context: str) -> bool:
     """
     Return whether this particular context is being explicitly repaired.
@@ -73,6 +76,7 @@ def recovering_route(context: str) -> bool:
     """
     # Restrict missing-file recovery to the selected routing context.
     return context in _CONTEXTS and _RECOVERING.get() == context
+
 
 def bootstrap_recovery_active() -> bool:
     """

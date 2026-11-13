@@ -1,3 +1,4 @@
+# ruff: noqa: ANN401, PLR0911, PLC0415
 """Encode and decode cache values with the configured serialization format."""
 
 from __future__ import annotations
@@ -5,12 +6,12 @@ import base64
 import datetime as dt
 import decimal
 import enum
-import importlib
 import json
 import secrets
 import sys
 import uuid
 from pathlib import Path
+from pkgutil import resolve_name
 from typing import TYPE_CHECKING, Any
 import msgspec.json as _msgjson
 from orionis.support.types.sentinel import _MISSING_TYPE, MISSING
@@ -23,6 +24,7 @@ _TK: str = "__type__"
 """Keys for type-discriminated payloads in the encoder output."""
 _VK: str = "__value__"
 """Vk identifier: ``__value__``."""
+
 
 def _identity(o: Any) -> Any:
     """
@@ -43,7 +45,8 @@ def _identity(o: Any) -> Any:
     """
     return o
 
-def _encode_subclass(obj: Any, t: type) -> Any:  # NOSONAR
+
+def _encode_subclass(obj: Any, t: type) -> Any:
     """
     Encode subclass instances not covered by the exact-type dispatch table.
 
@@ -68,28 +71,10 @@ def _encode_subclass(obj: Any, t: type) -> Any:  # NOSONAR
     TypeError
         If *obj* does not match any supported subclass or singleton.
     """
-    # Path subclasses (WindowsPath, PosixPath, etc.)
-    if isinstance(obj, Path):
-        return {
-            _TK: "path",
-            _VK: str(obj),
-        }
-    # datetime.datetime must be checked before datetime.date (it is a subclass)
-    if isinstance(obj, dt.datetime):
-        return {
-            _TK: "datetime",
-            _VK: obj.isoformat(),
-        }
-    if isinstance(obj, dt.date):
-        return {
-            _TK: "date",
-            _VK: obj.isoformat(),
-        }
-    if isinstance(obj, dt.time):
-        return {
-            _TK: "time",
-            _VK: obj.isoformat(),
-        }
+    # Preserve datetime-before-date precedence for subclasses.
+    for base in (Path, dt.datetime, dt.date, dt.time):
+        if isinstance(obj, base):
+            return _ENCODE_EXACT[base](obj)
     # dict/list subclasses: OrderedDict, defaultdict, UserList, etc.
     if isinstance(obj, dict):
         return {k: _encode(v) for k, v in obj.items()}
@@ -106,30 +91,19 @@ def _encode_subclass(obj: Any, t: type) -> Any:  # NOSONAR
             _TK: "missing",
             _VK: None,
         }
-    if isinstance(obj, tuple):
-        return {
-            _TK: "tuple",
-            _VK: [_encode(v) for v in obj],
-        }
-    if isinstance(obj, frozenset):
-        return {
-            _TK: "frozenset",
-            _VK: [_encode(v) for v in obj],
-        }
-    if isinstance(obj, set):
-        return {
-            _TK: "set",
-            _VK: [_encode(v) for v in obj],
-        }
+    for base in (tuple, frozenset, set):
+        if isinstance(obj, base):
+            return {_TK: base.__name__, _VK: [_encode(v) for v in obj]}
     if isinstance(obj, enum.Enum):
         et = type(obj)
         class_path = f"{et.__module__}.{et.__qualname__}"
         return {
             _TK: "enum",
-            _VK: {"class": class_path, "value": obj.value},
+            _VK: {"class": class_path, "value": _encode(obj.value)},
         }
     error_msg = f"Unsupported type for serialization: {t}"
     raise TypeError(error_msg)
+
 
 # Map supported types to their encoder functions.
 _ENCODE_EXACT: dict[type, Callable[[Any], Any]] = {
@@ -177,6 +151,7 @@ _ENCODE_EXACT: dict[type, Callable[[Any], Any]] = {
 }
 """Map supported types to their encoder functions."""
 
+
 def _encode(obj: Any) -> Any:
     """
     Encode a Python object into a JSON-compatible structure.
@@ -212,6 +187,7 @@ def _encode(obj: Any) -> Any:
     # Delegate all subclass/singleton cases to keep cognitive complexity low
     return _encode_subclass(obj, t)
 
+
 def _dec_missing(_: Any) -> Any:
     """
     Return the singleton marker for missing values.
@@ -228,6 +204,7 @@ def _dec_missing(_: Any) -> Any:
     """
     return MISSING
 
+
 def _dec_type(val: str) -> Any:
     """
     Resolve a dotted class path to the corresponding type object.
@@ -242,9 +219,12 @@ def _dec_type(val: str) -> Any:
     typing.Any
         The class object referenced by *val*.
     """
-    module_name, _, class_name = val.rpartition(".")
-    mod = sys.modules.get(module_name) or importlib.import_module(module_name)
-    return getattr(mod, class_name)
+    module_name, _, attribute = val.rpartition(".")
+    module = sys.modules.get(module_name)
+    if module is not None:
+        return getattr(module, attribute)
+    return resolve_name(val)
+
 
 def _dec_enum(val: dict) -> Any:
     """
@@ -260,9 +240,8 @@ def _dec_enum(val: dict) -> Any:
     typing.Any
         The enum member corresponding to the encoded value.
     """
-    module_name, _, class_name = val["class"].rpartition(".")
-    mod = sys.modules.get(module_name) or importlib.import_module(module_name)
-    return getattr(mod, class_name)(val["value"])
+    return _dec_type(val["class"])(_decode(val["value"]))
+
 
 def _dec_timedelta(v: Any) -> dt.timedelta:
     """
@@ -280,6 +259,7 @@ def _dec_timedelta(v: Any) -> dt.timedelta:
     """
     return dt.timedelta(**v)
 
+
 def _dec_tuple(v: Any) -> tuple:
     """
     Decode an iterable payload into a tuple.
@@ -295,6 +275,7 @@ def _dec_tuple(v: Any) -> tuple:
         Tuple with recursively decoded elements.
     """
     return tuple(_decode(x) for x in v)
+
 
 def _dec_set(v: Any) -> set:
     """
@@ -312,6 +293,7 @@ def _dec_set(v: Any) -> set:
     """
     return {_decode(x) for x in v}
 
+
 def _dec_frozenset(v: Any) -> frozenset:
     """
     Decode an iterable payload into a frozenset.
@@ -328,6 +310,7 @@ def _dec_frozenset(v: Any) -> frozenset:
     """
     return frozenset(_decode(x) for x in v)
 
+
 def _dec_complex(v: Any) -> complex:
     """
     Decode a mapping payload into a complex number.
@@ -343,6 +326,7 @@ def _dec_complex(v: Any) -> complex:
         Decoded complex value.
     """
     return complex(v["real"], v["imag"])
+
 
 # Dispatch table: keyed by the type string written by the encoder.
 _DECODE_DISPATCH: dict[str, Callable[[Any], Any]] = {
@@ -363,6 +347,7 @@ _DECODE_DISPATCH: dict[str, Callable[[Any], Any]] = {
     "enum": _dec_enum,
 }
 """Dispatch table: keyed by the type string written by the encoder."""
+
 
 def _decode(obj: Any) -> Any:
     """
@@ -397,10 +382,9 @@ def _decode(obj: Any) -> Any:
     # Primitive types (str, int, float, bool, None) are returned as-is
     return obj
 
+
 class Serializer:
     """Encode and decode cache values with the configured serialization format."""
-
-    # ruff: noqa: ANN401, PLR0911, C901, PLC0415
 
     @staticmethod
     def dumps(data: Any, indent: int | None = None) -> str:
@@ -431,7 +415,7 @@ class Serializer:
 
         Parameters
         ----------
-        raw : str
+        raw : str or bytes
             JSON-formatted string to deserialize.
 
         Returns
@@ -475,6 +459,7 @@ class Serializer:
                 tmp_file.unlink(missing_ok=True)
             except OSError as cleanup_error:
                 from orionis.failure.runtime import capture_nowait
+
                 capture_nowait(
                     cleanup_error,
                     flow="cache",
@@ -506,6 +491,7 @@ class Serializer:
             return None
         except OSError as error:
             from orionis.failure.runtime import capture_nowait
+
             capture_nowait(
                 error,
                 flow="cache",

@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Apply every migration that has not been run yet."""
 
 from typing import ClassVar
@@ -6,10 +8,9 @@ from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 from orionis.database.seeders.runner import SeederRunner
 
+
 class MigrateCommand(MigrationCommand):
     """Apply every migration that has not been run yet."""
-
-    # ruff: noqa: TC001
 
     signature: str = "migrate"
     """Signature identifier: ``migrate``."""

@@ -20,11 +20,13 @@ Both families expose identity, module, docstring, bases, source, file, annotatio
 
 ### `ReflectionModule`
 
-Imports a dotted module and exposes classes, constants, functions, imports, source, and file. Class and constant getters divide names by visibility; function getters additionally divide sync from async. Its mapping protocol reads or mutates module attributes.
+Imports a dotted module and exposes classes, constants, functions, imports, source, and file. Class and constant getters divide names by visibility; function getters additionally divide sync from async. Its item protocol reads or mutates the wrapper's memory cache. `setClass()` and `removeClass()` mutate the module and invalidate all cached member categories.
 
 ### `ReflectDependencies` and `Signature`
 
 `constructorSignature()`, `methodSignature(name)`, and `callableSignature()` return a `Signature`. The entity offers predicates and selectors: `hasParameters`, `noArgumentsRequired`, `hasUnresolvedArguments`, `getResolved`, `getUnresolved`, `getAllOrdered`, `getPositionalOnly`, `getKeywordOnly`, conversion helpers, and `arguments()`.
+
+`getPositionalOnly()` returns all arguments that are not keyword-only, including parameters that also accept keywords. Use the inspect signature to distinguish Python positional-only (`/`) parameters when constructing a call.
 
 ### `ModuleInspector`
 
@@ -49,7 +51,7 @@ Choose the narrowest wrapper, then use its categorized getters. Source/file retr
 
 ### Modify reflected members
 
-`setAttribute`, `removeAttribute`, `setMethod`, module item assignment, and deletion affect the actual reflected class, instance, or module. Clear the wrapper cache after external mutation; wrapper mutation methods invalidate affected data themselves. Restrict this capability to bootstrapping, tests, and controlled metaprogramming.
+`setAttribute`, `removeAttribute`, `setMethod`, `removeMethod`, `setClass`, and `removeClass` affect the actual reflected class, instance, or module. Clear the wrapper cache after external mutation; wrapper mutation methods invalidate affected data themselves. Abstract-class mutation also refreshes Python's abstract-method state. Instance method overrides are inspected before class methods; removing an instance override exposes the class method again. Without an instance override, `ReflectionInstance.removeMethod()` removes the class definition, affecting its other instances. Restrict mutation to bootstrapping, tests, and controlled metaprogramming.
 
 ## Configuration
 
@@ -67,15 +69,15 @@ Because inspection sits below the container, the package deliberately has no dep
 - `ReflectionInstance` rejects class objects, builtin/ABC instances, and instances whose class is defined in `__main__`.
 - `ReflectionCallable` accepts Python functions, bound methods, lambdas, and callable objects exposing `__code__`; other callables can be rejected.
 - Source and file lookup can raise `AttributeError`, `TypeError`, or underlying inspection errors for generated, interactive, or built-in objects.
-- Unknown methods/properties raise `AttributeError`; invalid mutation names and non-callable methods raise validation errors.
+- Unknown methods/properties raise `ValueError` in class wrappers or `AttributeError` in instance wrappers. An absent class attribute returns `None`; invalid mutation names and non-callable methods raise validation errors.
 - Required builtin annotations such as `int` remain unresolved by design; defaults make a parameter resolved from the default's concrete type.
 - Forward references are resolved when possible. Unavailable names remain conservative metadata instead of being imported speculatively.
-- `discoverModules` raises when the target is outside the base. AST checks return `False` for absent, invalid, or undecodable files.
-- Module discovery and frozen-dataclass discovery import code where documented; do not run them on untrusted packages.
+- `discoverModules` raises when the target is outside the base or a traversed directory cannot be read. An absent optional discovery directory yields an empty set. AST checks support Python encoding cookies and UTF-8 BOMs and return `False` for absent, invalid, or undecodable files.
+- Filesystem discovery and AST checks do not execute module code. `loadClass()`, module reflection, and frozen-dataclass discovery import code; use them with trusted packages.
 
 ## Performance and concurrency
 
-Class/member scans are single-pass and cached per wrapper. Inspect and dependency signatures are memoized, and module/class loading uses Python's import cache plus an Orionis class cache. Reuse wrappers in hot paths and call `clearCache()` only after intentional mutation.
+Class/member scans are single-pass and cached per wrapper. Inspect and dependency signatures are memoized, and module/class loading uses Python's import cache and reads the current class attribute. Reuse wrappers in hot paths and call `clearCache()` only after intentional mutation.
 
 The caches are process-local. Reads are suitable for normal concurrent application use under Python's runtime guarantees, but reflected object mutation and cache clearing are not transactional. Do not mutate a shared class/module while other threads or tasks inspect or invoke it. Discovery walks the filesystem synchronously and belongs in bootstrap or tooling, not request hot paths.
 

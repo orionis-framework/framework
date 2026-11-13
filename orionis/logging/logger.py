@@ -1,7 +1,11 @@
+# ruff: noqa: BLE001, SLF001, TC001
+# Attempt every owned sink on cleanup, annotate cooperating handlers, and retain
+# the application contract for runtime dependency injection.
 """Resolve logging channels and dispatch structured log records."""
 
 import asyncio
 import logging
+import orionis.failure.runtime as failure_runtime
 from contextlib import suppress
 from pathlib import Path
 from threading import Lock
@@ -11,26 +15,27 @@ from orionis.foundation.config.logging.enums.levels import Level
 from orionis.foundation.contracts.application import IApplication
 from orionis.logging.contracts.logger import ILogger
 from orionis.logging.handlers.queued import (
-    BoundedQueueHandler, LoggingDeliveryError, observe_sink_error,
+    BoundedQueueHandler,
+    LoggingDeliveryError,
+    observe_sink_error,
 )
 from orionis.logging.handlers.rotating_handler_factory import RotatingHandlerFactory
 from orionis.support.concurrency import complete_on_cancel
 
-class Logger(ILogger):
-    # ruff: noqa: RUF012, TC001
 
+class Logger(ILogger):
     # Identify the standard logger channel.
     """Resolve logging channels and dispatch structured log records."""
 
     name: ClassVar[str] = "__orionis__"
 
     # Share formatters configured with the same message and date formats.
-    _formatter_cache: dict[str, logging.Formatter] = {}
+    _formatter_cache: ClassVar[dict[str, logging.Formatter]] = {}
     """Share formatters configured with the same message and date formats."""
 
     def __init__(self: Self, app: IApplication) -> None:
         """
-        Initialize the Logger instance with ultra-fast optimization.
+        Retain logging configuration for lazy handler initialization.
 
         Parameters
         ----------
@@ -40,7 +45,7 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.__app: IApplication = app
         """Application instance providing configuration."""
@@ -73,21 +78,19 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
         RuntimeError
             If the logger cannot be initialized.
         """
+        pending_handler: logging.Handler | None = None
         try:
             # Retrieve the standard logger by name.
             logger = logging.getLogger(self.__logger_name)
 
-            # Close handlers left by an earlier logger instance.
-            for handler in logger.handlers[:]:
-                handler.close()
-                logger.removeHandler(handler)
+            self.__closeConfigurationHandlers(logger)
 
             # Basic logger setup
             logger.setLevel(self.__default_level)
@@ -109,11 +112,12 @@ class Logger(ILogger):
 
                 # Create the stack channel's file handler.
                 if default_channel_name == "stack":
-                    log_path = f"{app_root}/{
-                        channel_config.get('path', 'storage/logs/stack.log')
-                    }"
+                    log_path = Path(app_root) / channel_config.get(
+                        "path",
+                        "storage/logs/stack.log",
+                    )
                     # Ensure directory exists
-                    Path(log_path).parent.mkdir(parents=True, exist_ok=True)
+                    log_path.parent.mkdir(parents=True, exist_ok=True)
                     handler = logging.FileHandler(log_path, encoding="utf-8")
                 else:
                     # Use factory for complex handlers (rotating, etc.)
@@ -122,29 +126,122 @@ class Logger(ILogger):
                         channel_config=channel_config,
                         app_root=app_root,
                     )
+                pending_handler = handler
 
                 # Configure and add handler if created successfully
                 if handler:
                     handler.setFormatter(formatter)
                     handler.setLevel(channel_config.get("level", logging.INFO))
                     handler = self.__queueHandler(handler)
+                    pending_handler = handler
                     logger.addHandler(handler)
                     self.__handlers_cache[default_channel_name] = handler
+                    pending_handler = None
             else:
                 # Fallback: create basic file handler
                 fallback_path = f"{app_root}/storage/logs/default.log"
                 Path(fallback_path).parent.mkdir(parents=True, exist_ok=True)
                 handler = logging.FileHandler(fallback_path, encoding="utf-8")
+                pending_handler = handler
                 handler.setFormatter(formatter)
                 handler = self.__queueHandler(handler)
+                pending_handler = handler
                 logger.addHandler(handler)
                 self.__handlers_cache["fallback"] = handler
+                pending_handler = None
 
             self.__logger = logger
 
         except Exception as e:
             error_msg = f"Failed to initialize logger: {e!s}"
             raise RuntimeError(error_msg) from e
+        finally:
+            if pending_handler is not None:
+                logger.removeHandler(pending_handler)
+                self.__handlers_cache.clear()
+                self.__discardUnpublishedHandler(pending_handler, phase="configuration")
+
+    def __discardUnpublishedHandler(
+        self,
+        handler: logging.Handler,
+        *,
+        phase: str,
+    ) -> None:
+        """Close an unpublished sink without replacing the configuration failure.
+
+        Parameters
+        ----------
+        handler : logging.Handler
+            Newly created sink whose configuration did not complete.
+        phase : str
+            Lifecycle operation reported to the failure runtime.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        try:
+            handler.close()
+        except Exception as error:
+            observed = isinstance(handler, BoundedQueueHandler) and isinstance(
+                error,
+                LoggingDeliveryError,
+            )
+            if not observed:
+                failure_runtime.capture_nowait(
+                    error,
+                    app=self.__app,
+                    flow="logging",
+                    phase=phase,
+                    operation="close",
+                )
+
+    def __closeConfigurationHandlers(self, logger: logging.Logger | None) -> None:
+        """Detach and close previous sinks while holding the lifecycle lock.
+
+        Parameters
+        ----------
+        logger : logging.Logger | None
+            Standard logger containing active sinks, or ``None`` before use.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        Exception
+            The first cleanup failure after all handlers have been attempted.
+        """
+        handlers = dict.fromkeys(self.__handlers_cache.values())
+        if logger is not None:
+            handlers.update(dict.fromkeys(logger.handlers))
+            for handler in logger.handlers[:]:
+                logger.removeHandler(handler)
+        self.__handlers_cache.clear()
+        self.__logger = None
+        errors: list[Exception] = []
+        for handler in handlers:
+            try:
+                handler.close()
+            except Exception as error:
+                errors.append(error)
+                observed = isinstance(handler, BoundedQueueHandler) and isinstance(
+                    error,
+                    LoggingDeliveryError,
+                )
+                if len(errors) > 1 and not observed:
+                    failure_runtime.capture_nowait(
+                        error,
+                        app=self.__app,
+                        flow="logging",
+                        phase="configuration",
+                        operation="close",
+                    )
+        if errors:
+            raise errors[0]
 
     def __queueHandler(self: Self, handler: logging.Handler) -> logging.Handler:
         """
@@ -161,7 +258,7 @@ class Logger(ILogger):
             Queued wrapper when enabled, otherwise the original handler.
         """
         capacity = self.__config.get("queue_capacity", 0)
-        handler._orionis_failure_app = self.__app  # noqa: SLF001
+        handler._orionis_failure_app = self.__app
         if capacity:
             return BoundedQueueHandler(handler, capacity, app=self.__app)
         handler.handleError = partial(
@@ -173,7 +270,7 @@ class Logger(ILogger):
 
     def __createFormatter(self: Self) -> logging.Formatter:
         """
-        Create and return an optimized log formatter with caching.
+        Return the formatter shared by matching message and date formats.
 
         Returns
         -------
@@ -229,8 +326,7 @@ class Logger(ILogger):
             )
             return handler
         except (OSError, ValueError, RuntimeError) as error:
-            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
-            capture_nowait(
+            failure_runtime.capture_nowait(
                 error,
                 app=self.__app,
                 flow="logging",
@@ -260,17 +356,21 @@ class Logger(ILogger):
         if isinstance(level, Level) or hasattr(level, "value"):
             normalized["level"] = level.value
         elif isinstance(level, str):
-            normalized["level"] = getattr(logging, level.upper(), logging.INFO)
+            normalized["level"] = logging.getLevelNamesMapping().get(
+                level.upper(),
+                logging.INFO,
+            )
         elif level is None:
             normalized["level"] = logging.INFO
 
         return normalized
 
-    def __ensureLoggerReady(self: Self) -> None:
+    def __ensureLoggerReady(self: Self) -> logging.Logger:
         """
-        Ensure the logger is initialized and ready for use with ultra-fast lazy init.
+        Return the initialized logger while retaining a stable reference.
 
-        Uses optimized double-checked locking for maximum performance.
+        Initialize once under the instance lock and retain the selected logger
+        even if another thread closes the service after this method returns.
 
         Raises
         ------
@@ -279,22 +379,25 @@ class Logger(ILogger):
 
         Returns
         -------
-        None
-            This method does not return a value.
+        logging.Logger
+            Initialized standard logger selected by this call.
         """
         # Return when the logger has already been initialized.
-        if self.__logger is not None:
-            return
+        logger = self.__logger
+        if logger is not None:
+            return logger
 
         # Initialize the logger once under the instance lock.
         with self.__init_lock:
             if self.__logger is None:
                 self.__initializeLogger()
+            logger = self.__logger
 
         # Final check to ensure logger is available
-        if self.__logger is None:
+        if logger is None:
             error_msg = "Logger could not be initialized"
             raise RuntimeError(error_msg)
+        return logger
 
     def info(self: Self, message: str) -> None:
         """
@@ -308,12 +411,13 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Initialize the logger before writing the first message.
-        if self.__logger is None:
-            self.__ensureLoggerReady()
-        self.__logger.info(message)
+        logger = self.__logger
+        if logger is None:
+            logger = self.__ensureLoggerReady()
+        logger.info(message)
 
     def error(self: Self, message: str) -> None:
         """
@@ -327,11 +431,12 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
-        if self.__logger is None:
-            self.__ensureLoggerReady()
-        self.__logger.error(message)
+        logger = self.__logger
+        if logger is None:
+            logger = self.__ensureLoggerReady()
+        logger.error(message)
 
     def warning(self: Self, message: str) -> None:
         """
@@ -345,11 +450,12 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
-        if self.__logger is None:
-            self.__ensureLoggerReady()
-        self.__logger.warning(message)
+        logger = self.__logger
+        if logger is None:
+            logger = self.__ensureLoggerReady()
+        logger.warning(message)
 
     def debug(self: Self, message: str) -> None:
         """
@@ -363,11 +469,12 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
-        if self.__logger is None:
-            self.__ensureLoggerReady()
-        self.__logger.debug(message)
+        logger = self.__logger
+        if logger is None:
+            logger = self.__ensureLoggerReady()
+        logger.debug(message)
 
     def critical(self: Self, message: str) -> None:
         """
@@ -381,11 +488,12 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
-        if self.__logger is None:
-            self.__ensureLoggerReady()
-        self.__logger.critical(message)
+        logger = self.__logger
+        if logger is None:
+            logger = self.__ensureLoggerReady()
+        logger.critical(message)
 
     def getLogger(self: Self) -> logging.Logger:
         """
@@ -401,34 +509,26 @@ class Logger(ILogger):
         RuntimeError
             If the logger is not available.
         """
-        self.__ensureLoggerReady()
-        return self.__logger
+        return self.__ensureLoggerReady()
 
     def reloadConfiguration(self: Self) -> None:
         """
         Reload the logger configuration from the application.
 
         This method allows dynamic reloading of logger settings without restarting
-        the application.
+        the application. Every previous handler is detached and closed before
+        rebuilding. The first cleanup failure is preserved as the cause of the
+        public error; further failures are observed by the failure runtime.
 
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         try:
             # Acquire lock to ensure thread safety during reload
             with self.__init_lock:
-                # Close existing handlers and remove them from the logger.
-                # Iterate over a copy: removeHandler mutates the same list.
-                if self.__logger:
-                    for handler in self.__logger.handlers[:]:
-                        handler.close()
-                        self.__logger.removeHandler(handler)
-
-                # Clear the handler cache and reset the logger reference
-                self.__handlers_cache.clear()
-                self.__logger = None
+                self.__closeConfigurationHandlers(self.__logger)
 
                 # Reload configuration from the application
                 self.__config = self.__app.config("logging")
@@ -461,6 +561,7 @@ class Logger(ILogger):
         bool
             True if the switch was successful, False otherwise.
         """
+        pending_handler: logging.Handler | None = None
         try:
             # Check if channel exists in configuration
             channels: dict = self.__config.get("channels", {})
@@ -468,10 +569,12 @@ class Logger(ILogger):
                 return False
 
             # Initialize outside the lock: __init_lock is not reentrant
-            if self.__logger is None:
-                self.__ensureLoggerReady()
+            logger = self.__ensureLoggerReady()
 
             with self.__init_lock:
+                # A close between readiness and locking must not discard the
+                # standard logger selected for this explicit channel switch.
+                self.__logger = logger
                 active_handlers = dict.fromkeys(self.__logger.handlers)
                 handlers = dict.fromkeys(self.__handlers_cache.values())
                 handlers.update(active_handlers)
@@ -482,15 +585,12 @@ class Logger(ILogger):
                 for handler in handlers:
                     try:
                         handler.close()
-                    except Exception as error:  # noqa: BLE001
-                        from orionis.failure.runtime import (  # noqa: PLC0415
-                            capture_nowait,
-                        )
+                    except Exception as error:
                         failed |= handler in active_handlers
                         queued = isinstance(handler, BoundedQueueHandler)
                         observed = queued and isinstance(error, LoggingDeliveryError)
                         if not observed:
-                            capture_nowait(
+                            failure_runtime.capture_nowait(
                                 error,
                                 app=self.__app,
                                 flow="logging",
@@ -512,26 +612,59 @@ class Logger(ILogger):
                     channel_config,
                     app_root,
                 )
+                pending_handler = handler
 
                 if handler:
                     handler.setFormatter(formatter)
                     handler = self.__queueHandler(handler)
+                    pending_handler = handler
                     self.__logger.addHandler(handler)
                     self.__handlers_cache[channel_name] = handler
+                    pending_handler = None
                     self.info(f"Successfully switched to channel: {channel_name}")
                     return True
 
                 return False
 
         except (OSError, RuntimeError, ValueError) as error:
-            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
-            capture_nowait(
+            failure_runtime.capture_nowait(
                 error,
                 app=self.__app,
                 flow="logging",
                 phase="switch_channel",
             )
             return False
+        finally:
+            self.__discardChannelHandler(pending_handler, channel_name)
+
+    def __discardChannelHandler(
+        self,
+        handler: logging.Handler | None,
+        channel_name: str,
+    ) -> None:
+        """Remove an unpublished channel sink without disturbing another switch.
+
+        Parameters
+        ----------
+        handler : logging.Handler | None
+            Pending sink, or ``None`` after successful ownership transfer.
+        channel_name : str
+            Channel associated with the pending sink.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if handler is None:
+            return
+        with self.__init_lock:
+            logger = self.__logger
+            if logger is not None:
+                logger.removeHandler(handler)
+            if self.__handlers_cache.get(channel_name) is handler:
+                self.__handlers_cache.pop(channel_name)
+            self.__discardUnpublishedHandler(handler, phase="switch_channel")
 
     def close(self: Self) -> None:
         """
@@ -544,7 +677,7 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -566,10 +699,7 @@ class Logger(ILogger):
                     handler.close()
                 except LoggingDeliveryError as error:
                     if not isinstance(handler, BoundedQueueHandler):
-                        from orionis.failure.runtime import (  # noqa: PLC0415
-                            capture_nowait,
-                        )
-                        capture_nowait(
+                        failure_runtime.capture_nowait(
                             error,
                             app=self.__app,
                             flow="logging",
@@ -578,14 +708,18 @@ class Logger(ILogger):
                     errors.append(error)
                 except (OSError, RuntimeError, ValueError) as error:
                     # Preserve synchronous handler cleanup compatibility.
-                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
-                    capture_nowait(
-                        error, app=self.__app, flow="logging", phase="cleanup",
+                    failure_runtime.capture_nowait(
+                        error,
+                        app=self.__app,
+                        flow="logging",
+                        phase="cleanup",
                     )
-                except Exception as error:  # noqa: BLE001
-                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
-                    capture_nowait(
-                        error, app=self.__app, flow="logging", phase="cleanup",
+                except Exception as error:
+                    failure_runtime.capture_nowait(
+                        error,
+                        app=self.__app,
+                        flow="logging",
+                        phase="cleanup",
                     )
                     errors.append(error)
             self.__handlers_cache.clear()
@@ -604,7 +738,7 @@ class Logger(ILogger):
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         await complete_on_cancel(asyncio.to_thread(self.close))
 
@@ -655,7 +789,7 @@ class Logger(ILogger):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Suppress exceptions to avoid errors during garbage collection
         with suppress(Exception):

@@ -11,7 +11,7 @@
 | `handleFailure(exception, context)` | `FailureHandling \| None` | Receive the original exception and select deferred effects once per incident. |
 | `handleResult(value, context)` | `FailureHandling \| None` | Receive a declared failed outcome without manufacturing an exception. |
 
-`BaseExceptionHandler` implements both. Its `handleFailure` returns a plan preserving default logging and HTTP/CLI presentation; its `handleResult` returns `None`. The helper `toThrowable(exception)` stringifies arguments and retains the native traceback. `isExceptionIgnored(exception)` tests exact exception-class membership in `dont_catch` and rejects non-exceptions with `TypeError`.
+`BaseExceptionHandler` implements both. Its `handleFailure` returns a plan preserving default logging and HTTP/CLI presentation; its `handleResult` returns `None`. The helper `toThrowable(exception)` uses `str(exception)` for the message, preserving custom exception text and native details such as an `OSError` filename. It stringifies each original argument without adding entries to an empty argument tuple and retains the native traceback. `isExceptionIgnored(exception)` tests exact exception-class membership in `dont_catch` and rejects non-exceptions with `TypeError`.
 
 ### `FailureHandling`
 
@@ -24,6 +24,8 @@ Import from `orionis.failure.entities`. This mutable, incident-local plan is sep
 | `complete()` | Runs logging once; success marks `reported=True`. Repeated calls do not retry a failed callback. |
 | `present(*, flow, request=None)` | Runs presentation once and caches its result or failure. |
 | `reported`, `degraded` | Status of the plan's handling. Runtime receipts expose delivery status without retaining the plan or exception. |
+
+Calling `complete()` recursively from its logging callback, or `present()` recursively from its presentation callback in the same task, raises `RuntimeError` instead of waiting on itself. Cached callback failures preserve the original exception and its first callback traceback; repeated callers do not append an ever-growing chain of previous rethrows.
 
 The handler selects callbacks and returns the plan. Runtime reporting protection wraps completion; `complete()` is not an independent emergency reporter. Presentation is deferred until the execution owner has its live request. Keep plans out of singleton attributes and never retain them across independent incidents.
 
@@ -43,9 +45,19 @@ The handler selects callbacks and returns the plan. Runtime reporting protection
 
 `capture`, `capture_result`, and `operation` are available from `orionis.failure.runtime`. Capture requires an active post-startup runtime. Owners explicitly notify failures and retain their response, retry, recovery, and propagation behavior. A custom result plan may log, but `capture_result` does not replace the original result or render automatically.
 
+`capture_nowait` submits observation without awaiting it, returning an event-loop
+task or a thread-safe future according to the caller, or `None` when observation
+is unavailable. Cancelling the returned future does not let `drain()` overtake
+cleanup of an already running report.
+If scheduling rejects a submission, the runtime closes the unstarted coroutine,
+releases its incident claim, and diagnoses the scheduling failure once.
+
 When cleanup crosses a task boundary, an owner may pass the original receipt's
 `event_id` as `capture(..., parent_event_id=...)`. This preserves causal incident
 metadata without changing the secondary exception's Python cause or context.
+Cause lookup compares exception identity without evaluating the exception as a
+boolean. Tasks that outlive their operation do not reuse that closed operation's
+metadata or incident ledger.
 
 ## Configuration and defaults
 
@@ -66,7 +78,7 @@ Known exceptions map to 401 authentication, 403 authorization, 404 route not fou
 - Pass the live request or adapter for HTTP presentation. The base plan has no HTTP output without it.
 - The runtime protects hook execution and deferred logging with recursion checks, a cooperative timeout, and a bounded stderr fallback. Reporting failure can degrade delivery while allowing presentation.
 - Presentation requested through `Catch` uses the same cooperative timeout and reentry guard. A failed or internally cancelled presenter is diagnosed once on stderr and propagates the primary failure without replacing its cause. Genuine caller cancellation still propagates. Output that may have partially completed is never retried; subsequent calls reuse the failed plan.
-- Cancellation, `KeyboardInterrupt`, `SystemExit`, and `GeneratorExit` are not converted into server failures.
+- Cancellation, `KeyboardInterrupt`, `SystemExit`, and `GeneratorExit` are not converted into server failures, including direct and nonblocking capture. Mixed exception groups retain their original structure when they include an ordinary failure.
 - Before activation, capture returns `None`. `create()` alone does not activate the runtime, and failures before successful startup are outside the coverage guarantee.
 - External code that consumes exceptions must notify explicitly. Orionis installs no global Python exception hooks for arbitrary external execution.
 - A failed result must be explicitly declared by its execution owner; the runtime does not infer failure from every ordinary return value.
@@ -74,6 +86,21 @@ Known exceptions map to 401 authentication, 403 authorization, 404 route not fou
 ## Performance and concurrency
 
 The application reuses one prepared handler. Operation context, deduplication, and handling plans isolate incident state; completed operations release retained references. Independent operations and retry attempts are not one global incident. Constructor dependencies and custom policy must be safe for the shared handler lifetime.
+
+Shutdown closes admission of supervised work and waits for shared cleanup.
+Supervised work that has not started is cancelled before its body runs.
+An external asynchronous start waits for shutdown to finish; starting from the
+runtime's own cleanup or reporting callback raises `RuntimeError` to avoid
+waiting on itself. Synchronous activation also rejects an unfinished shutdown.
+Once shutdown finishes, the runtime can be activated again. If discarding a
+cancelled task's awaitable fails, its original cleanup exception is reported
+once with phase `cancelled_cleanup`.
+
+When an already running `Task` or `Future` from the same event loop is passed
+directly to `FailureRuntime.createTask()`, cancelling its supervision wrapper
+before entry still leaves `drain()` responsible for waiting for the original
+cleanup. An already cancelling task is not cancelled again, and a task already
+supervised by that runtime does not produce a duplicate failure report.
 
 Incident records and identifiers are allocated on failure paths. Execution boundaries and supervised tasks still perform context and lifecycle work during successful execution; this is not a zero-overhead guarantee. Deferred logging and presentation avoid doing protocol work where the execution owner does not request it.
 

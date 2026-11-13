@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import json
 import subprocess
 import sys
@@ -24,27 +26,48 @@ _AUTH_ROUTES = (
     ("GET", "/sign-up", RegisterController, "index", None, GuestMiddleware),
     ("POST", "/sign-up", RegisterController, "register", "register", GuestMiddleware),
     (
-        "GET", "/forgot-password", ForgotPasswordController,
-        "index", None, GuestMiddleware,
+        "GET",
+        "/forgot-password",
+        ForgotPasswordController,
+        "index",
+        None,
+        GuestMiddleware,
     ),
     (
-        "POST", "/forgot-password", ForgotPasswordController,
-        "sendResetLinkEmail", "forgot-password", GuestMiddleware,
+        "POST",
+        "/forgot-password",
+        ForgotPasswordController,
+        "sendResetLinkEmail",
+        "forgot-password",
+        GuestMiddleware,
     ),
     (
-        "GET", "/reset-password", ForgotPasswordController,
-        "showResetForm", "password.reset", GuestMiddleware,
+        "GET",
+        "/reset-password",
+        ForgotPasswordController,
+        "showResetForm",
+        "password.reset",
+        GuestMiddleware,
     ),
     (
-        "POST", "/reset-password", ForgotPasswordController,
-        "resetPassword", "password.update", GuestMiddleware,
+        "POST",
+        "/reset-password",
+        ForgotPasswordController,
+        "resetPassword",
+        "password.update",
+        GuestMiddleware,
     ),
     ("GET", "/verify-email", RegisterController, "verifyEmail", "verify-email", None),
     (
-        "POST", "/logout", LoginController, "logout", "logout",
+        "POST",
+        "/logout",
+        LoginController,
+        "logout",
+        "logout",
         AuthenticateSessionMiddleware,
     ),
 )
+
 
 class TestRouteAuth(TestCase):
     """Keep the web authentication helper consistent with normal route registration."""
@@ -55,7 +78,7 @@ class TestRouteAuth(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         router = make_router()
         facade = type("AuthRoutes", (Route,), {"_pinned_instance": router})
@@ -81,7 +104,7 @@ class TestRouteAuth(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         router = make_router()
         router._setKind("api")
@@ -98,7 +121,7 @@ class TestRouteAuth(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         router = make_router()
         router.auth()
@@ -122,7 +145,7 @@ class TestRouteAuth(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         router = make_router()
         router.auth()
@@ -136,7 +159,7 @@ class TestRouteAuth(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         router = make_router()
         router.get("/login", route_handler)
@@ -150,11 +173,13 @@ class TestRouteAuth(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = subprocess.run(
             [
-                sys.executable, "-B", "-c",
+                sys.executable,
+                "-B",
+                "-c",
                 (
                     "import sys; from orionis.support.facades.router import Route; "
                     "print(int('app.models.user' in sys.modules)); "
@@ -163,7 +188,10 @@ class TestRouteAuth(TestCase):
                 ),
             ],
             cwd=Path(__file__).resolve().parents[3],
-            capture_output=True, text=True, check=False, timeout=15,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=15,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.splitlines(), ["0", "0"])

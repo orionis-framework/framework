@@ -1,4 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify encrypter service registration and synchronous facade preparation."""
+
 import inspect
+from unittest.mock import patch
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.encrypter import provider as provider_module
@@ -7,6 +12,7 @@ from orionis.encrypter.encrypter import Encrypter
 from orionis.encrypter.provider import EncrypterProvider
 from orionis.foundation.core_providers import CORE_PROVIDERS
 from orionis.test import TestCase
+
 
 class _StubApp:
     """Application double capturing every binding it receives."""
@@ -19,13 +25,12 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.singletons: list[tuple[object, object]] = []
 
     def singleton(self, abstract: object, concrete: object) -> None:
-        """
-        Record a singleton binding.
+        """Record a singleton binding.
 
         Parameters
         ----------
@@ -37,8 +42,10 @@ class _StubApp:
         Returns
         -------
         None
+            No return value.
         """
         self.singletons.append((abstract, concrete))
+
 
 class _StubCryptFacade:
     """Facade double counting how many times it was pinned."""
@@ -51,21 +58,23 @@ class _StubCryptFacade:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.pinned = 0
 
     async def pin(self) -> None:
-        """
-        Count a pin invocation.
+        """Count a pin invocation.
 
         Returns
         -------
         None
+            No return value.
         """
         self.pinned += 1
 
+
 class TestEncrypterProviderDefinition(TestCase):
+    """Check the eager provider's registration and lifecycle contract."""
 
     def testInheritsTheServiceProviderBase(self) -> None:
         """Extend the base ServiceProvider class.
@@ -75,7 +84,7 @@ class TestEncrypterProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(EncrypterProvider, ServiceProvider))
 
@@ -89,7 +98,7 @@ class TestEncrypterProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(issubclass(EncrypterProvider, DeferrableProvider))
 
@@ -102,7 +111,7 @@ class TestEncrypterProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn(EncrypterProvider, CORE_PROVIDERS)
 
@@ -114,7 +123,7 @@ class TestEncrypterProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         self.assertIs(EncrypterProvider(app).app, app)
@@ -127,11 +136,13 @@ class TestEncrypterProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(inspect.iscoroutinefunction(EncrypterProvider.boot))
 
+
 class TestEncrypterProviderRegister(TestCase):
+    """Verify the binding installed during service registration."""
 
     def testRegisterBindsTheEncrypterAsASingleton(self) -> None:
         """Bind IEncrypter to the concrete Encrypter implementation.
@@ -141,13 +152,15 @@ class TestEncrypterProviderRegister(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         EncrypterProvider(app).register()
         self.assertEqual(app.singletons, [(IEncrypter, Encrypter)])
 
+
 class TestEncrypterProviderBoot(TestCase):
+    """Verify facade pinning without changing global facade state."""
 
     def setUp(self) -> None:
         """Replace the Crypt facade with a double before each test.
@@ -158,24 +171,12 @@ class TestEncrypterProviderBoot(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_facade = provider_module.CryptFacade
+        super().setUp()
         self._facade = _StubCryptFacade()
-        provider_module.CryptFacade = self._facade
+        self.enterContext(patch.object(provider_module, "CryptFacade", self._facade))
         self._app = _StubApp()
-
-    def tearDown(self) -> None:
-        """Restore the original Crypt facade after each test.
-
-        Guarantees that module-level state never leaks between tests.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        provider_module.CryptFacade = self._original_facade
 
     async def testBootPinsTheCryptFacade(self) -> None:
         """Pin the Crypt facade once the services are registered.
@@ -185,7 +186,7 @@ class TestEncrypterProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await EncrypterProvider(self._app).boot()
         self.assertEqual(self._facade.pinned, 1)
@@ -198,7 +199,7 @@ class TestEncrypterProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await EncrypterProvider(self._app).boot()
         self.assertEqual(self._app.singletons, [])

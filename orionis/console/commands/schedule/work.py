@@ -1,3 +1,5 @@
+# ruff: noqa: TC001, TC002
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Register and run the application's scheduled tasks."""
 
 import asyncio
@@ -26,10 +28,9 @@ Ordered pairs of scheduler method names and their corresponding events, used to
 register optional event listeners defined on the Scheduler class.
 """
 
+
 class ScheduleWorkCommand(BaseCommand):
     """Register and run the application's scheduled tasks."""
-
-    # ruff: noqa: TC001, TC002
 
     # Indicates whether timestamps will be shown in the command output
     timestamps: bool = False
@@ -154,8 +155,7 @@ class ScheduleWorkCommand(BaseCommand):
 
         if not callable(getattr(scheduler, "tasks", None)):
             error_msg = (
-                "Scheduler must define a callable 'tasks(schedule: ISchedule)' "
-                "method."
+                "Scheduler must define a callable 'tasks(schedule: ISchedule)' method."
             )
             raise TypeError(error_msg)
 
@@ -172,7 +172,7 @@ class ScheduleWorkCommand(BaseCommand):
             if app.isDebug():
                 self.__startPanel(console)
             await schedule_service.wait()
-        except (KeyboardInterrupt, asyncio.CancelledError):
+        except KeyboardInterrupt, asyncio.CancelledError:
             if started:
                 await self.__shutdownSchedule(schedule_service)
         except Exception as error:
@@ -184,7 +184,10 @@ class ScheduleWorkCommand(BaseCommand):
                     ("redis.exceptions", "RedisError"),
                     ("sqlalchemy.exc", "SQLAlchemyError"),
                 )
-                if (module := sys.modules.get(module_name)) is not None
+                if (  # NOSONAR(S1110) - Assign before comparing with None.
+                    module := sys.modules.get(module_name)
+                )
+                is not None
             )
             if not isinstance(error, (DatabaseException, OSError, *backend_errors)):
                 raise

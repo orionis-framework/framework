@@ -14,6 +14,7 @@ _VERBOSITY_VALUES: frozenset[int] = frozenset(mode.value for mode in VerbosityMo
 Pre-computed valid verbosity values: avoids building a list on every Testing() init.
 """
 
+
 @dataclass(frozen=True, kw_only=True)
 class Testing(BaseEntity):
     """

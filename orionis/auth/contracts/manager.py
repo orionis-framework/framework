@@ -1,18 +1,18 @@
+# ruff: noqa: TC001, TC003
+# Preserve concrete types for runtime inspection of the public contract.
 """Define the public entry point of the authentication module."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import Iterable, Mapping
+from datetime import datetime
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+from orionis.auth.contracts.authorizable import IAuthorizable
+from orionis.auth.contracts.context import IAuthenticationContext
+from orionis.auth.contracts.guard import IGuard
+from orionis.auth.contracts.policy import IPolicy
+from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
+from orionis.auth.entities.new_access_token import NewAccessToken
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
-    from datetime import datetime
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
-    from orionis.auth.contracts.authorizable import IAuthorizable
-    from orionis.auth.contracts.context import IAuthenticationContext
-    from orionis.auth.contracts.guard import IGuard
-    from orionis.auth.contracts.policy import IPolicy
-    from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
-    from orionis.auth.entities.new_access_token import NewAccessToken
 
 class IAuthManager(ABC):
     """
@@ -105,7 +105,10 @@ class IAuthManager(ABC):
 
     @abstractmethod
     async def attempt(
-        self, credentials: Mapping[str, object], *, remember: bool = False,
+        self,
+        credentials: Mapping[str, object],
+        *,
+        remember: bool = False,
     ) -> bool:
         """
         Authenticate the current request from submitted credentials.
@@ -136,7 +139,7 @@ class IAuthManager(ABC):
         Returns
         -------
         None
-            The session and the request context are updated.
+            No return value.
         """
 
     @abstractmethod
@@ -147,7 +150,7 @@ class IAuthManager(ABC):
         Returns
         -------
         None
-            The session and the request context are cleared.
+            No return value.
         """
 
     @abstractmethod
@@ -254,7 +257,7 @@ class IAuthManager(ABC):
         Returns
         -------
         None
-            Nothing is returned when the permission is granted.
+            No return value.
 
         Raises
         ------
@@ -315,7 +318,7 @@ class IAuthManager(ABC):
         Returns
         -------
         None
-            Nothing is returned when the policy allows the operation.
+            No return value.
 
         Raises
         ------
@@ -340,7 +343,7 @@ class IAuthManager(ABC):
         Returns
         -------
         None
-            The policy registry is updated as a side effect.
+            No return value.
         """
 
     @abstractmethod

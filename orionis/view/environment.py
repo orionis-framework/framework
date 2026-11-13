@@ -1,7 +1,11 @@
+# ruff: noqa: ANN401, S701, TC001, TC003
+# Dynamic template values remain unrestricted; runtime hints serve DI.
+# Built-in pages always escape and application templates follow explicit config.
 """Encapsulate and configure a Jinja2 ``Environment`` instance."""
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, TYPE_CHECKING
+from typing import Any
 import jinja2
 from orionis.view.cache import OrionisBytecodeCache
 from orionis.view.contracts.environment import IViewEnvironment
@@ -9,8 +13,6 @@ from orionis.view.exceptions import ViewException
 from orionis.foundation.config.view.entities.view import View as _ViewConfig
 from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 class ViewEnvironment(IViewEnvironment):
     """
@@ -24,8 +26,6 @@ class ViewEnvironment(IViewEnvironment):
     stored internally; no other class may access it directly except through
     :meth:`orionis.view.environment.ViewEnvironment.getJinjaEnvironment`.
     """
-
-    # ruff: noqa: ANN401, TC001
 
     __slots__ = ("_jinja_env",)
     """Declare the instance attribute slots reserved by this class."""
@@ -43,13 +43,11 @@ class ViewEnvironment(IViewEnvironment):
         Returns
         -------
         None
-            Build the Jinja2 environment from the application view configuration.
+            No return value.
         """
         # Resolve and normalise configuration
         _raw: dict = app.config("view")
-        _config: _ViewConfig = (
-            _ViewConfig(**_raw) if isinstance(_raw, dict) else _raw
-        )
+        _config: _ViewConfig = _ViewConfig(**_raw) if isinstance(_raw, dict) else _raw
 
         # Build loaders; resolve relative paths against the application base
         _base: Path = app.basePath
@@ -89,13 +87,17 @@ class ViewEnvironment(IViewEnvironment):
             """
             if name.startswith(_default_prefix):
                 return _default_loader.get_source(
-                    self._jinja_env, name.removeprefix(_default_prefix),
+                    self._jinja_env,
+                    name.removeprefix(_default_prefix),
                 )
             return None
 
-        _loader = jinja2.ChoiceLoader([
-            jinja2.FunctionLoader(load_default), _loader,
-        ])
+        _loader = jinja2.ChoiceLoader(
+            [
+                jinja2.FunctionLoader(load_default),
+                _loader,
+            ],
+        )
 
         def autoescape(name: str | None) -> bool:
             """
@@ -128,7 +130,7 @@ class ViewEnvironment(IViewEnvironment):
         self._jinja_env: jinja2.Environment = jinja2.Environment(
             loader=_loader,
             enable_async=True,
-            autoescape=autoescape,  # noqa: S701 - built-ins always escape.
+            autoescape=autoescape,
             auto_reload=_config.auto_reload,
             cache_size=_config.cache_size,
             bytecode_cache=_bytecode_cache,
@@ -154,7 +156,7 @@ class ViewEnvironment(IViewEnvironment):
         Returns
         -------
         None
-            Register a global variable or callable in all templates.
+            No return value.
         """
         self._jinja_env.globals[name] = value
 
@@ -172,7 +174,7 @@ class ViewEnvironment(IViewEnvironment):
         Returns
         -------
         None
-            Register a filter callable that templates can apply with ``|``.
+            No return value.
         """
         self._jinja_env.filters[name] = callback
 
@@ -190,7 +192,7 @@ class ViewEnvironment(IViewEnvironment):
         Returns
         -------
         None
-            Register a test callable used in Jinja2 ``is`` expressions.
+            No return value.
         """
         self._jinja_env.tests[name] = callback
 
@@ -206,7 +208,7 @@ class ViewEnvironment(IViewEnvironment):
         Returns
         -------
         None
-            Register a Jinja2 extension class with the environment.
+            No return value.
 
         Raises
         ------
@@ -217,9 +219,7 @@ class ViewEnvironment(IViewEnvironment):
             self._jinja_env.add_extension(extension)
         except Exception as exc:
             _name: str = getattr(extension, "__name__", str(extension))
-            error_msg: str = (
-                f"Failed to register Jinja2 extension '{_name}': {exc}"
-            )
+            error_msg: str = f"Failed to register Jinja2 extension '{_name}': {exc}"
             raise ViewException(error_msg) from exc
 
     def getJinjaEnvironment(self) -> jinja2.Environment:

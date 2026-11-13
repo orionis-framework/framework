@@ -1,9 +1,12 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Barrier, Lock
 from orionis.foundation.application import Application
 from orionis.test import TestCase
+
 
 class _RuntimeApplication:
     """Expose the runtime members used by Application.underMaintenance."""
@@ -80,6 +83,7 @@ class _RuntimeApplication:
             raise KeyError(key)
         return self.maintenance
 
+
 class _ReadableMarker:
     """Record reads of a maintenance marker and simulate a read error."""
 
@@ -119,6 +123,7 @@ class _ReadableMarker:
 
     # Preserve the pathlib.Path protocol name.
     read_text = readText
+
 
 class TestApplicationMaintenance(TestCase):
     """Verify runtime maintenance state follows its shared state file."""

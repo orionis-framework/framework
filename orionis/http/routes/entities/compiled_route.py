@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
     from orionis.http.routes.enums.route_types import RouteType
 
+
 @dataclass(slots=True, frozen=True)
 class CompiledRoute:
     """

@@ -13,11 +13,9 @@ from orionis.console.contracts import ISchedule
 
 class Scheduler(BaseScheduler):
     def tasks(self, schedule: ISchedule) -> None:
-        schedule.command("reports:build", purpose="Daily reports")\
-            .coalesce()\
-            .misfireGraceTime(60)\
-            .maxInstances(1)\
-            .dailyAt(2, 30)
+        schedule.command(
+            "reports:build", purpose="Daily reports"
+        ).coalesce().misfireGraceTime(60).maxInstances(1).dailyAt(2, 30)
 ```
 
 ```shell
@@ -44,6 +42,8 @@ Minute, hour, day, and week helpers are also available, along with `startDate` a
 
 Fluent tasks are stored by **command signature**. Registering the same signature again replaces its pending definition; this is not an API for independent schedules sharing one signature. Use distinct commands delegating to one service when separate schedules are needed.
 
+`TASKS_JITTER` applies to triggers that permit jitter, not only to their displayed metadata. Per-task `randomDelay(0)` overrides that default. `onceAt`, `everySeconds`, `everyMinuteAt`, `everyMinutesAt`, `hourlyAt`, and `everyHoursAt` retain exact timing and do not inherit jitter; their convenience wrappers retain the same policy. An explicit positive delay conflicts with those schedules and raises `ValueError`.
+
 ## Persistence and defaults
 
 The `scheduler` section in `config/scheduler.py` uses:
@@ -66,5 +66,11 @@ Redis uses `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD`, `REDIS_TASK
 `BaseScheduler` offers `onStarted`, `onPaused`, `onResumed`, and `onShutdown`. For task events use `.on(event, callback)` or `registerListener` with `BaseTaskListener`; enum `TaskEvent` and `SchedulerEvent` select events, while entities with the same names carry event data. Keep their imports distinct.
 
 The service provides async `boot()` and `info()`; `state`, `isRunning`, `isPaused`, `isStopped`, `pauseTask`, `resumeTask`, `removeTask`, `removeAllTasks`, `pause`, and `resume` provide control. `shutdown()` requests stopping and `await wait()` waits for completion; managed listener coroutines are drained during shutdown. Adding tasks after startup raises `RuntimeError` from `command()`.
+
+Lifecycle listeners observe the updated scheduler state. A failed start restores `STOPPED`; a completed shutdown clears running and paused task tracking. If listener task admission fails, both unscheduled coroutines are closed and the admission error propagates.
+
+Concurrent or repeated `boot()` calls share the active scheduler rather than starting duplicate agendas. A partial startup releases its owned stores and executor. Await `wait()` before restarting after shutdown; booting while shutdown is pending raises `RuntimeError`.
+
+Shutdown waits for the actual native close callback, cancelled job finalizers, and listeners admitted during that callback. Native store failures reach `wait()`; merely scheduling APScheduler's close callback is not considered completion.
 
 A misfire or interruption does not automatically create a business retry. Make commands idempotent, observe their exit codes, and use jobs when explicit leases and retries are required.

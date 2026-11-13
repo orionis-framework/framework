@@ -1,23 +1,28 @@
+# ruff: noqa: TC003
+# Keep public callback and application annotations resolvable at runtime.
 """Provide view globals operations.
 
 Includes ``_global_python_version``, ``_global_framework_version``.
 """
 
 from __future__ import annotations
+
 import sys
-from typing import Any
+from collections.abc import Callable
 
-# ruff: noqa: ANN401, PLC0415
+from orionis import metadata
 
-def _global_python_version() -> Any:
+
+def _global_python_version() -> Callable[[], str]:
     """
     Build the ``python_version`` template global.
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable that returns the Python version.
     """
+
     def python_version() -> str:
         """
         Return the Python version.
@@ -35,15 +40,17 @@ def _global_python_version() -> Any:
 
     return python_version
 
-def _global_framework_version() -> Any:
+
+def _global_framework_version() -> Callable[[], str]:
     """
     Build the ``framework_version`` template global.
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable that returns the framework version.
     """
+
     def framework_version() -> str:
         """
         Return the framework version.
@@ -53,7 +60,6 @@ def _global_framework_version() -> Any:
         str
             Framework version in ``X.X.X`` format.
         """
-        from orionis.metadata import VERSION
-        return VERSION
+        return metadata.VERSION
 
     return framework_version

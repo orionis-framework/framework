@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify session storage contracts and isolated persistence behavior."""
+
 from __future__ import annotations
 import asyncio
 import os
@@ -8,6 +12,7 @@ from pathlib import Path
 from orionis.session.entities.record import SessionRecord
 from orionis.session.stores.file import FileSessionStore
 from orionis.test import TestCase
+
 
 def _make_record(
     session_id: str = "test-id",
@@ -39,6 +44,7 @@ def _make_record(
         expires_at=datetime.now(UTC) + timedelta(seconds=offset_seconds),
     )
 
+
 class TestFileSessionStore(TestCase):
     """Unit tests for the filesystem-backed FileSessionStore."""
 
@@ -51,23 +57,11 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._directory = Path(self._tmpdir.name)
-
-    def tearDown(self) -> None:
-        """Remove the temporary directory and its contents after each test.
-
-        Ensures that all session files created during a test are cleaned
-        up regardless of whether the test passed or failed.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     def _store(self) -> FileSessionStore:
         """
@@ -91,7 +85,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         nested = self._directory / "deep" / "nested"
         FileSessionStore(directory=nested)
@@ -106,7 +100,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         self.assertIsNotNone(store)
@@ -122,7 +116,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         p = store._path("my-session")
@@ -139,7 +133,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         original = _make_record("rt", data={"user": "bob", "age": 30})
@@ -150,34 +144,17 @@ class TestFileSessionStore(TestCase):
         self.assertEqual(recovered.data, original.data)  # type: ignore[union-attr]
 
     def testDeserializeCorruptBytesReturnsNone(self) -> None:
-        """Return None when the raw bytes are not valid JSON.
-
-        Validates that _deserialize() gracefully handles corruption
-        without raising an exception.
+        """Treat both malformed and empty JSON bytes as misses.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
-        result = store._deserialize(b"not-json-at-all!!!")
-        self.assertIsNone(result)
-
-    def testDeserializeEmptyBytesReturnsNone(self) -> None:
-        """Return None when given an empty byte string.
-
-        Validates that _deserialize() handles the empty-input edge case
-        without raising.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        store = self._store()
-        result = store._deserialize(b"")
-        self.assertIsNone(result)
+        for content in (b"not-json-at-all!!!", b""):
+            with self.subTest(content=content):
+                self.assertIsNone(store._deserialize(content))
 
     # ── _readFile / _writeFile ────────────────────────────────────────────────
 
@@ -190,7 +167,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         path = self._directory / "test.bin"
@@ -208,7 +185,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         result = store._readFile(self._directory / "absent.bin")
@@ -223,7 +200,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         path = self._directory / "atomic.json"
@@ -247,7 +224,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         result = await store.read("ghost-session")
@@ -262,7 +239,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         record = _make_record("live-session", data={"token": "xyz"})
@@ -273,73 +250,36 @@ class TestFileSessionStore(TestCase):
         self.assertEqual(result.data, {"token": "xyz"})  # type: ignore[union-attr]
 
     async def testReadExpiredRecordReturnsNone(self) -> None:
-        """Return None and delete the file for an expired session.
-
-        Validates that a session file whose expires_at is in the past is
-        treated as a cache miss and lazily evicted.
+        """Return a miss and remove files at both expired deadline offsets.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
-        record = _make_record("expired-session", offset_seconds=-1)
-        await store.write(record)
-        result = await store.read("expired-session")
-        self.assertIsNone(result)
-
-    async def testReadExpiredRecordDeletesFile(self) -> None:
-        """Remove the session file when an expired record is read.
-
-        Validates that lazy eviction occurs so the storage directory
-        does not accumulate stale session files indefinitely.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        store = self._store()
-        record = _make_record("stale-session", offset_seconds=-5)
-        await store.write(record)
-        await store.read("stale-session")
-        path = store._path("stale-session")
-        self.assertFalse(path.exists())
+        for offset in (-1, -5):
+            with self.subTest(offset=offset):
+                record = _make_record(f"expired{offset}", offset_seconds=offset)
+                await store.write(record)
+                self.assertIsNone(await store.read(record.id))
+                self.assertFalse(store._path(record.id).exists())
 
     async def testReadCorruptFileReturnsNone(self) -> None:
-        """Return None when the session file contains invalid JSON.
-
-        Validates that a corrupt file is treated as a cache miss and
-        does not propagate a decode exception to the caller.
+        """Return a miss and remove each malformed session payload.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
-        path = store._path("corrupt-session")
-        store._writeFile(path, b"{{broken json")
-        result = await store.read("corrupt-session")
-        self.assertIsNone(result)
-
-    async def testReadCorruptFileDeletesFile(self) -> None:
-        """Delete the session file when it contains invalid JSON.
-
-        Validates that corrupt files are removed during the lazy eviction
-        triggered by a read attempt.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        store = self._store()
-        path = store._path("corrupt-del")
-        store._writeFile(path, b"not json")
-        await store.read("corrupt-del")
-        self.assertFalse(path.exists())
+        for content in (b"{{broken json", b"not json"):
+            with self.subTest(content=content):
+                path = store._path("corrupt-session")
+                store._writeFile(path, content)
+                self.assertIsNone(await store.read("corrupt-session"))
+                self.assertFalse(path.exists())
 
     # ── write ────────────────────────────────────────────────────────────────
 
@@ -352,7 +292,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         await store.write(_make_record("new-file"))
@@ -368,7 +308,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         record_v1 = _make_record("over", data={"v": 1})
@@ -390,11 +330,11 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         await store.write(_make_record("to-delete"))
-        await store.delete("to-delete")
+        self.assertTrue(await store.delete("to-delete"))
         path = store._path("to-delete")
         self.assertFalse(path.exists())
 
@@ -407,10 +347,10 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
-        await store.delete("nonexistent-session")
+        self.assertFalse(await store.delete("nonexistent-session"))
 
     async def testDeleteDoesNotAffectOtherSessions(self) -> None:
         """Preserve unrelated session files when one is deleted.
@@ -421,7 +361,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         await store.write(_make_record("keep-me"))
@@ -441,7 +381,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         await store.write(_make_record("live", offset_seconds=3600))
@@ -459,7 +399,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         corrupt_path = self._directory / "bad.json"
@@ -476,7 +416,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         await store.write(_make_record("session-a", offset_seconds=7200))
@@ -494,7 +434,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         await store.gc()
@@ -510,7 +450,7 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         other_file = self._directory / "readme.txt"
@@ -527,13 +467,14 @@ class TestFileSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         nested = self._directory / "nested.json"
         nested.mkdir()
         await store.gc()
         self.assertTrue(nested.is_dir())
+
 
 class TestFileSessionStoreAtomicWrites(TestCase):
     """Regression tests for the staging file backing every write."""
@@ -547,22 +488,11 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._directory = Path(self._tmpdir.name)
-
-    def tearDown(self) -> None:
-        """Remove the temporary directory and its contents after each test.
-
-        Ensures no session or staging file survives the test run.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     def _store(self) -> FileSessionStore:
         """
@@ -599,7 +529,7 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         path = self._directory / "abc.json"
@@ -621,7 +551,7 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         expires = datetime.now(UTC) + timedelta(hours=1)
@@ -658,7 +588,7 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
 
@@ -685,7 +615,7 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         orphan = self._directory / "abc.json.deadbeefdeadbeef.tmp"
@@ -706,7 +636,7 @@ class TestFileSessionStoreAtomicWrites(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = self._store()
         in_flight = self._directory / "abc.json.cafebabecafebabe.tmp"

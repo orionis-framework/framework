@@ -1,13 +1,21 @@
+# ruff: noqa: PT009, S608, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Interpolate only fixed fixture table names and bind all stored values.
+
+"""Verify session storage contracts and isolated persistence behavior."""
+
 import asyncio
 import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from unittest.mock import patch
 from orionis.database.connection import Connection
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, String, Text
 from orionis.session.entities.record import SessionRecord
 from orionis.session.stores.database import DatabaseSessionStore
 from orionis.test import TestCase
+
 
 def _make_record(
     session_id: str = "test-id",
@@ -36,6 +44,7 @@ def _make_record(
         expires_at=datetime.now(UTC) + timedelta(seconds=offset_seconds),
     )
 
+
 def _relaxed_sessions_table(table: str) -> TableDefinition:
     """
     Build a sessions table whose payload and expiry accept NULL.
@@ -61,6 +70,7 @@ def _relaxed_sessions_table(table: str) -> TableDefinition:
         column.name = name
     return TableDefinition(name=table, columns=columns, primary_key="id")
 
+
 class TestDatabaseSessionStore(TestCase):
     """Unit tests for the database-backed DatabaseSessionStore."""
 
@@ -74,28 +84,17 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._connection = Connection(
             "sqlite",
             {"driver": "sqlite", "database": ":memory:", "prefix": ""},
         )
+        self.addAsyncCleanup(self._connection.disconnect)
         self._store = DatabaseSessionStore(
             connection=self._connection,
             table="sessions",
         )
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the in-memory engine after each test.
-
-        Releases the pooled in-memory database.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._connection.disconnect()
 
     async def _relaxedStore(self, table: str) -> DatabaseSessionStore:
         """
@@ -141,10 +140,10 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
+            No return value.
         """
         await self._connection.execute(
-            f"INSERT INTO {table} (id, payload, expires_at) "  # noqa: S608
-            "VALUES (:id, :p, :e)",
+            f"INSERT INTO {table} (id, payload, expires_at) VALUES (:id, :p, :e)",
             {"id": session_id, "p": payload, "e": expiration},
         )
 
@@ -159,7 +158,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._store.read("nonexistent")
         self.assertIsNone(result)
@@ -173,7 +172,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = _make_record("abc")
         await self._store.write(record)
@@ -191,7 +190,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = SessionRecord(
             id="data-test",
@@ -212,7 +211,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = _make_record("tz")
         await self._store.write(record)
@@ -233,7 +232,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = _make_record("int-expiry")
         await self._store.write(record)
@@ -256,7 +255,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._store.write(_make_record("gone"))
         await self._store._connection.execute(
@@ -279,7 +278,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._store.write(_make_record("corrupt"))
         await self._store._connection.execute(
@@ -297,7 +296,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         table = "relaxed_sessions"
         store = await self._relaxedStore(table)
@@ -306,7 +305,7 @@ class TestDatabaseSessionStore(TestCase):
         self.assertIsNone(await store.read("no-expiry"))
 
         rows = await self._connection.select(
-            f"SELECT id FROM {table} WHERE id = :id",  # noqa: S608
+            f"SELECT id FROM {table} WHERE id = :id",
             {"id": "no-expiry"},
         )
         self.assertEqual(rows, [])
@@ -320,7 +319,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         table = "relaxed_payload_sessions"
         store = await self._relaxedStore(table)
@@ -340,7 +339,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._store.write(_make_record("stale"))
         expired = _make_record("stale", offset_seconds=-5)
@@ -357,7 +356,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record_v1 = SessionRecord(
             id="dup",
@@ -384,7 +383,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._store.write(_make_record("s1"))
         await self._store.write(_make_record("s2"))
@@ -404,7 +403,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._store.write(_make_record("conflict"))
         expiration = (datetime.now(UTC) + timedelta(hours=2)).timestamp()
@@ -430,13 +429,20 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertFalse(self._store._ready)
-        await self._store._ensureSchema()
-        self.assertTrue(self._store._ready)
-        await self._store._ensureSchema()
-        self.assertTrue(self._store._ready)
+        with patch.object(
+            Connection,
+            "createTable",
+            autospec=True,
+            side_effect=Connection.createTable,
+        ) as create:
+            self.assertFalse(self._store._ready)
+            await self._store._ensureSchema()
+            self.assertTrue(self._store._ready)
+            await self._store._ensureSchema()
+            self.assertTrue(self._store._ready)
+            create.assert_awaited_once()
 
     async def testConcurrentBootstrapCreatesSchemaOnce(self) -> None:
         """Serialise concurrent bootstraps behind the readiness lock.
@@ -447,15 +453,22 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await asyncio.gather(
-            self._store._ensureSchema(),
-            self._store._ensureSchema(),
-        )
-        self.assertTrue(self._store._ready)
-        await self._store.write(_make_record("after-bootstrap"))
-        self.assertIsNotNone(await self._store.read("after-bootstrap"))
+        with patch.object(
+            Connection,
+            "createTable",
+            autospec=True,
+            side_effect=Connection.createTable,
+        ) as create:
+            await asyncio.gather(
+                self._store._ensureSchema(),
+                self._store._ensureSchema(),
+            )
+            self.assertTrue(self._store._ready)
+            await self._store.write(_make_record("after-bootstrap"))
+            self.assertIsNotNone(await self._store.read("after-bootstrap"))
+            create.assert_awaited_once()
 
     # ── delete ───────────────────────────────────────────────────────────────
 
@@ -468,10 +481,10 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._store.write(_make_record("to-delete"))
-        await self._store.delete("to-delete")
+        self.assertTrue(await self._store.delete("to-delete"))
         result = await self._store.read("to-delete")
         self.assertIsNone(result)
 
@@ -484,9 +497,9 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._store.delete("ghost")
+        self.assertFalse(await self._store.delete("ghost"))
 
     # ── gc ───────────────────────────────────────────────────────────────────
 
@@ -499,13 +512,12 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._store.write(_make_record("alive"))
         await self._store._ensureSchema()
         await self._store._connection.execute(
-            "INSERT INTO sessions (id, payload, expires_at) "
-            "VALUES (:id, :p, :e)",
+            "INSERT INTO sessions (id, payload, expires_at) VALUES (:id, :p, :e)",
             {"id": "dead", "p": "{}", "e": 1.0},
         )
         await self._store.gc()
@@ -522,7 +534,7 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as directory:
             config = {
@@ -558,12 +570,13 @@ class TestDatabaseSessionStore(TestCase):
         Returns
         -------
         None
-            Verify column names and records across independent store migrations.
+            No return value.
         """
         await self._store.migrate()
         columns = await self._connection.select("PRAGMA table_info(sessions)")
         self.assertEqual(
-            [column["name"] for column in columns], ["id", "payload", "expires_at"],
+            [column["name"] for column in columns],
+            ["id", "payload", "expires_at"],
         )
         record = _make_record("preserved")
         await self._store.write(record)

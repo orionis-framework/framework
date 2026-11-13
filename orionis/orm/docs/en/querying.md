@@ -2,7 +2,7 @@
 
 ## Choose models or tables
 
-`Article.query()` and class entry points such as `Article.where(...)` create fresh builders returning models. `DB.table("articles")` creates a builder returning dictionaries. They share a query language, but raw table queries do not apply model scopes, events, hidden attributes, or soft deletion.
+`Article.query()` and class entry points such as `Article.where(...)` create fresh builders returning models. `DB.table("articles")` creates a builder returning dictionaries. They share a query language, but raw table queries do not apply model scopes, events, hidden attributes, or soft deletion. A gateway obtained from a particular connection manager keeps that manager and its selected connection; another application's global resolver does not replace that ownership.
 
 Clauses are synchronous. Await only the terminal: `await query.get()`, rather than `await query.where(...)`. This plan can be inspected without a connection:
 
@@ -33,8 +33,11 @@ Builders mutate their own state: use `clone()` when branching and do not share o
 async def search_articles():
     return await (
         Article.where("status", "published")
-        .where(lambda group: group.whereContains("title", "Python")
-               .orWhere("title", "Orionis"))
+        .where(
+            lambda group: group.whereContains("title", "Python").orWhere(
+                "title", "Orionis"
+            )
+        )
         .whereIn("id", [1, 2, 3])
         .orderBy("id")
         .get()
@@ -42,6 +45,8 @@ async def search_articles():
 ```
 
 Run this function inside a booted application with the `articles` table. Other predicates include `whereNull`, `whereNotNull`, `whereBetween`, `whereNotBetween`, `whereNotIn`, `whereColumn`, `whereExists`/`whereNotExists` subqueries, and `whereLike`, `whereILike`, `whereStartsWith`, `whereEndsWith`, `whereRegexpMatch`. Regex support differs by dialect.
+
+Model subqueries used in `IN`, `EXISTS`, joins, scalar projections, or unions apply their global scopes and soft-delete policy on a clone. Explicit `withoutGlobalScopes` and `withTrashed` choices are preserved; preparing the subquery does not mutate the original builder.
 
 Values are bound as parameters. `whereRaw`, `selectRaw`, and `havingRaw` accept trusted SQL and bindings; they do not safely interpolate arbitrary text. Allowlist column names, operators, and ordering received from requests.
 
@@ -96,7 +101,7 @@ async def articles_by_author():
 | `min`, `max`, `avg`, `sum` | Aggregate; `sum` returns 0 without results. |
 | `paginate(page=1, per_page=15)` | `Paginator` containing items and metadata. |
 
-`limit`, `offset`, `take`, `skip`, and `forPage` compose bounds without executing. Use deterministic ordering, including a unique key, for stable pages. `Paginator` exposes `items`, `total`, `page`, `perPage`, `lastPage`, `hasNext`, `hasPrevious`, and `toDict()`/`toJson()`. Count and fetch are two queries: outside transactions they may observe different changes and run concurrently; inside they run sequentially. Page and page size must be positive integers.
+`limit`, `offset`, `take`, `skip`, and `forPage` compose bounds without executing. Use deterministic ordering, including a unique key, for stable pages. `Paginator` exposes `items`, `total`, `page`, `perPage`, `lastPage`, `hasNext`, `hasPrevious`, and `toDict()`/`toJson()`. `exists()` preserves explicit projections, unions, grouping, and `having`. `sum`, `min`, `max`, and `avg` over a union operate on its projected rows; project the target column in each branch. Count and fetch are two queries: outside transactions they may observe different changes and run concurrently; inside they run sequentially. Page and page size must be positive integers.
 
 ## Writes and locks
 

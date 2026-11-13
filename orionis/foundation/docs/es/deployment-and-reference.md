@@ -16,7 +16,7 @@
 - `withConfigPaths(**paths)` resuelve el mapa completo.
 - `on(lifespan, *callbacks, runtime=None)` registra hooks globales o específicos.
 
-`with...` y `on(...)` retornan la aplicación para encadenar y rechazan cambios tras creación. `compile(...)` devuelve `None` y requiere una instrucción independiente. En hit válido de caché compilada, la metadata cacheada prevalece y registros/configuraciones se vuelven no-op intencionalmente.
+`with...` y `on(...)` retornan la aplicación para encadenar. La configuración bootstrap rechaza cambios tras creación; `on(...)` sigue admitiendo callbacks de ciclo de vida porque no se cachean. `compile(...)` devuelve `None` y requiere una instrucción independiente. En hit válido de caché compilada, la metadata cacheada prevalece y registros/configuraciones bootstrap se vuelven no-op intencionalmente.
 
 ### Métodos runtime
 

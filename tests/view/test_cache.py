@@ -1,7 +1,12 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify portable bytecode names and cache filename assembly."""
+
 import tempfile
 from pathlib import Path
 from orionis.test import TestCase
 from orionis.view.cache import OrionisBytecodeCache
+
 
 class _StubBucket:
     """Bytecode bucket double exposing only the cache key."""
@@ -9,35 +14,39 @@ class _StubBucket:
     __slots__ = ("key",)
 
     def __init__(self, key: str) -> None:
-        """Store the cache key exposed by the bucket double.
+        """
+        Store the cache key exposed by the bucket double.
 
         Parameters
         ----------
         key : str
             Cache key associated with the bucket.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.key: str = key
 
-class TestOrionisBytecodeCache(TestCase):
 
+class TestOrionisBytecodeCache(TestCase):
     def setUp(self) -> None:
         """
         Create an isolated temporary directory before each test.
 
         Provides a fresh, writable directory so every test operates on
         its own filesystem state without side effects.
+
+        Returns
+        -------
+        None
+            No return value.
         """
+        super().setUp()
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.enterContext(self._tmpdir)
         self._cache_dir = self._tmpdir.name
-
-    def tearDown(self) -> None:
-        """
-        Remove the temporary directory after each test.
-
-        Ensures all files created during the test are cleaned up
-        regardless of whether the test passed or failed.
-        """
-        self._tmpdir.cleanup()
 
     def _make(self) -> OrionisBytecodeCache:
         """
@@ -73,6 +82,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that a template name ending in .html produces a key
         whose readable stem carries no extension.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("users/index.html")
@@ -84,6 +98,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that a template name ending in .htm produces a key
         without the extension.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("pages/about.htm")
@@ -95,6 +114,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that a template name ending in .jinja produces a key
         without the extension.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("layout/base.jinja")
@@ -106,6 +130,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that a template name ending in .jinja2 produces a key
         without the extension.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("emails/welcome.jinja2")
@@ -117,6 +146,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that a template name ending in .j2 produces a key
         without the extension.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("admin/dashboard.j2")
@@ -128,6 +162,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that nested template paths are flattened using dot
         separators so the key is suitable as a filename stem.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("deep/nested/path/template.html")
@@ -139,6 +178,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that Windows-style path separators are handled the
         same way as forward slashes.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("partials\\nav.html")
@@ -150,6 +194,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that extensions not in the known list are kept intact
         in the returned key without stripping.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("styles/main.css")
@@ -161,6 +210,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that a template identifier without a known extension
         passes through the sanitisation step unmodified.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key = cache.get_cache_key("no_extension")
@@ -172,6 +226,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that the appended digest is derived from the name and
         never from per-instance or random state.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         first = self._make().get_cache_key("users/index.html")
         second = self._make().get_cache_key("users/index.html")
@@ -183,6 +242,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that mail/welcome.html and mail/welcome.j2 no longer
         normalise to the same key and therefore never share a file.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         html = cache.get_cache_key("mail/welcome.html")
@@ -196,6 +260,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that users/index.html and users.index.html produce
         different keys even though both flatten to the same stem.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         nested = cache.get_cache_key("users/index.html")
@@ -208,11 +277,17 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that the optional filename parameter does not affect the
         computed cache key because the implementation intentionally ignores it.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         key_without = cache.get_cache_key("users/index.html")
         key_with = cache.get_cache_key(
-            "users/index.html", "/abs/path/index.html",
+            "users/index.html",
+            "/abs/path/index.html",
         )
         self.assertEqual(key_without, key_with)
 
@@ -222,48 +297,17 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that the returned path is rooted at the configured
         cache directory and ends with the .cache suffix.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
-        bucket = _StubBucket("users.index")
-        result = cache._get_cache_filename(bucket)
-        expected = str(Path(self._cache_dir) / "users.index.cache")
-        self.assertEqual(result, expected)
-
-    def testGetCacheFilenameUsesKeyAttribute(self) -> None:
-        """
-        Build the cache filename from the bucket key attribute.
-
-        Validates that the filename stem is exactly the key on the
-        provided bucket, preserving any dot-separated structure.
-        """
-        cache = self._make()
-        bucket = _StubBucket("admin.dashboard.j2")
-        result = cache._get_cache_filename(bucket)
-        self.assertIn("admin.dashboard.j2.cache", result)
-
-    def testGetCacheFilenameAlwaysEndsDotCache(self) -> None:
-        """
-        Ensure _get_cache_filename always appends the .cache suffix.
-
-        Validates that every cache filename produced by the method ends
-        with the .cache extension.
-        """
-        cache = self._make()
-        bucket = _StubBucket("emails.welcome")
-        result = cache._get_cache_filename(bucket)
-        self.assertTrue(result.endswith(".cache"))
-
-    def testGetCacheFilenameIsAbsolutePath(self) -> None:
-        """
-        Confirm _get_cache_filename returns a string rooted at cache_dir.
-
-        Validates that the returned filename starts with the configured
-        cache directory path so writes land in the expected location.
-        """
-        cache = self._make()
-        bucket = _StubBucket("some.template")
-        result = cache._get_cache_filename(bucket)
-        self.assertTrue(result.startswith(self._cache_dir))
+        for key in ("users.index", "admin.dashboard.j2", "emails.welcome"):
+            with self.subTest(key=key):
+                result = cache._get_cache_filename(_StubBucket(key))
+                self.assertEqual(result, str(Path(self._cache_dir) / f"{key}.cache"))
 
     def testGetCacheKeyStripsOnlyTheMatchingExtension(self) -> None:
         """
@@ -271,6 +315,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that the sanitisation loop stops at the first match so
         chained suffixes are not removed twice.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         self.assertEqual(self._stem(cache.get_cache_key("page.html.j2")), "page.html")
@@ -281,6 +330,11 @@ class TestOrionisBytecodeCache(TestCase):
 
         Validates that the sanitisation step never fails on a degenerate
         template identifier.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache = self._make()
         self.assertEqual(self._stem(cache.get_cache_key("")), "")

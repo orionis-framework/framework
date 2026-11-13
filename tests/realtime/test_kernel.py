@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN202, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, cast
@@ -17,6 +19,7 @@ from tests.http.test_websocket import _ASGIPeer, _RSGIPeer, _ScopedApp
 
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
+
 
 class CalculatorHub(Hub):
     """Exercise preloaded Hub routing through both real transport adapters."""
@@ -51,6 +54,7 @@ class CalculatorHub(Hub):
             raise TypeError(message)
         return a + b + offset
 
+
 class _HubApp(_ScopedApp):
     """Expose full scope resolution over the real container fixture."""
 
@@ -82,6 +86,7 @@ class _HubApp(_ScopedApp):
             Active container scope, or None outside a scope.
         """
         return self.container.getCurrentScope()
+
 
 class _ASGIHubPeer(_ASGIPeer):
     """Queue server events so tests can drive the connection without sleeps."""
@@ -116,6 +121,7 @@ class _ASGIHubPeer(_ASGIPeer):
         """
         await super().send(event)
         self.output.put_nowait(event)
+
 
 class _RSGIHubPeer(_RSGIPeer):
     """Drive MessagePack through Granian's documented binary transport API."""
@@ -155,6 +161,7 @@ class _RSGIHubPeer(_RSGIPeer):
     # Preserve the Granian RSGI protocol name.
     send_bytes = sendBytes
 
+
 class TestHubKernel(TestCase):
     """Verify route preload, both protocols, connection scopes and cleanup."""
 
@@ -175,7 +182,9 @@ class TestHubKernel(TestCase):
         kernel, stub, _, _ = await boot_kernel()
         app = _HubApp(stub)
         route = Router(cast("IApplication", app)).hub(
-            "/hub/{offset:int}", CalculatorHub, protocol=protocol,
+            "/hub/{offset:int}",
+            CalculatorHub,
+            protocol=protocol,
         )
         compiled, _ = RouteCompiler().compile([route.export()], None)
         self.addCleanup(Container._instances.pop, type(app.container), None)
@@ -209,13 +218,18 @@ class TestHubKernel(TestCase):
                 self.assertEqual((await peer.output.get())["type"], "websocket.accept")
                 ready = msgspec.json.decode((await peer.output.get())["text"])
                 self.assertEqual(ready["version"], 1)
-                peer.events.put_nowait({
-                    "type": "websocket.receive",
-                    "text": '{"type":"invoke","id":"a","target":"add","args":[2,3]}',
-                })
+                peer.events.put_nowait(
+                    {
+                        "type": "websocket.receive",
+                        "text": (
+                            '{"type":"invoke","id":"a","target":"add","args":[2,3]}'
+                        ),
+                    },
+                )
                 result = msgspec.json.decode((await peer.output.get())["text"])
                 self.assertEqual(
-                    result, {"type": "completion", "id": "a", "result": 10},
+                    result,
+                    {"type": "completion", "id": "a", "result": 10},
                 )
                 peer.events.put_nowait({"type": "websocket.disconnect", "code": 1000})
                 await owner
@@ -243,11 +257,19 @@ class TestHubKernel(TestCase):
             async with asyncio.timeout(2):
                 ready = msgspec.msgpack.decode(await peer.output.get())
                 self.assertEqual(ready["type"], "ready")
-                peer.events.put_nowait(SimpleNamespace(
-                    kind=1, data=msgspec.msgpack.encode({
-                        "type": "invoke", "id": "a", "target": "add", "args": [2, 3],
-                    }),
-                ))
+                peer.events.put_nowait(
+                    SimpleNamespace(
+                        kind=1,
+                        data=msgspec.msgpack.encode(
+                            {
+                                "type": "invoke",
+                                "id": "a",
+                                "target": "add",
+                                "args": [2, 3],
+                            },
+                        ),
+                    ),
+                )
                 result = msgspec.msgpack.decode(await peer.output.get())
                 self.assertEqual(result["result"], 10)
                 peer.events.put_nowait(SimpleNamespace(kind=0, data=None))

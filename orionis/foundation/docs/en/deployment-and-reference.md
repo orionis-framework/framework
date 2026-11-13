@@ -16,7 +16,7 @@
 - `withConfigPaths(**paths)` resolves the full application directory map.
 - `on(lifespan, *callbacks, runtime=None)` registers global or runtime-specific hooks.
 
-`with...` and `on(...)` return the application for chaining and reject mutation after creation. `compile(...)` returns `None` and must be a separate statement. On a valid compiled-cache hit, cached bootstrap metadata wins and registration/configuration methods intentionally become no-ops.
+`with...` and `on(...)` return the application for chaining. Bootstrap configuration rejects mutation after creation; lifecycle callbacks remain registerable through `on(...)` because they are not cached. `compile(...)` returns `None` and must be a separate statement. On a valid compiled-cache hit, cached bootstrap metadata wins and bootstrap registration/configuration methods intentionally become no-ops.
 
 ### Runtime methods
 

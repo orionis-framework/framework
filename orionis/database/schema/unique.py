@@ -2,6 +2,7 @@
 
 from orionis.orm.schema.constraints import UniqueConstraint
 
+
 class Unique:
     """Describe a uniqueness constraint on table columns."""
 
@@ -20,7 +21,7 @@ class Unique:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         self.constraint = UniqueConstraint(columns=columns, name=name)
         """Constraint produced by ``UniqueConstraint``."""

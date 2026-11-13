@@ -1,3 +1,5 @@
+# ruff: noqa: T201
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Execute external commands and expose their console results."""
 
 from __future__ import annotations
@@ -9,9 +11,8 @@ from orionis.support.facades.datetime import DateTime
 if TYPE_CHECKING:
     from datetime import datetime
 
-class Executor(IExecutor):
 
-    # ruff: noqa: T201
+class Executor(IExecutor):
     """Execute external commands and expose their console results."""
 
     def __getNow(self) -> datetime:
@@ -69,9 +70,7 @@ class Executor(IExecutor):
 
         # Format timestamp with muted color;
         # cache the current time to avoid multiple calls
-        timestamp = (
-            f"{muted}{self.__getNow().strftime('%Y-%m-%d %H:%M:%S')}{default}"
-        )
+        timestamp = f"{muted}{self.__getNow().strftime('%Y-%m-%d %H:%M:%S')}{default}"
 
         # Single f-string: 1 str object vs 2 separate allocations + 1 concat op
         time_formatted = f"{muted}{time}{default}" if time else ""

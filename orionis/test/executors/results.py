@@ -21,10 +21,12 @@ _STATUS_STYLE: dict[TestStatus, str] = {
 """Status-to-color mapping for Rich console output."""
 
 # Statuses that require detailed error rendering in verbosity=2 panels.
-_FAILURE_STATUSES: frozenset[TestStatus] = frozenset({
-    TestStatus.ERRORED,
-    TestStatus.FAILED,
-})
+_FAILURE_STATUSES: frozenset[TestStatus] = frozenset(
+    {
+        TestStatus.ERRORED,
+        TestStatus.FAILED,
+    },
+)
 """Statuses that require detailed error rendering in verbosity=2 panels."""
 
 # Reusable Rich style strings for verbosity=2 panel content.
@@ -33,9 +35,13 @@ _V2_BOLD_WHITE: str = "bold bright_white"
 _V2_DIM: str = "dim white"
 """V2 dim identifier: ``dim white``."""
 
-class TestResultProcessor(unittest.TestResult):
+_DETAILED_VERBOSITY = 2
+"""Verbosity level rendering a complete result panel."""
+_SOURCE_LINE_WIDTH = 73
+"""Maximum displayed source width, including an ellipsis when truncated."""
 
-    # ruff: noqa: PLR2004,PLW2901
+
+class TestResultProcessor(unittest.TestResult):
     """Collect test outcomes and render configured console feedback."""
 
     def __init__(
@@ -65,7 +71,7 @@ class TestResultProcessor(unittest.TestResult):
         Returns
         -------
         None
-            This constructor initializes instance attributes and returns None.
+            No return value.
         """
         super().__init__(stream, descriptions, verbosity, **kwargs)
 
@@ -83,6 +89,8 @@ class TestResultProcessor(unittest.TestResult):
         """Console produced by ``Console``."""
         self.__max_width = self.__console.width * 0.8
         """Maximum width used when rendering test-result panels."""
+        self.__start_time: float | None = None
+        """Start time of the active test, or None between test methods."""
 
     def startTest(self, test: unittest.case.TestCase) -> None:
         """
@@ -96,11 +104,26 @@ class TestResultProcessor(unittest.TestResult):
         Returns
         -------
         None
-            This method starts a timer and calls the superclass method.
+            No return value.
         """
         self.__start_time = time.perf_counter()
-        """Start time produced by ``time.perf_counter``."""
         super().startTest(test)
+
+    def stopTest(self, test: unittest.case.TestCase) -> None:
+        """Clear the active timer after completing a test.
+
+        Parameters
+        ----------
+        test : unittest.TestCase
+            Test whose execution has finished.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self.__start_time = None
+        super().stopTest(test)
 
     def addSuccess(self, test: unittest.case.TestCase) -> None:
         """
@@ -114,8 +137,7 @@ class TestResultProcessor(unittest.TestResult):
         Returns
         -------
         None
-            This method appends the result and prints it, then calls the
-            superclass method.
+            No return value.
         """
         result = self.__createTestResult(test, TestStatus.PASSED)
         self.__test_results.append(result)
@@ -140,8 +162,7 @@ class TestResultProcessor(unittest.TestResult):
         Returns
         -------
         None
-            This method appends the result and prints it, then calls the
-            superclass method.
+            No return value.
         """
         result = self.__createTestResult(test, TestStatus.FAILED, err)
         self.__test_results.append(result)
@@ -166,8 +187,7 @@ class TestResultProcessor(unittest.TestResult):
         Returns
         -------
         None
-            This method appends the result and prints it, then calls the
-            superclass method.
+            No return value.
         """
         result = self.__createTestResult(test, TestStatus.ERRORED, err)
         self.__test_results.append(result)
@@ -192,8 +212,7 @@ class TestResultProcessor(unittest.TestResult):
         Returns
         -------
         None
-            This method appends the result and prints it, then calls the
-            superclass method.
+            No return value.
         """
         result = self.__createTestResult(test, TestStatus.SKIPPED)
         self.__test_results.append(result)
@@ -279,14 +298,16 @@ class TestResultProcessor(unittest.TestResult):
             "Test passed despite being marked as an expected failure.",
         )
         result = self.__createTestResult(
-            test, TestStatus.FAILED, (AssertionError, error, None),
+            test,
+            TestStatus.FAILED,
+            (AssertionError, error, None),
         )
         self.__test_results.append(result)
         self.__printTestResult(result)
 
-    def __printTestResult(self, result: TestResult) -> None: # NOSONAR
+    def __printTestResult(self, result: TestResult) -> None:
         """
-        Print the result of a test that did not fail.
+        Print a test outcome at the configured verbosity.
 
         Parameters
         ----------
@@ -296,8 +317,7 @@ class TestResultProcessor(unittest.TestResult):
         Returns
         -------
         None
-            This method prints the formatted test result to the console and
-            does not return a value.
+            No return value.
         """
         # Resolve status style and format status label centered in a fixed-width cell.
         status_style: str = _STATUS_STYLE.get(result.status, "white")
@@ -310,7 +330,6 @@ class TestResultProcessor(unittest.TestResult):
 
         # Compact single-line output with dot-filler alignment.
         if verbosity == 1:
-
             # Calculate filler length for formatting.
             max_width: int = int(self.__max_width)
             status_len: int = len(status_text)
@@ -352,15 +371,15 @@ class TestResultProcessor(unittest.TestResult):
             # Output formatted test result to console.
             self.__console.print(formatted_text)
 
-        elif verbosity == 2:
-
+        elif verbosity == _DETAILED_VERBOSITY:
             # Build the path segment; failures append the line number.
             text_path = Text(f"📄 Path: {result.file_path}")
             other_texts: list[Text] = []
             if result.status in _FAILURE_STATUSES:
                 icon = "❌" if result.status == TestStatus.FAILED else "💥"
                 text_path = Text(
-                    f"📄 Path: {result.file_path}:{result.line_no}", style="cyan",
+                    f"📄 Path: {result.file_path}:{result.line_no}",
+                    style="cyan",
                 )
                 other_texts.append(
                     Text(
@@ -369,22 +388,22 @@ class TestResultProcessor(unittest.TestResult):
                     ),
                 )
                 for line_no, code_line in result.source_code:
-                    code_line = (
+                    display_line = (
                         code_line[:70] + "..."
-                        if len(code_line) > 73
+                        if len(code_line) > _SOURCE_LINE_WIDTH
                         else code_line
                     )
                     if line_no == result.line_no:
                         other_texts.append(
                             Text(
-                                f"\n *| {line_no}: {code_line}",
+                                f"\n *| {line_no}: {display_line}",
                                 style="white on grey23",
                             ),
                         )
                     else:
                         other_texts.append(
                             Text(
-                                f"\n  | {line_no}: {code_line}",
+                                f"\n  | {line_no}: {display_line}",
                                 style="dim white",
                             ),
                         )
@@ -450,13 +469,11 @@ class TestResultProcessor(unittest.TestResult):
         _code: list[tuple[int, str]] = []
         line_no: int | None = None
 
-        # Scan the call stack for frames that belong to the test source file.
+        # Use the supplied traceback even after its except block has exited.
         if file_path:
-            for exc in inspect.trace():
-                frame = exc.frame
-                lineno = exc.lineno
-                if file_path in frame.f_code.co_filename:
-                    filename = frame.f_code.co_filename
+            for frame, lineno in traceback.walk_tb(exc_info[2]):
+                filename = frame.f_code.co_filename
+                if file_path == filename:
                     start = max(1, lineno - 2)
                     end = lineno + 1
                     line_no = lineno
@@ -494,14 +511,18 @@ class TestResultProcessor(unittest.TestResult):
             The constructed TestResult object containing test outcome details.
         """
         # Measure elapsed time and extract class metadata from the test instance.
-        elapsed: float = time.perf_counter() - self.__start_time
+        elapsed = (
+            time.perf_counter() - self.__start_time
+            if self.__start_time is not None
+            else 0.0
+        )
         cls = type(test)
         method_name: str | None = getattr(test, "_testMethodName", None)
 
         # Resolve the source file associated with the test class.
         try:
             file_path: str | None = inspect.getfile(cls)
-        except (TypeError, OSError):
+        except TypeError, OSError:
             file_path = None
 
         # Delegate traceback extraction to a focused helper to contain complexity.

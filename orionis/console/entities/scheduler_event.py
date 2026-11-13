@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from orionis.console.enums.events import SchedulerEvent as SchedulerEventEnum
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(kw_only=True)
 class SchedulerEvent(BaseEntity):
     """

@@ -9,7 +9,7 @@ El logger registra eventos de aplicación en archivos UTF-8 con un canal activo 
 
 Relacionados: [foundation](../../../foundation/docs/es/README.md) · [failure](../../../failure/docs/es/README.md)
 
-## Ejecución acotada y rendimiento
+## Logging en cola
 
 Configura `LOG_QUEUE_CAPACITY=1024`, `Application(...).withConfigLogging(queue_capacity=1024)` o el campo de configuración `Logging` para trasladar emisión, rotación y compresión a colas acotadas en segundo plano. Cero, el valor predeterminado, conserva la emisión síncrona. La capacidad se aplica por handler. Una cola llena lanza `queue.Full` en todos los niveles, incluido crítico; no descarta silenciosamente ni vuelve al I/O bloqueante. Los fallos del destino se notifican con `LoggingDeliveryError` en una emisión posterior, flush o cierre.
 

@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from abc import ABC
 from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.test import TestCase
+
 
 class _ConcreteProvider(IServiceProvider):
     """Minimal IServiceProvider implementation for structural tests."""
@@ -13,7 +16,7 @@ class _ConcreteProvider(IServiceProvider):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     async def boot(self) -> None:
@@ -22,11 +25,11 @@ class _ConcreteProvider(IServiceProvider):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
-class TestIServiceProvider(TestCase):
 
+class TestIServiceProvider(TestCase):
     def testContractIsAnAbstractBaseClass(self) -> None:
         """
         Declare IServiceProvider as an ABC that cannot be instantiated.
@@ -34,7 +37,7 @@ class TestIServiceProvider(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertTrue(issubclass(IServiceProvider, ABC))
         with self.assertRaises(TypeError):
@@ -47,7 +50,7 @@ class TestIServiceProvider(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(
             IServiceProvider.__abstractmethods__,
@@ -61,7 +64,7 @@ class TestIServiceProvider(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertTrue(
             inspect.iscoroutinefunction(IServiceProvider.boot),
@@ -77,7 +80,7 @@ class TestIServiceProvider(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         provider = _ConcreteProvider()
         self.assertIsInstance(provider, IServiceProvider)

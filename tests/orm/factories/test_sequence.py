@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import tests.orm.factories.test_factory as factory_fixtures
 from orionis.orm.factories import Sequence
@@ -6,6 +8,7 @@ from orionis.orm.factories.exceptions import (
     FactoryDefinitionException,
 )
 from orionis.test import TestCase
+
 
 async def _async_sequence_entry(index: int) -> dict[str, object]:
     """Produce an invalid asynchronous sequence entry.
@@ -22,6 +25,7 @@ async def _async_sequence_entry(index: int) -> dict[str, object]:
     """
     await asyncio.sleep(0)
     return {"index": index}
+
 
 class _AsyncSequenceEntry:
     """Expose an asynchronous callable object for registration validation."""
@@ -43,6 +47,7 @@ class _AsyncSequenceEntry:
         """
         return await _async_sequence_entry(index)
 
+
 class TestSequenceGeneration(TestCase):
     """Test public generation without requiring database resolution."""
 
@@ -52,7 +57,7 @@ class TestSequenceGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = factory_fixtures.UserFactory().sequence(
             Sequence({"active": True}, {"active": False}),
@@ -69,7 +74,7 @@ class TestSequenceGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = (
             factory_fixtures.UserFactory()
@@ -90,7 +95,7 @@ class TestSequenceGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         sequence = Sequence(factory_fixtures._indexed_email)
         first = factory_fixtures.UserFactory().sequence(sequence)
@@ -105,7 +110,7 @@ class TestSequenceGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         item = {"profile": {"tags": ["sequence"]}}
         sequence = Sequence(item)
@@ -120,12 +125,12 @@ class TestSequenceGeneration(TestCase):
         Returns
         -------
         None
-            Verify the public resolve method enforces its index contract.
+            No return value.
         """
         sequence = Sequence({"active": True})
         for index in (-1, True, False, 1.5, "1", None):
             with self.assertRaises(FactoryConfigurationException):
-                sequence.resolve(index)  # type: ignore[arg-type]
+                sequence.resolve(index)
 
     def testResolveUsesAbsoluteIndicesAndReturnsDetachedValues(self) -> None:
         """Cycle static entries while passing absolute indices to callbacks.
@@ -133,7 +138,7 @@ class TestSequenceGeneration(TestCase):
         Returns
         -------
         None
-            Verify callback indices and independent nested result values.
+            No return value.
         """
         sequence = Sequence({"values": []}, lambda index: {"index": index})
         first = sequence.resolve(0)
@@ -147,7 +152,7 @@ class TestSequenceGeneration(TestCase):
         Returns
         -------
         None
-            Verify early validation of functions and callable objects.
+            No return value.
         """
         for entries in (
             (),
@@ -157,7 +162,7 @@ class TestSequenceGeneration(TestCase):
             (_AsyncSequenceEntry(),),
         ):
             with self.assertRaises(FactoryConfigurationException):
-                Sequence(*entries)  # type: ignore[arg-type]
+                Sequence(*entries)
 
     def testRejectsInvalidCallbackResultsAtResolution(self) -> None:
         """Validate values produced by a synchronous sequence callback.
@@ -165,7 +170,7 @@ class TestSequenceGeneration(TestCase):
         Returns
         -------
         None
-            Verify malformed callback dictionaries raise definition errors.
+            No return value.
         """
         sequence = Sequence(lambda _index: {1: "value"})
         with self.assertRaises(FactoryDefinitionException):

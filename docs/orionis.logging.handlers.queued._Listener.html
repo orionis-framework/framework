@@ -255,7 +255,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13240"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13318"> 
                     
                 </input>
 
@@ -367,11 +367,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13241"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13319"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId13241">
+                <label class="lbl-toggle" for="expandableItemId13319">
                     
                     
                 </label>
@@ -509,7 +509,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13242"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13320"> 
                     
                 </input>
 
@@ -641,7 +641,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_Listener</span>(<a href="https://docs.python.org/3/library/logging.handlers.html#logging.handlers.QueueListener" class="intersphinx-link">QueueListener</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/logging/handlers/queued.py#L79" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.queued._Listener">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_Listener</span>(<a href="https://docs.python.org/3/library/logging.handlers.html#logging.handlers.QueueListener" class="intersphinx-link">QueueListener</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/logging/handlers/queued.py#L79" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.queued._Listener">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -649,7 +649,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1296">
+          <table class="children sortable" id="id1308">
   
   
   <tr class="method">
@@ -703,7 +703,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_deliver</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">record: <code><a href="https://docs.python.org/3/library/logging.html#logging.LogRecord" class="intersphinx-link">logging.LogRecord</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/logging/handlers/queued.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/logging/handlers/queued.py#L110">
       
       (source)
     </a>
@@ -718,7 +718,7 @@
     <div><p>Deliver a queued record and retain the listener's first sink failure.</p>
 <p>Continue draining after delivery exceptions and offer each failure to
 the owner's runtime.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><tt class="rst-docutils rst-literal">logging.LogRecord</tt></code></td><td class="fieldArgDesc">Queued record to pass to the configured handlers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Report delivery errors without interrupting the listener's queue drain.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><tt class="rst-docutils rst-literal">logging.LogRecord</tt></code></td><td class="fieldArgDesc">Queued record to pass to the configured handlers.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -733,7 +733,7 @@ the owner's runtime.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">enqueueSentinel</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/logging/handlers/queued.py#L143">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/logging/handlers/queued.py#L144">
       
       (source)
     </a>
@@ -745,7 +745,7 @@ the owner's runtime.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Enqueue the shutdown sentinel, waiting for queue capacity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Block until the sentinel can be added after pending records.</td></tr></table></div>
+    <div><p>Enqueue the shutdown sentinel, waiting for queue capacity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -760,7 +760,7 @@ the owner's runtime.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">handle</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">record: <code><a href="https://docs.python.org/3/library/logging.html#logging.LogRecord" class="intersphinx-link">logging.LogRecord</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/logging/handlers/queued.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/logging/handlers/queued.py#L89">
       
       (source)
     </a>
@@ -772,7 +772,7 @@ the owner's runtime.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Deliver a record under its originating failure-reporting context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><tt class="rst-docutils rst-literal">logging.LogRecord</tt></code></td><td class="fieldArgDesc">Queued record carrying optional reporter identity metadata.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Restore available reporter identity while dispatching the record.</td></tr></table></div>
+    <div><p>Deliver a record under its originating failure-reporting context.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><tt class="rst-docutils rst-literal">logging.LogRecord</tt></code></td><td class="fieldArgDesc">Queued record carrying optional reporter identity metadata.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -786,7 +786,7 @@ the owner's runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">app</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/logging/handlers/queued.py#L84">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/logging/handlers/queued.py#L84">
       
       (source)
     </a>
@@ -813,7 +813,7 @@ the owner's runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">error</span>: <code><a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/logging/handlers/queued.py#L82">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/logging/handlers/queued.py#L82">
       
       (source)
     </a>
@@ -839,8 +839,8 @@ the owner's runtime.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">runtime</span>: <code><a href="orionis.failure.runtime.FailureRuntime.html" class="internal-link" title="orionis.failure.runtime.FailureRuntime">FailureRuntime</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/logging/handlers/queued.py#L86">
+    <span class="py-defname">runtime</span>: <code><a href="orionis.failure.runtime.FailureRuntime.html" class="internal-link" title="orionis.failure.runtime.FailureRuntime">failure_runtime.FailureRuntime</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/logging/handlers/queued.py#L86">
       
       (source)
     </a>
@@ -866,7 +866,7 @@ the owner's runtime.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

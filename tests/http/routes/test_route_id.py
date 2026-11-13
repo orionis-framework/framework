@@ -1,5 +1,8 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.routes.route_id import RouteID
 from orionis.test import TestCase
+
 
 class TestRouteID(TestCase):
     """Unit tests for the RouteID unique-identifier generator."""

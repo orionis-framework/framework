@@ -8,6 +8,7 @@ Una petición entra por un adaptador ASGI o RSGI. El kernel aplica políticas gl
 from orionis.http import Request, Response, response
 from orionis.http.base.controller import BaseController
 
+
 class CatalogController(BaseController):
     async def show(self, request: Request) -> Response:
         product_id = request.routeParam("product_id")
@@ -33,6 +34,8 @@ La solicitud y su identidad viven en un scope. No conserves el `Request`, la ses
 Cada aplicación y kernel HTTP pertenece al event loop de un worker; no los compartas entre hilos ni entre event loops. El kernel aplica `http.body_limits.max_concurrent_requests` al conjunto de peticiones ASGI y RSGI sin bloquear el loop. Cada petición conserva su plaza hasta completar el envío y la limpieza de recursos, incluso si se cancela. Las peticiones que exceden el límite reciben `503` con `Retry-After: 1` antes de asignar otro scope.
 
 Las excepciones de validación y autenticación se convierten mediante los manejadores del framework. Una excepción después de enviar encabezados de streaming ya no puede reemplazar el estado HTTP enviado. Diseña el trabajo de preparación para fallar antes de devolver el stream.
+
+La limpieza conserva un fallo que se esté propagando desde la petición o WebSocket actual, no una excepción ajena que su llamador esté manejando. Si no existe ese fallo, los errores de limpieza se propagan. Si el cliente ASGI se desconecta antes del último frame del cuerpo, la lectura lanza `ConnectionError` y no almacena un cuerpo parcial en caché.
 
 ## Evidencia y continuación
 

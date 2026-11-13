@@ -1,18 +1,18 @@
+# ruff: noqa: TC001, TC003
+# Keep public annotations available to runtime reflection and injection.
 """Hold the authenticated state of one request."""
 
 import asyncio
 from collections.abc import Iterable
-from typing import TYPE_CHECKING
 from orionis.auth.authorization.snapshot import EMPTY_SNAPSHOT, AuthorizationSnapshot
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.auth.contracts.permission_repository import IPermissionRepository
+from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
 from orionis.auth.exceptions import AuthException
+from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
-    from orionis.container.context.manager import ScopeManager
 
 class AuthenticationContext(IAuthenticationContext):
     """
@@ -30,8 +30,6 @@ class AuthenticationContext(IAuthenticationContext):
     under an ``asyncio.Lock`` owned by this context, so several
     coroutines of the same request share a single database round trip.
     """
-
-    # ruff: noqa: TC001, TC003
 
     __slots__ = (
         "__abilities",
@@ -74,7 +72,7 @@ class AuthenticationContext(IAuthenticationContext):
         Returns
         -------
         None
-            The context starts without a resolved snapshot.
+            No return value.
         """
         self.__identity = identity
         """Identity resolved by a guard, or ``None`` for a guest."""
@@ -114,7 +112,7 @@ class AuthenticationContext(IAuthenticationContext):
         Returns
         -------
         None
-            Later reads verify that the context is still current in this scope.
+            No return value.
 
         Raises
         ------
@@ -133,19 +131,21 @@ class AuthenticationContext(IAuthenticationContext):
         Framework lifecycles call this while the owning scope is current, then
         bind the returned context inside their new scope. Authorization remains
         lazy and is resolved independently; neither a cached permission snapshot
-        nor the source scope or lock is retained. A stale context yields a guest.
+        nor the source scope or lock is retained. A stale context yields a guest
+        without a revocable credential.
 
         Returns
         -------
         orionis.auth.context.AuthenticationContext
             Unbound context carrying the current identity and credential limits.
         """
+        identity = self.identity
         return AuthenticationContext(
-            identity=self.identity,
+            identity=identity,
             guard=self.__guard,
             abilities=self.__abilities,
             repository=self.__repository,
-            credential_id=self.__credential_id,
+            credential_id=self.__credential_id if identity is not None else None,
         )
 
     def __isCurrent(self) -> bool:
@@ -280,8 +280,8 @@ class AuthenticationContext(IAuthenticationContext):
 
         async with lock:
             # Re-check inside the lock: another coroutine of this request
-            # may have resolved the snapshot while we were waiting.
-            snapshot = self.__snapshot
+            # may have resolved the snapshot or replaced the context.
+            snapshot = self.__snapshot if self.__isCurrent() else EMPTY_SNAPSHOT
             if snapshot is not None:
                 return snapshot
 
@@ -312,6 +312,7 @@ class AuthenticationContext(IAuthenticationContext):
             f"AuthenticationContext(guard={self.__guard!r}, "
             f"identifier={self.identifier()!r})"
         )
+
 
 # Shared context handed to every request nobody authenticated. It carries
 # no identity and resolves to the empty snapshot, so sharing is safe.

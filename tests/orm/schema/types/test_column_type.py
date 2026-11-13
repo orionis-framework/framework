@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema column type behavior."""
+
 from sqlalchemy.schema import CreateTable
 from orionis.database.compiler import SQLCompiler
 from orionis.database.exceptions import QueryException
@@ -5,6 +9,7 @@ from orionis.orm.schema import types as types_module
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import ColumnType, Enum, Integer, StrictArray
 from orionis.test import TestCase
+
 
 class TestColumnType(TestCase):
     """Verify logical column kinds are complete and reach SQL compilation."""
@@ -15,7 +20,7 @@ class TestColumnType(TestCase):
         Returns
         -------
         None
-            Verify constructor coverage and compiler handling for every kind.
+            No return value.
         """
         seen: set[ColumnType] = set()
         unsupported = {

@@ -5,6 +5,7 @@
 ```python
 from orionis.test import TestCase
 
+
 class TestArithmetic(TestCase):
     async def testAddition(self) -> None:
         self.assertEqual(2 + 2, 4)
@@ -15,6 +16,7 @@ Ejecuta la suite desde la raíz del proyecto:
 ```powershell
 python reactor test
 python reactor test --start-dir tests/unit --no-panel --verbosity 1
+python reactor test --start-dir tests/test_example.py --no-panel --verbosity 1
 ```
 
 ## Conceptos principales
@@ -27,7 +29,11 @@ Cada caso obtiene un event loop aislado. El umbral de callbacks lentos se establ
 
 ### Descubrimiento y ejecución
 
-`TestingEngine` recorre recursivamente el directorio configurado, incluidos directorios sin `__init__.py`, carga archivos coincidentes y filtra métodos individuales. Crea una suite nueva en cada ejecución y envía el runner síncrono de `unittest` a un executor para no bloquear el event loop del llamador.
+`TestingEngine` recorre recursivamente el directorio configurado, incluidos directorios sin `__init__.py`, carga archivos coincidentes y filtra métodos individuales. Las rutas relativas se resuelven desde la raíz de la aplicación. Un archivo Python explícito selecciona únicamente ese módulo, sin recorrer directorios hermanos ni aplicar el patrón de archivos. Las rutas deben existir dentro de la raíz de la aplicación; los errores de recorrido se propagan en vez de omitir una rama silenciosamente. Se rechaza un módulo ya importado desde otro proyecto para evitar ejecutar pruebas equivocadas.
+
+El patrón de métodos se aplica a nombres cortos, incluidos prefijos personalizados como `check*`. El motor instala su patrón solo mientras construye los casos y restaura el patrón del llamador al terminar, incluso si falla una importación. Crea una suite nueva en cada ejecución y ejecuta el runner síncrono de `unittest` en un hilo con las variables de contexto del llamador, manteniendo disponible su event loop.
+
+`reactor test` devuelve 1 y muestra un diagnóstico explícito si el descubrimiento o los filtros no producen resultados. Una ejecución vacía no constituye una validación exitosa. Los resultados no vacíos siguen distinguiendo pruebas aprobadas, fallidas, con error y omitidas; las omisiones no se cuentan como aprobaciones.
 
 ### Resultados estructurados
 
@@ -48,6 +54,7 @@ from uuid import uuid4
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.test import TestCase
 
+
 class TestHealth(TestCase):
     async def testCache(self, cache: ICacheManager) -> None:
         key = f"tests:health:{uuid4().hex}"
@@ -63,14 +70,16 @@ class TestHealth(TestCase):
 ```python
 from orionis.test import McpTestResponse
 
-response = McpTestResponse({
-    "jsonrpc": "2.0",
-    "id": 1,
-    "result": {
-        "content": [{"type": "text", "text": "Hello, Ada"}],
-        "isError": False,
-    },
-})
+response = McpTestResponse(
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+            "content": [{"type": "text", "text": "Hello, Ada"}],
+            "isError": False,
+        },
+    }
+)
 response.assertOk()
 response.assertTextContains("Ada")
 assert response.notifications == ()
@@ -102,7 +111,7 @@ La entidad de configuración `testing` lee estas variables de entorno:
 | --- | --- | --- |
 | `TESTING_VERBOSITY` | `2` | `0` silencioso, `1` compacto, `2` detallado. |
 | `TESTING_FAIL_FAST` | `False` | Detenerse tras el primer fallo o error. |
-| `TESTING_START_DIR` | `tests` | Raíz de descubrimiento. |
+| `TESTING_START_DIR` | `tests` | Directorio de descubrimiento o archivo Python explícito. |
 | `TESTING_FILE_PATTERN` | `test_*.py` | Patrón de archivos. |
 | `TESTING_METHOD_PATTERN` | `test*` | Patrón de métodos. |
 | `TESTING_CACHE_RESULTS` | `False` | Persistir resultados estructurados como JSON. |

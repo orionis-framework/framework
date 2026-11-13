@@ -1,7 +1,10 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a field contains a non-empty value."""
 
 from orionis.schemas.rule import Rule
 from orionis.schemas.rules.measure import is_empty
+
 
 class NoEmpty(Rule):
     """
@@ -22,9 +25,9 @@ class NoEmpty(Rule):
 
     async def enforce(
         self,
-        field: str,  # noqa: ARG002
+        field: str,
         value: object,
-        instance: object,  # noqa: ARG002
+        instance: object,
     ) -> bool:
         """
         Check that a field value is not empty.

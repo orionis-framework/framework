@@ -7,6 +7,7 @@ from dataclasses import dataclass
 _REFERENCE_PARTS: int = 2
 """Number of segments expected in a qualified reference such as "companies.id"."""
 
+
 @dataclass(frozen=True, slots=True)
 class ForeignReference:
     """

@@ -5,6 +5,7 @@
 ```python
 from orionis.test import TestCase
 
+
 class TestArithmetic(TestCase):
     async def testAddition(self) -> None:
         self.assertEqual(2 + 2, 4)
@@ -15,6 +16,7 @@ Run the suite from the project root:
 ```powershell
 python reactor test
 python reactor test --start-dir tests/unit --no-panel --verbosity 1
+python reactor test --start-dir tests/test_example.py --no-panel --verbosity 1
 ```
 
 ## Core concepts
@@ -27,7 +29,11 @@ Each case gets an isolated event loop. The slow-callback threshold is set to one
 
 ### Discovery and execution
 
-`TestingEngine` walks the configured directory recursively, including directories without `__init__.py`, loads matching files, and filters individual methods. It creates a fresh suite for every run and executes the synchronous `unittest` runner in an executor so the caller's event loop is not blocked.
+`TestingEngine` walks the configured directory recursively, including directories without `__init__.py`, loads matching files, and filters individual methods. Relative paths resolve from the application's root. An explicit Python file selects that module alone, without walking sibling directories or applying the file glob. Paths must exist inside the application's root; traversal errors propagate instead of silently dropping a branch. A module already imported from another project is rejected to prevent executing the wrong tests.
+
+The method glob applies to short method names, including custom prefixes such as `check*`. The engine installs its matcher only while constructing cases and restores the caller's matcher afterward, including after an import failure. It creates a fresh suite for every run and executes the synchronous `unittest` runner in a worker thread with the caller's context variables, keeping the caller's event loop available.
+
+`reactor test` returns 1 and prints an explicit diagnostic when discovery or filters produce no results. Empty execution is not a successful validation. Nonempty results still distinguish passed, failed, errored and skipped tests; skips are not counted as passes.
 
 ### Structured results
 
@@ -48,6 +54,7 @@ from uuid import uuid4
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.test import TestCase
 
+
 class TestHealth(TestCase):
     async def testCache(self, cache: ICacheManager) -> None:
         key = f"tests:health:{uuid4().hex}"
@@ -63,14 +70,16 @@ class TestHealth(TestCase):
 ```python
 from orionis.test import McpTestResponse
 
-response = McpTestResponse({
-    "jsonrpc": "2.0",
-    "id": 1,
-    "result": {
-        "content": [{"type": "text", "text": "Hello, Ada"}],
-        "isError": False,
-    },
-})
+response = McpTestResponse(
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+            "content": [{"type": "text", "text": "Hello, Ada"}],
+            "isError": False,
+        },
+    }
+)
 response.assertOk()
 response.assertTextContains("Ada")
 assert response.notifications == ()
@@ -102,7 +111,7 @@ The `testing` configuration entity reads these environment variables:
 | --- | --- | --- |
 | `TESTING_VERBOSITY` | `2` | `0` silent, `1` compact, `2` detailed. |
 | `TESTING_FAIL_FAST` | `False` | Stop after the first failure or error. |
-| `TESTING_START_DIR` | `tests` | Discovery root. |
+| `TESTING_START_DIR` | `tests` | Discovery directory or explicit Python file. |
 | `TESTING_FILE_PATTERN` | `test_*.py` | File glob. |
 | `TESTING_METHOD_PATTERN` | `test*` | Method glob. |
 | `TESTING_CACHE_RESULTS` | `False` | Persist structured results as JSON. |

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -17,6 +19,7 @@ from tests.session.test_manager import (
 
 _NOW = datetime(2030, 1, 1, tzinfo=UTC)
 _LIFETIME = timedelta(minutes=120)
+
 
 def make_manager(
     *,
@@ -49,6 +52,7 @@ def make_manager(
     manager._store = store
     return manager, store
 
+
 class TestSessionRenewal(TestCase):
     """Exercise persistence, cookie and revocation rules with renewal intervals."""
 
@@ -58,13 +62,14 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            Default behavior and exclusive lifetime bounds are checked.
+            No return value.
         """
         config = SessionConfig()
         self.assertTrue(config.track_previous_url)
         self.assertEqual(config.renewal_interval, 0)
         self.assertEqual(
-            SessionConfig(lifetime=2, renewal_interval=119).renewal_interval, 119,
+            SessionConfig(lifetime=2, renewal_interval=119).renewal_interval,
+            119,
         )
         for value in (True, False, 1.5, "30", None):
             with self.subTest(value=value), self.assertRaises(TypeError):
@@ -82,7 +87,7 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            Store reads remain independent and response headers remain untouched.
+            No return value.
         """
         manager, store = make_manager()
         with patch("orionis.session.manager.datetime") as clock:
@@ -101,7 +106,7 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            Server expiration and browser Max-Age are refreshed together.
+            No return value.
         """
         manager, store = make_manager()
         with patch("orionis.session.manager.datetime") as clock:
@@ -112,7 +117,8 @@ class TestSessionRenewal(TestCase):
             await manager.save(response, session)
             self.assertEqual(len(store.written), 1)
             self.assertEqual(
-                store.written[0].expires_at, clock.now.return_value + _LIFETIME,
+                store.written[0].expires_at,
+                clock.now.return_value + _LIFETIME,
             )
             self.assertEqual(response.set_calls[0][2]["max_age"], 7200)
             await manager.save(_FakeResponse(), session)
@@ -124,7 +130,7 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            Clean restored sessions still issue a write and Set-Cookie header.
+            No return value.
         """
         manager, store = make_manager(renewal_interval=0)
         with patch("orionis.session.manager.datetime") as clock:
@@ -141,7 +147,7 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            Every state transition writes once and produces a session cookie.
+            No return value.
         """
         for operation in ("put", "flash", "new", "rotate"):
             with self.subTest(operation=operation):
@@ -173,7 +179,7 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            New flash becomes old and a subsequent request removes it.
+            No return value.
         """
         for payload in ({"_flash_new": {"message": "saved"}}, {"_flash_old": {"x": 1}}):
             manager, store = make_manager(data=payload)
@@ -189,7 +195,7 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            Nested values are never eligible for skipped persistence.
+            No return value.
         """
         for value in (["book"], {"cart": ["book"]}, (["book"],)):
             manager, store = make_manager(data={"cart": value})
@@ -214,7 +220,7 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            The interval does not convert browser session cookies to persistent ones.
+            No return value.
         """
         manager, store = make_manager(expire_on_close=True)
         with patch("orionis.session.manager.datetime") as clock:
@@ -231,7 +237,7 @@ class TestSessionRenewal(TestCase):
         Returns
         -------
         None
-            A revoked session cannot be recreated by clean, dirty or rotating requests.
+            No return value.
         """
         manager, records = make_manager()
         store = MemorySessionStore()
@@ -246,7 +252,7 @@ class TestSessionRenewal(TestCase):
             logout, clean, dirty, rotating = requests
             logout.invalidate()
             await manager.save(_FakeResponse(), logout)
-            dirty.put("later", True)
+            dirty.put("later", value=True)
             rotating.regenerate()
             for stale in (clean, dirty, rotating):
                 response = _FakeResponse()

@@ -8,16 +8,22 @@ Declare routes at boot, usually in `routes/web.py` or `routes/api.py`. The `Rout
 from orionis.http import Request, response
 from orionis.support.facades import Route
 
+
 async def show_product(request: Request):
     return response.json({"id": request.routeParam("product_id")})
+
 
 async def create_product():
     return response.json({"created": True}, status_code=201)
 
-Route.group(prefix="/catalog", routes=[
-    Route.get("/products/{product_id:int}", show_product).name("products.show"),
-    Route.post("/products", create_product).name("products.create"),
-])
+
+Route.group(
+    prefix="/catalog",
+    routes=[
+        Route.get("/products/{product_id:int}", show_product).name("products.show"),
+        Route.post("/products", create_product).name("products.create"),
+    ],
+)
 ```
 
 The read URL is `/catalog/products/42`. A group takes already registered routes; it is neither a context manager nor a decorator. Include other `RouteGroup` objects to nest prefixes. `middleware`, `without_middleware` and `public` are group options; an explicit route-level `public` setting takes precedence over an inherited value. An empty group does not configure later declarations.
@@ -42,7 +48,9 @@ An action may be a function, an invokable class or `[Controller, "method"]`. Bui
 ```python
 from orionis.auth.middleware import AuthenticateTokenMiddleware
 
-Route.get("/private/product/{product_id:int}", show_product).middleware(AuthenticateTokenMiddleware)
+Route.get("/private/product/{product_id:int}", show_product).middleware(
+    AuthenticateTokenMiddleware
+)
 ```
 
 Route names support identification and URL generation by services that consume the router.
@@ -50,6 +58,8 @@ Route names support identification and URL generation by services that consume t
 ## Conflicts, fallback and caching
 
 Static routes use direct lookup; dynamic paths are compiled and ordered by specificity. Static conflicts, ambiguous dynamic structures, incompatible names and unfinished actions fail during registration or compilation. Only one fallback is allowed, using `Route.fallback(handler)`. A method mismatch is handled separately from a missing path.
+
+An `OPTIONS` response and the `Allow` header on a `405` response list methods whose complete parameter conversion succeeds. A regex match rejected by its converter, such as an oversized integer, is not an available route. GET also permits HEAD; OPTIONS is included for recognized paths.
 
 The default GET favicon, robots and sitemap routes can be replaced by declaring the same path. Do not rely on overwriting ordinary routes. In compiled mode, keep classes and functions importable by name; lambdas and local classes are not a portable cache contract. The cache carries a version and rejects incompatible data.
 

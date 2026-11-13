@@ -1,6 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema unique constraint behavior."""
+
 from dataclasses import FrozenInstanceError
 from orionis.orm.schema.constraints.unique_constraint import UniqueConstraint
 from orionis.test import TestCase
+
 
 class TestUniqueConstraint(TestCase):
     """Verify ordered unique-column metadata and optional constraint names."""
@@ -11,7 +16,7 @@ class TestUniqueConstraint(TestCase):
         Returns
         -------
         None
-            Verify ordered fields, equality, and immutable value semantics.
+            No return value.
         """
         columns = ("tenant_id", "email")
         constraint = UniqueConstraint(columns, name="unique_email")

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import io
 import sys
@@ -6,8 +8,8 @@ from orionis.console.output.contracts.executor import IExecutor
 from orionis.console.output.executor import Executor
 from orionis.test import TestCase
 
-class TestExecutor(TestCase):
 
+class TestExecutor(TestCase):
     # ------------------------------------------------------------------ #
     #  Instantiation & interface                                         #
     # ------------------------------------------------------------------ #
@@ -56,22 +58,6 @@ class TestExecutor(TestCase):
     # ------------------------------------------------------------------ #
     # Tests for running() method                                         #
     # ------------------------------------------------------------------ #
-
-    def testRunningCallsPrint(self) -> None:
-        """Verify that running() produces console output via print.
-
-        Ensures the method delegates to the built-in print function at
-        least once for any valid program name.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        executor = Executor()
-        with patch("builtins.print") as mock_print:
-            executor.running("my-program")
-            mock_print.assert_called_once()
 
     def testRunningWithoutTime(self) -> None:
         """Verify that running() works when no time argument is provided.
@@ -159,22 +145,6 @@ class TestExecutor(TestCase):
     # Tests for done() method                                            #
     # ------------------------------------------------------------------ #
 
-    def testDoneCallsPrint(self) -> None:
-        """Verify that done() produces console output via print.
-
-        Ensures the method delegates to the built-in print function at
-        least once for any valid program name.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        executor = Executor()
-        with patch("builtins.print") as mock_print:
-            executor.done("my-program")
-            mock_print.assert_called_once()
-
     def testDoneWithoutTime(self) -> None:
         """Verify that done() works when no time argument is provided.
 
@@ -261,22 +231,6 @@ class TestExecutor(TestCase):
     # ------------------------------------------------------------------ #
     # Tests for fail() method                                            #
     # ------------------------------------------------------------------ #
-
-    def testFailCallsPrint(self) -> None:
-        """Verify that fail() produces console output via print.
-
-        Ensures the method delegates to the built-in print function at
-        least once for any valid program name.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        executor = Executor()
-        with patch("builtins.print") as mock_print:
-            executor.fail("my-program")
-            mock_print.assert_called_once()
 
     def testFailWithoutTime(self) -> None:
         """Verify that fail() works when no time argument is provided.

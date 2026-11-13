@@ -1,12 +1,12 @@
+# ruff: noqa: TC001
+# Keep dataclass fields and generated constructor annotations resolvable.
 """Snapshot the explicitly supplied options of one independent chain."""
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from orionis.mail.entities.address import Address
+from orionis.mail.entities.attachment import Attachment
 from orionis.mail.entities.envelope import Envelope
 
-if TYPE_CHECKING:
-    from orionis.mail.entities.address import Address
-    from orionis.mail.entities.attachment import Attachment
 
 @dataclass(frozen=True, slots=True)
 class MailOptions:

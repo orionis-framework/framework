@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify the abstract synchronous encryption interface."""
+
 import inspect
 from abc import ABC
 from orionis.encrypter.contracts.encrypter import IEncrypter
@@ -6,6 +10,7 @@ from orionis.test import TestCase
 
 # Methods every implementation must provide.
 _ABSTRACT_METHODS: frozenset[str] = frozenset({"decrypt", "encrypt"})
+
 
 class _ConcreteEncrypter(IEncrypter):
     """Minimal implementation used to exercise the contract structurally."""
@@ -44,7 +49,9 @@ class _ConcreteEncrypter(IEncrypter):
         """
         return ""
 
+
 class TestIEncrypterDefinition(TestCase):
+    """Check abstract construction, required methods, and instance layout."""
 
     def testIsAnAbstractBaseClass(self) -> None:
         """Derive from the abstract base class machinery.
@@ -54,7 +61,7 @@ class TestIEncrypterDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(IEncrypter, ABC))
 
@@ -66,7 +73,7 @@ class TestIEncrypterDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             IEncrypter()  # type: ignore[abstract]
@@ -80,7 +87,7 @@ class TestIEncrypterDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(IEncrypter.__dict__.get("__slots__"), ())
 
@@ -92,25 +99,31 @@ class TestIEncrypterDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(IEncrypter.__abstractmethods__, _ABSTRACT_METHODS)
 
-    def testAbstractMethodsCarryNoImplementation(self) -> None:
-        """Keep the abstract methods free of executable bodies.
-
-        Validates that no dead code hides behind the contract.
+    def testPartialImplementationsRemainAbstract(self) -> None:
+        """Reject subclasses that implement only one required operation.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in _ABSTRACT_METHODS:
-            source = inspect.getsource(getattr(IEncrypter, name))
-            self.assertNotIn("return", source)
+            with self.subTest(implemented=name):
+                partial_type = type(
+                    "PartialEncrypter",
+                    (IEncrypter,),
+                    {name: getattr(_ConcreteEncrypter, name)},
+                )
+                with self.assertRaises(TypeError):
+                    partial_type()
+
 
 class TestIEncrypterImplementations(TestCase):
+    """Verify complete implementations preserve the declared callable interface."""
 
     def testEncrypterMatchesTheContractSignatures(self) -> None:
         """Keep the parameters of the service aligned with the contract.
@@ -121,15 +134,13 @@ class TestIEncrypterImplementations(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in _ABSTRACT_METHODS:
-            expected = inspect.signature(getattr(IEncrypter, name))
-            actual = inspect.signature(getattr(Encrypter, name))
-            self.assertEqual(
-                list(expected.parameters),
-                list(actual.parameters),
-            )
+            with self.subTest(method=name):
+                expected = inspect.signature(getattr(IEncrypter, name), eval_str=True)
+                actual = inspect.signature(getattr(Encrypter, name), eval_str=True)
+                self.assertEqual(actual, expected)
 
     def testConcreteSubclassSatisfiesTheContract(self) -> None:
         """Instantiate a subclass that implements every abstract method.
@@ -140,7 +151,7 @@ class TestIEncrypterImplementations(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _ConcreteEncrypter()
         self.assertIsInstance(instance, IEncrypter)
@@ -156,6 +167,6 @@ class TestIEncrypterImplementations(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(_ConcreteEncrypter(), "__dict__"))

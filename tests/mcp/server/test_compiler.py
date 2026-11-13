@@ -1,3 +1,6 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Runtime schema and handler compilation require these concrete annotations.
 from dataclasses import FrozenInstanceError
 import msgspec
 from orionis.mcp.context import McpRequest
@@ -13,19 +16,19 @@ from orionis.mcp.server.compiler import (
 from orionis.mcp.server.extension import McpExtension
 from orionis.mcp.server.primitives import Prompt, Resource, Server, Tool
 from orionis.schemas import Schema
-from orionis.schemas.constraints import MinLength
+from orionis.schemas.constraints import MinLength, StrongPassword
 from orionis.schemas.exceptions.validation import ValidationException
 from orionis.schemas.fields import Field
-from orionis.schemas.metadata import Description, ExtraJsonSchema
+from orionis.schemas.metadata import Coerce, Description, ExtraJsonSchema
 from orionis.test import TestCase
 
-# ruff: noqa: TC001
 
 class WeatherInput(Schema):
     """Reuse Orionis documentation, constraints and field metadata."""
 
     location: Field[str, MinLength(2), Description("City name")]
     region: Field[str, ExtraJsonSchema({"x-mcp-header": "Region"})] = "us"
+
 
 class CurrentWeatherTool(Tool[WeatherInput, list[int]]):
     """Infer typed input and scalar-array output from generic parameters."""
@@ -47,6 +50,7 @@ class CurrentWeatherTool(Tool[WeatherInput, list[int]]):
         """
         return [len(payload.location)]
 
+
 class StatusResource(Resource):
     """A literal URI independent of any filesystem."""
 
@@ -61,6 +65,7 @@ class StatusResource(Resource):
             Return the result produced by ``handle``.
         """
         return "ready"
+
 
 class ExplainPrompt(Prompt):
     """A string argument safe to bind by its explicitly declared name."""
@@ -97,6 +102,7 @@ class ExplainPrompt(Prompt):
         """
         return [request.method]
 
+
 class DemoServer(Server):
     """A complete minimal declaration."""
 
@@ -104,6 +110,41 @@ class DemoServer(Server):
     tools = (CurrentWeatherTool,)
     resources = (StatusResource,)
     prompts = (ExplainPrompt,)
+
+
+class _ValidatedValue(Schema):
+    """Require marked conversion and a framework validation rule."""
+
+    count: Field[int, Coerce()]
+    password: Field[str, StrongPassword()]
+
+
+class _WrappedInput(msgspec.Struct):
+    """Carry framework schemas through an ordinary Struct input."""
+
+    items: list[_ValidatedValue]
+
+
+class _ValidatedTool(Tool[_WrappedInput]):
+    """Declare a reusable conversion fixture without invoking services."""
+
+    name = "validated"
+
+    def handle(self, payload: _WrappedInput) -> object:
+        """Return the already validated input.
+
+        Parameters
+        ----------
+        payload : _WrappedInput
+            Typed input owned by this invocation.
+
+        Returns
+        -------
+        object
+            The input wrapper.
+        """
+        return payload
+
 
 class TestCompiledServer(TestCase):
     """Compile definitions without resolving any application service."""
@@ -128,7 +169,7 @@ class TestCompiledServer(TestCase):
             metadata["inputSchema"]["properties"]["location"]["description"],
             "City name",
         )
-        self.assertEqual(metadata["annotations"]["readOnlyHint"], True) # NOSONAR
+        self.assertEqual(metadata["annotations"]["readOnlyHint"], True)  # NOSONAR
         self.assertEqual(tool.mirrored_headers[0].name, "mcp-param-region")
         self.assertEqual(metadata["outputSchema"]["type"], "array")
         self.assertIn("completions", compiled.capabilities)
@@ -151,6 +192,79 @@ class TestCompiledServer(TestCase):
         with self.assertRaises(msgspec.ValidationError):
             await validate_output(tool, ["wrong"])
         self.assertEqual(await validate_output(tool, [1, 2]), [1, 2])
+
+    async def testPlainStructInputsApplyNestedCoercionAndRules(self) -> None:
+        """Validate schemas nested inside native Struct tool inputs.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        server = type(
+            "WrappedServer",
+            (Server,),
+            {"name": "Wrapped", "tools": (_ValidatedTool,)},
+        )
+        primitive = compile_server(server).tools["validated"]
+        source = {"items": [{"count": "3", "password": "CorrectHorse9!Battery"}]}
+        with self.subTest(check="coercion"):
+            result = await validate_payload(primitive, source)
+            self.assertIsInstance(result, _WrappedInput)
+            self.assertEqual(result.items[0].count, 3)
+            self.assertEqual(source["items"][0]["count"], "3")
+        with self.subTest(check="custom rule"), self.assertRaises(ValidationException):
+            await validate_payload(
+                primitive,
+                {"items": [{"count": 3, "password": "weak"}]},
+            )
+
+    async def testCompositeOutputsCannotBypassSchemaCoercionOrRules(self) -> None:
+        """Enforce schema contracts through nullable and collection outputs.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        valid = {"count": "3", "password": "CorrectHorse9!Battery"}
+        invalid = {"count": 3, "password": "weak"}
+        expected = _ValidatedValue(count=3, password=valid["password"])
+        for annotation, value, bad_value, converted in (
+            (_ValidatedValue | None, valid, invalid, expected),
+            (list[_ValidatedValue], [valid], [invalid], [expected]),
+            (
+                dict[str, _ValidatedValue],
+                {"first": valid},
+                {"first": invalid},
+                {"first": expected},
+            ),
+            (
+                _WrappedInput,
+                {"items": [valid]},
+                {"items": [invalid]},
+                _WrappedInput(items=[expected]),
+            ),
+        ):
+            with self.subTest(annotation=annotation):
+                tool = type("OutputTool", (_ValidatedTool,), {"output": annotation})
+                server = type(
+                    "OutputServer",
+                    (Server,),
+                    {"name": "Output", "tools": (tool,)},
+                )
+                primitive = compile_server(server).tools["validated"]
+                with self.subTest(check="coercion"):
+                    self.assertEqual(
+                        await validate_output(primitive, value),
+                        converted,
+                    )
+                with (
+                    self.subTest(check="custom rule"),
+                    self.assertRaises(ValidationException),
+                ):
+                    await validate_output(primitive, bad_value)
+        self.assertEqual(valid["count"], "3")
 
     def testImmutableSnapshot(self):
         """Compiled metadata and registries cannot be mutated between callers.
@@ -426,6 +540,30 @@ class TestCompiledServer(TestCase):
                 "org.example/test": {"view": "compact"},
             },
         )
+
+    def testStaticMetadataRejectsNonfiniteValuesBeforeCompilation(self) -> None:
+        """Reject static metadata that JSON encoding would silently turn into null.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for value in (float("nan"), float("inf"), float("-inf")):
+            tool = type(
+                "NonfiniteTool",
+                (CurrentWeatherTool,),
+                {"meta": {"example.org/value": {"nested": [value]}}},
+            )
+            server = type("NonfiniteServer", (DemoServer,), {"tools": (tool,)})
+            with (
+                self.subTest(value=value),
+                self.assertRaisesRegex(
+                    ValueError,
+                    "finite JSON",
+                ),
+            ):
+                compile_server(server)
 
     def testInheritedGenericAndCachePolicy(self):
         """A subclass keeps its generic payload and inherits its server's cache hint.

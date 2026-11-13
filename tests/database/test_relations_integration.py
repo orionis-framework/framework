@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 from unittest.mock import patch
@@ -16,10 +18,11 @@ if TYPE_CHECKING:
         HasManyRelation,
     )
 
+
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Return the requested database configuration.
 
         Parameters
@@ -32,6 +35,8 @@ class _StubApp:
         dict
             Value produced by the helper.
         """
+        if key != "database":
+            raise KeyError(key)
         return {
             "default": "sqlite",
             "connections": {
@@ -42,6 +47,7 @@ class _StubApp:
                 },
             },
         }
+
 
 def _pivot_table(name: str, first: str, second: str) -> TableDefinition:
     """Build a bare pivot table with two integer columns.
@@ -65,13 +71,14 @@ def _pivot_table(name: str, first: str, second: str) -> TableDefinition:
         column.name = key
     return TableDefinition(name=name, columns=columns)
 
+
 class Team(Model):
     id = Integer().primary().autoIncrement()
     name = String()
     timestamps = False
 
     def players(self) -> HasManyRelation[Player]:
-        """Every player on this team.
+        """Return every player on this team.
 
         Returns
         -------
@@ -81,7 +88,7 @@ class Team(Model):
         return self.hasMany(Player)
 
     def members(self) -> BelongsToManyRelation[Member]:
-        """Every member linked to this team through the pivot table.
+        """Return every member linked to this team through the pivot table.
 
         Returns
         -------
@@ -89,6 +96,7 @@ class Team(Model):
             Value produced by the helper.
         """
         return self.belongsToMany(Member)
+
 
 class Player(Model):
     id = Integer().primary().autoIncrement()
@@ -108,13 +116,14 @@ class Player(Model):
         """
         return self.belongsTo(Team)
 
+
 class Member(Model):
     id = Integer().primary().autoIncrement()
     name = String()
     timestamps = False
 
     def teams(self) -> BelongsToManyRelation[Team]:
-        """Every team this member is linked to through the pivot table.
+        """Return every team linked to this member through the pivot table.
 
         Returns
         -------
@@ -122,6 +131,7 @@ class Member(Model):
             Value produced by the helper.
         """
         return self.belongsToMany(Team)
+
 
 class TestRelationsWithTransactions(TestCase):
     """
@@ -139,13 +149,14 @@ class TestRelationsWithTransactions(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._manager = ConnectionManager(_StubApp())
-        ConnectionResolver.setManager(self._manager)
-        facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
-        facade.start()
-        self.addCleanup(facade.stop)
+        self.enterContext(patch.object(ConnectionResolver, "_manager", self._manager))
+        self.addAsyncCleanup(self._manager.disconnect)
+        self.enterContext(
+            patch.object(DB, "_pinned_instance", QueryBuilder(self._manager)),
+        )
         self._connection = self._manager.connection()
         await self._connection.createTable(Team.__meta__.table)
         await self._connection.createTable(Player.__meta__.table)
@@ -153,17 +164,6 @@ class TestRelationsWithTransactions(TestCase):
         await self._connection.createTable(
             _pivot_table("member_team", "member_id", "team_id"),
         )
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
 
     async def testHasManyCreateRollsBackWithTransaction(self) -> None:
         """Roll back a related row created inside a failed transaction.
@@ -174,12 +174,8 @@ class TestRelationsWithTransactions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised by this helper to exercise the failure path.
         """
         team = await Team.create({"name": "Reds"})
 
@@ -200,7 +196,7 @@ class TestRelationsWithTransactions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         team = await Team.create({"name": "Blues"})
 
@@ -219,12 +215,8 @@ class TestRelationsWithTransactions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised by this helper to exercise the failure path.
         """
         member = await Member.create({"name": "Ana"})
         team = await Team.create({"name": "Reds"})
@@ -246,7 +238,7 @@ class TestRelationsWithTransactions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         member = await Member.create({"name": "Bob"})
         team = await Team.create({"name": "Blues"})
@@ -266,12 +258,8 @@ class TestRelationsWithTransactions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised by this helper to exercise the failure path.
         """
         team = await Team.create({"name": "Reds"})
 
@@ -285,6 +273,7 @@ class TestRelationsWithTransactions(TestCase):
 
         players = await team.players().get()
         self.assertEqual([p.name for p in players], ["Kept"])
+
 
 class TestRelationsWithDbTable(TestCase):
     """
@@ -302,31 +291,21 @@ class TestRelationsWithDbTable(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._manager = ConnectionManager(_StubApp())
-        ConnectionResolver.setManager(self._manager)
+        self.enterContext(patch.object(ConnectionResolver, "_manager", self._manager))
+        self.addAsyncCleanup(self._manager.disconnect)
         connection = self._manager.connection()
-        facade = patch.object(DB, "_pinned_instance", QueryBuilder(self._manager))
-        facade.start()
-        self.addCleanup(facade.stop)
+        self.enterContext(
+            patch.object(DB, "_pinned_instance", QueryBuilder(self._manager)),
+        )
         await connection.createTable(Team.__meta__.table)
         await connection.createTable(Player.__meta__.table)
         await connection.createTable(Member.__meta__.table)
         await connection.createTable(
             _pivot_table("member_team", "member_id", "team_id"),
         )
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
 
     async def testAttachIsVisibleThroughDbTable(self) -> None:
         """Read pivot rows inserted by ``attach()`` directly with ``DB.table()``.
@@ -337,7 +316,7 @@ class TestRelationsWithDbTable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         member = await Member.create({"name": "Ana"})
         team = await Team.create({"name": "Reds"})
@@ -358,7 +337,7 @@ class TestRelationsWithDbTable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         member = await Member.create({"name": "Bob"})
         team = await Team.create({"name": "Blues"})
@@ -378,7 +357,7 @@ class TestRelationsWithDbTable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         member = await Member.create({"name": "Ana"})
         team = await Team.create({"name": "Reds"})
@@ -398,7 +377,7 @@ class TestRelationsWithDbTable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         team = await Team.create({"name": "Reds"})
         await Player.create({"name": "Ana", "team_id": team.id})

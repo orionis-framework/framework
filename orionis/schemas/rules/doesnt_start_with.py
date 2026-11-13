@@ -1,11 +1,12 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string does not start with any of the given prefixes."""
 
 from orionis.schemas.rule import Rule
 
+
 class DoesntStartWith(Rule):
     """Ensure a string does not start with any of the given prefixes."""
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_prefixes",)
     """Declare the instance attribute slots reserved by this class."""
@@ -32,7 +33,7 @@ class DoesntStartWith(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------

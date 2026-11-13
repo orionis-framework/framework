@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Self
 from orionis.http.adapters.request.rsgi import RSGITransportAdapter
 from orionis.test import TestCase
@@ -7,6 +9,7 @@ from tests.http.test_kernel import (
     _StubRsgiScope,
     boot_kernel,
 )
+
 
 class TestRsgiHeaders(TestCase):
     """Preserve header semantics through the RSGI normalization path."""

@@ -3,6 +3,7 @@
 from orionis.container.facades.facade import Facade
 from orionis.localization.contracts.translator import ITranslator
 
+
 class Lang(Facade):
     """Resolve the lang service through the application facade."""
 

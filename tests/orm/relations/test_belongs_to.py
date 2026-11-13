@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import tests.orm.relations.test_mixin as relation_fixtures
+
 
 class TestBelongsToRelation(relation_fixtures._RelationsTestCase):
     async def testAwaitShortcutReturnsOwner(self) -> None:
@@ -10,7 +13,7 @@ class TestBelongsToRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         book = await relation_fixtures.Book.create(
@@ -29,7 +32,7 @@ class TestBelongsToRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create(
             {"title": "Orphan", "author_id": None},
@@ -45,7 +48,7 @@ class TestBelongsToRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create(
             {"title": "Dangling", "author_id": 999},
@@ -61,7 +64,7 @@ class TestBelongsToRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One", "author_id": 1})
         relation = book.author()
@@ -76,7 +79,7 @@ class TestBelongsToRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         writer = await relation_fixtures.Writer.create({"name": "Mark"})
         article = await relation_fixtures.Article.create(

@@ -1,9 +1,12 @@
+# ruff: noqa: TC001
+# Keep constructor and driver annotations available for runtime inspection.
 """Persist queued jobs using atomic conditional updates and expiring leases."""
 
 import asyncio
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from uuid import uuid4
 import msgspec
+from orionis.database.contracts.connection import IConnection
 from orionis.orm.query.expressions import (
     AggregateClause,
     AggregateFunction,
@@ -17,19 +20,17 @@ from orionis.orm.query.expressions import (
 )
 from orionis.queues._database import _DatabaseStorage
 from orionis.queues.contracts.driver import IQueueDriver
+from orionis.queues.entities.envelope import JobEnvelope
 from orionis.queues.entities.reserved_job import ReservedJob
 from orionis.queues.exceptions import QueueStorageError
 from orionis.queues.functions import current_time, validate_name, validate_seconds
 from orionis.queues.schema import build_jobs_table
 
-if TYPE_CHECKING:
-    from orionis.database.contracts.connection import IConnection
-    from orionis.queues.entities.envelope import JobEnvelope
-
 _ENCODER = msgspec.json.Encoder()
 """Encoder used by ``database``."""
 _CLAIM_ROUNDS = 100
 """Claim rounds value used by ``database``."""
+
 
 def eligible_clauses(queue: str, now: float) -> list[WhereClause]:
     """

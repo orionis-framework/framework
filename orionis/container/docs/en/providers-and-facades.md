@@ -33,7 +33,7 @@ await container.invoke(function, *args, **kwargs)
 await container.call(instance, "method", *args, **kwargs)
 ```
 
-Both inject missing annotated parameters and await async results. `invoke` rejects classes; `call` distinguishes a missing attribute from a non-callable one.
+Both inject missing annotated parameters and await functions declared with `async def`. Results of synchronous callables are returned unchanged. `invoke` rejects classes; `call` distinguishes a missing attribute from a non-callable one.
 
 #### Scopes
 
@@ -42,11 +42,11 @@ async with container.beginScope() as scope:
     service = await container.make(ScopedContract)
 ```
 
-`getCurrentScope()` returns the active `ScopeManager` or `None`. A scope may be entered only once. `scope.set`, `get`, and `resolve` support explicitly stored values or coroutines; `resolve` raises `KeyError` when absent.
+`getCurrentScope()` returns the active `ScopeManager` or `None`. A scope may be entered only once. `scope.set`, `get`, and `resolve` support explicitly stored values or coroutines; `resolve` raises `KeyError` for an absent key or a resolved value of `None`.
 
 ### `ServiceProvider` and `DeferrableProvider`
 
-Subclass `ServiceProvider`, implement synchronous `register`, and optionally async `boot`. Registration is for bindings; boot is for work that requires all providers to exist. A deferrable provider implements `provides()` to list contracts that trigger lazy registration/boot.
+Subclass `ServiceProvider` and override synchronous `register` for bindings or async `boot` for initialization. Both base hooks are optional no-ops. Boot is for work that requires all providers to exist. A deferrable provider implements `provides()` to list contracts that trigger lazy registration/boot.
 
 ### `Facade` and `ScopedFacade`
 
@@ -109,19 +109,23 @@ from abc import ABC, abstractmethod
 from orionis.container.providers import ServiceProvider
 from orionis.container.facades import Facade
 
+
 class ICatalog(ABC):
     @abstractmethod
     def names(self) -> list[str]:
         raise NotImplementedError
 
+
 class MemoryCatalog(ICatalog):
     def names(self) -> list[str]:
         return ["book", "lamp"]
+
 
 class CatalogFacade(Facade):
     @classmethod
     def getFacadeAccessor(cls) -> type:
         return ICatalog
+
 
 class CatalogProvider(ServiceProvider):
     def register(self) -> None:

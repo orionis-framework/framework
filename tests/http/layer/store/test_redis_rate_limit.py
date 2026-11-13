@@ -1,9 +1,12 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from redis.exceptions import ConnectionError as RedisConnectionError
 from redis.exceptions import TimeoutError as RedisTimeoutError
 from orionis.foundation.config.http import HTTPRateLimit, Redis
 from orionis.http.layer.store.redis_rate_limit import RedisRateLimitStore
 from orionis.test import TestCase
+
 
 class _RedisTransport:
     """Record script calls and simulate storage failure or cancellation."""
@@ -59,6 +62,7 @@ class _RedisTransport:
         """
         self.closed = True
 
+
 class TestRedisRateLimitStore(TestCase):
     """Verify command boundaries and resource ownership using explicit doubles."""
 
@@ -73,7 +77,10 @@ class TestRedisRateLimitStore(TestCase):
         credential = "test@credential:/?#%"
         config = HTTPRateLimit(
             rate_limit_redis=Redis(
-                endpoint="::1", port=6381, db=4, password=credential,
+                endpoint="::1",
+                port=6381,
+                db=4,
+                password=credential,
             ),
             rate_limit_redis_timeout_seconds=2,
         )

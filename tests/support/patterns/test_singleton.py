@@ -1,9 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import gc
 import threading
-import time
 import weakref
+from concurrent.futures import ThreadPoolExecutor
 from orionis.support.patterns.singleton.meta import Singleton
 from orionis.test import TestCase
 
@@ -11,6 +13,7 @@ from orionis.test import TestCase
 # Fixture helpers - each test that needs a *fresh* singleton must define its
 # own class so there is no shared state between tests.
 # ---------------------------------------------------------------------------
+
 
 class _SimpleSingleton(metaclass=Singleton):
     """Minimal singleton for basic identity tests."""
@@ -21,9 +24,10 @@ class _SimpleSingleton(metaclass=Singleton):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.created = True
+
 
 class _ArgedSingleton(metaclass=Singleton):
     """Singleton whose constructor accepts arguments."""
@@ -39,16 +43,17 @@ class _ArgedSingleton(metaclass=Singleton):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.name = name
+
 
 # ---------------------------------------------------------------------------
 # Test class
 # ---------------------------------------------------------------------------
 
-class TestSingletonMeta(TestCase):
 
+class TestSingletonMeta(TestCase):
     # ------------------------------------------------ basic identity (sync)
 
     def testCallReturnsSameInstance(self) -> None:
@@ -60,10 +65,14 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        a = _SimpleSingleton()
-        b = _SimpleSingleton()
+
+        class LocalSingleton(_SimpleSingleton):
+            """Isolate the singleton cache for this scenario."""
+
+        a = LocalSingleton()
+        b = LocalSingleton()
         self.assertIs(a, b)
 
     def testSingletonInstanceIsInitialised(self) -> None:
@@ -75,7 +84,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         obj = _SimpleSingleton()
         self.assertTrue(obj.created)
@@ -89,7 +98,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instances = [_SimpleSingleton() for _ in range(20)]
         first = instances[0]
@@ -106,10 +115,14 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        first = _ArgedSingleton("alpha")
-        second = _ArgedSingleton("beta")
+
+        class LocalSingleton(_ArgedSingleton):
+            """Isolate constructor arguments from other scenarios."""
+
+        first = LocalSingleton("alpha")
+        second = LocalSingleton("beta")
         self.assertIs(first, second)
         self.assertEqual(first.name, "alpha")
 
@@ -123,36 +136,24 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _ThreadedSingleton(metaclass=Singleton):
             pass
 
-        instances: list[object] = []
-        lock = threading.Lock()
+        start = threading.Barrier(8, timeout=5)
 
-        def _create() -> None:
-            """Create and record one singleton instance.
+        def create() -> object:
+            """Start construction together and propagate worker errors."""
+            start.wait()
+            return _ThreadedSingleton()
 
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            obj = _ThreadedSingleton()
-            with lock:
-                instances.append(obj)
-
-        threads = [threading.Thread(target=_create) for _ in range(50)]
-        for t in threads:
-            t.start()
-        for t in threads:
-            t.join()
-
-        first = instances[0]
-        for inst in instances[1:]:
-            self.assertIs(inst, first)
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            futures = [pool.submit(create) for _ in range(8)]
+            instances = [future.result(timeout=5) for future in futures]
+        for instance in instances[1:]:
+            self.assertIs(instance, instances[0])
 
     # ------------------------------------------------ async path (__acall__)
 
@@ -165,7 +166,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _AsyncSingleton(metaclass=Singleton):
@@ -184,7 +185,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _MixedSingleton(metaclass=Singleton):
@@ -203,7 +204,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _AsyncFirstSingleton(metaclass=Singleton):
@@ -216,13 +217,13 @@ class TestSingletonMeta(TestCase):
     async def testAcallIsConcurrentlySafe(self) -> None:
         """Return the same instance from concurrent async tasks.
 
-        Validates that the async lock inside ``__acall__`` prevents
+        Validates that the shared construction lock inside ``__acall__`` prevents
         duplicate instance creation when many coroutines race.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _ConcurrentSingleton(metaclass=Singleton):
@@ -249,55 +250,45 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        start = threading.Barrier(2)
-        instances: list[object] = []
+        entered = threading.Event()
+        release = threading.Event()
+        second_started = threading.Event()
         construction_count = 0
 
-        class _MixedConcurrentSingleton(metaclass=Singleton):
-            def __init__(self) -> None:
-                """Initialize the support test double.
+        class MixedConcurrentSingleton(metaclass=Singleton):
+            """Hold first construction while another entry point requests it."""
 
-                Returns
-                -------
-                None
-                    Completes the operation described above.
-                """
+            def __init__(self) -> None:
+                """Count construction and wait for explicit release."""
                 nonlocal construction_count
                 construction_count += 1
-                time.sleep(0.02)
+                entered.set()
+                if not release.wait(5):
+                    message = "Singleton fixture was not released."
+                    raise TimeoutError(message)
 
-        def _create_async() -> None:
-            """Create the singleton through the async entry point.
+        def create_async() -> object:
+            """Request the shared singleton from a worker-owned event loop."""
 
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
+            async def resolve() -> object:
+                """Signal the second request before entering construction."""
+                second_started.set()
+                return await MixedConcurrentSingleton.__acall__()
 
-            async def _resolve() -> object:
-                """Wait for the concurrent singleton construction to finish.
+            return asyncio.run(resolve())
 
-                Returns
-                -------
-                object
-                    Value produced by the helper.
-                """
-                start.wait()
-                return await _MixedConcurrentSingleton.__acall__()
-
-            instances.append(asyncio.run(_resolve()))
-
-        async_thread = threading.Thread(target=_create_async)
-        async_thread.start()
-        start.wait()
-        instances.append(_MixedConcurrentSingleton())
-        async_thread.join()
-
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            first = pool.submit(MixedConcurrentSingleton)
+            try:
+                self.assertTrue(entered.wait(5))
+                second = pool.submit(create_async)
+                self.assertTrue(second_started.wait(5))
+            finally:
+                release.set()
+            self.assertIs(first.result(timeout=5), second.result(timeout=5))
         self.assertEqual(construction_count, 1)
-        self.assertIs(instances[0], instances[1])
 
     # ------------------------------------------------ per-class isolation
 
@@ -311,7 +302,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _SingletonX(metaclass=Singleton):
@@ -335,7 +326,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         obj = _SimpleSingleton()
         self.assertIsInstance(obj, _SimpleSingleton)
@@ -351,7 +342,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(type(_SimpleSingleton), Singleton)
 
@@ -364,7 +355,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         # Trigger creation so the attribute is populated
         obj = _SimpleSingleton()
@@ -382,7 +373,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Parent(metaclass=Singleton):
@@ -403,7 +394,7 @@ class TestSingletonMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         singleton_class = Singleton("_TemporarySingleton", (), {})
         class_ref = weakref.ref(singleton_class)

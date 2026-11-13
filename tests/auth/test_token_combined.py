@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import asyncio
 from typing import TYPE_CHECKING, Any, Self
 from unittest.mock import patch
@@ -14,6 +17,7 @@ if TYPE_CHECKING:
     from orionis.database.threaded.connection import ThreadedConnection
     from orionis.database.threaded.result import ThreadedResult
 
+
 class TestCombinedTokenLookup(_TokenCase):
     """Keep late revocation checks while reducing native lookup round trips."""
 
@@ -24,7 +28,7 @@ class TestCombinedTokenLookup(_TokenCase):
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         await super().asyncSetUp()
         await self.connection.createTable(accounts_table())
@@ -47,7 +51,7 @@ class TestCombinedTokenLookup(_TokenCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         issued = await self.repository.create(self.owner, "test", abilities=["read"])
         statements = []
@@ -101,7 +105,7 @@ class TestCombinedTokenLookup(_TokenCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         issued = await self.repository.create(self.owner, "test")
         statements = []
@@ -154,7 +158,7 @@ class TestCombinedTokenLookup(_TokenCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         issued = await self.repository.create(self.owner, "test")
         entered, released = asyncio.Event(), asyncio.Event()
@@ -176,7 +180,7 @@ class TestCombinedTokenLookup(_TokenCase):
             Returns
             -------
             None
-                Complete the operation without returning a value.
+                No return value.
             """
             entered.set()
             await released.wait()
@@ -191,7 +195,11 @@ class TestCombinedTokenLookup(_TokenCase):
                 await self.repository.revoke(issued.access_token.id)
             finally:
                 released.set()
-            self.assertIsNone(await resolving)
+                await asyncio.wait_for(
+                    asyncio.gather(resolving, return_exceptions=True),
+                    5,
+                )
+            self.assertIsNone(resolving.result())
 
     async def testMalformedOwnerKeysAreRejectedWithoutDatabaseCastErrors(
         self: Self,
@@ -202,7 +210,7 @@ class TestCombinedTokenLookup(_TokenCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         issued = await self.repository.create(self.owner, "test")
         for value in ("bad", "1--2", "9223372036854775808", "-9223372036854775809", ""):
@@ -222,7 +230,7 @@ class TestCombinedTokenLookup(_TokenCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         for identifier in (-9223372036854775808, 0, 9223372036854775807):
             await self.db.table("accounts").insert(
@@ -242,7 +250,7 @@ class TestCombinedTokenLookup(_TokenCase):
         with patch.dict(
             Account.__meta__.global_scopes,
             {
-                "active_only": lambda query: query.where("active", True),
+                "active_only": lambda query: query.where({"active": True}),
             },
         ):
             self.assertIsNone(
@@ -256,7 +264,7 @@ class TestCombinedTokenLookup(_TokenCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         from types import SimpleNamespace
 

@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.app import App, Cipher, Environments
 
+
 @dataclass(frozen=True, kw_only=True)
 class BootstrapApp(App):
-
     # ----------------------------------------------------------------------------------
     # name : str, optional
     # --- The name of the application. Defaults to the value of the 'APP_NAME'
@@ -72,10 +72,10 @@ class BootstrapApp(App):
     # ----------------------------------------------------------------------------------
     # cipher : str | Cipher, optional
     # --- The cipher used for encryption. Defaults to the value of the 'APP_CIPHER'
-    # --- environment variable or Cipher.AES_256_CBC.
+    # --- environment variable or Cipher.AES_256_GCM.
     # ----------------------------------------------------------------------------------
     cipher: str | Cipher = field(
-        default_factory=lambda: Env.get("APP_CIPHER", Cipher.AES_256_CBC),
+        default_factory=lambda: Env.get("APP_CIPHER", Cipher.AES_256_GCM),
     )
 
     # ----------------------------------------------------------------------------------

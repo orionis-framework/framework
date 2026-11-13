@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import tempfile
 from pathlib import Path
 from types import ModuleType
 from unittest.mock import patch
+from sqlalchemy import event
 from orionis.container.container import Container
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.seeders.events import SeederEvents
@@ -11,6 +14,7 @@ from orionis.database.seeders.seeder import Seeder
 from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.resolver import ConnectionResolver
 from orionis.test import TestCase
+
 
 class _StubApp:
     """Provide isolated database configuration to the runner."""
@@ -28,7 +32,7 @@ class _StubApp:
         Returns
         -------
         None
-            Initialize the app paths, configuration, and container.
+            No return value.
         """
 
         class _IsolatedContainer(Container):
@@ -64,11 +68,11 @@ class _StubApp:
         Returns
         -------
         None
-            The dependency is registered with the test container.
+            No return value.
         """
         self._container.instance(None, dependency)
 
-    def path(self, key: str) -> Path:  # noqa: ARG002
+    def path(self, key: str) -> Path:
         """Return the seeder directory for discovery.
 
         Parameters
@@ -81,9 +85,11 @@ class _StubApp:
         Path
             Directory used by the runner.
         """
+        if key != "database_seeders":
+            raise KeyError(key)
         return self.basePath / "database" / "seeders"
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Return two file-backed SQLite connections.
 
         Parameters
@@ -96,6 +102,8 @@ class _StubApp:
         dict
             Database configuration.
         """
+        if key != "database":
+            raise KeyError(key)
         return {
             "default": "sqlite",
             "connections": {
@@ -112,6 +120,7 @@ class _StubApp:
             },
         }
 
+
 class _Alpha(Seeder):
     """Insert one application record."""
 
@@ -123,13 +132,14 @@ class _Alpha(Seeder):
         Returns
         -------
         None
-            The row has been inserted.
+            No return value.
         """
         type(self).calls += 1
         await ConnectionResolver.connection().execute(
             "INSERT INTO entries (label) VALUES (:label)",
             {"label": "alpha"},
         )
+
 
 class _Beta(Seeder):
     """Insert a second application record."""
@@ -140,12 +150,13 @@ class _Beta(Seeder):
         Returns
         -------
         None
-            The row has been inserted.
+            No return value.
         """
         await ConnectionResolver.connection().execute(
             "INSERT INTO entries (label) VALUES (:label)",
             {"label": "beta"},
         )
+
 
 class _Flaky(Seeder):
     """Write data and fail until explicitly repaired by the test."""
@@ -158,17 +169,12 @@ class _Flaky(Seeder):
         Returns
         -------
         None
-            The row has been inserted on success.
+            No return value.
 
         Raises
         ------
         RuntimeError
             If the test keeps the seeder in its failing state.
-
-        Returns
-        -------
-        None
-            Replace the runner's cached mapping in persisted-name order.
         """
         await ConnectionResolver.connection().execute(
             "INSERT INTO entries (label) VALUES (:label)",
@@ -178,25 +184,30 @@ class _Flaky(Seeder):
             error_msg = "seeder failed"
             raise RuntimeError(error_msg)
 
+
 class _Slow(Seeder):
     """Hold a transaction open while a second runner competes."""
 
     calls = 0
+    entered: asyncio.Event
+    release: asyncio.Event
 
     async def run(self) -> None:
-        """Insert once after a short overlap window.
+        """Insert once after the contender attempts the SQLite write transaction.
 
         Returns
         -------
         None
-            The row has been inserted.
+            No return value.
         """
         type(self).calls += 1
-        await asyncio.sleep(0.15)
+        type(self).entered.set()
+        await type(self).release.wait()
         await ConnectionResolver.connection().execute(
             "INSERT INTO entries (label) VALUES (:label)",
             {"label": "slow"},
         )
+
 
 class _NestedTransaction(Seeder):
     """Use the public query builder transaction in a selected seeder."""
@@ -209,11 +220,12 @@ class _NestedTransaction(Seeder):
         Returns
         -------
         None
-            The row has been inserted.
+            No return value.
         """
         db = QueryBuilder(type(self).manager)
         async with db.transaction():
             await db.table("entries").insert({"label": "nested"})
+
 
 class _SeedLabel:
     """Value supplied by the test application container."""
@@ -231,9 +243,10 @@ class _SeedLabel:
         Returns
         -------
         None
-            Store the injected label.
+            No return value.
         """
         self.value = value
+
 
 class _Injected(Seeder):
     """Insert a record using a required constructor dependency."""
@@ -253,7 +266,7 @@ class _Injected(Seeder):
         Returns
         -------
         None
-            Store the label and record the active connection.
+            No return value.
         """
         self._label = label
         type(self).constructor_connection = ConnectionResolver.connection()
@@ -264,12 +277,13 @@ class _Injected(Seeder):
         Returns
         -------
         None
-            The label has been inserted.
+            No return value.
         """
         await ConnectionResolver.connection().execute(
             "INSERT INTO entries (label) VALUES (:label)",
             {"label": self._label.value},
         )
+
 
 class TestSeederRunner(TestCase):
     """Exercise seeder tracking against a real file-backed SQLite store."""
@@ -280,34 +294,26 @@ class TestSeederRunner(TestCase):
         Returns
         -------
         None
-            Test connections are ready.
+            No return value.
         """
         self._workspace = tempfile.TemporaryDirectory()
+        self.addCleanup(self._workspace.cleanup)
         self._app = _StubApp(str(Path(self._workspace.name) / "seeders.sqlite"))
         self._manager = ConnectionManager(self._app)
-        ConnectionResolver.setManager(self._manager)
+        self.enterContext(patch.object(ConnectionResolver, "_manager", self._manager))
+        self.addAsyncCleanup(self._manager.disconnect)
         self._runner = SeederRunner(self._app, self._manager)
-        _Alpha.calls = 0
-        _Flaky.fail = True
-        _Slow.calls = 0
-        _Injected.constructor_connection = None
-        _NestedTransaction.manager = self._manager
+        self.enterContext(patch.object(_Alpha, "calls", 0))
+        self.enterContext(patch.object(_Flaky, "fail", new=True))
+        self.enterContext(patch.object(_Slow, "calls", 0))
+        self.enterContext(patch.object(_Injected, "constructor_connection", None))
+        self.enterContext(
+            patch.object(_NestedTransaction, "manager", self._manager, create=True),
+        )
         for name in ("sqlite", "secondary"):
             await self._manager.connection(name).statement(
                 "CREATE TABLE entries (id INTEGER PRIMARY KEY, label VARCHAR(50))",
             )
-
-    async def asyncTearDown(self) -> None:
-        """Close connections and delete temporary databases.
-
-        Returns
-        -------
-        None
-            Resources have been released.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
-        self._workspace.cleanup()
 
     def useSeeders(self, seeders: dict[str, type[Seeder]]) -> None:
         """Replace filesystem discovery with a fixed mapping.
@@ -317,9 +323,11 @@ class TestSeederRunner(TestCase):
         seeders : dict
             Classes keyed by persisted names.
         """
-        self._runner._SeederRunner__discovered_cache = dict(sorted(
-            seeders.items(),
-        ))
+        self._runner._SeederRunner__discovered_cache = dict(
+            sorted(
+                seeders.items(),
+            ),
+        )
 
     async def entries(self, connection: str = "sqlite") -> list[str]:
         """Read inserted application rows from a chosen connection.
@@ -362,7 +370,7 @@ class TestSeederRunner(TestCase):
         Returns
         -------
         None
-            Verify the row and tracking record are written only once.
+            No return value.
         """
         self.useSeeders({"s01_alpha": _Alpha})
         self.assertEqual(await self._runner.seed(), ["s01_alpha"])
@@ -381,7 +389,7 @@ class TestSeederRunner(TestCase):
         Returns
         -------
         None
-            Verify the new seeder runs in filename order in the next batch.
+            No return value.
         """
         self.useSeeders({"s01_alpha": _Alpha})
         await self._runner.seed()
@@ -397,7 +405,7 @@ class TestSeederRunner(TestCase):
         Returns
         -------
         None
-            Verify rollback, failure callbacks, and a successful retry.
+            No return value.
         """
         self.useSeeders({"s02_flaky": _Flaky})
         events: list[str] = []
@@ -410,7 +418,7 @@ class TestSeederRunner(TestCase):
         self.assertEqual(await self.entries(), [])
         self.assertEqual(await self.tracking(), [])
         self.assertEqual(events, ["start:s02_flaky", "error:s02_flaky"])
-        _Flaky.fail = False # NOSONAR
+        self.enterContext(patch.object(_Flaky, "fail", new=False))
         self.assertEqual(await self._runner.seed(), ["s02_flaky"])
         self.assertEqual(await self.entries(), ["flaky"])
         self.assertEqual(len(await self.tracking()), 1)
@@ -421,7 +429,7 @@ class TestSeederRunner(TestCase):
         Returns
         -------
         None
-            Verify only the selected connection receives rows and history.
+            No return value.
         """
         self.useSeeders({"s01_nested": _NestedTransaction})
         self.assertEqual(
@@ -438,7 +446,7 @@ class TestSeederRunner(TestCase):
         Returns
         -------
         None
-            Verify constructor injection and seeding use the selected connection.
+            No return value.
         """
         self._app.provide(_SeedLabel("injected"))
         self.useSeeders({"s01_injected": _Injected})
@@ -461,19 +469,58 @@ class TestSeederRunner(TestCase):
         Returns
         -------
         None
-            Verify competing runners produce one row and one tracking record.
+            No return value.
         """
+        entered, release, attempted = asyncio.Event(), asyncio.Event(), asyncio.Event()
+        self.enterContext(patch.object(_Slow, "entered", entered, create=True))
+        self.enterContext(patch.object(_Slow, "release", release, create=True))
+        # Create the tracking table before holding a claim transaction open.
+        self.useSeeders({})
+        self.assertEqual(await self._runner.seed(), [])
         self.useSeeders({"s01_slow": _Slow})
         other_manager = ConnectionManager(self._app)
+        self.addAsyncCleanup(other_manager.disconnect)
         competing = SeederRunner(self._app, other_manager)
         competing._SeederRunner__discovered_cache = {"s01_slow": _Slow}
-        try:
-            results = await asyncio.gather(
-                self._runner.seed(),
-                competing.seed(),
-            )
-        finally:
-            await other_manager.disconnect()
+        self.assertEqual(
+            await other_manager.connection().select("SELECT 1 AS ready"),
+            [{"ready": 1}],
+        )
+        engine = other_manager.connection()._getEngine().sync_engine
+
+        def observe_claim(
+            _connection: object,
+            _cursor: object,
+            statement: str,
+            _parameters: object,
+            _context: object,
+            _executemany: object,
+        ) -> None:
+            """Observe the competing write transaction without replacing it.
+
+            Parameters
+            ----------
+            _connection, _cursor, _parameters, _context, _executemany : object
+                SQLAlchemy event arguments unused by this observer.
+            statement : str
+                SQL about to execute on the competing connection.
+            """
+            if statement == "BEGIN IMMEDIATE":
+                attempted.set()
+
+        event.listen(engine, "before_cursor_execute", observe_claim)
+        self.addCleanup(event.remove, engine, "before_cursor_execute", observe_claim)
+        async with asyncio.TaskGroup() as group:
+            first = group.create_task(self._runner.seed())
+            try:
+                await asyncio.wait_for(entered.wait(), 5)
+                second = group.create_task(competing.seed())
+                await asyncio.wait_for(attempted.wait(), 5)
+                self.assertFalse(first.done())
+                self.assertFalse(second.done())
+            finally:
+                release.set()
+        results = [first.result(), second.result()]
         self.assertCountEqual(results, [["s01_slow"], []])
         self.assertEqual(_Slow.calls, 1)
         self.assertEqual(await self.entries(), ["slow"])
@@ -485,14 +532,16 @@ class TestSeederRunner(TestCase):
         Returns
         -------
         None
-            Verify discovered seeder names follow their filename order.
+            No return value.
         """
         later = type(
-            "Later", (Seeder,),
+            "Later",
+            (Seeder,),
             {"__module__": "demo.s02_later", "run": _Beta.run},
         )
         earlier = type(
-            "Earlier", (Seeder,),
+            "Earlier",
+            (Seeder,),
             {"__module__": "demo.s01_earlier", "run": _Beta.run},
         )
         modules = {
@@ -505,7 +554,7 @@ class TestSeederRunner(TestCase):
         (self._app.path("database_seeders")).mkdir(parents=True)
         with (
             patch(
-                "orionis.database.seeders.runner.ModuleInspector.discoverModules",
+                "orionis.database.migrations.discovery.ModuleInspector.discoverModules",
                 return_value=set(modules),
             ),
             patch.dict("sys.modules", modules),

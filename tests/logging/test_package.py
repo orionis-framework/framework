@@ -1,9 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis import logging as logging_package
 from orionis.logging.logger import Logger
 from orionis.test import TestCase
 
-class TestLoggingPackage(TestCase):
 
+class TestLoggingPackage(TestCase):
     def testExportsOnlyTheLoggerSymbol(self) -> None:
         """Declare Logger as the only public export of the package.
 
@@ -13,7 +15,7 @@ class TestLoggingPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(logging_package.__all__, ["Logger"])
 
@@ -26,20 +28,6 @@ class TestLoggingPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(logging_package.Logger, Logger)
-
-    def testEveryDeclaredExportIsImportable(self) -> None:
-        """Expose every name declared in the export list.
-
-        Validates that ``__all__`` never advertises a symbol missing from the
-        package namespace, which would break star imports.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        for name in logging_package.__all__:
-            self.assertTrue(hasattr(logging_package, name))

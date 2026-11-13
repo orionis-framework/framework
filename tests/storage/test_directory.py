@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.storage.contracts.directory import IDirectory
 from orionis.storage.contracts.file import IFile
 from orionis.storage.directory import Directory
@@ -6,8 +8,8 @@ from orionis.storage.drivers.memory import MemoryStorageDriver
 from orionis.storage.exceptions import StoragePathException
 from orionis.test import TestCase
 
-class TestDirectoryPath(TestCase):
 
+class TestDirectoryPath(TestCase):
     def setUp(self) -> None:
         """Build a fresh memory driver before each test.
 
@@ -16,7 +18,7 @@ class TestDirectoryPath(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._driver = MemoryStorageDriver()
 
@@ -28,7 +30,7 @@ class TestDirectoryPath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Directory(self._driver), IDirectory)
 
@@ -40,7 +42,7 @@ class TestDirectoryPath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Directory(self._driver).path(), "")
 
@@ -52,7 +54,7 @@ class TestDirectoryPath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         directory = Directory(self._driver, "\\photos//2026/../2025/")
         self.assertEqual(directory.path(), "photos/2025")
@@ -65,13 +67,13 @@ class TestDirectoryPath(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StoragePathException):
             Directory(self._driver, "../outside")
 
-class TestDirectoryLifecycle(TestCase):
 
+class TestDirectoryLifecycle(TestCase):
     def setUp(self) -> None:
         """Build a disk over a fresh memory driver before each test.
 
@@ -80,22 +82,9 @@ class TestDirectoryLifecycle(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
-
-    async def testCreateIsFluent(self) -> None:
-        """Create the directory and return the same object.
-
-        Validates fluent chaining on create().
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        directory = self._disk.directory("uploads")
-        self.assertIs(await directory.create(), directory)
 
     async def testLifecycleCreateExistsDelete(self) -> None:
         """Create, detect, and delete a directory.
@@ -105,11 +94,11 @@ class TestDirectoryLifecycle(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         directory = self._disk.directory("uploads")
         self.assertFalse(await directory.exists())
-        await directory.create()
+        self.assertIs(await directory.create(), directory)
         self.assertTrue(await directory.exists())
         self.assertTrue(await directory.delete())
         self.assertFalse(await directory.exists())
@@ -122,7 +111,7 @@ class TestDirectoryLifecycle(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await self._disk.directory("ghost").delete())
 
@@ -134,7 +123,7 @@ class TestDirectoryLifecycle(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._disk.put("root/a/deep/f.txt", b"x")
         self.assertTrue(await self._disk.directory("root").delete())
@@ -148,12 +137,12 @@ class TestDirectoryLifecycle(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await self._disk.directory().exists())
 
-class TestDirectoryListing(TestCase):
 
+class TestDirectoryListing(TestCase):
     def setUp(self) -> None:
         """Build a disk over a fresh memory driver before each test.
 
@@ -162,7 +151,7 @@ class TestDirectoryListing(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
 
@@ -174,7 +163,7 @@ class TestDirectoryListing(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._disk.put("photos/a.png", b"1")
         await self._disk.put("photos/nested/b.png", b"2")
@@ -191,7 +180,7 @@ class TestDirectoryListing(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._disk.put("photos/a.png", b"1")
         await self._disk.put("photos/nested/b.png", b"2")
@@ -210,14 +199,15 @@ class TestDirectoryListing(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._disk.put("root/a/deep/f.txt", b"x")
 
         listing = await self._disk.directory("root").directories()
         self.assertIsInstance(listing[0], IDirectory)
         self.assertEqual(
-            [directory.path() for directory in listing], ["root/a"],
+            [directory.path() for directory in listing],
+            ["root/a"],
         )
 
     async def testAllDirectoriesWalksTheWholeSubtree(self) -> None:
@@ -228,7 +218,7 @@ class TestDirectoryListing(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._disk.put("root/a/deep/f.txt", b"x")
 
@@ -246,7 +236,7 @@ class TestDirectoryListing(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         directory = await self._disk.directory("empty").create()
         self.assertEqual(await directory.files(), [])

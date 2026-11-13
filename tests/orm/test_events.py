@@ -1,3 +1,7 @@
+# ruff: noqa: ARG002, FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
+# Exercise required hook signatures, synthetic secrets, and declared column names.
 from __future__ import annotations
 from typing import ClassVar
 import tests.orm.test_state as state_fixtures
@@ -8,10 +12,11 @@ from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.types import Boolean, Uuid
 from orionis.test import TestCase
 
+
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Run the config helper.
 
         Parameters
@@ -35,6 +40,7 @@ class _StubApp:
             },
         }
 
+
 class Account(Model):
     """Model exercising soft deletes, scopes, accessors, and events."""
 
@@ -53,7 +59,7 @@ class Account(Model):
 
     hidden: ClassVar[list[str]] = ["secret"]
 
-    def getDisplayNameAttribute(self, value: object) -> str:  # noqa: ARG002
+    def getDisplayNameAttribute(self, value: object) -> str:
         """Expose the full name as a computed attribute.
 
         Parameters
@@ -134,6 +140,7 @@ class Account(Model):
         """
         return query.where("role", role)
 
+
 class Token(Model):
     """Model using a client-generated UUID primary key."""
 
@@ -145,6 +152,7 @@ class Token(Model):
     id = Uuid().primary()
     label = String()
 
+
 class _ModelFeatureTestCase(TestCase):
     """Shared fixture creating the schema and cleaning class-level state."""
 
@@ -154,27 +162,24 @@ class _ModelFeatureTestCase(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
+        self.addCleanup(
+            setattr,
+            ConnectionResolver,
+            "_manager",
+            ConnectionResolver._manager,
+        )
         self._manager = ConnectionManager(_StubApp())
+        self.addAsyncCleanup(self._manager.disconnect)
+        for model in (Account, Token):
+            for state in (model.__meta__.events, model.__meta__.global_scopes):
+                self.addCleanup(state.update, state.copy())
+                self.addCleanup(state.clear)
         ConnectionResolver.setManager(self._manager)
         connection = self._manager.connection()
         await connection.createTable(Account.__meta__.table)
         await connection.createTable(Token.__meta__.table)
-
-    async def asyncTearDown(self) -> None:
-        """Release the manager and reset listeners and global scopes.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        Account.flushEvents()
-        Token.flushEvents()
-        Account.__meta__.global_scopes.clear()
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
 
     async def seed(self) -> None:
         """Insert the reference accounts shared by several tests.
@@ -182,7 +187,7 @@ class _ModelFeatureTestCase(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         await Account.create(
             {
@@ -203,6 +208,7 @@ class _ModelFeatureTestCase(TestCase):
             },
         )
 
+
 class TestModelEvents(_ModelFeatureTestCase):
     """Lifecycle events dispatched around persistence operations."""
 
@@ -214,7 +220,7 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         fired: list[str] = []
         for event in ("saving", "creating", "created", "saved"):
@@ -230,7 +236,7 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         fired: list[str] = []
@@ -249,7 +255,7 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         fired: list[str] = []
@@ -267,7 +273,7 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         fired: list[str] = []
@@ -286,7 +292,7 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Account.registerEvent("creating", lambda _model: False)
         account = Account({"first_name": "Ada", "last_name": "L", "active": True})
@@ -301,7 +307,7 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         fired: list[str] = []
 
@@ -316,7 +322,7 @@ class TestModelEvents(_ModelFeatureTestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             fired.append(model.first_name)
 
@@ -332,7 +338,7 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         seen: list[int] = []
@@ -348,7 +354,7 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         fired: list[str] = []
 
@@ -364,7 +370,7 @@ class TestModelEvents(_ModelFeatureTestCase):
                 Returns
                 -------
                 None
-                    Completes the operation described above.
+                    No return value.
                 """
                 fired.append("creating")
 
@@ -379,7 +385,7 @@ class TestModelEvents(_ModelFeatureTestCase):
                 Returns
                 -------
                 None
-                    Completes the operation described above.
+                    No return value.
                 """
                 fired.append("created")
 
@@ -395,10 +401,11 @@ class TestModelEvents(_ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(OrmException):
             Account.registerEvent("exploding", lambda _model: None)
+
 
 class TestModelEventInheritance(TestCase):
     """Exercise instance persistence using an overridable connection resolver."""
@@ -409,7 +416,7 @@ class TestModelEventInheritance(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Ancestor(state_fixtures._Record):
@@ -442,7 +449,7 @@ class TestModelEventInheritance(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Ancestor(state_fixtures._Record):
@@ -467,7 +474,7 @@ class TestModelEventInheritance(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Observed(state_fixtures._Record):
@@ -486,7 +493,7 @@ class TestModelEventInheritance(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             seen.append("first")
             type(record).registerEvent("saved", lambda _model: seen.append("next"))

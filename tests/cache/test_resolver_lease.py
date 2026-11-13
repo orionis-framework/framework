@@ -1,7 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from typing import Self
 from orionis.cache.locks.coalescing import RedisResolverLease
 from orionis.test import TestCase
+
 
 class _Backend:
     """Model atomic NX and owner-checked release without local waiter events."""
@@ -13,7 +16,7 @@ class _Backend:
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         self.values = {}
         self.entered = asyncio.Event()
@@ -54,7 +57,7 @@ class _Backend:
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         self.last_ttl = ttl
         if key in self.values:
@@ -100,7 +103,7 @@ class TestResolverLease(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         backend = _Backend()
         async with RedisResolverLease(backend, "key", 10, 0.1):
@@ -118,14 +121,17 @@ class TestResolverLease(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         backend = _Backend()
         backend.block = True
         lease = RedisResolverLease(backend, "key", 10, 0.1)
         acquiring = asyncio.create_task(lease.__aenter__())
-        await backend.entered.wait()
-        acquiring.cancel()
+        try:
+            await asyncio.wait_for(backend.entered.wait(), 2)
+        finally:
+            acquiring.cancel()
+            await asyncio.gather(acquiring, return_exceptions=True)
         with self.assertRaises(asyncio.CancelledError):
             await acquiring
         self.assertEqual(backend.values, {})
@@ -137,7 +143,7 @@ class TestResolverLease(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         backend = _Backend()
         async with RedisResolverLease(backend, "key", 10, 0.1):

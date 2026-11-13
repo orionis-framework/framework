@@ -1,3 +1,6 @@
+# ruff: noqa: BLE001, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Handle the built-in password-reset request endpoints."""
 
 from urllib.parse import urlencode
@@ -20,9 +23,8 @@ _MAX_EMAIL_LENGTH = 255
 _TOKEN_LENGTH = 43
 """Token length value used by ``forgot_password_controller``."""
 
-class ForgotPasswordController(BaseController):
 
-    # ruff: noqa: TC001, BLE001
+class ForgotPasswordController(BaseController):
     """Handle the built-in password-reset request endpoints."""
 
     SENT_MESSAGE = (
@@ -70,15 +72,17 @@ class ForgotPasswordController(BaseController):
         """
         # Immediately return a private redirect response while the reset
         # link is sent in the background.
-        return self._private(response.redirect(
-            "/forgot-password",
-            background=BackgroundTask(
-                self._sendLink,
-                payload.email,
-                request.baseUrl,
-                broker,
-            ),
-        ).withFlash("success", Lang.get(self.SENT_MESSAGE)))
+        return self._private(
+            response.redirect(
+                "/forgot-password",
+                background=BackgroundTask(
+                    self._sendLink,
+                    payload.email,
+                    request.baseUrl,
+                    broker,
+                ),
+            ).withFlash("success", Lang.get(self.SENT_MESSAGE)),
+        )
 
     async def _sendLink(
         self,
@@ -110,15 +114,17 @@ class ForgotPasswordController(BaseController):
         user, token = issued
 
         # Construct the reset URL using the base URL and issued token.
-        reset_url = (
-            f"{base_url.rstrip('/')}/reset-password?"
-            + urlencode({"email": user.email, "token": token})
+        reset_url = f"{base_url.rstrip('/')}/reset-password?" + urlencode(
+            {"email": user.email, "token": token},
         )
 
         # Send the password reset email to the user.
-        await Mail.to(user.email).subject(
+        await (
+            Mail.to(user.email)
+            .subject(
                 Lang.get("Reset your password"),
-            ).send(
+            )
+            .send(
                 Content(
                     view="emails.reset-password",
                     data={
@@ -128,6 +134,7 @@ class ForgotPasswordController(BaseController):
                     },
                 ),
             )
+        )
 
     # Validate the reset link without consuming its token.
     async def showResetForm(
@@ -154,8 +161,10 @@ class ForgotPasswordController(BaseController):
         email = request.queryParams.get("email", "")
         token = request.queryParams.get("token", "")
         valid = (
-            isinstance(email, str) and len(email) <= _MAX_EMAIL_LENGTH
-            and isinstance(token, str) and len(token) == _TOKEN_LENGTH
+            isinstance(email, str)
+            and len(email) <= _MAX_EMAIL_LENGTH
+            and isinstance(token, str)
+            and len(token) == _TOKEN_LENGTH
             and await broker.valid(email, token)
         )
 
@@ -188,8 +197,10 @@ class ForgotPasswordController(BaseController):
         email = data.get("email", "")
         token = data.get("token", "")
         if (
-            not isinstance(email, str) or len(email) > _MAX_EMAIL_LENGTH
-            or not isinstance(token, str) or len(token) != _TOKEN_LENGTH
+            not isinstance(email, str)
+            or len(email) > _MAX_EMAIL_LENGTH
+            or not isinstance(token, str)
+            or len(token) != _TOKEN_LENGTH
             or not await broker.valid(email, token)
         ):
             return await self._form("", "", valid=False)
@@ -206,9 +217,14 @@ class ForgotPasswordController(BaseController):
             user = await broker.reset(email, token, payload.password)
         except Exception as error:
             await capture(error, flow="http", phase="password.reset")
-            return await self._form(email, token, valid=True, errors={
-                "password": "The password could not be updated. Please try again.",
-            })
+            return await self._form(
+                email,
+                token,
+                valid=True,
+                errors={
+                    "password": "The password could not be updated. Please try again.",
+                },
+            )
 
         # Handle the case where the broker did not return a user.
         if user is None:
@@ -224,7 +240,8 @@ class ForgotPasswordController(BaseController):
                     user.email,
                 ),
             ).withFlash(
-                "success", Lang.get("Your password has been reset. Please log in."),
+                "success",
+                Lang.get("Your password has been reset. Please log in."),
             ),
         )
 
@@ -244,13 +261,13 @@ class ForgotPasswordController(BaseController):
         """
         await (
             Mail.to(email)
-                .subject(Lang.get("Your password was reset"))
-                .raw(
-                    Lang.get(
-                        "Your password has been reset. If you did not make this "
-                        "change, contact support immediately.",
-                    ),
-                )
+            .subject(Lang.get("Your password was reset"))
+            .raw(
+                Lang.get(
+                    "Your password has been reset. If you did not make this "
+                    "change, contact support immediately.",
+                ),
+            )
         )
 
     async def _form(

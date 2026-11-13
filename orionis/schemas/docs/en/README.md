@@ -16,13 +16,12 @@ The package separates declaration from validation. Direct construction trusts al
 
 - [Constraints, metadata, and reference](constraints-and-reference.md)
 - [Declaring schemas and converting data](declaring-schemas.md)
+- [Application rules and validation with I/O](application-rules.md)
 - [Validation, errors, and integration](validation-and-errors.md)
 
 Continue with: [http](../../../http/docs/en/README.md) · [database](../../../database/docs/en/README.md) · [mcp](../../../mcp/docs/en/README.md).
 
-Examples that require bootstrap, a request, or external services state that context. Verification for this reconstruction is distinct from historical notes; a production integration is not assumed to have been executed.
-
-- [Application rules and validation with I/O](application-rules.md)
+Examples that require bootstrap, a request, or external services state that context.
 
 ## Bounded execution and performance
 

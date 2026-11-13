@@ -1,3 +1,6 @@
+# ruff: noqa: PLR0913, S311, S603, T201
+# Use explicit process arguments or locally constructed execution fixtures.
+# Keep established public and external protocol names and signatures.
 import argparse
 import hashlib
 import http.client
@@ -33,7 +36,6 @@ from benchmarks.http_compare.report import (
 )
 
 # These commands run local, fixed benchmark applications, without a shell.
-# ruff: noqa: S603, T201
 
 REPO = Path(__file__).resolve().parents[2]
 SERVER_VERSIONS = {"granian": "2.8.4", "uvicorn": "0.54.0"}
@@ -52,6 +54,7 @@ BENCHMARK_ERRORS = (
     subprocess.SubprocessError,
     psutil.Error,
 )
+
 
 @dataclass(frozen=True)
 class Framework:
@@ -76,6 +79,7 @@ class Framework:
         """Enable HTTP preparation and load warmup only for Orionis."""
         return self.module == "orionis"
 
+
 FRAMEWORKS = {
     item.name: item
     for item in (
@@ -87,6 +91,7 @@ FRAMEWORKS = {
     )
 }
 
+
 def positive_number(value: str) -> float:
     """Parse a finite positive duration in seconds."""
     number = float(value)
@@ -94,6 +99,7 @@ def positive_number(value: str) -> float:
         error_msg = "must be finite and greater than zero"
         raise argparse.ArgumentTypeError(error_msg)
     return number
+
 
 def positive_integer(value: str) -> int:
     """Parse a positive connection or repetition count."""
@@ -103,24 +109,36 @@ def positive_integer(value: str) -> int:
         raise argparse.ArgumentTypeError(error_msg)
     return number
 
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the comparison CLI without importing benchmark applications."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--workers", type=int, nargs="+", choices=range(1, 5), default=[1, 2, 3, 4],
+        "--workers",
+        type=int,
+        nargs="+",
+        choices=range(1, 5),
+        default=[1, 2, 3, 4],
     )
     parser.add_argument(
-        "--frameworks", nargs="+", choices=FRAMEWORKS, default=list(FRAMEWORKS),
+        "--frameworks",
+        nargs="+",
+        choices=FRAMEWORKS,
+        default=list(FRAMEWORKS),
     )
     parser.add_argument("--duration", type=positive_number, default=10)
     parser.add_argument(
-        "--warmup", type=positive_number, default=2,
+        "--warmup",
+        type=positive_number,
+        default=2,
         help=argparse.SUPPRESS,
     )
     parser.add_argument("--connections", type=positive_integer, default=100)
     parser.add_argument("--repetitions", type=positive_integer, default=3)
     parser.add_argument(
-        "--seed", type=int, default=42,
+        "--seed",
+        type=int,
+        default=42,
         help="Seed for framework order per worker count",
     )
     parser.add_argument(
@@ -135,6 +153,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="New or empty directory",
     )
     return parser
+
 
 def _git(*arguments: str) -> str:
     """Read Git metadata, reporting unavailable values as unknown."""
@@ -152,6 +171,7 @@ def _git(*arguments: str) -> str:
         creationflags=PROCESS_FLAGS,
     )
     return result.stdout.strip() if result.returncode == 0 else "unknown"
+
 
 def collect_environment() -> dict[str, Any]:
     """Collect runtime, hardware, dependencies and source provenance."""
@@ -209,6 +229,7 @@ def collect_environment() -> dict[str, Any]:
         ),
     }
 
+
 def check_server_versions(frameworks: list[str], versions: dict[str, str]) -> None:
     """Require the pinned versions of the servers selected for this run."""
     for server in dict.fromkeys(FRAMEWORKS[name].server for name in frameworks):
@@ -220,54 +241,79 @@ def check_server_versions(frameworks: list[str], versions: dict[str, str]) -> No
             )
             raise RuntimeError(error_msg)
 
+
 def server_command(framework: Framework, workers: int, port: int) -> list[str]:
     """Build the assigned server command with matching HTTP and load settings."""
     server_module = (
         "benchmarks.http_compare.uvicorn_server"
-        if framework.server == "uvicorn" else framework.server
+        if framework.server == "uvicorn"
+        else framework.server
     )
     command = [
-        sys.executable, "-B", "-m", server_module,
+        sys.executable,
+        "-B",
+        "-m",
+        server_module,
         framework.target,
         "--factory",
-        "--host", "127.0.0.1",
-        "--port", str(port),
-        "--workers", str(workers),
-        "--loop", "asyncio",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(port),
+        "--workers",
+        str(workers),
+        "--loop",
+        "asyncio",
         "--no-access-log",
-        "--log-level", "info",
+        "--log-level",
+        "info",
     ]
     if framework.server == "granian":
-        command.extend([
-            "--interface", framework.interface,
-            "--http", "1",
-            "--runtime-threads", "1",
-            "--task-impl", "asyncio",
-            "--http1-keep-alive",
-            "--no-ws",
-            "--no-reload",
-            "--no-respawn-failed-workers",
-            "--no-metrics",
-        ])
+        command.extend(
+            [
+                "--interface",
+                framework.interface,
+                "--http",
+                "1",
+                "--runtime-threads",
+                "1",
+                "--task-impl",
+                "asyncio",
+                "--http1-keep-alive",
+                "--no-ws",
+                "--no-reload",
+                "--no-respawn-failed-workers",
+                "--no-metrics",
+            ],
+        )
     else:
-        command.extend([
-            "--http", "h11",
-            "--ws", "none",
-            "--lifespan", "on",
-            "--no-use-colors",
-        ])
+        command.extend(
+            [
+                "--http",
+                "h11",
+                "--ws",
+                "none",
+                "--lifespan",
+                "on",
+                "--no-use-colors",
+            ],
+        )
     return command
 
+
 def track_children(
-    process: subprocess.Popen[bytes], known: dict[int, psutil.Process],
+    process: subprocess.Popen[bytes],
+    known: dict[int, psutil.Process],
 ) -> None:
     """Retain owned worker identities for cleanup even after they are orphaned."""
     with suppress(psutil.NoSuchProcess):
         for child in psutil.Process(process.pid).children(recursive=True):
             known[child.pid] = child
 
+
 def stop_server(
-    process: subprocess.Popen[bytes], known: dict[int, psutil.Process] | None = None,
+    process: subprocess.Popen[bytes],
+    known: dict[int, psutil.Process] | None = None,
 ) -> None:
     """Terminate and reap only the owned server process tree."""
     if sys.platform != "win32":
@@ -302,8 +348,10 @@ def stop_server(
         )
         raise RuntimeError(error_msg)
 
+
 def check_workers(
-    process: subprocess.Popen[bytes], worker_pids: set[int],
+    process: subprocess.Popen[bytes],
+    worker_pids: set[int],
     known: dict[int, psutil.Process],
 ) -> None:
     """Require every worker announced by the server to remain alive and owned."""
@@ -323,10 +371,57 @@ def check_workers(
             if worker is not None:
                 alive = worker.is_running() and worker.status() != psutil.STATUS_ZOMBIE
         if not alive:
-            error_msg = (
-                f"Worker {pid} exited or does not belong to this server"
-            )
+            error_msg = f"Worker {pid} exited or does not belong to this server"
             raise RuntimeError(error_msg)
+
+
+def _listening_port(
+    process: subprocess.Popen[bytes],
+    known: dict[int, psutil.Process],
+) -> int | None:
+    """
+    Resolve the kernel-selected port from live, owned listener identities.
+
+    Parameters
+    ----------
+    process : subprocess.Popen
+        Owned server process.
+    known : dict[int, psutil.Process]
+        Retained identities of that process and its workers.
+
+    Returns
+    -------
+    int or None
+        Unique loopback listener port, or None before binding completes.
+
+    Raises
+    ------
+    RuntimeError
+        If the owned processes expose multiple loopback listeners.
+    """
+    track_children(process, known)
+    if process.pid not in known:
+        try:
+            known[process.pid] = psutil.Process(process.pid)
+        except psutil.NoSuchProcess:
+            return None
+    ports = set()
+    for owned in tuple(known.values()):
+        with suppress(psutil.NoSuchProcess):
+            if not owned.is_running():
+                continue
+            ports.update(
+                connection.laddr.port
+                for connection in owned.net_connections(kind="tcp")
+                if connection.status == psutil.CONN_LISTEN
+                and connection.laddr
+                and connection.laddr.ip == "127.0.0.1"
+            )
+    if len(ports) > 1:
+        error_msg = "The owned benchmark server exposes multiple loopback listeners."
+        raise RuntimeError(error_msg)
+    return next(iter(ports), None)
+
 
 def _probe_response(
     connection: http.client.HTTPConnection,
@@ -342,13 +437,13 @@ def _probe_response(
         or body != b"Hello World"
     ):
         error_msg = (
-            f"Unexpected response for /: {response.status}, "
-            f"{content_type}, {body!r}"
+            f"Unexpected response for /: {response.status}, {content_type}, {body!r}"
         )
         raise RuntimeError(error_msg)
     if response.version != HTTP_1_1 or response.will_close:
         error_msg = "Endpoint did not preserve HTTP/1.1 keep-alive"
         raise RuntimeError(error_msg)
+
 
 def started_workers(events: str, framework: Framework) -> set[int]:
     """Read native worker PIDs only after their application startup completes."""
@@ -363,14 +458,48 @@ def started_workers(events: str, framework: Framework) -> set[int]:
     return {
         int(pid)
         for index, pid in re.findall(
-            r"Spawning worker-(\d+) with PID: (\d+)\r?\n", events,
+            r"Spawning worker-(\d+) with PID: (\d+)\r?\n",
+            events,
         )
         if index in started
     }
 
-def wait_until_ready(  # noqa: PLR0913
-    process: subprocess.Popen[bytes], port: int, log_path: Path, workers: int,
-    known: dict[int, psutil.Process], *, framework: Framework,
+
+def _probe_server(port: int, *, requires_warmup: bool) -> None:
+    """
+    Probe a listener while sending preparation requests only to Orionis.
+
+    Parameters
+    ----------
+    port : int
+        Port already resolved from the owned server.
+    requires_warmup : bool
+        Whether this framework requires the existing two HTTP probes.
+
+    Returns
+    -------
+    None
+        No return value.
+    """
+    if not requires_warmup:
+        socket.create_connection(("127.0.0.1", port), timeout=1).close()
+        return
+    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=1)
+    try:
+        for _ in range(2):
+            _probe_response(connection)
+    finally:
+        connection.close()
+
+
+def wait_until_ready(
+    process: subprocess.Popen[bytes],
+    port: int,
+    log_path: Path,
+    workers: int,
+    known: dict[int, psutil.Process],
+    *,
+    framework: Framework,
 ) -> set[int]:
     """Wait for native server startup, probing HTTP only for Orionis."""
     deadline = time.monotonic() + STARTUP_TIMEOUT
@@ -388,18 +517,12 @@ def wait_until_ready(  # noqa: PLR0913
             time.sleep(0.1)
             continue
         check_workers(process, worker_pids, known)
+        selected_port = _listening_port(process, known) if port == 0 else port
+        if selected_port is None:
+            time.sleep(0.1)
+            continue
         try:
-            if framework.requires_warmup:
-                connection = http.client.HTTPConnection(
-                    "127.0.0.1", port, timeout=1,
-                )
-                try:
-                    for _ in range(2):
-                        _probe_response(connection)
-                finally:
-                    connection.close()
-            else:
-                socket.create_connection(("127.0.0.1", port), timeout=1).close()
+            _probe_server(selected_port, requires_warmup=framework.requires_warmup)
             check_workers(process, worker_pids, known)
             return worker_pids
         except OSError, http.client.HTTPException:
@@ -412,7 +535,8 @@ def wait_until_ready(  # noqa: PLR0913
     )
     raise TimeoutError(error_msg)
 
-def run_load(  # noqa: PLR0913
+
+def run_load(
     oha: Path,
     url: str,
     seconds: float,
@@ -424,13 +548,19 @@ def run_load(  # noqa: PLR0913
     command = [
         str(oha),
         "--no-tui",
-        "--output-format", "json",
-        "--http-version", "1.1",
-        "--worker-threads", "1",
+        "--output-format",
+        "json",
+        "--http-version",
+        "1.1",
+        "--worker-threads",
+        "1",
         "--wait-ongoing-requests-after-deadline",
-        "-t", "5s",
-        "-c", str(connections),
-        "-z", f"{seconds}s",
+        "-t",
+        "5s",
+        "-c",
+        str(connections),
+        "-z",
+        f"{seconds}s",
         url,
     ]
     commands.append({"kind": "oha", "argv": command, "output": str(output)})
@@ -449,7 +579,8 @@ def run_load(  # noqa: PLR0913
         stdout.seek(0)
         return parse_measurement(json.load(stdout))
 
-def benchmark_case(  # noqa: PLR0913
+
+def benchmark_case(
     framework: Framework,
     workers: int,
     args: argparse.Namespace,
@@ -467,9 +598,7 @@ def benchmark_case(  # noqa: PLR0913
                 REPO / "benchmarks" / "http_compare" / "apps" / "routes" / "web.py",
                 directory / "_http_compare_routes.py",
             )
-        with socket.socket() as candidate:
-            candidate.bind(("127.0.0.1", 0))
-            port = candidate.getsockname()[1]
+        port = 0
         command = server_command(framework, workers, port)
         commands.append({"kind": "server", "argv": command, "cwd": str(directory)})
         # Avoid inherited server tuning or a developer .env altering one case.
@@ -502,13 +631,24 @@ def benchmark_case(  # noqa: PLR0913
             known: dict[int, psutil.Process] = {}
             try:
                 worker_pids = wait_until_ready(
-                    process, port, log_path, workers, known,
+                    process,
+                    port,
+                    log_path,
+                    workers,
+                    known,
                     framework=framework,
                 )
+                port = _listening_port(process, known)
+                if port is None:
+                    error_msg = "The owned server stopped listening after startup."
+                    raise RuntimeError(error_msg)
                 url = f"http://127.0.0.1:{port}/"
                 if framework.requires_warmup:
                     row["warmup"] = run_load(
-                        oha, url, args.warmup, args.connections,
+                        oha,
+                        url,
+                        args.warmup,
+                        args.connections,
                         output / "raw" / f"{prefix}-warmup.json",
                         commands,
                     )
@@ -518,15 +658,21 @@ def benchmark_case(  # noqa: PLR0913
                     check_workers(process, worker_pids, known)
                 samples = row.setdefault("samples", [])
                 for repetition in range(1, args.repetitions + 1):
-                    samples.append(run_load(
-                        oha, url, args.duration, args.connections,
-                        output / "raw" / f"{prefix}-run-{repetition}.json",
-                        commands,
-                    ))
+                    samples.append(
+                        run_load(
+                            oha,
+                            url,
+                            args.duration,
+                            args.connections,
+                            output / "raw" / f"{prefix}-run-{repetition}.json",
+                            commands,
+                        ),
+                    )
                     check_workers(process, worker_pids, known)
                 row.update(aggregate_samples(samples))
             finally:
                 stop_server(process, known)
+
 
 def resolve_oha(explicit: Path | None, directory: Path) -> Path:
     """Locate or download oha and verify its pinned version."""
@@ -550,6 +696,7 @@ def resolve_oha(explicit: Path | None, directory: Path) -> Path:
         raise RuntimeError(error_msg)
     return path
 
+
 def _run_matrix(
     args: argparse.Namespace,
     oha: Path,
@@ -560,7 +707,7 @@ def _run_matrix(
     """Run shuffled cases sequentially, preserving failures and partial results."""
     settings = report["settings"]
     # Seeded benchmark ordering is reproducible and not security-sensitive.
-    generator = random.Random(args.seed)  # noqa: S311
+    generator = random.Random(args.seed)
     for workers in settings["workers"]:
         names = list(settings["frameworks"])
         generator.shuffle(names)  # NOSONAR(S2245)
@@ -593,6 +740,7 @@ def _run_matrix(
             write_reports(output, report)
             write_json(output / "commands.json", commands)
 
+
 def main(argv: list[str] | None = None) -> int:
     """Run the comparison CLI and persist reports, including partial failures."""
     parser = build_parser()
@@ -616,8 +764,7 @@ def main(argv: list[str] | None = None) -> int:
             "duration_seconds": args.duration,
             "warmup_seconds": args.warmup,
             "warmup_frameworks": [
-                name for name in frameworks
-                if FRAMEWORKS[name].requires_warmup
+                name for name in frameworks if FRAMEWORKS[name].requires_warmup
             ],
             "connections": args.connections,
             "repetitions": args.repetitions,
@@ -658,15 +805,15 @@ def main(argv: list[str] | None = None) -> int:
             with Path(summary).open("a", encoding="utf-8") as stream:
                 stream.write(markdown)
         print(markdown)
-    if "error" in report or any(
-        row["status"] != "ok" for row in report["results"]
-    ):
+    if "error" in report or any(row["status"] != "ok" for row in report["results"]):
         return 1
     for workers in report["settings"]["workers"]:
         (output / f"throughput-{workers}-workers.svg").write_text(
-            render_throughput_svg(report, workers), encoding="utf-8",
+            render_throughput_svg(report, workers),
+            encoding="utf-8",
         )
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import TYPE_CHECKING
 from orionis.storage.contracts.uploaded_file import IUploadedFile
 from orionis.storage.disk import Disk
@@ -9,6 +11,7 @@ from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
 
 class _FakeUpload:
     """Duck-typed multipart payload produced by the HTTP layer."""
@@ -28,7 +31,7 @@ class _FakeUpload:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.filename = filename
         self.content_type = "image/png"
@@ -75,7 +78,7 @@ class _FakeUpload:
             The next chunk of the buffered payload.
         """
         for start in range(0, len(self.payload), size):
-            yield self.payload[start:start + size]
+            yield self.payload[start : start + size]
 
     def close(self) -> None:
         """Mark the buffered payload as released.
@@ -83,9 +86,10 @@ class _FakeUpload:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.closed = True
+
 
 class _RecordingManager:
     """Manager double handing out a single disk and recording lookups."""
@@ -103,7 +107,7 @@ class _RecordingManager:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.target = target
         self.disk_names: list[str | None] = []
@@ -125,8 +129,8 @@ class _RecordingManager:
         self.disk_names.append(name)
         return self.target
 
-class TestUploadedFileMetadata(TestCase):
 
+class TestUploadedFileMetadata(TestCase):
     def setUp(self) -> None:
         """Build an uploaded file over a memory-backed disk.
 
@@ -136,7 +140,7 @@ class TestUploadedFileMetadata(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
         self._source = _FakeUpload("Profile Photo.png", b"png-payload")
@@ -154,7 +158,7 @@ class TestUploadedFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(self._upload, IUploadedFile)
 
@@ -166,7 +170,7 @@ class TestUploadedFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._upload.originalName(), "Profile Photo.png")
         self.assertEqual(self._upload.extension(), ".png")
@@ -181,7 +185,7 @@ class TestUploadedFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(self._upload.hashName().endswith(".png"))
 
@@ -193,7 +197,7 @@ class TestUploadedFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._upload.hashName(), self._upload.hashName())
 
@@ -205,7 +209,7 @@ class TestUploadedFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         upload = UploadedFile(
             source=_FakeUpload("archive", b"data"),  # type: ignore[arg-type]
@@ -221,12 +225,12 @@ class TestUploadedFileMetadata(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await self._upload.read(), b"png-payload")
 
-class TestUploadedFilePersistence(TestCase):
 
+class TestUploadedFilePersistence(TestCase):
     def setUp(self) -> None:
         """Build an uploaded file over a memory-backed disk.
 
@@ -236,7 +240,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._disk = Disk(name="fake", driver=MemoryStorageDriver())
         self._source = _FakeUpload("photo.png", b"png-payload")
@@ -254,7 +258,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.store("avatars")
         self.assertEqual(stored.path(), f"avatars/{self._upload.hashName()}")
@@ -268,7 +272,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.store()
         self.assertEqual(stored.path(), self._upload.hashName())
@@ -281,10 +285,12 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.store(
-            "avatars", "public", Visibility.PUBLIC.value,
+            "avatars",
+            "public",
+            Visibility.PUBLIC.value,
         )
         self.assertEqual(self._manager.disk_names, ["public"])
         self.assertEqual(await stored.visibility(), Visibility.PUBLIC.value)
@@ -297,7 +303,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.storeAs("avatars", "user.png")
         self.assertEqual(stored.path(), "avatars/user.png")
@@ -311,7 +317,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.storeAs("", "user.png")
         self.assertEqual(stored.path(), "user.png")
@@ -324,7 +330,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StoragePathException):
             await self._upload.storeAs("avatars", "")
@@ -337,7 +343,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StoragePathException):
             await self._upload.storeAs("avatars", "../user.png")
@@ -352,7 +358,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.move("avatars", "moved.png")
         self.assertEqual(stored.path(), "avatars/moved.png")
@@ -366,7 +372,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.move("avatars")
         self.assertEqual(stored.path(), f"avatars/{self._upload.hashName()}")
@@ -379,7 +385,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.copy("avatars", "kept.png")
         self.assertEqual(stored.path(), "avatars/kept.png")
@@ -393,7 +399,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = await self._upload.copy("avatars")
         self.assertEqual(stored.path(), f"avatars/{self._upload.hashName()}")
@@ -406,14 +412,33 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
+        chunks = []
+
+        class ChunkOnlyUpload(_FakeUpload):
+            """Reject whole-buffer reads and record the emitted chunks."""
+
+            __slots__ = ()
+
+            def read(self) -> bytes:
+                """Reject a read that would bypass the chunked upload protocol."""
+                error_msg = "Storage must consume the upload's chunks."
+                raise AssertionError(error_msg)
+
+            def chunks(self, size: int = 4) -> Iterator[bytes]:
+                """Record each source chunk before handing it to storage."""
+                for chunk in super().chunks(size):
+                    chunks.append(chunk)
+                    yield chunk
+
         upload = UploadedFile(
-            source=_FakeUpload("big.bin", b"0123456789"),  # type: ignore[arg-type]
+            source=ChunkOnlyUpload("big.bin", b"0123456789"),  # type: ignore[arg-type]
             manager=self._manager,  # type: ignore[arg-type]
         )
         stored = await upload.storeAs("bulk", "big.bin")
         self.assertEqual(await stored.read(), b"0123456789")
+        self.assertEqual(chunks, [b"0123", b"4567", b"89"])
 
     async def testEmptyPayloadIsPersisted(self) -> None:
         """Persist uploads whose buffer produces no chunk at all.
@@ -423,7 +448,7 @@ class TestUploadedFilePersistence(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         upload = UploadedFile(
             source=_FakeUpload("empty.bin", b""),  # type: ignore[arg-type]

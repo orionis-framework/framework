@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Define the metadata and execution hooks shared by console commands."""
 
 from __future__ import annotations
@@ -12,10 +14,8 @@ _MISSING = object()
 if TYPE_CHECKING:
     from orionis.console.args.argument import Argument
 
+
 class BaseCommand(Console, IBaseCommand):
-
-    # ruff: noqa: ANN401
-
     # Enable timestamps in console output by default
     """Define the metadata and execution hooks shared by console commands."""
 

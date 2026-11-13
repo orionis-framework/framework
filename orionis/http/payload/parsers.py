@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Provide http payload operations.
 
 Includes ``parse_content_type``, ``parse_json``, ``parse_msgpack``,
@@ -13,10 +15,11 @@ import msgspec.msgpack as _msgspec_msgpack
 if TYPE_CHECKING:
     from xml.etree.ElementTree import Element as XMLElement
 
-# ruff: noqa: PLC0415
 
-def _split_header_parameters( # NOSONAR
-    header: str, *, quote_chars: str = '"',
+def _split_header_parameters(  # NOSONAR
+    header: str,
+    *,
+    quote_chars: str = '"',
 ) -> list[str]:
     """
     Split header segments at semicolons outside quoted parameter values.
@@ -65,6 +68,7 @@ def _split_header_parameters( # NOSONAR
     parts.append(header[start:])
     return parts
 
+
 def parse_content_type(header: str) -> tuple[str, dict[str, str]]:
     """
     Parse a ``Content-Type`` header into a media-type and parameter dict.
@@ -97,6 +101,7 @@ def parse_content_type(header: str) -> tuple[str, dict[str, str]]:
             params[key.strip().lower()] = value.strip().strip('"')
     return media_type, params
 
+
 def parse_json(raw: bytes) -> object:
     """
     Decode a JSON payload using ``msgspec``.
@@ -120,6 +125,7 @@ def parse_json(raw: bytes) -> object:
     # Decode the JSON bytes into a Python value.
     return _msgspec_json.decode(raw)
 
+
 def parse_msgpack(raw: bytes) -> object:
     """
     Decode a MessagePack payload using ``msgspec``.
@@ -142,6 +148,7 @@ def parse_msgpack(raw: bytes) -> object:
     # Decode the MessagePack bytes into a Python value.
     return _msgspec_msgpack.decode(raw)
 
+
 def parse_urlencoded(raw: bytes) -> dict[str, str]:
     """
     Decode an ``application/x-www-form-urlencoded`` payload.
@@ -158,6 +165,7 @@ def parse_urlencoded(raw: bytes) -> dict[str, str]:
     """
     # keep_blank_values=True retains fields submitted with empty values.
     return dict(parse_qsl(raw.decode("utf-8"), keep_blank_values=True))
+
 
 def parse_urlencoded_multi(raw: bytes) -> dict[str, str | list[str]]:
     """
@@ -191,6 +199,7 @@ def parse_urlencoded_multi(raw: bytes) -> dict[str, str | list[str]]:
             result[k] = v
     return result
 
+
 def parse_xml(raw: bytes) -> XMLElement:
     """
     Parse an XML payload with entity declarations disabled.
@@ -219,7 +228,9 @@ def parse_xml(raw: bytes) -> XMLElement:
     """
     # Defaults forbid entities and external access, but allow DTD declarations.
     from defusedxml.ElementTree import fromstring as _xml_fromstring
+
     return _xml_fromstring(raw)
+
 
 def parse_text(raw: bytes) -> str:
     """
@@ -237,6 +248,7 @@ def parse_text(raw: bytes) -> str:
     """
     # Strict UTF-8; raises UnicodeDecodeError on invalid byte sequences.
     return raw.decode("utf-8")
+
 
 def parse_binary(raw: bytes) -> bytes:
     """

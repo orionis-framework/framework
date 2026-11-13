@@ -2,6 +2,7 @@
 
 from enum import IntEnum
 
+
 class HTTPStatus(IntEnum):
     """Enumerate HTTP response status codes supported by the framework."""
 
@@ -133,6 +134,7 @@ class HTTPStatus(IntEnum):
     """Not extended value used by ``HTTPStatus``."""
     NETWORK_AUTHENTICATION_REQUIRED = 511
     """Network authentication required value used by ``HTTPStatus``."""
+
 
 class WebSocketStatus(IntEnum):
     """Enumerate WebSocket close status codes."""

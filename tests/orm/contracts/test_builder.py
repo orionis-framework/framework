@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.orm.contracts.builder import IModelQueryBuilder
 from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.test import TestCase
@@ -18,6 +20,7 @@ MODEL_METHODS = BASE_METHODS | frozenset(
     },
 )
 
+
 class TestModelQueryBuilderContract(TestCase):
     """Verify model terminals extend the shared query-language contract."""
 
@@ -27,10 +30,13 @@ class TestModelQueryBuilderContract(TestCase):
         Returns
         -------
         None
-            Verify the complete model query contract and concrete surface.
+            No return value.
         """
         assert_contract_surface(
-            self, IModelQueryBuilder, ModelQueryBuilder, MODEL_METHODS,
+            self,
+            IModelQueryBuilder,
+            ModelQueryBuilder,
+            MODEL_METHODS,
         )
 
     def testContractDeclaresEmptySlots(self) -> None:
@@ -39,6 +45,6 @@ class TestModelQueryBuilderContract(TestCase):
         Returns
         -------
         None
-            Verify the interface declares empty slots.
+            No return value.
         """
         self.assertEqual(IModelQueryBuilder.__dict__.get("__slots__"), ())

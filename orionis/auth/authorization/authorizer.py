@@ -1,16 +1,18 @@
+# ruff: noqa: TC001, TC003
+# Keep public annotations available to runtime introspection.
+
 """Answer authorization questions for a given request context."""
 
 import inspect
-from typing import TYPE_CHECKING
+from collections.abc import Iterable
 from orionis.auth.authorization.registry import PolicyRegistry
 from orionis.auth.contracts.authorizer import IAuthorizer
 from orionis.auth.exceptions import PolicyNotFoundException
 from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-    from orionis.auth.contracts.context import IAuthenticationContext
-    from orionis.auth.contracts.policy import IPolicy
+from orionis.auth.contracts.context import IAuthenticationContext
+from orionis.auth.contracts.policy import IPolicy
+
 
 class Authorizer(IAuthorizer):
     """
@@ -28,8 +30,6 @@ class Authorizer(IAuthorizer):
     mutable policy state are never retained by this singleton.
     """
 
-    # ruff: noqa: TC001 (Dependency Injection)
-
     __slots__ = ("__app", "__registry")
     """Declare the instance attribute slots reserved by this class."""
 
@@ -46,7 +46,7 @@ class Authorizer(IAuthorizer):
         Returns
         -------
         None
-            The registry starts empty and is filled during boot.
+            No return value.
         """
         self.__app = app
         """
@@ -81,7 +81,7 @@ class Authorizer(IAuthorizer):
         Returns
         -------
         None
-            The registry is updated as a side effect.
+            No return value.
         """
         self.__registry.register(resource, policy)
 
@@ -235,9 +235,7 @@ class Authorizer(IAuthorizer):
         resource_type = resource if isinstance(resource, type) else type(resource)
         policy_class = self.__registry.policyFor(resource_type)
         if policy_class is None:
-            error_msg = (
-                f"No policy is registered for '{resource_type.__name__}'."
-            )
+            error_msg = f"No policy is registered for '{resource_type.__name__}'."
             raise PolicyNotFoundException(error_msg)
 
         policy = await self.__app.build(policy_class)

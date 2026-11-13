@@ -7,6 +7,7 @@ import struct
 import time
 from orionis.cache.serializer import Serializer
 
+
 class FileBasedCache:
     """Persist named cache entries in a filesystem directory."""
 
@@ -49,15 +50,33 @@ class FileBasedCache:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
+
+        Raises
+        ------
+        TypeError
+            If path is not a Path or filename is not a string.
+        ValueError
+            If filename is empty or contains path components.
         """
         if not isinstance(path, Path):
             error_msg = "path must be Path"
             raise TypeError(error_msg)
 
-        self.__path = path
+        if not isinstance(filename, str):
+            error_msg = "filename must be str"
+            raise TypeError(error_msg)
+        if (
+            not filename
+            or filename in {".", ".."}
+            or any(character in filename for character in ("/", "\\", ":", "\0"))
+        ):
+            error_msg = "filename must be a single nonempty file name"
+            raise ValueError(error_msg)
+
+        self.__path = path.resolve()
         """Directory path where the cache file will be stored."""
-        self.__file = path / filename
+        self.__file = self.__path / filename
         """Resolved filesystem path of the persistent cache entry."""
         # Store the resolved cache file path for later access.
         self.__file_resolved = self.__file.resolve()
@@ -91,12 +110,12 @@ class FileBasedCache:
         """
         # Load the cache payload when the file exists.
         payload = Serializer.loadFromFile(self.__file)
-        if not payload:
+        if not isinstance(payload, dict):
             return None
 
         # Extract metadata and validate
         meta = payload.get("__meta__")
-        if not meta:
+        if not isinstance(meta, dict):
             return None
 
         # Check cache version
@@ -107,7 +126,8 @@ class FileBasedCache:
         if meta.get("sourcesHash") != self.__computeSourcesHash():
             return None
 
-        return payload.get("__data__")
+        data = payload.get("__data__")
+        return data if isinstance(data, dict) else None
 
     def save(self, data: dict) -> tuple[int, str]:
         """
@@ -134,11 +154,12 @@ class FileBasedCache:
         # Load existing cache and skip write if nothing has changed.
         # loadFromFile uses EAFP internally — no redundant exists() check needed.
         existing = Serializer.loadFromFile(self.__file)
-        if existing:
-            existingmeta = existing.get("__meta__", {})
+        if isinstance(existing, dict):
+            existingmeta = existing.get("__meta__")
             # Short-circuit: version or hash mismatch skips the data comparison
             if (
-                existingmeta.get("version") == self.CACHE_VERSION
+                isinstance(existingmeta, dict)
+                and existingmeta.get("version") == self.CACHE_VERSION
                 and existingmeta.get("sourcesHash") == sourceshash
                 and existing.get("__data__") == data
             ):
@@ -192,7 +213,7 @@ class FileBasedCache:
         Returns
         -------
         None
-            This method updates ``result`` in place.
+            No return value.
         """
         for directory in self.__monitored_dirs:
             if directory.is_dir():
@@ -226,7 +247,7 @@ class FileBasedCache:
         Returns
         -------
         None
-            This method updates ``result`` in place.
+            No return value.
         """
         for file in self.__monitored_files:
             if file.exists():
@@ -259,7 +280,7 @@ class FileBasedCache:
         result.sort()
         return result
 
-    def __computeSourcesHash(self) -> str:  # NOSONAR
+    def __computeSourcesHash(self) -> str:
         """
         Compute and return a hash representing the state of monitored sources.
 
@@ -282,12 +303,12 @@ class FileBasedCache:
 
         hasher = hashlib.sha1(usedforsecurity=False)
 
-        # Update hash: path bytes + fixed-width binary (mtime_ns, size)
-        # struct.pack avoids the temporary str + encode() per file
+        # Signed 128-bit timestamps cover pre-epoch and far-future stat values.
         for posix, resolved_path in self.__collectFiles():
             stat = resolved_path.stat()
             hasher.update(posix.encode())
-            hasher.update(struct.pack(">QQ", stat.st_mtime_ns, stat.st_size))
+            hasher.update(stat.st_mtime_ns.to_bytes(16, "big", signed=True))
+            hasher.update(struct.pack(">Q", stat.st_size))
 
         self.__sourceshashcache = hasher.hexdigest()
         self.__lasthashcheck = now

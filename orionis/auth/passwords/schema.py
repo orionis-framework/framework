@@ -4,6 +4,7 @@ from orionis.orm.schema.constraints import TableIndex
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, String
 
+
 def build_password_reset_table(table: str) -> TableDefinition:
     """
     Build the schema consumed by the password-reset broker.

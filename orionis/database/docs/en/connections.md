@@ -21,23 +21,32 @@ This program creates data only in memory. User values are bound using `:name` pl
 
 ```python
 import asyncio
+
 from orionis.database import Connection
 
 
 async def main() -> None:
+    """Create and query an isolated in-memory database."""
+
     db = Connection("docs", {"driver": "sqlite", "database": ":memory:"})
+
     try:
         await db.statement(
             "CREATE TABLE notes (id INTEGER PRIMARY KEY, body TEXT NOT NULL)"
         )
+
         affected = await db.execute(
             "INSERT INTO notes (body) VALUES (:body)", {"body": "Hello"}
         )
+
         rows = await db.select(
             "SELECT id, body FROM notes WHERE body = :body", {"body": "Hello"}
         )
+
         assert affected == 1
+
         assert rows == [{"id": 1, "body": "Hello"}]
+
     finally:
         await db.disconnect()
 
@@ -55,15 +64,23 @@ After bootstrap, use the facade instead of constructing and disconnecting a conn
 from orionis.support.facades import DB
 
 
-async def find_note(body: str):
+async def find_note(body: str) -> dict[str, object] | None:
+    """Find the first note matching the supplied body."""
+
     return await DB.table("notes").where("body", body).first()
 
 
-async def count_notes():
+async def count_notes() -> list[dict[str, object]]:
+    """Return the note count as a materialized result row."""
+
     return await DB.select("SELECT COUNT(*) AS total FROM notes")
 ```
 
 `DB.connection("reporting")` returns a new gateway. `DB.connection("reporting").table("notes")` targets the registered connection without changing other consumers' selection. The manager provides `connection(name)`, `hasConnection(name)`, `configFor(name)`, `addConnection(name, config)`, and `setDefaultName(name)`. Changing the default affects future consumers without an explicit selection: do that during configuration, rather than using it for request isolation.
+
+Passwords supplied as configuration values retain their exact contents, including whitespace and an explicitly empty string. Batch insert plans reject keys absent from a declared table schema before writing; they do not silently discard unknown values.
+
+Registered connection names preserve their case. Default selection first uses an exact registered name; if that name is absent, it preserves the historical lowercase fallback (for example, `SQLITE` can select `sqlite`). Concurrent manager lookups publish one connection object for a configured name; this does not make an asynchronous connection shareable across event loops.
 
 ## Configuration values and common failures
 

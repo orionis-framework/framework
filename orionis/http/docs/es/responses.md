@@ -38,13 +38,20 @@ La aplicación web aplica estos datos a la sesión. `withErrors()` admite errore
 
 `setHeader()` reemplaza todos los valores de una cabecera; `addHeader()` añade otro. `getHeader()` devuelve una lista o `None`; las búsquedas ignoran mayúsculas. No añadas saltos de línea en nombres o valores. `withCookie()` permite encadenamiento; `setCookie()` devuelve `None`.
 
+Las cabeceras salientes rechazan nombres que no sean tokens válidos y caracteres de control inseguros antes del envío, incluidas las mutaciones mediante listas devueltas y copias de plantillas. Se conservan las tabulaciones horizontales y los valores Latin-1.
+
 Los tipos de respuesta incorporados inicializan sus metadatos estándar directamente cuando es posible, sin compartir cabeceras mutables entre respuestas. Se conserva la precedencia de las cabeceras personalizadas, incluidas las sustituciones de metadatos de redirección y archivo. Las subclases siguen utilizando sus hooks de cabeceras durante la construcción; la serialización JSON y el consumo de streams no cambian.
 
 ```python
 from orionis.http import response
 
 result = response.text("saved").withCookie(
-    "theme", "dark", secure=True, http_only=True, same_site="lax", max_age=3600,
+    "theme",
+    "dark",
+    secure=True,
+    http_only=True,
+    same_site="lax",
+    max_age=3600,
 )
 result.deleteCookie("obsolete", path="/")
 assert result.hasHeader("set-cookie")
@@ -54,7 +61,7 @@ Para borrar una cookie usa el mismo `path` y `domain` con los que se creó. `Sec
 
 ## Archivos y reutilización segura
 
-`response.file(path, media_type=..., filename=...)` verifica que exista un archivo regular y lo entrega con streaming. `download(path, filename=...)` añade disposición attachment. Resuelve la ruta desde un identificador autorizado, no desde un path arbitrario del cliente. Los adaptadores implementan respuestas condicionales y rangos; consulta sus pruebas antes de depender de un caso específico. El archivo puede desaparecer entre construcción y lectura.
+`response.file(path, media_type=..., filename=...)` verifica que exista un archivo regular y lo entrega con streaming. `download(path, filename=...)` añade disposición attachment. Resuelve la ruta desde un identificador autorizado, no desde un path arbitrario del cliente. Los adaptadores admiten un único intervalo de bytes por petición, no el manejo automático de peticiones condicionales. El archivo puede desaparecer entre construcción y lectura.
 
 `ResponseTemplate` permite conservar cuerpos codificados y encabezados base y obtener respuestas independientes con `make()`. No reutilices una misma respuesta mutable entre solicitudes. El trabajo `background` se ejecuta después del envío y la limpieza; no es una cola durable ni garantiza ejecución tras una caída del proceso.
 
@@ -62,7 +69,9 @@ Para borrar una cookie usa el mismo `path` y `domain` con los que se creó. `Sec
 ```python
 from orionis.http import ResponseTemplate
 
-template = ResponseTemplate("ready", headers={"X-Service": "catalog"}, media_type="text/plain")
+template = ResponseTemplate(
+    "ready", headers={"X-Service": "catalog"}, media_type="text/plain"
+)
 first = template.make()
 second = template.make()
 first.setHeader("X-Request-ID", "one")

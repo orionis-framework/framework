@@ -1,30 +1,35 @@
+# ruff: noqa: ARG002, PLC0415, TC003
+# Keep runtime annotations, optional failure imports and the shared driver signature.
 """Storage driver backed by the local filesystem."""
 
 from __future__ import annotations
 import asyncio
 import hashlib
 import mimetypes
+import os
+import re
 import secrets
 import shutil
+from collections.abc import AsyncIterable, AsyncIterator, Iterator
+from errno import EXDEV
 from datetime import UTC, datetime
 from functools import partial
 from pathlib import Path, PurePosixPath
-from typing import TYPE_CHECKING, Self
+from stat import S_ISDIR, S_ISREG
+from typing import BinaryIO, NoReturn, Self
 from urllib.parse import quote
-from orionis.storage.buffering import read_chunks
+from orionis.storage.buffering import _close_buffer, read_chunks
 from orionis.storage.contracts.driver import IStorageDriver
 from orionis.storage.entities.file_info import FileInfo
 from orionis.storage.enums.visibility import Visibility
 from orionis.storage.exceptions import (
     StorageFileNotFoundException,
+    StoragePathException,
     UnsupportedStorageOperationException,
 )
 from orionis.storage.paths import normalizeFilePath, normalizePath
 from orionis.storage.stream import AsyncStream
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterable, AsyncIterator, Iterator
-    from typing import BinaryIO
+from orionis.support.concurrency import complete_on_cancel
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
@@ -43,6 +48,55 @@ _ALLOWED_MODES: frozenset[str] = frozenset(
 )
 """Binary modes accepted by open()."""
 
+_STAGING_SUFFIX = re.compile(r"\.[0-9a-f]{16}\.tmp\Z")
+"""Identify the reserved sibling suffix used for atomic publication."""
+
+
+def _path_mode(path: Path) -> int | None:
+    """Read path metadata while distinguishing absence from an I/O failure.
+
+    Parameters
+    ----------
+    path : pathlib.Path
+        Filesystem path whose object type is required.
+
+    Returns
+    -------
+    int | None
+        Native mode bits, or ``None`` when the path or a parent is absent.
+
+    Raises
+    ------
+    OSError
+        If metadata cannot be read for a reason other than absence.
+    """
+    try:
+        return path.stat().st_mode
+    except FileNotFoundError, NotADirectoryError:
+        return None
+
+
+def _raise_walk_error(error: OSError) -> NoReturn:
+    """Propagate a directory scan error instead of returning a partial listing.
+
+    Parameters
+    ----------
+    error : OSError
+        Original error raised while traversing the selected directory.
+
+    Returns
+    -------
+    typing.NoReturn
+        Never return; propagate the original scan failure.
+
+    Raises
+    ------
+    OSError
+        Always propagate the supplied error.
+    """
+    raise error
+
+
 class LocalStorageDriver(IStorageDriver):
     """
     Storage driver backed by the local filesystem.
@@ -53,6 +107,9 @@ class LocalStorageDriver(IStorageDriver):
     Visibility is mapped onto POSIX permission bits (``0o644``/``0o600``
     for files), which degrades gracefully on platforms without a full
     POSIX mode implementation.
+
+    Preserve permission and device failures as their original I/O exceptions.
+    Missing paths retain the normal missing-file or empty existence results.
     """
 
     __slots__ = ("_base_url", "_root")
@@ -74,7 +131,8 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Initialize the driver rooted at *root*.
+            No return value.
+
         """
         self._root: Path = root.resolve()
         """Directory acting as the disk root. It is created when missing."""
@@ -103,8 +161,11 @@ class LocalStorageDriver(IStorageDriver):
         pathlib.Path
             Absolute path inside the disk root.
         """
-        # Normalized paths cannot escape the root, so a plain join is safe.
-        return self._root / normalized if normalized else self._root
+        absolute = self._root / normalized if normalized else self._root
+        if not absolute.resolve().is_relative_to(self._root):
+            error_msg = f"Storage path [{normalized}] escapes the disk root."
+            raise StoragePathException(error_msg)
+        return absolute
 
     def __relative(self: Self, absolute: Path) -> str:
         """
@@ -147,7 +208,7 @@ class LocalStorageDriver(IStorageDriver):
             raise UnsupportedStorageOperationException(error_msg)
         return mode
 
-    def __statOrFail(self: Self, normalized: str) -> tuple[Path, object]:
+    def __statOrFail(self: Self, normalized: str) -> tuple[Path, os.stat_result]:
         """
         Stat the file at *normalized* or raise when it is absent.
 
@@ -158,21 +219,23 @@ class LocalStorageDriver(IStorageDriver):
 
         Returns
         -------
-        tuple[pathlib.Path, object]
+        tuple[pathlib.Path, os.stat_result]
             The absolute path and its ``os.stat_result``.
 
         Raises
         ------
         orionis.storage.exceptions.StorageFileNotFoundException
             If the path does not reference an existing file.
+        OSError
+            If metadata cannot be read for a reason other than absence.
         """
         absolute = self.__absolute(normalized)
         try:
             stats = absolute.stat()
-        except OSError as exc:
+        except (FileNotFoundError, NotADirectoryError) as exc:
             error_msg = f"File does not exist at path [{normalized}]."
             raise StorageFileNotFoundException(error_msg) from exc
-        if not absolute.is_file():
+        if not S_ISREG(stats.st_mode):
             error_msg = f"Path [{normalized}] does not reference a file."
             raise StorageFileNotFoundException(error_msg)
         return absolute, stats
@@ -195,11 +258,13 @@ class LocalStorageDriver(IStorageDriver):
         ------
         orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
+        OSError
+            If reading is denied or the filesystem reports another I/O failure.
         """
         absolute = self.__absolute(normalized)
         try:
             return absolute.read_bytes()
-        except (FileNotFoundError, IsADirectoryError, PermissionError) as exc:
+        except (FileNotFoundError, NotADirectoryError, IsADirectoryError) as exc:
             error_msg = f"File does not exist at path [{normalized}]."
             raise StorageFileNotFoundException(error_msg) from exc
 
@@ -223,6 +288,8 @@ class LocalStorageDriver(IStorageDriver):
         ------
         orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
+        OSError
+            If opening is denied or the filesystem reports another I/O failure.
         """
         absolute = self.__absolute(normalized)
 
@@ -231,11 +298,15 @@ class LocalStorageDriver(IStorageDriver):
             absolute.parent.mkdir(parents=True, exist_ok=True)
         try:
             return absolute.open(mode)
-        except (FileNotFoundError, IsADirectoryError, PermissionError) as exc:
+        except (FileNotFoundError, NotADirectoryError, IsADirectoryError) as exc:
             error_msg = f"File does not exist at path [{normalized}]."
             raise StorageFileNotFoundException(error_msg) from exc
 
-    def __openTemp(self: Self, tmp: Path) -> BinaryIO:
+    def __openTemp(
+        self: Self,
+        tmp: Path,
+        visibility: str | None = None,
+    ) -> BinaryIO:
         """
         Open a temporary sibling file for writing synchronously.
 
@@ -243,14 +314,22 @@ class LocalStorageDriver(IStorageDriver):
         ----------
         tmp : pathlib.Path
             Absolute path of the temporary file.
+        visibility : str | None
+            Requested permissions applied when the staging file is created.
 
         Returns
         -------
         typing.BinaryIO
             Open binary handle in write mode.
         """
+        mode = 0o666 if visibility is None else self.__fileMode(visibility)
         tmp.parent.mkdir(parents=True, exist_ok=True)
-        return tmp.open("wb")
+        descriptor = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
+        try:
+            return os.fdopen(descriptor, "wb")
+        except BaseException:
+            os.close(descriptor)
+            raise
 
     @staticmethod
     def __tempPath(absolute: Path) -> Path:
@@ -292,21 +371,23 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Atomically write *data* to *normalized* synchronously.
-        """
-        absolute = self.__absolute(normalized)
-        absolute.parent.mkdir(parents=True, exist_ok=True)
+            No return value.
 
-        # Write to a sibling temp file then rename for atomic replacement.
+        """
+        if visibility is not None:
+            self.__fileMode(visibility)
+        absolute = self.__absolute(normalized)
         tmp = self.__tempPath(absolute)
         try:
-            tmp.write_bytes(data)
+            with self.__openTemp(tmp, visibility) as handle:
+                handle.write(data)
             tmp.replace(absolute)
         except OSError:
             try:
                 tmp.unlink(missing_ok=True)
             except OSError as cleanup_error:
-                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                from orionis.failure.runtime import capture_nowait
+
                 capture_nowait(
                     cleanup_error,
                     flow="storage",
@@ -314,9 +395,6 @@ class LocalStorageDriver(IStorageDriver):
                     operation="local.write",
                 )
             raise
-
-        if visibility is not None:
-            absolute.chmod(self.__fileMode(visibility))
 
     def __commitStream(
         self: Self,
@@ -339,11 +417,12 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Promote a finished temp file to its final destination.
+            No return value.
+
         """
-        tmp.replace(absolute)
         if visibility is not None:
-            absolute.chmod(self.__fileMode(visibility))
+            tmp.chmod(self.__fileMode(visibility))
+        tmp.replace(absolute)
 
     def __copySync(self: Self, source: str, target: str) -> None:
         """
@@ -356,10 +435,11 @@ class LocalStorageDriver(IStorageDriver):
         target : str
             Canonical root-relative destination path.
 
+
         Returns
         -------
         None
-            Copy *source* to *target* synchronously.
+            No return value.
 
         Raises
         ------
@@ -382,10 +462,11 @@ class LocalStorageDriver(IStorageDriver):
         target : str
             Canonical root-relative destination path.
 
+
         Returns
         -------
         None
-            Move *source* to *target* synchronously.
+            No return value.
 
         Raises
         ------
@@ -398,9 +479,10 @@ class LocalStorageDriver(IStorageDriver):
         try:
             origin.replace(destination)
         except OSError as error:
-            # Fall back for cross-device moves where rename cannot work.
-            from errno import EXDEV  # noqa: PLC0415
-            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            if error.errno != EXDEV:
+                raise
+            from orionis.failure.runtime import capture_nowait
+
             capture_nowait(
                 error,
                 flow="storage",
@@ -428,7 +510,11 @@ class LocalStorageDriver(IStorageDriver):
             Absolute path of each matching entry.
         """
         # Path.walk() traverses the tree without loading it in memory.
-        for parent, dirnames, filenames in base.walk():
+        for parent, dirnames, filenames in base.walk(on_error=_raise_walk_error):
+            # Windows junctions are not symbolic links; avoid traversing them too.
+            dirnames[:] = [
+                name for name in dirnames if not (parent / name).is_junction()
+            ]
             for name in dirnames if want_dirs else filenames:
                 yield parent / name
 
@@ -450,7 +536,8 @@ class LocalStorageDriver(IStorageDriver):
             Absolute path of each matching entry.
         """
         for entry in base.iterdir():
-            if entry.is_dir() is want_dirs:
+            mode = _path_mode(entry)
+            if mode is not None and S_ISDIR(mode) is want_dirs:
                 yield entry
 
     def __listSync(
@@ -478,7 +565,7 @@ class LocalStorageDriver(IStorageDriver):
             Sorted root-relative entry paths.
         """
         base = self.__absolute(normalized)
-        if not base.is_dir():
+        if not S_ISDIR(_path_mode(base) or 0):
             return []
 
         # Select the traversal strategy and drop in-flight temp files
@@ -487,7 +574,7 @@ class LocalStorageDriver(IStorageDriver):
         results = [
             self.__relative(entry)
             for entry in walker(base, want_dirs=want_dirs)
-            if want_dirs or not entry.name.endswith(".tmp")
+            if want_dirs or _STAGING_SUFFIX.search(entry.name) is None
         ]
         results.sort()
         return results
@@ -521,6 +608,9 @@ class LocalStorageDriver(IStorageDriver):
         except ValueError as exc:
             error_msg = f"Unsupported hash algorithm [{algorithm}]."
             raise UnsupportedStorageOperationException(error_msg) from exc
+        if hasher.digest_size == 0:
+            error_msg = f"Hash algorithm [{algorithm}] requires an output length."
+            raise UnsupportedStorageOperationException(error_msg)
 
         # Hash in fixed-size chunks to bound peak memory usage.
         with absolute.open("rb") as handle:
@@ -663,7 +753,7 @@ class LocalStorageDriver(IStorageDriver):
             If the file does not exist.
         """
         normalized = normalizeFilePath(path)
-        return await asyncio.to_thread(self.__readSync, normalized)
+        return await complete_on_cancel(asyncio.to_thread(self.__readSync, normalized))
 
     async def readStream(
         self: Self,
@@ -712,8 +802,12 @@ class LocalStorageDriver(IStorageDriver):
         bool
             ``True`` if a file exists at the given path.
         """
-        absolute = self.__absolute(normalizeFilePath(path))
-        return await asyncio.to_thread(absolute.is_file)
+        normalized = normalizeFilePath(path)
+        return await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: S_ISREG(_path_mode(self.__absolute(normalized)) or 0),
+            ),
+        )
 
     # ── Write operations ─────────────────────────────────────────────────────
 
@@ -741,13 +835,16 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Write *contents* to *path*, replacing any existing file.
+            No return value.
+
         """
         normalized = normalizeFilePath(path)
         data = (
             contents.encode("utf-8") if isinstance(contents, str) else bytes(contents)
         )
-        await asyncio.to_thread(self.__writeSync, normalized, data, visibility)
+        await complete_on_cancel(
+            asyncio.to_thread(self.__writeSync, normalized, data, visibility),
+        )
 
     async def writeStream(
         self: Self,
@@ -774,25 +871,29 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Write the chunks produced by *stream* to *path*.
+            No return value.
+
         """
         normalized = normalizeFilePath(path)
-        absolute = self.__absolute(normalized)
+        if visibility is not None:
+            self.__fileMode(visibility)
+        absolute = await complete_on_cancel(
+            asyncio.to_thread(self.__absolute, normalized),
+        )
         tmp = self.__tempPath(absolute)
-        handle = await asyncio.to_thread(self.__openTemp, tmp)
-
-        # Track completion so failures can discard the partial temp file.
-        completed = False
+        primary = None
         try:
-            async for chunk in stream:
-                await asyncio.to_thread(handle.write, chunk)
-            completed = True
+            async with AsyncStream(partial(self.__openTemp, tmp, visibility)) as target:
+                async for chunk in stream:
+                    await target.write(chunk)
+            await complete_on_cancel(
+                asyncio.to_thread(self.__commitStream, tmp, absolute, visibility),
+            )
+        except BaseException as error:
+            primary = error
+            raise
         finally:
-            await asyncio.to_thread(handle.close)
-            if not completed:
-                await asyncio.to_thread(tmp.unlink, missing_ok=True)
-
-        await asyncio.to_thread(self.__commitStream, tmp, absolute, visibility)
+            await _close_buffer(partial(tmp.unlink, missing_ok=True), primary)
 
     async def delete(self: Self, path: str) -> bool:
         """
@@ -808,9 +909,11 @@ class LocalStorageDriver(IStorageDriver):
         bool
             ``True`` if the file existed and was removed.
         """
-        absolute = self.__absolute(normalizeFilePath(path))
+        normalized = normalizeFilePath(path)
         try:
-            await asyncio.to_thread(absolute.unlink)
+            await complete_on_cancel(
+                asyncio.to_thread(lambda: self.__absolute(normalized).unlink()),
+            )
         except FileNotFoundError:
             return False
         return True
@@ -826,20 +929,23 @@ class LocalStorageDriver(IStorageDriver):
         target : str
             Root-relative destination path.
 
+
         Returns
         -------
         None
-            Copy the file at *source* to *target*.
+            No return value.
 
         Raises
         ------
         orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
-        await asyncio.to_thread(
-            self.__copySync,
-            normalizeFilePath(source),
-            normalizeFilePath(target),
+        await complete_on_cancel(
+            asyncio.to_thread(
+                self.__copySync,
+                normalizeFilePath(source),
+                normalizeFilePath(target),
+            ),
         )
 
     async def move(self: Self, source: str, target: str) -> None:
@@ -853,20 +959,23 @@ class LocalStorageDriver(IStorageDriver):
         target : str
             Root-relative destination path.
 
+
         Returns
         -------
         None
-            Move the file at *source* to *target*.
+            No return value.
 
         Raises
         ------
         orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
-        await asyncio.to_thread(
-            self.__moveSync,
-            normalizeFilePath(source),
-            normalizeFilePath(target),
+        await complete_on_cancel(
+            asyncio.to_thread(
+                self.__moveSync,
+                normalizeFilePath(source),
+                normalizeFilePath(target),
+            ),
         )
 
     # ── Metadata operations ──────────────────────────────────────────────────
@@ -890,9 +999,11 @@ class LocalStorageDriver(IStorageDriver):
         orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
-        _, stats = await asyncio.to_thread(
-            self.__statOrFail,
-            normalizeFilePath(path),
+        _, stats = await complete_on_cancel(
+            asyncio.to_thread(
+                self.__statOrFail,
+                normalizeFilePath(path),
+            ),
         )
         return stats.st_size
 
@@ -934,9 +1045,11 @@ class LocalStorageDriver(IStorageDriver):
         orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
-        _, stats = await asyncio.to_thread(
-            self.__statOrFail,
-            normalizeFilePath(path),
+        _, stats = await complete_on_cancel(
+            asyncio.to_thread(
+                self.__statOrFail,
+                normalizeFilePath(path),
+            ),
         )
         return datetime.fromtimestamp(stats.st_mtime, tz=UTC)
 
@@ -959,9 +1072,11 @@ class LocalStorageDriver(IStorageDriver):
         orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
-        _, stats = await asyncio.to_thread(
-            self.__statOrFail,
-            normalizeFilePath(path),
+        _, stats = await complete_on_cancel(
+            asyncio.to_thread(
+                self.__statOrFail,
+                normalizeFilePath(path),
+            ),
         )
         return self.__visibilityFromMode(stats.st_mode)
 
@@ -976,10 +1091,11 @@ class LocalStorageDriver(IStorageDriver):
         visibility : str
             Target visibility (``'public'`` or ``'private'``).
 
+
         Returns
         -------
         None
-            Change the visibility of the file at *path*.
+            No return value.
 
         Raises
         ------
@@ -989,11 +1105,13 @@ class LocalStorageDriver(IStorageDriver):
             If *visibility* is not a supported level.
         """
         mode = self.__fileMode(visibility)
-        absolute, _ = await asyncio.to_thread(
-            self.__statOrFail,
-            normalizeFilePath(path),
+        absolute, _ = await complete_on_cancel(
+            asyncio.to_thread(
+                self.__statOrFail,
+                normalizeFilePath(path),
+            ),
         )
-        await asyncio.to_thread(absolute.chmod, mode)
+        await complete_on_cancel(asyncio.to_thread(absolute.chmod, mode))
 
     async def hash(self: Self, path: str, algorithm: str = "sha256") -> str:
         """
@@ -1018,10 +1136,12 @@ class LocalStorageDriver(IStorageDriver):
         orionis.storage.exceptions.UnsupportedStorageOperationException
             If *algorithm* is not available.
         """
-        return await asyncio.to_thread(
-            self.__hashSync,
-            normalizeFilePath(path),
-            algorithm,
+        return await complete_on_cancel(
+            asyncio.to_thread(
+                self.__hashSync,
+                normalizeFilePath(path),
+                algorithm,
+            ),
         )
 
     async def info(self: Self, path: str) -> FileInfo:
@@ -1044,9 +1164,11 @@ class LocalStorageDriver(IStorageDriver):
         orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
-        return await asyncio.to_thread(
-            self.__infoSync,
-            normalizeFilePath(path),
+        return await complete_on_cancel(
+            asyncio.to_thread(
+                self.__infoSync,
+                normalizeFilePath(path),
+            ),
         )
 
     # ── Directory operations ─────────────────────────────────────────────────
@@ -1063,10 +1185,15 @@ class LocalStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Create the directory at *path*, including missing parents.
+            No return value.
+
         """
-        absolute = self.__absolute(normalizePath(path))
-        await asyncio.to_thread(absolute.mkdir, parents=True, exist_ok=True)
+        normalized = normalizePath(path)
+        await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: self.__absolute(normalized).mkdir(parents=True, exist_ok=True),
+            ),
+        )
 
     async def deleteDirectory(self: Self, path: str) -> bool:
         """
@@ -1082,11 +1209,23 @@ class LocalStorageDriver(IStorageDriver):
         bool
             ``True`` if the directory existed and was removed.
         """
-        absolute = self.__absolute(normalizePath(path))
-        if not await asyncio.to_thread(absolute.is_dir):
-            return False
-        await asyncio.to_thread(shutil.rmtree, absolute)
-        return True
+        normalized = normalizePath(path)
+
+        def delete_directory() -> bool:
+            """Check the root boundary and remove the directory on one worker.
+
+            Returns
+            -------
+            bool
+                Whether an existing directory was removed.
+            """
+            absolute = self.__absolute(normalized)
+            if not S_ISDIR(_path_mode(absolute) or 0):
+                return False
+            shutil.rmtree(absolute)
+            return True
+
+        return await complete_on_cancel(asyncio.to_thread(delete_directory))
 
     async def directoryExists(self: Self, path: str) -> bool:
         """
@@ -1103,8 +1242,12 @@ class LocalStorageDriver(IStorageDriver):
         bool
             ``True`` if a directory exists at the given path.
         """
-        absolute = self.__absolute(normalizePath(path))
-        return await asyncio.to_thread(absolute.is_dir)
+        normalized = normalizePath(path)
+        return await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: S_ISDIR(_path_mode(self.__absolute(normalized)) or 0),
+            ),
+        )
 
     async def files(
         self: Self,
@@ -1127,11 +1270,13 @@ class LocalStorageDriver(IStorageDriver):
         list[str]
             Sorted root-relative file paths.
         """
-        return await asyncio.to_thread(
-            lambda: self.__listSync(
-                normalizePath(path),
-                recursive=recursive,
-                want_dirs=False,
+        return await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: self.__listSync(
+                    normalizePath(path),
+                    recursive=recursive,
+                    want_dirs=False,
+                ),
             ),
         )
 
@@ -1156,11 +1301,13 @@ class LocalStorageDriver(IStorageDriver):
         list[str]
             Sorted root-relative directory paths.
         """
-        return await asyncio.to_thread(
-            lambda: self.__listSync(
-                normalizePath(path),
-                recursive=recursive,
-                want_dirs=True,
+        return await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: self.__listSync(
+                    normalizePath(path),
+                    recursive=recursive,
+                    want_dirs=True,
+                ),
             ),
         )
 
@@ -1192,7 +1339,9 @@ class LocalStorageDriver(IStorageDriver):
         return self.__buildUrl(normalized)
 
     async def temporaryUrl(
-        self: Self, path: str, expires_in: int,  # noqa: ARG002
+        self: Self,
+        path: str,
+        expires_in: int,
     ) -> str:
         """
         Build a signed, time-limited URL for the file at *path*.
@@ -1242,10 +1391,12 @@ class LocalStorageDriver(IStorageDriver):
         orionis.storage.exceptions.StorageFileNotFoundException
             If the file does not exist.
         """
-        return await asyncio.to_thread(
-            self.__downloadSync,
-            normalizeFilePath(path),
-            destination,
+        return await complete_on_cancel(
+            asyncio.to_thread(
+                self.__downloadSync,
+                normalizeFilePath(path),
+                destination,
+            ),
         )
 
     def open(self: Self, path: str, mode: str = "rb") -> AsyncStream:

@@ -1,9 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from dataclasses import FrozenInstanceError
 from orionis.mail.entities.prepared import PreparedMail
 from orionis.test import TestCase
 
-class TestPreparedMail(TestCase):
 
+class TestPreparedMail(TestCase):
     def testCarriesMimeAndTransportEnvelopeSeparately(self) -> None:
         """Expose serialized bytes beside the transport recipient union.
 

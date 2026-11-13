@@ -25,9 +25,12 @@ class ProductFactory(Factory[Product]):
         return {"name": self.fake.word(), "status": "draft"}
 
 
-products = ProductFactory(seed=7).count(2).sequence(
-    Sequence({"status": "draft"}, {"status": "published"})
-).make()
+products = (
+    ProductFactory(seed=7)
+    .count(2)
+    .sequence(Sequence({"status": "draft"}, {"status": "published"}))
+    .make()
+)
 assert [product.status for product in products] == ["draft", "published"]
 assert all(product.isDirty("name") for product in products)
 ```
@@ -40,7 +43,7 @@ assert all(product.isDirty("name") for product in products)
 
 `Sequence({...}, {...})` rotates states; callable states follow the sequence contract. Its index belongs to the factory and advances between generations. Do not rely on a global index shared by tests.
 
-`self.fake` wraps Faker with camelCase names such as `firstName()`, `safeEmail()`, and `word()`. `locale=` selects a locale; otherwise the factory attempts `app.locale` and falls back to `en_US` when configuration or a usable locale is unavailable. `fake.unique` remembers values seen by that instance; `clearUnique()` resets that registry. Faker uniqueness does not ensure uniqueness against existing database rows. Do not use generated data for real credentials.
+`self.fake` wraps Faker with camelCase names such as `firstName()`, `safeEmail()`, and `word()`. `locale=` selects a locale; otherwise the factory attempts `app.locale` and falls back to `en_US` when configuration or a usable locale is unavailable. `fake.unique` remembers values seen by that instance; `clearUnique()` resets that registry. A derived unique view initially shares the seen-value history; clearing that view starts an independent history, matching Faker's behavior. Faker uniqueness does not ensure uniqueness against existing database rows. Do not use generated data for real credentials.
 
 `fake.optional` exposes a provider view accepting `prob`; `fake.addProvider(provider)` registers custom providers and invalidates cached methods. `seedInstance(seed)` and `seedLocale(locale, seed)` provide explicit reseeding; `locales` returns a detached list. `UniqueFake` and `OptionalFake` are exported for typing and extending these views without placing services in generated attributes.
 
@@ -76,6 +79,6 @@ async def create_first_product():
 
 This example persists only the first model and requires database infrastructure. It is not ORM query streaming.
 
-A factory retains count, states, sequence, and Faker state. Overlapping use or reconfiguration while iterating raises `FactoryConcurrencyException`: create an instance per task. `FactoryConfigurationException` and `FactoryDefinitionException` distinguish invalid definitions from persistence failures. SQL failures retain database-layer errors.
+A factory retains count, states, sequence, and Faker state. Overlapping use or reconfiguration while iterating raises `FactoryConcurrencyException`: create an instance per task. `FactoryConfigurationException` reports invalid factory configuration; `FactoryDefinitionException` reports invalid generated definitions. `FactoryPersistenceException` reports a save veto or unusable persistence result. SQL failures retain database-layer errors.
 
 For isolated tests, use in-memory SQLite with a dedicated manager/resolver, as the module tests do. `ConnectionResolver.setManager(manager)` installs the global bridge and `clear()` removes it; do not replace that global while other tests/tasks query. Dialect tests need the corresponding server. Combine these practices with [Testing](../../../test/docs/en/README.md).

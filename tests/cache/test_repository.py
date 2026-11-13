@@ -1,11 +1,15 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import tempfile
 from pathlib import Path
 from aiocache import SimpleMemoryCache
 from orionis.cache.repository import CacheRepository
+from orionis.cache.locks.lock import CacheLock
 from orionis.cache.stores.file import FileCacheBackend
 from orionis.cache.stores.memory import build as build_memory
 from orionis.test import TestCase
+
 
 class _PausedMemoryCache(SimpleMemoryCache):
     """Pause after reading the compare-and-set token."""
@@ -16,7 +20,7 @@ class _PausedMemoryCache(SimpleMemoryCache):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         super().__init__()
         self.entered = asyncio.Event()
@@ -42,6 +46,7 @@ class _PausedMemoryCache(SimpleMemoryCache):
         await self.released.wait()
         return value
 
+
 class TestCacheRepository(TestCase):
     """Tests for CacheRepository backed by FileCacheBackend."""
 
@@ -54,24 +59,12 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._backend = FileCacheBackend(Path(self._tmpdir.name))
         self._repo = CacheRepository(self._backend)
-
-    def tearDown(self) -> None:
-        """Remove the temporary directory after each test.
-
-        Ensures all cache files written during the test are cleaned up
-        regardless of whether the test passed or failed.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     # ── get ──────────────────────────────────────────────────────────────────
 
@@ -83,7 +76,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._repo.get("absent")
         self.assertIsNone(result)
@@ -96,7 +89,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("hello", "world")
         result = await self._repo.get("hello")
@@ -112,7 +105,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._repo.set("k", "v")
         self.assertTrue(result)
@@ -126,7 +119,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("k", "first")
         await self._repo.set("k", "second")
@@ -138,7 +131,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await self._repo.replace("session", "new"))
         await self._repo.set("session", "old")
@@ -158,7 +151,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("present", 1)
         self.assertTrue(await self._repo.has("present"))
@@ -171,7 +164,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await self._repo.has("ghost"))
 
@@ -186,7 +179,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("del", "bye")
         result = await self._repo.delete("del")
@@ -201,7 +194,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._repo.delete("never_set")
         self.assertFalse(result)
@@ -216,7 +209,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("a", 1)
         await self._repo.set("b", 2)
@@ -236,7 +229,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("m1", "alpha")
         await self._repo.set("m2", "beta")
@@ -252,7 +245,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._repo.getMany(["x", "y"])
         self.assertIsNone(result["x"])
@@ -267,7 +260,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._repo.setMany({"s1": 10, "s2": 20})
         self.assertTrue(result)
@@ -285,7 +278,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         calls = []
 
@@ -314,7 +307,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("hit", "cached")
         calls = []
@@ -343,7 +336,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         async def async_resolver() -> int:
@@ -371,7 +364,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         calls = []
 
@@ -396,13 +389,13 @@ class TestCacheRepository(TestCase):
     async def testPullReturnsValueAndDeletesKey(self) -> None:
         """Return the stored value and remove the key in a single pull call.
 
-        Validates that pull atomically reads and deletes the entry so a
+        Validate that pull reads and then deletes the entry so a
         subsequent get returns None.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("pull_k", "pull_v")
         result = await self._repo.pull("pull_k")
@@ -418,7 +411,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._repo.pull("no_such_key")
         self.assertIsNone(result)
@@ -433,7 +426,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._repo.add("add_k", "add_v")
         self.assertTrue(result)
@@ -448,7 +441,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("dup", "original")
         result = await self._repo.add("dup", "new")
@@ -466,7 +459,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._repo.increment("cnt", 3)
         self.assertEqual(result, 3)
@@ -479,7 +472,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("cnt2", 10)
         result = await self._repo.increment("cnt2", 5)
@@ -494,7 +487,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.set("dcnt", 20)
         result = await self._repo.decrement("dcnt", 7)
@@ -511,7 +504,7 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         repo_a = CacheRepository(self._backend, prefix="ns_a")
         repo_b = CacheRepository(self._backend, prefix="ns_b")
@@ -531,11 +524,11 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         repo = CacheRepository(self._backend)
         await repo.set("raw", "value")
-        self.assertEqual(await repo.get("raw"), "value")
+        self.assertEqual(await self._backend.get("raw"), "value")
 
     # ── lock ─────────────────────────────────────────────────────────────────
 
@@ -548,11 +541,18 @@ class TestCacheRepository(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         lock = self._repo.lock("resource")
-        async with lock:
-            self.assertTrue(await self._repo.has("resource") or True)
+        self.assertIsInstance(lock, CacheLock)
+        async with lock as acquired:
+            self.assertIs(acquired, lock)
+            with self.assertRaises(TimeoutError):
+                async with self._repo.lock("resource", timeout=0.01):
+                    self.fail("A second caller acquired the held lock.")
+        async with self._repo.lock("resource", timeout=1):
+            self.assertFalse(await self._repo.has("resource"))
+
 
 class TestCacheRepositoryOnMemoryBackend(TestCase):
     """Tests for CacheRepository backed by the in-memory aiocache store."""
@@ -566,9 +566,11 @@ class TestCacheRepositoryOnMemoryBackend(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._repo = CacheRepository(build_memory())
+        backend = build_memory()
+        self.addAsyncCleanup(backend.close)
+        self._repo = CacheRepository(backend)
 
     async def testCounterIsReadableAfterIncrement(self) -> None:
         """Read back a counter written through increment.
@@ -579,7 +581,7 @@ class TestCacheRepositoryOnMemoryBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await self._repo.increment("hits", 5), 5)
         self.assertEqual(await self._repo.get("hits"), 5)
@@ -592,7 +594,7 @@ class TestCacheRepositoryOnMemoryBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.increment("hits", 5)
         self.assertEqual(await self._repo.decrement("hits", 2), 3)
@@ -607,7 +609,7 @@ class TestCacheRepositoryOnMemoryBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._repo.increment("hits")
         await self._repo.set("name", "orionis")
@@ -622,7 +624,7 @@ class TestCacheRepositoryOnMemoryBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await self._repo.replace("session", "new"))
         await self._repo.set("session", "old")
@@ -635,16 +637,18 @@ class TestCacheRepositoryOnMemoryBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         backend = _PausedMemoryCache()
+        self.addAsyncCleanup(backend.close)
         repository = CacheRepository(backend)
         await repository.set("session", "original")
         pending = asyncio.create_task(repository.replace("session", "stale"))
-        await backend.entered.wait()
         try:
+            await asyncio.wait_for(backend.entered.wait(), 2)
             await repository.delete("session")
         finally:
             backend.released.set()
+            await asyncio.gather(pending, return_exceptions=True)
         self.assertFalse(await pending)
         self.assertIsNone(await repository.get("session"))

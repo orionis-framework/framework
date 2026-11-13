@@ -160,11 +160,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36554"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36624"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId36554">
+                <label class="lbl-toggle" for="expandableItemId36624">
                     
                     
                 </label>
@@ -227,8 +227,31 @@
     </li>
 </ul>
 
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_freeze_sequences" class="internal-link" title="orionis.support.structures.freezer._freeze_sequences">_freeze<wbr></wbr>_sequences</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_mutable_graph" class="internal-link" title="orionis.support.structures.freezer._mutable_graph">_mutable<wbr></wbr>_graph</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -281,7 +304,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36555"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36625"> 
                     
                 </input>
 
@@ -315,8 +338,31 @@
     </li>
 </ul>
 
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_freeze_sequences" class="internal-link" title="orionis.support.structures.freezer._freeze_sequences">_freeze<wbr></wbr>_sequences</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_mutable_graph" class="internal-link" title="orionis.support.structures.freezer._mutable_graph">_mutable<wbr></wbr>_graph</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -429,7 +475,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/support/structures/freezer.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/support/structures/freezer.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
@@ -437,7 +483,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2142">
+          <table class="children sortable" id="id2156">
   
   
   <tr class="class">
@@ -445,11 +491,21 @@
     <td>Class</td>
     <td><code><a href="orionis.support.structures.freezer.FreezeThaw.html" class="internal-link" title="orionis.support.structures.freezer.FreezeThaw"><wbr></wbr>Freeze<wbr></wbr>Thaw</a></code></td>
     <td>Convert nested mutable structures to immutable snapshots and back.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_freeze_sequences" class="internal-link" title="orionis.support.structures.freezer._freeze_sequences">_freeze<wbr></wbr>_sequences</a></code></td>
+    <td>Resolve sequence dependencies and cache their immutable tuple snapshots.</td>
+  </tr><tr class="function">
+    
+    <td>Function</td>
+    <td><code><a href="#_mutable_graph" class="internal-link" title="orionis.support.structures.freezer._mutable_graph">_mutable<wbr></wbr>_graph</a></code></td>
+    <td>Copy graph containers and record edges that require reference updates.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
     <td><code><a href="#_CONTAINER_TYPES" class="internal-link" title="orionis.support.structures.freezer._CONTAINER_TYPES">_CONTAINER<wbr></wbr>_TYPES</a></code></td>
-    <td>Define container types handled by the freezer. Avoids re-creating the type-tuple on every call and enables JIT specialization.</td>
+    <td>Container types traversed when constructing a mutable snapshot.</td>
   </tr><tr class="constant">
     
     <td>Constant</td>
@@ -463,7 +519,61 @@
         </div>
 
         <div id="child-list">
-          <div class="baseconstant">
+          <div class="basefunction">
+  
+  
+  <a name="orionis.support.structures.freezer._freeze_sequences">
+    
+  </a>
+  <a name="_freeze_sequences">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_freeze_sequences</span><span class="function-signature">(<span class="rst-sig-param">sequences: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>]</code>, </span><span class="rst-sig-param">cache: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/support/structures/freezer.py#L50">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_freeze_sequences" title="orionis.support.structures.freezer._freeze_sequences">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve sequence dependencies and cache their immutable tuple snapshots.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">sequences:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, list | tuple]</code></td><td class="fieldArgDesc">Original sequences indexed by identity.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Completed snapshots, including preallocated mapping proxies.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a cycle consists entirely of sequences.</td></tr></table></div>
+  </div>
+</div><div class="basefunction">
+  
+  
+  <a name="orionis.support.structures.freezer._mutable_graph">
+    
+  </a>
+  <a name="_mutable_graph">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_mutable_graph</span><span class="function-signature">(<span class="rst-sig-param">obj: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>], <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]]]</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/support/structures/freezer.py#L13">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_mutable_graph" title="orionis.support.structures.freezer._mutable_graph">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Copy graph containers and record edges that require reference updates.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">obj:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Root container to traverse without recursion.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>], <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]]]</code></td><td class="fieldArgDesc">Mutable copies indexed by original identity and their pending edges.</td></tr></table></div>
+  </div>
+</div><div class="baseconstant">
   
   
   <a name="orionis.support.structures.freezer._CONTAINER_TYPES">
@@ -475,7 +585,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_CONTAINER_TYPES</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/support/structures/freezer.py#L9">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/support/structures/freezer.py#L7">
       
       (source)
     </a>
@@ -487,8 +597,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p>Define container types handled by the freezer. Avoids re-creating the type-tuple on
-every call and enables JIT specialization.</p></div>
+    <div><p>Container types traversed when constructing a mutable snapshot.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code>(<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>, <wbr></wbr><a href="https://docs.python.org/3/library/types.html#types.MappingProxyType" class="intersphinx-link">MappingProxyType</a>)</code></pre></td></tr></table>
   </div>
 </div><div class="baseconstant">
@@ -503,7 +612,7 @@ every call and enables JIT specialization.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_MUTABLE_TYPES</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/support/structures/freezer.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/support/structures/freezer.py#L9">
       
       (source)
     </a>
@@ -529,7 +638,7 @@ every call and enables JIT specialization.</p></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -9,6 +9,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+
 class _Page(HTMLParser):
     """Collect navigation targets and documentation diagnostics from one page."""
 
@@ -53,12 +54,18 @@ class _Page(HTMLParser):
             if href:
                 self.links.add(href)
         classes = set((attributes.get("class") or "").split())
-        self.problems.update(classes & {
-            "undocumented", "rst-system-message", "rst-problematic",
-        })
+        self.problems.update(
+            classes
+            & {
+                "undocumented",
+                "rst-system-message",
+                "rst-problematic",
+            },
+        )
         self.field_tables += "fieldTable" in classes
 
     handle_starttag = handleStarttag
+
 
 @cache
 def _local_target(directory: str, href: str) -> tuple[str, str] | None:
@@ -90,7 +97,8 @@ def _local_target(directory: str, href: str) -> tuple[str, str] | None:
         target = posixpath.join(target, "index.html")
     return target, unquote(url.fragment)
 
-def validate_site(directory: Path) -> dict[str, object]: # NOSONAR
+
+def validate_site(directory: Path) -> dict[str, object]:  # NOSONAR
     """Inspect the complete generated site before replacing published files.
 
     Parameters
@@ -103,8 +111,11 @@ def validate_site(directory: Path) -> dict[str, object]: # NOSONAR
     dict[str, object]
         Page and API counts, plus any broken links or incomplete fields.
     """
-    files = {path.relative_to(directory).as_posix(): path
-             for path in directory.rglob("*") if path.is_file()}
+    files = {
+        path.relative_to(directory).as_posix(): path
+        for path in directory.rglob("*")
+        if path.is_file()
+    }
     pages = {}
     errors = []
     for name, path in files.items():
@@ -125,17 +136,25 @@ def validate_site(directory: Path) -> dict[str, object]: # NOSONAR
             target = target or name
             if target not in files:
                 errors.append(f"{name}: missing local file {href}")
-            elif (fragment and target in pages
-                  and fragment not in pages[target].identifiers):
+            elif (
+                fragment
+                and target in pages
+                and fragment not in pages[target].identifiers
+            ):
                 errors.append(f"{name}: missing local anchor {href}")
     inventory = pages.get("all-documents.html")
     return {
         "html_pages": len(pages),
-        "api_objects": sum(identifier == "orionis" or identifier.startswith("orionis.")
-                           for identifier in inventory.identifiers) if inventory else 0,
+        "api_objects": sum(
+            identifier == "orionis" or identifier.startswith("orionis.")
+            for identifier in inventory.identifiers
+        )
+        if inventory
+        else 0,
         "numpy_field_tables": sum(page.field_tables for page in pages.values()),
         "errors": errors,
     }
+
 
 def main() -> int:
     """Validate a generated site passed on the command line.
@@ -148,6 +167,7 @@ def main() -> int:
     report = validate_site(Path(sys.argv[1]))
     sys.stdout.write(json.dumps(report, indent=2) + "\n")
     return int(bool(report["errors"]))
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -1,4 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
+import asyncio
 import io
 import sys
 from unittest.mock import MagicMock, patch
@@ -6,7 +9,37 @@ from orionis.console.dynamic.contracts.progress_bar import IProgressBar
 from orionis.console.output.console import Console
 from orionis.test import TestCase
 
+
 class TestConsole(TestCase):
+    async def testExitHelpersPreserveFinallyAndBufferedOutput(self) -> None:
+        """
+        Exit through SystemExit without bypassing cleanup or buffered output.
+
+        Returns
+        -------
+        None
+            Retain each exit code while executing the caller's finalizer.
+        """
+        for method, code in (("exitSuccess", 0), ("exitError", 1)):
+            with self.subTest(method=method):
+                source = (
+                    "from orionis.console.output.console import Console\n"
+                    "try:\n"
+                    f"    Console().{method}()\n"
+                    "finally:\n"
+                    "    print('cleanup-completed')\n"
+                )
+                process = await asyncio.create_subprocess_exec(
+                    sys.executable,
+                    "-B",
+                    "-c",
+                    source,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.STDOUT,
+                )
+                output, _ = await process.communicate()
+                self.assertEqual(process.returncode, code)
+                self.assertEqual(output.decode().strip(), "cleanup-completed")
 
     # ------------------------------------------------------------------ #
     #  Instantiation & property                                          #
@@ -571,7 +604,7 @@ class TestConsole(TestCase):
         console = Console()
         with patch("builtins.input", return_value=""):
             result_false = console.confirm("Continue?", default=False)
-            result_true  = console.confirm("Continue?", default=True)
+            result_true = console.confirm("Continue?", default=True)
         self.assertFalse(result_false)
         self.assertTrue(result_true)
 
@@ -694,7 +727,9 @@ class TestConsole(TestCase):
         console = Console()
         with patch("builtins.input", return_value="Go"):
             result = console.anticipate(
-                "Language?", ["Python", "PHP"], default="unknown",
+                "Language?",
+                ["Python", "PHP"],
+                default="unknown",
             )
         self.assertEqual(result, "unknown")
 
@@ -877,9 +912,13 @@ class TestConsole(TestCase):
             Assertions verify the behavior described above.
         """
         console = Console()
-        with patch("builtins.print") as mock_print, patch(
-            "sys.exit",
-        ) as mock_exit, patch("os._exit"):
+        with (
+            patch("builtins.print") as mock_print,
+            patch(
+                "sys.exit",
+            ) as mock_exit,
+            patch("os._exit"),
+        ):
             console.exitSuccess("Done!")
         mock_exit.assert_called_once_with(0)
         mock_print.assert_called()
@@ -912,9 +951,13 @@ class TestConsole(TestCase):
             Assertions verify the behavior described above.
         """
         console = Console()
-        with patch("builtins.print") as mock_print, patch(
-            "sys.exit",
-        ) as mock_exit, patch("os._exit"):
+        with (
+            patch("builtins.print") as mock_print,
+            patch(
+                "sys.exit",
+            ) as mock_exit,
+            patch("os._exit"),
+        ):
             console.exitError("Fatal error!")
         mock_exit.assert_called_once_with(1)
         mock_print.assert_called()

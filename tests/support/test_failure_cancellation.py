@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Observe native work failures while preserving caller cancellation."""
 
 import asyncio
@@ -66,7 +68,8 @@ class TestCancelledFailureObservation(TestCase):
         error = RuntimeError("stop callback")
         future = asyncio.get_running_loop().create_future()
 
-        def stop():
+        def stop() -> None:
+            """Raise the fixture error while stopping cancelled work."""
             raise error
 
         with operation(app):
@@ -85,11 +88,13 @@ class TestCancelledFailureObservation(TestCase):
         future = asyncio.get_running_loop().create_future()
         reporting = asyncio.Event()
 
-        def stop():
+        def stop() -> None:
+            """Raise the fixture error while stopping cancelled work."""
             message = "stop callback failed"
             raise RuntimeError(message)
 
-        async def observe(*_args: object, **_kwargs: object):
+        async def observe(*_args: object, **_kwargs: object) -> None:
+            """Suspend reporting so repeated cancellation can interrupt it."""
             reporting.set()
             await asyncio.Event().wait()
 

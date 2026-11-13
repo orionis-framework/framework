@@ -1,13 +1,13 @@
+# ruff: noqa: TC001, TC003
+# Keep extension hook annotations available for runtime inspection.
 """Declare reusable mail without I/O or per-send mutation."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import Sequence
+from orionis.mail.entities.attachment import Attachment
+from orionis.mail.entities.content import Content
+from orionis.mail.entities.envelope import Envelope
 
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from orionis.mail.entities.attachment import Attachment
-    from orionis.mail.entities.content import Content
-    from orionis.mail.entities.envelope import Envelope
 
 class Mailable(ABC):
     """

@@ -1,15 +1,16 @@
+# ruff: noqa: TC001
+# Keep storage protocol annotations available for runtime reflection.
 """Represent a configured storage disk."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from orionis.storage.contracts.disk import IDisk
 from orionis.storage.directory import Directory
 from orionis.storage.file import File
 
-if TYPE_CHECKING:
-    from orionis.storage.contracts.directory import IDirectory
-    from orionis.storage.contracts.driver import IStorageDriver
-    from orionis.storage.contracts.file import IFile
+from orionis.storage.contracts.directory import IDirectory
+from orionis.storage.contracts.driver import IStorageDriver
+from orionis.storage.contracts.file import IFile
+
 
 class Disk(IDisk):
     """
@@ -39,7 +40,7 @@ class Disk(IDisk):
         Returns
         -------
         None
-            Initialize the disk with its configuration name and driver.
+            No return value.
         """
         self._name = name
         """Disk name as declared in the filesystems configuration."""

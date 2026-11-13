@@ -1,14 +1,14 @@
+# ruff: noqa: TC001, TC003
+# Keep dataclass fields and generated constructor annotations resolvable.
 """Report SMTP acceptance or file storage, never final mailbox delivery."""
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
+from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from orionis.mail.enums.status import MailStatus
 from orionis.mail.functions import sanitize_reason
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from pathlib import Path
-    from orionis.mail.enums.status import MailStatus
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class MailResult:
@@ -62,8 +62,10 @@ class MailResult:
         object.__setattr__(
             self,
             "rejected_recipients",
-            MappingProxyType({
-                address: (code, sanitize_reason(reason))
-                for address, (code, reason) in self.rejected_recipients.items()
-            }),
+            MappingProxyType(
+                {
+                    address: (code, sanitize_reason(reason))
+                    for address, (code, reason) in self.rejected_recipients.items()
+                },
+            ),
         )

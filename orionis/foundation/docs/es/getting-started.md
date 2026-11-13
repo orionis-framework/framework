@@ -26,7 +26,7 @@ try:
             env="testing",
             debug=False,
             key=key,
-            cipher="AES-256-CBC",
+            cipher="AES-256-GCM",
         ).withConfigPaths(storage="var")
         app.create()
         assert app.isCreated and DocsApplication.current() is app

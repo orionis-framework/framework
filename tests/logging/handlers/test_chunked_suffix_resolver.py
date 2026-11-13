@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import UTC, datetime, timedelta
 from threading import Lock, Thread
 from orionis.logging.handlers.chunked_suffix_resolver import ChunkedSuffixResolver
@@ -6,8 +8,8 @@ from orionis.test import TestCase
 # Number of concurrent callers used to prove the counter is thread safe.
 _CONCURRENT_CALLERS = 20
 
-class TestChunkedSuffixResolverSuffix(TestCase):
 
+class TestChunkedSuffixResolverSuffix(TestCase):
     def testSuffixUsesTheTimestampAndCounterPattern(self) -> None:
         """Build the suffix from the timestamp and an incremental counter.
 
@@ -16,7 +18,7 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = datetime(2025, 4, 9, 14, 30, 5, tzinfo=UTC)
         self.assertEqual(
@@ -33,7 +35,7 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertRegex(
             ChunkedSuffixResolver().getSuffix(),
@@ -49,7 +51,7 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         resolver = ChunkedSuffixResolver()
         moment = datetime(2025, 1, 1, 0, 0, 0, tzinfo=UTC)
@@ -72,7 +74,7 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         resolver = ChunkedSuffixResolver()
         moment = datetime(2025, 1, 1, 0, 0, 0, tzinfo=UTC)
@@ -85,7 +87,7 @@ class TestChunkedSuffixResolverSuffix(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             suffix = resolver.getSuffix(dt=moment)
             with guard:
@@ -99,8 +101,8 @@ class TestChunkedSuffixResolverSuffix(TestCase):
 
         self.assertEqual(len(set(produced)), _CONCURRENT_CALLERS)
 
-class TestChunkedSuffixResolverRotation(TestCase):
 
+class TestChunkedSuffixResolverRotation(TestCase):
     def testNextRotationIsOneHourAhead(self) -> None:
         """Schedule the next rotation one hour after the supplied moment.
 
@@ -110,7 +112,7 @@ class TestChunkedSuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 10, 0, 0, tzinfo=UTC)
         self.assertEqual(

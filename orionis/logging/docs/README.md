@@ -1,5 +1,5 @@
 # logging: Official documentation
 
-The manual is now organized into bilingual chapters. Continue with [Official documentation](en/README.md).
+Configure file channels, record application events, and manage rotation and shutdown in the [English manual](en/README.md).
 
 [English](en/README.md) · [Español](es/README.md)

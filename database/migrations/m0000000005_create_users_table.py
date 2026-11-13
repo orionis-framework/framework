@@ -2,8 +2,8 @@ from database.schemas.users_v1 import USERS_V1
 from orionis.database import Migration
 from orionis.support.facades import Schema
 
-class CreateUsersTable(Migration):
 
+class CreateUsersTable(Migration):
     async def up(self) -> None:
         """
         Create the ``users`` table used to store application users.

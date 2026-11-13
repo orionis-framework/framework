@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class TestStatus(StrEnum):
     """
     Represent possible statuses for a test during execution.
@@ -15,12 +16,7 @@ class TestStatus(StrEnum):
     ERRORED : orionis.test.enums.status.TestStatus
         Indicates an unexpected error occurred during test execution.
     SKIPPED : orionis.test.enums.status.TestStatus
-        Indicates the test was intentionally not executed.
-
-    Returns
-    -------
-    orionis.test.enums.status.TestStatus
-        Enumeration member representing the test status.
+        Indicate an omitted test or a declared expected failure.
     """
 
     PASSED = "PASSED"

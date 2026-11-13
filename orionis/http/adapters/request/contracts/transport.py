@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Read/write abstraction over a protocol scope (ASGI or RSGI)."""
 
 from __future__ import annotations
@@ -8,6 +10,7 @@ if TYPE_CHECKING:
     from typing import Any
     from orionis.http.payload.estructures.headers import Headers
 
+
 class TransportAdapter(ABC):
     """
     Read/write abstraction over a protocol scope (ASGI or RSGI).
@@ -16,8 +19,6 @@ class TransportAdapter(ABC):
     allowing all middlewares to operate against a single unified
     interface regardless of whether the server speaks ASGI or RSGI.
     """
-
-    # ruff: noqa: ANN401
 
     # Define the transport interface without instance state.
     __slots__ = ()

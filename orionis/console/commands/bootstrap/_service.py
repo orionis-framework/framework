@@ -13,7 +13,9 @@ if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
 _HTTP_PATHS = (
-    "app_http_controllers", "app_http_middleware", "app_http_schemas",
+    "app_http_controllers",
+    "app_http_middleware",
+    "app_http_schemas",
     "app_http_schemas_rules",
 )
 """Http paths definitions used by ``_service``."""
@@ -23,10 +25,14 @@ _CONTEXT_PATHS = {
     "websocket": _HTTP_PATHS,
     "console": ("app_console_commands", "app_console_listeners"),
     "ai": (
-        "app_mcp_servers", "app_mcp_tools", "app_mcp_resources", "app_mcp_prompts",
+        "app_mcp_servers",
+        "app_mcp_tools",
+        "app_mcp_resources",
+        "app_mcp_prompts",
     ),
 }
 """Context paths definitions used by ``_service``."""
+
 
 class Bootstrapper:
     """Plan bootstrap integration before creating optional project resources."""
@@ -141,7 +147,9 @@ class Bootstrapper:
         return ("CREATED", display_path(self.app, path))
 
     def _routingPaths(
-        self, editor: BootstrapEditor, context: str,
+        self,
+        editor: BootstrapEditor,
+        context: str,
     ) -> list[Path]:
         """
         Reconcile declared routes with the loaded application registry.
@@ -181,9 +189,7 @@ class Bootstrapper:
         source_routes = editor.routePaths(context)
         if routes and source_routes:
             loaded = [(self.app.basePath / path).resolve() for path in routes]
-            declared = [
-                (self.app.basePath / path).resolve() for path in source_routes
-            ]
+            declared = [(self.app.basePath / path).resolve() for path in source_routes]
             if loaded != declared:
                 error_msg = (
                     f"Effective {context} routing paths differ from {editor.path}. "
@@ -234,7 +240,9 @@ class Bootstrapper:
             raise ValueError(error_msg)
         compile(path.read_bytes(), str(path), "exec")
         if not ModuleInspector.fileImportsAny(
-            path, {"orionis.support.facades"}, allow_empty=True,
+            path,
+            {"orionis.support.facades"},
+            allow_empty=True,
         ):
             error_msg = (
                 f"Routing file '{path}' does not contain valid routing "
@@ -291,7 +299,7 @@ class Bootstrapper:
             actions.append(("UPDATED", display_path(self.app, editor.path)))
         return actions
 
-    def lifespan(self) -> list[tuple[str, str]]: # NOSONAR
+    def lifespan(self) -> list[tuple[str, str]]:  # NOSONAR
         """
         Create and register native lifecycle callbacks before application boot.
 
@@ -316,7 +324,8 @@ class Bootstrapper:
             compile(existing, str(path), "exec")
             tree = ast.parse(existing, filename=str(path))
             names = {
-                node.name for node in tree.body
+                node.name
+                for node in tree.body
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
             }
             for node in tree.body:

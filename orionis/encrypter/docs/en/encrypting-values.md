@@ -33,19 +33,19 @@ print("round trip ok")
 
 The API encrypts non-empty text. Serialize structured documents first and store the complete opaque token in a sufficiently wide column. IV, tag, JSON, and two Base64 layers increase its size; a field sized for the original text may be too small. The library adds no expiration, associated context, key identifier, or replay protection.
 
-Explicitly select `AES-256-GCM` for a new workflow requiring authenticity. Current configuration defaults to `AES-256-CBC`; CBC checks padding but includes no MAC. Successful CBC decryption does not prove that content was never modified. Encryption also does not decide which user may recover a value: authorize access before calling `decrypt()`.
+Configuration defaults to `AES-256-GCM`. Only `AES-128-GCM` and `AES-256-GCM` are accepted; unauthenticated CBC configuration and CBC envelopes are rejected. Encryption also does not decide which user may recover a value: authorize access before calling `decrypt()`.
 
 The `b"k" * 32` keys in examples are test fixtures. In production retain the random key in your secret management system and share a stable value across workers and deployments that must read the same tokens. Do not replace `APP_KEY` without a migration: there is no key ring or automatic lookup of previous keys.
 
 ### Controlled rotation
 
-Retain access to the original key and cipher during migration. Decrypt with the previous configuration, encrypt with the new one, and replace a record only after both operations succeed. An interrupted migration must resume without confusing versions; version markers and key custody belong to the application. Include backups in the same plan. Never indiscriminately try keys in a public endpoint.
+Migrate existing CBC records before upgrading: use the previous framework version in a controlled offline process with the original key to recover trusted records, then encrypt them using GCM and replace each record only after both operations succeed. This version provides no CBC fallback. Old CBC data has no authentication, so successful recovery alone cannot establish its integrity; verify it against an independent trusted source. An interrupted migration must resume without confusing versions; version markers and key custody belong to the application. Include backups in the same plan. Never indiscriminately try keys in a public endpoint.
 
 ## Core concepts
 
 ### Cipher selection
 
-One `Encrypter` instance is fixed to the configured cipher and key. Supported identifiers are `AES-128-CBC`, `AES-256-CBC`, `AES-128-GCM`, and `AES-256-GCM`. A payload can only be decrypted by an instance configured with the same cipher and key.
+An `Encrypter` instance captures its cipher and key at construction. Supported identifiers are `AES-128-GCM` and `AES-256-GCM`. The legacy CBC enum members and size constants remain available for describing older data, but they do not enable CBC encryption or decryption. Recovering the original plaintext requires the same cipher and key. Create a new instance when changing configuration; mutating its key or cipher attributes does not rebuild cached cryptographic state.
 
 ### Envelope format
 
@@ -53,7 +53,7 @@ One `Encrypter` instance is fixed to the configured cipher and key. Supported id
 
 ### Authentication
 
-GCM authenticates the ciphertext and rejects modification through its 16-byte tag. CBC uses PKCS7 padding but this implementation does not add a MAC; prefer GCM for new security-sensitive data. Never expose, log, or commit the application key.
+GCM verifies the ciphertext and nonce through its 16-byte authentication tag using the existing [`cryptography.AESGCM` primitive](https://cryptography.io/en/50.0.0/hazmat/primitives/aead/#cryptography.hazmat.primitives.ciphers.aead.AESGCM). The service never releases plaintext after an authentication failure. Never expose, log, or commit the application key.
 
 ## Common workflows
 
@@ -90,7 +90,7 @@ for cipher in sorted(Encrypter.SUPPORTED_CIPHERS):
     service = Encrypter(App(cipher))
     assert service.decrypt(service.encrypt("Orionis")) == "Orionis"
 
-print("four ciphers ok")
+print("two authenticated ciphers ok")
 ```
 
 
@@ -158,7 +158,7 @@ assert plaintext == "private value"
 
 | Setting | Environment | Meaning |
 |---|---|---|
-| `app.cipher` | `APP_CIPHER` | One of the four supported AES identifiers; default is `AES-256-CBC`. |
+| `app.cipher` | `APP_CIPHER` | `AES-128-GCM` or `AES-256-GCM`; default is `AES-256-GCM`. |
 | `app.key` | `APP_KEY` | Raw text or `base64:`-prefixed key with exactly the cipher's required byte length. |
 
 The validated application config converts the key to bytes. If no key is configured, `SecureKeyGenerator` creates a random Laravel-compatible `base64:` value, persists it through `Env.set`, and normalizes it. Persist a stable production key: losing it makes existing ciphertext unrecoverable.
@@ -172,16 +172,17 @@ The validated application config converts the key to bytes. If no key is configu
 ## Errors and edge cases
 
 - Empty plaintext and payload strings raise `ValueError`; non-strings raise `TypeError`.
-- Unsupported ciphers and wrong key sizes fail at construction.
-- Invalid outer Base64/JSON or typed fields raise `ValueError`.
+- Unsupported ciphers and wrong key sizes raise `ValueError` at construction. Direct construction requires a `bytes` key; other key types raise `TypeError`.
+- Invalid outer Base64/JSON or typed fields raise `ValueError`. Base64 validation rejects non-alphabet characters, including whitespace, in both the outer token and its binary fields.
 - Payload cipher mismatch and invalid IV size raise `ValueError` before decryption.
 - GCM requires a 16-byte tag; authentication failures surface as wrapped `RuntimeError`.
-- CBC rejects empty ciphertext and invalid PKCS7 padding, but it does not authenticate metadata or ciphertext.
+- CBC configuration is rejected before key generation or persistence; legacy CBC envelopes are rejected before decryption.
 - The plaintext must be valid UTF-8 text; this API is not a raw-byte encryption interface.
+- Cryptographic failures use the public messages `Encryption failed` or `Decryption failed`. The original exception remains available as `__cause__` for internal diagnostics; these causes and tracebacks are not intended for public responses.
 
 ## Performance and concurrency
 
-The implementation is synchronous and CPU-bound. GCM caches one immutable `AESGCM` object per service; CBC creates a cipher context per call. Payload encoding uses reusable `msgspec` structures/decoder. Each call keeps data local and obtains a fresh IV from `os.urandom`, so the singleton can serve concurrent callers without mutable per-operation state.
+The implementation is synchronous and CPU-bound. The service caches one `AESGCM` object per instance. Payload encoding uses reusable `msgspec` structures/decoder. Each call keeps data local and obtains a fresh IV from `os.urandom`, so the singleton can serve concurrent callers without mutable per-operation state while its configuration remains unchanged.
 
 Token size includes JSON and two Base64 layers plus IV/tag overhead. Avoid using encryption as a streaming format for large files; use a purpose-built streaming scheme and authenticated mode instead.
 
@@ -189,15 +190,15 @@ Token size includes JSON and two Base64 layers plus IV/tag overhead. Avoid using
 
 ### `Encrypter(app)`
 
-Reads `app.key` as bytes and `app.cipher` as a supported string. Construction raises `ValueError` for an unsupported cipher or an incorrect key length. Constants such as `SUPPORTED_CIPHERS`, key sizes, IV sizes, and tag size describe the accepted wire format.
+Reads `app.key` as bytes and `app.cipher` as a supported string. Construction raises `TypeError` for a key that is not `bytes`, or `ValueError` for an unsupported cipher or an incorrect key length. The application configuration layer performs text and `base64:` key normalization before this service is constructed. `SUPPORTED_CIPHERS`, AES key sizes, `GCM_IV_SIZE`, and `GCM_TAG_SIZE` describe the accepted format. `CBC_IV_SIZE` and `PKCS7_BLOCK_SIZE` describe legacy data only.
 
 ### `encrypt(plaintext: str) -> str`
 
-Accepts a non-empty string and returns a new Base64 envelope. A random IV means encrypting the same plaintext twice should produce different tokens. Invalid input raises `TypeError` or `ValueError`; cryptographic failures are wrapped in `RuntimeError`.
+Accepts a non-empty string and returns a new Base64 envelope. A random IV means encrypting the same plaintext twice should produce different tokens. Invalid input raises `TypeError` or `ValueError`; cryptographic failures are wrapped in `RuntimeError("Encryption failed")` with the original exception as their direct cause.
 
 ### `decrypt(payload: str) -> str`
 
-Decodes and validates the envelope, requires its cipher to match configuration, checks IV/tag sizes, decrypts, and UTF-8 decodes the result. It rejects empty/non-string input, malformed envelopes, mismatched ciphers, bad padding, invalid tags, and authentication failures.
+Decodes and validates the envelope, requires its cipher to match configuration, checks IV/tag sizes, decrypts, and UTF-8 decodes the result. It rejects empty/non-string input, malformed envelopes, mismatched ciphers, legacy CBC envelopes, invalid tags, and authentication failures. Failures during cryptographic processing use `RuntimeError("Decryption failed")` with the original exception as their direct cause.
 
 ### `IEncrypter`
 
@@ -207,7 +208,7 @@ The contract declares only synchronous `encrypt` and `decrypt`. Import it from `
 
 | Path | Responsibility |
 |---|---|
-| `encrypter.py` | Key/cipher validation, envelope encoding, AES-CBC and AES-GCM operations. |
+| `encrypter.py` | Key/cipher validation, envelope encoding, authenticated AES-GCM operations. |
 | `contracts/encrypter.py` | `IEncrypter` abstract `encrypt`/`decrypt` interface. |
 | `provider.py` | Singleton binding and synchronous facade pinning. |
 | `__init__.py` | Public `Encrypter` export. |

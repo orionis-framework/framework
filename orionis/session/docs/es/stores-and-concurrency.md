@@ -19,15 +19,20 @@ from datetime import UTC, datetime, timedelta
 from orionis.session.entities.record import SessionRecord
 from orionis.session.stores.memory import MemorySessionStore
 
+
 async def example():
     store = MemorySessionStore()
-    record = SessionRecord(id="docs-example", data={"count": 1},
-                           expires_at=datetime.now(UTC) + timedelta(minutes=5))
+    record = SessionRecord(
+        id="docs-example",
+        data={"count": 1},
+        expires_at=datetime.now(UTC) + timedelta(minutes=5),
+    )
     await store.write(record)
     loaded = await store.read(record.id)
     assert loaded is not None and loaded.data == {"count": 1}
     assert await store.delete(record.id)
     assert not await store.update(record)
+
 
 asyncio.run(example())
 ```
@@ -43,6 +48,10 @@ La rotación elimina el ID anterior antes de guardar el nuevo. Las actualizacion
 ## I/O y limpieza
 
 File escribe JSON compacto mediante reemplazo atómico y locks de bandas acotadas. Cache delega expiración al TTL del backend; database realiza updates condicionales y crea su estructura al necesitarla. `gc()` proporciona recolección de expirados en stores que la requieren; no supongas que cualquier backend elimina todos los archivos inmediatamente al expirar.
+
+Las rutas de archivos quedan fijadas al construir el store, también cuando el directorio es relativo. La cancelación espera a que termine el trabajo de archivo activo antes de propagarse; no revierte una operación ya completada. La recolección sólo considera nombres de sesión y temporales con el formato del escritor, y conserva los archivos ajenos. La limpieza de temporales adquiere el lock de la sesión y vuelve a comprobar su edad cuando termina cualquier escritura activa.
+
+Los TTL de caché usan segundos enteros conservadores: un registro puede expirar hasta un segundo antes. Una escritura con menos de un segundo restante elimina su clave; una actualización condicional con ese plazo devuelve `False`. El store nunca envía TTL cero, que algunos backends interpretan como ausencia de expiración. Los relojes del backend y la latencia del transporte siguen influyendo en la eliminación. Las lecturas de base de datos rechazan plazos corruptos o no representables; si fallan tanto la inserción como su consulta de recuperación, se conserva el error original y se observa el fallo secundario.
 
 Para un store propio implementa [ISessionStore](../../contracts/store.py), conserva copias independientes cuando corresponda y verifica expiración, fallo de update tras delete, corrupción y errores de I/O. La selección del manager está integrada para los cuatro drivers existentes: incorporar otro requiere integración de servicios propia; añadir una cadena arbitraria a `SESSION_DRIVER` no registra una clase.
 

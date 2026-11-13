@@ -7,7 +7,7 @@ Un servicio `scoped` pertenece a una unidad de trabajo delimitada por `async wit
 - Registro duplicado lanza `ValueError` salvo override.
 - Relaciones incorrectas lanzan `TypeError`.
 - Scoped sin scope, scope cerrado o reentrada lanzan `RuntimeError`.
-- Ciclos lanzan `CircularDependencyException`; stack es local a tarea.
+- Los ciclos lanzan `CircularDependencyException`; el stack es local a la tarea y distingue instancias de contenedor. Construir la misma clase en otro contenedor independiente no produce un falso ciclo.
 - Parámetros sin anotación/default requieren argumento explícito.
 - Clase se autoconstruye; alias ausente no.
 - Fachada antes de boot o scoped fuera de scope lanza `RuntimeError`.
@@ -15,11 +15,15 @@ Un servicio `scoped` pertenece a una unidad de trabajo delimitada por `async wit
 
 ## Rendimiento y concurrencia
 
-Container es singleton por subclase mediante `threading.RLock`. Planes se almacenan. Primera construcción singleton/scoped/provider usa `asyncio.Lock` por clave para compartir resultado dentro de un loop.
+Container es singleton por subclase. La publicación y la inicialización usan locks de hilo con doble comprobación para que constructores concurrentes no reinicien los bindings de una instancia inicializada. Los planes se almacenan. La primera construcción singleton, scoped o de provider usa `asyncio.Lock` por clave para compartir resultado dentro de un loop.
 
 Locks se reemplazan entre loops: serialización es por loop, no global cross-loop. Registro no está bloqueado. `ContextVar` aísla tareas aunque hijas heredan scope.
 
 Fachadas fijadas evitan resolución repetida; scoped la evitan para preservar aislamiento.
+
+Los dispatchers de facades sin fijar usan una caché LRU compartida de hasta 1024 pares de clase y atributo. El acceso repetido conserva la identidad del dispatcher mientras el par permanece en caché; su expulsión libera la referencia almacenada. Los métodos especiales de Python ausentes lanzan `AttributeError` en lugar de crear un dispatcher de servicio.
+
+`scope.get()` comparte una corrutina almacenada como tarea y guarda su resultado. Al terminar, no sobrescribe un valor reemplazado mediante `set()` ni repone una entrada eliminada por `clear()`; el llamador que ya esperaba sigue recibiendo el resultado de su tarea original. Terminar después de salir del scope lanza `RuntimeError`. Cancelar un llamador que espera propaga la cancelación a la tarea compartida.
 
 ## Configuración
 
@@ -52,7 +56,7 @@ async def main() -> None:
         print(first is second)  # True
     async with container.beginScope():
         third = await container.make(RequestState)
-        print(first is third)   # False
+        print(first is third)  # False
 
 
 asyncio.run(main())
@@ -61,6 +65,8 @@ asyncio.run(main())
 ## Cerrar recursos y tareas
 
 La salida del scope limpia sus referencias e invalida el contexto. No llama automáticamente `close()` ni `aclose()` sobre cualquier servicio y no espera tareas arbitrarias que hayas creado. El propietario del recurso debe cerrarlo mediante su context manager o un bloque `finally`. Si una tarea hija necesita usar un servicio scoped, espera su finalización dentro del scope; no la dejes ejecutándose después de salir. Tampoco se aplica un mecanismo de captura de dependencias que impida guardar un objeto scoped en un singleton: controla esa relación en el diseño de tus servicios.
+
+Al almacenar una corrutina nativa sin iniciar, el scope asume su custodia hasta que se solicite. Reemplazar ese valor, limpiar el scope o salir de él cierra esa corrutina sin iniciar. Reasignar el mismo objeto lo conserva. Esta limpieza no cancela tareas prestadas ni cierra corrutinas ya ejecutándose o suspendidas en otro lugar.
 
 ## Fuentes y siguientes pasos
 

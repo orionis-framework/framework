@@ -7,6 +7,7 @@ from orionis.realtime.contracts.manager import IConnectionManager
 from orionis.realtime.manager import ConnectionManager
 from orionis.support.facades.realtime import Realtime
 
+
 class RealtimeProvider(ServiceProvider):
     """Register one worker-local registry and pin the synchronous target facade."""
 
@@ -29,9 +30,12 @@ class RealtimeProvider(ServiceProvider):
         ValueError
             If configured limits are outside their accepted ranges.
         """
-        configured = self.app.config("realtime") or {}
+        configured = self.app.config("realtime")
+        if configured is None:
+            configured = {}
         config = (
-            configured if isinstance(configured, RealtimeConfig)
+            configured
+            if isinstance(configured, RealtimeConfig)
             else RealtimeConfig(**cast("dict", configured))
         )
         self.app.instance(RealtimeConfig, config)

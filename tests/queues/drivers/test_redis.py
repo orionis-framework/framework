@@ -1,3 +1,5 @@
+# ruff: noqa: PLR2004, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import TYPE_CHECKING, Self
 from redis.exceptions import NoScriptError, RedisError
 from orionis.foundation.config.queue import Redis as RedisConfig
@@ -16,6 +18,7 @@ from tests.queues.drivers.test_database import make_envelope
 
 if TYPE_CHECKING:
     from orionis.queues.entities.reserved_job import ReservedJob
+
 
 class _RedisTransport:
     """Provide explicit replies and capture atomic Redis transport calls."""
@@ -121,6 +124,7 @@ class _RedisTransport:
             Mark the explicit fake as closed.
         """
         self.closed = True
+
 
 class TestRedisQueueDriverTransport(TestCase):
     """Verify driver transport and result validation without a Redis server."""

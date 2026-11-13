@@ -7,6 +7,7 @@ from orionis.background.task import BackgroundTask
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
+
 class BackgroundTasks(BackgroundTask):
     """
     Manage and execute a collection of background tasks sequentially.
@@ -38,7 +39,10 @@ class BackgroundTasks(BackgroundTask):
         """Optional sequence of BackgroundTask instances to initialize with."""
 
     def addTask(
-        self, func: Callable, *args: object, **kwargs: object,
+        self,
+        func: Callable,
+        *args: object,
+        **kwargs: object,
     ) -> None:
         """
         Add a new BackgroundTask to the task list.

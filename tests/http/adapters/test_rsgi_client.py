@@ -1,7 +1,10 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.adapters.request.rsgi import RSGITransportAdapter
 from orionis.http.layer.shared.proxies import ProxiesMiddleware
 from orionis.test import TestCase
 from tests.http.test_kernel import _StubRsgiHeaders, _StubRsgiScope
+
 
 def _make_scope(
     client: str | None,
@@ -27,8 +30,8 @@ def _make_scope(
         scope.headers = _StubRsgiHeaders(headers)
     return scope
 
-class TestRsgiClient(TestCase):
 
+class TestRsgiClient(TestCase):
     def testClientNormalizesIpv6AndPreservesCacheAndOverrides(self) -> None:
         """Normalize socket hosts while retaining port and cached overrides.
 
@@ -100,21 +103,29 @@ class TestRsgiClient(TestCase):
         )
         real_ip = "2001:db8:ffff::123"
         for raw, trusted, proxy in cases:
-            adapter = RSGITransportAdapter(_make_scope(raw, {
-                "x-forwarded-for": [f"{real_ip}, {proxy}"],
-                "x-forwarded-proto": ["https"],
-            }))
+            adapter = RSGITransportAdapter(
+                _make_scope(
+                    raw,
+                    {
+                        "x-forwarded-for": [f"{real_ip}, {proxy}"],
+                        "x-forwarded-proto": ["https"],
+                    },
+                ),
+            )
             middleware = ProxiesMiddleware({"trusted_proxies": [trusted]})
 
             self.assertIs(middleware.handle(adapter), adapter)
             self.assertEqual(adapter.client(), real_ip)
             self.assertEqual(adapter.scheme(), "https")
             self.assertEqual(adapter["port"], 1234)
-            self.assertEqual(adapter["forwarded"], {
-                "client": real_ip,
-                "proxies": [proxy],
-                "chain": [real_ip, proxy],
-            })
+            self.assertEqual(
+                adapter["forwarded"],
+                {
+                    "client": real_ip,
+                    "proxies": [proxy],
+                    "chain": [real_ip, proxy],
+                },
+            )
 
     def testUntrustedIpv6AndIpv4PeersIgnoreForwarding(self) -> None:
         """Preserve the direct peer and scheme when proxy trust does not match.
@@ -130,10 +141,15 @@ class TestRsgiClient(TestCase):
             ("192.0.2.10:1234", "127.0.0.1/32", "192.0.2.10"),
         )
         for raw, trusted, expected in cases:
-            adapter = RSGITransportAdapter(_make_scope(raw, {
-                "x-forwarded-for": ["198.51.100.9"],
-                "x-forwarded-proto": ["https"],
-            }))
+            adapter = RSGITransportAdapter(
+                _make_scope(
+                    raw,
+                    {
+                        "x-forwarded-for": ["198.51.100.9"],
+                        "x-forwarded-proto": ["https"],
+                    },
+                ),
+            )
             middleware = ProxiesMiddleware({"trusted_proxies": [trusted]})
 
             self.assertIs(middleware.handle(adapter), adapter)

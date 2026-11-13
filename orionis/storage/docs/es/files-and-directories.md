@@ -34,11 +34,11 @@ asyncio.run(example())
 
 ## Guardar un resultado de negocio
 
-Después de generar un reporte, decide un disco y una ruta lógica estable. En una aplicación iniciada puedes usar `await Storage.disk("local").put("reports/42.txt", content)`. `disk()` es síncrono; `put()` es async y devuelve un `File`. Conserva ese objeto o su `path()` para futuras operaciones. La ruta no contiene el directorio físico ni credenciales del proveedor.
+Después de generar un reporte, decide un disco y una ruta lógica estable. En una aplicación iniciada llama primero `await Storage.pin()` y luego usa `await Storage.disk("local").put("reports/42.txt", content)`. `disk()` es síncrono; `put()` es async y devuelve un `File`. Conserva ese objeto o su `path()` para futuras operaciones. La ruta no contiene el directorio físico ni credenciales del proveedor.
 
 `disk.file(path)` y `disk.directory(path)` solo crean referencias; no verifican existencia. `await file.exists()` sirve para presentación, pero una comprobación seguida de lectura puede tener carreras: captura `StorageFileNotFoundException` en la lectura que importa. No se incluye una transacción que englobe base de datos y almacenamiento. Si publicas una fila y un archivo, diseña limpieza/compensación cuando una operación falle.
 
-`write()` y `put()` reemplazan contenido. `copyTo()` y `moveTo()` operan dentro del mismo disco. Devuelven un objeto nuevo; después de mover, el objeto original sigue apuntando a la ruta anterior. `rename(name)` conserva el directorio y rechaza separadores. Para copiar entre discos, transmite chunks entre sus referencias: no pases el nombre de otro disco como ruta de destino.
+`write()` y `put()` reemplazan contenido. `copyTo()` y `moveTo()` operan dentro del mismo disco. Devuelven un objeto nuevo; después de mover, el objeto original sigue apuntando a la ruta anterior. En memory y cloud, mover un origen existente a la misma ruta normalizada conserva su contenido; el origen debe existir. `rename(name)` conserva el directorio y rechaza nombres vacíos, separadores y los segmentos `.` y `..`. Para copiar entre discos, transmite chunks entre sus referencias: no pases el nombre de otro disco como ruta de destino.
 
 ### Leer metadatos y eliminar
 
@@ -64,7 +64,7 @@ Un disco es un límite de driver nombrado. `file`/`directory` normalizan de inme
 
 ### Rutas relativas seguras
 
-Las rutas usan `/`, ignoran vacío/`.` y resuelven `..` internos; rechazan escape de raíz, null, dos puntos y target file vacío. Local además impide escapes por symlink.
+Las rutas usan `/`, ignoran vacío/`.` y resuelven `..` internos; rechazan escape de raíz, null, dos puntos y target file vacío. Local resuelve las rutas dentro de su raíz durante la operación nativa y rechaza escapes por enlaces simbólicos o junctions de Windows. Los listados recursivos no entran en junctions. Los archivos del usuario terminados en `.tmp` siguen visibles; solo se ocultan los nombres reservados `.<16 dígitos hexadecimales>.tmp` del staging interno.
 
 ### Listar directorios
 
@@ -80,7 +80,8 @@ async def example() -> None:
     reports = disk.directory("reports")
     assert [item.path() for item in await reports.files()] == ["reports/summary.txt"]
     assert sorted(item.path() for item in await reports.allFiles()) == [
-        "reports/2026/january.txt", "reports/summary.txt",
+        "reports/2026/january.txt",
+        "reports/summary.txt",
     ]
 
 
@@ -96,7 +97,9 @@ from orionis.storage import Disk, MemoryStorageDriver, Visibility
 
 async def example() -> None:
     file = await Disk("memory", MemoryStorageDriver()).put(
-        "assets/app.css", "body{}", Visibility.PUBLIC,
+        "assets/app.css",
+        "body{}",
+        Visibility.PUBLIC,
     )
     info = await file.info()
     assert info.size == 6
@@ -130,7 +133,9 @@ else:
 
 La raíz se representa con `disk.directory()` y puede existir aunque aún no hayas guardado archivos. En object storage los directorios también pueden derivarse de prefijos implícitos: no dependas de que un directorio vacío sea una entidad persistente idéntica en todos los proveedores. Los listados se materializan como listas, no como cursores paginados públicos. Para árboles grandes considera su memoria y el número de peticiones del SDK.
 
-`lastModified` contiene una fecha consciente de zona horaria en UTC; `createdAt` puede ser `None` cuando el proveedor no expone una fecha de creación. Un snapshot no se actualiza después de escribir: solicita otro `info()` si necesitas el estado posterior.
+`lastModified` contiene una fecha consciente de zona horaria en UTC; `createdAt` puede ser `None` cuando el proveedor no expone una fecha de creación. El hash admite algoritmos de resumen de tamaño fijo; los de salida extensible como SHAKE lanzan `UnsupportedStorageOperationException`.
+
+Un snapshot no se actualiza después de escribir: solicita otro `info()` si necesitas el estado posterior.
 
 ---
 

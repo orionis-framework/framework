@@ -1,12 +1,14 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Run fixed import probes using the active interpreter and separate arguments.
 import subprocess
 import sys
 import unittest
 from pathlib import Path
 
+
 class TestBackendLazyImports(unittest.TestCase):
     """Exercise backend selection in fresh interpreters with empty module caches."""
-
-    # ruff: noqa: S603
 
     def _check(self, script: str) -> None:
         """Run an isolated import scenario and report child diagnostics.

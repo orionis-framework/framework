@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class PGSQLCollation(Enum):
     """
     Enumerate common PostgreSQL collations.

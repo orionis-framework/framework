@@ -16,7 +16,7 @@ El manager acepta los nombres integrados `memory`, `file`, `redis`, `memcached` 
 
 Los stores serializan con JSON de msgspec: limita el contrato de tus valores a estructuras JSON y verifica round trips si necesitas fechas, tuplas o tipos propios. El `Serializer` enriquecido documentado en [artefactos](source-artifacts.md) no participa en estos stores. Una fecha puede volver como texto y una tupla como lista; no presupongas identidad de tipos.
 
-El store database crea sus tablas de entradas y locks de forma lazy; la conexión necesita permisos de creación. Rechaza conexiones sin restricciones únicas efectivas, como Redshift. No depende de que ejecutes una migración de caché específica. Mantén los nombres de tablas exclusivos de la aplicación. El store file usa expiraciones basadas en reloj monotónico; no lo uses como persistencia duradera ni compartas sus archivos entre máquinas con relojes monotónicos distintos.
+El store database crea sus tablas de entradas y locks de forma lazy; la conexión necesita permisos de creación. Rechaza conexiones sin restricciones únicas efectivas, como Redshift. No depende de que ejecutes una migración de caché específica. Mantén los nombres de tablas exclusivos de la aplicación. El store file guarda los vencimientos como timestamps Unix; reiniciar la máquina no reinicia el TTL. Estos vencimientos dependen del reloj de pared. Los vencimientos del antiguo formato monotónico no se migran; las entradas antiguas vencidas se regeneran cuando faltan.
 
 ### Evitar regeneraciones simultáneas
 
@@ -45,7 +45,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-Para memory esto usa el `RedLock` basado en lease de aiocache y coordina usuarios de la misma instancia backend.
+Para memory esto usa el `RedLock` basado en lease de aiocache y coordina usuarios de la misma instancia backend. Las instancias memory independientes no comparten eventos de notificación del lock; el vencimiento del lease aún puede admitir varios llamadores.
 
 ## Configuración
 
@@ -76,7 +76,7 @@ El paquete también se usa en compilación del framework y otros módulos con es
 
 ## Errores y casos límite
 
-- Ausencia y `None` almacenado son indistinguibles mediante `get`, pero `remember` los distingue internamente.
+- Ausencia y `None` almacenado son indistinguibles mediante `get`; `remember` y `rememberOnce` los distinguen en los stores JSON de Orionis. Un backend propio debe conservar la ausencia separadamente para ofrecer la misma garantía.
 - `clear()` vacía el namespace del backend y no filtra por prefijo.
 - `pull` es lectura seguida de eliminación, no una primitiva backend atómica.
 - Misses concurrentes de `remember` pueden ejecutar varias veces el resolver.
@@ -89,9 +89,9 @@ El paquete también se usa en compilación del framework y otros módulos con es
 
 ## Rendimiento y concurrencia
 
-La creación de repositorios es diferida y se almacena por manager. Memory es local al proceso; file desplaza operaciones bloqueantes y usa file locks/reemplazo atómico; Redis y Memcached delegan a aiocache; database asegura su esquema de forma diferida y usa operaciones DB para coordinación compartida.
+La creación de repositorios es diferida y se almacena por manager; los llamadores concurrentes publican un único repositorio por store. Memory es local al proceso; file desplaza operaciones bloqueantes y usa file locks/reemplazo atómico; Redis y Memcached delegan a aiocache; database asegura su esquema de forma diferida y usa operaciones DB para coordinación compartida.
 
-Los locks async de file se comparten solo dentro del mismo event loop y directorio. Database hace polling cada 0,05 segundos y usa lease predeterminado de 10 segundos sin timeout. Los demás backends usan RedLock con lease predeterminado de 10 segundos. Los métodos por lotes delegan a multi-operaciones del backend.
+Los locks async de file se comparten solo dentro del mismo event loop y directorio. Database hace polling cada 0,05 segundos y usa lease predeterminado de 10 segundos sin timeout. Los demás backends usan RedLock con lease predeterminado de 10 segundos. Los métodos por lotes delegan a multi-operaciones del backend. La cancelación de operaciones individuales de archivo espera a que termine el worker activo. Los lotes completan la operación actual y se detienen antes de iniciar otra entrada. Vaciar un store memory también cancela sus temporizadores de expiración anteriores.
 
 
 
@@ -104,10 +104,13 @@ from orionis.support.facades import Cache
 
 
 async def cache_example() -> None:
+    await Cache.pin()
     repo = Cache.store("redis")
     value = await repo.get("key")
     await repo.set("key", value, ttl=60)
 ```
+
+El provider de caché es diferible: iniciar la aplicación no necesariamente lo resuelve. Espera `Cache.pin()` antes de llamadas síncronas de la fachada como `store()`; después del pin, esas llamadas devuelven sus valores directamente. Las llamadas asíncronas normales de la fachada ya esperan la resolución del servicio.
 
 Los nombres soportados son `file`, `memory`, `redis`, `memcached` y `database`. Un store desconocido o ausente provoca `CacheStoreException`.
 

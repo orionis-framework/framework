@@ -3,6 +3,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
+
 class IEncrypter(ABC):
     """Define the contract for encrypter implementations."""
 

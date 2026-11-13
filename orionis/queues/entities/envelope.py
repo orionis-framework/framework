@@ -1,13 +1,20 @@
 """Carry immutable, versioned job data independently of backend state."""
 
-import math
 from uuid import UUID
 import msgspec
 from orionis.queues.exceptions import QueuePayloadError
-from orionis.queues.functions import validate_name, validate_seconds
+from orionis.queues.functions import (
+    _is_finite_number,
+    validate_name,
+    validate_seconds,
+)
+
 
 class JobEnvelope(
-    msgspec.Struct, frozen=True, kw_only=True, forbid_unknown_fields=True,
+    msgspec.Struct,
+    frozen=True,
+    kw_only=True,
+    forbid_unknown_fields=True,
 ):
     """Carry immutable, versioned job data independently of backend state."""
 
@@ -71,10 +78,6 @@ class JobEnvelope(
             raise QueuePayloadError(message)
         for delay in self.backoff:
             validate_seconds(delay, "Job backoff")
-        if self.retry_until is not None and (
-            isinstance(self.retry_until, bool)
-            or not isinstance(self.retry_until, (int, float))
-            or not math.isfinite(self.retry_until)
-        ):
+        if self.retry_until is not None and not _is_finite_number(self.retry_until):
             message = "Queue envelope retry_until must be a finite epoch timestamp."
             raise QueuePayloadError(message)

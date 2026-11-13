@@ -1,8 +1,8 @@
 from orionis.http import HTMLResponse, response
 from orionis.http.base import BaseController
 
-class AdministrationController(BaseController):
 
+class AdministrationController(BaseController):
     async def roles(self) -> HTMLResponse:
         """
         Render the roles placeholder inside the authenticated layout.

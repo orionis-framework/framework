@@ -5,6 +5,7 @@ EXPECTED_EXPORTS = {
     "IModelQueryBuilder": ("orionis.orm.contracts.builder", "IModelQueryBuilder"),
 }
 
+
 class TestContractsPackage(TestCase):
     """Verify the orionis.orm.contracts public export surface."""
 
@@ -14,6 +15,6 @@ class TestContractsPackage(TestCase):
         Returns
         -------
         None
-            Verify exact exported names and identities without shadowing modules.
+            No return value.
         """
         assert_package_exports(self, "orionis.orm.contracts", EXPECTED_EXPORTS)

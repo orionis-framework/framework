@@ -6,6 +6,7 @@ from typing import cast
 from orionis.mail.exceptions import MailCompositionException
 from orionis.mail.functions import freeze_owned
 
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Content:
     """

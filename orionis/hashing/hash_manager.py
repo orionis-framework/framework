@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415, TC001
+# Preserve runtime injection types and resolve optional driver implementations lazily.
 """Expose an algorithm-agnostic hashing API."""
 
 from typing import Self
@@ -7,6 +9,7 @@ from orionis.foundation.contracts.application import IApplication
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashDriverNotSupportedException
+
 
 class HashManager(IHashManager):
     """Expose an algorithm-agnostic hashing API.
@@ -28,8 +31,6 @@ class HashManager(IHashManager):
     application.
     """
 
-    # ruff: noqa: PLC0415, TC001
-
     __slots__ = ("_config", "_default", "_drivers")
     """Declare the instance attribute slots reserved by this class."""
 
@@ -48,7 +49,7 @@ class HashManager(IHashManager):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
         """
         config_data = app.config("hashing") or {}
         self._config: _HashingConfig = (
@@ -59,7 +60,7 @@ class HashManager(IHashManager):
         """Validated configuration used to construct and operate the service."""
 
         self._default: str = str(self._config.driver)
-        """Value used when the client omits this argument."""
+        """Configured driver name used when a caller does not select one."""
         self._drivers: dict[str, IHasher] = {}
         """Configured backend drivers cached by their registered names."""
 
@@ -73,7 +74,7 @@ class HashManager(IHashManager):
         ----------
         name : str | None
             Driver name (``'argon2'`` or ``'bcrypt'``). ``None`` selects
-            the configured default driver.
+            the configured default driver. An empty string also selects it.
 
         Returns
         -------
@@ -124,8 +125,8 @@ class HashManager(IHashManager):
             If *name* does not match any supported driver.
         """
         if name == Drivers.ARGON2.value:
-
             from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
+
             options = self._config.argon2
             return Argon2Hasher(
                 memory=options.memory,
@@ -134,8 +135,8 @@ class HashManager(IHashManager):
             )
 
         if name == Drivers.BCRYPT.value:
-
             from orionis.hashing.hashers.bcrypt_hasher import BcryptHasher
+
             return BcryptHasher(rounds=self._config.bcrypt.rounds)
 
         error_msg = (

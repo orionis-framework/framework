@@ -1,22 +1,24 @@
+# ruff: noqa: SLF001, TC001
+# Keep public callback and delivery annotations resolvable at runtime.
+# Copy the operation-local snapshot shared with the Message configurator.
 """Build independent chains; every fluent call returns a new operation."""
 
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from dataclasses import replace
 from inspect import isawaitable, iscoroutine
-from typing import TYPE_CHECKING, TypeGuard, cast, overload
+from typing import TypeGuard, cast, overload
+from orionis.mail.entities.address import Address
 from orionis.mail.entities.attachment import Attachment
 from orionis.mail.entities.content import Content
 from orionis.mail.entities.envelope import Envelope
 from orionis.mail.entities.options import MailOptions
+from orionis.mail.entities.result import MailResult
 from orionis.mail.exceptions import MailCompositionException, MailConfigurationException
 from orionis.mail.mailable import Mailable
 from orionis.mail.message import Message
+from orionis.mail.types import Delivery, MessageCallback, Recipients
 from orionis.support.types.sentinel import MISSING
 
-if TYPE_CHECKING:
-    from orionis.mail.entities.address import Address
-    from orionis.mail.entities.result import MailResult
-    from orionis.mail.types import Delivery, MessageCallback, Recipients
 
 class PendingMail:
     """
@@ -236,7 +238,7 @@ class PendingMail:
         callback: MessageCallback | None = None,
     ) -> MailResult: ...
 
-    async def send( # NOSONAR
+    async def send(  # NOSONAR
         self,
         value: Mailable | type[Mailable] | str | Content,
         /,
@@ -269,7 +271,6 @@ class PendingMail:
             If preparation or transport fails.
         """
         if isinstance(value, Mailable) or _is_mailable_class(value):
-
             # A Mailable owns its context, so supplying either argument here
             # would silently drop it.
             if data is not MISSING or callback is not MISSING:
@@ -287,7 +288,7 @@ class PendingMail:
                 try:
                     mailable = await self._mailable_builder(value)
                 except Exception as exc:
-                    error_msg = (
+                    error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                         f"Could not resolve Mailable [{value.__name__}] "
                         "through the application container."
                     )
@@ -390,7 +391,7 @@ class PendingMail:
         """
         return PendingMail(
             self._delivery,
-            message._snapshot(),  # noqa: SLF001
+            message._snapshot(),
             self._mailable_builder,
         )
 
@@ -419,7 +420,7 @@ class PendingMail:
         if callback is not None:
             await _run_callback(callback, message)
 
-        options = message._snapshot()  # noqa: SLF001
+        options = message._snapshot()
         return await self._delivery(
             options.mailer,
             options.envelope(),
@@ -468,6 +469,7 @@ class PendingMail:
             (*attachments, *self._options.attachments),
         )
 
+
 async def _run_callback(callback: object, message: Message) -> None:
     """
     Run one configurator exactly once and await an asynchronous result.
@@ -510,6 +512,7 @@ async def _run_callback(callback: object, message: Message) -> None:
         error_msg = "Mail callbacks must return None or the received Message."
         raise MailCompositionException(error_msg)
 
+
 def _assert_declaration(value: object, expected: type, label: str) -> None:
     """
     Reject invalid synchronous declarations without leaking coroutines.
@@ -543,6 +546,7 @@ def _assert_declaration(value: object, expected: type, label: str) -> None:
 
     error_msg = f"Mailable {label}() must return {expected.__name__} synchronously."
     raise MailCompositionException(error_msg)
+
 
 def _is_mailable_class(value: object) -> TypeGuard[type[Mailable]]:
     """

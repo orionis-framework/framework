@@ -1,6 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import ast
 from pathlib import Path
 from orionis.test import TestCase
+
 
 def public_signatures(path: Path, class_name: str) -> dict:
     """Read public method signatures without importing stub-only definitions.
@@ -35,6 +38,7 @@ def public_signatures(path: Path, class_name: str) -> dict:
         )
     return result
 
+
 class TestRouterTyping(TestCase):
     """Check shared API structure in addition to behavioral integration tests."""
 
@@ -64,6 +68,7 @@ class TestRouterTyping(TestCase):
         root = Path(__file__).resolve().parents[3]
         runtime = public_signatures(root / "orionis/http/routes/router.py", "Router")
         contract = public_signatures(
-            root / "orionis/http/routes/contracts/router.py", "IRouter",
+            root / "orionis/http/routes/contracts/router.py",
+            "IRouter",
         )
         self.assertEqual(contract, runtime)

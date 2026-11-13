@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Expose the schema annotation to runtime dependency reflection.
 """Validate structured input against declared fields and validation rules."""
 
 from __future__ import annotations
@@ -7,6 +9,7 @@ from orionis.schemas.coercion import coerce_payload
 from orionis.schemas.exceptions.validation import ValidationException
 from orionis.schemas.failure_collector import FailureCollector
 from orionis.schemas.instance_payload import instance_payload
+from orionis.schemas.schema import Schema as SchemaType
 from orionis.schemas.rules_executor import (
     _build_plan,
     _cache_get,
@@ -15,7 +18,6 @@ from orionis.schemas.rules_executor import (
 
 if TYPE_CHECKING:
     from orionis.schemas.entities.failure import ValidationFailure
-    from orionis.schemas.schema import Schema as SchemaType
 
 # Alias msgspec's convert function to avoid direct dependency on msgspec in the
 # rest of the codebase.
@@ -26,8 +28,8 @@ _convert = msgspec.convert
 _ValidationError = msgspec.ValidationError
 _Struct = msgspec.Struct
 
-class Schema:
 
+class Schema:
     # Prevent per-instance dictionaries; the class is used statically.
     """Validate structured input against declared fields and validation rules."""
 

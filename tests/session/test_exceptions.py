@@ -1,6 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.session.exceptions import SessionException, SessionStorageException
 from orionis.test import TestCase
+
 
 class TestSessionException(TestCase):
     """Unit tests for the base SessionException."""
@@ -14,7 +17,7 @@ class TestSessionException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(SessionException("base error"), Exception)
 
@@ -27,7 +30,7 @@ class TestSessionException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         message = "something went wrong"
         self.assertIn(message, str(SessionException(message)))
@@ -41,16 +44,12 @@ class TestSessionException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
-
-        Raises
-        ------
-        SessionException
-            Raised by this helper to exercise the failure path.
+            No return value.
         """
         error_msg = "test raise"
         with self.assertRaises(SessionException):
             raise SessionException(error_msg)
+
 
 class TestSessionStorageException(TestCase):
     """Unit tests for the storage-specific session exception."""
@@ -64,7 +63,7 @@ class TestSessionStorageException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = SessionStorageException("store error")
         self.assertIsInstance(exc, SessionException)
@@ -78,7 +77,7 @@ class TestSessionStorageException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(SessionStorageException("store error"), Exception)
 
@@ -91,7 +90,7 @@ class TestSessionStorageException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         message = "disk write failed"
         self.assertIn(message, str(SessionStorageException(message)))
@@ -105,12 +104,7 @@ class TestSessionStorageException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
-
-        Raises
-        ------
-        SessionStorageException
-            Raised by this helper to exercise the failure path.
+            No return value.
         """
         error_msg = "hierarchy test"
         with self.assertRaises(SessionException):

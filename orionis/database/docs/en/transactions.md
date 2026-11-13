@@ -8,24 +8,34 @@ The async context commits when its body completes normally and rolls back when a
 
 ```python
 import asyncio
+
 from orionis.database import Connection
 
 
 async def main() -> None:
+    """Verify nested rollback while preserving the outer transaction."""
+
     db = Connection("tx", {"driver": "sqlite", "database": ":memory:"})
+
     try:
         await db.statement("CREATE TABLE events (name TEXT NOT NULL)")
+
         async with db.transaction():
             await db.execute("INSERT INTO events VALUES (:name)", {"name": "outer"})
+
             try:
                 async with db.transaction():
                     await db.execute(
                         "INSERT INTO events VALUES (:name)", {"name": "inner"}
                     )
+
                     raise ValueError("discard inner work")
+
             except ValueError:
                 pass
+
         assert await db.select("SELECT name FROM events") == [{"name": "outer"}]
+
     finally:
         await db.disconnect()
 
@@ -34,6 +44,8 @@ asyncio.run(main())
 ```
 
 Inside an application, use `async with DB.transaction():` or `async with DB.transaction("reporting"):`. Manual facade control uses `beginTransaction()`, `commit()`, and `rollback()`; direct connections use `begin()`, `commit()`, and `rollback()`. Prefer the context manager: manual control must handle failures and cancellation on every path. Committing or rolling back without an active transaction raises `TransactionException`.
+
+Rollback remains in the task that owns the transaction. If rollback or connection cleanup fails while an exception is already escaping the body, the body exception remains primary. Secondary or delayed SQL failures reach the central failure runtime with SQL and bound values redacted.
 
 ## Nesting and task ownership
 

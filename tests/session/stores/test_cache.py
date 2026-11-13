@@ -1,11 +1,13 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify session storage contracts and isolated persistence behavior."""
+
 from __future__ import annotations
 from datetime import UTC, datetime, timedelta
-from typing import Any
 from orionis.session.entities.record import SessionRecord
 from orionis.session.stores.cache import CacheSessionStore
 from orionis.test import TestCase
 
-# ruff: noqa: ANN401
 
 class _FakeCacheRepository:
     """Minimal in-memory stand-in for ICacheRepository."""
@@ -16,12 +18,12 @@ class _FakeCacheRepository:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self.data: dict[str, Any] = {}
+        self.data: dict[str, object] = {}
         self.ttls: dict[str, float | None] = {}
 
-    async def get(self, key: str) -> Any:
+    async def get(self, key: str) -> object | None:
         """Return a cached value by key.
 
         Parameters
@@ -31,19 +33,19 @@ class _FakeCacheRepository:
 
         Returns
         -------
-        Any
-            Value produced by the helper.
+        object or None
+            Stored value, or None when the key is absent.
         """
         return self.data.get(key)
 
-    async def set(self, key: str, value: Any, ttl: float | None = None) -> bool:
+    async def set(self, key: str, value: object, ttl: float | None = None) -> bool:
         """Store a cache value under its key.
 
         Parameters
         ----------
         key : str
             Value supplied for ``key``.
-        value : Any
+        value : object
             Value supplied for ``value``.
         ttl : float | None
             Value supplied for ``ttl``.
@@ -75,6 +77,7 @@ class _FakeCacheRepository:
         self.ttls.pop(key, None)
         return existed
 
+
 class _FakeCacheManager:
     """Fake ICacheManager exposing only the store() factory method."""
 
@@ -84,7 +87,7 @@ class _FakeCacheManager:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.repository = _FakeCacheRepository()
         self.requested_store: str | None = "__unset__"
@@ -104,6 +107,7 @@ class _FakeCacheManager:
         """
         self.requested_store = name
         return self.repository
+
 
 def _make_record(
     session_id: str = "test-id",
@@ -132,6 +136,7 @@ def _make_record(
         expires_at=datetime.now(UTC) + timedelta(seconds=offset_seconds),
     )
 
+
 class TestCacheSessionStore(TestCase):
     """Unit tests for the cache-backed CacheSessionStore."""
 
@@ -146,7 +151,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = _FakeCacheManager()
         CacheSessionStore(cache=manager)
@@ -161,7 +166,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = _FakeCacheManager()
         CacheSessionStore(cache=manager, store="sessions")
@@ -178,7 +183,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = CacheSessionStore(cache=_FakeCacheManager())
         result = await store.read("nonexistent")
@@ -193,7 +198,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = CacheSessionStore(cache=_FakeCacheManager())
         record = _make_record("abc")
@@ -212,7 +217,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = _FakeCacheManager()
         store = CacheSessionStore(cache=manager)
@@ -228,7 +233,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = CacheSessionStore(cache=_FakeCacheManager())
         record = _make_record("expiry")
@@ -248,7 +253,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = _FakeCacheManager()
         store = CacheSessionStore(cache=manager)
@@ -268,7 +273,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = _FakeCacheManager()
         store = CacheSessionStore(cache=manager)
@@ -286,7 +291,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = CacheSessionStore(cache=_FakeCacheManager())
         record_v1 = SessionRecord(
@@ -316,11 +321,11 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = CacheSessionStore(cache=_FakeCacheManager())
         await store.write(_make_record("to-delete"))
-        await store.delete("to-delete")
+        self.assertTrue(await store.delete("to-delete"))
         result = await store.read("to-delete")
         self.assertIsNone(result)
 
@@ -333,10 +338,10 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         store = CacheSessionStore(cache=_FakeCacheManager())
-        await store.delete("ghost")
+        self.assertFalse(await store.delete("ghost"))
 
     async def testDeleteUsesNamespacedKey(self) -> None:
         """Remove the namespaced entry rather than the raw identifier.
@@ -346,7 +351,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = _FakeCacheManager()
         store = CacheSessionStore(cache=manager)
@@ -365,7 +370,7 @@ class TestCacheSessionStore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = _FakeCacheManager()
         store = CacheSessionStore(cache=manager)

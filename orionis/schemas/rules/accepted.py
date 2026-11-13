@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value expresses an explicit acceptance."""
 
 from orionis.schemas.rule import Rule
@@ -6,6 +8,7 @@ from orionis.schemas.rule import Rule
 _ACCEPTED_TEXT: frozenset[str] = frozenset({"yes", "on", "1", "true"})
 """Textual representations treated as an explicit acceptance."""
 
+
 class Accepted(Rule):
     """
     Ensure a value expresses an explicit acceptance.
@@ -13,8 +16,6 @@ class Accepted(Rule):
     Accepts ``True``, ``1`` and the strings ``"yes"``, ``"on"``, ``"1"``
     and ``"true"``, which makes it suitable for terms-of-service fields.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

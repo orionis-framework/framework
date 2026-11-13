@@ -61,8 +61,10 @@ async def publish(article: Article) -> bool:
     return await article.save()
 ```
 
-`save()` inserta instancias nuevas y actualiza solo atributos sucios de instancias recuperadas. Devuelve `False` si un evento previo veta la operación. `await Article.create({...})` devuelve la instancia, pero actualmente no expone como resultado booleano el veto de `save()`: si necesitas comprobar persistencia explícita, construye el modelo y comprueba `await model.save()`.
+`save()` inserta instancias nuevas y actualiza solo atributos sucios de instancias recuperadas. Devuelve `False` si un evento previo veta la operación o una actualización no encuentra la fila almacenada. Esa escritura fallida no emite eventos posteriores de éxito. `await Article.create({...})` devuelve la instancia, pero actualmente no expone como resultado booleano el veto de `save()`: si necesitas comprobar persistencia explícita, construye el modelo y comprueba `await model.save()`.
+
+Los modelos recuperados mediante una conexión seleccionada conservan esa conexión exacta para las escrituras posteriores de instancia. Las instancias nuevas utilizan la política de conexión de su modelo.
 
 `find(id)` y `first()` devuelven modelo o `None`; sus variantes `OrFail` lanzan `ModelNotFoundException`. `update({...})` de instancia devuelve booleano; `delete()` devuelve booleano y respeta soft deletes. Las [operaciones de builder](querying.md) devuelven recuentos y no equivalen al ciclo de cada instancia.
 
-`getDirty`, `isDirty`, `isClean`, `getOriginal`, `wasChanged` y `getChanges` ayudan a decidir qué cambió antes/después de guardar. No constituyen bloqueo optimista: dos escritores pueden sobrescribir cambios. Para unidades atómicas utiliza [transacciones](../../../database/docs/es/transactions.md) y, si el motor lo admite, locks adecuados.
+`getDirty`, `isDirty`, `isClean`, `getOriginal`, `wasChanged` y `getChanges` ayudan a decidir qué cambió antes/después de guardar. Un atributo recién asignado está sucio aunque no tuviera valor original. `syncOriginal()` publica una nueva instantánea original solo después de copiar correctamente todos los valores. No constituyen bloqueo optimista: dos escritores pueden sobrescribir cambios. Para unidades atómicas utiliza [transacciones](../../../database/docs/es/transactions.md) y, si el motor lo admite, locks adecuados.

@@ -1,3 +1,7 @@
+# ruff: noqa: ARG002, FBT003, PT009, PT027, S105, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
+# Exercise required hook signatures, synthetic secrets, and declared column names.
 from __future__ import annotations
 import uuid
 from datetime import datetime
@@ -16,10 +20,11 @@ from orionis.orm.schema.types import Boolean
 from orionis.support.types.collection import Collection
 from orionis.test import TestCase
 
+
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Run the config helper.
 
         Parameters
@@ -48,6 +53,7 @@ class _StubApp:
             },
         }
 
+
 class Person(Model):
     id = Integer().primary().autoIncrement()
     name = String()
@@ -60,6 +66,7 @@ class Person(Model):
     casts: ClassVar[dict[str, str]] = {"active": "bool", "meta": "json"}
     hidden: ClassVar[list[str]] = ["email"]
 
+
 class Secret(Model):
     id = Integer().primary().autoIncrement()
     name = String()
@@ -67,6 +74,7 @@ class Secret(Model):
 
     fillable: ClassVar[list[str]] = ["name"]
     timestamps = False
+
 
 class Guarded(Model):
     id = Integer().primary().autoIncrement()
@@ -76,17 +84,20 @@ class Guarded(Model):
     guarded: ClassVar[list[str]] = ["role"]
     timestamps = False
 
+
 class Legacy(Model):
     id = Integer().primary().autoIncrement()
     name = String()
     created_at = DateTime().nullable()
     updated_at = DateTime().nullable()
 
+
 class Remote(Model):
     id = Integer().primary().autoIncrement()
     name = String()
     connection = "replica"
     timestamps = False
+
 
 class TestModelCrud(TestCase):
     async def asyncSetUp(self) -> None:
@@ -97,9 +108,16 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
+        self.addCleanup(
+            setattr,
+            ConnectionResolver,
+            "_manager",
+            ConnectionResolver._manager,
+        )
         self._manager = ConnectionManager(_StubApp())
+        self.addAsyncCleanup(self._manager.disconnect)
         ConnectionResolver.setManager(self._manager)
         connection = self._manager.connection()
         await connection.createTable(Person.__meta__.table)
@@ -108,19 +126,6 @@ class TestModelCrud(TestCase):
         await connection.createTable(Legacy.__meta__.table)
         replica = self._manager.connection("replica")
         await replica.createTable(Remote.__meta__.table)
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test.
-
-        Restores the global resolver state.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
 
     # ── Create / find ─────────────────────────────────────────────────────────
 
@@ -132,7 +137,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John", "email": "j@x.com"})
         self.assertEqual(person.id, 1)
@@ -146,7 +151,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John"})
         self.assertIsInstance(person.created_at, datetime)
@@ -160,7 +165,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Person.create({"name": "John", "active": True})
         person = await Person.find(1)
@@ -176,7 +181,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(await Person.find(99))
 
@@ -188,7 +193,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ModelNotFoundException):
             await Person.findOrFail(99)
@@ -201,7 +206,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ModelNotFoundException):
             await Person.where("name", "nobody").firstOrFail()
@@ -216,7 +221,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for index in range(5):
             await Person.create(
@@ -239,7 +244,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Person.create({"name": "a"})
         await Person.create({"name": "b"})
@@ -255,7 +260,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Person.create({"name": "a", "email": "a@x.com"})
         await Person.create({"name": "b"})
@@ -278,7 +283,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in ("alpha", "beta", "alberto"):
             await Person.create({"name": name})
@@ -297,7 +302,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Person.create({"name": "a"})
         await Person.create({"name": "b"})
@@ -305,15 +310,13 @@ class TestModelCrud(TestCase):
         rows = await Person.where("name", "a").orWhere("name", "c").get()
         self.assertEqual({p.name for p in rows}, {"a", "c"})
 
-    async def testLatestOrdersByPrimaryKeyWithoutTimestamps(self) -> None:
-        """Order latest() by the created timestamp column when present.
-
-        Validates the latest/oldest defaults.
+    async def testLatestUsesExplicitPrimaryKeyOrder(self) -> None:
+        """Order latest() by an explicitly selected primary key.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Person.create({"name": "first"})
         await Person.create({"name": "second"})
@@ -328,7 +331,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             Person.query().where("name")
@@ -347,7 +350,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for index in range(1, 5):
             await Person.create({"name": f"user{index}"})
@@ -368,7 +371,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await Person.query().sum("id"), 0)
 
@@ -382,7 +385,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John"})
         await person.update({"name": "Peter"})
@@ -400,7 +403,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John"})
         self.assertTrue(await person.save())
@@ -414,7 +417,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Person.create({"name": "a", "active": False})
         await Person.create({"name": "b", "active": False})
@@ -429,7 +432,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John"})
         self.assertTrue(await person.delete())
@@ -444,7 +447,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in ("a", "b", "c"):
             await Person.create({"name": name})
@@ -461,7 +464,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for index in range(5):
             await Person.create({"name": f"user{index}"})
@@ -482,7 +485,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John", "email": "j@x.com"})
         data = person.toDict()
@@ -498,7 +501,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John", "email": "j@x.com"})
         self.assertEqual(person.only("name"), {"name": "John"})
@@ -513,7 +516,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"tags": ["a", "b"], "level": 3}
         person = await Person.create({"name": "John", "meta": payload})
@@ -528,7 +531,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John"})
         self.assertTrue(person.isClean())
@@ -552,7 +555,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         secret = await Secret.create({"name": "ok"})
         self.assertEqual(secret.name, "ok")
@@ -567,7 +570,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MassAssignmentException):
             Person({"ghost": 1})
@@ -580,11 +583,11 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         secret = Secret()
         secret.name = "n"
-        secret.token = "t"  # noqa: S105
+        secret.token = "t"
         await secret.save()
         fresh = await Secret.find(secret.id)
         self.assertEqual(fresh.token, "t")
@@ -597,7 +600,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guarded = await Guarded.create({"name": "ok"})
         self.assertEqual(guarded.name, "ok")
@@ -612,7 +615,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await Person.destroy(), 0)
 
@@ -624,7 +627,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await Person.query().insert(
             [{"name": "a"}, {"name": "b"}],
@@ -640,11 +643,11 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = Person()
         person.active = "1"
-        self.assertIs(person.active, True)
+        self.assertIs(person.active, expr2=True)
 
     async def testUnknownAttributeAccessRaises(self) -> None:
         """Raise AttributeError for names that are not columns.
@@ -654,7 +657,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = Person({"name": "x"})
         with self.assertRaises(AttributeError):
@@ -668,7 +671,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = Person()
         self.assertIsNone(person.email)
@@ -681,7 +684,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = Person({"name": "x"})
         person.transient = "note"
@@ -696,7 +699,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "x"})
         self.assertIn("Person", repr(person))
@@ -710,7 +713,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         remote = await Remote.create({"name": "far"})
         self.assertEqual(remote.id, 1)
@@ -729,7 +732,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "a"})
         self.assertIsNotNone(person.updated_at)
@@ -750,7 +753,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(await Person.first())
         await Person.create({"name": "a"})
@@ -767,7 +770,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Person.create({"name": "only"})
         person = await Person.firstOrFail()
@@ -785,7 +788,7 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         person = await Person.create({"name": "John"})
         person.id = 999
@@ -807,10 +810,11 @@ class TestModelCrud(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = Secret.freshTimestamp()
         self.assertIsNotNone(moment.tzinfo)
+
 
 class TestUniqueIds(feature_fixtures._ModelFeatureTestCase):
     """Client-generated primary keys."""
@@ -823,7 +827,7 @@ class TestUniqueIds(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         token = await feature_fixtures.Token.create({"label": "api"})
         self.assertIsInstance(token.id, uuid.UUID)
@@ -837,11 +841,12 @@ class TestUniqueIds(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         identifier = uuid.uuid4()
         token = await feature_fixtures.Token.create({"id": identifier, "label": "api"})
         self.assertEqual(token.id, identifier)
+
 
 class TestModelConnectionRouting(TestCase):
     """Exercise instance persistence using an overridable connection resolver."""
@@ -852,7 +857,7 @@ class TestModelConnectionRouting(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = Connection("sqlite", {"driver": "sqlite", "database": ":memory:"})
         self.addAsyncCleanup(connection.disconnect)

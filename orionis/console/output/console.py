@@ -1,9 +1,10 @@
+# ruff: noqa: PLR0913, T201
+# Keep established public and external protocol names and signatures.
 """Provide formatted console output, prompts and interactive utilities."""
 
 from __future__ import annotations
 import asyncio
 import getpass
-import os
 import sys
 from typing import TYPE_CHECKING, Any
 from rich.console import Console as RichConsole
@@ -19,9 +20,8 @@ if TYPE_CHECKING:
     from _typeshed import SupportsWrite
     from datetime import datetime
 
-class Console(IConsole):
 
-    # ruff: noqa: T201, B905, PLR0913
+class Console(IConsole):
     """Provide formatted console output, prompts and interactive utilities."""
 
     @property
@@ -65,7 +65,12 @@ class Console(IConsole):
         )
 
     def __printWithBackground(
-        self, label: str, bg_color: ANSIColors, message: str, *, timestamp: bool,
+        self,
+        label: str,
+        bg_color: ANSIColors,
+        message: str,
+        *,
+        timestamp: bool,
     ) -> None:
         """
         Print a formatted message with a background color.
@@ -85,6 +90,7 @@ class Console(IConsole):
         -------
         None
             This method does not return any value.
+
         """
         # Get the timestamp string if required
         str_time = self.__getTimestamp() if timestamp else ""
@@ -658,8 +664,7 @@ class Console(IConsole):
         """
         # Prompt the user for hidden input with info color
         prompt = (
-            f"{ANSIColors.TEXT_INFO.value}{question.strip()}"
-            f"{ANSIColors.DEFAULT.value} "
+            f"{ANSIColors.TEXT_INFO.value}{question.strip()}{ANSIColors.DEFAULT.value} "
         )
         return getpass.getpass(prompt)
 
@@ -701,7 +706,7 @@ class Console(IConsole):
         # Calculate maximum width for each column
         col_widths = [
             max(len(str(item)) for item in col)
-            for col in zip(headers, *rows)
+            for col in zip(headers, *rows, strict=False)
         ]
 
         # Define table border characters
@@ -721,7 +726,7 @@ class Console(IConsole):
             + " │ ".join(
                 f"{ANSIColors.TEXT_BOLD.value}{header:<{col_width}}"
                 f"{ANSIColors.DEFAULT.value}"
-                for header, col_width in zip(headers, col_widths)
+                for header, col_width in zip(headers, col_widths, strict=False)
             )
             + " │"
         )
@@ -737,7 +742,7 @@ class Console(IConsole):
                 "│ "
                 + " │ ".join(
                     f"{item!s:<{col_width}}"
-                    for item, col_width in zip(row, col_widths)
+                    for item, col_width in zip(row, col_widths, strict=False)
                 )
                 + " │"
             )
@@ -771,14 +776,15 @@ class Console(IConsole):
         """
         # Prompt the user for input with info color
         prompt = (
-            f"{ANSIColors.TEXT_INFO.value}{question.strip()}"
-            f"{ANSIColors.DEFAULT.value} "
+            f"{ANSIColors.TEXT_INFO.value}{question.strip()}{ANSIColors.DEFAULT.value} "
         )
         input_value = input(prompt)
 
         # Find first option that starts with input_value, or use default/user input
-        return next((option for option in options if option.startswith(input_value)),
-                    default or input_value)
+        return next(
+            (option for option in options if option.startswith(input_value)),
+            default or input_value,
+        )
 
     def choice(self, question: str, choices: list, default_index: int = 0) -> str:
         """
@@ -902,21 +908,19 @@ class Console(IConsole):
         -------
         None
             This method does not return any value.
+
+        Raises
+        ------
+        SystemExit
+            Exit with status 0 while permitting normal interpreter cleanup.
         """
         # Print success message if provided
         if message:
             self.success(message)
 
-        # Attempt to exit gracefully
-        try:
-            sys.exit(0)
+        sys.exit(0)
 
-        # Force exit if SystemExit is caught
-        except SystemExit:
-            os._exit(0)
-            raise
-
-    def exitError(self, message: str| None = None) -> None:
+    def exitError(self, message: str | None = None) -> None:
         """
         Exit the program with an error message.
 
@@ -929,19 +933,17 @@ class Console(IConsole):
         -------
         None
             This method does not return any value.
+
+        Raises
+        ------
+        SystemExit
+            Exit with status 1 while permitting normal interpreter cleanup.
         """
         # Print error message if provided
         if message:
             self.error(message)
 
-        # Attempt to exit gracefully
-        try:
-            sys.exit(1)
-
-        # Force exit if SystemExit is caught
-        except SystemExit:
-            os._exit(1)
-            raise
+        sys.exit(1)
 
     def dump(
         self,
@@ -988,16 +990,19 @@ class Console(IConsole):
             This method does not return any value.
         """
         # Configure VarDumper with provided options and dump variables
-        return VarDumper().showTypes(show=show_types)\
-            .showIndex(show=show_index)\
-            .expandAll(expand=expand_all)\
-            .maxDepth(max_depth)\
-            .modulePath(module_path)\
-            .lineNumber(line_number)\
-            .redirectOutput(redirect=redirect_output)\
-            .forceExit(force=force_exit)\
-            .values(*args)\
+        return (
+            VarDumper()
+            .showTypes(show=show_types)
+            .showIndex(show=show_index)
+            .expandAll(expand=expand_all)
+            .maxDepth(max_depth)
+            .modulePath(module_path)
+            .lineNumber(line_number)
+            .redirectOutput(redirect=redirect_output)
+            .forceExit(force=force_exit)
+            .values(*args)
             .print(insert_line=insert_line)
+        )
 
     async def sleep(self, seconds: float) -> None:
         """

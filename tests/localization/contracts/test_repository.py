@@ -1,34 +1,21 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.localization.contracts.repository import ITranslationRepository
 from orionis.localization.repository import TranslationRepository
 from orionis.test import TestCase
 
 # Methods every translation repository must implement.
-_ABSTRACT_METHODS: frozenset[str] = frozenset({
-    "flush",
-    "forget",
-    "get",
-    "has",
-    "loadedLocales",
-})
+_ABSTRACT_METHODS: frozenset[str] = frozenset(
+    {
+        "flush",
+        "forget",
+        "get",
+        "has",
+        "loadedLocales",
+    },
+)
 
-def parameter_names(owner: type, method: str) -> list[str]:
-    """
-    Return the parameter names declared by *method* on *owner*.
-
-    Parameters
-    ----------
-    owner : type
-        Class owning the inspected method.
-    method : str
-        Name of the method to inspect.
-
-    Returns
-    -------
-    list[str]
-        Ordered parameter names of the method signature.
-    """
-    return list(inspect.signature(getattr(owner, method)).parameters)
 
 class TestTranslationRepositoryContract(TestCase):
     """Validate the repository interface and its implementation parity."""
@@ -42,7 +29,7 @@ class TestTranslationRepositoryContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             ITranslationRepository.__abstractmethods__,
@@ -58,7 +45,7 @@ class TestTranslationRepositoryContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ITranslationRepository.__slots__, ())
 
@@ -71,7 +58,7 @@ class TestTranslationRepositoryContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(
             issubclass(TranslationRepository, ITranslationRepository),
@@ -86,11 +73,20 @@ class TestTranslationRepositoryContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for method in sorted(_ABSTRACT_METHODS):
-            self.assertEqual(
-                parameter_names(TranslationRepository, method),
-                parameter_names(ITranslationRepository, method),
-                method,
-            )
+            with self.subTest(method=method):
+                expected = inspect.signature(
+                    getattr(ITranslationRepository, method),
+                    eval_str=True,
+                )
+                actual = inspect.signature(
+                    getattr(TranslationRepository, method),
+                    eval_str=True,
+                )
+                self.assertEqual(
+                    list(actual.parameters.values())[1:],
+                    list(expected.parameters.values())[1:],
+                )
+                self.assertEqual(actual.return_annotation, expected.return_annotation)

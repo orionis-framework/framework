@@ -1,23 +1,33 @@
+# ruff: noqa: ANN201, DTZ001, PT009, PT027, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Native schema compilation resolves Field and Coerce from runtime annotations.
 import base64
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from uuid import UUID
+from unittest.mock import patch
 import msgspec
 from orionis.container.container import Container
 from orionis.mcp.protocol.metadata import ContentAnnotations
 from orionis.mcp.protocol.metadata import PromptArgument
 from orionis.mcp.protocol.results import CallToolResult
+from orionis.mcp.protocol.content import TextContent
 from orionis.mcp.responses import McpResponse
 from orionis.mcp.server.primitives import Prompt, Resource, Server, Tool
 from orionis.schemas import Schema
+from orionis.schemas.fields import Field
+from orionis.schemas.metadata import Coerce
+from orionis.schemas.validator import Schema as Validator
 from orionis.test import TestCase
 
 _SERIALIZED_DATA = {"name": "Caf\u00e9", "values": [1, None, False]}
 
+
 class _Status(Enum):
     READY = "ready"
+
 
 class _NativePayload(Schema, omit_defaults=True):
     display_name: str = msgspec.field(name="name")
@@ -26,9 +36,11 @@ class _NativePayload(Schema, omit_defaults=True):
     identifier: UUID
     status: _Status = _Status.READY
 
+
 @dataclass
 class _NativeEnvelope:
     payload: _NativePayload
+
 
 _NATIVE_DATA = _NativePayload(
     display_name="demo",
@@ -43,8 +55,10 @@ _NATIVE_JSON = {
     "identifier": "12345678-1234-5678-1234-567812345678",
 }
 
+
 class _SerializationInput(Schema):
     mime_type: str
+
 
 class _SerializationTool(Tool[_SerializationInput]):
     name = "serialized-data"
@@ -63,8 +77,11 @@ class _SerializationTool(Tool[_SerializationInput]):
             Resource content encoded by the shared response builder.
         """
         return McpResponse.resource(
-            "demo://serialized", _SERIALIZED_DATA, payload.mime_type,
+            "demo://serialized",
+            _SERIALIZED_DATA,
+            payload.mime_type,
         )
+
 
 class _SerializationPrompt(Prompt):
     name = "serialized-data"
@@ -84,8 +101,11 @@ class _SerializationPrompt(Prompt):
             Resource content encoded by the shared response builder.
         """
         return McpResponse.resource(
-            "demo://serialized", _SERIALIZED_DATA, mime_type,
+            "demo://serialized",
+            _SERIALIZED_DATA,
+            mime_type,
         ).asAssistant()
+
 
 class _SerializationResource(Resource):
     uri = "demo://serialized/json"
@@ -101,9 +121,11 @@ class _SerializationResource(Resource):
         """
         return McpResponse.structured(_SERIALIZED_DATA)
 
+
 class _MessagePackResource(_SerializationResource):
     uri = "demo://serialized/msgpack"
     mime_type = "application/msgpack"
+
 
 class _ScalarSerializationResource(_SerializationResource):
     uri = "demo://scalar/json"
@@ -118,9 +140,11 @@ class _ScalarSerializationResource(_SerializationResource):
         """
         return McpResponse.structured("Caf\u00e9")
 
+
 class _ScalarMessagePackResource(_ScalarSerializationResource):
     uri = "demo://scalar/msgpack"
     mime_type = "application/msgpack"
+
 
 class _TextMessagePackResource(_MessagePackResource):
     uri = "demo://text/msgpack"
@@ -135,15 +159,19 @@ class _TextMessagePackResource(_MessagePackResource):
         """
         return McpResponse.text("Caf\u00e9")
 
+
 class _SerializationServer(Server):
     name = "MIME serialization"
     tools = (_SerializationTool,)
     resources = (
-        _SerializationResource, _MessagePackResource,
-        _ScalarSerializationResource, _ScalarMessagePackResource,
+        _SerializationResource,
+        _MessagePackResource,
+        _ScalarSerializationResource,
+        _ScalarMessagePackResource,
         _TextMessagePackResource,
     )
     prompts = (_SerializationPrompt,)
+
 
 class _NativeTool(Tool[_SerializationInput, _NativePayload]):
     name = "native-data"
@@ -158,6 +186,7 @@ class _NativeTool(Tool[_SerializationInput, _NativePayload]):
             Structured response containing the native schema data.
         """
         return McpResponse.structured(_NATIVE_DATA)
+
 
 class _NativeResource(Resource):
     uri = "demo://native"
@@ -174,6 +203,7 @@ class _NativeResource(Resource):
         """
         return McpResponse.structured(_NATIVE_DATA)
 
+
 class _NativePrompt(Prompt):
     name = "native-data"
 
@@ -188,11 +218,67 @@ class _NativePrompt(Prompt):
         """
         return McpResponse.resource("demo://native", _NATIVE_DATA).asAssistant()
 
+
 class _NativeServer(Server):
     name = "Native serialization"
     tools = (_NativeTool,)
     resources = (_NativeResource,)
     prompts = (_NativePrompt,)
+
+
+class _CoercedOutput(Schema):
+    """Declare a structured result whose number explicitly accepts coercion."""
+
+    count: Field[int, Coerce()]
+
+
+class _CoercedOutputTool(Tool[object, _CoercedOutput]):
+    """Return generated JSON alongside independently authored text."""
+
+    name = "coerced-output"
+    response = (
+        McpResponse.structured({"count": "7"})
+        .withContentMeta({"example.org/source": "generated"})
+        .withAnnotations(ContentAnnotations(priority=0.5))
+        .withMeta({"example.org/result": "retained"})
+    )
+
+    def handle(self) -> tuple[McpResponse, ...]:
+        """Return the shared response without allowing normalization to mutate it.
+
+        Returns
+        -------
+        tuple[McpResponse, ...]
+            Manual content and the generated structured response.
+        """
+        return McpResponse.text('{"count":"7"}'), self.response
+
+
+class _RawCoercedOutputTool(Tool[object, _CoercedOutput]):
+    """Return a low-level result whose content is entirely application-owned."""
+
+    name = "raw-coerced-output"
+
+    def handle(self) -> CallToolResult:
+        """Return a structured value and manual text through the native result API.
+
+        Returns
+        -------
+        CallToolResult
+            Unnormalized output with explicitly authored content.
+        """
+        return CallToolResult(
+            content=(TextContent(text="manual result"),),
+            structuredContent={"count": "7"},
+        )
+
+
+class _CoercedOutputServer(Server):
+    """Expose both public response paths to the actual dispatcher."""
+
+    name = "Output coercion"
+    tools = (_CoercedOutputTool, _RawCoercedOutputTool)
+
 
 class TestResponses(TestCase):
     """Preserve JSON scalar/null values and base64 binary contents."""
@@ -219,6 +305,84 @@ class TestResponses(TestCase):
             self.assertEqual(msgspec.json.decode(wire["content"][0]["text"]), value)
             self.assertEqual(wire["resultType"], "complete")
 
+    async def testOutputConversionReachesWireAndOnlyUpdatesGeneratedText(self) -> None:
+        """Publish the converted output while preserving manual text and metadata.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        app = object.__new__(Container)
+        Container.__init__(app)
+        client = await self.mcp(_CoercedOutputServer, app=app)
+        with patch.object(Validator, "validate", wraps=Validator.validate) as validate:
+            wrapped = await client.tool("coerced-output")
+            raw = await client.tool("raw-coerced-output")
+        self.assertEqual(validate.await_count, 2)
+        for response in (wrapped, raw):
+            with self.subTest(response=response.message):
+                response.assertOk()
+                self.assertEqual(
+                    response.message["result"]["structuredContent"],
+                    {"count": 7},
+                )
+        content = wrapped.message["result"]["content"]
+        self.assertEqual(content[0]["text"], '{"count":"7"}')
+        self.assertEqual(msgspec.json.decode(content[1]["text"]), {"count": 7})
+        self.assertEqual(content[1]["_meta"]["example.org/source"], "generated")
+        self.assertEqual(content[1]["annotations"]["priority"], 0.5)
+        self.assertEqual(
+            wrapped.message["result"]["_meta"]["example.org/result"],
+            "retained",
+        )
+        self.assertEqual(raw.message["result"]["content"][0]["text"], "manual result")
+        original = _CoercedOutputTool.response
+        self.assertEqual(original.structured_content, {"count": "7"})
+        self.assertEqual(
+            msgspec.json.decode(original.content[0].text),
+            {"count": "7"},
+        )
+
+    async def testResponseCopiesRetainGeneratedAndManualTextOwnership(
+        self,
+    ) -> None:
+        """Track generated content across copies without rewriting substituted text.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        app = object.__new__(Container)
+        Container.__init__(app)
+        client = await self.mcp(_CoercedOutputServer, app=app)
+        for response, text in (
+            (
+                replace(
+                    _CoercedOutputTool.response,
+                    meta={"example.org/copied": True},
+                ),
+                '{"count":7}',
+            ),
+            (
+                replace(
+                    _CoercedOutputTool.response,
+                    content=(TextContent(text="application-authored replacement"),),
+                ),
+                "application-authored replacement",
+            ),
+        ):
+            with self.subTest(text=text):
+                with patch.object(_CoercedOutputTool, "response", response):
+                    result = await client.tool("coerced-output")
+                result.assertOk()
+                self.assertEqual(
+                    result.message["result"]["structuredContent"],
+                    {"count": 7},
+                )
+                self.assertEqual(result.message["result"]["content"][1]["text"], text)
+
     def testNativeJsonValuesAreNormalized(self) -> None:
         """
         Normalize native types recursively while honoring Struct settings.
@@ -228,28 +392,40 @@ class TestResponses(TestCase):
         None
             Assert recursive normalization with the declared Struct settings.
         """
+
         class _TaggedPayload(msgspec.Struct, tag=True):
             payload: _NativePayload
             optional: str | msgspec.UnsetType = msgspec.UNSET
 
         for payload, expected in (
             (_NATIVE_DATA, _NATIVE_JSON),
-            ({"items": [_NativeEnvelope(_NATIVE_DATA)]},
-             {"items": [{"payload": _NATIVE_JSON}]}),
-            (_TaggedPayload(_NATIVE_DATA),
-             {"type": "_TaggedPayload", "payload": _NATIVE_JSON}),
+            (
+                {"items": [_NativeEnvelope(_NATIVE_DATA)]},
+                {"items": [{"payload": _NATIVE_JSON}]},
+            ),
+            (
+                _TaggedPayload(_NATIVE_DATA),
+                {"type": "_TaggedPayload", "payload": _NATIVE_JSON},
+            ),
             (_Status.READY, "ready"),
         ):
             with self.subTest(payload=payload):
                 response = McpResponse.structured(payload)
                 self.assertEqual(response.structured_content, expected)
                 self.assertEqual(
-                    msgspec.json.decode(response.content[0].text), expected,
+                    msgspec.json.decode(response.content[0].text),
+                    expected,
                 )
                 for mime_type in (None, "application/json", "application/example+json"):
-                    resource = McpResponse.resource(
-                        "docs://native", payload, mime_type,
-                    ).content[0].resource
+                    resource = (
+                        McpResponse.resource(
+                            "docs://native",
+                            payload,
+                            mime_type,
+                        )
+                        .content[0]
+                        .resource
+                    )
                     self.assertEqual(msgspec.json.decode(resource.text), expected)
         self.assertEqual(_NATIVE_DATA.display_name, "demo")
         self.assertIsInstance(_NATIVE_DATA.created_at, datetime)
@@ -270,10 +446,12 @@ class TestResponses(TestCase):
         payload.display_name = "changed"
         self.assertEqual(response.structured_content, _NATIVE_JSON)
         self.assertEqual(
-            msgspec.json.decode(response.content[0].text), _NATIVE_JSON,
+            msgspec.json.decode(response.content[0].text),
+            _NATIVE_JSON,
         )
         self.assertEqual(
-            msgspec.json.decode(resource.content[0].resource.text), _NATIVE_JSON,
+            msgspec.json.decode(resource.content[0].resource.text),
+            _NATIVE_JSON,
         )
 
     def testNativeJsonValuesStillRejectInvalidData(self) -> None:
@@ -285,12 +463,19 @@ class TestResponses(TestCase):
         None
             Assert rejection of invalid nested values after normalization.
         """
+
         class _InvalidPayload(Schema):
             value: object
 
         for value in (
-            float("nan"), float("inf"), float("-inf"), {1: "key"},
-            b"data", bytearray(b"data"), memoryview(b"data"), object(),
+            float("nan"),
+            float("inf"),
+            float("-inf"),
+            {1: "key"},
+            b"data",
+            bytearray(b"data"),
+            memoryview(b"data"),
+            object(),
         ):
             payload = {"nested": [_InvalidPayload(value)]}
             with self.subTest(value=value):
@@ -308,6 +493,7 @@ class TestResponses(TestCase):
         None
             Assert native Schema serialization through the MCP dispatcher.
         """
+
         class _NativeContainer(Container):
             pass
 
@@ -321,7 +507,8 @@ class TestResponses(TestCase):
         self.assertFalse(result["isError"])
         self.assertEqual(result["structuredContent"], _NATIVE_JSON)
         self.assertEqual(
-            msgspec.json.decode(result["content"][0]["text"]), _NATIVE_JSON,
+            msgspec.json.decode(result["content"][0]["text"]),
+            _NATIVE_JSON,
         )
         self.assertEqual(
             msgspec.json.decode(resource.message["result"]["contents"][0]["text"]),
@@ -407,7 +594,8 @@ class TestResponses(TestCase):
         """
         payload = {"name": "Caf\u00e9", "values": [1, None, False]}
         for mime_type in (
-            "application/json", "application/schema+json",
+            "application/json",
+            "application/schema+json",
             "Application/JSON; charset=UTF-8",
         ):
             with self.subTest(mime_type=mime_type):
@@ -425,8 +613,10 @@ class TestResponses(TestCase):
         """
         payload = {"name": "Caf\u00e9", "binary": b"\x00\xff", "values": [None, 1]}
         for mime_type in (
-            "application/msgpack", "application/x-msgpack",
-            "application/vnd.msgpack", "application/example+msgpack",
+            "application/msgpack",
+            "application/x-msgpack",
+            "application/vnd.msgpack",
+            "application/example+msgpack",
             "Application/X-MsgPack; version=1",
         ):
             with self.subTest(mime_type=mime_type):
@@ -463,7 +653,9 @@ class TestResponses(TestCase):
         for payload in (binary, bytearray(binary), memoryview(binary)):
             with self.subTest(payload_type=type(payload).__name__):
                 response = McpResponse.resource(
-                    "docs://value", payload, "application/msgpack",
+                    "docs://value",
+                    payload,
+                    "application/msgpack",
                 )
                 contents = msgspec.to_builtins(response.content[0])["resource"]
                 encoded = base64.b64decode(contents["blob"], validate=True)
@@ -481,7 +673,9 @@ class TestResponses(TestCase):
         for payload in (None, False, 0, "Caf\u00e9", [1, None]):
             with self.subTest(payload=payload):
                 response = McpResponse.resource(
-                    "docs://value", payload, "application/msgpack",
+                    "docs://value",
+                    payload,
+                    "application/msgpack",
                 )
                 contents = msgspec.to_builtins(response.content[0])["resource"]
                 encoded = base64.b64decode(contents["blob"], validate=True)
@@ -494,7 +688,11 @@ class TestResponses(TestCase):
         Validates that nonfinite numbers and non-JSON nested data are rejected.
         """
         for payload in (
-            float("nan"), float("inf"), {1: "key"}, {"binary": b"data"}, object(),
+            float("nan"),
+            float("inf"),
+            {1: "key"},
+            {"binary": b"data"},
+            object(),
         ):
             with self.subTest(payload=payload):
                 with self.assertRaises(ValueError):
@@ -521,10 +719,14 @@ class TestResponses(TestCase):
         """
         payload = {"values": [1, None]}
         json_response = McpResponse.resource(
-            "docs://value", payload, "application/json",
+            "docs://value",
+            payload,
+            "application/json",
         )
         packed_response = McpResponse.resource(
-            "docs://value", payload, "application/msgpack",
+            "docs://value",
+            payload,
+            "application/msgpack",
         )
         self.assertEqual(payload, {"values": [1, None]})
         payload["values"].append(2)
@@ -539,6 +741,7 @@ class TestResponses(TestCase):
 
         Validates actual native scopes, result schemas and JSON-RPC framing.
         """
+
         class _SerializationContainer(Container):
             pass
 
@@ -578,6 +781,7 @@ class TestResponses(TestCase):
 
         Validates scalar JSON, structured MessagePack and plain text conversion.
         """
+
         class _ScalarContainer(Container):
             pass
 

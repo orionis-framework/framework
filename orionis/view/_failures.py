@@ -1,9 +1,15 @@
+# ruff: noqa: BLE001
+# Observe inspection failures centrally while preserving the original service error.
 """Observe broken optional view services without reporting missing scopes."""
 
 from orionis.failure.runtime import capture, get_runtime
 
+
 async def capture_service_failure(
-    error: Exception, contract: type, *, app: object | None = None,
+    error: Exception,
+    contract: type,
+    *,
+    app: object | None = None,
 ) -> None:
     """
     Observe a view-service failure when its binding exists or cannot be checked.
@@ -23,7 +29,7 @@ async def capture_service_failure(
     Returns
     -------
     None
-        Submit applicable failures with view-service metadata.
+        No return value.
     """
     runtime = get_runtime(app)
     if runtime is None:
@@ -31,7 +37,7 @@ async def capture_service_failure(
     owner = runtime.app
     try:
         registered = owner.bound(contract)
-    except Exception as inspection_error:  # noqa: BLE001
+    except Exception as inspection_error:
         await capture(
             inspection_error,
             runtime=runtime,

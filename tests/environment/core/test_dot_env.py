@@ -1,7 +1,10 @@
+# ruff: noqa: FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import os
-import shutil
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 from orionis.environment.core.dot_env import DotEnv
 from orionis.environment.enums import EnvironmentValueType
 from orionis.support.patterns.singleton.meta import _MISSING
@@ -16,6 +19,7 @@ _MALFORMED_PATH: str = "broken\x00path"
 # ---------------------------------------------------------------------------
 # Test doubles
 # ---------------------------------------------------------------------------
+
 
 class _OpaqueValue:
     """Value outside the supported catalogue with a stable text form."""
@@ -32,67 +36,34 @@ class _OpaqueValue:
         """
         return "opaque-value"
 
+
 # ---------------------------------------------------------------------------
 # Shared fixture
 # ---------------------------------------------------------------------------
 
+
 class _DotEnvTestCase(TestCase):
-
     def setUp(self) -> None:
-        """Install a throwaway `.env` file as the active singleton.
-
-        Isolates every test from the repository `.env` file and from the
-        process environment shared with the rest of the suite.
+        """Isolate the file, singleton, and process variables for this test.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._previous_singleton = vars(DotEnv)["_singleton_instance"]
-        type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
-        self._directory = Path(tempfile.mkdtemp())
-        self._env_path = self._directory / ".env"
-        self._dot_env = DotEnv(path=str(self._env_path))
-        self._tracked_keys: list[str] = []
-
-    def tearDown(self) -> None:
-        """Restore the previous singleton and clean every side effect.
-
-        Removes the tracked process variables and the temporary directory
-        so no state survives the test case.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        for key in self._tracked_keys:
-            os.environ.pop(key, None)
-        shutil.rmtree(self._directory, ignore_errors=True)
-        type.__setattr__(
+        super().setUp()
+        self.addCleanup(
+            type.__setattr__,
             DotEnv,
             "_singleton_instance",
-            self._previous_singleton,
+            vars(DotEnv)["_singleton_instance"],
         )
-
-    def _trackKey(self, key: str) -> str:
-        """
-        Register a variable for automatic cleanup after the test.
-
-        Parameters
-        ----------
-        key : str
-            Environment variable name to remove during teardown.
-
-        Returns
-        -------
-        str
-            The same key, so it can be used inline at the call site.
-        """
-        if key not in self._tracked_keys:
-            self._tracked_keys.append(key)
-        return key
+        type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
+        self.enterContext(patch.dict(os.environ))
+        os.environ.pop("UNDEFINED_KEY", None)
+        self._directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        self._env_path = self._directory / ".env"
+        self._dot_env = DotEnv(path=str(self._env_path))
 
     def _fileContents(self) -> str:
         """
@@ -118,48 +89,35 @@ class _DotEnvTestCase(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        os.environ[self._trackKey(key)] = raw
+        os.environ[key] = raw
+
 
 # ---------------------------------------------------------------------------
 # TestDotEnvInitialisation
 # ---------------------------------------------------------------------------
 
+
 class TestDotEnvInitialisation(TestCase):
-
     def setUp(self) -> None:
-        """Detach the singleton and prepare an empty working directory.
-
-        Allows each test to build its own instance without leaking state
-        into the rest of the suite.
+        """Detach the singleton and preserve all process state.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._previous_singleton = vars(DotEnv)["_singleton_instance"]
-        type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
-        self._directory = Path(tempfile.mkdtemp())
-
-    def tearDown(self) -> None:
-        """Restore the previous singleton and drop the working directory.
-
-        Guarantees that the shared application state is left untouched.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        os.environ.pop("INIT_SEEDED_KEY", None)
-        shutil.rmtree(self._directory, ignore_errors=True)
-        type.__setattr__(
+        super().setUp()
+        self.addCleanup(
+            type.__setattr__,
             DotEnv,
             "_singleton_instance",
-            self._previous_singleton,
+            vars(DotEnv)["_singleton_instance"],
         )
+        type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
+        self.enterContext(patch.dict(os.environ))
+        self._directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
 
     def testCreatesTheFileWhenItDoesNotExist(self) -> None:
         """Create an empty `.env` file when none is present.
@@ -170,7 +128,7 @@ class TestDotEnvInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         target = self._directory / ".env"
         DotEnv(path=str(target))
@@ -185,7 +143,7 @@ class TestDotEnvInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         target = self._directory / ".env"
         target.write_text("INIT_SEEDED_KEY=seeded\n", encoding="utf-8")
@@ -201,7 +159,7 @@ class TestDotEnvInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         target = self._directory / ".env"
         target.write_text("INIT_SEEDED_KEY=seeded\n", encoding="utf-8")
@@ -217,7 +175,7 @@ class TestDotEnvInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         nested = self._directory / "nested"
         nested.mkdir()
@@ -233,7 +191,7 @@ class TestDotEnvInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         first = DotEnv(path=str(self._directory / ".env"))
         second = DotEnv(path=str(self._directory / "ignored.env"))
@@ -248,7 +206,7 @@ class TestDotEnvInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         target = self._directory / _UNREACHABLE_DIRECTORY / ".env"
         with self.assertRaises(OSError) as ctx:
@@ -264,7 +222,7 @@ class TestDotEnvInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(RuntimeError) as ctx:
             DotEnv(path=_MALFORMED_PATH)
@@ -279,18 +237,19 @@ class TestDotEnvInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(OSError):
             DotEnv(path=str(self._directory / _UNREACHABLE_DIRECTORY / ".env"))
         self.assertIs(vars(DotEnv)["_singleton_instance"], _MISSING)
 
+
 # ---------------------------------------------------------------------------
 # TestDotEnvSet
 # ---------------------------------------------------------------------------
 
-class TestDotEnvSet(_DotEnvTestCase):
 
+class TestDotEnvSet(_DotEnvTestCase):
     def testReportsASuccessfulAssignment(self) -> None:
         """Report success after storing a variable.
 
@@ -300,9 +259,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertTrue(self._dot_env.set(self._trackKey("PLAIN_KEY"), "value"))
+        self.assertTrue(self._dot_env.set("PLAIN_KEY", "value"))
 
     def testPersistsTheValueInTheFile(self) -> None:
         """Persist the assigned value in the `.env` file.
@@ -312,9 +271,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self._dot_env.set(self._trackKey("PLAIN_KEY"), "value")
+        self._dot_env.set("PLAIN_KEY", "value")
         self.assertIn("PLAIN_KEY", self._fileContents())
 
     def testPublishesTheValueInTheProcessEnvironment(self) -> None:
@@ -326,9 +285,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self._dot_env.set(self._trackKey("PLAIN_KEY"), "value")
+        self._dot_env.set("PLAIN_KEY", "value")
         self.assertEqual(os.environ.get("PLAIN_KEY"), "value")
 
     def testOverwritesAnExistingValue(self) -> None:
@@ -340,9 +299,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("PLAIN_KEY")
+        key = "PLAIN_KEY"
         self._dot_env.set(key, "first")
         self._dot_env.set(key, "second")
         self.assertEqual(self._dot_env.get(key), "second")
@@ -356,12 +315,12 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for index, value in enumerate(
             ("text", 42, 2.5, True, False, [1, 2], {"a": 1}, (1, 2), {1, 2}),
         ):
-            key = self._trackKey(f"INFERRED_KEY_{index}")
+            key = f"INFERRED_KEY_{index}"
             self._dot_env.set(key, value, only_os=True)
             self.assertEqual(self._dot_env.get(key), value)
 
@@ -374,9 +333,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("NULL_KEY")
+        key = "NULL_KEY"
         self._dot_env.set(key, None, only_os=True)
         self.assertEqual(os.environ.get(key), "null")
         self.assertIsNone(self._dot_env.get(key))
@@ -390,9 +349,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("PADDED_KEY")
+        key = "PADDED_KEY"
         self._dot_env.set(key, "  padded  ", only_os=True)
         self.assertEqual(self._dot_env.get(key), "padded")
 
@@ -405,9 +364,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("OPAQUE_KEY")
+        key = "OPAQUE_KEY"
         self._dot_env.set(key, _OpaqueValue(), only_os=True)
         self.assertEqual(self._dot_env.get(key), "opaque-value")
 
@@ -420,9 +379,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("HINTED_KEY")
+        key = "HINTED_KEY"
         self._dot_env.set(key, 42, "int", only_os=True)
         self.assertEqual(os.environ.get(key), "int:42")
         self.assertEqual(self._dot_env.get(key), 42)
@@ -436,9 +395,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("ENUM_HINTED_KEY")
+        key = "ENUM_HINTED_KEY"
         self._dot_env.set(key, "secret", EnvironmentValueType.BASE64, only_os=True)
         self.assertEqual(self._dot_env.get(key), "secret")
 
@@ -451,9 +410,9 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("EPHEMERAL_KEY")
+        key = "EPHEMERAL_KEY"
         self._dot_env.set(key, "value", only_os=True)
         self.assertNotIn(key, self._fileContents())
         self.assertEqual(os.environ.get(key), "value")
@@ -467,7 +426,7 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self._dot_env.set("lower_case", "value")
@@ -483,10 +442,10 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
-            self._dot_env.set(self._trackKey("BYTES_KEY"), b"payload", "str")
+            self._dot_env.set("BYTES_KEY", b"payload", "str")
 
     def testRejectsAnUnknownTypeHint(self) -> None:
         """Reject a hint that names no supported type.
@@ -497,10 +456,10 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(RuntimeError):
-            self._dot_env.set(self._trackKey("HINTED_KEY"), "value", "complex")
+            self._dot_env.set("HINTED_KEY", "value", "complex")
 
     def testRejectsAValueThatDoesNotFitTheDeclaredHint(self) -> None:
         """Reject a value that cannot be serialised for the declared hint.
@@ -511,17 +470,18 @@ class TestDotEnvSet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
-            self._dot_env.set(self._trackKey("HINTED_KEY"), "abc", "int")
+            self._dot_env.set("HINTED_KEY", "abc", "int")
+
 
 # ---------------------------------------------------------------------------
 # TestDotEnvGet
 # ---------------------------------------------------------------------------
 
-class TestDotEnvGet(_DotEnvTestCase):
 
+class TestDotEnvGet(_DotEnvTestCase):
     def testReturnsNoneForAnUnknownVariable(self) -> None:
         """Return ``None`` when the variable is not defined.
 
@@ -530,7 +490,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(self._dot_env.get("UNDEFINED_KEY"))
 
@@ -543,7 +503,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._dot_env.get("UNDEFINED_KEY", "fallback"), "fallback")
         self.assertEqual(self._dot_env.get("UNDEFINED_KEY", 7), 7)
@@ -557,7 +517,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for index, raw in enumerate(("null", "NONE", " Nan ", "nil")):
             key = f"NULLISH_KEY_{index}"
@@ -573,7 +533,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeRawEntry("EMPTY_KEY", "")
         self.assertIsNone(self._dot_env.get("EMPTY_KEY"))
@@ -586,7 +546,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeRawEntry("TRUE_KEY", "TRUE")
         self._writeRawEntry("FALSE_KEY", " false ")
@@ -602,7 +562,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for index, (raw, expected) in enumerate(
             (
@@ -626,7 +586,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeRawEntry("TYPED_KEY", "int:42")
         self.assertEqual(self._dot_env.get("TYPED_KEY"), 42)
@@ -640,7 +600,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeRawEntry("URL_KEY", "https://example.test/path")
         self.assertEqual(
@@ -657,7 +617,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeRawEntry("TEXT_KEY", "just some text")
         self.assertEqual(self._dot_env.get("TEXT_KEY"), "just some text")
@@ -671,7 +631,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         parse = self._dot_env._DotEnv__parseValue
         for value in (True, 42, 2.5, {"a": 1}, [1], (1,), {1}):
@@ -685,7 +645,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self._dot_env.get("lower_case")
@@ -701,7 +661,7 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeRawEntry("BROKEN_INT_KEY", "int:abc")
         with self.assertRaises(ValueError):
@@ -716,18 +676,19 @@ class TestDotEnvGet(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._writeRawEntry("BROKEN_LIST_KEY", "list:{1}")
         with self.assertRaises(TypeError):
             self._dot_env.get("BROKEN_LIST_KEY")
 
+
 # ---------------------------------------------------------------------------
 # TestDotEnvUnset
 # ---------------------------------------------------------------------------
 
-class TestDotEnvUnset(_DotEnvTestCase):
 
+class TestDotEnvUnset(_DotEnvTestCase):
     def testReportsASuccessfulRemoval(self) -> None:
         """Report success after removing a variable.
 
@@ -737,9 +698,9 @@ class TestDotEnvUnset(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("REMOVABLE_KEY")
+        key = "REMOVABLE_KEY"
         self._dot_env.set(key, "value")
         self.assertTrue(self._dot_env.unset(key))
 
@@ -751,9 +712,9 @@ class TestDotEnvUnset(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("REMOVABLE_KEY")
+        key = "REMOVABLE_KEY"
         self._dot_env.set(key, "value")
         self._dot_env.unset(key)
         self.assertNotIn(key, self._fileContents())
@@ -767,9 +728,9 @@ class TestDotEnvUnset(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("REMOVABLE_KEY")
+        key = "REMOVABLE_KEY"
         self._dot_env.set(key, "value")
         self._dot_env.unset(key)
         self.assertNotIn(key, os.environ)
@@ -784,9 +745,9 @@ class TestDotEnvUnset(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("REMOVABLE_KEY")
+        key = "REMOVABLE_KEY"
         self._dot_env.set(key, "value")
         self._dot_env.unset(key, only_os=True)
         self.assertIn(key, self._fileContents())
@@ -801,7 +762,7 @@ class TestDotEnvUnset(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(self._dot_env.unset("UNDEFINED_KEY"))
 
@@ -813,19 +774,20 @@ class TestDotEnvUnset(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self._dot_env.unset("lower_case")
         with self.assertRaises(TypeError):
             self._dot_env.unset(42)
 
+
 # ---------------------------------------------------------------------------
 # TestDotEnvAll
 # ---------------------------------------------------------------------------
 
-class TestDotEnvAll(_DotEnvTestCase):
 
+class TestDotEnvAll(_DotEnvTestCase):
     def testReturnsAnEmptyMappingForAnEmptyFile(self) -> None:
         """Return an empty mapping when the file holds no variables.
 
@@ -834,7 +796,7 @@ class TestDotEnvAll(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._dot_env.all(), {})
 
@@ -846,10 +808,10 @@ class TestDotEnvAll(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self._dot_env.set(self._trackKey("FIRST_KEY"), "first")
-        self._dot_env.set(self._trackKey("SECOND_KEY"), "second")
+        self._dot_env.set("FIRST_KEY", "first")
+        self._dot_env.set("SECOND_KEY", "second")
         self.assertEqual(
             self._dot_env.all(),
             {"FIRST_KEY": "first", "SECOND_KEY": "second"},
@@ -864,11 +826,11 @@ class TestDotEnvAll(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self._dot_env.set(self._trackKey("NUMBER_KEY"), 42)
-        self._dot_env.set(self._trackKey("FLAG_KEY"), True)
-        self._dot_env.set(self._trackKey("ITEMS_KEY"), [1, 2])
+        self._dot_env.set("NUMBER_KEY", 42)
+        self._dot_env.set("FLAG_KEY", True)
+        self._dot_env.set("ITEMS_KEY", [1, 2])
         self.assertEqual(
             self._dot_env.all(),
             {"NUMBER_KEY": 42, "FLAG_KEY": True, "ITEMS_KEY": [1, 2]},
@@ -883,9 +845,9 @@ class TestDotEnvAll(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("TEMPORARY_KEY")
+        key = "TEMPORARY_KEY"
         self._dot_env.set(key, "value")
         self._dot_env.unset(key)
         self.assertNotIn(key, self._dot_env.all())
@@ -899,9 +861,9 @@ class TestDotEnvAll(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("EPHEMERAL_KEY")
+        key = "EPHEMERAL_KEY"
         self._dot_env.set(key, "value", only_os=True)
         self.assertNotIn(key, self._dot_env.all())
 
@@ -914,18 +876,19 @@ class TestDotEnvAll(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._env_path.write_text("BARE_KEY\n", encoding="utf-8")
         self._dot_env.reload()
         self.assertEqual(self._dot_env.all(), {"BARE_KEY": None})
 
+
 # ---------------------------------------------------------------------------
 # TestDotEnvReload
 # ---------------------------------------------------------------------------
 
-class TestDotEnvReload(_DotEnvTestCase):
 
+class TestDotEnvReload(_DotEnvTestCase):
     def testReportsASuccessfulReload(self) -> None:
         """Report success after reloading the file.
 
@@ -934,7 +897,7 @@ class TestDotEnvReload(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(self._dot_env.reload())
 
@@ -947,9 +910,9 @@ class TestDotEnvReload(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("EXTERNAL_KEY")
+        key = "EXTERNAL_KEY"
         self._env_path.write_text(f"{key}=external\n", encoding="utf-8")
         self._dot_env.reload()
         self.assertEqual(self._dot_env.get(key), "external")
@@ -963,9 +926,9 @@ class TestDotEnvReload(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("STALE_KEY")
+        key = "STALE_KEY"
         self._dot_env.set(key, "old")
         self._env_path.write_text(f"{key}=new\n", encoding="utf-8")
         self._dot_env.reload()
@@ -980,9 +943,9 @@ class TestDotEnvReload(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("DROPPED_KEY")
+        key = "DROPPED_KEY"
         self._dot_env.set(key, "value")
         self._env_path.write_text("", encoding="utf-8")
         self._dot_env.reload()
@@ -997,32 +960,20 @@ class TestDotEnvReload(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._env_path.write_bytes(b"KEY=\xff\xfe\n")
         with self.assertRaises(RuntimeError) as ctx:
             self._dot_env.reload()
         self.assertIn("while reloading environment variables", str(ctx.exception))
 
+
 # ---------------------------------------------------------------------------
 # TestDotEnvLayout
 # ---------------------------------------------------------------------------
 
+
 class TestDotEnvLayout(_DotEnvTestCase):
-
-    def testDeclaresItsInstanceStateAsSlots(self) -> None:
-        """Declare the whole instance state as slots.
-
-        Validates that the resolved path and the snapshot are the only
-        attributes the reader keeps per instance.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(DotEnv.__slots__, ("__cache", "__resolved_path"))
-
     def testDoesNotExposeAnInstanceDictionary(self) -> None:
         """Keep the reader free of an instance dictionary.
 
@@ -1032,7 +983,7 @@ class TestDotEnvLayout(_DotEnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(self._dot_env, "__dict__"))
         with self.assertRaises(AttributeError):

@@ -1,13 +1,15 @@
-"""Expose nested dictionary values through dot-delimited paths."""
+"""Expose nested dictionary values through attribute access."""
 
 from __future__ import annotations
+from copy import deepcopy
 from typing import Any
 
 _MISSING = object()
 """Sentinel distinguishing missing from ordinary values."""
 
+
 class DotDict(dict):
-    """Expose nested dictionary values through dot-delimited paths."""
+    """Expose nested dictionary values through attribute access."""
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -23,7 +25,7 @@ class DotDict(dict):
 
         Returns
         -------
-        typing.Any or None
+        object or None
             Value associated with the key, converted to DotDict if it is a dict.
             Returns None if the key does not exist.
 
@@ -48,13 +50,13 @@ class DotDict(dict):
         ----------
         key : str
             Attribute name to set.
-        value : typing.Any
+        value : object
             Value to assign. If a dict (not DotDict), it is converted to DotDict.
 
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Notes
         -----
@@ -77,7 +79,7 @@ class DotDict(dict):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -113,7 +115,9 @@ class DotDict(dict):
             The value associated with the key, converted to DotDict if it is a
             dict. Returns the specified default value if the key is not present.
         """
-        value = dict.get(self, key, default)
+        value = dict.get(self, key, _MISSING)
+        if value is _MISSING:
+            return default
         if type(value) is dict:
             value = DotDict(value)
             dict.__setitem__(self, key, value)
@@ -148,13 +152,50 @@ class DotDict(dict):
         orionis.support.types.DotDict
             A new DotDict instance with recursively copied contents.
         """
-        result = DotDict()
-        _setitem = dict.__setitem__
-        for k, v in dict.items(self):
-            if type(v) is DotDict:
-                _setitem(result, k, v.copy())
-            elif isinstance(v, dict):
-                _setitem(result, k, DotDict(v).copy())
-            else:
-                _setitem(result, k, v)
-        return result
+        return deepcopy(self)
+
+    def __deepcopy__(self, memo: dict[int, object]) -> DotDict:
+        """
+        Copy values while preserving shared references and cycles.
+
+        Parameters
+        ----------
+        memo : dict[int, object]
+            Objects already copied by the standard copy protocol.
+
+        Returns
+        -------
+        DotDict
+            Independent contents with dictionary-valued members exposed as DotDict.
+        """
+        return _copy_mapping(self, memo)
+
+
+def _copy_mapping(source: dict, memo: dict[int, object]) -> DotDict:
+    """
+    Copy a mapping into DotDict using the shared deepcopy memo.
+
+    Parameters
+    ----------
+    source : dict
+        Mapping whose contents will be copied.
+    memo : dict[int, object]
+        Previously copied objects, including active mapping ancestors.
+
+    Returns
+    -------
+    DotDict
+        Copied mapping or its existing shared copy.
+    """
+    if id(source) in memo:
+        return memo[id(source)]
+    result = DotDict()
+    memo[id(source)] = result
+    for key, value in source.items():
+        copied = (
+            _copy_mapping(value, memo)
+            if isinstance(value, dict)
+            else deepcopy(value, memo)
+        )
+        result[deepcopy(key, memo)] = copied
+    return result

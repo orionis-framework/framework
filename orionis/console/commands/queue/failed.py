@@ -1,8 +1,11 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """List persistent failed jobs and their original exceptions."""
 
 from orionis.console.base.command import BaseCommand
-from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
+from orionis.queues.contracts.manager import IQueueManager
 from orionis.queues.exceptions import QueueError
+
 
 class QueueFailedCommand(BaseCommand):
     """List persistent failed jobs and their original exceptions."""

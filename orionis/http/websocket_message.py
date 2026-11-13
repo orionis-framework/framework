@@ -6,6 +6,7 @@ Includes ``WebSocketMessageType``, ``WebSocketState``, ``WebSocketMessage``.
 from dataclasses import dataclass
 from enum import Enum
 
+
 class WebSocketMessageType(Enum):
     """Identify a normalized complete WebSocket message."""
 
@@ -15,6 +16,7 @@ class WebSocketMessageType(Enum):
     """Bytes identifier: ``bytes``."""
     DISCONNECT = "disconnect"
     """Disconnect identifier: ``disconnect``."""
+
 
 class WebSocketState(Enum):
     """Describe the connection lifecycle independently of its server."""
@@ -27,6 +29,7 @@ class WebSocketState(Enum):
     """Closing identifier: ``closing``."""
     CLOSED = "closed"
     """Closed identifier: ``closed``."""
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class WebSocketMessage:

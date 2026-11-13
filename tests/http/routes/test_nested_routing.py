@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 from types import SimpleNamespace
@@ -19,6 +21,7 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
     from orionis.http.request import Request
 
+
 def route_handler() -> Response:
     """Return the terminal response for routing integration tests.
 
@@ -28,6 +31,7 @@ def route_handler() -> Response:
         Value produced by the helper.
     """
     return Response(content="routed")
+
 
 class UserController:
     """Provide both controller-action and invokable route fixtures."""
@@ -52,8 +56,10 @@ class UserController:
         """
         return route_handler()
 
+
 class ChildController(UserController):
     """Inherit the invokable action from a parent controller."""
+
 
 class OneMiddleware(BaseMiddleware):
     """Record middleware nesting on the request itself."""
@@ -88,14 +94,18 @@ class OneMiddleware(BaseMiddleware):
         response.setHeader("x-trace", ",".join(trace))
         return response
 
+
 class TwoMiddleware(OneMiddleware):
     """Mark the second middleware layer."""
+
 
 class ThreeMiddleware(OneMiddleware):
     """Mark the third middleware layer."""
 
+
 class FourMiddleware(OneMiddleware):
     """Mark the fourth middleware layer."""
+
 
 class Namespace:
     """Group nested importable fixtures."""
@@ -106,6 +116,7 @@ class Namespace:
     class Middleware(OneMiddleware):
         """Expose a nested middleware class for cache restoration."""
 
+
 def make_router() -> Router:
     """Build a router with the same default routes as an application.
 
@@ -115,6 +126,7 @@ def make_router() -> Router:
         Value produced by the helper.
     """
     return Router(SimpleNamespace(routeHealthCheck="/up"))
+
 
 def compile_router(router: Router, middleware: list | None = None) -> dict:
     """Compile the exported routes through the production compiler.
@@ -138,6 +150,7 @@ def compile_router(router: Router, middleware: list | None = None) -> dict:
         middleware,
     )
     return compiled
+
 
 class TestNestedRouting(TestCase):
     """Exercise composition through the public router and fluent APIs."""
@@ -308,7 +321,8 @@ class TestNestedRouting(TestCase):
                 )
                 resolver = RouteResolver(compile_router(router))
                 self.assertEqual(
-                    resolver.resolve("GET", "/admin/users/index").params, {},
+                    resolver.resolve("GET", "/admin/users/index").params,
+                    {},
                 )
                 self.assertEqual(resolver.resolve("POST", "/admin/users").params, {})
 
@@ -409,7 +423,8 @@ class TestNestedRouting(TestCase):
         ):
             router = make_router()
             router.group(
-                middleware=middleware, routes=[router.get("/x", route_handler)],
+                middleware=middleware,
+                routes=[router.get("/x", route_handler)],
             )
             self.assertEqual(
                 RouteResolver(compile_router(router))
@@ -514,7 +529,8 @@ class TestNestedRouting(TestCase):
         router = make_router()
         router.group(routes=(FluentRoute("GET", "/x", route_handler),))
         self.assertEqual(
-            RouteResolver(compile_router(router)).resolve("GET", "/x").params, {},
+            RouteResolver(compile_router(router)).resolve("GET", "/x").params,
+            {},
         )
 
     def testSiblingGroupsCanStartWithTheSameRelativePath(self) -> None:
@@ -562,6 +578,7 @@ class TestNestedRouting(TestCase):
         route = resolver.resolve("GET", "/x").route
         self.assertEqual(route.compiled_middlewares, (OneMiddleware,))
         self.assertEqual(route.middleware, [OneMiddleware])
+
 
 class TestNestedRoutingExecution(TestCase):
     """Run compiled groups through the real HTTP kernel and its middleware."""

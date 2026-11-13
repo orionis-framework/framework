@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from orionis.http.routes.types import MiddlewareInput, RouteAction
     from orionis.realtime.hub import Hub
 
+
 class IRouter(ABC):
     """Define the contract for router implementations."""
 

@@ -1,14 +1,12 @@
+# ruff: noqa: TC001, TC003
+# Keep public inspect and dependency-signature annotations resolvable at runtime.
 """Define the contract for reflection abstract implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+import inspect
+from orionis.introspection.dependencies.entities.signature import Signature
 
-if TYPE_CHECKING:
-    import inspect
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
 
 class IReflectionAbstract(ABC):
     """Define the contract for reflection abstract implementations."""
@@ -115,16 +113,16 @@ class IReflectionAbstract(ABC):
         """
 
     @abstractmethod
-    def getAnnotations(self) -> dict:
+    def getAnnotations(self) -> dict[str, object]:
         """
         Retrieve type annotations for class attributes.
 
         Returns
         -------
-        dict
+        dict[str, object]
             Dictionary mapping attribute names to their annotated types.
             Private attribute names are normalized by removing name mangling
-            prefixes.
+            prefixes. Unavailable native annotations remain forward references.
         """
 
     @abstractmethod
@@ -158,10 +156,6 @@ class IReflectionAbstract(ABC):
         object or None
             Value of the specified class attribute, or None if not found.
 
-        Raises
-        ------
-        ValueError
-            If the attribute does not exist or is inaccessible.
         """
 
     @abstractmethod
@@ -185,8 +179,9 @@ class IReflectionAbstract(ABC):
         Raises
         ------
         ValueError
-            If the attribute name is invalid, is a Python keyword, or if the
-            value is callable.
+            If the attribute name is invalid or is a Python keyword.
+        TypeError
+            If the value is callable.
         """
 
     @abstractmethod
@@ -260,7 +255,7 @@ class IReflectionAbstract(ABC):
         dict
             Dictionary mapping private attribute names (with name mangling
             removed) to their values. Only includes attributes starting with
-            _ClassName that are not callable, static methods, class methods,
+            _ClassName__ that are not callable, static methods, class methods,
             or properties.
         """
 
@@ -438,7 +433,7 @@ class IReflectionAbstract(ABC):
         """
         Return all private instance method names.
 
-        Private methods are those with name-mangling (start with _ClassName).
+        Private methods have a complete ``_ClassName__`` mangling prefix.
         Excludes static methods, class methods, properties, and dunder methods.
 
         Returns
@@ -850,7 +845,9 @@ class IReflectionAbstract(ABC):
         Clear all cached reflection data.
 
         Removes all cached entries stored in the reflection instance. Forces
-        fresh computation on subsequent method calls.
+        fresh computation on subsequent method calls and invalidates shared
+        dependency signatures and their registered consumers. Refreshes the
+        class name and module while preserving its declared private-name prefix.
 
         Returns
         -------

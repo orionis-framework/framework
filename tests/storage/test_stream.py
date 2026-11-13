@@ -1,7 +1,10 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import io
 from orionis.storage.contracts.stream import IStorageStream
 from orionis.storage.stream import AsyncStream
 from orionis.test import TestCase
+
 
 class _RecordingHandle:
     """Binary handle double backed by an in-memory buffer."""
@@ -19,7 +22,7 @@ class _RecordingHandle:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.buffer = io.BytesIO(data)
         self.closed = False
@@ -75,14 +78,16 @@ class _RecordingHandle:
         return self.buffer.seek(offset, whence)
 
     def close(self) -> None:
-        """Mark the handle as closed.
+        """Close the buffer and record the released state.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.closed = True
+        self.buffer.close()
+
 
 class _CountingOpener:
     """Handle factory counting how many times it was invoked."""
@@ -100,7 +105,7 @@ class _CountingOpener:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.handle = handle
         self.calls = 0
@@ -117,6 +122,7 @@ class _CountingOpener:
         self.calls += 1
         return self.handle
 
+
 class _CloseRecorder:
     """Close callback recording the handle state on invocation."""
 
@@ -128,7 +134,7 @@ class _CloseRecorder:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.calls = 0
         self.states: list[bool] = []
@@ -145,12 +151,13 @@ class _CloseRecorder:
         Returns
         -------
         None
+            No return value.
         """
         self.calls += 1
         self.states.append(handle.closed)
 
-class TestAsyncStream(TestCase):
 
+class TestAsyncStream(TestCase):
     def setUp(self) -> None:
         """Build a stream over a recording handle before each test.
 
@@ -159,12 +166,14 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._handle = _RecordingHandle(b"payload")
+        self.addCleanup(self._handle.buffer.close)
         self._opener = _CountingOpener(self._handle)
         self._on_close = _CloseRecorder()
         self._stream = AsyncStream(self._opener, self._on_close)
+        self.addAsyncCleanup(self._stream.close)
 
     def testImplementsTheStreamContract(self) -> None:
         """Expose the stream through its published contract.
@@ -174,7 +183,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(self._stream, IStorageStream)
 
@@ -186,7 +195,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._opener.calls, 0)
 
@@ -198,7 +207,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._stream.read(1)
         await self._stream.read(1)
@@ -212,7 +221,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await self._stream.read(3), b"pay")
 
@@ -224,7 +233,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await self._stream.read(), b"payload")
 
@@ -236,7 +245,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._stream.seek(0, io.SEEK_END)
         self.assertEqual(await self._stream.write(b"-more"), 5)
@@ -250,7 +259,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await self._stream.seek(3), 3)
         self.assertEqual(await self._stream.seek(0, io.SEEK_END), 7)
@@ -263,27 +272,14 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._stream.read(1)
         await self._stream.close()
         self.assertEqual(self._on_close.calls, 1)
         self.assertEqual(self._on_close.states, [False])
-        self.assertTrue(self._handle.closed)
-
-    async def testCloseDetachesTheHandle(self) -> None:
-        """Detach the handle once the stream has been closed.
-
-        Validates the internal state after a successful close.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        await self._stream.read(1)
-        await self._stream.close()
         self.assertIsNone(self._stream._handle)
+        self.assertTrue(self._handle.closed)
 
     async def testCloseIsIdempotent(self) -> None:
         """Turn repeated close calls into harmless no-ops.
@@ -293,7 +289,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._stream.read(1)
         await self._stream.close()
@@ -308,7 +304,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._stream.close()
         self.assertEqual(self._opener.calls, 0)
@@ -323,7 +319,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handle = _RecordingHandle(b"x")
         stream = AsyncStream(_CountingOpener(handle))
@@ -339,7 +335,7 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         async with self._stream as entered:
             self.assertIs(entered, self._stream)
@@ -354,12 +350,8 @@ class TestAsyncStream(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised by this helper to exercise the failure path.
         """
         error_msg = "boom"
         with self.assertRaises(RuntimeError):

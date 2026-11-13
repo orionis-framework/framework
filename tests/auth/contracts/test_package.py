@@ -1,5 +1,8 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.auth import contracts
 from orionis.test import TestCase
+
 
 class TestContractsPackage(TestCase):
     """Validate the public surface of the contracts package."""
@@ -13,7 +16,7 @@ class TestContractsPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in contracts.__all__:
             contract = getattr(contracts, name)
@@ -29,7 +32,7 @@ class TestContractsPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(list(contracts.__all__), sorted(contracts.__all__))
         for name in contracts.__all__:

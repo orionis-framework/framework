@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401, TC001
+# Flash values are heterogeneous; retain the public session type for reflection.
 """Provide session operations.
 
 Includes ``filter_input``, ``normalize_errors``, ``queue_bag``, ``apply_flash``.
@@ -5,10 +7,8 @@ Includes ``filter_input``, ``normalize_errors``, ``queue_bag``, ``apply_flash``.
 
 from __future__ import annotations
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Self
-
-if TYPE_CHECKING:
-    from orionis.session.contracts.session import ISession
+from typing import Any, Self
+from orionis.session.contracts.session import ISession
 
 # Reserved flash-bag keys owned by the framework.  Application code must
 # never write them directly; use ``withInput()`` / ``withErrors()`` instead.
@@ -41,6 +41,7 @@ SENSITIVE_INPUT_FIELDS: frozenset[str] = frozenset(
 _SEQUENCE_TYPES: tuple[type, ...] = (list, tuple, set, frozenset)
 """Hoisted so the isinstance check does not rebuild the tuple on every field."""
 
+
 def filter_input(values: Mapping[str, Any]) -> dict[str, Any]:
     """
     Drop credential-like fields from a form payload before flashing it.
@@ -64,7 +65,26 @@ def filter_input(values: Mapping[str, Any]) -> dict[str, Any]:
         key: value for key, value in values.items() if key not in SENSITIVE_INPUT_FIELDS
     }
 
-def normalize_errors(errors: object) -> dict[str, list[str]]:  # NOSONAR
+
+def _normalize_message(value: object) -> str:
+    """Extract a structured message or stringify a scalar value.
+
+    Parameters
+    ----------
+    value : object
+        Message value or mapping containing a message entry.
+
+    Returns
+    -------
+    str
+        Text representation without a structured rule code.
+    """
+    if isinstance(value, Mapping) and "message" in value:
+        return str(value["message"])
+    return str(value)
+
+
+def normalize_errors(errors: object) -> dict[str, list[str]]:
     """
     Normalize validation errors into field-indexed message lists.
 
@@ -93,8 +113,8 @@ def normalize_errors(errors: object) -> dict[str, list[str]]:  # NOSONAR
         failure = getattr(errors, "failure", None)
         if failure is not None:
             field = getattr(failure, "field", "") or ""
-            message = getattr(failure, "message", "") or ""
-            return {field: [message]}
+            message = getattr(failure, "message", None)
+            return {field: ["" if message is None else str(message)]}
 
         error_msg = (
             "errors must be a mapping of field to message(s) or a validation exception"
@@ -106,17 +126,11 @@ def normalize_errors(errors: object) -> dict[str, list[str]]:  # NOSONAR
         if isinstance(value, str):
             normalized[field] = [value]
         elif isinstance(value, _SEQUENCE_TYPES):
-            normalized[field] = [
-                str(item["message"])
-                if isinstance(item, Mapping) and "message" in item
-                else str(item)
-                for item in value
-            ]
-        elif isinstance(value, Mapping) and "message" in value:
-            normalized[field] = [str(value["message"])]
+            normalized[field] = [_normalize_message(item) for item in value]
         else:
-            normalized[field] = [str(value)]
+            normalized[field] = [_normalize_message(value)]
     return normalized
+
 
 def queue_bag(
     flash: dict[str, Any],
@@ -138,13 +152,14 @@ def queue_bag(
     Returns
     -------
     None
-        Merge *values* into the reserved bag *key* of a pending flash payload.
+        No return value.
     """
     current = flash.get(key)
     if isinstance(current, dict):
         current.update(values)
     else:
         flash[key] = dict(values)
+
 
 def apply_flash(session: ISession, data: Mapping[str, Any]) -> None:
     """
@@ -164,7 +179,7 @@ def apply_flash(session: ISession, data: Mapping[str, Any]) -> None:
     Returns
     -------
     None
-        Write a pending flash payload into the session.
+        No return value.
     """
     for key, value in data.items():
         if key == OLD_INPUT_KEY:
@@ -173,6 +188,7 @@ def apply_flash(session: ISession, data: Mapping[str, Any]) -> None:
             session.flashErrors(value)
         else:
             session.flash(key, value)
+
 
 class _FlashData:
     """Queue flash payloads for responses and deferred views.
@@ -185,8 +201,6 @@ class _FlashData:
     """Declare the instance attribute slots reserved by this class."""
     _flash: dict[str, Any] | None
     """Session values scheduled for availability during the next request."""
-
-    # ruff: noqa: ANN401
 
     def withFlash(self: Self, key: str, value: Any | None = None) -> Self:
         """

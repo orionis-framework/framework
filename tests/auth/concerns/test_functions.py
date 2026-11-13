@@ -1,5 +1,10 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify authentication functions contracts and behavior."""
+
 from orionis.auth.concerns.functions import model_primary_key
 from orionis.test import TestCase
+
 
 class _Meta:
     """Model metadata double publishing a primary key name."""
@@ -17,9 +22,10 @@ class _Meta:
         Returns
         -------
         None
-            Initializes the metadata double.
+            No return value.
         """
         self.primary_key = primary_key
+
 
 class _Documented:
     """Object exposing ORM style metadata."""
@@ -28,12 +34,14 @@ class _Documented:
 
     __meta__ = _Meta("uuid")
 
+
 class _Blank:
     """Object whose metadata declares an unusable primary key."""
 
     __slots__ = ()
 
     __meta__ = _Meta("")
+
 
 class TestModelPrimaryKey(TestCase):
     """Validate the duck typed primary key lookup."""
@@ -47,7 +55,7 @@ class TestModelPrimaryKey(TestCase):
         Returns
         -------
         None
-            Asserts that the metadata's declared primary key is returned.
+            No return value.
         """
         self.assertEqual(model_primary_key(_Documented()), "uuid")
 
@@ -59,7 +67,7 @@ class TestModelPrimaryKey(TestCase):
         Returns
         -------
         None
-            Asserts that an object without metadata uses the ``id`` key.
+            No return value.
         """
         self.assertEqual(model_primary_key(object()), "id")
 
@@ -72,6 +80,6 @@ class TestModelPrimaryKey(TestCase):
         Returns
         -------
         None
-            Asserts that an unusable declaration falls back to ``id``.
+            No return value.
         """
         self.assertEqual(model_primary_key(_Blank()), "id")

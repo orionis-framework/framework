@@ -1,8 +1,10 @@
-"""Provide schemas operations through ``MetadataConflictError``, ``MetaCompiler``."""
+# ruff: noqa: TC001
+# Keep metadata annotations resolvable through runtime introspection.
+"""Compile metadata into native constraints and reject incompatible declarations."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
 import msgspec
+from orionis.schemas.meta.validation import ValidationMetadata
 from orionis.schemas.metadata import (
     Description,
     Examples,
@@ -23,8 +25,6 @@ from orionis.schemas.constraints import (
     TimezoneNaive,
 )
 
-if TYPE_CHECKING:
-    from orionis.schemas.meta.validation import ValidationMetadata
 
 class MetadataConflictError(ValueError):
     """
@@ -42,6 +42,7 @@ class MetadataConflictError(ValueError):
     * **Invalid values** — a constraint carries a value that is semantically
       illegal (e.g., ``MultipleOf(0)``, ``MinLength(-1)``, ``MaxLength(-5)``).
     """
+
 
 class MetaCompiler:
     """
@@ -122,17 +123,11 @@ class MetaCompiler:
         return seen
 
     @staticmethod
-    def _validateConflicts( # NOSONAR
+    def _validateConflicts(
         seen: dict[type[ValidationMetadata], ValidationMetadata],
     ) -> None:
         """
-        Validate the indexed metadata for all semantic conflicts in a single pass.
-
-        Checks are applied in order: ambiguous bounds, impossible numeric ranges,
-        impossible length ranges, mutually exclusive timezone flags, and invalid
-        individual values.  All checks are inlined to eliminate five separate
-        staticmethod call overheads and to consolidate shared ``seen.get()``
-        calls (MinLength and MaxLength are looked up once instead of twice).
+        Validate numeric bounds, length ranges and individual metadata values.
 
         Parameters
         ----------
@@ -142,14 +137,39 @@ class MetaCompiler:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
 
         Raises
         ------
         orionis.schemas.compiler.MetadataConflictError
             On any detected conflict.
         """
-        # Ambiguous bounds
+        MetaCompiler._validateNumericBounds(seen)
+        MetaCompiler._validateLengthRange(seen)
+        MetaCompiler._validateValues(seen)
+
+    @staticmethod
+    def _validateNumericBounds(
+        seen: dict[type[ValidationMetadata], ValidationMetadata],
+    ) -> None:
+        """
+        Reject ambiguous or impossible combinations of numeric bounds.
+
+        Parameters
+        ----------
+        seen : dict[type[ValidationMetadata], ValidationMetadata]
+            Indexed declarations with at most one of each concrete metadata type.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        MetadataConflictError
+            If numeric bounds overlap ambiguously or permit no valid values.
+        """
         if GreaterThan in seen and GreaterThanOrEqual in seen:
             msg = (
                 "Cannot combine 'GreaterThan' and 'GreaterThanOrEqual'"
@@ -185,7 +205,28 @@ class MetaCompiler:
                 )
                 raise MetadataConflictError(msg)
 
-        # Validate length constraints and allowed values.
+    @staticmethod
+    def _validateLengthRange(
+        seen: dict[type[ValidationMetadata], ValidationMetadata],
+    ) -> None:
+        """
+        Reject a minimum length greater than the declared maximum.
+
+        Parameters
+        ----------
+        seen : dict[type[ValidationMetadata], ValidationMetadata]
+            Indexed declarations to compare.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        MetadataConflictError
+            If no length can satisfy both bounds.
+        """
         min_len = seen.get(MinLength)
         max_len = seen.get(MaxLength)
         if (
@@ -200,7 +241,28 @@ class MetaCompiler:
             )
             raise MetadataConflictError(msg)
 
-        # Timezone
+    @staticmethod
+    def _validateValues(
+        seen: dict[type[ValidationMetadata], ValidationMetadata],
+    ) -> None:
+        """
+        Reject conflicting timezones, nonpositive divisors and negative lengths.
+
+        Parameters
+        ----------
+        seen : dict[type[ValidationMetadata], ValidationMetadata]
+            Indexed declarations whose individual values must be valid.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        MetadataConflictError
+            If timezone requirements conflict or an individual value is invalid.
+        """
         if TimezoneAware in seen and TimezoneNaive in seen:
             msg = (
                 "Cannot combine 'TimezoneAware' and 'TimezoneNaive'"
@@ -218,6 +280,8 @@ class MetaCompiler:
                 " The divisor must be strictly positive (> 0)."
             )
             raise MetadataConflictError(msg)
+        min_len = seen.get(MinLength)
+        max_len = seen.get(MaxLength)
         if min_len is not None and min_len.value < 0:
             msg = (
                 f"Invalid 'MinLength' value: {min_len.value!r}."
@@ -254,19 +318,19 @@ class MetaCompiler:
         """
         # Read field constraints from the compiled metadata.
         _s = seen.get
-        gt_m    = _s(GreaterThan)
-        ge_m    = _s(GreaterThanOrEqual)
-        lt_m    = _s(LessThan)
-        le_m    = _s(LessThanOrEqual)
-        mul_m   = _s(MultipleOf)
-        pat_m   = _s(Pattern)
-        minl_m  = _s(MinLength)
-        maxl_m  = _s(MaxLength)
+        gt_m = _s(GreaterThan)
+        ge_m = _s(GreaterThanOrEqual)
+        lt_m = _s(LessThan)
+        le_m = _s(LessThanOrEqual)
+        mul_m = _s(MultipleOf)
+        pat_m = _s(Pattern)
+        minl_m = _s(MinLength)
+        maxl_m = _s(MaxLength)
         title_m = _s(Title)
-        desc_m  = _s(Description)
-        ex_m    = _s(Examples)
-        exj_m   = _s(ExtraJsonSchema)
-        ext_m   = _s(Extra)
+        desc_m = _s(Description)
+        ex_m = _s(Examples)
+        exj_m = _s(ExtraJsonSchema)
+        ext_m = _s(Extra)
 
         # Resolve the timezone flag from the two mutually exclusive markers.
         tz: bool | None = None
@@ -276,21 +340,22 @@ class MetaCompiler:
             tz = False
 
         return msgspec.Meta(
-            gt           = gt_m.value        if gt_m    is not None else None,
-            ge           = ge_m.value        if ge_m    is not None else None,
-            lt           = lt_m.value        if lt_m    is not None else None,
-            le           = le_m.value        if le_m    is not None else None,
-            multiple_of  = mul_m.value       if mul_m   is not None else None,
-            pattern      = pat_m.regex       if pat_m   is not None else None,
-            min_length   = minl_m.value      if minl_m  is not None else None,
-            max_length   = maxl_m.value      if maxl_m  is not None else None,
-            tz           = tz,
-            title        = title_m.value     if title_m is not None else None,
-            description  = desc_m.value      if desc_m  is not None else None,
-            examples     = list(ex_m.values) if ex_m    is not None else None,
-            extra_json_schema = dict(exj_m.data) if exj_m is not None else None,
-            extra        = dict(ext_m.data)  if ext_m   is not None else None,
+            gt=gt_m.value if gt_m is not None else None,
+            ge=ge_m.value if ge_m is not None else None,
+            lt=lt_m.value if lt_m is not None else None,
+            le=le_m.value if le_m is not None else None,
+            multiple_of=mul_m.value if mul_m is not None else None,
+            pattern=pat_m.regex if pat_m is not None else None,
+            min_length=minl_m.value if minl_m is not None else None,
+            max_length=maxl_m.value if maxl_m is not None else None,
+            tz=tz,
+            title=title_m.value if title_m is not None else None,
+            description=desc_m.value if desc_m is not None else None,
+            examples=list(ex_m.values) if ex_m is not None else None,
+            extra_json_schema=dict(exj_m.data) if exj_m is not None else None,
+            extra=dict(ext_m.data) if ext_m is not None else None,
         )
+
 
 # Expose only the public API of this module via __all__
 # to prevent accidental imports of internal helper functions.

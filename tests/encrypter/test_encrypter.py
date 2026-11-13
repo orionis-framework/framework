@@ -1,6 +1,10 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify AES envelopes, input validation, and plaintext recovery."""
+
 import base64
 import msgspec.json as msjson
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from orionis.encrypter.contracts.encrypter import IEncrypter
 from orionis.encrypter.encrypter import Encrypter
@@ -11,16 +15,14 @@ _KEY_16: bytes = b"\x4b" * 16
 _KEY_32: bytes = b"\x9f" * 32
 
 # Fixed initialisation vectors used to forge payloads by hand.
-_CBC_IV: bytes = b"\x11" * 16
 _GCM_IV: bytes = b"\x22" * 12
 
 # Every cipher accepted by the encrypter.
 _CIPHERS: tuple[str, ...] = (
-    "AES-128-CBC",
     "AES-128-GCM",
-    "AES-256-CBC",
     "AES-256-GCM",
 )
+
 
 class _StubApp:
     """Application double exposing only the two configuration keys read."""
@@ -40,7 +42,7 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._key = key
         self._cipher = cipher
@@ -65,6 +67,7 @@ class _StubApp:
             return self._cipher
         return None
 
+
 def key_for(cipher: str) -> bytes:
     """
     Return the key matching the key size demanded by a cipher name.
@@ -80,6 +83,7 @@ def key_for(cipher: str) -> bytes:
         A 16-byte key for AES-128 variants, a 32-byte one otherwise.
     """
     return _KEY_16 if cipher.startswith("AES-128") else _KEY_32
+
 
 def make_encrypter(cipher: str) -> Encrypter:
     """
@@ -97,6 +101,7 @@ def make_encrypter(cipher: str) -> Encrypter:
     """
     return Encrypter(_StubApp(key_for(cipher), cipher))
 
+
 def to_base64(data: bytes) -> str:
     """
     Encode raw bytes as an ASCII base64 string.
@@ -113,6 +118,7 @@ def to_base64(data: bytes) -> str:
     """
     return base64.b64encode(data).decode()
 
+
 def encode_payload(cipher: str, iv: str, value: str, tag: str | None) -> str:
     """
     Build the base64-wrapped JSON envelope consumed by decrypt().
@@ -126,7 +132,7 @@ def encode_payload(cipher: str, iv: str, value: str, tag: str | None) -> str:
     value : str
         Already encoded ciphertext field.
     tag : str | None
-        Already encoded authentication tag, or None for CBC payloads.
+        Already encoded authentication tag, or None to exercise rejection.
 
     Returns
     -------
@@ -136,32 +142,9 @@ def encode_payload(cipher: str, iv: str, value: str, tag: str | None) -> str:
     envelope = {"iv": iv, "value": value, "tag": tag, "cipher": cipher}
     return to_base64(msjson.encode(envelope))
 
-def cbc_payload_from_raw(raw: bytes) -> str:
-    """
-    Wrap unpadded bytes into an AES-128-CBC payload without PKCS7 padding.
-
-    Parameters
-    ----------
-    raw : bytes
-        Block-aligned bytes encrypted verbatim, so the decrypter observes
-        whatever padding byte the caller planted in the last position.
-
-    Returns
-    -------
-    str
-        A payload string accepted by decrypt() up to the padding check.
-    """
-    algorithm = algorithms.AES(_KEY_16)
-    encryptor = Cipher(algorithm, modes.CBC(_CBC_IV)).encryptor()
-    ciphertext = encryptor.update(raw) + encryptor.finalize()
-    return encode_payload(
-        "AES-128-CBC",
-        to_base64(_CBC_IV),
-        to_base64(ciphertext),
-        None,
-    )
 
 class TestEncrypterDefinition(TestCase):
+    """Check the supported cipher catalogue and service structure."""
 
     def testExposesTheAesSizeConstants(self) -> None:
         """Publish the byte sizes demanded by every supported mode.
@@ -172,7 +155,7 @@ class TestEncrypterDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Encrypter.AES_128_KEY_SIZE, 16)
         self.assertEqual(Encrypter.AES_256_KEY_SIZE, 32)
@@ -182,14 +165,14 @@ class TestEncrypterDefinition(TestCase):
         self.assertEqual(Encrypter.PKCS7_BLOCK_SIZE, 16)
 
     def testAdvertisesTheSupportedCiphersAsAFrozenSet(self) -> None:
-        """Advertise exactly the four AES variants the service accepts.
+        """Advertise exactly the two authenticated AES variants the service accepts.
 
         Validates the immutable catalogue used to reject unknown ciphers.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Encrypter.SUPPORTED_CIPHERS, frozenset)
         self.assertEqual(Encrypter.SUPPORTED_CIPHERS, frozenset(_CIPHERS))
@@ -202,9 +185,9 @@ class TestEncrypterDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertIsInstance(make_encrypter("AES-128-CBC"), IEncrypter)
+        self.assertIsInstance(make_encrypter("AES-128-GCM"), IEncrypter)
 
     def testInstancesDoNotCarryAnAttributeDictionary(self) -> None:
         """Keep instances free of a per-object attribute dictionary.
@@ -215,11 +198,13 @@ class TestEncrypterDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(make_encrypter("AES-256-GCM"), "__dict__"))
 
+
 class TestEncrypterInitialisation(TestCase):
+    """Check application configuration and key-size requirements."""
 
     def testReadsKeyAndCipherFromTheApplicationConfiguration(self) -> None:
         """Adopt the key and cipher published by the application.
@@ -229,11 +214,11 @@ class TestEncrypterInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-256-CBC")
+        encrypter = make_encrypter("AES-256-GCM")
         self.assertEqual(encrypter.key, _KEY_32)
-        self.assertEqual(encrypter.cipher, "AES-256-CBC")
+        self.assertEqual(encrypter.cipher, "AES-256-GCM")
 
     def testAcceptsEverySupportedCipher(self) -> None:
         """Build successfully for each entry of the supported catalogue.
@@ -243,37 +228,23 @@ class TestEncrypterInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for cipher in _CIPHERS:
-            self.assertEqual(make_encrypter(cipher).cipher, cipher)
-
-    def testCbcModeSkipsTheAuthenticatedCipherHelper(self) -> None:
-        """Leave the AEAD helper unset when a CBC cipher is configured.
-
-        Validates the mode flag precomputed once at construction time.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-128-CBC")
-        self.assertFalse(encrypter._is_gcm)
-        self.assertIsNone(encrypter._aesgcm)
+            with self.subTest(cipher=cipher):
+                self.assertEqual(make_encrypter(cipher).cipher, cipher)
 
     def testGcmModeCachesTheAuthenticatedCipherHelper(self) -> None:
         """Cache an AESGCM helper when a GCM cipher is configured.
 
-        Validates that the key schedule is computed once per instance.
+        Validate the helper retained by the GCM execution path.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-256-GCM")
-        self.assertTrue(encrypter._is_gcm)
         self.assertIsInstance(encrypter._aesgcm, AESGCM)
 
     def testRejectsAnUnsupportedCipher(self) -> None:
@@ -284,7 +255,7 @@ class TestEncrypterInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             Encrypter(_StubApp(_KEY_16, "AES-128-XTS"))
@@ -298,10 +269,10 @@ class TestEncrypterInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as short_ctx:
-            Encrypter(_StubApp(b"too-short", "AES-128-CBC"))
+            Encrypter(_StubApp(b"too-short", "AES-128-GCM"))
         self.assertIn("16 bytes", str(short_ctx.exception))
         with self.assertRaises(ValueError):
             Encrypter(_StubApp(_KEY_32, "AES-128-GCM"))
@@ -314,15 +285,17 @@ class TestEncrypterInitialisation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as short_ctx:
-            Encrypter(_StubApp(_KEY_16, "AES-256-CBC"))
+            Encrypter(_StubApp(_KEY_16, "AES-256-GCM"))
         self.assertIn("32 bytes", str(short_ctx.exception))
         with self.assertRaises(ValueError):
             Encrypter(_StubApp(_KEY_32 + b"\x00", "AES-256-GCM"))
 
+
 class TestEncrypterEncrypt(TestCase):
+    """Check encryption validation, random IVs, and envelope fields."""
 
     def testRejectsNonStringPlaintext(self) -> None:
         """Refuse plaintext values that are not strings.
@@ -332,9 +305,9 @@ class TestEncrypterEncrypt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-128-CBC")
+        encrypter = make_encrypter("AES-128-GCM")
         with self.assertRaises(TypeError):
             encrypter.encrypt(123)  # type: ignore[arg-type]
 
@@ -346,7 +319,7 @@ class TestEncrypterEncrypt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-256-GCM")
         with self.assertRaises(ValueError):
@@ -360,29 +333,12 @@ class TestEncrypterEncrypt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-128-CBC")
+        encrypter = make_encrypter("AES-128-GCM")
         with self.assertRaises(ValueError) as ctx:
             encrypter.encrypt("\ud800")
         self.assertIn("UTF-8 encoding error", str(ctx.exception))
-
-    def testCbcPayloadCarriesTheIvAndCipherWithoutTag(self) -> None:
-        """Emit a CBC envelope with a block-sized IV and a null tag.
-
-        Validates the payload layout produced by the CBC branch.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-256-CBC")
-        envelope = msjson.decode(base64.b64decode(encrypter.encrypt("cbc")))
-        self.assertEqual(envelope["cipher"], "AES-256-CBC")
-        self.assertIsNone(envelope["tag"])
-        self.assertEqual(len(base64.b64decode(envelope["iv"])), 16)
-        self.assertTrue(base64.b64decode(envelope["value"]))
 
     def testGcmPayloadCarriesTheAuthenticationTag(self) -> None:
         """Emit a GCM envelope with a short IV and a detached tag.
@@ -392,7 +348,7 @@ class TestEncrypterEncrypt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-128-GCM")
         envelope = msjson.decode(base64.b64decode(encrypter.encrypt("gcm")))
@@ -408,26 +364,15 @@ class TestEncrypterEncrypt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-256-GCM")
-        self.assertNotEqual(encrypter.encrypt("same"), encrypter.encrypt("same"))
-
-    def testWrapsCbcEncryptionFailuresInRuntimeError(self) -> None:
-        """Surface a runtime error when the CBC primitive cannot be built.
-
-        Validates the failure path of the CBC encryption helper.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-128-CBC")
-        encrypter.key = "not-bytes"  # type: ignore[assignment]
-        with self.assertRaises(RuntimeError) as ctx:
-            encrypter.encrypt("boom")
-        self.assertIn("Error in CBC encryption", str(ctx.exception))
+        for cipher in _CIPHERS:
+            with self.subTest(cipher=cipher):
+                encrypter = make_encrypter(cipher)
+                self.assertNotEqual(
+                    encrypter.encrypt("same"),
+                    encrypter.encrypt("same"),
+                )
 
     def testWrapsGcmEncryptionFailuresInRuntimeError(self) -> None:
         """Surface a runtime error when the AEAD helper is unavailable.
@@ -437,15 +382,18 @@ class TestEncrypterEncrypt(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-256-GCM")
         encrypter._aesgcm = None
         with self.assertRaises(RuntimeError) as ctx:
             encrypter.encrypt("boom")
-        self.assertIn("Error in GCM encryption", str(ctx.exception))
+        self.assertEqual(str(ctx.exception), "Encryption failed")
+        self.assertIsInstance(ctx.exception.__cause__, AttributeError)
+
 
 class TestEncrypterDecryptPayloadValidation(TestCase):
+    """Check envelope decoding and compatibility before decryption."""
 
     def testRejectsNonStringPayload(self) -> None:
         """Refuse payload values that are not strings.
@@ -455,9 +403,9 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-128-CBC")
+        encrypter = make_encrypter("AES-128-GCM")
         with self.assertRaises(TypeError):
             encrypter.decrypt(42)  # type: ignore[arg-type]
 
@@ -469,7 +417,7 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-256-GCM")
         with self.assertRaises(ValueError):
@@ -483,9 +431,9 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-256-CBC")
+        encrypter = make_encrypter("AES-256-GCM")
         with self.assertRaises(ValueError) as ctx:
             encrypter.decrypt("abcde")
         self.assertIn("Invalid payload", str(ctx.exception))
@@ -498,9 +446,9 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-128-CBC")
+        encrypter = make_encrypter("AES-128-GCM")
         with self.assertRaises(ValueError) as ctx:
             encrypter.decrypt(to_base64(b"this-is-not-json"))
         self.assertIn("Invalid payload", str(ctx.exception))
@@ -513,10 +461,10 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-128-CBC")
-        incomplete = to_base64(msjson.encode({"iv": to_base64(_CBC_IV)}))
+        encrypter = make_encrypter("AES-128-GCM")
+        incomplete = to_base64(msjson.encode({"iv": to_base64(_GCM_IV)}))
         with self.assertRaises(ValueError) as ctx:
             encrypter.decrypt(incomplete)
         self.assertIn("Invalid payload", str(ctx.exception))
@@ -529,10 +477,10 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-128-CBC")
-        payload = encode_payload("AES-128-CBC", "a", "", None)
+        encrypter = make_encrypter("AES-128-GCM")
+        payload = encode_payload("AES-128-GCM", "a", "", None)
         with self.assertRaises(ValueError) as ctx:
             encrypter.decrypt(payload)
         self.assertIn("Error decoding payload data", str(ctx.exception))
@@ -545,34 +493,13 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        source = make_encrypter("AES-128-CBC")
-        target = make_encrypter("AES-256-CBC")
+        source = make_encrypter("AES-128-GCM")
+        target = make_encrypter("AES-256-GCM")
         with self.assertRaises(ValueError) as ctx:
             target.decrypt(source.encrypt("mismatch"))
         self.assertIn("does not match", str(ctx.exception))
-
-    def testRejectsCbcPayloadWithAnUnexpectedIvSize(self) -> None:
-        """Refuse a CBC envelope whose IV is not sixteen bytes long.
-
-        Validates the CBC branch of the IV size guard.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-128-CBC")
-        payload = encode_payload(
-            "AES-128-CBC",
-            to_base64(b"\x00" * 5),
-            to_base64(b"\x00" * 16),
-            None,
-        )
-        with self.assertRaises(ValueError) as ctx:
-            encrypter.decrypt(payload)
-        self.assertIn("Invalid IV for CBC", str(ctx.exception))
 
     def testRejectsGcmPayloadWithAnUnexpectedIvSize(self) -> None:
         """Refuse a GCM envelope whose IV is not twelve bytes long.
@@ -582,7 +509,7 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-128-GCM")
         payload = encode_payload(
@@ -595,7 +522,9 @@ class TestEncrypterDecryptPayloadValidation(TestCase):
             encrypter.decrypt(payload)
         self.assertIn("Invalid IV for GCM", str(ctx.exception))
 
+
 class TestEncrypterDecryptFailures(TestCase):
+    """Check authentication and cryptographic failure propagation."""
 
     def testRejectsGcmPayloadWithoutAuthenticationTag(self) -> None:
         """Refuse a GCM envelope that carries no authentication tag.
@@ -605,7 +534,7 @@ class TestEncrypterDecryptFailures(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-128-GCM")
         payload = encode_payload(
@@ -616,7 +545,8 @@ class TestEncrypterDecryptFailures(TestCase):
         )
         with self.assertRaises(RuntimeError) as ctx:
             encrypter.decrypt(payload)
-        self.assertIn("Tag required for GCM mode", str(ctx.exception))
+        self.assertEqual(str(ctx.exception), "Decryption failed")
+        self.assertIsInstance(ctx.exception.__cause__, ValueError)
 
     def testRejectsGcmPayloadWithATagOfTheWrongSize(self) -> None:
         """Refuse a GCM envelope whose tag is not sixteen bytes long.
@@ -626,7 +556,7 @@ class TestEncrypterDecryptFailures(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-128-GCM")
         payload = encode_payload(
@@ -637,7 +567,8 @@ class TestEncrypterDecryptFailures(TestCase):
         )
         with self.assertRaises(RuntimeError) as ctx:
             encrypter.decrypt(payload)
-        self.assertIn("Invalid tag", str(ctx.exception))
+        self.assertEqual(str(ctx.exception), "Decryption failed")
+        self.assertIsInstance(ctx.exception.__cause__, ValueError)
 
     def testRejectsGcmPayloadThatFailsAuthentication(self) -> None:
         """Refuse a GCM envelope whose tag does not authenticate the data.
@@ -647,7 +578,7 @@ class TestEncrypterDecryptFailures(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-128-GCM")
         payload = encode_payload(
@@ -658,7 +589,8 @@ class TestEncrypterDecryptFailures(TestCase):
         )
         with self.assertRaises(RuntimeError) as ctx:
             encrypter.decrypt(payload)
-        self.assertIn("Error in GCM decryption", str(ctx.exception))
+        self.assertEqual(str(ctx.exception), "Decryption failed")
+        self.assertIsInstance(ctx.exception.__cause__, InvalidTag)
 
     def testRejectsGcmDecryptionWithoutTagAtTheHelperLevel(self) -> None:
         """Refuse a direct GCM decryption call that omits the tag.
@@ -669,145 +601,95 @@ class TestEncrypterDecryptFailures(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-256-GCM")
         with self.assertRaises(ValueError) as ctx:
             encrypter._Encrypter__decryptGCM(b"\x00" * 8, _GCM_IV, None)
         self.assertIn("Tag required for GCM decryption", str(ctx.exception))
 
-    def testRejectsCbcPayloadThatDecryptsToNothing(self) -> None:
-        """Refuse a CBC envelope holding an empty ciphertext.
-
-        Validates the guard rejecting empty plaintext before unpadding.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-128-CBC")
-        payload = encode_payload("AES-128-CBC", to_base64(_CBC_IV), "", None)
-        with self.assertRaises(RuntimeError) as ctx:
-            encrypter.decrypt(payload)
-        self.assertIn("Decrypted data is empty", str(ctx.exception))
-
-    def testRejectsCbcPaddingLengthOfZero(self) -> None:
-        """Refuse a CBC plaintext whose trailing padding byte is zero.
-
-        Validates the lower bound of the PKCS7 padding length check.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-128-CBC")
-        with self.assertRaises(RuntimeError) as ctx:
-            encrypter.decrypt(cbc_payload_from_raw(b"\x00" * 16))
-        self.assertIn("Invalid PKCS7 padding length", str(ctx.exception))
-
-    def testRejectsCbcPaddingLengthAboveTheBlockSize(self) -> None:
-        """Refuse a CBC plaintext whose padding byte exceeds one block.
-
-        Validates the upper bound of the PKCS7 padding length check.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-128-CBC")
-        with self.assertRaises(RuntimeError) as ctx:
-            encrypter.decrypt(cbc_payload_from_raw(b"\xff" * 16))
-        self.assertIn("Invalid PKCS7 padding length", str(ctx.exception))
-
-    def testRejectsCbcPaddingWithInconsistentBytes(self) -> None:
-        """Refuse a CBC plaintext whose padding bytes are not uniform.
-
-        Validates the bulk comparison of the PKCS7 padding block.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-128-CBC")
-        raw = b"\x00" * 14 + b"\x01\x02"
-        with self.assertRaises(RuntimeError) as ctx:
-            encrypter.decrypt(cbc_payload_from_raw(raw))
-        self.assertIn("Corrupted PKCS7 padding", str(ctx.exception))
-
-    def testWrapsCbcDecryptionFailuresInRuntimeError(self) -> None:
-        """Surface a runtime error when the CBC primitive cannot be built.
-
-        Validates the failure path of the CBC decryption helper.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        encrypter = make_encrypter("AES-128-CBC")
-        payload = encrypter.encrypt("boom")
-        encrypter.key = "not-bytes"  # type: ignore[assignment]
-        with self.assertRaises(RuntimeError) as ctx:
-            encrypter.decrypt(payload)
-        self.assertIn("Error in CBC decryption", str(ctx.exception))
 
 class TestEncrypterRoundTrip(TestCase):
+    """Verify plaintext recovery across ciphers, block boundaries, and UTF-8."""
+
+    def testDecryptsExistingAuthenticatedPayloads(self) -> None:
+        """Recover fixed GCM envelopes generated by the previous implementation.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        stored = {
+            "AES-128-GCM": (
+                "eyJpdiI6IklpSWlJaUlpSWlJaUlpSWkiLCJ2YWx1ZSI6InRVeFZqUnZGUVJ0OTNW"
+                "am1ZKy9iOUhXRkZLUXZkT2lSVmRNPSIsInRhZyI6InJ2dXd4K0VkalEyRTNaZTYv"
+                "MlZ5VkE9PSIsImNpcGhlciI6IkFFUy0xMjgtR0NNIn0="
+            ),
+            "AES-256-GCM": (
+                "eyJpdiI6IklpSWlJaUlpSWlJaUlpSWkiLCJ2YWx1ZSI6IjNlSVhrM0JxQTdYYnIyam"
+                "15RzYrZkFmdzlTQ0dxdHZJcUFjPSIsInRhZyI6Ik4wNWI4REpPbTc0Q1B4bzRMbX"
+                "pBalE9PSIsImNpcGhlciI6IkFFUy0yNTYtR0NNIn0="
+            ),
+        }
+        for cipher, payload in stored.items():
+            with self.subTest(cipher=cipher):
+                self.assertEqual(
+                    make_encrypter(cipher).decrypt(payload),
+                    "stored authenticated value",
+                )
 
     def testRecoversPlaintextForEverySupportedCipher(self) -> None:
         """Recover the original text after a full cycle in every mode.
 
-        Validates the interoperability of both encryption branches with
-        their matching decryption branches.
+        Validate recovery with both accepted AES key sizes.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for cipher in _CIPHERS:
-            encrypter = make_encrypter(cipher)
-            self.assertEqual(encrypter.decrypt(encrypter.encrypt(cipher)), cipher)
+            with self.subTest(cipher=cipher):
+                encrypter = make_encrypter(cipher)
+                self.assertEqual(encrypter.decrypt(encrypter.encrypt(cipher)), cipher)
 
     def testRecoversPlaintextOfExactlyOneBlock(self) -> None:
-        """Recover a text whose length matches the PKCS7 block size.
+        """Recover a text containing exactly sixteen UTF-8 bytes.
 
-        Validates the boundary where a whole padding block is appended.
+        Validate a complete block without adding a padding requirement.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-256-CBC")
+        encrypter = make_encrypter("AES-256-GCM")
         original = "a" * 16
         self.assertEqual(encrypter.decrypt(encrypter.encrypt(original)), original)
 
     def testRecoversASingleCharacter(self) -> None:
         """Recover the shortest possible non-empty plaintext.
 
-        Validates the boundary where padding fills almost a whole block.
+        Validate the minimum accepted plaintext length.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-128-CBC")
+        encrypter = make_encrypter("AES-128-GCM")
         self.assertEqual(encrypter.decrypt(encrypter.encrypt("x")), "x")
 
     def testRecoversAMultiBlockPayload(self) -> None:
         """Recover a text spanning many cipher blocks.
 
-        Validates streaming of large inputs through both modes.
+        Validate recovery of a complete GCM payload larger than one block.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-256-GCM")
         original = "z" * 4096
@@ -821,9 +703,9 @@ class TestEncrypterRoundTrip(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        encrypter = make_encrypter("AES-256-CBC")
+        encrypter = make_encrypter("AES-256-GCM")
         original = "こんにちは 你好 مرحبا"
         self.assertEqual(encrypter.decrypt(encrypter.encrypt(original)), original)
 
@@ -835,8 +717,33 @@ class TestEncrypterRoundTrip(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encrypter = make_encrypter("AES-128-GCM")
         original = "line1\nline2\tend !@#$%^&*()_+-=[]{}|;':\",./<>?"
         self.assertEqual(encrypter.decrypt(encrypter.encrypt(original)), original)
+
+
+class TestLegacyPayloadRejection(TestCase):
+    """Reject CBC envelopes regardless of their unauthenticated tag contents."""
+
+    def testRejectsUnauthenticatedCbcEnvelopes(self) -> None:
+        """Reject legacy modes before returning any recovered plaintext.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for bits in (128, 256):
+            encrypter = make_encrypter(f"AES-{bits}-GCM")
+            for tag in (None, "", to_base64(b"x" * 16)):
+                with self.subTest(bits=bits, tag=tag):
+                    payload = encode_payload(
+                        f"AES-{bits}-CBC",
+                        to_base64(b"i" * 16),
+                        to_base64(b"c" * 16),
+                        tag,
+                    )
+                    with self.assertRaisesRegex(ValueError, "does not match"):
+                        encrypter.decrypt(payload)

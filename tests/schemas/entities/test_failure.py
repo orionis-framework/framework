@@ -1,8 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.test import TestCase
 
-class TestValidationFailure(TestCase):
 
+class TestValidationFailure(TestCase):
     def testInstantiationStoresFields(self) -> None:
         """Instantiate ValidationFailure and verify stored attributes.
 
@@ -12,7 +14,7 @@ class TestValidationFailure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = ValidationFailure(
             field="username",
@@ -32,7 +34,7 @@ class TestValidationFailure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = ValidationFailure(
             field="email",
@@ -41,28 +43,14 @@ class TestValidationFailure(TestCase):
         )
         result = failure.toDict()
         self.assertIsInstance(result, dict)
-        self.assertEqual(result["field"], "email")
-        self.assertEqual(result["rule"], "pattern")
-        self.assertEqual(result["message"], "Invalid email format.")
-
-    def testToDictContainsExactlyThreeKeys(self) -> None:
-        """Ensure toDict output contains exactly the three expected keys.
-
-        Validates that no extra or missing keys appear in the returned
-        dictionary.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        failure = ValidationFailure(
-            field="age",
-            rule="gt",
-            message="Must be greater than zero.",
+        self.assertEqual(
+            result,
+            {
+                "field": "email",
+                "rule": "pattern",
+                "message": "Invalid email format.",
+            },
         )
-        result = failure.toDict()
-        self.assertEqual(set(result.keys()), {"field", "rule", "message"})
 
     def testImmutabilityPreventsFieldMutation(self) -> None:
         """Confirm that ValidationFailure is immutable (frozen dataclass).
@@ -73,7 +61,7 @@ class TestValidationFailure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = ValidationFailure(
             field="name",
@@ -92,7 +80,7 @@ class TestValidationFailure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = ValidationFailure(field="", rule="", message="")
         self.assertEqual(failure.field, "")
@@ -108,7 +96,7 @@ class TestValidationFailure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failure = ValidationFailure(
             field="score",

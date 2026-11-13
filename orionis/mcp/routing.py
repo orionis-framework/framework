@@ -1,10 +1,13 @@
+# ruff: noqa: TC001
+# Native controller injection and handler reflection resolve these concrete types.
 """An importable native HTTP handler, including after route-cache restore."""
 
 from typing import ClassVar
-from orionis.http.request import Request  # noqa: TC001 - Native controller DI.
-from orionis.http.responses import Response  # noqa: TC001 - Handler metadata.
-from orionis.mcp.contracts.manager import IMcpManager  # noqa: TC001 - Native controller DI.
+from orionis.http.request import Request
+from orionis.http.responses import Response
+from orionis.mcp.contracts.manager import IMcpManager
 from orionis.mcp.transport.policy import McpHttpPolicy
+
 
 class McpController:
     """An importable native HTTP handler, including after route-cache restore."""

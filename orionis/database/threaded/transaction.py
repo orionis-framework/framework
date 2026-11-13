@@ -1,11 +1,11 @@
+# ruff: noqa: TC001, TC002
+# Keep worker and native transaction annotations available at runtime.
 """Settle a Core transaction on its connection's reserved worker."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from sqlalchemy.engine import Transaction
+from orionis.database.threaded.worker import ThreadedWorker
 
-if TYPE_CHECKING:
-    from sqlalchemy.engine import Transaction
-    from orionis.database.threaded.worker import ThreadedWorker
 
 class ThreadedTransaction:
     """Settle a Core transaction on its connection's reserved worker."""
@@ -14,14 +14,16 @@ class ThreadedTransaction:
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, transaction: Transaction, worker: ThreadedWorker,
+        self,
+        transaction: Transaction,
+        worker: ThreadedWorker,
     ) -> None:
         """
         Retain the Core transaction and its owning worker.
 
         Parameters
         ----------
-        transaction : orionis.database.Transaction
+        transaction : ``sqlalchemy.engine.Transaction``
             Open Core transaction.
         worker : orionis.database.threaded.worker.ThreadedWorker
             Worker owning the associated DBAPI checkout.
@@ -29,7 +31,7 @@ class ThreadedTransaction:
         Returns
         -------
         None
-            Initialize the asynchronous transaction adapter.
+            No return value.
         """
         self._transaction = transaction
         """Open Core transaction."""
@@ -42,7 +44,7 @@ class ThreadedTransaction:
         Returns
         -------
         None
-            Complete the blocking commit operation.
+            No return value.
         """
         await self._worker.run(self._transaction.commit)
 
@@ -52,6 +54,6 @@ class ThreadedTransaction:
         Returns
         -------
         None
-            Complete the blocking rollback operation.
+            No return value.
         """
         await self._worker.run(self._transaction.rollback)

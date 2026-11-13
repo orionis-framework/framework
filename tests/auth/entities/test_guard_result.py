@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.auth.entities.guard_result import GuardResult
 from orionis.test import TestCase
+
 
 class TestGuardResult(TestCase):
     """Validate the transport object returned by a guard."""
@@ -13,7 +16,7 @@ class TestGuardResult(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = GuardResult(identity=object(), guard="session")
         self.assertFalse(hasattr(result, "__dict__"))
@@ -30,7 +33,7 @@ class TestGuardResult(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = GuardResult(identity=object(), guard="session")
         self.assertIsNone(result.abilities)
@@ -45,7 +48,7 @@ class TestGuardResult(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         identity = object()
         result = GuardResult(
@@ -68,7 +71,7 @@ class TestGuardResult(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             GuardResult(object(), "session")  # type: ignore[misc]

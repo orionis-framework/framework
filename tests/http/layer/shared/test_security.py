@@ -1,7 +1,10 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.layer.shared.security import SecurityMiddleware
 from orionis.http.responses import Response
 from orionis.test import TestCase
 from tests.http.test_support import make_adapter
+
 
 class _DefaultResponses:
     """Produce plain error responses for middleware assertions."""
@@ -26,6 +29,7 @@ class _DefaultResponses:
         """
         return Response(status_code=status_code, content=content)
 
+
 class TestSecurityHeaderChecks(TestCase):
     """Preserve host and header policies across middleware changes."""
 
@@ -38,9 +42,14 @@ class TestSecurityHeaderChecks(TestCase):
             Assertions verify the behavior described above.
         """
         middleware = SecurityMiddleware({}, _DefaultResponses())
-        response = await middleware.handle(make_adapter([
-            (b"Host", b"example.com"), (b"host", b"other.example.com"),
-        ]))
+        response = await middleware.handle(
+            make_adapter(
+                [
+                    (b"Host", b"example.com"),
+                    (b"host", b"other.example.com"),
+                ],
+            ),
+        )
         self.assertEqual(response.getStatusCode(), 400)
 
     async def testMatchesExactAndWildcardHosts(self) -> None:
@@ -56,13 +65,21 @@ class TestSecurityHeaderChecks(TestCase):
             _DefaultResponses(),
         )
         for hostname in (
-            b"example.com", b"api.example.com", b"API.EXAMPLE.COM:443",
+            b"example.com",
+            b"api.example.com",
+            b"API.EXAMPLE.COM:443",
             b"internal.local",
         ):
             with self.subTest(hostname=hostname):
-                self.assertIsNone(await middleware.handle(make_adapter([
-                    (b"host", hostname),
-                ])))
+                self.assertIsNone(
+                    await middleware.handle(
+                        make_adapter(
+                            [
+                                (b"host", hostname),
+                            ],
+                        ),
+                    ),
+                )
         for hostname in (b"evil-example.com", b"example.com.evil", b"unknown"):
             with self.subTest(hostname=hostname):
                 response = await middleware.handle(make_adapter([(b"host", hostname)]))
@@ -78,7 +95,8 @@ class TestSecurityHeaderChecks(TestCase):
         """
         middleware = SecurityMiddleware({}, _DefaultResponses())
         for headers in (
-            [(b"x-value", b"text\r\ninvalid")], [(b"x-invalid\n", b"text")],
+            [(b"x-value", b"text\r\ninvalid")],
+            [(b"x-invalid\n", b"text")],
         ):
             response = await middleware.handle(make_adapter(headers))
             self.assertEqual(response.getStatusCode(), 400)

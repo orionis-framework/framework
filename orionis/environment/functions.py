@@ -3,6 +3,7 @@
 from __future__ import annotations
 from orionis.environment.facade import Env
 
+
 def env(key: str, default: object | None = None) -> object:
     """
     Retrieve the value of an environment variable using the Env facade.

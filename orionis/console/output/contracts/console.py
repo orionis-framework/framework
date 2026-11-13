@@ -1,3 +1,5 @@
+# ruff: noqa: PLR0913
+# Keep established public and external protocol names and signatures.
 """Define the contract for console implementations."""
 
 from __future__ import annotations
@@ -8,9 +10,8 @@ if TYPE_CHECKING:
     from _typeshed import SupportsWrite
     from orionis.console.dynamic.contracts.progress_bar import IProgressBar
 
-class IConsole(ABC):
 
-    # ruff: noqa: PLR0913
+class IConsole(ABC):
     """Define the contract for console implementations."""
 
     @property
@@ -619,7 +620,7 @@ class IConsole(ABC):
         """
 
     @abstractmethod
-    def exitError(self, message: str| None = None) -> None:
+    def exitError(self, message: str | None = None) -> None:
         """
         Exit the program with an error message.
 

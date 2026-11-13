@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import ast
 import re
 from inspect import Parameter, iscoroutinefunction, signature
@@ -10,6 +12,7 @@ from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
 
 def foundation_definitions() -> Iterator[
     tuple[Path, ast.FunctionDef | ast.AsyncFunctionDef, bool]
@@ -28,6 +31,7 @@ def foundation_definitions() -> Iterator[
             for node in ast.iter_child_nodes(parent):
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     yield path, node, isinstance(parent, ast.ClassDef)
+
 
 class TestApplicationContract(TestCase):
     """Verify that the interface describes Application's public API."""
@@ -110,9 +114,7 @@ class TestApplicationContract(TestCase):
                 for parameter in parameters
                 if parameter.arg not in {"self", "cls"}
             )
-            missing_result = not (
-                "Returns\n-------" in doc or "Yields\n------" in doc
-            )
+            missing_result = not ("Returns\n-------" in doc or "Yields\n------" in doc)
             if (
                 missing_result
                 or missing_annotations
@@ -191,15 +193,11 @@ class TestApplicationContract(TestCase):
             Assert that configuration values and path values are correctly typed.
         """
         self.assertEqual(
-            signature(IApplication.withConfigApp)
-            .parameters["app_config"]
-            .annotation,
+            signature(IApplication.withConfigApp).parameters["app_config"].annotation,
             "object",
         )
         self.assertEqual(
-            signature(IApplication.withConfigPaths)
-            .parameters["paths"]
-            .annotation,
+            signature(IApplication.withConfigPaths).parameters["paths"].annotation,
             "str | Path | None",
         )
         self.assertEqual(

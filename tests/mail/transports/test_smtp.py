@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import smtplib
 import ssl
@@ -34,6 +36,7 @@ _MESSAGE = PreparedMail(
     mime=b"From: sender@example.com\r\nTo: ana@example.com\r\n\r\nHello\r\n",
     smtp_utf8=False,
 )
+
 
 class SmtpBoundary:
     """Build explicit per-operation connections without opening a socket."""
@@ -130,6 +133,7 @@ class SmtpBoundary:
         connection = RecordingClient(self, timeout, context)
         self.clients.append(connection)
         return connection
+
 
 class RecordingClient:
     """Implement the exact smtplib boundary used by the transport."""
@@ -326,8 +330,8 @@ class RecordingClient:
             error_msg = "Private close failure."
             raise OSError(error_msg)
 
-class TestSmtpTransport(TestCase):
 
+class TestSmtpTransport(TestCase):
     def setUp(self) -> None:
         """Replace only the SMTP boundary, keeping real protocol errors.
 
@@ -370,11 +374,13 @@ class TestSmtpTransport(TestCase):
             Value produced by the helper.
         """
         return SmtpTransport(
-            SmtpSettings.fromConfig({
-                "host": "smtp.example.com",
-                "encryption": "TLS",
-                **options,
-            }),
+            SmtpSettings.fromConfig(
+                {
+                    "host": "smtp.example.com",
+                    "encryption": "TLS",
+                    **options,
+                },
+            ),
         )
 
     async def testStartTlsAndAuthenticationRunOffLoopWithVerifiedContext(self) -> None:

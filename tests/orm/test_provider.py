@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.foundation.core_providers import CORE_PROVIDERS
 from orionis.orm import provider as provider_module
@@ -5,6 +7,7 @@ from orionis.orm.contracts.query_builder import IQueryBuilder
 from orionis.orm.provider import QueryBuilderProvider
 from orionis.orm.query_builder import QueryBuilder
 from orionis.test import TestCase
+
 
 class _CaptureApp:
     """Record the provider's service registrations."""
@@ -17,7 +20,7 @@ class _CaptureApp:
         Returns
         -------
         None
-            Prepare the current test's container observations.
+            No return value.
         """
         self.bindings: list[tuple[type, type]] = []
 
@@ -34,9 +37,10 @@ class _CaptureApp:
         Returns
         -------
         None
-            Append the requested registration.
+            No return value.
         """
         self.bindings.append((contract, implementation))
+
 
 class _RecordingFacade:
     """Record facade pinning without touching the running application's DB."""
@@ -49,7 +53,7 @@ class _RecordingFacade:
         Returns
         -------
         None
-            Start the pin counter at zero.
+            No return value.
         """
         self.pin_count = 0
 
@@ -59,9 +63,10 @@ class _RecordingFacade:
         Returns
         -------
         None
-            Increment the facade pin counter.
+            No return value.
         """
         self.pin_count += 1
+
 
 class TestQueryBuilderProvider(TestCase):
     """Verify singleton registration and eager facade boot wiring."""
@@ -72,7 +77,7 @@ class TestQueryBuilderProvider(TestCase):
         Returns
         -------
         None
-            Preserve the real facade and prepare provider observations.
+            No return value.
         """
         self.app = _CaptureApp()
         self.facade = _RecordingFacade()
@@ -86,7 +91,7 @@ class TestQueryBuilderProvider(TestCase):
         Returns
         -------
         None
-            Verify the provider declares exactly one singleton binding.
+            No return value.
         """
         self.provider.register()
         self.assertEqual(self.app.bindings, [(IQueryBuilder, QueryBuilder)])
@@ -98,7 +103,7 @@ class TestQueryBuilderProvider(TestCase):
         Returns
         -------
         None
-            Verify boot awaits one pin operation and leaves bindings unchanged.
+            No return value.
         """
         await self.provider.boot()
         self.assertEqual(self.facade.pin_count, 1)
@@ -110,7 +115,7 @@ class TestQueryBuilderProvider(TestCase):
         Returns
         -------
         None
-            Verify core registration and the non-deferrable provider lifetime.
+            No return value.
         """
         self.assertIn(QueryBuilderProvider, CORE_PROVIDERS)
         self.assertFalse(issubclass(QueryBuilderProvider, DeferrableProvider))

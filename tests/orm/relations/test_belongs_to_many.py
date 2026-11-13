@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
@@ -8,6 +10,7 @@ from tests.orm.relations import test_mixin as fixtures
 
 if TYPE_CHECKING:
     from orionis.orm.query.raw_builder import RawQueryBuilder
+
 
 class _RecordingPivotRelation(BelongsToManyRelation[fixtures.Tag]):
     """Record pivot preparation while executing the real database operations."""
@@ -25,7 +28,7 @@ class _RecordingPivotRelation(BelongsToManyRelation[fixtures.Tag]):
         Returns
         -------
         None
-            Initialize relation state and independent query observations.
+            No return value.
         """
         super().__init__(
             parent,
@@ -63,6 +66,7 @@ class _RecordingPivotRelation(BelongsToManyRelation[fixtures.Tag]):
         await asyncio.sleep(0)
         return await super()._resolvePivotMap()
 
+
 class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
     async def testAttachLinksRecords(self) -> None:
         """Link records through the pivot table via ``attach()``.
@@ -72,7 +76,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -90,7 +94,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -107,7 +111,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -124,7 +128,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         inserted = await book.tags().attach([])
@@ -138,7 +142,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -157,7 +161,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -176,7 +180,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -199,7 +203,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -221,7 +225,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         tags = await book.tags().get()
@@ -235,7 +239,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         relation = book.tags()
@@ -251,7 +255,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         student = await relation_fixtures.Student.create({"name": "Alice"})
         course = await relation_fixtures.Course.create({"name": "Math"})
@@ -268,7 +272,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -285,7 +289,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -305,7 +309,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -323,7 +327,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -340,7 +344,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         self.assertFalse(await book.tags().exists())
@@ -351,6 +355,7 @@ class TestBelongsToManyRelation(relation_fixtures._RelationsTestCase):
         self.assertTrue(await book.tags().exists())
         self.assertFalse(await book.tags().doesntExist())
 
+
 class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
     """Exercise repeated terminals and relation writes against SQLite."""
 
@@ -360,7 +365,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         tag = await fixtures.Tag.create({"name": "linked"})
@@ -380,7 +385,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         tag = await fixtures.Tag.create({"name": "linked"})
@@ -398,7 +403,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         tag = await fixtures.Tag.create({"name": "linked"})
@@ -416,7 +421,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         first = await fixtures.Tag.create({"name": "first"})
@@ -434,7 +439,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         linked = await fixtures.Tag.create({"name": "linked"})
@@ -450,7 +455,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         linked = await fixtures.Tag.create({"name": "linked"})
@@ -465,7 +470,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         linked = await fixtures.Tag.create({"name": "linked"})
@@ -480,7 +485,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         tag = await fixtures.Tag.create({"name": "unrelated"})
@@ -494,7 +499,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         tag = await fixtures.Tag.create({"name": "linked"})
@@ -507,7 +512,7 @@ class TestPivotTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await fixtures.Book.create({"title": "book"})
         relation = _RecordingPivotRelation(book)

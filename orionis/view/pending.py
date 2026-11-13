@@ -1,25 +1,30 @@
+# ruff: noqa: ANN401, BLE001, PLC0415, TC001, TC003, TRY004
+# Preserve dynamic response arguments, runtime types and attribute protocol errors.
+# Observe resolution failures through the lazily imported central failure service.
 """Provide awaitable, chainable results of template rendering."""
 
 from __future__ import annotations
 import re
-from typing import TYPE_CHECKING, Any, Self
+from collections.abc import Callable, Generator
+from typing import Any, Self
 from orionis.http.responses import HTMLResponse
+from orionis.session.contracts.session import ISession
 from orionis.session.flash import _FlashData, apply_flash
+from orionis.support.concurrency import WorkQueueFullError
 from orionis.support.facades.session import Session
 from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundException
-
-if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
-    from orionis.session.contracts.session import ISession
-    from orionis.view.contracts.engine import IViewEngine
+from orionis.view.contracts.engine import IViewEngine
 
 # Closure qualname noise (e.g. ``_global_csrf_field.<locals>.``) leaked by
 # errors raised inside template globals; irrelevant for the developer.
-_LOCALS_QUALNAME = re.compile(r"[\w.]*<locals>\.")  # NOSONAR
+# Start at a qualifier boundary to avoid rescanning every suffix of long messages.
+# Consume adjacent nested qualifiers together to preserve the original output.
+_LOCALS_QUALNAME = re.compile(r"(?<![\w.])(?:[\w.]*<locals>\.)+")
 """
 Closure qualname noise (e.g. ``_global_csrf_field.<locals>.``) leaked by errors
 raised inside template globals; irrelevant for the developer.
 """
+
 
 class PendingView(_FlashData):
     """
@@ -36,8 +41,6 @@ class PendingView(_FlashData):
     Every attribute that exists on :class:`orionis.http.HTMLResponse` is accepted and
     replayed on the real response once the template has been rendered.
     """
-
-    # ruff: noqa: ANN401, BLE001
 
     __slots__ = ("_context", "_engine", "_flash", "_mutations", "_template")
     """Declare the instance attribute slots reserved by this class."""
@@ -63,7 +66,7 @@ class PendingView(_FlashData):
         Returns
         -------
         None
-            Store the rendering intent without performing any work.
+            No return value.
         """
         self._engine: IViewEngine = engine
         """Engine used to render the template once awaited."""
@@ -97,7 +100,7 @@ class PendingView(_FlashData):
         """
         if not callable(getattr(HTMLResponse, name, None)):
             error_msg = f"'{type(self).__name__}' object has no attribute '{name}'"
-            raise AttributeError(error_msg)  # noqa: TRY004
+            raise AttributeError(error_msg)
 
         def queue(*args: Any, **kwargs: Any) -> PendingView:
             """
@@ -149,6 +152,8 @@ class PendingView(_FlashData):
             When the view file cannot be located.
         orionis.view.exceptions.ViewRenderException
             When rendering fails for any reason.
+        orionis.support.concurrency.WorkQueueFullError
+            When the engine's template loading workers are saturated.
         """
         if self._flash:
             await self.__flashToSession()
@@ -164,8 +169,8 @@ class PendingView(_FlashData):
                     "X-Orionis-Render": "SSR",
                 },
             )
-        except ViewTemplateNotFoundException:
-            # Missing templates keep their own type for the caller.
+        except ViewTemplateNotFoundException, ViewRenderException, WorkQueueFullError:
+            # Preserve the engine's classified failure and original cause.
             raise
         except Exception as e:
             detail: str = _LOCALS_QUALNAME.sub("", str(e))
@@ -183,19 +188,19 @@ class PendingView(_FlashData):
         """
         Write the queued flash data into the active session.
 
-        Silently skips when no session is available, e.g. on routes
-        without the session middleware.
+        Skip writes when the session is unavailable, such as on routes without
+        session middleware, and centrally observe unexpected resolution failures.
 
         Returns
         -------
         None
-            Write the queued flash data into the active session.
+            No return value.
         """
         try:
             session: ISession = await Session.resolve()
         except Exception as error:
-            from orionis.session.contracts.session import ISession  # noqa: PLC0415
-            from orionis.view._failures import capture_service_failure  # noqa: PLC0415
+            from orionis.view._failures import capture_service_failure
+
             await capture_service_failure(error, ISession)
             return
 

@@ -1,9 +1,11 @@
+# ruff: noqa: TC001
+# Resolve metadata-builder annotations during runtime API reflection.
 """Provide mcp operations through ``mime_format``, ``Progress``, ``McpResponse``."""
 
 import base64
 from dataclasses import dataclass, field, replace
 import math
-from typing import TYPE_CHECKING, Literal, Self
+from typing import Literal, Self
 import msgspec
 from orionis.mcp.protocol.content import (
     Annotations,
@@ -18,16 +20,19 @@ from orionis.mcp.protocol.content import (
 )
 from orionis.mcp.protocol.metavalidation import validate_metadata
 from orionis.mcp.protocol.validation import validate_json
-
-if TYPE_CHECKING:
-    from orionis.mcp.protocol.metadata import ContentAnnotations
+from orionis.mcp.protocol.metadata import ContentAnnotations
 
 _JSON_MIME_TYPE = "application/json"
 """Json mime type identifier: ``application/json``."""
-_MSGPACK_MIME_TYPES = frozenset({
-    "application/msgpack", "application/x-msgpack", "application/vnd.msgpack",
-})
+_MSGPACK_MIME_TYPES = frozenset(
+    {
+        "application/msgpack",
+        "application/x-msgpack",
+        "application/vnd.msgpack",
+    },
+)
 """Msgpack mime types used by ``responses``."""
+
 
 def mime_format(mime_type: str | None) -> Literal["json", "msgpack"] | None:
     """
@@ -56,8 +61,10 @@ def mime_format(mime_type: str | None) -> Literal["json", "msgpack"] | None:
         return "msgpack"
     return None
 
+
 def _encode_payload(
-    value: object, payload_format: Literal["json", "msgpack"] | None,
+    value: object,
+    payload_format: Literal["json", "msgpack"] | None,
 ) -> bytes:
     """
     Serialize application data with the selected native msgspec codec.
@@ -83,7 +90,8 @@ def _encode_payload(
     if payload_format == "json":
         try:
             value = msgspec.to_builtins(
-                value, builtin_types=(bytes, bytearray, memoryview),
+                value,
+                builtin_types=(bytes, bytearray, memoryview),
             )
         except TypeError as exc:
             raise ValueError(str(exc)) from exc
@@ -93,6 +101,7 @@ def _encode_payload(
         return msgspec.msgpack.encode(value)
     message = "Structured MCP data requires a JSON or MessagePack MIME type"
     raise ValueError(message)
+
 
 @dataclass(frozen=True, slots=True)
 class Progress:
@@ -121,6 +130,13 @@ class McpResponse:
     """Progress notification emitted independently of response content."""
     meta: dict[str, object] = field(default_factory=dict)
     """Meta produced by ``field``."""
+    _structured_text: TextContent | None = field(
+        default=None,
+        kw_only=True,
+        repr=False,
+        compare=False,
+    )
+    """Generated text block owned by structured content, excluding manual text."""
 
     @classmethod
     def text(cls, value: str) -> Self:
@@ -301,9 +317,11 @@ class McpResponse:
             Any JSON value and the recommended serialized text content.
         """
         encoded = _encode_payload(value, "json")
+        text = TextContent(text=encoded.decode("utf-8"))
         return cls(
-            content=(TextContent(text=encoded.decode("utf-8")),),
+            content=(text,),
             structured_content=msgspec.json.decode(encoded),
+            _structured_text=text,
         )
 
     @classmethod
@@ -347,9 +365,13 @@ class McpResponse:
         typing.Self
             Result of the operation described above.
         """
-        if type(current) not in (int, float) or not math.isfinite(current) or (
-            total is not None
-            and (type(total) not in (int, float) or not math.isfinite(total))
+        if (
+            type(current) not in (int, float)
+            or not math.isfinite(current)
+            or (
+                total is not None
+                and (type(total) not in (int, float) or not math.isfinite(total))
+            )
         ):
             error = "Progress values must be finite"
             raise ValueError(error)
@@ -411,8 +433,7 @@ class McpResponse:
         """
         validate_metadata(metadata, allow_reserved=False)
         validate_json(metadata)
-        return replace(
-            self,
+        return self._copyContent(
             content=tuple(
                 msgspec.structs.replace(
                     part,
@@ -440,10 +461,33 @@ class McpResponse:
             Result of the operation described above.
         """
         value = msgspec.convert(msgspec.to_builtins(annotations), type=Annotations)
-        return replace(
-            self,
+        return self._copyContent(
             content=tuple(
                 msgspec.structs.replace(part, annotations=value)
                 for part in self.content
             ),
         )
+
+    def _copyContent(self, content: tuple[ContentBlock, ...]) -> Self:
+        """Retain generated-text ownership when cloning content metadata.
+
+        Parameters
+        ----------
+        content : tuple[orionis.mcp.protocol.content.ContentBlock, ``...``]
+            Transformed content preserving the original blocks' order.
+
+        Returns
+        -------
+        typing.Self
+            Independent response retaining the corresponding generated block.
+        """
+        generated = next(
+            (
+                updated
+                for original, updated in zip(self.content, content, strict=True)
+                if original is self._structured_text
+                and isinstance(updated, TextContent)
+            ),
+            None,
+        )
+        return replace(self, content=content, _structured_text=generated)

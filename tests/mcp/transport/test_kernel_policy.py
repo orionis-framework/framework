@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import ClassVar
 import msgspec
 from orionis.auth.exceptions import AuthenticationException
@@ -18,6 +20,7 @@ from tests.http.test_kernel import (
     make_asgi_scope,
     receive_empty,
 )
+
 
 class _Reporter:
     """Observe reporting while never constructing HTML error presentation."""
@@ -64,10 +67,12 @@ class _Reporter:
         if method != "handleFailure":
             message = "The HTML exception presenter must not run"
             raise AssertionError(message)
+
         async def log():
             self.reported.append(arguments["exception"])
 
         return FailureHandling(logging=log)
+
 
 class _Policy(McpHttpPolicy):
     """Supply concrete dependencies to the existing kernel test application."""
@@ -86,6 +91,7 @@ class _Policy(McpHttpPolicy):
             _Reporter(),
             McpConfig(allowed_origins=("https://trusted.test",)),
         )
+
 
 class _Controller:
     """Expose the same policy marker as the native MCP controller."""
@@ -106,6 +112,7 @@ class _Controller:
             media_type="application/json",
         )
 
+
 class _OrdinaryController:
     """Keep a neighboring ordinary HTTP route outside the endpoint policy."""
 
@@ -120,6 +127,7 @@ class _OrdinaryController:
             Return the result produced by ``handle``.
         """
         return HTMLResponse(content="<p>ordinary</p>")
+
 
 class _AuthMiddleware(BaseMiddleware):
     """Raise authentication failure from inside the ordinary route pipeline."""
@@ -144,6 +152,7 @@ class _AuthMiddleware(BaseMiddleware):
         message = "private credential details"
         raise AuthenticationException(message)
 
+
 class _RedirectMiddleware(BaseMiddleware):
     """Simulate an application browser-login redirect attached by mistake."""
 
@@ -165,6 +174,7 @@ class _RedirectMiddleware(BaseMiddleware):
             Return the result produced by ``handle``.
         """
         return RedirectResponse("/login")
+
 
 class _LimitMiddleware(BaseMiddleware):
     """Provide a native rejection whose important headers must survive."""
@@ -191,6 +201,7 @@ class _LimitMiddleware(BaseMiddleware):
             status_code=429,
             headers={"Retry-After": "12", "X-Content-Type-Options": "nosniff"},
         )
+
 
 class _Protocol:
     """Capture actual RSGI response-adapter output."""
@@ -248,6 +259,7 @@ class _Protocol:
 
     # Preserve the Granian RSGI protocol name.
     response_empty = responseEmpty
+
 
 class TestKernelPolicy(TestCase):
     """Keep native HTTP semantics while forcing protocol-safe MCP boundaries."""

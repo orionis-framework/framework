@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class VerbosityMode(Enum):
     """
     Enumerate verbosity levels for test output.

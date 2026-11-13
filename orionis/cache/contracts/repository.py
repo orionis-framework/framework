@@ -1,14 +1,12 @@
+# ruff: noqa: ANN401, TC003
 """Define the contract for cache repository implementations."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Self
+from collections.abc import Callable
+from typing import Any, Self
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 class ICacheRepository(ABC):
-
-    # ruff: noqa: ANN401
     """Define the contract for cache repository implementations."""
 
     __slots__ = ()
@@ -48,7 +46,10 @@ class ICacheRepository(ABC):
 
     @abstractmethod
     async def replace(
-        self: Self, key: str, value: Any, ttl: float | None = None,
+        self: Self,
+        key: str,
+        value: Any,
+        ttl: float | None = None,
     ) -> bool:
         """
         Replace a live entry atomically without creating a missing key.

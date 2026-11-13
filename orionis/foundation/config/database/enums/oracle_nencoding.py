@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class OracleNencoding(Enum):
     """
     Represent Oracle national character sets supported by Oracle Database.

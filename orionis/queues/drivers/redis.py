@@ -1,25 +1,26 @@
+# ruff: noqa: TC001
+# Keep driver annotations available for runtime inspection.
 """Persist delayed jobs and fenced reservations through atomic Lua scripts."""
 
 from functools import lru_cache
 from hashlib import sha1
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from uuid import uuid4
 import msgspec
 from redis.asyncio import Redis
 from redis.exceptions import NoScriptError, RedisError
 from orionis.foundation.config.queue import Redis as RedisConfig
 from orionis.queues.contracts.driver import IQueueDriver
+from orionis.queues.entities.envelope import JobEnvelope
 from orionis.queues.entities.reserved_job import ReservedJob
 from orionis.queues.exceptions import QueueStorageError
 from orionis.queues.functions import current_time, validate_name, validate_seconds
-
-if TYPE_CHECKING:
-    from orionis.queues.entities.envelope import JobEnvelope
 
 _ENCODER = msgspec.json.Encoder()
 """Encoder used by ``redis``."""
 _RESERVATION_FIELDS = 3
 """Reservation fields value used by ``redis``."""
+
 
 @lru_cache(maxsize=16)
 def _script_digest(script: str) -> str:
@@ -37,6 +38,7 @@ def _script_digest(script: str) -> str:
         Hexadecimal SHA-1 identifier expected by Redis EVALSHA.
     """
     return sha1(script.encode(), usedforsecurity=False).hexdigest()
+
 
 # Validate key types before any transition can remove persisted queue state.
 _CHECK_TYPES = """
@@ -129,6 +131,7 @@ redis.call('DEL', unpack(KEYS))
 return count
 """
 """Remove a queue's complete state and report its previous number of jobs."""
+
 
 class RedisQueueDriver(IQueueDriver):
     """Persist delayed jobs and fenced reservations through atomic Lua scripts."""

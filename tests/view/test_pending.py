@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Any
 from orionis.http.responses import HTMLResponse
 from orionis.test import TestCase
@@ -18,6 +20,7 @@ _MISSING_TEMPLATE: str = "template not found"
 _NO_SESSION: str = "no active session"
 _QUALNAME_FAILURE: str = "_global_csrf_field.<locals>.csrf_field is broken"
 
+
 class _StubEngine:
     """View engine double recording calls and returning canned output."""
 
@@ -36,6 +39,11 @@ class _StubEngine:
             HTML returned by ``render``.
         error : Exception | None, optional
             Exception raised by ``render`` when provided.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.html: str = html
         self.error: Exception | None = error
@@ -67,6 +75,7 @@ class _StubEngine:
             raise self.error
         return self.html
 
+
 class _StubSession:
     """Session double capturing every flash write it receives."""
 
@@ -79,7 +88,7 @@ class _StubSession:
         Returns
         -------
         None
-            Prepare separate message, old-input, and validation-error bags.
+            No return value.
         """
         self.messages: dict[str, Any] = {}
         self.inputs: dict[str, Any] = {}
@@ -99,7 +108,7 @@ class _StubSession:
         Returns
         -------
         None
-            Store the message in the captured flash bag.
+            No return value.
         """
         self.messages[key] = value
 
@@ -115,7 +124,7 @@ class _StubSession:
         Returns
         -------
         None
-            Update the captured old-input values.
+            No return value.
         """
         self.inputs.update(values)
 
@@ -131,9 +140,10 @@ class _StubSession:
         Returns
         -------
         None
-            Update the captured validation errors.
+            No return value.
         """
         self.errors.update(errors)
+
 
 class _StubSessionFacade:
     """Session facade double returning a session or failing resolution."""
@@ -153,6 +163,11 @@ class _StubSessionFacade:
             Session returned by ``resolve``.
         failure : Exception | None, optional
             Exception raised by ``resolve`` when provided.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.session: _StubSession | None = session
         self.failure: Exception | None = failure
@@ -177,6 +192,7 @@ class _StubSessionFacade:
             raise self.failure
         return self.session
 
+
 class _StubValidationError(Exception):
     """Validation error exposing an ``errors`` mapping like the real one."""
 
@@ -187,18 +203,28 @@ class _StubValidationError(Exception):
         ----------
         errors : dict[str, list[str]]
             Messages grouped by field name.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         super().__init__(_INVALID_PAYLOAD)
         self.errors: dict[str, list[str]] = errors
 
-class TestPendingViewConstruction(TestCase):
 
+class TestPendingViewConstruction(TestCase):
     def testConstructionDoesNotRenderEagerly(self) -> None:
         """
         Defer all rendering work until the view is awaited.
 
         Validates that building a PendingView never touches the engine,
         keeping ``make()`` free of I/O.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine = _StubEngine()
         PendingView(engine, "users.index", {})
@@ -210,6 +236,11 @@ class TestPendingViewConstruction(TestCase):
 
         Validates that the pending view keeps the exact rendering intent
         it was built with.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine = _StubEngine()
         context = {"name": "World"}
@@ -224,13 +255,18 @@ class TestPendingViewConstruction(TestCase):
 
         Validates the lazy-allocation strategy: no dictionary or list is
         created until a mutator is actually chained.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = PendingView(_StubEngine(), "users.index", {})
         self.assertIsNone(view._mutations)
         self.assertIsNone(view._flash)
 
-class TestPendingViewFlashMutators(TestCase):
 
+class TestPendingViewFlashMutators(TestCase):
     def _make(self) -> PendingView:
         """
         Build a pending view backed by a stub engine.
@@ -248,6 +284,11 @@ class TestPendingViewFlashMutators(TestCase):
 
         Validates that the mutator never clones the pending view so calls
         can be chained on a single object.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         self.assertIs(view.withFlash("status", "saved"), view)
@@ -258,6 +299,11 @@ class TestPendingViewFlashMutators(TestCase):
 
         Validates that the value is buffered locally until the view is
         rendered.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withFlash("status", "saved")
@@ -268,6 +314,11 @@ class TestPendingViewFlashMutators(TestCase):
         Queue a None value when no explicit value is supplied.
 
         Validates the optional second parameter of withFlash.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withFlash("notified")
@@ -279,6 +330,11 @@ class TestPendingViewFlashMutators(TestCase):
 
         Validates that repeated calls extend the queue instead of
         replacing previously queued entries.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withFlash("status", "saved").withFlash("level", "info")
@@ -289,6 +345,11 @@ class TestPendingViewFlashMutators(TestCase):
         Return the same pending view from withInput for fluent chaining.
 
         Validates that the mutator keeps the chain anchored on one object.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         self.assertIs(view.withInput({"email": "user@example.com"}), view)
@@ -299,6 +360,11 @@ class TestPendingViewFlashMutators(TestCase):
 
         Validates that passwords are never written to the session when a
         form is repopulated.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withInput({"email": "user@example.com", "password": _CREDENTIAL})
@@ -312,6 +378,11 @@ class TestPendingViewFlashMutators(TestCase):
         Merge repeated withInput calls into a single old-input bag.
 
         Validates that the reserved bag is updated rather than replaced.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withInput({"email": "user@example.com"}).withInput({"age": 30})
@@ -325,6 +396,11 @@ class TestPendingViewFlashMutators(TestCase):
         Return the same pending view from withErrors for fluent chaining.
 
         Validates that the mutator keeps the chain anchored on one object.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         self.assertIs(view.withErrors({"email": "invalid"}), view)
@@ -335,6 +411,11 @@ class TestPendingViewFlashMutators(TestCase):
 
         Validates that the errors bag always stores lists so templates
         can iterate them uniformly.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withErrors({"email": "invalid"})
@@ -346,6 +427,11 @@ class TestPendingViewFlashMutators(TestCase):
 
         Validates the duck-typed contract used by validation exceptions
         raised by the schemas package.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withErrors(_StubValidationError({"email": ["invalid"]}))
@@ -357,6 +443,11 @@ class TestPendingViewFlashMutators(TestCase):
 
         Validates that the reserved bag accumulates fields instead of
         overwriting the previous payload.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withErrors({"email": "invalid"}).withErrors({"name": "required"})
@@ -371,6 +462,11 @@ class TestPendingViewFlashMutators(TestCase):
 
         Validates that messages, old input and errors coexist in the same
         queued payload.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withFlash("status", "failed")
@@ -381,8 +477,8 @@ class TestPendingViewFlashMutators(TestCase):
             ["_errors", "_old_input", "status"],
         )
 
-class TestPendingViewAttributeQueue(TestCase):
 
+class TestPendingViewAttributeQueue(TestCase):
     def _make(self) -> PendingView:
         """
         Build a pending view backed by a stub engine.
@@ -400,10 +496,14 @@ class TestPendingViewAttributeQueue(TestCase):
 
         Validates that the proxy never silently swallows typos in
         chained response mutators.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
-        with self.assertRaises(AttributeError):
-            view.doesNotExist  # noqa: B018
+        self.assertRaises(AttributeError, getattr, view, "doesNotExist")
 
     def testNonCallableAttributeRaisesAttributeError(self) -> None:
         """
@@ -411,16 +511,25 @@ class TestPendingViewAttributeQueue(TestCase):
 
         Validates that only methods can be queued for replay, never
         plain class attributes.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
-        with self.assertRaises(AttributeError):
-            view._CONTENT_TYPE  # noqa: B018
+        self.assertRaises(AttributeError, getattr, view, "charset")
 
     def testQueuedCallReturnsSameInstance(self) -> None:
         """
         Return the same pending view from a queued response call.
 
         Validates that proxied response methods remain chainable.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         self.assertIs(view.addHeader("X-Test", "1"), view)
@@ -431,6 +540,11 @@ class TestPendingViewAttributeQueue(TestCase):
 
         Validates that the queued invocation carries everything needed to
         replay it on the rendered response.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.withCookie("session", value="abc")
@@ -445,14 +559,19 @@ class TestPendingViewAttributeQueue(TestCase):
 
         Validates that replay order matches the call order written by the
         developer.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make()
         view.addHeader("X-Order", "first").addHeader("X-Order", "second")
         recorded = [name for name, _, _ in view._mutations]
         self.assertEqual(recorded, ["addHeader", "addHeader"])
 
-class TestPendingViewRender(TestCase):
 
+class TestPendingViewRender(TestCase):
     def _make(
         self,
         html: str = "<p>ok</p>",
@@ -482,6 +601,11 @@ class TestPendingViewRender(TestCase):
 
         Validates that the pending view materialises a framework-native
         response rather than a raw string.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view, _ = self._make()
         self.assertIsInstance(await view.render(), HTMLResponse)
@@ -492,6 +616,11 @@ class TestPendingViewRender(TestCase):
 
         Validates that __await__ delegates to render so controllers can
         simply await the value returned by the factory.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view, _ = self._make(html="<p>awaited</p>")
         response = await view
@@ -503,6 +632,11 @@ class TestPendingViewRender(TestCase):
 
         Validates that no transformation is applied to the rendering
         intent before it reaches the engine.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view, engine = self._make()
         await view.render()
@@ -514,6 +648,11 @@ class TestPendingViewRender(TestCase):
 
         Validates that server-rendered responses are identifiable by
         clients and middleware.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view, _ = self._make()
         response = await view.render()
@@ -525,6 +664,11 @@ class TestPendingViewRender(TestCase):
 
         Validates that chained mutators reach the real response exactly
         as they were written.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view, _ = self._make()
         view.addHeader("X-Order", "first").addHeader("X-Order", "second")
@@ -539,6 +683,11 @@ class TestPendingViewRender(TestCase):
         Render successfully when no response mutator was chained.
 
         Validates the fast path where the mutation queue stays empty.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view, _ = self._make(html="<p>plain</p>")
         response = await view.render()
@@ -550,22 +699,16 @@ class TestPendingViewRender(TestCase):
 
         Validates that a missing template keeps its own exception type
         instead of being wrapped as a render failure.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view, _ = self._make(
             error=ViewTemplateNotFoundException(_MISSING_TEMPLATE),
         )
         with self.assertRaises(ViewTemplateNotFoundException):
-            await view.render()
-
-    async def testRenderWrapsUnexpectedErrors(self) -> None:
-        """
-        Wrap any unexpected engine failure in ViewRenderException.
-
-        Validates that the view layer exposes a single error type for
-        rendering problems.
-        """
-        view, _ = self._make(error=RuntimeError(_ENGINE_FAILURE))
-        with self.assertRaises(ViewRenderException):
             await view.render()
 
     async def testRenderPreservesOriginalCause(self) -> None:
@@ -574,23 +717,17 @@ class TestPendingViewRender(TestCase):
 
         Validates that debugging information is never lost when an error
         is re-raised as ViewRenderException.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         original = RuntimeError(_ENGINE_FAILURE)
         view, _ = self._make(error=original)
         with self.assertRaises(ViewRenderException) as ctx:
             await view.render()
         self.assertIs(ctx.exception.__cause__, original)
-
-    async def testRenderErrorMessageNamesTheTemplate(self) -> None:
-        """
-        Name the failing template in the wrapped error message.
-
-        Validates that the message points developers at the exact view
-        that failed.
-        """
-        view, _ = self._make(error=RuntimeError(_ENGINE_FAILURE))
-        with self.assertRaises(ViewRenderException) as ctx:
-            await view.render()
         self.assertIn("users.index", str(ctx.exception))
 
     async def testRenderStripsClosureQualnameNoise(self) -> None:
@@ -599,36 +736,50 @@ class TestPendingViewRender(TestCase):
 
         Validates that ``<locals>`` fragments leaked by template globals
         never reach the developer-facing message.
+
+        Returns
+        -------
+        None
+            No return value.
         """
-        view, _ = self._make(error=RuntimeError(_QUALNAME_FAILURE))
-        with self.assertRaises(ViewRenderException) as ctx:
-            await view.render()
-        message = str(ctx.exception)
-        self.assertNotIn("<locals>", message)
-        self.assertIn("csrf_field is broken", message)
+        for detail, expected in (
+            (_QUALNAME_FAILURE, "csrf_field is broken"),
+            (
+                "module.outer.<locals>.nested.<locals>.callback failed",
+                "callback failed",
+            ),
+            ("<locals>.handler failed", "handler failed"),
+            ("ñ.módulo.<locals>.func failed", "func failed"),
+            ("x." * 2048 + "plain failure", "x." * 2048 + "plain failure"),
+        ):
+            with self.subTest(detail=detail):
+                view, _ = self._make(error=RuntimeError(detail))
+                with self.assertRaises(ViewRenderException) as ctx:
+                    await view.render()
+                self.assertEqual(
+                    str(ctx.exception),
+                    f"Failed to render view 'users.index': {expected}",
+                )
+
 
 class TestPendingViewSessionFlashing(TestCase):
-
     def setUp(self) -> None:
         """
         Replace the session facade with a controllable double.
 
         Keeps every test isolated from the real container so no booted
         application is required.
+
+        Returns
+        -------
+        None
+            No return value.
         """
-        self._original_facade = pending_module.Session
+        original_facade = pending_module.Session
+        self.addCleanup(setattr, pending_module, "Session", original_facade)
         self._session = _StubSession()
         self._facade = _StubSessionFacade(session=self._session)
         pending_module.Session = self._facade
-
-    def tearDown(self) -> None:
-        """
-        Restore the original session facade after each test.
-
-        Guarantees that module-level state is never leaked to other
-        test cases.
-        """
-        pending_module.Session = self._original_facade
 
     def _make(self) -> PendingView:
         """
@@ -647,6 +798,11 @@ class TestPendingViewSessionFlashing(TestCase):
 
         Validates that plain renders never pay the cost of resolving the
         session service.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._make().render()
         self.assertEqual(self._facade.resolved, 0)
@@ -657,6 +813,11 @@ class TestPendingViewSessionFlashing(TestCase):
 
         Validates that status messages become readable through the
         ``flash()`` template global.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make().withFlash("status", "saved")
         await view.render()
@@ -668,6 +829,11 @@ class TestPendingViewSessionFlashing(TestCase):
 
         Validates that repopulation data merges instead of overwriting
         anything already flashed during the request.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make().withInput({"email": "user@example.com"})
         await view.render()
@@ -679,6 +845,11 @@ class TestPendingViewSessionFlashing(TestCase):
 
         Validates that validation errors merge instead of replacing
         errors flashed earlier in the request.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make().withErrors({"email": "invalid"})
         await view.render()
@@ -690,6 +861,11 @@ class TestPendingViewSessionFlashing(TestCase):
 
         Validates that a single write pass carries the whole queued
         payload instead of resolving the service per key.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view = self._make().withFlash("status", "saved")
         view.withErrors({"email": "invalid"})
@@ -702,6 +878,11 @@ class TestPendingViewSessionFlashing(TestCase):
 
         Validates that routes without the session middleware still
         return a response instead of failing.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self._facade.failure = RuntimeError(_NO_SESSION)
         view = self._make().withFlash("status", "saved")
@@ -713,6 +894,11 @@ class TestPendingViewSessionFlashing(TestCase):
 
         Validates that a failed resolution aborts the write pass instead
         of partially applying it.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self._facade.failure = RuntimeError(_NO_SESSION)
         await self._make().withFlash("status", "saved").render()

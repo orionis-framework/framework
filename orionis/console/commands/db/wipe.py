@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Provide console commands db operations.
 
 Includes ``WipeResult``, ``DatabaseWiper``, ``DbWipeCommand``.
@@ -13,6 +15,7 @@ from orionis.console.commands.db._inspection import DatabaseInspector
 from orionis.console.enums.actions import ArgumentAction
 from orionis.database.contracts.connection_manager import IConnectionManager
 
+
 @dataclass(frozen=True, slots=True)
 class WipeResult:
     """Store counts for objects removed by a database wipe."""
@@ -23,6 +26,7 @@ class WipeResult:
     """Number of database views removed by the wipe operation."""
     types: int
     """Number of user-defined database types removed by the wipe operation."""
+
 
 class DatabaseWiper:
     """Remove user-defined objects from a selected connection."""
@@ -104,7 +108,10 @@ class DatabaseWiper:
             # Oracle DDL commits implicitly and cannot be rolled back as a
             # group. Check type dependencies before the first destructive DDL.
             types = await self._prepareOracleTypes(
-                tables, views, materialized_views, types,
+                tables,
+                views,
+                materialized_views,
+                types,
             )
             await self._dropMaterializedViews(materialized_views)
             # A materialized view built on a pre-existing table leaves that
@@ -234,7 +241,7 @@ class DatabaseWiper:
             else:
                 sql = f"DROP VIEW IF EXISTS {quoted}"
             if cascade:
-                sql += " CASCADE" # NOSONAR
+                sql += " CASCADE"  # NOSONAR
             await self._inspector.connection.statement(sql)
 
     async def _dropTables(
@@ -432,7 +439,7 @@ class DatabaseWiper:
         )
 
     @staticmethod
-    def _dependencyOrder( # NOSONAR
+    def _dependencyOrder(  # NOSONAR
         dependencies: dict[str, set[str]],
         cycle_error: str,
     ) -> list[str]:
@@ -456,9 +463,7 @@ class DatabaseWiper:
             for referenced in referenced_types:
                 if referenced in dependencies:
                     dependent_counts[referenced] += 1
-        ready = sorted(
-            name for name, count in dependent_counts.items() if count == 0
-        )
+        ready = sorted(name for name, count in dependent_counts.items() if count == 0)
         ordered: list[str] = []
         while ready:
             ordered.extend(ready)
@@ -511,10 +516,12 @@ class DatabaseWiper:
             referenced = f"{row['referenced_schema']}.{row['referenced_view']}"
             if referencing in selected and referenced in selected:
                 dependencies[referencing].add(referenced)
-        await self._dropViews(self._dependencyOrder(
-            dependencies,
-            "SQL Server view dependencies contain a cycle.",
-        ))
+        await self._dropViews(
+            self._dependencyOrder(
+                dependencies,
+                "SQL Server view dependencies contain a cycle.",
+            ),
+        )
 
     async def _disableSqlserverTemporalTables(self, tables: list[str]) -> None:
         """
@@ -584,16 +591,16 @@ class DatabaseWiper:
             if name in selected:
                 table = self._inspector.quoteIdentifier(name)
                 constraint = self._inspector.quoteIdentifier(
-                    row["constraint_name"], qualified=False,
+                    row["constraint_name"],
+                    qualified=False,
                 )
                 await self._inspector.connection.statement(
                     f"ALTER TABLE {table} DROP CONSTRAINT {constraint}",
                 )
 
+
 class DbWipeCommand(BaseCommand):
     """Wipe a database connection after confirmation."""
-
-    # ruff: noqa: TC001
 
     signature: str = "db:wipe"
     """Signature identifier: ``db:wipe``."""

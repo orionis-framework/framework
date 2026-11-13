@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from email import policy
 from email.parser import BytesParser
@@ -32,6 +34,7 @@ _MAIL_TEMPLATES = {
     "welcome.txt": "Hello, {{ name }}.\n",
 }
 
+
 def create_mail_views(base_path: Path) -> Path:
     """Create mail templates in a test-owned temporary directory.
 
@@ -56,6 +59,7 @@ def create_mail_views(base_path: Path) -> Path:
     for name, template in _MAIL_TEMPLATES.items():
         (emails / name).write_text(template, encoding="utf-8")
     return view_path
+
 
 class ViewApplication:
     """Expose explicit view configuration without an HTTP request."""
@@ -115,6 +119,7 @@ class ViewApplication:
             "autoescape": True,
         }
 
+
 class MailApplication(ViewApplication):
     """Expose central mail configuration plus a recording dependency resolver."""
 
@@ -170,6 +175,7 @@ class MailApplication(ViewApplication):
         self.resolved.append(contract)
         return contract()
 
+
 class RenderingEngine:
     """Return a controlled render result instead of a real template."""
 
@@ -212,6 +218,7 @@ class RenderingEngine:
             raise self.failure
         return self.rendered
 
+
 class MemoryStorage:
     """Expose memory-backed disks without local paths or public URLs."""
 
@@ -247,6 +254,7 @@ class MemoryStorage:
         """
         self.selected.append(name)
         return self.disks[name or self.default_disk]
+
 
 class RemoteStream:
     """Expose an async stream without any local filesystem handle or path."""
@@ -333,6 +341,7 @@ class RemoteStream:
         if self.close_error:
             error_msg = "Remote close failed."
             raise OSError(error_msg)
+
 
 class RemoteStorage:
     """Serve the real disk/file/stream call shape without a local path."""
@@ -427,6 +436,7 @@ class RemoteStorage:
             raise ValueError(error_msg)
         return self.stream
 
+
 class RecordingDelivery:
     """Capture the declarations a chain hands to the delivery pipeline."""
 
@@ -479,6 +489,7 @@ class RecordingDelivery:
             recipients=envelope.recipients(),
         )
 
+
 class RecordingTransport(IMailTransport):
     """Record only prepared mail; never see templates or logical paths."""
 
@@ -526,6 +537,7 @@ class RecordingTransport(IMailTransport):
             recipients=message.recipients,
         )
 
+
 class RecordingFactory:
     """Exercise the public extension signature and async dependency lookup."""
 
@@ -561,6 +573,7 @@ class RecordingFactory:
         transport = await app.make(RecordingTransport)
         self.transports.append(transport)
         return transport
+
 
 class TestMailComposer(TestCase):
     def setUp(self) -> None:
@@ -732,6 +745,7 @@ class TestMailComposer(TestCase):
             next(parsed.iter_attachments()).get_payload(decode=True),
             b"%PDF-local-fixture",
         )
+
 
 class TestMailComposerStorageAttachments(TestCase):
     def setUp(self) -> None:
@@ -956,6 +970,7 @@ class TestMailComposerStorageAttachments(TestCase):
         with self.assertRaises(asyncio.CancelledError):
             await operation
         self.assertEqual(self.storage.stream.closed, 1)
+
 
 class TestMailComposerGuards(TestCase):
     def setUp(self) -> None:

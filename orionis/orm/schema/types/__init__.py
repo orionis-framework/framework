@@ -113,7 +113,10 @@ _EXPORTS = {
     "StrictChar": ("orionis.orm.schema.types.strict_char", "StrictChar"),
     "StrictClob": ("orionis.orm.schema.types.strict_clob", "StrictClob"),
     "StrictDecimal": ("orionis.orm.schema.types.strict_decimal", "StrictDecimal"),
-    "StrictDoublePrecision": ("orionis.orm.schema.types.strict_double_precision", "StrictDoublePrecision"),
+    "StrictDoublePrecision": (
+        "orionis.orm.schema.types.strict_double_precision",
+        "StrictDoublePrecision",
+    ),
     "StrictInt": ("orionis.orm.schema.types.strict_int", "StrictInt"),
     "StrictJson": ("orionis.orm.schema.types.strict_json", "StrictJson"),
     "StrictNChar": ("orionis.orm.schema.types.strict_nchar", "StrictNChar"),
@@ -121,7 +124,10 @@ _EXPORTS = {
     "StrictReal": ("orionis.orm.schema.types.strict_real", "StrictReal"),
     "StrictSmallInt": ("orionis.orm.schema.types.strict_small_int", "StrictSmallInt"),
     "StrictTimestamp": ("orionis.orm.schema.types.strict_timestamp", "StrictTimestamp"),
-    "StrictVarBinary": ("orionis.orm.schema.types.strict_var_binary", "StrictVarBinary"),
+    "StrictVarBinary": (
+        "orionis.orm.schema.types.strict_var_binary",
+        "StrictVarBinary",
+    ),
     "StrictVarChar": ("orionis.orm.schema.types.strict_varchar", "StrictVarChar"),
     "String": ("orionis.orm.schema.types.string_type", "String"),
     "Text": ("orionis.orm.schema.types.text", "Text"),
@@ -131,6 +137,7 @@ _EXPORTS = {
     "Uuid": ("orionis.orm.schema.types.uuid_type", "Uuid"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -152,6 +159,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

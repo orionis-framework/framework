@@ -1,8 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock
 from orionis.console.commands.support.optimize import OptimizeCommand
 from orionis.test import TestCase
+
 
 class TestOptimizeCommand(TestCase):
     """Verify source validation never persists or executes compiled code."""
@@ -69,13 +72,18 @@ class TestOptimizeCommand(TestCase):
             root = Path(temporary)
             (root / "app.py").write_text("VALUE = 1\n", encoding="utf-8")
             for name in (
-                ".venv", ".git", "build", "dist", "node_modules",
+                ".venv",
+                ".git",
+                "build",
+                "dist",
+                "node_modules",
                 "sample.egg-info",
             ):
                 directory = root / name
                 directory.mkdir()
                 (directory / "broken.py").write_text(
-                    "return 1\n", encoding="utf-8",
+                    "return 1\n",
+                    encoding="utf-8",
                 )
             console = Mock()
 

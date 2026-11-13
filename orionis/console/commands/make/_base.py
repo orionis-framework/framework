@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Create application files from packaged stubs."""
 
 from asyncio import to_thread
@@ -6,7 +8,8 @@ from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.console.templates.stub import Stub
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
+
 
 class MakeStubCommand(BaseCommand):
     """Create application files from packaged stubs."""
@@ -148,7 +151,7 @@ class MakeStubCommand(BaseCommand):
         """
         return ((self.success_label, self.createFile(app, name)),)
 
-    async def handle(self, app: IApplication) -> None:
+    async def handle(self, app: IApplication) -> int | None:
         """
         Create configured files without blocking the running event loop.
 
@@ -159,8 +162,8 @@ class MakeStubCommand(BaseCommand):
 
         Returns
         -------
-        None
-            Write success or error details to the command output.
+        int or None
+            Return 1 after reporting a generation error, or None on success.
         """
         self.newLine()
         try:
@@ -174,6 +177,7 @@ class MakeStubCommand(BaseCommand):
                 self.success(f"{label} [{file_path}] created successfully.")
         except (OSError, TypeError, ValueError) as error:
             self.error(error)
+            return 1
         finally:
             self.newLine()
-
+        return None

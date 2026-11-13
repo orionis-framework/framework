@@ -1,3 +1,5 @@
+# ruff: noqa: N815, SLF001
+# Keep established public and external protocol names and signatures.
 """Adapt pydoctor's source model to the Python syntax used by Orionis."""
 
 from __future__ import annotations
@@ -6,12 +8,13 @@ from collections import defaultdict
 from functools import cache
 from typing import TYPE_CHECKING
 from urllib.parse import quote
-from docutils import nodes # pyright: ignore[reportMissingModuleSource]
+from docutils import nodes  # pyright: ignore[reportMissingModuleSource]
 from pydoctor import astbuilder, astutils, epydoc2stan, model
 
 if TYPE_CHECKING:
-    from pydoctor.epydoc.markup import ParsedDocstring # pyright: ignore[reportMissingImports]
-    from pydoctor.options import Options # pyright: ignore[reportMissingImports]
+    from pydoctor.epydoc.markup import ParsedDocstring  # pyright: ignore[reportMissingImports]
+    from pydoctor.options import Options  # pyright: ignore[reportMissingImports]
+
 
 class _PortableUrls:
     """Resolve documentation links without case-sensitive filename collisions."""
@@ -32,6 +35,7 @@ class _PortableUrls:
         if page is self:
             return page_url
         return f"{page_url}#{quote(self.name)}"
+
 
 def _stabilize_toc(parsed: ParsedDocstring, depth: int) -> None:
     """Keep repeated sidebar rendering from creating dangling section backlinks.
@@ -75,6 +79,7 @@ def _stabilize_toc(parsed: ParsedDocstring, depth: int) -> None:
     parsed.get_toc = get_toc
     get_toc(depth)
 
+
 def _copy_syntax[T](value: T) -> T:
     """Copy syntax fields without copying pydoctor's parent-reference graphs.
 
@@ -89,13 +94,14 @@ def _copy_syntax[T](value: T) -> T:
         Independent syntax data with source locations preserved.
     """
     if isinstance(value, ast.AST):
-        copied = type(value)(**{
-            name: _copy_syntax(field) for name, field in ast.iter_fields(value)
-        })
+        copied = type(value)(
+            **{name: _copy_syntax(field) for name, field in ast.iter_fields(value)},
+        )
         return ast.copy_location(copied, value)
     if isinstance(value, list):
         return [_copy_syntax(item) for item in value]
     return value
+
 
 class _TypeAliasNormalizer(ast.NodeTransformer):
     """Expose PEP 695 aliases to pydoctor's existing type-alias processor."""
@@ -127,9 +133,10 @@ class _TypeAliasNormalizer(ast.NodeTransformer):
             node,
         )
 
-    visit_TypeAlias = visitTypeAlias  # noqa: N815 - ast.NodeVisitor protocol
+    visit_TypeAlias = visitTypeAlias  # ast.NodeVisitor protocol
 
-class _AnnotationParser(astutils._AnnotationStringParser):  # noqa: SLF001
+
+class _AnnotationParser(astutils._AnnotationStringParser):
     """Preserve literal validation metadata while resolving forward references."""
 
     def visitSubscript(self, node: ast.Subscript) -> ast.Subscript:
@@ -154,7 +161,8 @@ class _AnnotationParser(astutils._AnnotationStringParser):  # noqa: SLF001
             return annotation
         return super().visit_Subscript(node)
 
-    visit_Subscript = visitSubscript  # noqa: N815 - ast.NodeVisitor protocol
+    visit_Subscript = visitSubscript  # ast.NodeVisitor protocol
+
 
 class _ModuleVisitor(astbuilder.ModuleVistor):
     """Build attribute documentation without interpreting metadata as type names."""
@@ -193,12 +201,18 @@ class _ModuleVisitor(astbuilder.ModuleVistor):
                 # value is a single imported name, such as HttpResponse = Response.
                 if isinstance(current, model.Module):
                     self._handleModuleVar(
-                        node.target.id, annotation, node.value, node.lineno,
+                        node.target.id,
+                        annotation,
+                        node.value,
+                        node.lineno,
                         augassign=None,
                     )
                 elif isinstance(current, model.Class):
                     self._handleClassVar(
-                        node.target.id, annotation, node.value, node.lineno,
+                        node.target.id,
+                        annotation,
+                        node.value,
+                        node.lineno,
                         augassign=None,
                     )
             else:
@@ -207,7 +221,8 @@ class _ModuleVisitor(astbuilder.ModuleVistor):
             return
         self._handleAssignmentDoc(node, node.target)
 
-    visit_AnnAssign = visitAnnAssign  # noqa: N815 - ast.NodeVisitor protocol
+    visit_AnnAssign = visitAnnAssign  # ast.NodeVisitor protocol
+
 
 class _ASTBuilder(astbuilder.ASTBuilder):
     """Normalize documentation trees without modifying framework runtime code."""
@@ -234,10 +249,11 @@ class _ASTBuilder(astbuilder.ASTBuilder):
         astutils.Parentage().visit(normalized)
         super().processModuleAST(normalized, mod)
 
+
 class DocumentationSystem(model.System):
     """Document Orionis with support for its type aliases and schema metadata."""
 
-    defaultBuilder = _ASTBuilder  # noqa: N815 - pydoctor System protocol
+    defaultBuilder = _ASTBuilder  # pydoctor System protocol
 
     def __init__(self, options: Options | None = None) -> None:
         """Initialize a model with portable URLs for every documentable kind.
@@ -271,9 +287,13 @@ class DocumentationSystem(model.System):
                 groups[obj.url.casefold()].append(obj)
         used = set(groups)
         for group in groups.values():
-            ordered = sorted(group, key=lambda obj: (
-                isinstance(obj, model.Module), obj.fullName(),
-            ))
+            ordered = sorted(
+                group,
+                key=lambda obj: (
+                    isinstance(obj, model.Module),
+                    obj.fullName(),
+                ),
+            )
             for obj in ordered[1:]:
                 stem = obj.url.removesuffix(".html")
                 kind = obj.kind.name.lower()
@@ -285,7 +305,7 @@ class DocumentationSystem(model.System):
                 used.add(candidate.casefold())
                 self.pageUrls[obj.fullName()] = candidate
 
-    def postProcess(self) -> None: # NOSONAR
+    def postProcess(self) -> None:  # NOSONAR
         """Recognize NumPy attribute descriptions in documentation coverage.
 
         Returns
@@ -320,7 +340,10 @@ class DocumentationSystem(model.System):
                         )
                     tags = {field.tag() for field in obj.parsed_docstring.fields}
                     if tags & {"yield", "yields"} and not tags & {
-                        "return", "returns", "rtype", "returntype",
+                        "return",
+                        "returns",
+                        "rtype",
+                        "returntype",
                     }:
                         # NumPy generators document their output with Yields.
                         # Keep the iterator annotation in obj.signature while

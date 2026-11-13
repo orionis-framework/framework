@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use explicit process arguments or locally constructed execution fixtures.
 import base64
 import hashlib
 import json
@@ -95,6 +98,7 @@ class TestBootstrapConfigCli(unittest.TestCase):
                 "size": len(content),
                 "sha": hashlib.sha1(
                     f"blob {len(content)}\0".encode() + content,
+                    usedforsecurity=False,
                 ).hexdigest(),
             }
             for path, content in files.items()
@@ -106,10 +110,16 @@ class TestBootstrapConfigCli(unittest.TestCase):
         responses[_TREE_URL] = base64.b64encode(
             json.dumps({"truncated": False, "tree": entries}).encode(),
         ).decode("ascii")
-        return subprocess.run(  # noqa: S603
+        return subprocess.run(
             [
-                sys.executable, "-B", "-c", _DRIVER,
-                entry, str(self.reactor), json.dumps(responses), *arguments,
+                sys.executable,
+                "-B",
+                "-c",
+                _DRIVER,
+                entry,
+                str(self.reactor),
+                json.dumps(responses),
+                *arguments,
             ],
             cwd=self.root,
             env={
@@ -173,9 +183,8 @@ class TestBootstrapConfigCli(unittest.TestCase):
 
         self.assertEqual(repeated.returncode, 0, repeated.stdout + repeated.stderr)
         self.assertIn("EXISTS", repeated.stdout)
-        self.assertEqual(
-            (destination.read_bytes(), destination.stat().st_mtime_ns), original,
-        )
+        current = destination.read_bytes(), destination.stat().st_mtime_ns
+        self.assertEqual(current, original)
         self.assertFalse((self.root / "config" / "mail.py").exists())
 
     def testUnknownFileReportsCurrentRemoteOptionsWithoutWrites(self) -> None:

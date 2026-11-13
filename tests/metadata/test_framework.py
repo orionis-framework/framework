@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import re
 import sys
 import tomllib
@@ -36,6 +38,7 @@ _EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 # Accepted shape for a module level constant name.
 _CONSTANT_NAME_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
+
 def public_names() -> set[str]:
     """
     Collect the public attribute names declared by the metadata module.
@@ -47,6 +50,7 @@ def public_names() -> set[str]:
         with an underscore.
     """
     return {name for name in vars(framework) if not name.startswith("_")}
+
 
 def read_project_table() -> dict[str, Any]:
     """
@@ -60,6 +64,7 @@ def read_project_table() -> dict[str, Any]:
     with _PYPROJECT.open("rb") as handle:
         return tomllib.load(handle)["project"]
 
+
 class TestFrameworkModuleSurface(TestCase):
     """Structural guarantees of the metadata module."""
 
@@ -69,10 +74,6 @@ class TestFrameworkModuleSurface(TestCase):
         Validates that no helper, import or intermediate value leaks into
         the public namespace of the module.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(public_names(), set(_PUBLIC_CONSTANTS))
 
@@ -81,10 +82,6 @@ class TestFrameworkModuleSurface(TestCase):
 
         Validates that the module keeps a constants-only surface.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         for name in public_names():
             self.assertRegex(name, _CONSTANT_NAME_PATTERN)
@@ -94,10 +91,6 @@ class TestFrameworkModuleSurface(TestCase):
 
         Validates that a consumer cannot mutate shared metadata in place.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         for name in _PUBLIC_CONSTANTS:
             value = getattr(framework, name)
@@ -109,13 +102,10 @@ class TestFrameworkModuleSurface(TestCase):
         Validates that no placeholder is shipped as an empty string or an
         empty tuple.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         for name in _PUBLIC_CONSTANTS:
             self.assertGreater(len(getattr(framework, name)), 0, msg=name)
+
 
 class TestFrameworkIdentity(TestCase):
     """Distribution name and short description."""
@@ -125,36 +115,14 @@ class TestFrameworkIdentity(TestCase):
 
         Validates the name used by package indexes and by the API URL.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(framework.NAME, "orionis")
-
-    def testNameIsANormalisedImportableIdentifier(self) -> None:
-        """Keep the distribution name normalised and importable.
-
-        Validates that the name is trimmed, lowercase and usable as a
-        Python identifier.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(framework.NAME, framework.NAME.strip().lower())
-        self.assertTrue(framework.NAME.isidentifier())
 
     def testDescriptionMentionsTheFrameworkName(self) -> None:
         """Reference the framework name inside the short description.
 
         Validates that the summary identifies the project it describes.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertIn("Orionis", framework.DESCRIPTION)
 
@@ -164,10 +132,6 @@ class TestFrameworkIdentity(TestCase):
         Validates the shape required by package indexes, which render the
         summary as one line.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(framework.DESCRIPTION, framework.DESCRIPTION.strip())
         self.assertNotIn("\n", framework.DESCRIPTION)
@@ -177,12 +141,9 @@ class TestFrameworkIdentity(TestCase):
 
         Validates that the summary is not degraded to a placeholder.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertGreater(len(framework.DESCRIPTION), 20)
+
 
 class TestFrameworkVersion(TestCase):
     """Released version string."""
@@ -192,10 +153,6 @@ class TestFrameworkVersion(TestCase):
 
         Validates the release shape consumed by packaging tools.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertRegex(framework.VERSION, _VERSION_PATTERN)
 
@@ -204,10 +161,6 @@ class TestFrameworkVersion(TestCase):
 
         Validates that segments such as ``01`` never reach a release.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         for segment in framework.VERSION.split("."):
             self.assertEqual(segment, str(int(segment)), msg=segment)
@@ -218,10 +171,6 @@ class TestFrameworkVersion(TestCase):
         Validates that release tooling can compare two published
         versions.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         parsed = tuple(int(segment) for segment in framework.VERSION.split("."))
         self.assertGreater(parsed, (0, 0, 0))
@@ -231,12 +180,9 @@ class TestFrameworkVersion(TestCase):
 
         Validates that the value can be embedded verbatim in output.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(framework.VERSION, framework.VERSION.strip())
+
 
 class TestFrameworkAuthor(TestCase):
     """Maintainer contact details."""
@@ -246,10 +192,6 @@ class TestFrameworkAuthor(TestCase):
 
         Validates that the value is a person name and not a placeholder.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertGreaterEqual(len(framework.AUTHOR.split()), 2)
 
@@ -258,10 +200,6 @@ class TestFrameworkAuthor(TestCase):
 
         Validates that the value can be embedded verbatim in output.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(framework.AUTHOR, framework.AUTHOR.strip())
 
@@ -271,24 +209,9 @@ class TestFrameworkAuthor(TestCase):
         Validates the ``local@domain.tld`` shape expected by package
         indexes.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertRegex(framework.AUTHOR_EMAIL, _EMAIL_PATTERN)
 
-    def testAuthorEmailHasASingleAtSeparator(self) -> None:
-        """Separate local part and domain with exactly one at sign.
-
-        Validates that the address cannot be split ambiguously.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(framework.AUTHOR_EMAIL.count("@"), 1)
 
 class TestFrameworkUrls(TestCase):
     """Absolute URLs advertised by the framework."""
@@ -298,10 +221,6 @@ class TestFrameworkUrls(TestCase):
 
         Validates that no documented resource is served over plain HTTP.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         for name in _URL_CONSTANTS:
             parsed = urlparse(getattr(framework, name))
@@ -312,10 +231,6 @@ class TestFrameworkUrls(TestCase):
 
         Validates that the network location carries a domain separator.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         for name in _URL_CONSTANTS:
             parsed = urlparse(getattr(framework, name))
@@ -327,10 +242,6 @@ class TestFrameworkUrls(TestCase):
         Validates that the values can be embedded verbatim in rendered
         output without escaping.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         for name in _URL_CONSTANTS:
             value = getattr(framework, name)
@@ -342,10 +253,6 @@ class TestFrameworkUrls(TestCase):
 
         Validates that no constant was copied over another by mistake.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         urls = [getattr(framework, name) for name in _URL_CONSTANTS]
         self.assertEqual(len(set(urls)), len(urls))
@@ -355,10 +262,6 @@ class TestFrameworkUrls(TestCase):
 
         Validates the framework and skeleton repository locations.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         for name in ("FRAMEWORK", "SKELETON"):
             self.assertIn("orionis", getattr(framework, name).lower(), msg=name)
@@ -369,15 +272,12 @@ class TestFrameworkUrls(TestCase):
         Validates that renaming the distribution without updating the
         endpoint is reported as a failure.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(
             framework.API,
             f"https://pypi.org/pypi/{framework.NAME}/json",
         )
+
 
 class TestFrameworkPythonRequires(TestCase):
     """Minimum interpreter version required by the framework."""
@@ -388,10 +288,6 @@ class TestFrameworkPythonRequires(TestCase):
         Validates the element type required to compare the value against
         ``sys.version_info``.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertIsInstance(framework.PYTHON_REQUIRES, tuple)
         for part in framework.PYTHON_REQUIRES:
@@ -403,10 +299,6 @@ class TestFrameworkPythonRequires(TestCase):
         Validates the shape consumed by the ``about`` and ``serve``
         commands, which index the first two positions of the tuple.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(len(framework.PYTHON_REQUIRES), 2)
 
@@ -416,10 +308,6 @@ class TestFrameworkPythonRequires(TestCase):
         Validates the guard used by ``Application`` to reject unsupported
         interpreters.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertIsInstance(sys.version_info >= framework.PYTHON_REQUIRES, bool)
 
@@ -429,10 +317,6 @@ class TestFrameworkPythonRequires(TestCase):
         Validates that the declared floor is not above the interpreter
         the framework is actually tested with.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         segments = sys.version_info[: len(framework.PYTHON_REQUIRES)]
         self.assertGreaterEqual(segments, framework.PYTHON_REQUIRES)
@@ -443,12 +327,9 @@ class TestFrameworkPythonRequires(TestCase):
         Validates that the floor stays at Python 3.14, the version whose
         PEP 649 support the schema metaclass depends on.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(framework.PYTHON_REQUIRES, (3, 14))
+
 
 class TestFrameworkProjectManifest(TestCase):
     """Consistency between the metadata module and ``pyproject.toml``."""
@@ -461,10 +342,6 @@ class TestFrameworkProjectManifest(TestCase):
         The manifest is absent when the package is installed from a built
         distribution, in which case every test of the class is skipped.
 
-        Returns
-        -------
-        None
-            Completes the operation described above.
         """
         if not _PYPROJECT.is_file():
             self.skipTest("pyproject.toml is not available in this installation")
@@ -475,21 +352,11 @@ class TestFrameworkProjectManifest(TestCase):
 
         Validates that a release bump updates both declarations.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(self.project["version"], framework.VERSION)
 
     def testDevelopmentStatusIsProductionStable(self) -> None:
-        """Advertise a single stable production status.
-
-        Returns
-        -------
-        None
-            Assertions verify the package's release classification.
-        """
+        """Advertise a single stable production status."""
         status_classifiers = [
             classifier
             for classifier in self.project["classifiers"]
@@ -506,10 +373,6 @@ class TestFrameworkProjectManifest(TestCase):
         Validates that the packaged distribution and the runtime metadata
         never drift apart.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(self.project["name"], framework.NAME)
         self.assertEqual(self.project["description"], framework.DESCRIPTION)
@@ -519,10 +382,6 @@ class TestFrameworkProjectManifest(TestCase):
 
         Validates the author entry rendered by package indexes.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         author = self.project["authors"][0]
         self.assertEqual(author["name"], framework.AUTHOR)
@@ -534,10 +393,6 @@ class TestFrameworkProjectManifest(TestCase):
         Validates that installers and the runtime guard agree on the
         minimum supported interpreter.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         expected = ">=" + ".".join(str(part) for part in framework.PYTHON_REQUIRES)
         self.assertEqual(self.project["requires-python"], expected)
@@ -547,10 +402,6 @@ class TestFrameworkProjectManifest(TestCase):
 
         Validates the ``[project.urls]`` entries against the constants.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         urls = self.project["urls"]
         self.assertEqual(urls["Homepage"], framework.FRAMEWORK)

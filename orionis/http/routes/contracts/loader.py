@@ -3,6 +3,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
+
 class IRouteLoader(ABC):
     """Define the contract for route loader implementations."""
 

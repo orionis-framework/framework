@@ -7,6 +7,7 @@ from orionis.support.patterns.final.meta import Final
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+
 class QueryParams(metaclass=Final):
     """Parse query-string pairs while preserving repeated parameter values."""
 

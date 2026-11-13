@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string contains only alphabetic characters."""
 
 import unicodedata
@@ -7,6 +9,7 @@ from orionis.schemas.rule import Rule
 _LETTER_CATEGORIES: frozenset[str] = frozenset({"L", "M"})
 """Unicode general category prefixes accepted as alphabetic content."""
 
+
 class Alpha(Rule):
     """
     Ensure a string contains only alphabetic characters.
@@ -14,8 +17,6 @@ class Alpha(Rule):
     By default every Unicode letter and combining mark is accepted. Set
     ``ascii_only`` to restrict the value to the ``a-z`` and ``A-Z`` ranges.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_ascii_only",)
     """Declare the instance attribute slots reserved by this class."""
@@ -44,7 +45,7 @@ class Alpha(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
         """
         super().__init__(message=message)
         self._ascii_only: bool = ascii_only

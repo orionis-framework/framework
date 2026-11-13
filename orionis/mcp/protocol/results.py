@@ -1,3 +1,5 @@
+# ruff: noqa: N815
+# Protocol fields retain the official MCP property names.
 """Provide mcp protocol operations.
 
 Includes ``Error``, ``ErrorResponse``, ``ResultResponse``, ``Notification``.
@@ -6,8 +8,6 @@ Includes ``Error``, ``ErrorResponse``, ``ResultResponse``, ``Notification``.
 from typing import Literal
 import msgspec
 
-# Protocol fields retain the official MCP property names.
-# ruff: noqa: N815
 
 class Error(msgspec.Struct, frozen=True, kw_only=True):
     """A safe protocol error."""
@@ -18,6 +18,7 @@ class Error(msgspec.Struct, frozen=True, kw_only=True):
     """Human-readable message associated with this operation or result."""
     data: object = msgspec.UNSET
 
+
 class ErrorResponse(msgspec.Struct, frozen=True, kw_only=True):
     """An unidentifiable malformed request has an omitted ID."""
 
@@ -26,6 +27,7 @@ class ErrorResponse(msgspec.Struct, frozen=True, kw_only=True):
     id: str | int | msgspec.UnsetType = msgspec.UNSET
     jsonrpc: Literal["2.0"] = "2.0"
     """Jsonrpc identifier: ``2.0``."""
+
 
 class ResultResponse(msgspec.Struct, frozen=True, kw_only=True):
     """A response correlated with one client request."""
@@ -37,6 +39,7 @@ class ResultResponse(msgspec.Struct, frozen=True, kw_only=True):
     jsonrpc: Literal["2.0"] = "2.0"
     """Jsonrpc identifier: ``2.0``."""
 
+
 class Notification(msgspec.Struct, frozen=True, kw_only=True):
     """A server notification with no request ID."""
 
@@ -46,6 +49,7 @@ class Notification(msgspec.Struct, frozen=True, kw_only=True):
     """Parameters carried by the JSON-RPC message."""
     jsonrpc: Literal["2.0"] = "2.0"
     """Jsonrpc identifier: ``2.0``."""
+
 
 class InputRequiredResult(msgspec.Struct, frozen=True, kw_only=True):
     """An MRTR interim result, never a pushed JSON-RPC request."""
@@ -57,6 +61,7 @@ class InputRequiredResult(msgspec.Struct, frozen=True, kw_only=True):
     resultType: Literal["input_required"] = "input_required"
     """Result type identifier: ``input_required``."""
 
+
 class CompleteResult(msgspec.Struct, frozen=True, kw_only=True):
     """Common fields of completed server results."""
 
@@ -65,6 +70,7 @@ class CompleteResult(msgspec.Struct, frozen=True, kw_only=True):
     resultType: Literal["complete"] = "complete"
     """Result type identifier: ``complete``."""
 
+
 class CacheableResult(CompleteResult, kw_only=True, frozen=True):
     """Required, conservative client cache hints."""
 
@@ -72,6 +78,7 @@ class CacheableResult(CompleteResult, kw_only=True, frozen=True):
     """Ttl ms value used by ``CacheableResult``."""
     cacheScope: Literal["private", "public"] = "private"
     """Cache scope identifier: ``private``."""
+
 
 class DiscoverResult(CacheableResult, kw_only=True, frozen=True):
     """Self-contained server discovery."""
@@ -82,12 +89,14 @@ class DiscoverResult(CacheableResult, kw_only=True, frozen=True):
     """Capabilities advertised by the compiled server."""
     instructions: str | msgspec.UnsetType = msgspec.UNSET
 
+
 class ListToolsResult(CacheableResult, kw_only=True, frozen=True):
     """One deterministic tool catalog page."""
 
     tools: tuple[object, ...]
     """Tool declarations available through this server or catalog."""
     nextCursor: str | msgspec.UnsetType = msgspec.UNSET
+
 
 class ListResourcesResult(CacheableResult, kw_only=True, frozen=True):
     """One deterministic resource page."""
@@ -96,6 +105,7 @@ class ListResourcesResult(CacheableResult, kw_only=True, frozen=True):
     """Resource declarations available through this server."""
     nextCursor: str | msgspec.UnsetType = msgspec.UNSET
 
+
 class ListResourceTemplatesResult(CacheableResult, kw_only=True, frozen=True):
     """One deterministic template page."""
 
@@ -103,12 +113,14 @@ class ListResourceTemplatesResult(CacheableResult, kw_only=True, frozen=True):
     """Parameterized resource templates advertised by the server."""
     nextCursor: str | msgspec.UnsetType = msgspec.UNSET
 
+
 class ListPromptsResult(CacheableResult, kw_only=True, frozen=True):
     """One deterministic prompt page."""
 
     prompts: tuple[object, ...]
     """Prompt declarations available through this server."""
     nextCursor: str | msgspec.UnsetType = msgspec.UNSET
+
 
 class CallToolResult(CompleteResult, kw_only=True, frozen=True):
     """Content with optional structured output of any JSON type."""
@@ -118,11 +130,13 @@ class CallToolResult(CompleteResult, kw_only=True, frozen=True):
     structuredContent: object = msgspec.UNSET
     isError: bool | msgspec.UnsetType = msgspec.UNSET
 
+
 class ReadResourceResult(CacheableResult, kw_only=True, frozen=True):
     """Text or blob resource contents."""
 
     contents: tuple[object, ...]
     """Resource content items returned by the read operation."""
+
 
 class GetPromptResult(CompleteResult, kw_only=True, frozen=True):
     """User and assistant prompt messages."""
@@ -131,6 +145,7 @@ class GetPromptResult(CompleteResult, kw_only=True, frozen=True):
     """Ordered messages supplied to or returned by the operation."""
     description: str | msgspec.UnsetType = msgspec.UNSET
 
+
 class Completion(msgspec.Struct, frozen=True, kw_only=True):
     """At most one hundred completion values."""
 
@@ -138,6 +153,7 @@ class Completion(msgspec.Struct, frozen=True, kw_only=True):
     """Candidate values returned by the completion operation."""
     total: int | msgspec.UnsetType = msgspec.UNSET
     hasMore: bool | msgspec.UnsetType = msgspec.UNSET
+
 
 class CompleteCompletionResult(CompleteResult, kw_only=True, frozen=True):
     """A completion response."""

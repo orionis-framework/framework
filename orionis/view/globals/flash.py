@@ -1,15 +1,20 @@
+# ruff: noqa: ANN401, BLE001, TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
+# Preserve heterogeneous template payload values.
+# Observe optional service failures centrally before returning a fallback.
 """Provide view globals operations through ``_global_flash``."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from collections.abc import Awaitable, Callable
+from typing import Any
+
+from orionis.foundation.contracts.application import IApplication
 from orionis.session.contracts.session import ISession
+from orionis.view._failures import capture_service_failure
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
 
-# ruff: noqa: ANN401, BLE001
-
-def _global_flash(app: IApplication) -> Any:
+def _global_flash(app: IApplication) -> Callable[..., Awaitable[Any]]:
     """
     Build the async ``flash`` template global.
 
@@ -20,9 +25,10 @@ def _global_flash(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that reads one-request status messages.
     """
+
     async def flash(key: str, default: Any = None) -> Any:
         """
         Return a status message flashed with ``withFlash()``.
@@ -46,7 +52,6 @@ def _global_flash(app: IApplication) -> Any:
         try:
             session: ISession = await app.make(ISession)
         except Exception as error:
-            from orionis.view._failures import capture_service_failure  # noqa: PLC0415
             await capture_service_failure(error, ISession, app=app)
             return default
 

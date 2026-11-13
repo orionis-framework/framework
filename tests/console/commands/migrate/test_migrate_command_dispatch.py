@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import io
 from contextlib import redirect_stdout
 from orionis.console.commands.migrate.fresh import MigrateFreshCommand
@@ -6,6 +8,7 @@ from orionis.console.commands.migrate.reset import MigrateResetCommand
 from orionis.console.commands.migrate.status import MigrateStatusCommand
 from orionis.database.migrations.events import MigrationEvents
 from orionis.test import TestCase
+
 
 class _RecordingMigrator:
     """Record migration service calls and return configured results."""
@@ -120,6 +123,7 @@ class _RecordingMigrator:
         self.calls.append(("status", connection, None))
         return self.status_result
 
+
 class _RecordingSeederRunner:
     """Record seeder service calls."""
 
@@ -158,6 +162,7 @@ class _RecordingSeederRunner:
         self.calls.append((connection, events))
         return ["insert_reports"]
 
+
 class _CountingMigrateCommand(MigrateCommand):
     """Count reads of the command's selected database connection."""
 
@@ -184,6 +189,7 @@ class _CountingMigrateCommand(MigrateCommand):
         """
         self.target_calls += 1
         return super().targetConnection()
+
 
 class TestMigrationCommandDispatch(TestCase):
     """Check the command contract with the migration services."""

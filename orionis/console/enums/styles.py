@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class ANSIColors(Enum):
     """
     Define ANSI escape codes for styling terminal text and backgrounds.

@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     import unittest
     from orionis.test.entities.result import TestResult
 
+
 class ITestingEngine(ABC):
     """Define the contract for testing engine implementations."""
 
@@ -46,12 +47,13 @@ class ITestingEngine(ABC):
     @abstractmethod
     def setStartDir(self, start_dir: str) -> Self:
         """
-        Set the start directory for test discovery.
+        Set the directory or Python file used for test discovery.
 
         Parameters
         ----------
         start_dir : str
-            Directory to start test discovery from.
+            Directory or Python file, relative to the application root when
+            not absolute.
 
         Returns
         -------

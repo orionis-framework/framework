@@ -1,7 +1,9 @@
+# ruff: noqa: ARG002
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 from orionis.http import BaseMiddleware, NextCallable, Request, Response
 
-class GlobalMiddleware(BaseMiddleware):
 
+class GlobalMiddleware(BaseMiddleware):
     __slots__ = ()
 
     async def handle(

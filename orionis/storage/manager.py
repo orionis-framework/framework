@@ -1,7 +1,10 @@
+# ruff: noqa: PLC0415, TC001, TC003
+# Keep extension annotations available while optional driver imports remain lazy.
 """Coordinate disk resolution for the storage component."""
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING
+from threading import RLock
 from orionis.foundation.config.filesystems.entitites.filesystems import Filesystems
 from orionis.foundation.contracts.application import IApplication
 from orionis.storage.contracts.manager import IStorageManager
@@ -11,15 +14,13 @@ from orionis.storage.exceptions import (
     DriverNotSupportedException,
 )
 from orionis.storage.uploaded_file import UploadedFile
+from orionis.http.payload.contracts.uploaded_file import (
+    IUploadedFile as IHttpUploadedFile,
+)
+from orionis.storage.contracts.disk import IDisk
+from orionis.storage.contracts.driver import IStorageDriver
+from orionis.storage.contracts.uploaded_file import IUploadedFile
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.http.payload.contracts.uploaded_file import (
-        IUploadedFile as IHttpUploadedFile,
-    )
-    from orionis.storage.contracts.disk import IDisk
-    from orionis.storage.contracts.driver import IStorageDriver
-    from orionis.storage.contracts.uploaded_file import IUploadedFile
 
 class StorageManager(IStorageManager):
     """
@@ -32,9 +33,15 @@ class StorageManager(IStorageManager):
     each disk.
     """
 
-    # ruff: noqa: PLC0415, TC001
-
-    __slots__ = ("_app", "_base_path", "_config", "_custom", "_default", "_disks")
+    __slots__ = (
+        "_app",
+        "_base_path",
+        "_config",
+        "_custom",
+        "_default",
+        "_disks",
+        "_lock",
+    )
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication) -> None:
@@ -50,7 +57,7 @@ class StorageManager(IStorageManager):
         Returns
         -------
         None
-            Initialize the manager and resolve the active configuration.
+            No return value.
         """
         self._app = app
         """Application container used to read the configuration and the base path."""
@@ -60,9 +67,7 @@ class StorageManager(IStorageManager):
         # Normalize the raw configuration into the validated entity.
         config_data = app.config("filesystems")
         self._config: Filesystems = (
-            Filesystems(**config_data)
-            if isinstance(config_data, dict)
-            else config_data
+            Filesystems(**config_data) if isinstance(config_data, dict) else config_data
         )
         """Validated configuration used to construct and operate the service."""
 
@@ -72,6 +77,8 @@ class StorageManager(IStorageManager):
         """Storage disks cached after their first resolution."""
         self._custom: dict[str, Callable[[object], IStorageDriver]] = {}
         """Custom implementations registered by the application."""
+        self._lock = RLock()
+        """Serialize disk publication while allowing nested synchronous factories."""
 
     # ── Disk resolution ──────────────────────────────────────────────────────
 
@@ -79,7 +86,9 @@ class StorageManager(IStorageManager):
         """
         Resolve the disk registered under *name*.
 
-        The disk is built on first access and cached for reuse.
+        Build and publish a single disk on first access, including concurrent
+        calls. A synchronous custom factory may resolve another configured disk.
+        Subsequent calls reuse the published instance without taking the lock.
 
         Parameters
         ----------
@@ -104,9 +113,12 @@ class StorageManager(IStorageManager):
         if cached is not None:
             return cached
 
-        built = Disk(name=resolved, driver=self.__buildDriver(resolved))
-        self._disks[resolved] = built
-        return built
+        with self._lock:
+            cached = self._disks.get(resolved)
+            if cached is None:
+                cached = Disk(name=resolved, driver=self.__buildDriver(resolved))
+                self._disks[resolved] = cached
+        return cached
 
     def default(self) -> IDisk:
         """
@@ -148,12 +160,12 @@ class StorageManager(IStorageManager):
         Returns
         -------
         None
-            Register a custom driver factory under *driver*.
+            No return value.
         """
-        self._custom[driver] = factory
-
-        # Invalidate cached disks so they rebuild with the new factory.
-        self._disks.clear()
+        with self._lock:
+            self._custom[driver] = factory
+            # Invalidate cached disks so they rebuild with the new factory.
+            self._disks.clear()
 
     def uploaded(self, source: IHttpUploadedFile) -> IUploadedFile:
         """
@@ -195,8 +207,7 @@ class StorageManager(IStorageManager):
         config = getattr(self._config.disks, name, None)
         if config is None:
             error_msg = (
-                f"Disk [{name}] is not defined in the filesystems "
-                "configuration."
+                f"Disk [{name}] is not defined in the filesystems configuration."
             )
             raise DiskNotFoundException(error_msg)
         return config
@@ -234,8 +245,8 @@ class StorageManager(IStorageManager):
             return self.__buildLocalDriver(config)
 
         if driver_name == "memory":
-
             from orionis.storage.drivers.memory import MemoryStorageDriver
+
             return MemoryStorageDriver(
                 base_url=getattr(config, "url", None),
             )
@@ -244,18 +255,18 @@ class StorageManager(IStorageManager):
         # a missing package surfaces on first operation with install
         # instructions (see each driver's docstring).
         if driver_name in ("aws", "s3"):
-
             from orionis.storage.drivers.s3 import S3StorageDriver
+
             return S3StorageDriver(config)
 
         if driver_name == "azure":
-
             from orionis.storage.drivers.azure import AzureStorageDriver
+
             return AzureStorageDriver(config)
 
         if driver_name in ("gcs", "google"):
-
             from orionis.storage.drivers.gcs import GoogleStorageDriver
+
             return GoogleStorageDriver(config)
 
         error_msg = (

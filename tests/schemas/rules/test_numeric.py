@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from decimal import Decimal
 from types import SimpleNamespace
 from orionis.schemas.rules.between import Between
@@ -12,8 +15,8 @@ from orionis.test import TestCase
 # Shared owner instance for rules that never inspect sibling fields.
 _OWNER = object()
 
-class TestBetween(TestCase):
 
+class TestBetween(TestCase):
     async def testNumbersAreComparedByMagnitude(self) -> None:
         """Return True when a number falls inside the inclusive range.
 
@@ -22,7 +25,7 @@ class TestBetween(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Between(1, 10)
         for value in (1, 5, 10, 2.5):
@@ -36,7 +39,7 @@ class TestBetween(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Between(1, 10)
         self.assertFalse(await rule.enforce("qty", 0, _OWNER))
@@ -50,7 +53,7 @@ class TestBetween(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Between(2, 4)
         self.assertTrue(await rule.enforce("tag", "abc", _OWNER))
@@ -66,7 +69,7 @@ class TestBetween(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Between(1, 10)
         self.assertTrue(await rule.enforce("qty", None, _OWNER))
@@ -80,13 +83,13 @@ class TestBetween(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Between(10, 1)
 
-class TestGreaterThanOrEqualField(TestCase):
 
+class TestGreaterThanOrEqualField(TestCase):
     async def testValueAboveOrEqualSiblingPasses(self) -> None:
         """Return True when the value reaches the compared field.
 
@@ -95,7 +98,7 @@ class TestGreaterThanOrEqualField(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = GreaterThanOrEqualField("minimum")
         instance = SimpleNamespace(minimum=5)
@@ -110,7 +113,7 @@ class TestGreaterThanOrEqualField(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = GreaterThanOrEqualField("minimum")
         self.assertFalse(await rule.enforce("maximum", 1, SimpleNamespace(minimum=5)))
@@ -123,7 +126,7 @@ class TestGreaterThanOrEqualField(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = GreaterThanOrEqualField("short")
         instance = SimpleNamespace(short="ab")
@@ -138,14 +141,14 @@ class TestGreaterThanOrEqualField(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = GreaterThanOrEqualField("minimum")
         self.assertTrue(await rule.enforce("maximum", 1, SimpleNamespace()))
         self.assertTrue(await rule.enforce("maximum", None, SimpleNamespace(minimum=5)))
 
-class TestLessThanOrEqualField(TestCase):
 
+class TestLessThanOrEqualField(TestCase):
     async def testValueBelowOrEqualSiblingPasses(self) -> None:
         """Return True when the value stays under the compared field.
 
@@ -154,7 +157,7 @@ class TestLessThanOrEqualField(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = LessThanOrEqualField("maximum")
         instance = SimpleNamespace(maximum=5)
@@ -169,7 +172,7 @@ class TestLessThanOrEqualField(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = LessThanOrEqualField("maximum")
         self.assertFalse(await rule.enforce("minimum", 9, SimpleNamespace(maximum=5)))
@@ -182,13 +185,13 @@ class TestLessThanOrEqualField(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = LessThanOrEqualField("maximum")
         self.assertTrue(await rule.enforce("minimum", 1, SimpleNamespace()))
 
-class TestDecimalPlaces(TestCase):
 
+class TestDecimalPlaces(TestCase):
     async def testExactNumberOfPlacesPasses(self) -> None:
         """Return True when the value carries exactly the required places.
 
@@ -197,7 +200,7 @@ class TestDecimalPlaces(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DecimalPlaces(2)
         self.assertTrue(await rule.enforce("price", "10.50", _OWNER))
@@ -211,7 +214,7 @@ class TestDecimalPlaces(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DecimalPlaces(2)
         self.assertFalse(await rule.enforce("price", "10.5", _OWNER))
@@ -225,7 +228,7 @@ class TestDecimalPlaces(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DecimalPlaces(2, 4)
         for value in ("1.00", "1.000", "1.0000"):
@@ -240,7 +243,7 @@ class TestDecimalPlaces(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await DecimalPlaces(0).enforce("price", 10, _OWNER))
         self.assertFalse(await DecimalPlaces(2).enforce("price", 10, _OWNER))
@@ -254,7 +257,7 @@ class TestDecimalPlaces(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DecimalPlaces(2)
         for value in (True, "abc", None, [1]):
@@ -268,15 +271,15 @@ class TestDecimalPlaces(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             DecimalPlaces(-1)
         with self.assertRaises(ValueError):
             DecimalPlaces(4, 2)
 
-class TestInteger(TestCase):
 
+class TestInteger(TestCase):
     async def testWholeNumbersPass(self) -> None:
         """Return True for integers and for floats without a fraction.
 
@@ -285,7 +288,7 @@ class TestInteger(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Integer()
         for value in (0, 42, -7, 5.0):
@@ -299,7 +302,7 @@ class TestInteger(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Integer()
         for value in ("42", "-42", "+42"):
@@ -313,14 +316,14 @@ class TestInteger(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Integer()
         for value in (5.5, "4.2", "abc", "", True, None, [1]):
             self.assertFalse(await rule.enforce("qty", value, _OWNER))
 
-class TestMaxDigits(TestCase):
 
+class TestMaxDigits(TestCase):
     async def testValuesWithinLimitPass(self) -> None:
         """Return True when the digit count stays within the limit.
 
@@ -329,7 +332,7 @@ class TestMaxDigits(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = MaxDigits(5)
         self.assertTrue(await rule.enforce("code", 12345, _OWNER))
@@ -344,7 +347,7 @@ class TestMaxDigits(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = MaxDigits(4)
         self.assertFalse(await rule.enforce("code", 12345, _OWNER))
@@ -358,7 +361,7 @@ class TestMaxDigits(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = MaxDigits(5)
         for value in (True, 1.5, "", None):
@@ -372,13 +375,13 @@ class TestMaxDigits(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             MaxDigits(0)
 
-class TestDifferent(TestCase):
 
+class TestDifferent(TestCase):
     async def testDistinctValuePasses(self) -> None:
         """Return True when the value differs from every forbidden value.
 
@@ -387,7 +390,7 @@ class TestDifferent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Different(1, 2, 3)
         self.assertTrue(await rule.enforce("qty", 4, _OWNER))
@@ -400,7 +403,7 @@ class TestDifferent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Different("draft", "archived")
         self.assertFalse(await rule.enforce("status", "draft", _OWNER))
@@ -414,7 +417,7 @@ class TestDifferent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Different([1, 2])
         self.assertFalse(await rule.enforce("items", [1, 2], _OWNER))
@@ -428,7 +431,7 @@ class TestDifferent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Different()

@@ -1,11 +1,12 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value differs from every value supplied to the rule."""
 
 from orionis.schemas.rule import Rule
 
+
 class Different(Rule):
     """Ensure a value differs from every value supplied to the rule."""
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_forbidden",)
     """Declare the instance attribute slots reserved by this class."""
@@ -31,7 +32,7 @@ class Different(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------

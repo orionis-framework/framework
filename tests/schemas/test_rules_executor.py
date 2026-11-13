@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Annotated
 import msgspec
 from orionis.schemas.entities.failure import ValidationFailure
@@ -17,6 +19,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 # Rule and schema fixtures
 # ---------------------------------------------------------------------------
+
 
 class _RejectRule(Rule):
     """Rule rejecting every value it inspects."""
@@ -49,6 +52,7 @@ class _RejectRule(Rule):
         """
         return False
 
+
 class _AcceptRule(Rule):
     """Rule accepting every value it inspects."""
 
@@ -80,21 +84,27 @@ class _AcceptRule(Rule):
         """
         return True
 
+
 class _RejectingChild(Schema):
     code: Annotated[str, _RejectRule()]
 
+
 class _PlainSchema(Schema):
     name: str
+
 
 class _ParentSchema(Schema):
     child: _RejectingChild
     label: str
 
+
 class _OptionalParentSchema(Schema):
     child: _RejectingChild | None
 
+
 class _MessageWithRuleSchema(Schema):
     code: Annotated[str, Message("Code must be a string."), _AcceptRule()]
+
 
 def _uncached_struct(name: str, meta: dict[str, list[object]] | None = None) -> type:
     """
@@ -116,8 +126,22 @@ def _uncached_struct(name: str, meta: dict[str, list[object]] | None = None) -> 
     klass.__orionis_meta__ = {} if meta is None else meta
     return klass
 
-class TestTypeContainsNested(TestCase):
 
+class _PlanTestCase(TestCase):
+    """Restore shared plan ownership after each cache inspection."""
+
+    def setUp(self) -> None:
+        """Save the previously published plans before creating local schemas."""
+        self._original_plans = _PLAN_CACHE.copy()
+        self.addCleanup(self._restorePlans)
+
+    def _restorePlans(self) -> None:
+        """Restore the cache entries and ordering that preceded this test."""
+        _PLAN_CACHE.clear()
+        _PLAN_CACHE.update(self._original_plans)
+
+
+class TestTypeContainsNested(_PlanTestCase):
     def testDirectSchemaIsDetected(self) -> None:
         """Detect a bare schema annotation as nested.
 
@@ -126,7 +150,7 @@ class TestTypeContainsNested(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(_type_contains_nested(_RejectingChild))
 
@@ -138,7 +162,7 @@ class TestTypeContainsNested(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(_type_contains_nested(_RejectingChild | None))
 
@@ -150,7 +174,7 @@ class TestTypeContainsNested(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(_type_contains_nested(Annotated[_RejectingChild, Title("C")]))
 
@@ -162,13 +186,13 @@ class TestTypeContainsNested(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(_type_contains_nested(str))
         self.assertFalse(_type_contains_nested(int | str))
 
-class TestWarmChildPlan(TestCase):
 
+class TestWarmChildPlan(_PlanTestCase):
     def testDirectSchemaPlanIsBuilt(self) -> None:
         """Build the plan of a nested schema declared directly.
 
@@ -177,7 +201,7 @@ class TestWarmChildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         klass = _uncached_struct("_WarmDirect")
         self.assertNotIn(klass, _PLAN_CACHE)
@@ -192,7 +216,7 @@ class TestWarmChildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         klass = _uncached_struct("_WarmUnion")
         self.assertNotIn(klass, _PLAN_CACHE)
@@ -205,7 +229,7 @@ class TestWarmChildPlan(TestCase):
         Returns
         -------
         None
-            Assertions validate first-use plan readiness.
+            No return value.
         """
         direct = _uncached_struct("_WarmAnnotated")
         optional = _uncached_struct("_WarmAnnotatedOptional")
@@ -225,7 +249,7 @@ class TestWarmChildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cached = _PLAN_CACHE[_RejectingChild]
         _warm_child_plan(_RejectingChild)
@@ -239,13 +263,13 @@ class TestWarmChildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         _warm_child_plan(str)
         self.assertNotIn(str, _PLAN_CACHE)
 
-class TestBuildPlan(TestCase):
 
+class TestBuildPlan(_PlanTestCase):
     def testPlanIsCachedAtClassCreation(self) -> None:
         """Cache the validation plan when the schema class is created.
 
@@ -254,7 +278,7 @@ class TestBuildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn(_RejectingChild, _PLAN_CACHE)
 
@@ -266,7 +290,7 @@ class TestBuildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         name, dotted, getter, validators, is_nested = _PLAN_CACHE[_RejectingChild][0]
         self.assertEqual(name, "code")
@@ -278,12 +302,12 @@ class TestBuildPlan(TestCase):
     def testFieldsWithoutRulesOrNestingAreSkipped(self) -> None:
         """Produce an empty plan for a schema declaring no rules.
 
-        Validates that plain schemas cost nothing at validation time.
+        Validates that plain schemas add no executable rule traversal entries.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_PLAN_CACHE[_PlainSchema], ())
 
@@ -295,7 +319,7 @@ class TestBuildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entries = {entry[0]: entry for entry in _PLAN_CACHE[_ParentSchema]}
         self.assertIn("child", entries)
@@ -311,7 +335,7 @@ class TestBuildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entry = _PLAN_CACHE[_MessageWithRuleSchema][0]
         self.assertEqual(len(entry[3]), 1)
@@ -324,14 +348,14 @@ class TestBuildPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         klass = _uncached_struct("_BadMeta", {"code": [object()]})
         with self.assertRaises(TypeError):
             _build_plan(klass)
 
-class TestCollectNested(TestCase):
 
+class TestCollectNested(_PlanTestCase):
     async def testUncachedChildPlanIsBuiltOnDemand(self) -> None:
         """Build the child plan when the nested type is not cached yet.
 
@@ -340,7 +364,7 @@ class TestCollectNested(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         klass = _uncached_struct("_NestedColdPlan")
         failures: list[ValidationFailure] = []
@@ -356,7 +380,7 @@ class TestCollectNested(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failures: list[ValidationFailure] = []
         await _collect_nested(_RejectingChild(code="abc"), "child.", failures)
@@ -364,8 +388,8 @@ class TestCollectNested(TestCase):
         self.assertIsInstance(failures[0], ValidationFailure)
         self.assertEqual(failures[0].field, "child.code")
 
-class TestCollectWithPlan(TestCase):
 
+class TestCollectWithPlan(_PlanTestCase):
     async def testNestedFailuresAreAccumulated(self) -> None:
         """Accumulate failures found inside a nested schema.
 
@@ -374,7 +398,7 @@ class TestCollectWithPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _ParentSchema(child=_RejectingChild(code="abc"), label="ok")
         failures: list[ValidationFailure] = []
@@ -389,12 +413,15 @@ class TestCollectWithPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _OptionalParentSchema(child=None)
         failures: list[ValidationFailure] = []
         await _collect_with_plan(
-            _PLAN_CACHE[_OptionalParentSchema], instance, "", failures,
+            _PLAN_CACHE[_OptionalParentSchema],
+            instance,
+            "",
+            failures,
         )
         self.assertEqual(failures, [])
 
@@ -406,13 +433,24 @@ class TestCollectWithPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        instance = _RejectingChild(code="abc")
+
+        class MultipleRules(Schema):
+            code: Annotated[str, _RejectRule(), _RejectRule(message="Rejected again.")]
+
+        instance = MultipleRules(code="abc")
         failures: list[ValidationFailure] = []
-        plan = _PLAN_CACHE[_RejectingChild]
+        plan = _PLAN_CACHE[MultipleRules]
         await _collect_with_plan(plan, instance, "", failures)
         await _collect_with_plan(plan, instance, "other.", failures)
-        self.assertEqual([f.field for f in failures], ["code", "other.code"])
+        self.assertEqual(
+            [(f.field, f.message) for f in failures],
+            [
+                ("code", "Rejected."),
+                ("code", "Rejected again."),
+                ("other.code", "Rejected."),
+                ("other.code", "Rejected again."),
+            ],
+        )
         self.assertEqual({f.rule for f in failures}, {"reject"})
-        self.assertEqual({f.message for f in failures}, {"Rejected."})

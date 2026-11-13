@@ -12,12 +12,13 @@ if TYPE_CHECKING:
 
 # Loopback and RFC-1918 networks used to expand the 'private' shorthand.
 _PRIVATE_NETWORKS: tuple[IPv4Network, ...] = (
-    ip_network("127.0.0.0/8"),    # NOSONAR
-    ip_network("10.0.0.0/8"),     # NOSONAR
+    ip_network("127.0.0.0/8"),  # NOSONAR
+    ip_network("10.0.0.0/8"),  # NOSONAR
     ip_network("172.16.0.0/12"),  # NOSONAR
-    ip_network("192.168.0.0/16"), # NOSONAR
+    ip_network("192.168.0.0/16"),  # NOSONAR
 )
 """Loopback and RFC-1918 networks used to expand the 'private' shorthand."""
+
 
 class ProxiesMiddleware:
     """
@@ -123,7 +124,8 @@ class ProxiesMiddleware:
                 return
 
         real_ip, proxies, chain = self.__resolveForwardedChain(
-            adapter, client_ip,
+            adapter,
+            client_ip,
         )
 
         adapter.setClient(real_ip)
@@ -133,11 +135,14 @@ class ProxiesMiddleware:
             adapter.setScheme(scheme)
 
         # Expose resolved forwarding metadata for downstream middleware.
-        adapter.setState("forwarded", {
-            "client": real_ip,
-            "proxies": proxies,
-            "chain": chain,
-        })
+        adapter.setState(
+            "forwarded",
+            {
+                "client": real_ip,
+                "proxies": proxies,
+                "chain": chain,
+            },
+        )
 
     def __resolveForwardedChain(
         self,

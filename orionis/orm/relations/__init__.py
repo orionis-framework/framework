@@ -23,15 +23,22 @@ __all__ = [
 ]
 
 _EXPORTS = {
-    "BelongsToManyRelation": ("orionis.orm.relations.belongs_to_many", "BelongsToManyRelation"),
+    "BelongsToManyRelation": (
+        "orionis.orm.relations.belongs_to_many",
+        "BelongsToManyRelation",
+    ),
     "BelongsToRelation": ("orionis.orm.relations.belongs_to", "BelongsToRelation"),
     "HasManyRelation": ("orionis.orm.relations.has_many", "HasManyRelation"),
-    "HasOneOrManyRelation": ("orionis.orm.relations.has_one_or_many", "HasOneOrManyRelation"),
+    "HasOneOrManyRelation": (
+        "orionis.orm.relations.has_one_or_many",
+        "HasOneOrManyRelation",
+    ),
     "HasOneRelation": ("orionis.orm.relations.has_one", "HasOneRelation"),
     "Relation": ("orionis.orm.relations.relation", "Relation"),
     "RelationsMixin": ("orionis.orm.relations.mixin", "RelationsMixin"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -53,6 +60,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

@@ -11,9 +11,13 @@ __all__ = [
 ]
 
 _EXPORTS = {
-    "ModelIdentityProvider": ("orionis.auth.identity.provider", "ModelIdentityProvider"),
+    "ModelIdentityProvider": (
+        "orionis.auth.identity.provider",
+        "ModelIdentityProvider",
+    ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -35,6 +39,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

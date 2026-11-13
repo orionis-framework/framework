@@ -1,20 +1,16 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Keep dynamic database values and public annotations available to runtime reflection.
 """Contract for a single named database connection."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from collections.abc import Mapping
+from orionis.database.contracts.transaction import ITransaction
+from orionis.database.entities.result import InsertResult
+from orionis.orm.query.expressions import DeletePlan, InsertPlan, SelectPlan, UpdatePlan
+from orionis.orm.schema.table import TableDefinition
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from orionis.database.contracts.transaction import ITransaction
-    from orionis.database.entities.result import InsertResult
-    from orionis.orm.query.expressions import (
-        DeletePlan,
-        InsertPlan,
-        SelectPlan,
-        UpdatePlan,
-    )
-    from orionis.orm.schema.table import TableDefinition
 
 class IConnection(ABC):
     """
@@ -25,8 +21,6 @@ class IConnection(ABC):
     (dictionaries, integers, result entities). Engine objects never leak
     through this interface.
     """
-
-    # ruff: noqa: ANN401
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -326,7 +320,7 @@ class IConnection(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -342,7 +336,7 @@ class IConnection(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -358,7 +352,7 @@ class IConnection(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -398,5 +392,5 @@ class IConnection(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """

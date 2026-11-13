@@ -11,6 +11,7 @@ _MIN_ROUNDS: int = 4
 _MAX_ROUNDS: int = 31
 """Max rounds value used by ``bcrypt``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Bcrypt(BaseEntity):
     """

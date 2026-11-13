@@ -1,15 +1,15 @@
+# ruff: noqa: TC001, TC003
+# Keep public protocol and native annotations available for runtime reflection.
 """Define the contract for a single file on a storage disk."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import AsyncIterable, AsyncIterator
+from datetime import datetime
+from pathlib import Path
+from orionis.storage.contracts.stream import IStorageStream
+from orionis.storage.entities.file_info import FileInfo
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterable, AsyncIterator
-    from datetime import datetime
-    from pathlib import Path
-    from orionis.storage.contracts.stream import IStorageStream
-    from orionis.storage.entities.file_info import FileInfo
 
 class IFile(ABC):
     """
@@ -214,7 +214,7 @@ class IFile(ABC):
         Raises
         ------
         orionis.storage.exceptions.StoragePathException
-            If *name* is empty or contains a directory separator.
+            If *name* is empty, a dot segment, or contains a directory separator.
         orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """

@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class Migration(ABC):
     """
     Abstract base class for all database migrations.
@@ -40,7 +41,7 @@ class Migration(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -62,7 +63,7 @@ class Migration(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------

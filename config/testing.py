@@ -2,12 +2,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.testing import (
-    Testing, VerbosityMode,
+    Testing,
+    VerbosityMode,
 )
+
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapTesting(Testing):
-
     # ----------------------------------------------------------------------------------
     # verbosity : int | VerbosityMode, optional
     # --- Level of detail in test output. 0: silent, 1: standard, 2: detailed.

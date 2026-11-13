@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.database.contracts.transaction import ITransaction
 from orionis.database.exceptions import TransactionException
 from orionis.database.transaction import Transaction
 from orionis.test import TestCase
+
 
 class _FakeConnection:
     """Fake connection recording the transaction control calls it receives."""
@@ -19,7 +22,7 @@ class _FakeConnection:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.calls: list[str] = []
         self._fail_begin = fail_begin
@@ -30,7 +33,7 @@ class _FakeConnection:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
 
         Raises
         ------
@@ -48,7 +51,7 @@ class _FakeConnection:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.calls.append("commit")
 
@@ -58,12 +61,12 @@ class _FakeConnection:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.calls.append("rollback")
 
-class TestTransaction(TestCase):
 
+class TestTransaction(TestCase):
     async def testEnterBeginsTransactionAndReturnsItself(self) -> None:
         """Begin the transaction and yield the transaction itself.
 
@@ -72,13 +75,15 @@ class TestTransaction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = _FakeConnection()
         transaction = Transaction(connection)
         entered = await transaction.__aenter__()
         self.assertIs(entered, transaction)
         self.assertEqual(connection.calls, ["begin"])
+        self.assertFalse(await transaction.__aexit__(None, None, None))
+        self.assertEqual(connection.calls, ["begin", "commit"])
 
     async def testCleanExitCommitsTransaction(self) -> None:
         """Commit the transaction when the block exits without error.
@@ -88,7 +93,7 @@ class TestTransaction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = _FakeConnection()
         async with Transaction(connection):
@@ -103,36 +108,16 @@ class TestTransaction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised by this helper to exercise the failure path.
         """
         connection = _FakeConnection()
-        error_msg = "boom"
-        with self.assertRaises(RuntimeError):
+        error = RuntimeError("boom")
+        with self.assertRaises(RuntimeError) as caught:
             async with Transaction(connection):
-                raise RuntimeError(error_msg)
+                raise error
+        self.assertIs(caught.exception, error)
         self.assertEqual(connection.calls, ["begin", "rollback"])
-
-    async def testAexitReturnsFalseOnCleanExit(self) -> None:
-        """Return False from __aexit__ on a clean exit.
-
-        Validates that the context manager never swallows exceptions,
-        even when there is none to propagate.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        connection = _FakeConnection()
-        transaction = Transaction(connection)
-        await transaction.__aenter__()
-        result = await transaction.__aexit__(None, None, None)
-        self.assertFalse(result)
 
     async def testAexitReturnsFalseOnException(self) -> None:
         """Return False from __aexit__ so exceptions keep propagating.
@@ -143,7 +128,7 @@ class TestTransaction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = _FakeConnection()
         transaction = Transaction(connection)
@@ -162,7 +147,7 @@ class TestTransaction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = _FakeConnection(fail_begin=True)
         with self.assertRaises(TransactionException):
@@ -179,7 +164,7 @@ class TestTransaction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         transaction = Transaction(_FakeConnection())
         self.assertIsInstance(transaction, ITransaction)

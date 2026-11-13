@@ -1,3 +1,4 @@
+# Keep file-specific exceptions in explicit source headers, not global path patterns.
 [lint]
 select = ["ALL"]
 ignore = [
@@ -16,61 +17,6 @@ ignore = [
 ]
 exclude = [
     "test/*",
-]
-
-[lint.per-file-ignores]
-"**/__init__.py" = [
-    "E501",
-]
-"app/**" = [
-    "ARG002",
-    "BLE001",
-    "TC001",
-    "TC002",
-]
-"app/console/commands/**" = [
-    "RUF012",
-]
-"app/http/schemas/constraints/**" = [
-    "PLR2004",
-]
-"app/models/**" = [
-    "FBT003",
-    "RUF012",
-]
-"config/**" = [
-    "E501",
-]
-"database/**" = [
-    "E501",
-    "S608",
-    "TC001",
-]
-"routes/**" = [
-    "E501",
-    "S608",
-]
-"orionis/database/**" = [
-    "S608",
-]
-"tests/**" = [
-    "ANN001",
-    "ANN201",
-    "ANN202",
-    "PT009",
-    "PT027",
-    "SLF001",
-    "ARG003",
-    "FBT003",
-    "PTH110",
-    "PTH113",
-    "PTH118",
-    "PTH123",
-    "PLC0415",
-    "PLR2004",
-    "DTZ001",
-    "ERA001",
-    "S324",
 ]
 
 [lint.pydocstyle]

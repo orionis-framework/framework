@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import SimpleNamespace
 from typing import ClassVar
 from orionis.container.container import Container
@@ -16,6 +18,8 @@ from orionis.introspection.dependencies.reflection import (
     _get_signature,
 )
 from orionis.test import TestCase
+from tests.http.test_support import replace_attribute
+
 
 def function_handler(item: int = 2) -> Response:
     """Return the value resolved from route parameters.
@@ -32,6 +36,7 @@ def function_handler(item: int = 2) -> Response:
     """
     return Response(str(item))
 
+
 def invalid_signature_handler() -> Response:
     """Represent a function whose exposed signature cannot be inspected.
 
@@ -42,7 +47,9 @@ def invalid_signature_handler() -> Response:
     """
     return Response()
 
+
 invalid_signature_handler.__signature__ = "invalid"
+
 
 class _Controller:
     """Expose instance, class, and static actions with constructor metadata."""
@@ -112,6 +119,7 @@ class _Controller:
         """
         return Response(str(item))
 
+
 class _DynamicAction:
     """Count descriptor execution before returning a controller action."""
 
@@ -135,10 +143,12 @@ class _DynamicAction:
         type(self).calls += 1
         return function_handler
 
+
 class _DynamicController:
     """Provide an action whose descriptor must remain lazy."""
 
     action = _DynamicAction()
+
 
 class _DynamicConstructor:
     """Reject any descriptor execution during constructor plan warmup."""
@@ -166,11 +176,13 @@ class _DynamicConstructor:
         message = "Custom constructor descriptors must remain lazy."
         raise AssertionError(message)
 
+
 class _CustomConstructorController:
     """Keep constructor descriptor execution outside metadata warmup."""
 
     __init__ = _DynamicConstructor()
     action = staticmethod(function_handler)
+
 
 class _Request:
     """Supply route parameters to the real kernel dispatch stage."""
@@ -185,6 +197,7 @@ class _Request:
             Parameters supplied to every fixture route.
         """
         return {"item": 7}
+
 
 def make_route(handler: str, method: str | None = None) -> CompiledRoute:
     """Create a route descriptor consumed by handler preloading.
@@ -207,10 +220,15 @@ def make_route(handler: str, method: str | None = None) -> CompiledRoute:
     else:
         action.update({"class": handler, "method": method})
     return CompiledRoute(
-        path=f"/{handler}/{method}", method="GET",
+        path=f"/{handler}/{method}",
+        method="GET",
         type=RouteType.FUNCTION if method is None else RouteType.CONTROLLER,
-        action=action, name=None, regex=None, segment_count=2,
+        action=action,
+        name=None,
+        regex=None,
+        segment_count=2,
     )
+
 
 class TestHandlerPlanWarmup(TestCase):
     """Exercise real kernel preloading and invocation with bounded DI caches."""
@@ -240,13 +258,23 @@ class TestHandlerPlanWarmup(TestCase):
             First requests add no signature or invocation-plan cache misses.
         """
         routes = [make_route("function_handler")]
-        routes.extend(make_route("_Controller", method) for method in (
-            "instanceAction", "classAction", "staticAction",
-        ))
-        _Controller.constructions = 0 # NOSONAR
-        self.kernel._KernelHTTP__routes = RouteResolver(routes={
-            "GET": {"static": {route.path: route for route in routes}, "dynamic": []},
-        })
+        routes.extend(
+            make_route("_Controller", method)
+            for method in (
+                "instanceAction",
+                "classAction",
+                "staticAction",
+            )
+        )
+        self.enterContext(replace_attribute(_Controller, "constructions", 0))
+        self.kernel._KernelHTTP__routes = RouteResolver(
+            routes={
+                "GET": {
+                    "static": {route.path: route for route in routes},
+                    "dynamic": [],
+                },
+            },
+        )
         await self.kernel._KernelHTTP__preloadHandlers()
         self.assertEqual(_Controller.constructions, 0)
         signature_misses = _get_signature.cache_info().misses
@@ -255,7 +283,8 @@ class TestHandlerPlanWarmup(TestCase):
         self.assertGreater(signature_misses, 0)
         for route in routes:
             response = await self.kernel._KernelHTTP__callHandler(
-                SimpleNamespace(route=route), _Request(),
+                SimpleNamespace(route=route),
+                _Request(),
             )
             self.assertEqual(response.getBody(), b"7")
         self.assertEqual(_Controller.constructions, 3)
@@ -272,14 +301,17 @@ class TestHandlerPlanWarmup(TestCase):
             One request evaluates its custom descriptor exactly once.
         """
         route = make_route("_DynamicController", "action")
-        _DynamicAction.calls = 0 # NOSONAR
-        self.kernel._KernelHTTP__routes = RouteResolver(routes={
-            "GET": {"static": {route.path: route}, "dynamic": []},
-        })
+        self.enterContext(replace_attribute(_DynamicAction, "calls", 0))
+        self.kernel._KernelHTTP__routes = RouteResolver(
+            routes={
+                "GET": {"static": {route.path: route}, "dynamic": []},
+            },
+        )
         await self.kernel._KernelHTTP__preloadHandlers()
         self.assertEqual(_DynamicAction.calls, 0)
         response = await self.kernel._KernelHTTP__callHandler(
-            SimpleNamespace(route=route), _Request(),
+            SimpleNamespace(route=route),
+            _Request(),
         )
         self.assertEqual(response.getBody(), b"7")
         self.assertEqual(_DynamicAction.calls, 1)
@@ -306,9 +338,11 @@ class TestHandlerPlanWarmup(TestCase):
             Boot reports the reflection error without publishing partial tables.
         """
         route = make_route("invalid_signature_handler")
-        self.kernel._KernelHTTP__routes = RouteResolver(routes={
-            "GET": {"static": {route.path: route}, "dynamic": []},
-        })
+        self.kernel._KernelHTTP__routes = RouteResolver(
+            routes={
+                "GET": {"static": {route.path: route}, "dynamic": []},
+            },
+        )
         with self.assertRaisesRegex(ValueError, "Unable to inspect signature"):
             await self.kernel._KernelHTTP__preloadHandlers()
         self.assertFalse(hasattr(self.kernel, "_KernelHTTP__fn_dispatch"))

@@ -26,15 +26,34 @@ __all__ = [
 
 _EXPORTS = {
     "ModuleInspector": ("orionis.introspection.modules.inspector", "ModuleInspector"),
-    "ReflectDependencies": ("orionis.introspection.dependencies.reflection", "ReflectDependencies"),
+    "ReflectDependencies": (
+        "orionis.introspection.dependencies.reflection",
+        "ReflectDependencies",
+    ),
     "Reflection": ("orionis.introspection.reflection", "Reflection"),
-    "ReflectionAbstract": ("orionis.introspection.abstract.reflection", "ReflectionAbstract"),
-    "ReflectionCallable": ("orionis.introspection.callables.reflection", "ReflectionCallable"),
-    "ReflectionConcrete": ("orionis.introspection.concretes.reflection", "ReflectionConcrete"),
-    "ReflectionInstance": ("orionis.introspection.instances.reflection", "ReflectionInstance"),
-    "ReflectionModule": ("orionis.introspection.modules.reflection", "ReflectionModule"),
+    "ReflectionAbstract": (
+        "orionis.introspection.abstract.reflection",
+        "ReflectionAbstract",
+    ),
+    "ReflectionCallable": (
+        "orionis.introspection.callables.reflection",
+        "ReflectionCallable",
+    ),
+    "ReflectionConcrete": (
+        "orionis.introspection.concretes.reflection",
+        "ReflectionConcrete",
+    ),
+    "ReflectionInstance": (
+        "orionis.introspection.instances.reflection",
+        "ReflectionInstance",
+    ),
+    "ReflectionModule": (
+        "orionis.introspection.modules.reflection",
+        "ReflectionModule",
+    ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -56,6 +75,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

@@ -244,6 +244,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_discardResult" class="internal-link" title="orionis.aio.Loop._discardResult">_discard<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_getRegisteredLoop" class="internal-link" title="orionis.aio.Loop._getRegisteredLoop">_get<wbr></wbr>Registered<wbr></wbr>Loop</a></code>
             </div>
         
@@ -255,6 +265,16 @@
 
         
             <div class="itemName"><code><a href="#_getRunningLoop" class="internal-link" title="orionis.aio.Loop._getRunningLoop">_get<wbr></wbr>Running<wbr></wbr>Loop</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_reportAbandonedError" class="internal-link" title="orionis.aio.Loop._reportAbandonedError">_report<wbr></wbr>Abandoned<wbr></wbr>Error</a></code>
             </div>
         
 
@@ -544,6 +564,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_discardResult" class="internal-link" title="orionis.aio.Loop._discardResult">_discard<wbr></wbr>Result</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_getRegisteredLoop" class="internal-link" title="orionis.aio.Loop._getRegisteredLoop">_get<wbr></wbr>Registered<wbr></wbr>Loop</a></code>
             </div>
         
@@ -555,6 +585,16 @@
 
         
             <div class="itemName"><code><a href="#_getRunningLoop" class="internal-link" title="orionis.aio.Loop._getRunningLoop">_get<wbr></wbr>Running<wbr></wbr>Loop</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_reportAbandonedError" class="internal-link" title="orionis.aio.Loop._reportAbandonedError">_report<wbr></wbr>Abandoned<wbr></wbr>Error</a></code>
             </div>
         
 
@@ -775,14 +815,14 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Loop</span>: <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L15" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.aio.Loop">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Loop</span>: <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L20" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.aio.Loop">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Thread-safe, platform-aware asyncio event loop manager for the Orionis Framework.</p>
-<p>Centralises every aspect of event loop lifecycle:</p>
+<p>Coordinate loop selection, execution, and resource ownership:</p>
 <ul class="rst-simple">
-<li>Optimal factory selection: uvloop (non-Windows) → ProactorEventLoop
+<li>Platform factory selection: uvloop (non-Windows) → ProactorEventLoop
 (Windows) → stdlib default.</li>
 <li>Per-thread loop registration through asyncio as the source of truth.</li>
 <li>Synchronous entry points that reject calls from a running loop.</li>
@@ -840,6 +880,11 @@
   </tr><tr class="staticmethod">
     
     <td>Static Method</td>
+    <td><code><a href="#_discardResult" class="internal-link" title="orionis.aio.Loop._discardResult">_discard<wbr></wbr>Result</a></code></td>
+    <td>Release a worker result abandoned by a cancelled caller.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
     <td><code><a href="#_getRegisteredLoop" class="internal-link" title="orionis.aio.Loop._getRegisteredLoop">_get<wbr></wbr>Registered<wbr></wbr>Loop</a></code></td>
     <td>Return the thread's registered loop if it is still open.</td>
   </tr><tr class="staticmethod">
@@ -850,13 +895,18 @@
   </tr><tr class="staticmethod">
     
     <td>Static Method</td>
+    <td><code><a href="#_reportAbandonedError" class="internal-link" title="orionis.aio.Loop._reportAbandonedError">_report<wbr></wbr>Abandoned<wbr></wbr>Error</a></code></td>
+    <td>Observe an unconsumed worker or cleanup failure through its owner.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
     <td><code><a href="#createTask" class="internal-link" title="orionis.aio.Loop.createTask">create<wbr></wbr>Task</a></code></td>
     <td>Create and schedule a new asyncio task for <em>coro</em> immediately.</td>
   </tr><tr class="staticmethod">
     
     <td>Async Static Method</td>
     <td><code><a href="#execute" class="internal-link" title="orionis.aio.Loop.execute">execute</a></code></td>
-    <td>Transparently execute a sync or async callable.</td>
+    <td>Execute a sync or async callable while preserving the calling context.</td>
   </tr><tr class="staticmethod">
     
     <td>Static Method</td>
@@ -913,7 +963,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_detectUvloop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code>Callable[<wbr></wbr>[], <wbr></wbr><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L110">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L112">
       
       (source)
     </a>
@@ -944,7 +994,7 @@ platform, otherwise <tt class="rst-docutils rst-literal">None</tt>.</td></tr></t
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_getLoopFactory</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code>Callable[<wbr></wbr>[], <wbr></wbr><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L142">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L145">
       
       (source)
     </a>
@@ -963,8 +1013,7 @@ platform, otherwise <tt class="rst-docutils rst-literal">None</tt>.</td></tr></t
 <li><tt class="rst-docutils rst-literal">asyncio.ProactorEventLoop</tt> (Windows only).</li>
 <li><tt class="rst-docutils rst-literal">None</tt> — the caller falls back to <tt class="rst-docutils rst-literal">asyncio.new_event_loop()</tt>.</li>
 </ol>
-<p>The result is cached after the first call; repeated invocations are
-essentially free.</p>
+<p>Cache the result after the first call to avoid repeating detection.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Platform-specific loop factory, or None to use the asyncio default.</td></tr></table></div>
   </div>
 </div><div class="baseclassmethod">
@@ -980,7 +1029,7 @@ essentially free.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_newEventLoop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L179">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L181">
       
       (source)
     </a>
@@ -1007,7 +1056,7 @@ essentially free.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span><span class="decorator">@contextmanager<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_runnerContext</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code>Generator[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-runner.html#asyncio.Runner" class="intersphinx-link">asyncio.Runner</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L194">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L196">
       
       (source)
     </a>
@@ -1034,7 +1083,7 @@ essentially free.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span><span class="decorator">@contextmanager<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">eventLoopContext</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code>Generator[<wbr></wbr><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L353">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L452">
       
       (source)
     </a>
@@ -1072,7 +1121,7 @@ closed or is still running.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getEventLoop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span></span>) -&gt; <code><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L235">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L235">
       
       (source)
     </a>
@@ -1109,7 +1158,7 @@ directly when no open loop is registered.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">run</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">coro: <code>Coroutine[<wbr></wbr>Any, <wbr></wbr>Any, <wbr></wbr>T]</code></span>) -&gt; <code>T</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L262">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L262">
       
       (source)
     </a>
@@ -1143,7 +1192,7 @@ unconsumed; the caller must await or close it.</td></tr><tr><td class="fieldArgC
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">runSync</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">coro: <code>Coroutine[<wbr></wbr>Any, <wbr></wbr>Any, <wbr></wbr>T]</code></span>) -&gt; <code>T</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L430">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L530">
       
       (source)
     </a>
@@ -1166,6 +1215,33 @@ unconsumed and must be awaited or closed by the caller.</td></tr><tr><td class="
 </div><div class="basestaticmethod">
   
   
+  <a name="orionis.aio.Loop._discardResult">
+    
+  </a>
+  <a name="_discardResult">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_discardResult</span><span class="function-signature">(<span class="rst-sig-param">future: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<wbr></wbr>Any]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L342">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_discardResult" title="orionis.aio.Loop._discardResult">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Release a worker result abandoned by a cancelled caller.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">future:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a></code></td><td class="fieldArgDesc">Completed executor operation whose caller no longer awaits it.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
   <a name="orionis.aio.Loop._getRegisteredLoop">
     
   </a>
@@ -1176,7 +1252,7 @@ unconsumed and must be awaited or closed by the caller.</td></tr><tr><td class="
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_getRegisteredLoop</span><span class="function-signature">() -&gt; <code><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L92">
       
       (source)
     </a>
@@ -1203,7 +1279,7 @@ unconsumed and must be awaited or closed by the caller.</td></tr><tr><td class="
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_getRunningLoop</span><span class="function-signature">() -&gt; <code><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L74">
       
       (source)
     </a>
@@ -1217,9 +1293,35 @@ unconsumed and must be awaited or closed by the caller.</td></tr><tr><td class="
     
     <div><p>Return the event loop currently running in this thread, or <tt class="rst-docutils rst-literal">None</tt>.</p>
 <p>Uses the public <tt class="rst-docutils rst-literal">asyncio.get_running_loop()</tt> API with a
-<tt class="rst-docutils rst-literal">try/except</tt> to avoid relying on CPython private internals.
-The overhead is negligible when a loop is present (fast path).</p>
+<tt class="rst-docutils rst-literal">try/except</tt> to avoid relying on CPython private internals.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Loop running in the current thread, or None when no loop is running.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.aio.Loop._reportAbandonedError">
+    
+  </a>
+  <a name="_reportAbandonedError">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_reportAbandonedError</span><span class="function-signature">(<span class="rst-sig-param">error: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-param">future: <code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a>[<wbr></wbr>Any]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L306">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_reportAbandonedError" title="orionis.aio.Loop._reportAbandonedError">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Observe an unconsumed worker or cleanup failure through its owner.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">error:</span><code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code></td><td class="fieldArgDesc">Original worker or resource-cleanup error.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">future:</span><code><a href="https://docs.python.org/3/library/asyncio-future.html#asyncio.Future" class="intersphinx-link">asyncio.Future</a></code></td><td class="fieldArgDesc">Worker future providing the fallback exception handler's loop.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -1234,7 +1336,7 @@ The overhead is negligible when a loop is present (fast path).</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">createTask</span><span class="function-signature">(<span class="rst-sig-param">coro: <code>Coroutine[<wbr></wbr>Any, <wbr></wbr>Any, <wbr></wbr>T]</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>[<wbr></wbr>T]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L400">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L499">
       
       (source)
     </a>
@@ -1264,7 +1366,7 @@ not to create the task.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">execute</span><span class="function-signature">(<span class="rst-sig-param">func: <code>Callable[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr>Any]</code>, </span><span class="rst-sig-symbol">/, </span><span class="rst-sig-param">*args: <code>Any</code>, </span><span class="rst-sig-param">**kwargs: <code>Any</code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L306">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L377">
       
       (source)
     </a>
@@ -1276,12 +1378,16 @@ not to create the task.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Transparently execute a sync or async callable.</p>
+    <div><p>Execute a sync or async callable while preserving the calling context.</p>
 <p>Async callables are awaited directly; synchronous callables are
-offloaded with <tt class="rst-docutils rst-literal">asyncio.to_thread</tt> to avoid blocking the loop thread
+offloaded to the default executor to avoid blocking the loop thread
 while preserving the calling context's <tt class="rst-docutils rst-literal">contextvars</tt>.
 If a synchronous callable returns an awaitable, including a
-generator-based coroutine, that result is awaited on the calling loop.</p>
+generator-based coroutine, that result is awaited on the calling loop.
+Cancellation cannot stop a synchronous callable already executing.
+A late coroutine result is closed and a late future is cancelled;
+late worker failures reach the active failure runtime, or the loop's
+exception handler when no runtime is active.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">func:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">The function or coroutine function to invoke.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*args:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Positional arguments forwarded to <em>func</em>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**kwargs:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Keyword arguments forwarded to <em>func</em>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Callable result, or its resolved result when execution is asynchronous.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>func</em> is not callable.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
@@ -1297,7 +1403,7 @@ generator-based coroutine, that result is awaited on the calling loop.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isLoopRunning</span><span class="function-signature">() -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L388">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L487">
       
       (source)
     </a>
@@ -1323,7 +1429,7 @@ generator-based coroutine, that result is awaited on the calling loop.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_IS_WIN32</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L41">
       
       (source)
     </a>
@@ -1350,7 +1456,7 @@ generator-based coroutine, that result is awaited on the calling loop.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_loop_factory_cached</span>: <code>ClassVar[<wbr></wbr>Callable[<wbr></wbr>[], <wbr></wbr><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L62">
       
       (source)
     </a>
@@ -1378,7 +1484,7 @@ when <tt class="rst-docutils rst-literal">_loop_factory_resolved</tt> is <tt cla
   <div class="functionHeader">
     
     <span class="py-defname">_loop_factory_resolved</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L57">
       
       (source)
     </a>
@@ -1405,7 +1511,7 @@ when <tt class="rst-docutils rst-literal">_loop_factory_resolved</tt> is <tt cla
   <div class="functionHeader">
     
     <span class="py-defname">_loop_lock</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/library/threading.html#threading.Lock" class="intersphinx-link">threading.Lock</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L53">
       
       (source)
     </a>
@@ -1432,7 +1538,7 @@ when <tt class="rst-docutils rst-literal">_loop_factory_resolved</tt> is <tt cla
   <div class="functionHeader">
     
     <span class="py-defname">_uvloop_checked</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L49">
       
       (source)
     </a>
@@ -1459,7 +1565,7 @@ when <tt class="rst-docutils rst-literal">_loop_factory_resolved</tt> is <tt cla
   <div class="functionHeader">
     
     <span class="py-defname">_uvloop_factory</span>: <code>ClassVar[<wbr></wbr>Callable[<wbr></wbr>[], <wbr></wbr><a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.AbstractEventLoop" class="intersphinx-link">asyncio.AbstractEventLoop</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/aio/loop.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/aio/loop.py#L45">
       
       (source)
     </a>
@@ -1485,7 +1591,7 @@ when <tt class="rst-docutils rst-literal">_loop_factory_resolved</tt> is <tt cla
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

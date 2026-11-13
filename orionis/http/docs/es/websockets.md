@@ -24,6 +24,7 @@ Admite nombres con subcarpetas, respeta `app_realtime_sockets` y no sobrescribe 
 ```python
 from orionis.http import WebSocket, WebSocketDisconnected
 
+
 async def echo(socket: WebSocket) -> None:
     await socket.accept()
     try:

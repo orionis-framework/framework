@@ -7,9 +7,9 @@ from orionis.foundation.config.session import (
     SessionDriver,
 )
 
+
 @dataclass(frozen=True, kw_only=True)
 class BootstrapSession(Session):
-
     # ----------------------------------------------------------------------------------
     # driver : str | SessionDriver, optional
     # --- Session driver.

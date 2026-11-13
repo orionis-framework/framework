@@ -1,11 +1,20 @@
+# ruff: noqa: PT009, PT027, S102
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Compile a fixed postponed-annotation fixture in a temporary module namespace.
+import sys
+from types import ModuleType
 from typing import ClassVar
+from unittest.mock import patch
 import msgspec
 from orionis.queues.exceptions import (
-    QueueConfigurationError, QueuePayloadError, UnknownJobError,
+    QueueConfigurationError,
+    QueuePayloadError,
+    UnknownJobError,
 )
 from orionis.queues.job import BaseJob
 from orionis.queues.serializer import JobSerializer
 from orionis.test import TestCase
+
 
 class StateJob(BaseJob):
     """Retain persistent state without constructing service dependencies."""
@@ -39,6 +48,7 @@ class StateJob(BaseJob):
             message = "Negative identity."
             raise ValueError(message)
 
+
 class InheritedStateJob(StateJob):
     """Retain inherited fields alongside a single declared slot."""
 
@@ -46,6 +56,7 @@ class InheritedStateJob(StateJob):
 
     label: str
     category: ClassVar[str] = "inherited"
+
 
 class UndeclaredJob(BaseJob):
     """Expose undeclared fields to test explicit serialization requirements."""
@@ -62,6 +73,7 @@ class UndeclaredJob(BaseJob):
         """
         self.__dict__.clear()
 
+
 class AnnotatedJob(UndeclaredJob):
     """Declare persistent fields stored in an inherited instance dictionary."""
 
@@ -69,6 +81,7 @@ class AnnotatedJob(UndeclaredJob):
 
     data: str
     user_id: int
+
 
 class BlockingJob(BaseJob):
     """Expose a synchronous handler rejected by the async registry."""
@@ -86,7 +99,52 @@ class BlockingJob(BaseJob):
         message = "Synchronous jobs are not supported."
         raise RuntimeError(message)
 
+
 class TestJobSerializer(TestCase):
+    def testPostponedFieldAnnotationsPreserveInheritedState(self) -> None:
+        """Resolve postponed fields and exclude ClassVar from persistent state.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        module = ModuleType("_orionis_queue_future_probe")
+        source = """
+from __future__ import annotations
+from typing import ClassVar
+from tests.queues.test_serializer import StateJob
+
+class PostponedStateJob(StateJob):
+    __slots__ = ("label",)
+    label: str
+    category: ClassVar[str] = "policy"
+"""
+        with patch.dict(sys.modules, {module.__name__: module}):
+            exec(compile(source, "queue-future-fixture", "exec"), vars(module))
+            job_type = module.PostponedStateJob
+            original = job_type(7, {"values": [1, 2]})
+            original.label = "saved"
+            serializer = JobSerializer()
+            identity, payload = serializer.encode(original)
+            self.assertEqual(
+                tuple(msgspec.msgpack.decode(payload)),
+                ("data", "user_id", "label"),
+            )
+            restored = serializer.decode(identity, payload)
+            self.assertIsInstance(restored, job_type)
+            self.assertEqual(restored.label, original.label)
+            self.assertEqual(restored.user_id, original.user_id)
+            self.assertEqual(restored.data, original.data)
+            self.assertIsNot(restored.data, original.data)
+            with self.assertRaises(QueuePayloadError):
+                serializer.decode(
+                    identity,
+                    msgspec.msgpack.encode(
+                        {"data": None, "user_id": 7, "label": 42},
+                    ),
+                )
+
     def testRoundTripPersistentFields(self) -> None:
         """Restore primitive collections, bytes, and nested tuples faithfully.
 
@@ -160,7 +218,8 @@ class TestJobSerializer(TestCase):
         serializer.register(StateJob)
         identity = f"{StateJob.__module__}:{StateJob.__qualname__}"
         restored = serializer.decode(
-            identity, msgspec.msgpack.encode({"user_id": 1, "data": "saved"}),
+            identity,
+            msgspec.msgpack.encode({"user_id": 1, "data": "saved"}),
         )
         self.assertEqual(restored.data, "saved")
 
@@ -233,7 +292,8 @@ class TestJobSerializer(TestCase):
         del original.data
         original.service = None
         with self.assertRaisesRegex(
-            QueuePayloadError, "Declare all persistent job fields",
+            QueuePayloadError,
+            "Declare all persistent job fields",
         ):
             serializer.encode(original)
 
@@ -246,8 +306,11 @@ class TestJobSerializer(TestCase):
             Verify registration enforces the execution contract.
         """
         for job_type in (BaseJob, BlockingJob):
-            with self.subTest(job_type=job_type), self.assertRaises(
-                QueueConfigurationError,
+            with (
+                self.subTest(job_type=job_type),
+                self.assertRaises(
+                    QueueConfigurationError,
+                ),
             ):
                 JobSerializer().register(job_type)
 
@@ -263,8 +326,11 @@ class TestJobSerializer(TestCase):
         identity, _ = serializer.encode(StateJob(1, None))
         with self.assertRaises(QueuePayloadError):
             serializer.decode(identity, b"x" * (1024 * 1024 + 1))
-        payload = msgspec.msgpack.encode({
-            "user_id": 1, "data": msgspec.msgpack.Ext(2, b"x"),
-        })
+        payload = msgspec.msgpack.encode(
+            {
+                "user_id": 1,
+                "data": msgspec.msgpack.Ext(2, b"x"),
+            },
+        )
         with self.assertRaises(QueuePayloadError):
             serializer.decode(identity, payload)

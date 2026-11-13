@@ -1,15 +1,18 @@
+# ruff: noqa: BLE001, TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
+# Observe optional service failures centrally before returning a fallback.
 """Provide view globals operations through ``_global_session``."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from collections.abc import Awaitable, Callable
+
+from orionis.foundation.contracts.application import IApplication
 from orionis.session.contracts.session import ISession
+from orionis.view._failures import capture_service_failure
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
 
-# ruff: noqa: ANN401, BLE001
-
-def _global_session(app: IApplication) -> Any:
+def _global_session(app: IApplication) -> Callable[[], Awaitable[ISession | None]]:
     """
     Build the async ``session`` template global.
 
@@ -20,9 +23,10 @@ def _global_session(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that resolves the current session.
     """
+
     async def session() -> ISession | None:
         """
         Resolve the current session from the container.
@@ -36,7 +40,6 @@ def _global_session(app: IApplication) -> Any:
         try:
             return await app.make(ISession)
         except Exception as error:
-            from orionis.view._failures import capture_service_failure  # noqa: PLC0415
             await capture_service_failure(error, ISession, app=app)
             return None
 

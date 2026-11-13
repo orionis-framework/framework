@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, PLR2004, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 from contextlib import suppress
@@ -7,6 +9,7 @@ from orionis.foundation.application import _ASGI_BODY_QUEUE_SIZE, Application
 from orionis.foundation.enums.runtimes import Runtime
 from orionis.http.contracts.kernel import IKernelHTTP
 from orionis.test import TestCase
+
 
 class _AsyncCall:
     """Record asynchronous calls and return explicit results or failures."""
@@ -65,6 +68,7 @@ class _AsyncCall:
         if callable(effect):
             return await effect(*args, **kwargs)
         return self.returnValue if self.sideEffect is None else effect
+
 
 class _StubKernel(IKernelHTTP):
     """Implement the HTTP kernel contract with recording entry points."""
@@ -133,6 +137,7 @@ class _StubKernel(IKernelHTTP):
         """
         return await self.rsgiAction(scope, protocol)
 
+
 def _new_application() -> Application:
     """
     Construct an application without registering a container singleton.
@@ -154,6 +159,7 @@ def _new_application() -> Application:
     }
     return application
 
+
 async def _cancel_task(task: asyncio.Task) -> None:
     """
     Cancel and join a pending task during test cleanup.
@@ -172,6 +178,7 @@ async def _cancel_task(task: asyncio.Task) -> None:
         task.cancel()
         with suppress(asyncio.CancelledError):
             await task
+
 
 class _AsyncGate:
     """Expose synchronization points around a cancellable coroutine."""
@@ -212,6 +219,7 @@ class _AsyncGate:
         finally:
             await asyncio.sleep(0)
             self.cleaned.set()
+
 
 class _ReceiveChannel:
     """Provide queued ASGI messages and observable receive cleanup."""
@@ -261,6 +269,7 @@ class _ReceiveChannel:
             self.cleaned.set()
             raise
 
+
 class _CleanupChannel:
     """Suspend receive cleanup until released or cancelled again."""
 
@@ -300,6 +309,7 @@ class _CleanupChannel:
                 await self.release.wait()
             finally:
                 self.cleaned.set()
+
 
 class TestApplicationAsync(TestCase):
     """Verify HTTP transport lifetime, backpressure, and kernel initialization."""
@@ -419,7 +429,8 @@ class TestApplicationAsync(TestCase):
             maximum_read_ahead = _ASGI_BODY_QUEUE_SIZE + 1
             self.assertLessEqual(channel.calls, maximum_read_ahead)
             self.assertGreaterEqual(
-                channel.messages.qsize(), 1000 - maximum_read_ahead,
+                channel.messages.qsize(),
+                1000 - maximum_read_ahead,
             )
             handler.release.set()
             self.assertEqual(await task, "response")
@@ -543,7 +554,7 @@ class TestApplicationAsync(TestCase):
             raise RuntimeError(message)
 
         async with asyncio.timeout(2):
-            with self.assertRaisesRegex(RuntimeError, "receive failed"): # NOSONAR
+            with self.assertRaisesRegex(RuntimeError, "receive failed"):  # NOSONAR
                 await application({"type": "http"}, receive, _AsyncCall())
         self.assertTrue(handler.cleaned.is_set())
 
@@ -600,7 +611,7 @@ class TestApplicationAsync(TestCase):
         application = _new_application()
         handler = _AsyncGate()
         application._Application__kernel_http_asgi = handler.run
-        with self.assertRaises(asyncio.CancelledError): # NOSONAR
+        with self.assertRaises(asyncio.CancelledError):  # NOSONAR
             await asyncio.wait_for(
                 application(
                     {"type": "http"},
@@ -655,7 +666,9 @@ class TestApplicationAsync(TestCase):
             async with asyncio.timeout(2):
                 self.assertIsNone(
                     await application(
-                        {"type": "http"}, channel.receive, _AsyncCall(),
+                        {"type": "http"},
+                        channel.receive,
+                        _AsyncCall(),
                     ),
                 )
         finally:
@@ -986,8 +999,7 @@ class TestApplicationAsync(TestCase):
             first = self._requestTask(application, _ReceiveChannel())
             await boot.entered.wait()
             requests = [
-                self._requestTask(application, _ReceiveChannel())
-                for _ in range(8)
+                self._requestTask(application, _ReceiveChannel()) for _ in range(8)
             ]
             requests.append(self._rsgiTask(application, _AsyncGate().run))
             await asyncio.sleep(0)
@@ -1014,7 +1026,7 @@ class TestApplicationAsync(TestCase):
         kernel.rsgiAction = _AsyncCall(return_value="ready")
         application.build = _AsyncCall(return_value=kernel)
         async with asyncio.timeout(2):
-            with self.assertRaisesRegex(RuntimeError, "boot failed"): # NOSONAR
+            with self.assertRaisesRegex(RuntimeError, "boot failed"):  # NOSONAR
                 await self._requestTask(application, _ReceiveChannel())
             self.assertIsNone(application._Application__kernel_http_asgi)
             self.assertIsNone(application._Application__kernel_http_rsgi)
@@ -1067,13 +1079,15 @@ class TestApplicationAsync(TestCase):
         application = _new_application()
         application._Application__onStartup = _AsyncCall()
         application._Application__onShutdown = _AsyncCall()
-        receive = _AsyncCall(side_effect=[
-            {"type": "unknown.event"},
-            {"type": "lifespan.startup"},
-            {"type": "lifespan.startup"},
-            {"type": "lifespan.shutdown"},
-            {"type": "lifespan.shutdown"},
-        ])
+        receive = _AsyncCall(
+            side_effect=[
+                {"type": "unknown.event"},
+                {"type": "lifespan.startup"},
+                {"type": "lifespan.startup"},
+                {"type": "lifespan.shutdown"},
+                {"type": "lifespan.shutdown"},
+            ],
+        )
         send = _AsyncCall()
         await application({"type": "lifespan"}, receive, send)
         self.assertEqual(
@@ -1111,10 +1125,20 @@ class TestApplicationAsync(TestCase):
         send = _AsyncCall()
         await application({"type": "lifespan"}, receive, send)
         self.assertEqual(receive.awaitCount, 1)
-        self.assertEqual(send.calls, [(({
-            "type": "lifespan.startup.failed",
-            "message": "startup failed",
-        },), {})])
+        self.assertEqual(
+            send.calls,
+            [
+                (
+                    (
+                        {
+                            "type": "lifespan.startup.failed",
+                            "message": "startup failed",
+                        },
+                    ),
+                    {},
+                ),
+            ],
+        )
 
     async def testUnsupportedScopesDoNotInitializeKernel(self) -> None:
         """

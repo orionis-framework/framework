@@ -10,6 +10,14 @@ Los drivers cloud usan `SpooledTemporaryFile` para `open()`, de modo que abrir p
 
 `open()` es síncrono y devuelve un handle lazy con operaciones async. Los modos son `rb`, `wb`, `ab`, `rb+`, `wb+` y `ab+`; los modos de texto no están admitidos. Usa siempre `async with` para cerrar. En memory/cloud los modos de escritura publican al cerrar: cerrar después de una excepción también puede ejecutar flush. Un handle no es una transacción ni ofrece rollback. En local `open("wb")` utiliza el archivo directamente; si necesitas publicación atómica de contenido completo, utiliza `write()`/`writeStream()`.
 
+Los handles de memory y cloud respetan el modo elegido: `rb` rechaza escrituras, `wb` y `ab` rechazan lecturas, y `+` permite ambas. Cada escritura en modo append se realiza al final, incluso después de `seek()`.
+
+En extensiones que utilicen `orionis.storage.buffering.spool_stream`, `max_size` debe ser un entero positivo. Cero, valores negativos, booleanos y otros tipos se rechazan antes de consumir el origen. Es el umbral para pasar el buffer a disco, no un límite del tamaño del payload.
+
+Las operaciones locales esperan al trabajo nativo activo antes de propagar la cancelación. `write()` y `writeStream()` locales validan la visibilidad antes de escribir o consumir el origen, solicitan los permisos del temporal desde su creación, según el soporte de la plataforma y lo eliminan si falla la publicación.
+
+La cancelación cloud también espera la operación activa del SDK. Los temporales de upload permanecen abiertos hasta que termine, y un opener que falla libera su temporal. Si falla la limpieza mientras se propaga un error de esa misma operación de almacenamiento, se conserva el original y se informa el fallo secundario al runtime central. Una excepción ajena que el llamador esté gestionando no oculta un nuevo fallo de cierre. S3 valida la visibilidad antes de invocar el SDK o consumir el upload por chunks. Estas garantías no convierten las escrituras remotas en transacciones.
+
 ### Abrir y cerrar un archivo local aislado
 
 ```python
@@ -37,10 +45,11 @@ asyncio.run(main())
 
 ```python
 import asyncio
+from collections.abc import AsyncIterator
 from orionis.storage import Disk, MemoryStorageDriver
 
 
-async def chunks():
+async def chunks() -> AsyncIterator[bytes]:
     for value in (b"alpha", b"-", b"beta"):
         yield value
 
@@ -55,13 +64,17 @@ async def example() -> None:
 asyncio.run(example())
 ```
 
+Si fallan tanto el cuerpo del contexto como la persistencia al cerrar, se propaga el error original del cuerpo y los errores de limpieza se envían al runtime central de fallos. Cerrar correctamente tampoco revierte el contenido tras un error del cuerpo.
+
 ## Persistir una carga HTTP
 
 El tipo HTTP `orionis.http.payload.uploaded_file.UploadedFile` mantiene el multipart en un buffer. El adaptador storage `orionis.storage.uploaded_file.UploadedFile` lo referencia y entrega métodos para guardar en un disco. Usa `Storage.uploaded(source)` para obtener este último. No necesitas copiar todo a bytes antes de guardarlo.
 
 Valida tamaño y contenido antes de publicar. Aplica las reglas Schema de archivo/imagen al payload HTTP original: esperan `filename`, `size` y un `read()` síncrono. El adaptador storage tiene métodos async y no sustituye ese protocolo de validación. `originalName()` y `mimeType()` reflejan metadatos del cliente; aun cuando el payload HTTP sanitiza el nombre, la extensión no demuestra el formato del archivo. `hashName()` genera una vez 40 caracteres hex más la extensión; llamar nuevamente al mismo upload conserva el nombre. Esto reduce colisiones, pero una escritura puede reemplazar una ruta existente según el backend.
 
-`store(directory="", disk=None, visibility=None)` usa ese nombre aleatorio. `storeAs(directory, name, disk=None, visibility=None)` permite uno explícito sin separadores. `copy(directory, name=None, disk=None)` guarda y mantiene abierto el origen; `move(...)` guarda y después cierra el buffer HTTP. Ninguno convierte la operación en una transacción con tu modelo. Guarda la ruta que devuelve `stored.path()` y conserva el nombre original solo como metadata de presentación.
+`store(directory="", disk=None, visibility=None)` usa ese nombre aleatorio. `storeAs(directory, name, disk=None, visibility=None)` permite uno explícito sin separadores, excluyendo nombres vacíos y `.`/`..`. `copy(directory, name=None, disk=None)` guarda y mantiene abierto el origen; `move(...)` guarda y después cierra el buffer HTTP. Ninguno convierte la operación en una transacción con tu modelo. Guarda la ruta que devuelve `stored.path()` y conserva el nombre original solo como metadata de presentación.
+
+La lectura del upload, el avance de sus chunks y el cierre realizado por `move()` esperan al worker nativo activo antes de propagar la cancelación. Guardar asume el cierre del iterador de chunks, incluso si falla el destino; no cierra el upload HTTP prestado. Mantén ese origen abierto hasta que termine la operación y ciérralo desde el ámbito que lo posee.
 
 El ejemplo crea un payload pequeño para ejecutar el recorrido sin servidor; en un controlador `source` procede del parser HTTP.
 

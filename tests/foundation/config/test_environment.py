@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import importlib
 import pkgutil
 from dataclasses import fields, is_dataclass
@@ -11,7 +13,12 @@ from config.realtime import BootstrapRealtime
 from config.view import BootstrapView
 from orionis.foundation.config.database import ConnectionName, Database
 from orionis.foundation.config.http import (
-    HTTP, Cors, HTTPBodyLimits, HTTPRateLimit, HTTPWebSocket, Redis,
+    HTTP,
+    Cors,
+    HTTPBodyLimits,
+    HTTPRateLimit,
+    HTTPWebSocket,
+    Redis,
 )
 from orionis.foundation.config.logging import Logging
 from orionis.foundation.config.mcp.entities.mcp import McpConfig
@@ -24,6 +31,7 @@ from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from types import ModuleType
+
 
 def configuration_modules() -> list[ModuleType]:
     """Load every configuration module, including public package reexports.
@@ -44,6 +52,7 @@ def configuration_modules() -> list[ModuleType]:
         for path in sorted(Path("config").glob("*.py"))
     )
     return modules
+
 
 def configuration_classes(modules: list[ModuleType]) -> list[type]:
     """Collect concrete dataclasses once, excluding imported aliases.
@@ -66,6 +75,7 @@ def configuration_classes(modules: list[ModuleType]) -> list[type]:
         and is_dataclass(value)
         and value.__module__ == module.__name__
     ]
+
 
 class EnvironmentDouble:
     """Provide deterministic environment values without writing to .env."""
@@ -117,6 +127,7 @@ class EnvironmentDouble:
         """
         self.writes.append((key, value))
 
+
 class ConfigurationTestCase(TestCase):
     """Isolate the environment consumed by all configuration factories."""
 
@@ -146,6 +157,7 @@ class ConfigurationTestCase(TestCase):
         """
         for module, original in self.originals:
             module.Env = original
+
 
 class TestConfigurationEnvironment(ConfigurationTestCase):
     def testSelectedDatabaseCharsetDoesNotInvalidateOtherConnections(self) -> None:
@@ -221,9 +233,7 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
                 self.assertEqual(getattr(first, name), ["*"])
                 getattr(first, name).append("another")
                 self.assertEqual(getattr(Cors(), name), ["*"])
-                definition = next(
-                    field for field in fields(Cors) if field.name == name
-                )
+                definition = next(field for field in fields(Cors) if field.name == name)
                 self.assertEqual(definition.metadata["default"], ["*"])
                 for cls in (HTTP, BootstrapHTTP):
                     with self.subTest(entity=cls.__name__):
@@ -292,6 +302,7 @@ class TestConfigurationEnvironment(ConfigurationTestCase):
                 self.assertFalse(config.auto_reload)
                 self.assertIsNone(config.cache_path)
 
+
 class TestSharedRedisConfiguration(ConfigurationTestCase):
     """Keep shared Redis settings consistent without connecting to a server."""
 
@@ -304,15 +315,24 @@ class TestSharedRedisConfiguration(ConfigurationTestCase):
             Core and application rate-limit configuration share connection fields.
         """
         credential = "test@credential:/?#%"
-        self.environment.values.update({
-            "REDIS_HOST": "cache.example", "REDIS_PORT": 6381,
-            "REDIS_DB": 4, "REDIS_PASSWORD": credential,
-        })
+        self.environment.values.update(
+            {
+                "REDIS_HOST": "cache.example",
+                "REDIS_PORT": 6381,
+                "REDIS_DB": 4,
+                "REDIS_PASSWORD": credential,
+            },
+        )
         for config in (HTTPRateLimit(), BootstrapHTTP().rate_limit):
-            self.assertEqual(config.toDict()["rate_limit_redis"], {
-                "endpoint": "cache.example", "port": 6381,
-                "db": 4, "password": credential,
-            })
+            self.assertEqual(
+                config.toDict()["rate_limit_redis"],
+                {
+                    "endpoint": "cache.example",
+                    "port": 6381,
+                    "db": 4,
+                    "password": credential,
+                },
+            )
 
     def testExplicitConnectionTakesPrecedenceWithoutReadingSharedValues(self) -> None:
         """Keep explicit Redis connection fields independent of shared defaults.
@@ -323,10 +343,16 @@ class TestSharedRedisConfiguration(ConfigurationTestCase):
             An explicit connection wins even when unused shared data is invalid.
         """
         connection = Redis(
-            endpoint="dedicated.example", port=6380, db=5, password=None,
+            endpoint="dedicated.example",
+            port=6380,
+            db=5,
+            password=None,
         )
         self.environment.values.update(
-            REDIS_HOST=None, REDIS_PORT="unused", REDIS_DB=-1, REDIS_PASSWORD=True,
+            REDIS_HOST=None,
+            REDIS_PORT="unused",
+            REDIS_DB=-1,
+            REDIS_PASSWORD=True,
         )
         core = HTTPRateLimit(rate_limit_redis=connection)
         bootstrap = BootstrapHTTP(rate_limit={"rate_limit_redis": connection})
@@ -356,7 +382,10 @@ class TestSharedRedisConfiguration(ConfigurationTestCase):
             Verify both layers retain all four connection fields without a URL.
         """
         expected = {
-            "endpoint": "127.0.0.1", "port": 6379, "db": 0, "password": None,
+            "endpoint": "127.0.0.1",
+            "port": 6379,
+            "db": 0,
+            "password": None,
         }
         self.assertEqual(Redis().toDict(), expected)
         for config in (HTTPRateLimit(), BootstrapHTTP().rate_limit):
@@ -380,12 +409,15 @@ class TestSharedRedisConfiguration(ConfigurationTestCase):
         second = (HTTPRateLimit(), BootstrapHTTP().rate_limit)
         for before, after in zip(first, second, strict=True):
             self.assertEqual(
-                before.toDict()["rate_limit_redis"]["endpoint"], "first.cache",
+                before.toDict()["rate_limit_redis"]["endpoint"],
+                "first.cache",
             )
             self.assertEqual(
-                after.toDict()["rate_limit_redis"]["endpoint"], "second.cache",
+                after.toDict()["rate_limit_redis"]["endpoint"],
+                "second.cache",
             )
             self.assertIsNot(before.rate_limit_redis, after.rate_limit_redis)
+
 
 class TestRealtimeConfigurationEnvironment(ConfigurationTestCase):
     def testDefaultsMatchStaticMetadata(self) -> None:
@@ -448,22 +480,35 @@ class TestRealtimeConfigurationEnvironment(ConfigurationTestCase):
             for item in fields(RealtimeConfig):
                 key = "REALTIME_" + item.name.upper()
                 for value, error in (
-                    (True, TypeError), (0, ValueError), (-1, ValueError),
+                    (True, TypeError),
+                    (0, ValueError),
+                    (-1, ValueError),
                 ):
                     self.environment.values.clear()
                     self.environment.values[key] = value
-                    with self.subTest(
-                        entity=cls.__name__, field=item.name, value=value,
-                    ), self.assertRaises(error):
+                    with (
+                        self.subTest(
+                            entity=cls.__name__,
+                            field=item.name,
+                            value=value,
+                        ),
+                        self.assertRaises(error),
+                    ):
                         cls()
             for name in ("invocation_timeout", "client_result_timeout"):
                 for value in (float("inf"), float("nan")):
                     self.environment.values.clear()
                     self.environment.values["REALTIME_" + name.upper()] = value
-                    with self.subTest(
-                        entity=cls.__name__, field=name, value=value,
-                    ), self.assertRaises(ValueError):
+                    with (
+                        self.subTest(
+                            entity=cls.__name__,
+                            field=name,
+                            value=value,
+                        ),
+                        self.assertRaises(ValueError),
+                    ):
                         cls()
+
 
 class TestProtocolEnvironment(ConfigurationTestCase):
     """Keep protocol defaults environment-backed and their origins explicit."""
@@ -477,27 +522,33 @@ class TestProtocolEnvironment(ConfigurationTestCase):
             Every field exposes a static default and a nonempty description.
         """
         expected = (
-            (HTTPWebSocket, {
-                "max_connections": 128,
-                "max_message_size": 1024 * 1024,
-                "allow_origins": (),
-            }),
-            (McpConfig, {
-                "max_request_size": 1024 * 1024,
-                "default_page_size": 50,
-                "max_page_size": 100,
-                "max_concurrent_requests": 32,
-                "subscription_buffer_size": 64,
-                "max_subscriptions": 1024,
-                "max_resource_subscriptions": 64,
-                "subscription_keepalive": 15.0,
-                "allowed_origins": [],
-                "tool_search_max_results": 20,
-                "tool_search_max_calls": 5,
-                "tool_search_max_output_bytes": 256 * 1024,
-                "max_response_size": 4 * 1024 * 1024,
-                "max_metadata_size": 64 * 1024,
-            }),
+            (
+                HTTPWebSocket,
+                {
+                    "max_connections": 128,
+                    "max_message_size": 1024 * 1024,
+                    "allow_origins": (),
+                },
+            ),
+            (
+                McpConfig,
+                {
+                    "max_request_size": 1024 * 1024,
+                    "default_page_size": 50,
+                    "max_page_size": 100,
+                    "max_concurrent_requests": 32,
+                    "subscription_buffer_size": 64,
+                    "max_subscriptions": 1024,
+                    "max_resource_subscriptions": 64,
+                    "subscription_keepalive": 15.0,
+                    "allowed_origins": [],
+                    "tool_search_max_results": 20,
+                    "tool_search_max_calls": 5,
+                    "tool_search_max_output_bytes": 256 * 1024,
+                    "max_response_size": 4 * 1024 * 1024,
+                    "max_metadata_size": 64 * 1024,
+                },
+            ),
         )
         for config_type, defaults in expected:
             self.assertEqual(config_type().toDict(), defaults)
@@ -537,13 +588,15 @@ class TestProtocolEnvironment(ConfigurationTestCase):
             Request bytes and concurrent admission can share HTTP environment values.
         """
         self.environment.values.update(
-            HTTP_MAX_BODY_SIZE=2048, HTTP_MAX_CONCURRENT_REQUESTS=8,
+            HTTP_MAX_BODY_SIZE=2048,
+            HTTP_MAX_CONCURRENT_REQUESTS=8,
         )
         for config_type in (McpConfig, BootstrapMcp):
             self.assertEqual(config_type().max_request_size, 2048)
             self.assertEqual(config_type().max_concurrent_requests, 8)
         self.environment.values.update(
-            MCP_MAX_REQUEST_SIZE=512, MCP_MAX_CONCURRENT_REQUESTS=2,
+            MCP_MAX_REQUEST_SIZE=512,
+            MCP_MAX_CONCURRENT_REQUESTS=2,
         )
         self.assertEqual(McpConfig().max_request_size, 512)
         self.assertEqual(McpConfig().max_concurrent_requests, 2)
@@ -614,22 +667,36 @@ class TestProtocolEnvironment(ConfigurationTestCase):
         origins = ["https://first.example"]
         self.environment.values["CORS_ALLOW_ORIGINS"] = origins
         first = (
-            McpConfig().allowed_origins, BootstrapMcp().allowed_origins,
-            HTTPWebSocket().allow_origins, BootstrapHTTP().websocket.allow_origins,
+            McpConfig().allowed_origins,
+            BootstrapMcp().allowed_origins,
+            HTTPWebSocket().allow_origins,
+            BootstrapHTTP().websocket.allow_origins,
         )
         origins[0] = "https://second.example"
         second = (
-            McpConfig().allowed_origins, BootstrapMcp().allowed_origins,
-            HTTPWebSocket().allow_origins, BootstrapHTTP().websocket.allow_origins,
+            McpConfig().allowed_origins,
+            BootstrapMcp().allowed_origins,
+            HTTPWebSocket().allow_origins,
+            BootstrapHTTP().websocket.allow_origins,
         )
-        self.assertEqual(first, (
-            ["https://first.example"], ["https://first.example"],
-            ("https://first.example",), ("https://first.example",),
-        ))
-        self.assertEqual(second, (
-            ["https://second.example"], ["https://second.example"],
-            ("https://second.example",), ("https://second.example",),
-        ))
+        self.assertEqual(
+            first,
+            (
+                ["https://first.example"],
+                ["https://first.example"],
+                ("https://first.example",),
+                ("https://first.example",),
+            ),
+        )
+        self.assertEqual(
+            second,
+            (
+                ["https://second.example"],
+                ["https://second.example"],
+                ("https://second.example",),
+                ("https://second.example",),
+            ),
+        )
 
     def testExplicitProtocolOriginsCanDifferFromSharedDefaults(self) -> None:
         """Leave separately supplied origins under the developer's control.
@@ -642,10 +709,12 @@ class TestProtocolEnvironment(ConfigurationTestCase):
         self.environment.values["CORS_ALLOW_ORIGINS"] = ["https://shared.example"]
         origins = ("https://private.example",)
         self.assertEqual(
-            McpConfig(allowed_origins=origins).allowed_origins, list(origins),
+            McpConfig(allowed_origins=origins).allowed_origins,
+            list(origins),
         )
         self.assertEqual(
-            BootstrapMcp(allowed_origins=origins).allowed_origins, list(origins),
+            BootstrapMcp(allowed_origins=origins).allowed_origins,
+            list(origins),
         )
         self.assertEqual(HTTPWebSocket(allow_origins=origins).allow_origins, origins)
         config = BootstrapHTTP(websocket={"allow_origins": origins})
@@ -663,11 +732,18 @@ class TestProtocolEnvironment(ConfigurationTestCase):
         for origins in ("https://client.example", None, [1], [" "]):
             self.environment.values["CORS_ALLOW_ORIGINS"] = origins
             for config_type in (
-                McpConfig, BootstrapMcp, HTTPWebSocket, BootstrapHTTP,
+                McpConfig,
+                BootstrapMcp,
+                HTTPWebSocket,
+                BootstrapHTTP,
             ):
-                with self.subTest(
-                    entity=config_type.__name__, origins=origins,
-                ), self.assertRaises((TypeError, ValueError)):
+                with (
+                    self.subTest(
+                        entity=config_type.__name__,
+                        origins=origins,
+                    ),
+                    self.assertRaises((TypeError, ValueError)),
+                ):
                     config_type()
 
     def testSharedWildcardsFollowEachProtocolValidation(self) -> None:
@@ -681,9 +757,13 @@ class TestProtocolEnvironment(ConfigurationTestCase):
         for origins in (["*"], ["https://*.example.com"]):
             self.environment.values["CORS_ALLOW_ORIGINS"] = origins
             for config_type in (McpConfig, BootstrapMcp):
-                with self.subTest(
-                    entity=config_type.__name__, origins=origins,
-                ), self.assertRaises(ValueError):
+                with (
+                    self.subTest(
+                        entity=config_type.__name__,
+                        origins=origins,
+                    ),
+                    self.assertRaises(ValueError),
+                ):
                     config_type()
             expected = tuple(origins)
             self.assertEqual(HTTPWebSocket().allow_origins, expected)
@@ -698,11 +778,13 @@ class TestProtocolEnvironment(ConfigurationTestCase):
             Both layers consume the declared connection and message limits.
         """
         self.environment.values.update(
-            WEBSOCKET_MAX_CONNECTIONS=12, WEBSOCKET_MAX_MESSAGE_SIZE=8192,
+            WEBSOCKET_MAX_CONNECTIONS=12,
+            WEBSOCKET_MAX_MESSAGE_SIZE=8192,
         )
         for config in (HTTPWebSocket(), BootstrapHTTP().websocket):
             self.assertEqual(config.max_connections, 12)
             self.assertEqual(config.max_message_size, 8192)
+
 
 class TestHttpBodyLimitsEnvironment(ConfigurationTestCase):
     """Keep core and application request budgets consistent with the environment."""
@@ -755,7 +837,8 @@ class TestHttpBodyLimitsEnvironment(ConfigurationTestCase):
             first = HTTPBodyLimits()
             self.assertEqual(getattr(first, item.name), default + 1)
             self.assertEqual(
-                getattr(BootstrapHTTP().body_limits, item.name), default + 1,
+                getattr(BootstrapHTTP().body_limits, item.name),
+                default + 1,
             )
             self.environment.values[key] = default + 2
             self.assertEqual(getattr(HTTPBodyLimits(), item.name), default + 2)
@@ -781,8 +864,12 @@ class TestHttpBodyLimitsEnvironment(ConfigurationTestCase):
         for item in fields(HTTPBodyLimits):
             key = keys.get(item.name, "HTTP_" + item.name.upper())
             for value, error in (
-                (True, TypeError), (False, TypeError), (1.5, TypeError),
-                ("invalid", TypeError), (None, TypeError), (-1, ValueError),
+                (True, TypeError),
+                (False, TypeError),
+                (1.5, TypeError),
+                ("invalid", TypeError),
+                (None, TypeError),
+                (-1, ValueError),
             ):
                 self.environment.values.clear()
                 self.environment.values[key] = value
@@ -810,13 +897,16 @@ class TestHttpBodyLimitsEnvironment(ConfigurationTestCase):
             Parser defaults and explicit values bypass unused environment limits.
         """
         self.environment.values.update(
-            HTTP_MAX_BUFFER_SIZE=None, HTTP_MAX_CONCURRENT_REQUESTS=None,
+            HTTP_MAX_BUFFER_SIZE=None,
+            HTTP_MAX_CONCURRENT_REQUESTS=None,
         )
         with self.assertRaises(TypeError):
             HTTPBodyLimits()
         parser = MultipartStreamParser(
-            BodyStream(Interface.ASGI, None).stream(), b"body-limits",
-            max_body_size=512, max_files=0,
+            BodyStream(Interface.ASGI, None).stream(),
+            b"body-limits",
+            max_body_size=512,
+            max_files=0,
         )
         self.assertEqual(parser.max_body_size, 512)
         self.assertEqual(parser.max_files, 0)

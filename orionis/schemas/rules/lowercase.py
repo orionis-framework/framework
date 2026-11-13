@@ -1,11 +1,12 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string contains no uppercase characters."""
 
 from orionis.schemas.rule import Rule
 
+
 class Lowercase(Rule):
     """Ensure a string contains no uppercase characters."""
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

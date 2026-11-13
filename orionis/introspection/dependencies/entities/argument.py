@@ -1,8 +1,12 @@
+# ruff: noqa: TC003
+# Qualify the runtime type annotation to avoid the slot named type shadowing it.
 """Represent a function or method argument with type and resolution metadata."""
 
 from __future__ import annotations
+import builtins
 from dataclasses import dataclass
 from typing import Any
+
 
 @dataclass(slots=True, kw_only=True, frozen=True)
 class Argument:
@@ -36,7 +40,7 @@ class Argument:
     resolved: bool
     module_name: str
     class_name: str
-    type: type[Any]
+    type: builtins.type[Any]
     full_class_path: str
 
     # Optional metadata fields with sensible defaults.
@@ -51,7 +55,7 @@ class Argument:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
 
         Raises
         ------
@@ -62,16 +66,10 @@ class Argument:
             If ``type`` is ``None`` and no ``default`` value is provided.
         """
         if not isinstance(self.module_name, str):
-            msg = (
-                f"module_name must be a str, "
-                f"got {type(self.module_name).__name__!r}"
-            )
+            msg = f"module_name must be a str, got {type(self.module_name).__name__!r}"
             raise TypeError(msg)
         if not isinstance(self.class_name, str):
-            msg = (
-                f"class_name must be a str, "
-                f"got {type(self.class_name).__name__!r}"
-            )
+            msg = f"class_name must be a str, got {type(self.class_name).__name__!r}"
             raise TypeError(msg)
         if not isinstance(self.full_class_path, str):
             msg = (

@@ -1,25 +1,33 @@
 # Conectar código síncrono y asíncrono
 
-Loop reúne la creación de loops, el despacho de callables y los puentes síncronos. Empieza por distinguir si tu código ya está dentro de un loop: esa decisión determina qué operación usar.
+`Loop` proporciona gestión de event loops, programación de tareas y despacho de callables. Se importa directamente: no requiere una aplicación Orionis, un provider, un archivo de configuración ni un servicio externo.
 
 ## Requisitos
 
 - Python 3.14 o posterior, según declara el proyecto.
-- Una instalación normal de Orionis. No existe un extra de instalación específico para `aio`.
-- En plataformas distintas de Windows, el proyecto declara `uvloop>=0.22.1`; `Loop` lo utiliza cuando se puede importar. En Windows, `uvloop` no es necesario y Orionis intenta usar `asyncio.ProactorEventLoop`.
-- No se requiere iniciar la aplicación, registrar un binding en el contenedor, preparar un archivo de configuración ni disponer de un servicio externo para usar `Loop` directamente.
-## Inicio rápido
+- Una instalación normal de Orionis; no existe un extra separado de `aio`.
+- Fuera de Windows, Orionis utiliza `uvloop` cuando puede importarse. En Windows selecciona `asyncio.ProactorEventLoop` cuando está disponible. En los demás casos utiliza la factoría estándar de asyncio.
 
-Ejecuta el punto de entrada async de una aplicación y mueve un callable bloqueante al ejecutor predeterminado del loop:
+## Elegir la operación adecuada
+
+| Situación | Operación | Comportamiento |
+|---|---|---|
+| Script o CLI sin loop activo | `Loop.run(main())` | Posee un loop y devuelve el resultado de la corrutina. |
+| Dentro de una función async | `await main()` | Utiliza el loop y los recursos actuales. |
+| Callable sync o async | `await Loop.execute(callback, ...)` | Ejecuta lo síncrono en un worker y espera los resultados asíncronos. |
+| Trabajo concurrente en el loop actual | `task = Loop.createTask(work())` | Programa inmediatamente; espera `task` para obtener el resultado. |
+| API síncrona sin loop activo | `Loop.runSync(work())` | Aplica la misma propiedad y validación que `run`. |
+| Bloque síncrono que requiere un loop gestionado | `with Loop.eventLoopContext() as loop:` | Toma prestado un loop existente o posee uno nuevo. |
+
+`run` y `runSync` rechazan llamadas desde un hilo que ya ejecuta un event loop. No trasladan esa corrutina a un worker privado. Una corrutina rechazada sigue perteneciendo al llamador: debe esperarla o cerrarla.
+
+## Iniciar un script y desplazar trabajo bloqueante
 
 ```python
-import time
-
 from orionis.aio import Loop
 
 
 def blocking_label(value: int) -> str:
-    time.sleep(0.01)
     return f"job-{value}"
 
 
@@ -28,71 +36,14 @@ async def main() -> str:
     return label.upper()
 
 
-result = Loop.run(main())
-print(result)  # JOB-7
+print(Loop.run(main()))  # JOB-7
 ```
 
-`Loop.run` crea y posee el loop del punto de entrada. `Loop.execute` invoca `blocking_label` en el ejecutor predeterminado y devuelve después su resultado a `main`.
+`run` crea y registra un loop propio antes de iniciar la corrutina. Al salir, `asyncio.Runner` cancela y drena tareas pendientes, finaliza generadores asíncronos, cierra el ejecutor predeterminado y cierra ese loop. Restaura un loop previamente registrado que siga abierto; no vuelve a registrar uno que se haya cerrado. Los errores de la corrutina y `KeyboardInterrupt` se propagan al llamador.
 
-## Elegir el punto de entrada correcto
+`execute` acepta un callable, no un objeto corrutina ya creado. Espera las funciones corrutina en el loop del llamador. Los demás callables se ejecutan en el ejecutor predeterminado de ese loop con una copia del contexto `contextvars` del llamador. Los cambios realizados a variables de contexto dentro del worker no alteran el contexto del llamador. Si un callable síncrono devuelve un awaitable, incluida una corrutina basada en generador, el resultado se espera en el loop del llamador. Los generadores ordinarios se devuelven como valores sin esperarlos.
 
-| Situación | Operación | Resultado |
-|---|---|---|
-| Script o CLI sin loop activo | `Loop.run(main())` | Ejecuta la corrutina y devuelve su resultado. |
-| Ya estás en una función `async` | `await main()` | Conserva el loop y los recursos actuales. |
-| Callback sync o async desconocido | `await Loop.execute(callback, ...)` | Despacha y espera el resultado. |
-| Trabajo concurrente en el mismo loop | `task = await Loop.createTask(work())` y después `await task` | Crea una `asyncio.Task`; el primer `await` solo obtiene la tarea. |
-| Contrato síncrono que exige resultado async | `Loop.runSync(work())` | Bloquea al llamador hasta completar la operación. |
-
-En un controlador async, llama directamente con `await`. `runSync()` usa otro hilo cuando ya hay un loop activo, pero espera con `.result()`: durante esa espera bloquea el hilo llamador y, si es el del servidor, también sus demás solicitudes. No transfieras conexiones, locks ni tareas ligadas al loop original hacia ese puente. Tampoco puede completar una corrutina que necesite que el loop bloqueado avance.
-
-`execute()` acepta una función, no el objeto corrutina ya creado. Los callables síncronos se ejecutan en el executor y, si devuelven un awaitable, ese resultado se espera de vuelta en el loop. `run_in_executor` no promete propagar automáticamente los `ContextVar` del llamador; pasa datos necesarios de forma explícita.
-
-### Propiedad de recursos
-
-`getEventLoop()` reutiliza el loop activo o uno cacheado por hilo. `eventLoopContext()` cancela y espera tareas pendientes solo cuando el loop no está ejecutándose; no cierra el loop ni sustituye el ciclo de vida del servidor. `Loop.run()` sí administra su propio runner de entrada. Conserva una referencia a cada tarea y espera o cancela su resultado; crear una tarea no añade persistencia, reintentos ni un supervisor.
-
-## Conceptos principales
-
-### Loop de punto de entrada frente al loop actual
-
-`Loop.run(coro)` está destinado a un punto de entrada síncrono donde no haya un event loop en ejecución en el hilo que llama. Dentro de código async, utiliza `await` de forma normal. `Loop.getEventLoop()` devuelve el loop activo cuando se llama desde código async; fuera de él, el método crea o reutiliza un loop abierto almacenado para el hilo actual.
-
-### Puente de callables
-
-`Loop.execute(func, *args, **kwargs)` acepta ambos tipos de callable. Una función corrutina se llama y espera en el loop actual. Un callable síncrono se envía al ejecutor predeterminado de ese loop. Si el callable síncrono devuelve un awaitable, el objeto devuelto se espera después en el loop actual.
-
-### Puente síncrono de corrutinas
-
-`Loop.runSync(coro)` bloquea deliberadamente hasta que termina la corrutina. Sin un loop activo delega en `Loop.run`. Con un loop activo en el hilo que llama, envía `Loop.run(coro)` a un `ThreadPoolExecutor` compartido de un solo worker, donde la corrutina recibe un loop separado.
-
-### Propiedad y limpieza del loop
-
-`Loop.eventLoopContext()` toma prestado el loop devuelto por `getEventLoop`; no lo cierra. Al salir, cuando ese loop no está en ejecución, cancela y drena todas sus tareas pendientes. Cuando se llama desde un loop ya activo, omite la limpieza para no cancelar la tarea que impulsa al llamador.
-
-## Flujos de trabajo comunes
-
-### Iniciar una CLI o un script
-
-Define una corrutina de nivel superior, crea el objeto corrutina y pásalo a `Loop.run`. No llames `Loop.run` desde un manejador async; se intentaría anidar event loops en un mismo hilo.
-
-### Llamar código bloqueante desde código async
-
-Pasa la función síncrona y sus argumentos a `await Loop.execute(...)`. El loop permanece disponible para ejecutar otras tareas mientras el ejecutor predeterminado realiza la llamada bloqueante. Las funciones corrutina pueden usar el mismo punto de entrada y se esperan directamente.
-
-### Programar trabajo concurrente
-
-Dentro de un loop activo, llama `await Loop.createTask(coro, name=...)` para cada corrutina. Conserva las tareas devueltas y después espéralas individualmente o con `asyncio.gather`.
-
-### Adaptar una operación async a un contrato síncrono
-
-Usa `Loop.runSync(coro)` únicamente en un límite síncrono que no pueda hacerse async. Si quien llama ya está en el hilo de un event loop, el puente usa su worker dedicado para no intentar ejecutar un segundo loop en ese mismo hilo. La llamada sigue bloqueando al llamador hasta completarse.
-
-## Ejemplos
-
-### Despachar callables sync y async mediante una sola interfaz
-
-La misma operación maneja ambos estilos de callable y conserva los argumentos con nombre:
+Los argumentos con nombre se transmiten sin cambios:
 
 ```python
 from orionis.aio import Loop
@@ -107,46 +58,68 @@ async def async_join(*, left: str, right: str) -> str:
 
 
 async def main() -> tuple[str, str]:
-    sync_value = await Loop.execute(sync_join, left="a", right="b")
-    async_value = await Loop.execute(async_join, left="a", right="b")
-    return sync_value, async_value
+    first = await Loop.execute(sync_join, left="a", right="b")
+    second = await Loop.execute(async_join, left="a", right="b")
+    return first, second
 
 
 print(Loop.run(main()))  # ('a:b', 'a/b')
 ```
 
-La función síncrona se ejecuta en el ejecutor predeterminado del loop; la función corrutina permanece en el loop del llamador.
+Cancelar la tarea que espera no puede detener por la fuerza un callable síncrono que ya se ejecuta en un worker. En particular, la cancelación no demuestra que un envío SMTP o una operación de archivos no se hayan completado. Los resultados awaitable deben pertenecer al loop del llamador; no devuelvas futures pendientes ligados a otro loop.
 
+El trabajo en cola comprueba la cancelación antes de invocar su callable. Cuando termina un callable ya iniciado, un resultado corrutina abandonado se cierra y se solicita la cancelación de un future abandonado en su loop propietario cuando ese loop permanece abierto. También se observa la excepción de un future que falla antes de poder cancelarlo. Una excepción tardía del worker o de la limpieza se captura en el runtime de fallos de Orionis activo, o llega al manejador de excepciones del loop cuando no hay un runtime activo.
 
-### Crear e identificar una tarea
+## Programar y observar una tarea
 
-Los nombres de tareas son útiles en diagnósticos, mientras el objeto de tarea conserva el resultado:
+`createTask` es síncrono. Conserva la tarea devuelta y espérala para recibir su resultado o excepción:
 
 ```python
-import asyncio
-
 from orionis.aio import Loop
 
 
 async def fetch_total() -> int:
-    await asyncio.sleep(0)
     return 42
 
 
 async def main() -> tuple[str, int]:
-    task = await Loop.createTask(fetch_total(), name="fetch-total")
+    task = Loop.createTask(fetch_total(), name="fetch-total")
     return task.get_name(), await task
 
 
 print(Loop.run(main()))  # ('fetch-total', 42)
 ```
 
-`createTask` programa la ejecución inmediatamente; esperar la tarea devuelta es lo que recupera su resultado.
+La tarea captura el contexto presente al crearla y queda programada sin un `await` adicional sobre la factoría. Cuando hay un runtime de fallos de Orionis activo, la programación delega en su supervisión de tareas. En los demás casos delega en `asyncio.create_task`. Crear una tarea no proporciona persistencia ni reintentos.
+
+## Poseer o tomar prestado un loop
+
+El registro de asyncio para el hilo llamador es la fuente de verdad. `getEventLoop()` devuelve primero un loop activo, después uno registrado y abierto, o crea y registra uno nuevo. Cuando crea el loop, el llamador es su propietario y debe cerrarlo.
+
+`eventLoopContext()` tiene dos ciclos de vida distintos:
+
+- Si existe un loop registrado abierto o activo, lo toma prestado. No cancela sus tareas ni lo cierra, incluso si el bloque lanza una excepción.
+- Si no existe un loop registrado abierto, crea uno y utiliza la limpieza de Runner al salir. Los contextos anidados toman prestado el loop externo y dejan su limpieza al propietario.
+
+Para obtener limpieza automática, entra directamente al contexto antes de adquirir un loop:
+
+```python
+from orionis.aio import Loop
 
 
-### Llevar una operación async a código síncrono
+async def calculate() -> int:
+    return 42
 
-Este ejemplo recorre la ruta del hilo worker porque `runSync` se llama mientras el loop de `main` está activo:
+
+with Loop.eventLoopContext() as loop:
+    result = loop.run_until_complete(calculate())
+
+print(result, loop.is_closed())  # 42 True
+```
+
+Este ejemplo corresponde a un hilo síncrono sin loop registrado. Si llamas primero a `getEventLoop()`, un contexto posterior toma prestado ese loop y no adquiere su propiedad. No cierres manualmente un loop gestionado ni lo dejes ejecutándose cuando salga su contexto: ambas situaciones provocan `RuntimeError` en lugar de omitir silenciosamente la limpieza.
+
+## Adaptar una corrutina a una API síncrona
 
 ```python
 from orionis.aio import Loop
@@ -156,154 +129,38 @@ async def lookup(code: str) -> str:
     return code.upper()
 
 
-async def main() -> str:
-    return Loop.runSync(lookup("orionis"))
-
-
-print(Loop.run(main()))  # ORIONIS
+print(Loop.runSync(lookup("orionis")))  # ORIONIS
 ```
 
-El resultado vuelve sincrónicamente a `main`. Durante esa llamada, el hilo que ejecuta `main` está bloqueado, por lo que es preferible usar directamente `await lookup(...)` cuando la API circundante pueda ser async.
+`runSync` es un punto de entrada síncrono directo en el hilo llamador. Dentro de código async, utiliza `await lookup(...)`. No mantiene un ejecutor compartido y los llamadores síncronos independientes no pasan por un único worker. Los recursos ligados a otro event loop no se pueden trasladar simplemente usando este puente.
 
+## Configuración e integración
 
-### Manejar un uso inválido del punto de entrada
+La selección de factoría se conserva a nivel de clase; la detección de uvloop utiliza un lock. El paquete no consume claves de configuración ni variables de entorno de Orionis, ni ofrece un reemplazo público de la factoría. El registro de loops sigue perteneciendo a cada hilo mediante asyncio; Orionis no mantiene una segunda caché de loops por hilo.
 
-Pasa el objeto corrutina que devuelve la llamada a una función async, no la propia función:
+Entre sus consumidores directos están el punto de entrada `reactor` y la CLI (`run`), la composición y los transportes de correo (`execute`), y la supervisión del runtime de fallos (`createTask`). Importar `orionis.aio` no crea por sí solo un loop, ejecutor ni aplicación.
 
-```python
-from orionis.aio import Loop
+## API y errores
 
+| Firma | Valor devuelto y restricciones |
+|---|---|
+| `Loop.getEventLoop() -> asyncio.AbstractEventLoop` | Devuelve un loop abierto; el llamador posee únicamente un loop creado por esta llamada. |
+| `Loop.run(coro: Coroutine[Any, Any, T]) -> T` | Acepta un objeto corrutina nativo; rechaza un loop activo en este hilo. |
+| `await Loop.execute(func, /, *args, **kwargs) -> Any` | Acepta un callable y conserva sus resultados y excepciones durante el despacho. |
+| `Loop.eventLoopContext()` | Entrega un loop prestado o propio con el ciclo de vida descrito arriba. |
+| `Loop.isLoopRunning() -> bool` | Indica si este hilo está ejecutando un loop; un registro inactivo no basta. |
+| `Loop.createTask(coro, *, name=None) -> asyncio.Task[T]` | Requiere un loop activo y devuelve inmediatamente la tarea programada. |
+| `Loop.runSync(coro: Coroutine[Any, Any, T]) -> T` | Delega en `run` sin un ejecutor privado. |
 
-async def main() -> int:
-    return 1
+`run` y `runSync` lanzan `TypeError("A coroutine object is required")` para funciones corrutina, valores simples y awaitables generales que no sean objetos corrutina nativos. Lanzan `RuntimeError` si se llaman desde un loop activo. `execute` lanza `TypeError("The provided object is not callable")` antes de despachar un objeto no invocable. Las excepciones del código ejecutado se propagan; ningún error se convierte en un retorno exitoso.
 
+La capacidad y el cierre de los workers pertenecen al ejecutor predeterminado del loop. Conservar la factoría evita repetir la detección, pero no establece una garantía de latencia ni rendimiento. Las tareas cooperativas deben ceder el control para que avance otro trabajo en el mismo loop.
 
-try:
-    Loop.run(main)  # type: ignore[arg-type]
-except TypeError as error:
-    print(str(error))  # A coroutine object is required
-```
-
-La validación ocurre antes de crear un loop.
-
-## Configuración
-
-Este módulo no consume claves de configuración ni variables de entorno de Orionis. La selección de factoría depende de la plataforma actual y de si `uvloop` se puede importar; no existe una opción pública para reemplazar esa selección. La factoría resuelta se almacena durante toda la vida del proceso.
-
-## Integración con Orionis
-
-- `orionis.mail` usa `Loop.execute` para mantener fuera del hilo del event loop activo el renderizado síncrono, almacenamiento en archivos y trabajo SMTP.
-- `orionis.schemas.rules.unique` usa `Loop.runSync` porque su hook público de validación es síncrono mientras su comprobación de existencia utiliza operaciones asíncronas de base de datos.
-- El ejecutable `reactor` del repositorio inicia `app.handleCommand(sys.argv)` con `Loop.run`.
-- `Loop` no tiene provider y no se resuelve mediante el contenedor de servicios; basta con importarlo.
-
-Estos son consumidores directos, no efectos secundarios del bootstrap. Importar `orionis.aio` no crea un loop, ejecutor ni aplicación.
-
-## Errores y casos límite
-
-- `run` lanza `TypeError("A coroutine object is required")` para una función corrutina, valor simple u otro objeto que no sea un objeto corrutina nativo.
-- `run` lanza `RuntimeError` cuando el hilo que llama ya tiene un loop en ejecución. La corrutina proporcionada queda sin consumir y sigue perteneciendo al llamador.
-- `execute` lanza `TypeError("The provided object is not callable")` antes de programar un objeto que no sea callable. Sin un loop en ejecución, su llamada a `asyncio.get_running_loop()` lanza `RuntimeError`.
-- Las excepciones de los callables y corrutinas invocados se propagan; el módulo no las envuelve.
-- `run` convierte un `KeyboardInterrupt` lanzado durante la ejecución de la corrutina en el entero `0`.
-- `eventLoopContext` puede cancelar cualquier tarea pendiente asociada a su loop inactivo, no solo las tareas creadas dentro del contexto. Intencionalmente, no cierra ese loop.
-- Un loop cerrado en el almacenamiento local del hilo se descarta y reemplaza en la siguiente llamada a `getEventLoop`.
-
-## Rendimiento y concurrencia
-
-La resolución de la factoría de loops y la detección de `uvloop` se almacenan para todo el proceso y están protegidas por un `threading.Lock` durante el primer uso. Las resoluciones posteriores usan una ruta rápida sin adquirir el lock.
-
-Los loops inactivos se almacenan en `threading.local`, por lo que cada hilo recibe el suyo y las llamadas repetidas en ese hilo lo reutilizan hasta que se cierre. Un loop actualmente en ejecución siempre tiene prioridad sobre el valor almacenado.
-
-`execute` usa el ejecutor predeterminado del loop actual para el trabajo síncrono; su capacidad y ciclo de vida pertenecen por tanto a ese event loop. `runSync` usa un `ThreadPoolExecutor(max_workers=1)` separado para todo el proceso y creado de forma diferida bajo un lock. En consecuencia, las llamadas concurrentes a `runSync` que necesiten el worker se serializan. El ejecutor se conserva en vez de cerrarse después de cada llamada.
-
-`runSync` evita errores por loops anidados ejecutando la corrutina en otro hilo, pero es una llamada bloqueante y puede pausar el hilo del event loop llamador. `createTask` solo programa trabajo; la concurrencia depende de que la corrutina ceda el control.
-
-## API pública
-
-### `Loop`
-
-Import recomendado:
-
-```python
-from orionis.aio import Loop
-```
-
-Todos los métodos públicos son estáticos o de clase y operan sobre estado compartido de la clase.
-
-#### `getEventLoop()`
-
-```text
-Loop.getEventLoop() -> asyncio.AbstractEventLoop
-```
-
-Devuelve el loop que se está ejecutando en el hilo que llama. Si ninguno está activo, reutiliza el loop abierto almacenado para ese hilo o crea uno nuevo, lo instala con `asyncio.set_event_loop` y lo guarda en almacenamiento local del hilo. Un loop almacenado que ya esté cerrado se reemplaza. Los loops nunca se comparten entre almacenamientos locales de hilos distintos.
-
-#### `run(coro)`
-
-```text
-Loop.run(coro: Coroutine[Any, Any, T]) -> T
-```
-
-Ejecuta un objeto corrutina nativo hasta completarlo y devuelve su valor. La selección de factoría es `uvloop.new_event_loop` cuando está disponible fuera de Windows, después `asyncio.ProactorEventLoop` en Windows cuando se expone y, por último, la factoría estándar de `asyncio`. Si existe una factoría explícita, la implementación usa `asyncio.Runner`; en caso contrario usa `asyncio.run`.
-
-El método acepta un objeto corrutina, no una función corrutina ni un awaitable general. Devuelve `0` después de `KeyboardInterrupt`, propaga las demás excepciones de la corrutina y rechaza su uso desde un hilo que ya tenga un loop en ejecución.
-
-#### `execute(func, /, *args, **kwargs)`
-
-```text
-await Loop.execute(func, *args, **kwargs) -> Any
-```
-
-Invoca directamente una función corrutina y la espera. Mueve cualquier otro callable al ejecutor predeterminado del loop actual mediante `run_in_executor(None, ...)`. Los argumentos y valores de retorno pasan sin alteración; si el callable ejecutado fuera del loop devuelve un awaitable, este se espera antes de devolver el resultado. Las excepciones originales atraviesan sin cambios el límite de `await`.
-
-Este método debe llamarse dentro de un event loop activo. No utiliza el ejecutor privado de un solo worker reservado para `runSync`.
-
-#### `eventLoopContext()`
-
-```python
-from orionis.aio import Loop
-
-
-with Loop.eventLoopContext() as loop:
-    assert loop is Loop.getEventLoop()
-```
-
-Entrega el resultado de `getEventLoop()`. Al salir de un loop que no está en ejecución, cancela todas sus tareas pendientes y las reúne con `return_exceptions=True`. La limpieza suprime `RuntimeError` y `asyncio.CancelledError`, incluido el caso en que el código dentro del bloque haya cerrado el loop. El contexto deja el loop abierto y reutilizable cuando puede hacerlo.
-
-#### `isLoopRunning()`
-
-```text
-Loop.isLoopRunning() -> bool
-```
-
-Indica si un event loop se está ejecutando activamente en el hilo que llama. Tener un loop almacenado pero inactivo no hace que devuelva `True`.
-
-#### `createTask(coro, *, name=None)`
-
-```text
-await Loop.createTask(coro, name=None) -> asyncio.Task[T]
-```
-
-Crea la tarea en el loop actual en ejecución y la devuelve sin esperar a que termine. Aunque el método en sí es async, quien llama debe conservar o esperar la tarea devuelta para observar su finalización y excepciones. El nombre opcional se reenvía a `loop.create_task`.
-
-#### `runSync(coro)`
-
-```text
-Loop.runSync(coro: Coroutine[Any, Any, T]) -> T
-```
-
-Espera sincrónicamente una corrutina y devuelve su resultado. En un hilo sin loop en ejecución, es una llamada directa a `run`. En un hilo con un loop en ejecución, mueve la ejecución al ejecutor compartido de un worker que el módulo crea de forma diferida. Las excepciones lanzadas por la corrutina se vuelven a lanzar en el hilo que llama.
-
-Como `runSync` bloquea el hilo que llama, debe reservarse para APIs genuinamente síncronas. Quienes llaman desde async y controlan su cadena de llamadas deben usar `await`.
-
-## Referencia de implementación para extensiones
+## Referencia de implementación
 
 | Ruta | Responsabilidad |
 |---|---|
-| `__init__.py` | Reexporta `Loop` como único símbolo de nivel superior soportado por el paquete. |
-| `loop.py` | Implementa la selección de factoría, reutilización de loops por hilo, limpieza de tareas, despacho de callables y puentes sync/async. |
-
----
+| `__init__.py` | Expone `Loop` mediante las exportaciones diferidas del paquete. |
+| `loop.py` | Selecciona factorías, gestiona propiedad, despacha callables y programa tareas. |
 
 [Índice](README.md) · [background](../../../background/docs/es/README.md) · [foundation](../../../foundation/docs/es/README.md)

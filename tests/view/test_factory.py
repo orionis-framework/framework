@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Any
 from orionis.http.responses import HTMLResponse
 from orionis.test import TestCase
@@ -8,6 +10,7 @@ from orionis.view.pending import PendingView
 # Failure messages hoisted out of the raise statements (EM101).
 _MISSING_TEMPLATE: str = "template not found"
 _RENDER_FAILURE: str = "render failed"
+
 
 class _StubEngine:
     """View engine double recording calls and returning canned output."""
@@ -27,6 +30,11 @@ class _StubEngine:
             HTML returned by ``render``.
         error : Exception | None, optional
             Exception raised by ``render`` when provided.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.html: str = html
         self.error: Exception | None = error
@@ -58,8 +66,8 @@ class _StubEngine:
             raise self.error
         return self.html
 
-class TestViewFactory(TestCase):
 
+class TestViewFactory(TestCase):
     def _buildEngine(
         self,
         html: str = "<html></html>",
@@ -88,6 +96,11 @@ class TestViewFactory(TestCase):
 
         Validates that response mutators can be chained on the value
         returned by the factory.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         factory = ViewFactory(self._buildEngine())
         self.assertIsInstance(factory.make("users.index"), PendingView)
@@ -98,6 +111,11 @@ class TestViewFactory(TestCase):
 
         Validates that building a view is free of I/O so it can be
         chained safely inside controllers.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine = self._buildEngine()
         ViewFactory(engine).make("users.index")
@@ -109,6 +127,11 @@ class TestViewFactory(TestCase):
 
         Validates that the factory wraps the engine's output in an
         HTMLResponse rather than returning a plain string.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine = self._buildEngine(html="<p>Hello</p>")
         factory = ViewFactory(engine)
@@ -121,6 +144,11 @@ class TestViewFactory(TestCase):
 
         Validates that the engine's output is correctly stored in the
         response body and is accessible as bytes.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine = self._buildEngine(html="<p>Rendered</p>")
         factory = ViewFactory(engine)
@@ -133,6 +161,11 @@ class TestViewFactory(TestCase):
 
         Validates that the factory calls engine.render with the exact
         template string supplied by the caller.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine = self._buildEngine()
         factory = ViewFactory(engine)
@@ -145,6 +178,11 @@ class TestViewFactory(TestCase):
 
         Validates that **context kwargs are collected into a dict and
         forwarded as the second positional argument to engine.render.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine = self._buildEngine()
         factory = ViewFactory(engine)
@@ -154,23 +192,17 @@ class TestViewFactory(TestCase):
             [("users.index", {"name": "World", "count": 5})],
         )
 
-    async def testMakeSetsOrionisRenderHeader(self) -> None:
-        """
-        Set the X-Orionis-Render header on the response.
-
-        Validates that the factory marks SSR responses with the
-        X-Orionis-Render header so clients can identify server rendering.
-        """
-        factory = ViewFactory(self._buildEngine())
-        response = await factory.make("users.index")
-        self.assertTrue(response.hasHeader("x-orionis-render"))
-
     async def testMakeOrionisRenderHeaderValueIsSsr(self) -> None:
         """
         Set the X-Orionis-Render header value to 'SSR'.
 
         Validates that the header carries the expected SSR marker value
         identifying server-side rendering.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         factory = ViewFactory(self._buildEngine())
         response = await factory.make("users.index")
@@ -182,6 +214,11 @@ class TestViewFactory(TestCase):
 
         Validates the fluent contract documented for the factory, where
         mutators are replayed on the rendered response.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         factory = ViewFactory(self._buildEngine())
         response = await factory.make("users.index").addHeader("X-Demo", "1")
@@ -193,6 +230,11 @@ class TestViewFactory(TestCase):
 
         Validates that the factory does not swallow template-not-found
         errors raised by the rendering engine.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine = self._buildEngine(
             error=ViewTemplateNotFoundException(_MISSING_TEMPLATE),
@@ -207,11 +249,18 @@ class TestViewFactory(TestCase):
 
         Validates that the factory does not swallow render errors raised
         by the underlying Jinja2 engine.
+
+        Returns
+        -------
+        None
+            No return value.
         """
-        engine = self._buildEngine(error=ViewRenderException(_RENDER_FAILURE))
+        original = ViewRenderException(_RENDER_FAILURE)
+        engine = self._buildEngine(error=original)
         factory = ViewFactory(engine)
-        with self.assertRaises(ViewRenderException):
+        with self.assertRaises(ViewRenderException) as raised:
             await factory.make("broken.template")
+        self.assertIs(raised.exception, original)
 
     async def testMakeWithEmptyContextSucceeds(self) -> None:
         """
@@ -219,6 +268,11 @@ class TestViewFactory(TestCase):
 
         Validates that an empty context is forwarded correctly without
         causing errors in the engine call.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         factory = ViewFactory(self._buildEngine(html="<p>static</p>"))
         response = await factory.make("static.page")

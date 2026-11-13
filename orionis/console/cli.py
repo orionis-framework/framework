@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Provide console operations through ``main``."""
 
 import os
@@ -6,6 +8,7 @@ from importlib import import_module
 from pathlib import Path
 from orionis.console.startup import startup_feedback
 from orionis.console.stdio import protocol_stdio
+
 
 def main() -> int:
     """
@@ -32,7 +35,7 @@ def main() -> int:
     arguments = ["reactor", *sys.argv[1:]]
 
     with startup_feedback(arguments), protocol_stdio(arguments):
-        from orionis.aio import Loop  # noqa: PLC0415
+        from orionis.aio import Loop
 
         application = import_module("bootstrap.app").app
         return Loop.run(application.handleCommand(arguments))

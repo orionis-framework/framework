@@ -1,8 +1,13 @@
+# ruff: noqa: ARG002, PLR0913
+# Keep rule interface parameter names compatible with keyword callers.
+# Preserve the existing rule configuration signature.
 """Ensure an uploaded image satisfies the given dimension constraints."""
 
+from math import isfinite
 from orionis.schemas.rules.image_probe import probe_image
 from orionis.schemas.rules.measure import read_content
 from orionis.schemas.rule import Rule
+
 
 def _parse_ratio(raw: object, name: str) -> float | None:
     """
@@ -23,28 +28,28 @@ def _parse_ratio(raw: object, name: str) -> float | None:
     Raises
     ------
     ValueError
-        If the value is neither a number nor a parsable fraction.
+        If the value cannot be parsed as a finite number or fraction.
     """
     if raw is None:
         return None
 
-    if isinstance(raw, int | float) and not isinstance(raw, bool):
-        return float(raw)
-
-    if isinstance(raw, str):
-        try:
-            numerator, separator, denominator = raw.partition("/")
-            return (
-                float(numerator) / float(denominator)
-                if separator
-                else float(numerator)
-            )
-        except (ValueError, ZeroDivisionError) as exc:
-            error_msg = f"Invalid '{name}' value: {raw!r}."
-            raise ValueError(error_msg) from exc
-
     error_msg = f"Invalid '{name}' value: {raw!r}."
-    raise ValueError(error_msg)
+    try:
+        if isinstance(raw, str):
+            numerator, separator, denominator = raw.partition("/")
+            parsed = (
+                float(numerator) / float(denominator) if separator else float(numerator)
+            )
+        elif isinstance(raw, int | float) and not isinstance(raw, bool):
+            parsed = float(raw)
+        else:
+            parsed = None
+    except (ValueError, ZeroDivisionError, OverflowError) as exc:
+        raise ValueError(error_msg) from exc
+    if parsed is None or not isfinite(parsed):
+        raise ValueError(error_msg)
+    return parsed
+
 
 class Dimensions(Rule):
     """
@@ -54,8 +59,6 @@ class Dimensions(Rule):
     imaging library is required. Ratios accept either a number or a
     ``"width/height"`` string such as ``"3/2"``.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = (
         "_height",
@@ -75,7 +78,7 @@ class Dimensions(Rule):
     __code__ = "dimensions"
     """Code identifier: ``dimensions``."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         *,
         min_width: int | None = None,
@@ -118,12 +121,12 @@ class Dimensions(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------
         ValueError
-            If any ratio constraint cannot be parsed.
+            If any ratio constraint cannot be parsed as a finite value.
         """
         super().__init__(message=message)
         self._min_width: int | None = min_width

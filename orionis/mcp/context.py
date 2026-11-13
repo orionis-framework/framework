@@ -1,16 +1,17 @@
+# ruff: noqa: TC001, UP037
+# Runtime types stay resolvable; keep the HTTP forward reference deferred.
 """Hold only explicit input and native context for one independent call."""
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Literal
+from typing import Literal, Optional
 import msgspec
+import orionis.http as http_module
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.auth.context.functions import current_auth_context
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
-    from orionis.auth.contracts.context import IAuthenticationContext
-    from orionis.http.request import Request
 
 def freeze_json(value: object) -> object:
     """
@@ -32,6 +33,7 @@ def freeze_json(value: object) -> object:
         return tuple(freeze_json(item) for item in value)
     return value
 
+
 def mutable_json(value: object) -> object:
     """
     Copy a request snapshot into standard containers for msgspec validation.
@@ -51,6 +53,7 @@ def mutable_json(value: object) -> object:
     if isinstance(value, tuple):
         return [mutable_json(item) for item in value]
     return value
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class McpRequest:
@@ -79,7 +82,8 @@ class McpRequest:
     """Transport identifier: ``test``."""
     authentication: IAuthenticationContext = field(default_factory=current_auth_context)
     """Authentication produced by ``field``."""
-    native_request: Request | None = None
+    # Python 3.15 dataclasses resolve dotted string annotations during decoration.
+    native_request: Optional["http_module.Request"] = None  # noqa: UP045
     """Underlying HTTP request when this call arrived over HTTP."""
 
     def __post_init__(self) -> None:
@@ -118,5 +122,6 @@ class McpRequest:
         """
         value = self.meta.get("io.modelcontextprotocol/clientCapabilities", {})
         return value if isinstance(value, Mapping) else MappingProxyType({})
+
 
 McpContext = McpRequest

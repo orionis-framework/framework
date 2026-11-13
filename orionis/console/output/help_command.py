@@ -1,3 +1,5 @@
+# ruff: noqa: SLF001
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Display available commands and their usage information."""
 
 import argparse
@@ -8,9 +10,8 @@ from rich.panel import Panel
 from rich import box
 from orionis.console.output.contracts.help_command import IHelpCommand
 
-class HelpCommand(IHelpCommand):
 
-    # ruff: noqa: SLF001
+class HelpCommand(IHelpCommand):
     """Display available commands and their usage information."""
 
     @staticmethod
@@ -45,7 +46,6 @@ class HelpCommand(IHelpCommand):
 
         # Iterate over each action and categorize it based on its type and attributes
         for action in actions:
-
             # Cache option_strings: accessed twice per iteration without this
             option_strings = action.option_strings
 
@@ -59,7 +59,8 @@ class HelpCommand(IHelpCommand):
                 "default": action.default,
                 "type": (
                     getattr(action.type, "__name__", str(action.type))
-                    if action.type else "str"
+                    if action.type
+                    else "str"
                 ),
                 "choices": action.choices,
                 "required": action.required,
@@ -90,7 +91,7 @@ class HelpCommand(IHelpCommand):
         return result
 
     @staticmethod
-    def printActions( # NOSONAR
+    def printActions(  # NOSONAR
         command_name: str,
         actions: list[argparse.Action],
         *,
@@ -122,7 +123,6 @@ class HelpCommand(IHelpCommand):
         # If this is an error case
         # show an error panel with a message about invalid command usage
         if is_error:
-
             # Show error panel if command usage is invalid
             error_msg = (
                 f"[bold red]Error:[/bold red] Invalid usage of "

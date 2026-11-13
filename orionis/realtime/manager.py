@@ -1,18 +1,19 @@
+# ruff: noqa: BLE001, TC001
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
+# Keep connection registry and constructor annotations resolvable at runtime.
 """Own worker-local connections and isolate every group by Hub class."""
 
 import asyncio
-from typing import TYPE_CHECKING
 from orionis.failure.runtime import capture, capture_result
 from orionis.foundation.config.realtime.entities.realtime import (
-    RealtimeConfig,  # noqa: TC001 - Constructor injection.
+    RealtimeConfig,
 )
 from orionis.realtime.clients import HubClients, validate_group, validate_identifier
+from orionis.realtime.contracts.connection import RealtimeConnectionLike
 from orionis.realtime.contracts.manager import IConnectionManager
 from orionis.realtime.entities import BroadcastResult
 from orionis.realtime.hub import Hub
 
-if TYPE_CHECKING:
-    from orionis.realtime.contracts.connection import RealtimeConnectionLike
 
 class _Broadcast:
     """Share one immutable encoded payload per codec among bounded workers."""
@@ -79,22 +80,29 @@ class _Broadcast:
             if connection is None:
                 self.failed += 1
                 await capture_result(
-                    "recipient_unavailable", flow="realtime", phase="broadcast",
-                    operation=self.hub.__name__, correlation_id=connection_id,
+                    "recipient_unavailable",
+                    flow="realtime",
+                    phase="broadcast",
+                    operation=self.hub.__name__,
+                    correlation_id=connection_id,
                     expected=True,
                 )
                 continue
             try:
                 await connection.sendEncoded(self.encoded[connection.protocol.name])
-            except Exception as exc:  # noqa: BLE001 - Preserve partial delivery.
+            except Exception as exc:  # Preserve partial delivery.
                 await capture(
-                    exc, flow="realtime", phase="broadcast",
-                    operation=self.hub.__name__, correlation_id=connection_id,
+                    exc,
+                    flow="realtime",
+                    phase="broadcast",
+                    operation=self.hub.__name__,
+                    correlation_id=connection_id,
                     runtime=getattr(connection, "_failure_runtime", None),
                 )
                 self.failed += 1
             else:
                 self.sent += 1
+
 
 class ConnectionManager(IConnectionManager):
     """Own worker-local connections and isolate every group by Hub class.
@@ -228,7 +236,9 @@ class ConnectionManager(IConnectionManager):
                 del self._groups[key]
 
     def get(
-        self, connection_id: str, hub: type[Hub] | None = None,
+        self,
+        connection_id: str,
+        hub: type[Hub] | None = None,
     ) -> RealtimeConnectionLike | None:
         """
         Return a ready, nonclosing connection within an optional Hub namespace.
@@ -281,7 +291,8 @@ class ConnectionManager(IConnectionManager):
             an empty tuple.
         """
         return tuple(
-            identifier for identifier in self._hubs.get(hub, ())
+            identifier
+            for identifier in self._hubs.get(hub, ())
             if self.get(identifier, hub) is not None
         )
 
@@ -309,7 +320,8 @@ class ConnectionManager(IConnectionManager):
         """
         validate_group(group)
         return tuple(
-            identifier for identifier in self._groups.get((hub, group), ())
+            identifier
+            for identifier in self._groups.get((hub, group), ())
             if self.get(identifier, hub) is not None
         )
 
@@ -410,7 +422,10 @@ class ConnectionManager(IConnectionManager):
         return HubClients(self, hub)
 
     async def broadcast(
-        self, hub: type[Hub], connection_ids: tuple[str, ...], envelope: object,
+        self,
+        hub: type[Hub],
+        connection_ids: tuple[str, ...],
+        envelope: object,
     ) -> BroadcastResult:
         """
         Broadcast an envelope with per-codec encoding and bounded concurrency.

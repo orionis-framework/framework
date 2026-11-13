@@ -1,3 +1,5 @@
+# ruff: noqa: S104
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Provide foundation lifespan operations.
 
 Includes ``before_startup_orionis_generator``, ``after_startup_orionis_generator``,
@@ -38,6 +40,7 @@ _INTERFACE_LABELS: dict[str, str] = {
 }
 """Mapping of GRANIAN_INTERFACE values to their human-readable display labels."""
 
+
 def before_startup_orionis_generator() -> None:
     """
     Render a brief startup panel before the server begins accepting requests.
@@ -48,6 +51,7 @@ def before_startup_orionis_generator() -> None:
         Leave the startup panel visible while lifecycle hooks execute.
     """
     _console.print(_BEFORE_STARTUP_PANEL)
+
 
 def after_startup_orionis_generator(host: str, port: int) -> None:
     """
@@ -65,8 +69,6 @@ def after_startup_orionis_generator(host: str, port: int) -> None:
     None
         Prints the status panel to stdout and returns nothing.
     """
-    # ruff: noqa: S104
-
     # Clear the terminal and print a blank line for spacing
     _console.clear()
     _console.line()
@@ -95,7 +97,7 @@ def after_startup_orionis_generator(host: str, port: int) -> None:
         ("\n", ""),
         ("✅ The HTTP server has started successfully.\n", "bold green"),
         ("🔗 Service running at: ", "white"),
-        (f"http://{host}:{port}\n", "bold cyan"), # NOSONAR
+        (f"http://{host}:{port}\n", "bold cyan"),  # NOSONAR
         (f"🕒 Started at: {tz} - {now}   ", "dim"),
         (f"🆔 PID: {pid}\n", "dim"),
         ("⚡ Orionis Loop: ", "cyan"),
@@ -115,6 +117,7 @@ def after_startup_orionis_generator(host: str, port: int) -> None:
         ),
     )
     _console.line()
+
 
 def startup_orionis_generator(app: IApplication) -> Generator[None]:
     """

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.mail.entities.address import Address
 from orionis.mail.entities.attachment import Attachment
 from orionis.mail.entities.options import MailOptions
@@ -5,8 +7,8 @@ from orionis.mail.exceptions import MailCompositionException
 from orionis.mail.message import Message
 from orionis.test import TestCase
 
-class TestMessage(TestCase):
 
+class TestMessage(TestCase):
     def setUp(self) -> None:
         """Create a configurator that starts from an empty declaration.
 

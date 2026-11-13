@@ -1,15 +1,13 @@
 """Configure one direct send without exposing a mutable MIME message."""
 
 from dataclasses import replace
-from typing import TYPE_CHECKING, Self
-from orionis.mail.entities.address import Address, addresses, one_address
+from typing import Self
+from orionis.mail.entities.address import Address, Recipients, addresses, one_address
 from orionis.mail.entities.attachment import Attachment
 from orionis.mail.entities.options import MailOptions
 from orionis.mail.exceptions import MailCompositionException
 from orionis.mail.functions import header_value
 
-if TYPE_CHECKING:
-    from orionis.mail.types import Recipients
 
 class Message:
     """

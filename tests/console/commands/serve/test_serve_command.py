@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027, S104, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import os
 import sys
 from argparse import ArgumentParser
@@ -9,7 +12,6 @@ from orionis.foundation.enums.runtimes import Runtime
 from orionis.support.types.sentinel import MISSING
 from orionis.test import TestCase
 
-# ruff: noqa: S104
 
 class _Application:
     """Expose server settings from an isolated application root."""
@@ -68,6 +70,7 @@ class _Application:
         """
         return self.production
 
+
 class TestServerCommand(TestCase):
     """Verify server launch state and interface lifecycle behavior."""
 
@@ -93,7 +96,9 @@ class TestServerCommand(TestCase):
                     patch.object(command, "_ServerCommand__unixServe"),
                     patch.object(command, "_ServerCommand__windowsServe"),
                     patch.object(
-                        command, "_ServerCommand__isDebugMode", return_value=False,
+                        command,
+                        "_ServerCommand__isDebugMode",
+                        return_value=False,
                     ),
                 ):
                     await command.handle(app)
@@ -101,7 +106,8 @@ class TestServerCommand(TestCase):
                 self.assertTrue(sys.dont_write_bytecode)
                 self.assertEqual(os.environ["PYTHONDONTWRITEBYTECODE"], "1")
                 self.assertEqual(
-                    command._ServerCommand__env["PYTHONDONTWRITEBYTECODE"], "1",
+                    command._ServerCommand__env["PYTHONDONTWRITEBYTECODE"],
+                    "1",
                 )
                 self.assertEqual(command._ServerCommand__cmd[1], "-B")
 
@@ -164,7 +170,8 @@ class TestServerCommand(TestCase):
                             ["-m", "granian", "--host", expected, "--port", "8000"],
                         )
                         self.assertEqual(
-                            command._ServerCommand__env["GRANIAN_HOST"], expected,
+                            command._ServerCommand__env["GRANIAN_HOST"],
+                            expected,
                         )
 
     async def testRepeatedExportsRebuildTheCommand(self) -> None:
@@ -188,9 +195,13 @@ class TestServerCommand(TestCase):
                 patch.object(command, "textMuted") as output,
             ):
                 for host, port in (("0.0.0.0", 9001), ("::1", 9002)):
-                    command.setArguments({
-                        "host": host, "port": port, "export": True,
-                    })
+                    command.setArguments(
+                        {
+                            "host": host,
+                            "port": port,
+                            "export": True,
+                        },
+                    )
                     with self.assertRaises(SystemExit):
                         await command.handle(app)
                     exported.append(output.call_args.args[0])
@@ -228,7 +239,9 @@ class TestServerCommand(TestCase):
             for host, configured_host, expected in cases:
                 with (
                     self.subTest(
-                        interface=interface, host=host, config=configured_host,
+                        interface=interface,
+                        host=host,
+                        config=configured_host,
                     ),
                     TemporaryDirectory() as temporary,
                 ):

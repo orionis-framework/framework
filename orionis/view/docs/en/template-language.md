@@ -55,15 +55,19 @@ The following names are registered during `ViewServiceProvider.boot()`. Helpers 
 | Dates/versions | `now()`, `today()`, `framework_version()`, `python_version()` |
 | Encryption | `encrypt(plaintext)`, `decrypt(payload)` |
 
-`route` path values are encoded; remaining parameters become a query string. Missing routes or required arguments raise `ViewRouteException`. URLs use the current request's origin when available and may be relative outside scope. `secure_url` upgrades to HTTPS when a host exists; it does not discover a host for a relative path. `asset` asks the disk for `file.url()`: it neither checks existence nor publishes the file.
+`route` path values are encoded; remaining parameters become a query string. `url` and `secure_url` insert query parameters before an existing `#fragment`, preserving the fragment literally. Missing routes or required arguments raise `ViewRouteException`. URLs use the current request's origin when available and may be relative outside scope. `secure_url` upgrades to HTTPS when a host exists; it does not discover a host for a relative path. `asset` asks the disk for `file.url()`: it neither checks existence nor publishes the file.
 
-`cache(key, default)` treats `None` as a miss. `errors` is a bag with methods, not a dict. `old` returns an empty string for `None`. `auth()` does not cache identity and preserves request scope; check `auth().check()` before accessing user attributes. For concurrent locales, explicitly pass `locale=` because `locale()` reads shared global state.
+`cache(key, default)` treats `None` as a miss. `errors` is a bag with methods, not a dict. `errors.any()` requires at least one nonempty message list; keys mapped to empty lists do not count. Outside session scope, each empty result is independent; with a session, `errors.all()` returns its existing error mapping. `old` returns an empty string for `None`. `auth()` does not cache identity and preserves request scope; check `auth().check()` before accessing user attributes. For concurrent locales, explicitly pass `locale=` because `locale()` reads shared global state.
+
+`today()` returns a `pendulum.DateTime` at midnight. `encrypt` and `decrypt` use the configured encrypter.
 
 ## Escaping and trusted content
 
-Application autoescaping defaults to enabled. Keep escaping for `{{ user.name }}`; use `|safe` and `Markup` only for HTML you control. The `markdown` filter returns an HTML `str` without sanitizing arbitrary content. Marking it safe can admit user-supplied HTML; add a sanitization policy if your product accepts external Markdown.
+Application autoescaping defaults to enabled. Keep escaping for `{{ user.name }}`; use `|safe` and `Markup` only for HTML you control. Both `json` and `markdown` return ordinary `str` values subject to Jinja autoescaping. The `markdown` filter produces HTML without sanitizing arbitrary content. Marking it safe can admit user-supplied HTML; add a sanitization policy if your product accepts external Markdown.
 
-`json` serializes with msgspec, optionally `|json(indent=2)`, but falls back to `str(value)` when encoding fails. It is a presentation filter, not a guarantee of valid JSON for every object or a `<script>`-specific escaping mechanism. Avoid interpolating it as executable code. `dump()` exposes values as HTML and belongs in controlled diagnostics; never dump secrets. Encryption helpers do not replace authorization.
+`json` serializes with msgspec, optionally `|json(indent=2)`, but falls back to `str(value)` when encoding or formatting fails. It is a presentation filter, not a guarantee of valid JSON for every object or a `<script>`-specific escaping mechanism. Avoid interpolating it as executable code. The `{% csrf %}` tag accepts synchronous or asynchronous `csrf_field` builders, escapes plain strings, and preserves `Markup` values. A missing builder raises `ViewRenderException`.
+
+`dump()` exposes values as HTML and belongs in controlled diagnostics; never dump secrets. Encryption helpers do not replace authorization.
 
 ---
 

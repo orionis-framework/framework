@@ -2,7 +2,7 @@
 
 ## Elegir modelos o tablas
 
-`Article.query()` y los accesos de clase como `Article.where(...)` crean builders nuevos y recuperan modelos. `DB.table("articles")` crea un builder que devuelve diccionarios. Ambos utilizan el mismo lenguaje de consultas, pero la tabla cruda no aplica scopes, eventos, ocultación ni eliminación lógica del modelo.
+`Article.query()` y los accesos de clase como `Article.where(...)` crean builders nuevos y recuperan modelos. `DB.table("articles")` crea un builder que devuelve diccionarios. Ambos utilizan el mismo lenguaje de consultas, pero la tabla cruda no aplica scopes, eventos, ocultación ni eliminación lógica del modelo. Un gateway obtenido de un gestor de conexiones conserva ese gestor y la conexión seleccionada; el resolver global de otra aplicación no sustituye esa pertenencia.
 
 Las cláusulas son síncronas. Solo espera el terminal: `await query.get()`, no `await query.where(...)`. Este plan se puede inspeccionar sin conexión:
 
@@ -33,8 +33,11 @@ Los builders mutan su propio estado: usa `clone()` para ramificar consultas y no
 async def search_articles():
     return await (
         Article.where("status", "published")
-        .where(lambda group: group.whereContains("title", "Python")
-               .orWhere("title", "Orionis"))
+        .where(
+            lambda group: group.whereContains("title", "Python").orWhere(
+                "title", "Orionis"
+            )
+        )
         .whereIn("id", [1, 2, 3])
         .orderBy("id")
         .get()
@@ -43,7 +46,9 @@ async def search_articles():
 
 Ejecuta esta función en una aplicación inicializada con la tabla `articles`. También están disponibles `whereNull`, `whereNotNull`, `whereBetween`, `whereNotBetween`, `whereNotIn`, comparaciones con `whereColumn`, subconsultas `whereExists`/`whereNotExists` y filtros `whereLike`, `whereILike`, `whereStartsWith`, `whereEndsWith`, `whereRegexpMatch`. No todos los dialectos admiten las mismas expresiones de regex.
 
-Valores se enlazan como parámetros. `whereRaw`, `selectRaw` y `havingRaw` aceptan SQL confiable y bindings; no interpolan de forma segura texto arbitrario. Controla columnas, operadores y ordenación desde una lista permitida cuando provienen de una petición.
+Las subconsultas de modelo utilizadas en `IN`, `EXISTS`, joins, proyecciones escalares o uniones aplican sus scopes globales y política de soft delete sobre un clon. Se conservan las opciones explícitas `withoutGlobalScopes` y `withTrashed`; la preparación no modifica el builder original.
+
+Los valores se enlazan como parámetros. `whereRaw`, `selectRaw` y `havingRaw` aceptan SQL confiable y bindings; no interpolan de forma segura texto arbitrario. Controla columnas, operadores y ordenación desde una lista permitida cuando provienen de una petición.
 
 ## Inspeccionar SQL
 
@@ -96,7 +101,7 @@ async def articles_by_author():
 | `min`, `max`, `avg`, `sum` | Agregado; `sum` devuelve 0 sin resultados. |
 | `paginate(page=1, per_page=15)` | `Paginator` con items y metadatos. |
 
-`limit`, `offset`, `take`, `skip` y `forPage` componen límites sin ejecutar. Usa orden determinista, incluyendo una clave única, para páginas estables. `Paginator` expone `items`, `total`, `page`, `perPage`, `lastPage`, `hasNext`, `hasPrevious` y `toDict()`/`toJson()`. Recuento y lectura son dos consultas: fuera de una transacción pueden observar cambios distintos y ejecutarse concurrentemente; dentro se ejecutan en secuencia. Página y tamaño deben ser enteros positivos.
+`limit`, `offset`, `take`, `skip` y `forPage` componen límites sin ejecutar. Usa orden determinista, incluyendo una clave única, para páginas estables. `Paginator` expone `items`, `total`, `page`, `perPage`, `lastPage`, `hasNext`, `hasPrevious` y `toDict()`/`toJson()`. `exists()` conserva proyecciones explícitas, uniones, agrupación y `having`. `sum`, `min`, `max` y `avg` sobre una unión operan en sus filas proyectadas; incluye la columna objetivo en cada rama. Recuento y lectura son dos consultas: fuera de una transacción pueden observar cambios distintos y ejecutarse concurrentemente; dentro se ejecutan en secuencia. Página y tamaño deben ser enteros positivos.
 
 ## Escrituras y locks
 

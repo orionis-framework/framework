@@ -1,6 +1,6 @@
 # Entorno y configuración de proceso
 
-El manual oficial está organizado en capítulos bilingües. La información técnica del manual anterior se ha redistribuido por temas; sus notas históricas de ejecución no se trasladan como resultados actuales.
+Lee y escribe valores de entorno tipados, elige el archivo `.env` y coordina los valores del proceso con la configuración persistente.
 
 - [Manual en español](es/README.md)
 - [English manual](en/README.md)

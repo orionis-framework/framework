@@ -4,7 +4,7 @@ Usa una caché de artefactos cuando un diccionario calculado depende de archivos
 
 ## Reconstruir cuando cambian fuentes
 
-`FileBasedCache` es síncrono y guarda un diccionario completo, adecuado para metadatos compilados. En el arranque, llama a `get()`; si devuelve `None`, reconstruye el resultado, llama a `save(data)` y utiliza ese diccionario. No ofrece TTL, claves independientes ni locks distribuidos.
+`FileBasedCache` es síncrono y guarda un diccionario completo, adecuado para metadatos compilados. En el arranque, llama a `get()`; si devuelve `None`, reconstruye el resultado, llama a `save(data)` y utiliza ese diccionario. No ofrece TTL, claves independientes ni locks distribuidos. El constructor resuelve el directorio una vez y exige un nombre de archivo simple: rechaza nombres vacíos, `.` o `..`, separadores, dos puntos y NUL.
 
 La huella usa ruta absoluta, `st_mtime_ns` y tamaño de los archivos. No calcula un hash del contenido completo: una modificación que conserve esos metadatos puede pasar inadvertida. Los directorios monitoreados solo añaden `*.py`; `monitored_files` permite declarar archivos concretos adicionales. La consulta de huella se memoiza 0,5 segundos; durante esa ventana un cambio aún puede no invalidar el resultado. Esa ventana es distinta a un TTL del artefacto.
 
@@ -12,7 +12,7 @@ La huella usa ruta absoluta, `st_mtime_ns` y tamaño de los archivos. No calcula
 
 ### Serializar tipos de framework
 
-`from orionis.cache.serializer import Serializer` expone `dumps`, `loads`, `dumpToFile` y `loadFromFile`. Además de contenedores y primitivos, admite bytes, Path, fechas/horas, timedelta, Decimal, UUID, complejos, tuplas, sets, frozensets, enums, tipos y el sentinel `MISSING`. Usa marcadores `__type__` y `__value__`; evita utilizar esos nombres en mapas de negocio que deban volver intactos.
+`from orionis.cache.serializer import Serializer` expone `dumps`, `loads`, `dumpToFile` y `loadFromFile`. Además de contenedores y primitivos, admite bytes, Path, fechas/horas, timedelta, Decimal, UUID, complejos, tuplas, sets, frozensets, enums, tipos y el sentinel `MISSING`. Admite referencias importables a tipos y enums anidados, y codifica recursivamente los valores de enum. Usa marcadores `__type__` y `__value__`; evita utilizar esos nombres en mapas de negocio que deban volver intactos.
 
 Este formato es para artefactos locales de confianza. La reconstrucción de enums y tipos puede importar módulos por nombre: no deserialices payloads aportados por clientes ni archivos modificables por usuarios no confiables. No incluye firma ni cifrado. Un archivo ausente, vacío o ilegible devuelve `None` en `loadFromFile`; JSON corrupto o un marcador desconocido puede propagar un error. Trata el caché como regenerable y define si tu arranque lo descarta o falla.
 
@@ -36,7 +36,7 @@ with TemporaryDirectory() as directory:
     cache.save({"routes": ["/"]})
     print(cache.get())  # {'routes': ['/']}
 
-    source.write_text("VALUE = 2\n", encoding="utf-8")
+    source.write_text("VALUE = 200\n", encoding="utf-8")
     time.sleep(0.6)  # FileBasedCache refreshes its source hash every 0.5 s.
     print(cache.get())  # None
 ```
@@ -52,7 +52,7 @@ FileBasedCache(
 )
 ```
 
-`save(data)` escribe un payload versionado y devuelve `(CACHE_VERSION, sources_hash)`; datos y hash idénticos omiten reescritura. `get()` devuelve el diccionario solo si versión y hash coinciden, o `None`. `clear()` indica si existía el archivo. Solo participan archivos Python de directorios monitorizados y se excluye el propio archivo de caché.
+`save(data)` escribe un payload versionado y devuelve `(CACHE_VERSION, sources_hash)`; datos y hash idénticos omiten reescritura. `get()` devuelve el diccionario solo si versión y hash coinciden, o `None`. Un envoltorio, sección de metadatos o sección de datos que no sea un mapa también cuenta como ausencia; `save()` puede reemplazar ese artefacto malformado. `clear()` indica si existía el archivo. Solo participan archivos Python de directorios monitorizados y se excluye el propio archivo de caché.
 
 ---
 

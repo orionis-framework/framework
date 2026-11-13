@@ -24,6 +24,7 @@ Names can include nested directories; the generator respects `app_realtime_socke
 ```python
 from orionis.http import WebSocket, WebSocketDisconnected
 
+
 async def echo(socket: WebSocket) -> None:
     await socket.accept()
     try:

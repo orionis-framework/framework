@@ -1,9 +1,12 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Create all configured queue tables without removing existing data."""
 
 from orionis.console.base.command import BaseCommand
 from orionis.database.exceptions import DatabaseException
-from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
+from orionis.queues.contracts.manager import IQueueManager
 from orionis.queues.exceptions import QueueError
+
 
 class QueueMigrateCommand(BaseCommand):
     """Create all configured queue tables without removing existing data."""

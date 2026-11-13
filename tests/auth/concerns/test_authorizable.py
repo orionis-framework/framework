@@ -1,6 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify authentication authorizable contracts and behavior."""
+
 from orionis.auth.concerns.authorizable import Authorizable
 from orionis.auth.contracts.authorizable import IAuthorizable
 from orionis.test import TestCase
+
 
 class _Meta:
     """Model metadata double publishing a primary key name."""
@@ -18,9 +23,10 @@ class _Meta:
         Returns
         -------
         None
-            Initializes the metadata double.
+            No return value.
         """
         self.primary_key = primary_key
+
 
 class _Owner(Authorizable):
     """Permission owner relying on the derived polymorphic type."""
@@ -38,9 +44,10 @@ class _Owner(Authorizable):
         Returns
         -------
         None
-            Initializes the permission owner.
+            No return value.
         """
         self.id = identifier
+
 
 class _RenamedOwner(Authorizable):
     """Permission owner pinning its polymorphic type explicitly."""
@@ -62,14 +69,16 @@ class _RenamedOwner(Authorizable):
         Returns
         -------
         None
-            Initializes the renamed permission owner.
+            No return value.
         """
         self.uuid = uuid
+
 
 class _UnsavedOwner(Authorizable):
     """Permission owner that was never persisted."""
 
     __slots__ = ()
+
 
 class TestAuthorizableLayout(TestCase):
     """Validate how the mixin is attached to an application model."""
@@ -83,7 +92,7 @@ class TestAuthorizableLayout(TestCase):
         Returns
         -------
         None
-            Asserts virtual contract registration without MRO inheritance.
+            No return value.
         """
         self.assertTrue(issubclass(Authorizable, IAuthorizable))
         self.assertNotIn(IAuthorizable, Authorizable.__mro__)
@@ -97,10 +106,11 @@ class TestAuthorizableLayout(TestCase):
         Returns
         -------
         None
-            Asserts that the mixin preserves slotted instance layout.
+            No return value.
         """
         self.assertEqual(Authorizable.__slots__, ())
         self.assertFalse(hasattr(_Owner(7), "__dict__"))
+
 
 class TestAuthorizableAccessors(TestCase):
     """Validate the polymorphic pair stored in the pivot tables."""
@@ -114,11 +124,12 @@ class TestAuthorizableAccessors(TestCase):
         Returns
         -------
         None
-            Asserts the derived polymorphic type and owner identifier.
+            No return value.
         """
         owner = _Owner(7)
         self.assertEqual(
-            owner.getAuthorizableType(), f"{__name__}.{type(owner).__qualname__}",
+            owner.getAuthorizableType(),
+            f"{__name__}.{type(owner).__qualname__}",
         )
         self.assertEqual(owner.getAuthorizableId(), 7)
 
@@ -131,7 +142,7 @@ class TestAuthorizableAccessors(TestCase):
         Returns
         -------
         None
-            Asserts the explicit polymorphic type and UUID are returned.
+            No return value.
         """
         owner = _RenamedOwner("abc")
         self.assertEqual(owner.getAuthorizableType(), "tests.CustomIdentity")
@@ -146,6 +157,6 @@ class TestAuthorizableAccessors(TestCase):
         Returns
         -------
         None
-            Asserts that an unsaved owner has no identifier.
+            No return value.
         """
         self.assertIsNone(_UnsavedOwner().getAuthorizableId())

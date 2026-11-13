@@ -8,6 +8,7 @@ Resources publish URI-addressed content; prompts produce conversation messages. 
 from orionis.mcp import McpResponse, Resource, Server
 from orionis.mcp.server.compiler import compile_server
 
+
 class UserResource(Resource):
     uri_template = "demo://users/{user_id}"
     mime_type = "application/json"
@@ -15,9 +16,11 @@ class UserResource(Resource):
     def handle(self, user_id: str) -> McpResponse:
         return McpResponse.structured({"id": user_id})
 
+
 class DirectoryServer(Server):
     name = "Directory"
     resources = (UserResource,)
+
 
 assert len(compile_server(DirectoryServer).templates) == 1
 ```
@@ -34,6 +37,7 @@ Templates follow RFC 6570 level four through `uritemplate`. Simple forms support
 from orionis.mcp import Completion, McpResponse, Prompt, PromptArgument, Server
 from orionis.mcp.server.compiler import compile_server
 
+
 class ExplainPrompt(Prompt):
     arguments = (PromptArgument(name="topic", required=True),)
 
@@ -43,9 +47,11 @@ class ExplainPrompt(Prompt):
     def complete(self) -> Completion:
         return Completion(values=("sessions", "routing"))
 
+
 class GuideServer(Server):
     name = "Guide"
     prompts = (ExplainPrompt,)
+
 
 assert "explain" in compile_server(GuideServer).prompts
 ```

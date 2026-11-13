@@ -1,15 +1,18 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 from orionis.cache.locks.lock import _FILE_LOCKS, CacheLock
 from orionis.cache.stores.database import DatabaseCacheBackend
 from orionis.cache.stores.file import FileCacheBackend
 from orionis.database.connection import Connection
 from orionis.test import TestCase
 
-class TestCacheLock(TestCase):
 
+class TestCacheLock(TestCase):
     def setUp(self) -> None:
         """Create a temporary directory and a FileCacheBackend before each test.
 
@@ -19,41 +22,14 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
+        self.enterContext(patch.dict(_FILE_LOCKS, clear=True))
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._backend = FileCacheBackend(Path(self._tmpdir.name))
 
-    def tearDown(self) -> None:
-        """Remove the temporary directory and purge per-key asyncio locks.
-
-        Ensures filesystem resources and the global _FILE_LOCKS dict are
-        cleaned up after each test to prevent cross-test contamination.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
-        _FILE_LOCKS.clear()
-
     # ── basic acquire / release ───────────────────────────────────────────────
-
-    async def testFileLockAcquireAndRelease(self) -> None:
-        """Acquire and release a file-based lock without error.
-
-        Validates that the happy-path async context manager usage does
-        not raise and the lock is released on exit.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        lock = CacheLock(self._backend, "resource_a")
-        async with lock:
-            pass  # Lock is held here; no assertion needed beyond no-raise.
 
     async def testFileLockReturnsContextManagerSelf(self) -> None:
         """Return self from __aenter__ so the as-clause works correctly.
@@ -64,7 +40,7 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         lock = CacheLock(self._backend, "self_check")
         async with lock as acquired:
@@ -79,7 +55,7 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         key = "release_check"
         lock = CacheLock(self._backend, key)
@@ -97,7 +73,7 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         lock = CacheLock(self._backend, "no_timeout", timeout=None)
         async with lock:
@@ -114,7 +90,7 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         lock = CacheLock(self._backend, "with_timeout", timeout=2.0)
         async with lock:
@@ -123,132 +99,47 @@ class TestCacheLock(TestCase):
     # ── mutual exclusion ─────────────────────────────────────────────────────
 
     async def testTwoLocksOnSameKeyAreMutuallyExclusive(self) -> None:
-        """Prevent two coroutines from holding the same key lock simultaneously.
+        """Block a second caller until the current file-lock owner exits."""
+        attempted = asyncio.Event()
+        entered = asyncio.Event()
 
-        Validates mutual exclusion by checking that the second acquire
-        cannot enter the critical section while the first is still held.
+        async def acquire_second() -> None:
+            """Signal the attempt and record successful acquisition."""
+            attempted.set()
+            async with CacheLock(self._backend, "exclusive"):
+                entered.set()
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        key = "exclusive"
-        lock_a = CacheLock(self._backend, key)
-        lock_b = CacheLock(self._backend, key)
-
-        inside = []
-
-        async def coroutine_a() -> None:
-            """Hold the first lock while recording its execution order.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            async with lock_a:
-                inside.append("a_start")
-                await asyncio.sleep(0.05)
-                inside.append("a_end")
-
-        async def coroutine_b() -> None:
-            """Wait for the first task to acquire its lock.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            await asyncio.sleep(0.01)  # Let A acquire first.
-            async with lock_b:
-                inside.append("b_start")
-
-        await asyncio.gather(coroutine_a(), coroutine_b())
-        # A must complete before B enters.
-        self.assertEqual(inside.index("a_end"), inside.index("b_start") - 1)
+        task = None
+        try:
+            async with CacheLock(self._backend, "exclusive"):
+                task = asyncio.create_task(acquire_second())
+                await asyncio.wait_for(attempted.wait(), 2)
+                self.assertFalse(entered.is_set())
+            await asyncio.wait_for(task, 2)
+            self.assertTrue(entered.is_set())
+        finally:
+            if task is not None:
+                task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
 
     async def testTwoLocksOnDifferentKeysAreIndependent(self) -> None:
-        """Allow two coroutines to hold locks on different keys simultaneously.
-
-        Validates that namespace isolation prevents lock contention
-        between unrelated resources.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        lock_x = CacheLock(self._backend, "key_x")
-        lock_y = CacheLock(self._backend, "key_y")
-
-        acquired = []
-
-        async def hold_x() -> None:
-            """Hold the lock for key x while recording acquisition.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            async with lock_x:
-                acquired.append("x")
-                await asyncio.sleep(0.05)
-
-        async def hold_y() -> None:
-            """Hold the lock for key y while recording acquisition.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            async with lock_y:
-                acquired.append("y")
-                await asyncio.sleep(0.05)
-
-        await asyncio.gather(hold_x(), hold_y())
-        # Both should have been acquired (in whichever order).
-        self.assertIn("x", acquired)
-        self.assertIn("y", acquired)
+        """Hold two different keys concurrently within one event loop."""
+        async with (
+            CacheLock(self._backend, "key_x") as first,
+            CacheLock(self._backend, "key_y", timeout=1) as second,
+        ):
+            self.assertIsNot(first._impl, second._impl)
+            self.assertTrue(first._impl.locked())
+            self.assertTrue(second._impl.locked())
 
     # ── timeout expiry ────────────────────────────────────────────────────────
 
     async def testFileLockTimeoutRaisesWhenLockHeld(self) -> None:
-        """Raise asyncio.TimeoutError when the lock cannot be acquired in time.
-
-        Validates that a very short timeout expires while another coroutine
-        holds the lock, propagating TimeoutError to the waiting caller.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        key = "tight_timeout"
-        holder = CacheLock(self._backend, key)
-        waiter = CacheLock(self._backend, key, timeout=0.01)
-
-        async def hold() -> None:
-            """Hold the cache lock until the timeout is observed.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            async with holder:
-                await asyncio.sleep(0.2)
-
-        holder_task = asyncio.create_task(hold())
-        await asyncio.sleep(0.02)  # Let the holder acquire first.
-
-        with self.assertRaises(asyncio.TimeoutError):
-            async with waiter:
-                pass  # Should not reach here.
-
-        await holder_task
+        """Expire a waiter's acquisition deadline while the owner holds its lock."""
+        async with CacheLock(self._backend, "tight_timeout"):
+            with self.assertRaises(TimeoutError):
+                async with CacheLock(self._backend, "tight_timeout", timeout=0.01):
+                    self.fail("A waiter entered the held lock.")
 
     async def testSeparateDirectoriesHaveIndependentLocks(self) -> None:
         """
@@ -257,7 +148,7 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assert independent lock acquisition for separate directories.
+            No return value.
         """
         other = FileCacheBackend(Path(self._tmpdir.name) / "other")
         async with (
@@ -273,7 +164,7 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assert mutual exclusion across backends sharing a directory.
+            No return value.
         """
         other = FileCacheBackend(Path(self._tmpdir.name) / ".")
         async with CacheLock(self._backend, "shared"):
@@ -288,7 +179,7 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assert removal of unused lock registry entries.
+            No return value.
         """
         for index in range(100):
             async with CacheLock(self._backend, str(index)):
@@ -302,7 +193,7 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assert that a cancelled waiter does not release the holder's lock.
+            No return value.
         """
         async with CacheLock(self._backend, "shared") as holder:
             waiter = CacheLock(self._backend, "shared")
@@ -323,8 +214,9 @@ class TestCacheLock(TestCase):
         Returns
         -------
         None
-            Assert that different event loops use independent locks.
+            No return value.
         """
+
         async def acquire_lock() -> asyncio.Lock:
             """Acquire the key within the worker event loop.
 
@@ -350,8 +242,8 @@ class TestCacheLock(TestCase):
             other = await asyncio.to_thread(run_probe)
             self.assertIsNot(holder._impl, other)
 
-class TestDatabaseCacheLock(TestCase):
 
+class TestDatabaseCacheLock(TestCase):
     async def asyncSetUp(self) -> None:
         """Create an in-memory SQLite connection and a database-backed lock.
 
@@ -364,44 +256,19 @@ class TestDatabaseCacheLock(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._connection = Connection(
             "sqlite",
             {"driver": "sqlite", "database": ":memory:", "prefix": ""},
         )
+        self.addAsyncCleanup(self._connection.disconnect)
         self._backend = DatabaseCacheBackend(
             connection=self._connection,
             table="cache",
             lock_table="cache_locks",
         )
         await self._backend._ensureSchema()
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the in-memory engine after each test.
-
-        Releases the pooled in-memory database.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._connection.disconnect()
-
-    async def testDatabaseLockAcquireAndRelease(self) -> None:
-        """Acquire and release a database-backed lock without error.
-
-        Validates the happy-path async context manager usage.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        lock = CacheLock(self._backend, "db_resource_a")
-        async with lock:
-            pass  # Lock is held here; no assertion needed beyond no-raise.
 
     async def testDatabaseLockRowIsRemovedAfterRelease(self) -> None:
         """Remove the underlying lock row once the context exits.
@@ -411,7 +278,7 @@ class TestDatabaseCacheLock(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         key = "db_release_check"
         lock = CacheLock(self._backend, key)
@@ -423,79 +290,65 @@ class TestDatabaseCacheLock(TestCase):
         await self._backend.releaseLock(key, "someone-else")
 
     async def testTwoDatabaseLocksOnSameKeyAreMutuallyExclusive(self) -> None:
-        """Prevent two coroutines from holding the same key lock simultaneously.
+        """Block a database contender until its current owner releases the row."""
+        blocked = asyncio.Event()
+        entered = asyncio.Event()
+        original = DatabaseCacheBackend.acquireLock
 
-        Validates mutual exclusion (never more than one concurrent holder)
-        without assuming a specific acquisition order: unlike the
-        asyncio.Lock-backed file lock, the row-based database lock does
-        not guarantee FIFO fairness between owners racing to acquire it.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        key = "db_exclusive"
-        lock_a = CacheLock(self._backend, key)
-        lock_b = CacheLock(self._backend, key)
-        state = {"concurrent": 0, "max_concurrent": 0}
-
-        async def hold(lock: CacheLock) -> None:
-            """Hold the cache lock until the timeout is observed.
+        async def observe_acquisition(
+            backend: DatabaseCacheBackend,
+            key: str,
+            owner: str,
+            lease: float,
+        ) -> bool:
+            """Record a real database rejection before allowing the owner to exit.
 
             Parameters
             ----------
-            lock : CacheLock
-                Value supplied for ``lock``.
+            backend : DatabaseCacheBackend
+                Real backend handling the contender's request.
+            key : str
+                Shared resource key.
+            owner : str
+                Token identifying the contender.
+            lease : float
+                Requested lease duration in seconds.
 
             Returns
             -------
-            None
-                Completes the operation described above.
+            bool
+                Whether the database granted the lease.
             """
-            async with lock:
-                state["concurrent"] += 1
-                state["max_concurrent"] = max(
-                    state["max_concurrent"],
-                    state["concurrent"],
-                )
-                await asyncio.sleep(0.05)
-                state["concurrent"] -= 1
+            acquired = await original(backend, key, owner, lease=lease)
+            if not acquired:
+                blocked.set()
+            return acquired
 
-        await asyncio.gather(hold(lock_a), hold(lock_b))
-        self.assertEqual(state["max_concurrent"], 1)
+        self.enterContext(
+            patch.object(DatabaseCacheBackend, "acquireLock", observe_acquisition),
+        )
+
+        async def acquire_second() -> None:
+            """Signal the attempt and record successful database-lock acquisition."""
+            async with CacheLock(self._backend, "db_exclusive", timeout=2):
+                entered.set()
+
+        task = None
+        try:
+            async with CacheLock(self._backend, "db_exclusive"):
+                task = asyncio.create_task(acquire_second())
+                await asyncio.wait_for(blocked.wait(), 2)
+                self.assertFalse(entered.is_set())
+            await asyncio.wait_for(task, 3)
+            self.assertTrue(entered.is_set())
+        finally:
+            if task is not None:
+                task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
 
     async def testDatabaseLockTimeoutRaisesWhenLockHeld(self) -> None:
-        """Raise TimeoutError when the lock cannot be acquired in time.
-
-        Validates that a very short timeout expires while another
-        coroutine holds the lock, propagating TimeoutError to the caller.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        key = "db_tight_timeout"
-        holder = CacheLock(self._backend, key)
-        waiter = CacheLock(self._backend, key, timeout=0.05)
-
-        async def hold() -> None:
-            """Hold the cache lock until the timeout is observed.
-
-            Returns
-            -------
-            None
-                Completes the operation described above.
-            """
-            async with holder:
-                await asyncio.sleep(0.3)
-
-        holder_task = asyncio.create_task(hold())
-        await asyncio.sleep(0.02)  # Let the holder acquire first.
-
-        with self.assertRaises(TimeoutError):
-            async with waiter:
-                pass  # Should not reach here.
-
-        await holder_task
+        """Expire a database contender's deadline while the lock row is held."""
+        async with CacheLock(self._backend, "db_tight_timeout"):
+            with self.assertRaises(TimeoutError):
+                async with CacheLock(self._backend, "db_tight_timeout", timeout=0.05):
+                    self.fail("A database contender entered the held lock.")

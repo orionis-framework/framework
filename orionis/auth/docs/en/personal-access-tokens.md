@@ -9,9 +9,11 @@ from datetime import UTC, datetime, timedelta
 from orionis.http import response
 from orionis.support.facades import Auth
 
+
 async def issue_read_token():
     issued = await Auth.createToken(
-        "report-client", abilities=("reports.read",),
+        "report-client",
+        abilities=("reports.read",),
         expires_at=datetime.now(UTC) + timedelta(days=7),
     )
     return response.json({"token": issued.plain_text, "metadata": issued.toDict()}, 201)
@@ -27,7 +29,8 @@ The secret appears only in `NewAccessToken.plain_text`. `repr` and `toDict()` om
 from orionis.auth import AuthorizationSnapshot
 
 snapshot = AuthorizationSnapshot(
-    permissions={"reports.read", "reports.delete"}, roles={"analyst"},
+    permissions={"reports.read", "reports.delete"},
+    roles={"analyst"},
     abilities={"reports.read"},
 )
 assert snapshot.can("reports.read")
@@ -41,7 +44,7 @@ Snapshots can report roles, but role middleware rejects restricted credentials s
 
 In a token request, `await Auth.revokeCurrentToken()` returns whether the active credential was revoked. `AccessTokenRepository` exposes asynchronous `create`, `findByPlainText`, `touch`, `revoke`, `revokeAll` and `purgeExpired`. Inject it or its contract into trusted administration. `revokeAll(owner)` requires caller authorization to administer that owner.
 
-Validation rejects malformed, expired, revoked and inactive-owner credentials. Secret comparisons use constant-time helpers. Do not base client logic on parsing the identifier/secret representation.
+Validation rejects malformed, expired and revoked credentials. If an identity exposes `active`, its value must be `True` before the guard records token usage; custom identities without that optional attribute remain supported. Owner keys use the shared bounded scalar-key validation. The repository performs an indexed lookup of the SHA-256 digest, without comparing a stored plaintext secret. The combined ORM lookup retains the exact queried connection before retrieved callbacks or eager loading, so subsequent persistence stays on that connection. Do not base client logic on parsing the identifier/secret representation.
 
 ## Configuration
 

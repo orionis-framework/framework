@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import io
 import sys
@@ -6,8 +8,8 @@ from orionis.console.dynamic.contracts.progress_bar import IProgressBar
 from orionis.console.dynamic.progress_bar import ProgressBar
 from orionis.test import TestCase
 
-class TestProgressBar(TestCase):
 
+class TestProgressBar(TestCase):
     def _make(self, total: int = 100, width: int = 50) -> ProgressBar:
         """
         Create a ProgressBar with stdout patched to suppress terminal output.

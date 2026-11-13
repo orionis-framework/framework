@@ -1,11 +1,12 @@
+# ruff: noqa: TC001
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Define how an authenticated identity is extracted from a request."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from orionis.auth.entities.guard_result import GuardResult
-    from orionis.http.request import Request
+import orionis.http as _http
+from orionis.auth.entities.guard_result import GuardResult
+
 
 class IGuard(ABC):
     """
@@ -31,7 +32,7 @@ class IGuard(ABC):
         """
 
     @abstractmethod
-    async def resolve(self, request: Request) -> GuardResult | None:
+    async def resolve(self, request: _http.Request) -> GuardResult | None:
         """
         Resolve the identity backing the incoming request.
 

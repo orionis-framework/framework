@@ -1,6 +1,6 @@
 # Introspección y metaprogramación
 
-El manual oficial está organizado en capítulos bilingües. La información técnica del manual anterior se ha redistribuido por temas; sus notas históricas de ejecución no se trasladan como resultados actuales.
+Refleje funciones, clases, instancias y módulos Python, e inspeccione firmas de dependencias. Elija un idioma para abrir el manual completo.
 
 - [Manual en español](es/README.md)
 - [English manual](en/README.md)

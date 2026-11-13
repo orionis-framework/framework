@@ -1,10 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.hashing import contracts as contracts_package
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.test import TestCase
 
-class TestHashingContractsPackage(TestCase):
 
+class TestHashingContractsPackage(TestCase):
     def testDeclaresTheDocumentedPublicSurface(self) -> None:
         """Declare exactly the two hashing contracts as public exports.
 
@@ -14,7 +16,7 @@ class TestHashingContractsPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             contracts_package.__all__,
@@ -30,7 +32,7 @@ class TestHashingContractsPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(contracts_package.IHashManager, IHashManager)
         self.assertIs(contracts_package.IHasher, IHasher)

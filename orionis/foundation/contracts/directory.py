@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pathlib import Path
 
+
 class IDirectory(ABC):
     """Define access to the application directory paths."""
 

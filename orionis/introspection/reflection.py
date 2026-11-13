@@ -1,42 +1,41 @@
+# ruff: noqa: PLC0415, TC001, TC003
+# Preserve dynamic reflection, lazy concrete helpers, and runtime public hints.
 """Select reflection helpers for classes, instances, functions and modules."""
 
 from __future__ import annotations
 import abc
 import inspect
 import typing
-from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.introspection.abstract.contracts.reflection import (
-        IReflectionAbstract,
-    )
-    from orionis.introspection.callables.contracts.reflection import (
-        IReflectionCallable,
-    )
-    from orionis.introspection.concretes.contracts.reflection import (
-        IReflectionConcrete,
-    )
-    from orionis.introspection.instances.contracts.reflection import (
-        IReflectionInstance,
-    )
-    from orionis.introspection.modules.contracts.reflection import (
-        IReflectionModule,
-    )
+from collections.abc import Callable
+from orionis.introspection.abstract.contracts.reflection import (
+    IReflectionAbstract,
+)
+from orionis.introspection.callables.contracts.reflection import (
+    IReflectionCallable,
+)
+from orionis.introspection.concretes.contracts.reflection import (
+    IReflectionConcrete,
+)
+from orionis.introspection.instances.contracts.reflection import (
+    IReflectionInstance,
+)
+from orionis.introspection.modules.contracts.reflection import (
+    IReflectionModule,
+)
+
 
 class Reflection:
-
-    # ruff: noqa: ANN401, PLC0415
     """Select reflection helpers for classes, instances, functions and modules."""
 
     @staticmethod
-    def instance(instance: Any) -> IReflectionInstance:
+    def instance(instance: object) -> IReflectionInstance:
         """
         Create a ReflectionInstance for an object instance.
 
         Parameters
         ----------
-        instance : typing.Any
+        instance : object
             Object instance to reflect.
 
         Returns
@@ -47,6 +46,7 @@ class Reflection:
         from orionis.introspection.instances.reflection import (
             ReflectionInstance,
         )
+
         return ReflectionInstance(instance)
 
     @staticmethod
@@ -67,6 +67,7 @@ class Reflection:
         from orionis.introspection.abstract.reflection import (
             ReflectionAbstract,
         )
+
         return ReflectionAbstract(abstract)
 
     @staticmethod
@@ -87,6 +88,7 @@ class Reflection:
         from orionis.introspection.concretes.reflection import (
             ReflectionConcrete,
         )
+
         return ReflectionConcrete(concrete)
 
     @staticmethod
@@ -105,6 +107,7 @@ class Reflection:
             Reflection object for the specified module.
         """
         from orionis.introspection.modules.reflection import ReflectionModule
+
         return ReflectionModule(module)
 
     @staticmethod
@@ -125,16 +128,17 @@ class Reflection:
         from orionis.introspection.callables.reflection import (
             ReflectionCallable,
         )
+
         return ReflectionCallable(fn)
 
     @staticmethod
-    def isAbstract(obj: Any) -> bool:
+    def isAbstract(obj: object) -> bool:
         """
         Determine if the object is an abstract base class.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check for abstractness.
 
         Returns
@@ -146,13 +150,13 @@ class Reflection:
         return inspect.isabstract(obj)
 
     @staticmethod
-    def isConcreteClass(obj: Any) -> bool:
+    def isConcreteClass(obj: object) -> bool:
         """
         Determine if the object is a concrete user-defined class.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check for concreteness.
 
         Returns
@@ -165,7 +169,7 @@ class Reflection:
 
         if (
             not isinstance(obj, type)
-            or Reflection.isBuiltIn(obj)
+            or obj.__module__ == "builtins"
             or Reflection.isAbstract(obj)
             or Reflection.isGeneric(obj)
             or Reflection.isProtocol(obj)
@@ -178,13 +182,13 @@ class Reflection:
         return result
 
     @staticmethod
-    def isAsyncGen(obj: Any) -> bool:
+    def isAsyncGen(obj: object) -> bool:
         """
         Determine if the object is an asynchronous generator.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -196,13 +200,13 @@ class Reflection:
         return inspect.isasyncgen(obj)
 
     @staticmethod
-    def isAsyncGenFunction(obj: Any) -> bool:
+    def isAsyncGenFunction(obj: object) -> bool:
         """
         Determine if the object is an asynchronous generator function.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -215,13 +219,13 @@ class Reflection:
         return inspect.isasyncgenfunction(obj)
 
     @staticmethod
-    def isAwaitable(obj: Any) -> bool:
+    def isAwaitable(obj: object) -> bool:
         """
         Determine if the object can be awaited.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check for awaitability.
 
         Returns
@@ -233,13 +237,13 @@ class Reflection:
         return inspect.isawaitable(obj)
 
     @staticmethod
-    def isBuiltIn(obj: Any) -> bool:
+    def isBuiltIn(obj: object) -> bool:
         """
         Determine if the object is a built-in function or method.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -251,13 +255,13 @@ class Reflection:
         return inspect.isbuiltin(obj)
 
     @staticmethod
-    def isClass(obj: Any) -> bool:
+    def isClass(obj: object) -> bool:
         """
         Determine if the object is a class.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -268,13 +272,13 @@ class Reflection:
         return inspect.isclass(obj)
 
     @staticmethod
-    def isCode(obj: Any) -> bool:
+    def isCode(obj: object) -> bool:
         """
         Determine if the object is a code object.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -285,13 +289,13 @@ class Reflection:
         return inspect.iscode(obj)
 
     @staticmethod
-    def isCoroutine(obj: Any) -> bool:
+    def isCoroutine(obj: object) -> bool:
         """
         Determine if the object is a coroutine.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -302,13 +306,13 @@ class Reflection:
         return inspect.iscoroutine(obj)
 
     @staticmethod
-    def isCoroutineFunction(obj: Any) -> bool:
+    def isCoroutineFunction(obj: object) -> bool:
         """
         Determine if the object is a coroutine function.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -319,13 +323,13 @@ class Reflection:
         return inspect.iscoroutinefunction(obj)
 
     @staticmethod
-    def isDataDescriptor(obj: Any) -> bool:
+    def isDataDescriptor(obj: object) -> bool:
         """
         Determine if the object is a data descriptor.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -336,13 +340,13 @@ class Reflection:
         return inspect.isdatadescriptor(obj)
 
     @staticmethod
-    def isFrame(obj: Any) -> bool:
+    def isFrame(obj: object) -> bool:
         """
         Determine if the object is a frame object.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -353,13 +357,13 @@ class Reflection:
         return inspect.isframe(obj)
 
     @staticmethod
-    def isFunction(obj: Any) -> bool:
+    def isFunction(obj: object) -> bool:
         """
         Determine if the object is a Python function.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -370,13 +374,13 @@ class Reflection:
         return inspect.isfunction(obj)
 
     @staticmethod
-    def isGenerator(obj: Any) -> bool:
+    def isGenerator(obj: object) -> bool:
         """
         Determine if the object is a generator.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -387,13 +391,13 @@ class Reflection:
         return inspect.isgenerator(obj)
 
     @staticmethod
-    def isGeneratorFunction(obj: Any) -> bool:
+    def isGeneratorFunction(obj: object) -> bool:
         """
         Determine if the object is a generator function.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -404,13 +408,13 @@ class Reflection:
         return inspect.isgeneratorfunction(obj)
 
     @staticmethod
-    def isGetSetDescriptor(obj: Any) -> bool:
+    def isGetSetDescriptor(obj: object) -> bool:
         """
         Determine if the object is a getset descriptor.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -421,13 +425,13 @@ class Reflection:
         return inspect.isgetsetdescriptor(obj)
 
     @staticmethod
-    def isMemberDescriptor(obj: Any) -> bool:
+    def isMemberDescriptor(obj: object) -> bool:
         """
         Determine if the object is a member descriptor.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -438,13 +442,13 @@ class Reflection:
         return inspect.ismemberdescriptor(obj)
 
     @staticmethod
-    def isMethod(obj: Any) -> bool:
+    def isMethod(obj: object) -> bool:
         """
         Determine if the object is a method.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -455,13 +459,13 @@ class Reflection:
         return inspect.ismethod(obj)
 
     @staticmethod
-    def isMethodDescriptor(obj: Any) -> bool:
+    def isMethodDescriptor(obj: object) -> bool:
         """
         Determine if the object is a method descriptor.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -472,13 +476,13 @@ class Reflection:
         return inspect.ismethoddescriptor(obj)
 
     @staticmethod
-    def isModule(obj: Any) -> bool:
+    def isModule(obj: object) -> bool:
         """
         Determine if the object is a module.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -489,13 +493,13 @@ class Reflection:
         return inspect.ismodule(obj)
 
     @staticmethod
-    def isRoutine(obj: Any) -> bool:
+    def isRoutine(obj: object) -> bool:
         """
         Determine if the object is a user-defined or built-in function or method.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -506,13 +510,13 @@ class Reflection:
         return inspect.isroutine(obj)
 
     @staticmethod
-    def isTraceback(obj: Any) -> bool:
+    def isTraceback(obj: object) -> bool:
         """
         Determine if the object is a traceback object.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to check.
 
         Returns
@@ -523,13 +527,13 @@ class Reflection:
         return inspect.istraceback(obj)
 
     @staticmethod
-    def isGeneric(obj: Any) -> bool:
+    def isGeneric(obj: object) -> bool:
         """
         Determine if the provided type is a generic type.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             The type to check.
 
         Returns
@@ -546,13 +550,13 @@ class Reflection:
         return isinstance(obj, typing.TypeVar)
 
     @staticmethod
-    def isProtocol(obj: Any) -> bool:
+    def isProtocol(obj: object) -> bool:
         """
         Determine if the object is a subclass of ``typing.Protocol``.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object or type to evaluate.
 
         Returns
@@ -569,13 +573,13 @@ class Reflection:
         )
 
     @staticmethod
-    def isInstance(obj: Any) -> bool:
+    def isInstance(obj: object) -> bool:
         """
         Determine if the object is an instance of a user-defined class.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to evaluate.
 
         Returns
@@ -593,13 +597,13 @@ class Reflection:
         return module not in {"builtins", "abc"}
 
     @staticmethod
-    def isTypingConstruct(obj: Any) -> bool:
+    def isTypingConstruct(obj: object) -> bool:
         """
         Determine if the object is a construct from the ``typing`` module.
 
         Parameters
         ----------
-        obj : typing.Any
+        obj : object
             Object to evaluate.
 
         Returns
@@ -608,13 +612,7 @@ class Reflection:
             True if the object is a recognized typing construct from the ``typing``
             module, otherwise False.
         """
-        # List of known typing constructs for comparison
-        typing_constructs: list[str] = [
-            "Any", "Union", "Optional", "List", "Dict", "Set", "Tuple",
-            "Callable", "TypeVar", "Generic", "Protocol", "Literal",
-            "Final", "TypedDict", "NewType", "Deque", "DefaultDict",
-            "Counter", "ChainMap",
-        ]
-        # Compare the object's type name to known typing constructs
-        obj_type_name: str = type(obj).__name__
-        return obj_type_name in typing_constructs
+        return not inspect.isfunction(obj) and (
+            getattr(obj, "__module__", None) == "typing"
+            or type(obj).__module__ == "typing"
+        )

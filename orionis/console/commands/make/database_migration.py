@@ -1,10 +1,13 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Generate a migration named for its creation date and time."""
 
 import re
 from pathlib import Path
 from orionis.console.commands.make._base import MakeStubCommand
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
 from orionis.support.facades.datetime import DateTime
+
 
 class MakeDatabaseMigration(MakeStubCommand):
     """Generate a migration named for its creation date and time."""

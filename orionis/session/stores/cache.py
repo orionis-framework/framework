@@ -1,7 +1,9 @@
+# ruff: noqa: TC001
+# Expose cache contract types to runtime dependency injection.
+
 """Session store backed by the framework's cache system."""
 
 from datetime import UTC, datetime
-from math import ceil
 from typing import Any
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.cache.contracts.repository import ICacheRepository
@@ -12,24 +14,25 @@ from orionis.session.entities.record import SessionRecord
 _KEY_PREFIX: str = "session:"
 """Namespace prefix keeping session entries away from unrelated cache keys."""
 
+
 class CacheSessionStore(ISessionStore):
     """
     Session store backed by the framework's cache system.
 
-    Each session is persisted as a single cache entry whose TTL mirrors
-    ``record.expires_at``.  Expiry is therefore delegated entirely to the
-    underlying cache backend (file, database, Redis, ...); no in-process
-    bookkeeping or manual sweeping is required.
+    Persist each session as one cache entry. Truncate its remaining TTL to
+    whole seconds so rounding cannot prolong the record's deadline. This can
+    expire a record up to one second early; deadlines less than one full
+    second away cannot be persisted or renewed. Actual eviction timing still
+    depends on the backend, its clock and transport latency.
 
     Notes
     -----
     ``ICacheManager`` exposes no way to enumerate stored keys, so this
     store cannot (and does not need to) implement an active
     :meth:`orionis.session.stores.cache.CacheSessionStore.gc`:
-    the backend evicts expired entries on its own.
+    the backend enforces expiration. Physical removal of stale entries depends
+    on that backend's cleanup policy and may occur only when they are read.
     """
-
-    # ruff: noqa: TC001
 
     __slots__ = ("_repository",)
     """Declare the instance attribute slots reserved by this class."""
@@ -49,7 +52,7 @@ class CacheSessionStore(ISessionStore):
         Returns
         -------
         None
-            Bind the store to the requested (or default) cache repository.
+            No return value.
         """
         self._repository: ICacheRepository = cache.store(store)
         """Repository produced by ``cache.store``."""
@@ -99,7 +102,7 @@ class CacheSessionStore(ISessionStore):
         Insert or replace the record keyed by its identifier.
 
         The cache entry's TTL is derived from ``record.expires_at``; a
-        record that has already expired is deleted instead of written.
+        record with less than one full second remaining is deleted instead.
 
         Parameters
         ----------
@@ -109,9 +112,9 @@ class CacheSessionStore(ISessionStore):
         Returns
         -------
         None
-            Insert or replace the record keyed by its identifier.
+            No return value.
         """
-        ttl = (record.expires_at - datetime.now(UTC)).total_seconds()
+        ttl = int((record.expires_at - datetime.now(UTC)).total_seconds())
 
         if ttl <= 0:
             await self.delete(record.id)
@@ -122,7 +125,7 @@ class CacheSessionStore(ISessionStore):
             "data": record.data,
             "expires_at": record.expires_at,
         }
-        await self._repository.set(_KEY_PREFIX + record.id, payload, ttl=ceil(ttl))
+        await self._repository.set(_KEY_PREFIX + record.id, payload, ttl=ttl)
 
     async def update(self, record: SessionRecord) -> bool:
         """
@@ -136,9 +139,10 @@ class CacheSessionStore(ISessionStore):
         Returns
         -------
         bool
-            Whether the cache atomically replaced a live record.
+            Whether the cache atomically replaced a live record. Return False
+            when the replacement has less than one full second remaining.
         """
-        ttl = (record.expires_at - datetime.now(UTC)).total_seconds()
+        ttl = int((record.expires_at - datetime.now(UTC)).total_seconds())
         if ttl <= 0:
             return False
         return await self._repository.replace(
@@ -148,7 +152,7 @@ class CacheSessionStore(ISessionStore):
                 "data": record.data,
                 "expires_at": record.expires_at,
             },
-            ttl=ceil(ttl),
+            ttl=ttl,
         )
 
     async def delete(self, session_id: str) -> bool:
@@ -169,11 +173,10 @@ class CacheSessionStore(ISessionStore):
 
     async def gc(self) -> None:
         """
-        No-op: expiry is enforced natively by the cache backend's TTL.
+        Leave expiration cleanup to the cache backend's TTL.
 
         Returns
         -------
         None
-            No-op: expiry is enforced natively by the cache backend's TTL.
+            No return value.
         """
-

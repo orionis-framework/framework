@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class MailDriver(StrEnum):
     """
     Enumeration of supported mail drivers.

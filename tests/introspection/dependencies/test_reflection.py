@@ -1,3 +1,7 @@
+# ruff: noqa: ANN001, F821, PT009, PT027, UP037
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep a quoted unresolved type name to exercise conservative metadata.
+
 from orionis.introspection.dependencies.entities.signature import (
     Signature,
 )
@@ -10,6 +14,7 @@ from orionis.test import TestCase
 # Target fixtures used across multiple test classes
 # ---------------------------------------------------------------------------
 
+
 class _NoArgs:
     """Class with a no-argument constructor (only self)."""
 
@@ -19,8 +24,9 @@ class _NoArgs:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
+
 
 class _AllResolved:
     """Class whose constructor uses only type-annotated, non-builtin params."""
@@ -36,9 +42,10 @@ class _AllResolved:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.dep = dep
+
 
 class _WithDefault:
     """Class whose constructor has a parameter with a default value."""
@@ -54,9 +61,10 @@ class _WithDefault:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.value = value
+
 
 class _WithBuiltin:
     """Class whose constructor has a bare builtin-typed parameter."""
@@ -72,9 +80,10 @@ class _WithBuiltin:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.name = name
+
 
 class _Unannotated:
     """Class whose constructor has a completely unannotated parameter."""
@@ -90,9 +99,10 @@ class _Unannotated:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.x = x
+
 
 class _Mixed:
     """Class with a mix of annotated and default-valued constructor params."""
@@ -117,7 +127,7 @@ class _Mixed:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.dep = dep
         self.name = name
@@ -141,6 +151,7 @@ class _Mixed:
         """
         return f"{value}-{mode}"
 
+
 class _KeywordOnly:
     """Class whose constructor has keyword-only parameters."""
 
@@ -157,17 +168,18 @@ class _KeywordOnly:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.label = label
         self.count = count
+
 
 class _ForwardRef:
     """Class whose constructor annotates a parameter with a string literal."""
 
     def __init__(
         self,
-        dep: "UnknownDependency",  # type: ignore[name-defined]  # noqa: F821, UP037
+        dep: "UnknownDependency",  # type: ignore[name-defined]
     ) -> None:
         """Initialize the test helper.
 
@@ -179,9 +191,10 @@ class _ForwardRef:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.dep = dep
+
 
 def _plain_function(a: int, b: str = "hello") -> str:
     """
@@ -201,7 +214,8 @@ def _plain_function(a: int, b: str = "hello") -> str:
     """
     return f"{a}-{b}"
 
-async def _async_function(x: int) -> int: # NOSONAR
+
+async def _async_function(x: int) -> int:
     """
     Return x unchanged (async fixture).
 
@@ -217,12 +231,13 @@ async def _async_function(x: int) -> int: # NOSONAR
     """
     return x
 
+
 # ---------------------------------------------------------------------------
 # ReflectDependencies — constructor
 # ---------------------------------------------------------------------------
 
-class TestReflectDependenciesInit(TestCase):
 
+class TestReflectDependenciesInit(TestCase):
     def testInitWithNoneTarget(self) -> None:
         """
         Assert that ReflectDependencies accepts None as a valid target.
@@ -230,7 +245,7 @@ class TestReflectDependenciesInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rd = ReflectDependencies(None)
         self.assertIsInstance(rd, ReflectDependencies)
@@ -242,7 +257,7 @@ class TestReflectDependenciesInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rd = ReflectDependencies(_Mixed)
         self.assertIsInstance(rd, ReflectDependencies)
@@ -254,7 +269,7 @@ class TestReflectDependenciesInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rd = ReflectDependencies(_plain_function)
         self.assertIsInstance(rd, ReflectDependencies)
@@ -266,17 +281,18 @@ class TestReflectDependenciesInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rd = ReflectDependencies()
         self.assertIsInstance(rd, ReflectDependencies)
+
 
 # ---------------------------------------------------------------------------
 # constructorSignature
 # ---------------------------------------------------------------------------
 
-class TestConstructorSignatureNoArgs(TestCase):
 
+class TestConstructorSignatureNoArgs(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _NoArgs.
@@ -284,7 +300,7 @@ class TestConstructorSignatureNoArgs(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_NoArgs)
 
@@ -295,7 +311,7 @@ class TestConstructorSignatureNoArgs(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rd.constructorSignature(), Signature)
 
@@ -306,7 +322,7 @@ class TestConstructorSignatureNoArgs(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertEqual(sig.ordered, {})
@@ -318,7 +334,7 @@ class TestConstructorSignatureNoArgs(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertTrue(sig.noArgumentsRequired())
@@ -330,13 +346,13 @@ class TestConstructorSignatureNoArgs(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertFalse(sig.hasUnresolvedArguments())
 
-class TestConstructorSignatureWithDefault(TestCase):
 
+class TestConstructorSignatureWithDefault(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _WithDefault.
@@ -344,7 +360,7 @@ class TestConstructorSignatureWithDefault(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_WithDefault)
 
@@ -355,7 +371,7 @@ class TestConstructorSignatureWithDefault(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertIn("value", sig.resolved)
@@ -367,7 +383,7 @@ class TestConstructorSignatureWithDefault(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertIn("value", sig.ordered)
@@ -379,7 +395,7 @@ class TestConstructorSignatureWithDefault(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertNotIn("value", sig.unresolved)
@@ -391,7 +407,7 @@ class TestConstructorSignatureWithDefault(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertEqual(sig.resolved["value"].default, 10)
@@ -403,13 +419,13 @@ class TestConstructorSignatureWithDefault(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertTrue(sig.resolved["value"].resolved)
 
-class TestConstructorSignatureWithBuiltin(TestCase):
 
+class TestConstructorSignatureWithBuiltin(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _WithBuiltin.
@@ -417,7 +433,7 @@ class TestConstructorSignatureWithBuiltin(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_WithBuiltin)
 
@@ -428,7 +444,7 @@ class TestConstructorSignatureWithBuiltin(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertIn("name", sig.unresolved)
@@ -440,7 +456,7 @@ class TestConstructorSignatureWithBuiltin(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertNotIn("name", sig.resolved)
@@ -452,7 +468,7 @@ class TestConstructorSignatureWithBuiltin(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertFalse(sig.unresolved["name"].resolved)
@@ -464,13 +480,13 @@ class TestConstructorSignatureWithBuiltin(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertEqual(sig.unresolved["name"].class_name, "str")
 
-class TestConstructorSignatureUnannotated(TestCase):
 
+class TestConstructorSignatureUnannotated(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _Unannotated.
@@ -478,7 +494,7 @@ class TestConstructorSignatureUnannotated(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_Unannotated)
 
@@ -489,7 +505,7 @@ class TestConstructorSignatureUnannotated(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertIn("x", sig.unresolved)
@@ -501,7 +517,7 @@ class TestConstructorSignatureUnannotated(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertNotIn("x", sig.resolved)
@@ -513,13 +529,13 @@ class TestConstructorSignatureUnannotated(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertFalse(sig.unresolved["x"].resolved)
 
-class TestConstructorSignatureMixed(TestCase):
 
+class TestConstructorSignatureMixed(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _Mixed.
@@ -527,7 +543,7 @@ class TestConstructorSignatureMixed(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_Mixed)
 
@@ -538,7 +554,7 @@ class TestConstructorSignatureMixed(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertIn("dep", sig.resolved)
@@ -550,7 +566,7 @@ class TestConstructorSignatureMixed(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertIn("name", sig.unresolved)
@@ -562,7 +578,7 @@ class TestConstructorSignatureMixed(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertIn("count", sig.resolved)
@@ -574,17 +590,18 @@ class TestConstructorSignatureMixed(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertEqual(len(sig.ordered), 3)
+
 
 # ---------------------------------------------------------------------------
 # methodSignature
 # ---------------------------------------------------------------------------
 
-class TestMethodSignature(TestCase):
 
+class TestMethodSignature(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _Mixed.
@@ -592,7 +609,7 @@ class TestMethodSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_Mixed)
 
@@ -603,7 +620,7 @@ class TestMethodSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rd.methodSignature("process"), Signature)
 
@@ -614,7 +631,7 @@ class TestMethodSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.methodSignature("process")
         self.assertIn("value", sig.unresolved)
@@ -626,7 +643,7 @@ class TestMethodSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.methodSignature("process")
         self.assertIn("mode", sig.resolved)
@@ -638,19 +655,19 @@ class TestMethodSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.methodSignature("process")
         self.assertEqual(len(sig.ordered), 2)
 
-    def testModeDefaultIsHello(self) -> None:
+    def testModeDefaultIsFast(self) -> None:
         """
         Assert that the Argument for 'mode' stores 'fast' as its default.
 
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.methodSignature("process")
         self.assertEqual(sig.resolved["mode"].default, "fast")
@@ -662,17 +679,18 @@ class TestMethodSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.rd.methodSignature("non_existent_method_xyz")
+
 
 # ---------------------------------------------------------------------------
 # callableSignature
 # ---------------------------------------------------------------------------
 
-class TestCallableSignaturePlainFunction(TestCase):
 
+class TestCallableSignaturePlainFunction(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _plain_function.
@@ -680,7 +698,7 @@ class TestCallableSignaturePlainFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_plain_function)
 
@@ -691,7 +709,7 @@ class TestCallableSignaturePlainFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rd.callableSignature(), Signature)
 
@@ -702,7 +720,7 @@ class TestCallableSignaturePlainFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.callableSignature()
         self.assertIn("a", sig.unresolved)
@@ -714,7 +732,7 @@ class TestCallableSignaturePlainFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.callableSignature()
         self.assertIn("b", sig.resolved)
@@ -726,7 +744,7 @@ class TestCallableSignaturePlainFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.callableSignature()
         self.assertEqual(len(sig.ordered), 2)
@@ -738,13 +756,13 @@ class TestCallableSignaturePlainFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.callableSignature()
         self.assertEqual(sig.resolved["b"].default, "hello")
 
-class TestCallableSignatureAsyncFunction(TestCase):
 
+class TestCallableSignatureAsyncFunction(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _async_function.
@@ -752,7 +770,7 @@ class TestCallableSignatureAsyncFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_async_function)
 
@@ -763,7 +781,7 @@ class TestCallableSignatureAsyncFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rd.callableSignature(), Signature)
 
@@ -774,13 +792,13 @@ class TestCallableSignatureAsyncFunction(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.callableSignature()
         self.assertIn("x", sig.unresolved)
 
-class TestCallableSignatureNonCallable(TestCase):
 
+class TestCallableSignatureNonCallable(TestCase):
     def testNonCallableRaisesTypeError(self) -> None:
         """
         Assert that calling callableSignature on a non-callable raises TypeError.
@@ -788,7 +806,7 @@ class TestCallableSignatureNonCallable(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         # A plain integer is not callable; signature inspection must fail
         rd = ReflectDependencies(42)
@@ -802,7 +820,7 @@ class TestCallableSignatureNonCallable(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -813,12 +831,13 @@ class TestCallableSignatureNonCallable(TestCase):
         with self.assertRaises(ValueError):
             rd.callableSignature()
 
+
 # ---------------------------------------------------------------------------
 # Forward-referenced (string) annotations
 # ---------------------------------------------------------------------------
 
-class TestForwardReferencedAnnotations(TestCase):
 
+class TestForwardReferencedAnnotations(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectDependencies over the forward-reference fixture.
@@ -826,7 +845,7 @@ class TestForwardReferencedAnnotations(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.rd = ReflectDependencies(_ForwardRef)
 
@@ -837,7 +856,7 @@ class TestForwardReferencedAnnotations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         argument = self.rd.constructorSignature().ordered["dep"]
         self.assertEqual(argument.module_name, "typing")
@@ -851,18 +870,19 @@ class TestForwardReferencedAnnotations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         argument = self.rd.constructorSignature().ordered["dep"]
         self.assertTrue(argument.resolved)
         self.assertFalse(argument.is_schema)
 
+
 # ---------------------------------------------------------------------------
 # Keyword-only parameters
 # ---------------------------------------------------------------------------
 
-class TestKeywordOnlyParameters(TestCase):
 
+class TestKeywordOnlyParameters(TestCase):
     def setUp(self) -> None:
         """
         Prepare a ReflectDependencies instance wrapping _KeywordOnly.
@@ -870,7 +890,7 @@ class TestKeywordOnlyParameters(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rd = ReflectDependencies(_KeywordOnly)
 
@@ -881,7 +901,7 @@ class TestKeywordOnlyParameters(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertTrue(sig.unresolved["label"].is_keyword_only)
@@ -893,7 +913,7 @@ class TestKeywordOnlyParameters(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertTrue(sig.resolved["count"].is_keyword_only)
@@ -905,7 +925,7 @@ class TestKeywordOnlyParameters(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertIn("label", sig.getKeywordOnly())
@@ -917,7 +937,7 @@ class TestKeywordOnlyParameters(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.rd.constructorSignature()
         self.assertEqual(sig.getPositionalOnly(), {})

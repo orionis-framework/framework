@@ -1,3 +1,6 @@
+# ruff: noqa: BLE001, PLR0913
+# Keep established public and external protocol names and signatures.
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Parse a multipart byte stream into form fields and uploaded files."""
 
 from __future__ import annotations
@@ -44,6 +47,7 @@ _CHUNK_SIZE = 64 * 1024
 _CLEANUP_PHASE = "payload.cleanup"
 """Failure phase shared by multipart upload cleanup operations."""
 
+
 async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
     """
     Run a blocking function in a worker thread without losing cancellation state.
@@ -78,9 +82,10 @@ async def complete_in_thread[T](function: Callable[..., T], *args: object) -> T:
         with suppress(CancelledError):
             try:
                 task.result()
-            except Exception as error:  # noqa: BLE001 - Retain caller cancellation.
+            except Exception as error:  # Retain caller cancellation.
                 await capture(error, flow="http", phase=_CLEANUP_PHASE)
         raise
+
 
 class MultipartStreamParser(IMultipartStreamParser):
     """
@@ -170,7 +175,7 @@ class MultipartStreamParser(IMultipartStreamParser):
     )
     """Declare the instance attribute slots reserved by this class."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         stream: AsyncIterable[bytes],
         boundary: bytes,
@@ -224,9 +229,13 @@ class MultipartStreamParser(IMultipartStreamParser):
             error_msg = "Invalid multipart boundary"
             raise ValueError(error_msg)
         limits = HTTPBodyLimits(
-            max_body_size=max_body_size, max_files=max_files, max_fields=max_fields,
-            max_part_size=max_part_size, memory_threshold=memory_threshold,
-            max_header_size=max_header_size, max_field_size=max_field_size,
+            max_body_size=max_body_size,
+            max_files=max_files,
+            max_fields=max_fields,
+            max_part_size=max_part_size,
+            memory_threshold=memory_threshold,
+            max_header_size=max_header_size,
+            max_field_size=max_field_size,
             max_memory_size=max_memory_size,
             max_buffer_size=_DEFAULT_LIMITS["max_buffer_size"],
             max_concurrent_requests=_DEFAULT_LIMITS["max_concurrent_requests"],
@@ -320,8 +329,7 @@ class MultipartStreamParser(IMultipartStreamParser):
         if closing and self._eof and end == len(buf):
             return end
         if not self._eof and (
-            end == len(buf)
-            or (end + 1 == len(buf) and buf[end] in (13, 45))
+            end == len(buf) or (end + 1 == len(buf) and buf[end] in (13, 45))
         ):
             return -1
         return _DELIMITER_INVALID
@@ -423,7 +431,8 @@ class MultipartStreamParser(IMultipartStreamParser):
                     flow="http",
                     phase="payload.parse",
                     expected=isinstance(
-                        failure, (ValueError, PayloadTooLargeException),
+                        failure,
+                        (ValueError, PayloadTooLargeException),
                     ),
                 )
             capture_nowait(close_error, flow="http", phase=_CLEANUP_PHASE)
@@ -550,7 +559,8 @@ class MultipartStreamParser(IMultipartStreamParser):
         """
         encoding = part.headers.get("content-transfer-encoding", "").strip().lower()
         if (
-            part.is_file and encoding in ("base64", "quoted-printable")
+            part.is_file
+            and encoding in ("base64", "quoted-printable")
             and self._memorySize + 2 * part.data.size > self.max_memory_size
         ):
             error_msg = "Multipart transfer decoding exceeds memory budget"
@@ -564,8 +574,9 @@ class MultipartStreamParser(IMultipartStreamParser):
         else:
             value = part.finalize()
         retained = (
-            (0 if value.requiresDiskWrite() else value.size) # NOSONAR
-            if part.is_file else getsizeof(value)
+            (0 if value.requiresDiskWrite() else value.size)  # NOSONAR
+            if part.is_file
+            else getsizeof(value)
         )
         if self._memorySize + (0 if part.is_file else retained) > self.max_memory_size:
             error_msg = "Multipart decoded field exceeds memory budget"
@@ -603,7 +614,7 @@ class MultipartStreamParser(IMultipartStreamParser):
                 raise PayloadTooLargeException(error_msg)
             self._pendingChunk = chunk
         end = min(self._pendingOffset + _CHUNK_SIZE, len(self._pendingChunk))
-        with memoryview(self._pendingChunk)[self._pendingOffset:end] as chunk:
+        with memoryview(self._pendingChunk)[self._pendingOffset : end] as chunk:
             self.buffer.extend(chunk)
         self._pendingOffset = end
         return True
@@ -741,7 +752,8 @@ class MultipartStreamParser(IMultipartStreamParser):
         raise ValueError(error_msg)
 
     def _closeFailedParts(
-        self, form_items: list[tuple[str, object]],
+        self,
+        form_items: list[tuple[str, object]],
     ) -> list[Exception]:
         """
         Close every failed upload before error reporting can be cancelled.
@@ -764,7 +776,7 @@ class MultipartStreamParser(IMultipartStreamParser):
         for file in files:
             try:
                 file.close()
-            except Exception as error:  # noqa: BLE001 - Observed after all closures.
+            except Exception as error:  # Observed after all closures.
                 failures.append(error)
         return failures
 
@@ -789,7 +801,8 @@ class MultipartStreamParser(IMultipartStreamParser):
                         flow="http",
                         phase="payload.parse",
                         expected=isinstance(
-                            failure, (ValueError, PayloadTooLargeException),
+                            failure,
+                            (ValueError, PayloadTooLargeException),
                         ),
                     )
             finally:

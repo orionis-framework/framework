@@ -1,4 +1,7 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
+from unittest.mock import patch
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.foundation.core_providers import CORE_PROVIDERS
@@ -12,24 +15,24 @@ from orionis.test import TestCase
 # Cheap cost parameters keeping the facade round trip fast.
 _CHEAP_COSTS: dict[str, int] = {"rounds": 1, "memory": 8, "threads": 1}
 
+
 class _StubApp:
     """Application double capturing every binding it receives."""
 
     __slots__ = ("singletons",)
 
     def __init__(self) -> None:
-        """
-        Initialise the list of recorded bindings.
+        """Initialise the list of recorded bindings.
 
         Returns
         -------
         None
+            No return value.
         """
         self.singletons: list[tuple[object, object]] = []
 
     def singleton(self, abstract: object, concrete: object) -> None:
-        """
-        Record a singleton binding.
+        """Record a singleton binding.
 
         Parameters
         ----------
@@ -41,8 +44,10 @@ class _StubApp:
         Returns
         -------
         None
+            No return value.
         """
         self.singletons.append((abstract, concrete))
+
 
 class _StubHashFacade:
     """Facade double counting how many times it was pinned."""
@@ -50,27 +55,27 @@ class _StubHashFacade:
     __slots__ = ("pinned",)
 
     def __init__(self) -> None:
-        """
-        Initialise the pin counter.
+        """Initialise the pin counter.
 
         Returns
         -------
         None
+            No return value.
         """
         self.pinned = 0
 
     async def pin(self) -> None:
-        """
-        Count a pin invocation.
+        """Count a pin invocation.
 
         Returns
         -------
         None
+            No return value.
         """
         self.pinned += 1
 
-class TestHashProviderDefinition(TestCase):
 
+class TestHashProviderDefinition(TestCase):
     def testInheritsTheServiceProviderBase(self) -> None:
         """Extend the base ServiceProvider class.
 
@@ -79,7 +84,7 @@ class TestHashProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(HashProvider, ServiceProvider))
 
@@ -94,7 +99,7 @@ class TestHashProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(issubclass(HashProvider, DeferrableProvider))
 
@@ -107,7 +112,7 @@ class TestHashProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn(HashProvider, CORE_PROVIDERS)
 
@@ -119,7 +124,7 @@ class TestHashProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         self.assertIs(HashProvider(app).app, app)  # type: ignore[arg-type]
@@ -132,12 +137,12 @@ class TestHashProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(inspect.iscoroutinefunction(HashProvider.boot))
 
-class TestHashProviderRegister(TestCase):
 
+class TestHashProviderRegister(TestCase):
     def testRegisterBindsTheManagerAsASingleton(self) -> None:
         """Bind IHashManager to the concrete HashManager implementation.
 
@@ -146,14 +151,14 @@ class TestHashProviderRegister(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         HashProvider(app).register()  # type: ignore[arg-type]
         self.assertEqual(app.singletons, [(IHashManager, HashManager)])
 
-class TestHashProviderBoot(TestCase):
 
+class TestHashProviderBoot(TestCase):
     def setUp(self) -> None:
         """Replace the Hash facade with a double before each test.
 
@@ -163,24 +168,12 @@ class TestHashProviderBoot(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_facade = provider_module.HashFacade
+        super().setUp()
         self._facade = _StubHashFacade()
-        provider_module.HashFacade = self._facade
+        self.enterContext(patch.object(provider_module, "HashFacade", self._facade))
         self._app = _StubApp()
-
-    def tearDown(self) -> None:
-        """Restore the original Hash facade after each test.
-
-        Guarantees that module level state never leaks between tests.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        provider_module.HashFacade = self._original_facade
 
     async def testBootPinsTheHashFacade(self) -> None:
         """Pin the Hash facade once the services are registered.
@@ -190,7 +183,7 @@ class TestHashProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await HashProvider(self._app).boot()  # type: ignore[arg-type]
         self.assertEqual(self._facade.pinned, 1)
@@ -203,13 +196,13 @@ class TestHashProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await HashProvider(self._app).boot()  # type: ignore[arg-type]
         self.assertEqual(self._app.singletons, [])
 
-class TestHashFacade(TestCase):
 
+class TestHashFacade(TestCase):
     def testAccessorIsTheManagerContract(self) -> None:
         """Resolve the hashing manager contract from the container.
 
@@ -218,7 +211,7 @@ class TestHashFacade(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(Hash.getFacadeAccessor(), IHashManager)
 
@@ -230,7 +223,7 @@ class TestHashFacade(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(await Hash.resolve(), HashManager)
 
@@ -243,7 +236,7 @@ class TestHashFacade(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Hash._pinned_instance, HashManager)
 
@@ -255,7 +248,7 @@ class TestHashFacade(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hashed = await Hash.make("my-secret-password", **_CHEAP_COSTS)
         self.assertIsInstance(hashed, str)

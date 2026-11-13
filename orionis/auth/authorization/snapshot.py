@@ -1,10 +1,11 @@
+# ruff: noqa: TC003
+# Keep the public constructor annotation available at runtime.
+
 """Hold the immutable authorization picture of a single request."""
 
-from typing import TYPE_CHECKING
+from collections.abc import Iterable
 from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable
 
 class AuthorizationSnapshot(IAuthorizationSnapshot):
     """
@@ -49,7 +50,7 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
         Returns
         -------
         None
-            The snapshot is initialised with immutable collections.
+            No return value.
         """
         self.__permissions: frozenset[str] = frozenset(permissions)
         """
@@ -146,14 +147,13 @@ class AuthorizationSnapshot(IAuthorizationSnapshot):
             Compact description with the collection sizes only.
         """
         abilities = (
-            "unrestricted"
-            if self.__abilities is None
-            else str(len(self.__abilities))
+            "unrestricted" if self.__abilities is None else str(len(self.__abilities))
         )
         return (
             f"AuthorizationSnapshot(permissions={len(self.__permissions)}, "
             f"roles={len(self.__roles)}, abilities={abilities})"
         )
+
 
 # Shared snapshot handed to guest requests: no permissions, no roles.
 EMPTY_SNAPSHOT: AuthorizationSnapshot = AuthorizationSnapshot(

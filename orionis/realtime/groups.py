@@ -1,10 +1,9 @@
+# ruff: noqa: TC001
+# Keep the group service constructor annotation available to runtime reflection.
 """Manage group membership owned by the current Hub connection."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from orionis.realtime.contracts.manager import IConnectionManager
+from orionis.realtime.contracts.manager import IConnectionManager
 
 
 class HubGroups:
@@ -34,7 +33,7 @@ class HubGroups:
         self._connection_id = connection_id
         """Current connection identifier."""
 
-    async def join(self, group: str) -> None: # NOSONAR
+    async def join(self, group: str) -> None:  # NOSONAR
         """
         Join a group without consuming another slot for existing membership.
 
@@ -59,7 +58,7 @@ class HubGroups:
         """
         self._manager.join(self._connection_id, group)
 
-    async def leave(self, group: str) -> None: # NOSONAR
+    async def leave(self, group: str) -> None:  # NOSONAR
         """
         Remove the current connection from one group idempotently.
 

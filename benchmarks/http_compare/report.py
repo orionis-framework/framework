@@ -33,6 +33,7 @@ FRAMEWORK_LABELS = {
     "starlette": "Starlette",
 }
 
+
 def aggregate_samples(samples: list[dict[str, Any]]) -> dict[str, Any]:
     """
     Aggregate independent runs without publishing metrics for failed samples.
@@ -64,7 +65,8 @@ def aggregate_samples(samples: list[dict[str, Any]]) -> dict[str, Any]:
     # Withhold all comparative metrics when even one measured run has errors.
     if result["errors"]:
         result.update(
-            status="failed", reason="HTTP or transport errors during measurement",
+            status="failed",
+            reason="HTTP or transport errors during measurement",
         )
     else:
         result.update(status="ok")
@@ -75,6 +77,7 @@ def aggregate_samples(samples: list[dict[str, Any]]) -> dict[str, Any]:
             },
         )
     return result
+
 
 def write_json(path: Path, value: object) -> None:
     """
@@ -97,6 +100,7 @@ def write_json(path: Path, value: object) -> None:
         json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
         encoding="utf-8",
     )
+
 
 def render_summary(report: dict[str, Any]) -> str:
     """
@@ -131,6 +135,7 @@ def render_summary(report: dict[str, Any]) -> str:
     if "error" in report or any(row["status"] != "ok" for row in report["results"]):
         lines.extend(["", FAILED_COMPARISON])
     return "\n".join(lines) + "\n"
+
 
 def render_throughput_svg(report: dict[str, Any], workers: int) -> str:
     """
@@ -208,41 +213,46 @@ def render_throughput_svg(report: dict[str, Any], workers: int) -> str:
     ]
     for tick in range(5):
         x = plot_left + plot_width * tick / 4
-        lines.extend([
-            (
-                f'<line class="grid" x1="{x:.2f}" y1="{plot_top - 8}" '
-                f'x2="{x:.2f}" y2="{plot_bottom}"/>'
-            ),
-            (
-                f'<text class="muted" x="{x:.2f}" y="{plot_bottom + 24}" '
-                f'text-anchor="middle">{step * tick:,.{precision}f}</text>'
-            ),
-        ])
+        lines.extend(
+            [
+                (
+                    f'<line class="grid" x1="{x:.2f}" y1="{plot_top - 8}" '
+                    f'x2="{x:.2f}" y2="{plot_bottom}"/>'
+                ),
+                (
+                    f'<text class="muted" x="{x:.2f}" y="{plot_bottom + 24}" '
+                    f'text-anchor="middle">{step * tick:,.{precision}f}</text>'
+                ),
+            ],
+        )
     for index, row in enumerate(rows):
         framework = row["framework"]
         label = FRAMEWORK_LABELS.get(framework, framework)
         rate = row["requests_per_second"]
         width = rate / upper * plot_width
         y = plot_top + index * row_height
-        lines.extend([
-            f'<g data-framework="{escape(framework)}">',
-            f"<title>{escape(label)}: {rate:,.2f} requests/s</title>",
-            (
-                f'<text class="label" x="{plot_left - 12}" y="{y + 27}" '
-                f'text-anchor="end">{escape(label)}</text>'
-            ),
-            (
-                f'<rect class="bar" x="{plot_left}" y="{y}" '
-                f'width="{width:.2f}" height="44" rx="6"/>'
-            ),
-            (
-                f'<text class="label" x="{plot_left + width + 10:.2f}" '
-                f'y="{y + 27}">{rate:,.2f}</text>'
-            ),
-            "</g>",
-        ])
+        lines.extend(
+            [
+                f'<g data-framework="{escape(framework)}">',
+                f"<title>{escape(label)}: {rate:,.2f} requests/s</title>",
+                (
+                    f'<text class="label" x="{plot_left - 12}" y="{y + 27}" '
+                    f'text-anchor="end">{escape(label)}</text>'
+                ),
+                (
+                    f'<rect class="bar" x="{plot_left}" y="{y}" '
+                    f'width="{width:.2f}" height="44" rx="6"/>'
+                ),
+                (
+                    f'<text class="label" x="{plot_left + width + 10:.2f}" '
+                    f'y="{y + 27}">{rate:,.2f}</text>'
+                ),
+                "</g>",
+            ],
+        )
     lines.append("</svg>")
     return "\n".join(lines) + "\n"
+
 
 def write_reports(output: Path, report: dict[str, Any]) -> str:
     """
@@ -263,12 +273,9 @@ def write_reports(output: Path, report: dict[str, Any]) -> str:
     write_json(output / "diagnostics.json", report)
     summary: dict[str, Any] = {
         "schema_version": 2,
-        "settings": {
-            key: report["settings"][key] for key in ("frameworks", "workers")
-        },
+        "settings": {key: report["settings"][key] for key in ("frameworks", "workers")},
         "results": [
-            {key: row[key] for key in FIELDS if key in row}
-            for row in report["results"]
+            {key: row[key] for key in FIELDS if key in row} for row in report["results"]
         ],
     }
     if "error" in report:

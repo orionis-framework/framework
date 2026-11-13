@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from granian.rsgi import HTTPProtocol
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
+
 class RSGIResponseAdapter(ResponseAdapter):
     """Translate HTTP responses into Granian RSGI operations."""
 
@@ -147,11 +148,14 @@ class RSGIResponseAdapter(ResponseAdapter):
             Close an unstarted event stream after sending the empty response.
         """
         self.__ensureContentLength(headers, response)
+        failure = None
         try:
             protocol.response_empty(status, headers)
+        except BaseException as error:
+            failure = error
+            raise
         finally:
-            if isinstance(response, EventStreamResponse):
-                await response.getStream().aclose()
+            await close_stream(response.getStream(), failure)
 
     async def __waitDisconnect(self, protocol: HTTPProtocol) -> None:
         """
@@ -252,14 +256,17 @@ class RSGIResponseAdapter(ResponseAdapter):
             return
         start, end = interval
         headers = [
-            pair for pair in headers
+            pair
+            for pair in headers
             if pair[0] not in {"content-length", "content-range", "accept-ranges"}
         ]
-        headers.extend((
-            ("content-length", str(end - start)),
-            ("content-range", f"bytes {start}-{end - 1}/{file_size}"),
-            ("accept-ranges", "bytes"),
-        ))
+        headers.extend(
+            (
+                ("content-length", str(end - start)),
+                ("content-range", f"bytes {start}-{end - 1}/{file_size}"),
+                ("accept-ranges", "bytes"),
+            ),
+        )
         protocol.response_file_range(206, headers, path, start, end)
 
     def __ensureContentLength(

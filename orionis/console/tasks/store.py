@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Construct scheduler job stores from application configuration."""
 
 from __future__ import annotations
@@ -18,9 +20,8 @@ if TYPE_CHECKING:
     from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
     from sqlalchemy.engine.url import URL
 
-class ScheduleStore(IScheduleStore):
 
-    # ruff: noqa: PLC0415, TC001
+class ScheduleStore(IScheduleStore):
     """Construct scheduler job stores from application configuration."""
 
     def __init__(
@@ -156,9 +157,9 @@ class ScheduleStore(IScheduleStore):
         url: URL = build_engine_url(config, sync=True)
         options: dict[str, Any] = engine_options(config, sync=True)
         try:
-
             # Build the job store; the sync driver may be missing.
             from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+
             store = SQLAlchemyJobStore(
                 url=url,
                 tablename=database_store.table,
@@ -169,19 +170,22 @@ class ScheduleStore(IScheduleStore):
             # the next_run_time column.
             if resolve_driver(config) == "oracle":
                 from sqlalchemy.dialects.oracle import FLOAT
+
                 column = store.jobs_t.c.next_run_time
                 column.type = column.type.with_variant(
-                    FLOAT(binary_precision=83), "oracle",
+                    FLOAT(binary_precision=83),
+                    "oracle",
                 )
 
             # Return the fully configured job store instance.
             return store
 
         except ModuleNotFoundError as exc:
-
             # Map the missing package to an actionable framework error.
             raise missing_dependency_error(
-                resolve_driver(config), exc, sync=True,
+                resolve_driver(config),
+                exc,
+                sync=True,
             ) from exc
 
     async def migrate(self) -> None:

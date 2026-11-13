@@ -1,11 +1,14 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value can be represented in a given character encoding."""
 
-from orionis.schemas.rules.measure import read_content
+from orionis.schemas.rules.measure import is_file, read_content
 from orionis.schemas.rule import Rule
 
 # Codec aliases that are always available through the standard library.
 _DEFAULT_ENCODING = "utf-8"
 """Codec aliases that are always available through the standard library."""
+
 
 class Encoding(Rule):
     """
@@ -14,8 +17,6 @@ class Encoding(Rule):
     Strings are re-encoded and uploaded files are decoded, so the rule
     covers both textual fields and text uploads.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_encoding",)
     """Declare the instance attribute slots reserved by this class."""
@@ -44,7 +45,7 @@ class Encoding(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------
@@ -84,17 +85,19 @@ class Encoding(Rule):
         bool
             Return ``True`` when the value passes validation.
         """
-        content = await read_content(value)
-
         # Textual fields are checked by re-encoding them into the codec.
-        if content is None:
-            if not isinstance(value, str):
-                return True
+        if isinstance(value, str):
             try:
                 value.encode(self._encoding)
             except UnicodeEncodeError:
                 return False
             return True
+
+        if not is_file(value):
+            return True
+        content = await read_content(value)
+        if content is None:
+            return False
 
         try:
             content.decode(self._encoding)

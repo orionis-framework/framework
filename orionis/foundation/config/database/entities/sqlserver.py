@@ -13,6 +13,7 @@ from orionis.support.entities.base import BaseEntity
 _MAX_PORT: int = 65535
 """Valid TCP port boundary for the SQL Server listener."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class SQLServer(BaseEntity):
     """

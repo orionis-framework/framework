@@ -1,5 +1,7 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import AsyncMock, Mock, patch
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.contracts.connection_manager import IConnectionManager
@@ -8,6 +10,7 @@ from orionis.orm.contracts.query_builder import IQueryBuilder
 from orionis.orm.resolver import ConnectionResolver
 from orionis.support.facades.db import DB
 from orionis.test import TestCase
+
 
 class _CaptureApp:
     """Application stub capturing singleton registrations."""
@@ -18,7 +21,7 @@ class _CaptureApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.bindings: list[tuple[type, type]] = []
 
@@ -35,9 +38,10 @@ class _CaptureApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.bindings.append((contract, implementation))
+
 
 class TestConnectionManagerProvider(TestCase):
     """Registration and boot wiring of the connection manager provider."""
@@ -50,7 +54,7 @@ class TestConnectionManagerProvider(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(ConnectionManagerProvider, ServiceProvider))
 
@@ -62,7 +66,7 @@ class TestConnectionManagerProvider(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _CaptureApp()
         provider = ConnectionManagerProvider(app)  # type: ignore[arg-type]
@@ -77,10 +81,9 @@ class TestConnectionManagerProvider(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        previous = ConnectionResolver._manager
-        try:
+        with patch.object(ConnectionResolver, "_manager", None):
             application = Mock()
             application.config.return_value = {
                 "default": "sqlite",
@@ -92,8 +95,7 @@ class TestConnectionManagerProvider(TestCase):
             await provider.boot()
             application.make.assert_awaited_once_with(IConnectionManager)
             self.assertIs(ConnectionResolver.manager(), manager)
-        finally:
-            ConnectionResolver._manager = previous # NOSONAR
+
 
 class TestDBFacade(TestCase):
     """Contract exposed by the DB facade."""
@@ -106,6 +108,6 @@ class TestDBFacade(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(DB.getFacadeAccessor(), IQueryBuilder)

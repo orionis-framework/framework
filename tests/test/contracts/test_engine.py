@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from abc import ABC
 from orionis.test import TestCase
 from orionis.test.contracts.engine import ITestingEngine
@@ -14,6 +16,7 @@ _CONTRACT_METHODS: tuple[str, ...] = (
     "discover",
     "run",
 )
+
 
 def _noop_implementation(self: object, *_args: object, **_kwargs: object) -> object:
     """
@@ -35,6 +38,7 @@ def _noop_implementation(self: object, *_args: object, **_kwargs: object) -> obj
     """
     return self
 
+
 def _make_engine(*, skip: str | None = None) -> type:
     """
     Create a concrete engine implementing the contract except one member.
@@ -50,14 +54,12 @@ def _make_engine(*, skip: str | None = None) -> type:
         Generated engine class with the selected concrete implementations.
     """
     namespace = {
-        name: _noop_implementation
-        for name in _CONTRACT_METHODS
-        if name != skip
+        name: _noop_implementation for name in _CONTRACT_METHODS if name != skip
     }
     return type("_EngineDouble", (ITestingEngine,), namespace)
 
-class TestITestingEngineDefinition(TestCase):
 
+class TestITestingEngineDefinition(TestCase):
     def testContractIsAbstract(self) -> None:
         """
         Derive the contract from the abstract base class helper.
@@ -99,8 +101,8 @@ class TestITestingEngineDefinition(TestCase):
         for name in _CONTRACT_METHODS:
             self.assertIsNotNone(getattr(ITestingEngine, name).__doc__)
 
-class TestITestingEngineImplementations(TestCase):
 
+class TestITestingEngineImplementations(TestCase):
     def testCompleteImplementationCanBeInstantiated(self) -> None:
         """
         Instantiate a subclass implementing every abstract method.

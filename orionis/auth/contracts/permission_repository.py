@@ -1,10 +1,11 @@
+# ruff: noqa: TC001
+# Keep the public contract annotation available at runtime.
+
 """Define how the effective permissions of an identity are loaded."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.auth.contracts.authorizable import IAuthorizable
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.authorizable import IAuthorizable
 
 class IPermissionRepository(ABC):
     """Define how the effective permissions of an identity are loaded."""

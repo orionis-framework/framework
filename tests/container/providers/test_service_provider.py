@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.container.contracts.service_provider import IServiceProvider
@@ -8,8 +10,10 @@ from orionis.test import TestCase
 # Module-level doubles — no external dependencies
 # ---------------------------------------------------------------------------
 
+
 class _FakeApp:
     """Lightweight application stub; satisfies the type hint without booting."""
+
 
 class _FullProvider(ServiceProvider):
     """Subclass recording both register() and boot() invocations."""
@@ -25,7 +29,7 @@ class _FullProvider(ServiceProvider):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         super().__init__(app)
         self.register_calls: int = 0
@@ -37,7 +41,7 @@ class _FullProvider(ServiceProvider):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.register_calls += 1
 
@@ -47,16 +51,17 @@ class _FullProvider(ServiceProvider):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.boot_calls += 1
+
 
 # ===========================================================================
 # Construction and contract
 # ===========================================================================
 
-class TestServiceProviderConstruction(TestCase):
 
+class TestServiceProviderConstruction(TestCase):
     def testApplicationIsStoredOnTheInstance(self) -> None:
         """
         Keep the injected application object untouched on the provider.
@@ -64,7 +69,7 @@ class TestServiceProviderConstruction(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         app = _FakeApp()
         self.assertIs(_FullProvider(app).app, app)
@@ -76,7 +81,7 @@ class TestServiceProviderConstruction(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         first, second = _FakeApp(), _FakeApp()
         self.assertIsNot(
@@ -91,18 +96,19 @@ class TestServiceProviderConstruction(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         provider = _FullProvider(_FakeApp())
         self.assertIsInstance(provider, ServiceProvider)
         self.assertIsInstance(provider, IServiceProvider)
 
+
 # ===========================================================================
 # Default hooks
 # ===========================================================================
 
-class TestServiceProviderDefaultHooks(TestCase):
 
+class TestServiceProviderDefaultHooks(TestCase):
     def testBaseRegisterIsANoopReturningNone(self) -> None:
         """
         Return None from the inherited, empty register() implementation.
@@ -110,7 +116,7 @@ class TestServiceProviderDefaultHooks(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         provider = _FullProvider(_FakeApp())
         self.assertIsNone(ServiceProvider.register(provider))
@@ -123,7 +129,7 @@ class TestServiceProviderDefaultHooks(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         provider = _FullProvider(_FakeApp())
         self.assertIsNone(await ServiceProvider.boot(provider))
@@ -136,16 +142,17 @@ class TestServiceProviderDefaultHooks(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertTrue(inspect.iscoroutinefunction(ServiceProvider.boot))
+
 
 # ===========================================================================
 # Overridden hooks
 # ===========================================================================
 
-class TestServiceProviderOverriddenHooks(TestCase):
 
+class TestServiceProviderOverriddenHooks(TestCase):
     async def testRegisterAndBootRunIndependentlyAndRepeatedly(self) -> None:
         """
         Run the overridden hooks independently and tolerate repeated calls.
@@ -156,7 +163,7 @@ class TestServiceProviderOverriddenHooks(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         provider = _FullProvider(_FakeApp())
 

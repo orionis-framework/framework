@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import ModuleType
 from orionis.mail import entities as entities_package
 from orionis.mail.entities.address import Address
@@ -10,8 +12,8 @@ from orionis.mail.entities.result import MailResult
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from orionis.test import TestCase
 
-class TestMailEntitiesPackage(TestCase):
 
+class TestMailEntitiesPackage(TestCase):
     def testDeclaresEveryEntityAsAPublicExport(self) -> None:
         """Expose the eight mail entities from the package root.
 

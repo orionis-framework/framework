@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from typing import NoReturn
@@ -6,6 +8,7 @@ from orionis.orm.relations.relation import Relation
 from orionis.support.types.collection import Collection
 from orionis.test import TestCase
 from tests.orm.relations import test_mixin as fixtures
+
 
 def _raise_relation_error() -> NoReturn:
     """Reject construction of the relation template.
@@ -22,6 +25,7 @@ def _raise_relation_error() -> NoReturn:
     """
     error_msg = "Relation factory failed."
     raise ValueError(error_msg)
+
 
 class _QueryRejectingHasMany(HasManyRelation[fixtures.Book]):
     """Reject any query attempted for a keyless eager batch."""
@@ -44,6 +48,7 @@ class _QueryRejectingHasMany(HasManyRelation[fixtures.Book]):
         error_msg = "A keyless batch must not execute a related query."
         raise AssertionError(error_msg)
 
+
 class TestRelationAwait(fixtures._RelationsTestCase):
     async def testAwaitShortcutEquivalentToGet(self) -> None:
         """Await a relationship directly without a terminal method.
@@ -53,13 +58,14 @@ class TestRelationAwait(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await fixtures.Author.create({"name": "Ana"})
         await fixtures.Book.create({"title": "One", "author_id": author.id})
 
         books = await author.books()
         self.assertEqual(len(books), 1)
+
 
 class TestRelationConstraints(TestCase):
     """Check terminal guards and execution-context isolation."""
@@ -70,7 +76,7 @@ class TestRelationConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         parent = fixtures.Author({"id": 9, "name": "author"})
         with ThreadPoolExecutor(max_workers=1) as executor:
@@ -98,7 +104,7 @@ class TestRelationConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         parent = fixtures.Author({"id": 9, "name": "author"})
         with self.assertRaises(ValueError):
@@ -111,7 +117,7 @@ class TestRelationConstraints(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         parent = fixtures.Author({"name": "author"})
         relation = Relation.noConstraints(
@@ -126,7 +132,7 @@ class TestRelationConstraints(TestCase):
         Returns
         -------
         None
-            Verify each synchronous template hook raises NotImplementedError.
+            No return value.
         """
         parent = fixtures.Author({"id": 9, "name": "author"})
         relation = Relation.noConstraints(lambda: Relation(parent, fixtures.Book))
@@ -143,7 +149,7 @@ class TestRelationConstraints(TestCase):
         Returns
         -------
         None
-            Verify awaiting the base result hook raises NotImplementedError.
+            No return value.
         """
         parent = fixtures.Author({"id": 9, "name": "author"})
         relation = Relation.noConstraints(lambda: Relation(parent, fixtures.Book))

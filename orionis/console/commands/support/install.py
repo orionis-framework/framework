@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Install optional features declared by the resolved project manifest."""
 
 import sys
@@ -32,10 +34,9 @@ _PACKAGE_MANIFEST = Path(__file__).resolve().parents[3] / _MANIFEST_NAME
 _SOURCE_MANIFEST = Path(__file__).resolve().parents[4] / _MANIFEST_NAME
 """Source manifest used by ``install``."""
 
+
 class InstallCommand(BaseCommand):
     """Install optional features declared by the resolved project manifest."""
-
-    # ruff: noqa: TC001
 
     __slots__ = ("_console", "_purposes")
     """Declare the instance attribute slots reserved by this class."""
@@ -113,7 +114,7 @@ class InstallCommand(BaseCommand):
             if not selected:
                 return 0
             return await self.__installSelection(project_path.parent, options, selected)
-        except (CancelledError, EOFError, KeyboardInterrupt):
+        except CancelledError, EOFError, KeyboardInterrupt:
             self._console.print(Text("Installation interrupted.", _WARNING_STYLE))
             return 130
         except (OSError, TypeError, ValueError) as error:
@@ -170,16 +171,16 @@ class InstallCommand(BaseCommand):
             "project.optional-dependencies",
         )
         groups = self.__dependencyTable(
-            manifest.get("dependency-groups", {}), "dependency-groups",
+            manifest.get("dependency-groups", {}),
+            "dependency-groups",
         )
         options = {
             f"extra:{name}": self.__requirements(entries, f"extra:{name}")
             for name, entries in extras.items()
         }
-        options.update({
-            f"group:{name}": self.__resolveGroup(name, groups, ())
-            for name in groups
-        })
+        options.update(
+            {f"group:{name}": self.__resolveGroup(name, groups, ()) for name in groups},
+        )
         self._purposes = self.__loadPurposes(manifest)
         return options
 
@@ -207,7 +208,8 @@ class InstallCommand(BaseCommand):
         tool = self.__dependencyTable(manifest.get("tool", {}), "tool")
         settings = self.__dependencyTable(tool.get("orionis", {}), "tool.orionis")
         descriptions = self.__dependencyTable(
-            settings.get("packages", {}), "tool.orionis.packages",
+            settings.get("packages", {}),
+            "tool.orionis.packages",
         )
         purposes: dict[str, str] = {}
         for key, purpose in descriptions.items():
@@ -356,16 +358,19 @@ class InstallCommand(BaseCommand):
         self._console.print(header)
         self._console.print(
             Text.assemble(("Manifest  ", "dim"), str(project_path)),
-            overflow="ellipsis", no_wrap=True,
+            overflow="ellipsis",
+            no_wrap=True,
         )
         self._console.print(
             Text.assemble(("Python    ", "dim"), sys.executable),
-            overflow="ellipsis", no_wrap=True,
+            overflow="ellipsis",
+            no_wrap=True,
         )
         if not options:
             self._console.print(
                 Text(
-                    "No optional dependencies or groups are declared.", _WARNING_STYLE,
+                    "No optional dependencies or groups are declared.",
+                    _WARNING_STYLE,
                 ),
             )
             return
@@ -373,12 +378,18 @@ class InstallCommand(BaseCommand):
         self._console.print()
         table = Table(box=box.SIMPLE_HEAD, padding=(0, 1), show_edge=False)
         table.add_column(
-            "#", style="dim", justify="right", no_wrap=True,
+            "#",
+            style="dim",
+            justify="right",
+            no_wrap=True,
             min_width=len(str(len(options))),
         )
         table.add_column("Option", no_wrap=True)
         table.add_column(
-            "Purpose", style="dim", no_wrap=True, overflow="ellipsis",
+            "Purpose",
+            style="dim",
+            no_wrap=True,
+            overflow="ellipsis",
             max_width=self._console.width // 2,
         )
         for index, key in enumerate(options, start=1):
@@ -388,7 +399,9 @@ class InstallCommand(BaseCommand):
                 style=_ACCENT_STYLE if kind == "group" else "bold green",
             )
             table.add_row(
-                str(index), option, Text(self.__optionPurpose(key)),
+                str(index),
+                option,
+                Text(self.__optionPurpose(key)),
             )
         self._console.print(table)
 
@@ -439,10 +452,12 @@ class InstallCommand(BaseCommand):
         raw = " ".join(self.getArgument("options", default=[]) or [])
         if not raw:
             if not self._console.is_interactive:
-                self._console.print(Text(
-                    "Pass option names and --yes to install non-interactively.",
-                    _WARNING_STYLE,
-                ))
+                self._console.print(
+                    Text(
+                        "Pass option names and --yes to install non-interactively.",
+                        _WARNING_STYLE,
+                    ),
+                )
                 return []
             raw = Prompt.ask(
                 "[bold cyan]Select names or numbers[/bold cyan] "
@@ -455,10 +470,12 @@ class InstallCommand(BaseCommand):
             self._console.print(Text("Installation canceled.", _WARNING_STYLE))
             return []
         keys = tuple(options)
-        return list(dict.fromkeys(
-            self.__resolveOption(token, keys)
-            for token in raw.replace(",", " ").split()
-        ))
+        return list(
+            dict.fromkeys(
+                self.__resolveOption(token, keys)
+                for token in raw.replace(",", " ").split()
+            ),
+        )
 
     @staticmethod
     def __resolveOption(token: str, keys: tuple[str, ...]) -> str:
@@ -530,35 +547,51 @@ class InstallCommand(BaseCommand):
         OSError
             If the installer process cannot be started.
         """
-        requirements = tuple(dict.fromkeys(
-            requirement for key in selected for requirement in options[key]
-        ))
+        requirements = tuple(
+            dict.fromkeys(
+                requirement for key in selected for requirement in options[key]
+            ),
+        )
         if not requirements:
-            self._console.print(Text(
-                "The selection contains no packages.", _WARNING_STYLE,
-            ))
+            self._console.print(
+                Text(
+                    "The selection contains no packages.",
+                    _WARNING_STYLE,
+                ),
+            )
             return 0
 
         summary = Text.assemble(
-            ("Options   ", _ACCENT_STYLE), ", ".join(selected),
-            ("\nTarget    ", _ACCENT_STYLE), sys.executable,
+            ("Options   ", _ACCENT_STYLE),
+            ", ".join(selected),
+            ("\nTarget    ", _ACCENT_STYLE),
+            sys.executable,
         )
         for key in selected:
             summary.append("\n" + self.__optionPurpose(key), style="dim")
-        self._console.print(Panel(
-            summary, title="Installation", border_style="green", padding=(1, 2),
-        ))
+        self._console.print(
+            Panel(
+                summary,
+                title="Installation",
+                border_style="green",
+                padding=(1, 2),
+            ),
+        )
         confirmed = self.getArgument("yes", default=False)
         if not confirmed:
             if not self._console.is_interactive:
-                self._console.print(Text(
-                    "Confirmation required: pass --yes to install these packages.",
-                    _ERROR_STYLE,
-                ))
+                self._console.print(
+                    Text(
+                        "Confirmation required: pass --yes to install these packages.",
+                        _ERROR_STYLE,
+                    ),
+                )
                 return 1
             confirmed = await to_thread(
-                Confirm.ask, "Install selected packages?",
-                console=self._console, default=False,
+                Confirm.ask,
+                "Install selected packages?",
+                console=self._console,
+                default=False,
             )
         if not confirmed:
             self._console.print(Text("Installation canceled.", _WARNING_STYLE))
@@ -595,19 +628,31 @@ class InstallCommand(BaseCommand):
         """
         executable = await to_thread(which, "uv")
         if executable is None:
-            self._console.print(Text(
-                "uv is required but was not found on PATH. Install uv and retry.",
-                _ERROR_STYLE,
-            ))
+            self._console.print(
+                Text(
+                    "uv is required but was not found on PATH. Install uv and retry.",
+                    _ERROR_STYLE,
+                ),
+            )
             return 1
 
         with self._console.status(
-            "Installing selected packages...", spinner="dots", spinner_style="cyan",
+            "Installing selected packages...",
+            spinner="dots",
+            spinner_style="cyan",
         ):
             process = await create_subprocess_exec(
-                executable, "pip", "install", "--python", sys.executable,
-                "--", *requirements,
-                cwd=project_root, stdin=DEVNULL, stdout=PIPE, stderr=STDOUT,
+                executable,
+                "pip",
+                "install",
+                "--python",
+                sys.executable,
+                "--",
+                *requirements,
+                cwd=project_root,
+                stdin=DEVNULL,
+                stdout=PIPE,
+                stderr=STDOUT,
             )
             try:
                 output, _ = await process.communicate()
@@ -621,9 +666,12 @@ class InstallCommand(BaseCommand):
             self._console.print(Text(output.decode("utf-8", errors="replace")))
         exit_code = process.returncode
         if exit_code:
-            self._console.print(Text(
-                f"Installation failed (exit code {exit_code}).", _ERROR_STYLE,
-            ))
+            self._console.print(
+                Text(
+                    f"Installation failed (exit code {exit_code}).",
+                    _ERROR_STYLE,
+                ),
+            )
             return exit_code if exit_code > 0 else 1
         self._console.print(Text("Packages installed successfully.", "bold green"))
         return 0

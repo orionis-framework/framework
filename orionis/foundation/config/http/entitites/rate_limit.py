@@ -7,6 +7,7 @@ from orionis.foundation.config.http.entitites.redis import Redis
 from orionis.foundation.config.validation import validate_integer, validate_string
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class HTTPRateLimit(BaseEntity):
     """
@@ -92,7 +93,8 @@ class HTTPRateLimit(BaseEntity):
 
     rate_limit_redis_prefix: str = field(
         default_factory=lambda: Env.get(
-            "RATE_LIMIT_REDIS_PREFIX", "orionis:http:rate-limit",
+            "RATE_LIMIT_REDIS_PREFIX",
+            "orionis:http:rate-limit",
         ),
         metadata={
             "description": "Application namespace for Redis rate limits.",
@@ -139,13 +141,16 @@ class HTTPRateLimit(BaseEntity):
             error_msg = "'rate_limit_store' must be 'memory' or 'redis'."
             raise ValueError(error_msg)
         for name in (
-            "rate_limit_max_keys", "rate_limit_max_events",
+            "rate_limit_max_keys",
+            "rate_limit_max_events",
             "rate_limit_redis_timeout_seconds",
         ):
             validate_integer(getattr(self, name), name, minimum=1)
         if isinstance(self.rate_limit_redis, dict):
             object.__setattr__(
-                self, "rate_limit_redis", Redis(**self.rate_limit_redis),
+                self,
+                "rate_limit_redis",
+                Redis(**self.rate_limit_redis),
             )
         elif not isinstance(self.rate_limit_redis, Redis):
             error_msg = "'rate_limit_redis' must be a Redis instance or dict."

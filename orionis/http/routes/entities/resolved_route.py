@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 _EMPTY_PARAMS = MappingProxyType({})
 """Empty params used by ``resolved_route``."""
 
+
 @dataclass(slots=True, frozen=True)
 class ResolvedRoute:
     """

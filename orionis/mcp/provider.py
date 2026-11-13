@@ -13,6 +13,7 @@ from orionis.mcp.subscriptions.event_bus import InMemoryMcpEventBus
 from orionis.support.facades.mcp import Mcp
 from orionis.support.facades.router import Route
 
+
 class McpProvider(ServiceProvider):
     """Register one manager and load declarations before either runtime starts."""
 
@@ -27,11 +28,21 @@ class McpProvider(ServiceProvider):
         -------
         None
             Register MCP configuration, event delivery, and the manager binding.
+
+        Raises
+        ------
+        TypeError
+            If the configured value or an option has an invalid type.
+        ValueError
+            If an option is outside its accepted range.
         """
         # Validate configuration before registering application-owned services.
-        configured = self.app.config("mcp") or {}
+        configured = self.app.config("mcp")
+        if configured is None:
+            configured = {}
         config = (
-            configured if isinstance(configured, McpConfig)
+            configured
+            if isinstance(configured, McpConfig)
             else McpConfig(**cast("dict", configured))
         )
         self.app.instance(McpConfig, config)

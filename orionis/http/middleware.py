@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
     from orionis.http.responses import Response
 
+
 class BaseMiddleware(IBaseMiddleware):
     """Base class for HTTP middleware implementations."""
 
@@ -46,8 +47,5 @@ class BaseMiddleware(IBaseMiddleware):
             Always raised as subclasses must implement this method.
         """
         # Subclasses must implement the handle method
-        error_msg = (
-            f"{self.__class__.__name__} must implement the handle() "
-            "method"
-        )
+        error_msg = f"{self.__class__.__name__} must implement the handle() method"
         raise NotImplementedError(error_msg)

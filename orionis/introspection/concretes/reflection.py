@@ -1,34 +1,74 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Public annotations remain available to runtime inspection.
 """Inspect concrete classes and their construction requirements."""
 
 from __future__ import annotations
 import inspect
 import keyword
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from orionis.introspection.concretes.contracts.reflection import (
     IReflectionConcrete,
 )
-from orionis.introspection.dependencies.reflection import ReflectDependencies
+from orionis.introspection.dependencies.reflection import (
+    ReflectDependencies,
+    _clear_dependency_caches,
+    _inspect_annotations,
+    _inspect_signature,
+)
 from orionis.introspection.reflection import Reflection as _Reflection
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
+from collections.abc import Callable
+from orionis.introspection.dependencies.entities.signature import (
+    Signature,
+)
 
 # Standard dunder names excluded from non-callable attribute introspection results
-_DUNDER_ATTR_EXCLUDE: frozenset[str] = frozenset({
-    "__class__", "__delattr__", "__dir__", "__doc__", "__eq__", "__format__",
-    "__ge__", "__getattribute__", "__gt__", "__hash__", "__init__",
-    "__init_subclass__", "__le__", "__lt__", "__module__", "__ne__", "__new__",
-    "__reduce__", "__reduce_ex__", "__repr__", "__setattr__", "__sizeof__",
-    "__str__", "__subclasshook__", "__firstlineno__", "__annotations__",
-    "__static_attributes__", "__dict__", "__weakref__", "__slots__", "__mro__",
-    "__subclasses__", "__bases__", "__base__", "__flags__",
-    "__abstractmethods__", "__code__", "__defaults__", "__kwdefaults__",
-    "__closure__",
-})
+_DUNDER_ATTR_EXCLUDE: frozenset[str] = frozenset(
+    {
+        "__class__",
+        "__delattr__",
+        "__dir__",
+        "__doc__",
+        "__eq__",
+        "__format__",
+        "__ge__",
+        "__getattribute__",
+        "__gt__",
+        "__hash__",
+        "__init__",
+        "__init_subclass__",
+        "__le__",
+        "__lt__",
+        "__module__",
+        "__ne__",
+        "__new__",
+        "__reduce__",
+        "__reduce_ex__",
+        "__repr__",
+        "__setattr__",
+        "__sizeof__",
+        "__str__",
+        "__subclasshook__",
+        "__firstlineno__",
+        "__annotations__",
+        "__static_attributes__",
+        "__dict__",
+        "__weakref__",
+        "__slots__",
+        "__mro__",
+        "__subclasses__",
+        "__bases__",
+        "__base__",
+        "__flags__",
+        "__abstractmethods__",
+        "__code__",
+        "__defaults__",
+        "__kwdefaults__",
+        "__closure__",
+    },
+)
 """Standard dunder names excluded from non-callable attribute introspection results."""
+
 
 class _ScanBuffers:
     """
@@ -163,7 +203,7 @@ class _ScanBuffers:
         Returns
         -------
         None
-            Return ``None`` after initializing mutable scan buffers.
+            No return value.
         """
         # Initialize all mutable buckets used during class scanning.
         # Attribute buckets partitioned by visibility
@@ -208,9 +248,8 @@ class _ScanBuffers:
         self.prot_props: list[str] = []
         self.priv_props: list[str] = []
 
-class ReflectionConcrete(IReflectionConcrete):
 
-    # ruff: noqa: ANN401
+class ReflectionConcrete(IReflectionConcrete):
     """Inspect concrete classes and their construction requirements."""
 
     def __init__(self, concrete: type) -> None:
@@ -225,14 +264,12 @@ class ReflectionConcrete(IReflectionConcrete):
         Raises
         ------
         TypeError
-            If the argument is not a class type.
-        ValueError
-            If the class is built-in, primitive, abstract, or an interface.
+            If the argument is not a supported concrete user-defined class.
 
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Validate that the provided type is a concrete class
         if not _Reflection.isConcreteClass(concrete):
@@ -250,7 +287,8 @@ class ReflectionConcrete(IReflectionConcrete):
         """Class name obtained from ``concrete.__name__``."""
         # Python strips the leading underscores of the class name when it
         # mangles private members, so the prefix must be built the same way.
-        self._private_prefix: str = f"_{self._class_name.lstrip('_')}"
+        class_name = self._class_name.lstrip("_")
+        self._private_prefix: str = f"_{class_name}" if class_name else ""
         """
         Python strips the leading underscores of the class name when it mangles
         private members, so the prefix must be built the same way.
@@ -291,7 +329,7 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Set the value in the cache for the given key
         self._cache[key] = value
@@ -325,7 +363,7 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Remove the key from the cache if present
         self._cache.pop(key, None)
@@ -361,12 +399,12 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         None
-            Results are written into ``buf`` in place.
+            No return value.
         """
         # Detect coroutine status from the underlying wrapped function
         is_coro = inspect.iscoroutinefunction(value.__func__)
         # Private: strip name-mangling prefix before appending
-        if attr.startswith(prefix):
+        if attr.startswith(prefix + "__") and not attr.endswith("__"):
             clean = attr[prefix_len:]
             buf.priv_sm.append(clean)
             (buf.priv_async_sm if is_coro else buf.priv_sync_sm).append(clean)
@@ -411,12 +449,12 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         None
-            Results are written into ``buf`` in place.
+            No return value.
         """
         # Detect coroutine status from the underlying wrapped function
         is_coro = inspect.iscoroutinefunction(value.__func__)
         # Private: strip name-mangling prefix before appending
-        if attr.startswith(prefix):
+        if attr.startswith(prefix + "__") and not attr.endswith("__"):
             clean = attr[prefix_len:]
             buf.priv_cm.append(clean)
             (buf.priv_async_cm if is_coro else buf.priv_sync_cm).append(clean)
@@ -458,10 +496,10 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         None
-            Results are written into ``buf`` in place.
+            No return value.
         """
         # Private property: strip name-mangling prefix
-        if attr.startswith(prefix):
+        if attr.startswith(prefix + "__") and not attr.endswith("__"):
             clean = attr[prefix_len:]
             buf.priv_props.append(clean)
             buf.all_props.append(clean)
@@ -504,12 +542,12 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         None
-            Results are written into ``buf`` in place.
+            No return value.
         """
         # Detect async vs sync before branching on visibility
         is_coro = inspect.iscoroutinefunction(value)
         # Private: strip name-mangling prefix before appending
-        if attr.startswith(prefix):
+        if attr.startswith(prefix + "__") and not attr.endswith("__"):
             clean = attr[prefix_len:]
             buf.priv_m.append(clean)
             (buf.priv_async_m if is_coro else buf.priv_sync_m).append(clean)
@@ -557,10 +595,10 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         None
-            Results are written into ``buf`` in place.
+            No return value.
         """
         # Private attribute: strip name-mangling prefix
-        if attr.startswith(prefix):
+        if attr.startswith(prefix + "__") and not attr.endswith("__"):
             buf.priv_attrs[attr[prefix_len:]] = value
         elif attr.startswith("__") and attr.endswith("__"):
             # Only include dunder attributes not in the exclusion set
@@ -587,8 +625,7 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         None
-            All classification results are stored atomically in the
-            instance cache via a single ``dict.update`` call.
+            No return value.
         """
         # Initialize the accumulator and bind local constants for the loop
         buf = _ScanBuffers()
@@ -610,57 +647,67 @@ class ReflectionConcrete(IReflectionConcrete):
 
         # Aggregate cross-category collections before caching
         all_attrs: dict = {
-            **buf.pub_attrs, **buf.prot_attrs,
-            **buf.priv_attrs, **buf.dunder_attrs,
+            **buf.pub_attrs,
+            **buf.prot_attrs,
+            **buf.priv_attrs,
+            **buf.dunder_attrs,
         }
         all_methods: list[str] = [
-            *buf.pub_m, *buf.prot_m, *buf.priv_m,
-            *buf.pub_cm, *buf.prot_cm, *buf.priv_cm,
-            *buf.pub_sm, *buf.prot_sm, *buf.priv_sm,
+            *buf.pub_m,
+            *buf.prot_m,
+            *buf.priv_m,
+            *buf.pub_cm,
+            *buf.prot_cm,
+            *buf.priv_cm,
+            *buf.pub_sm,
+            *buf.prot_sm,
+            *buf.priv_sm,
         ]
 
         # Store all classification results atomically via a single dict update
-        self._cache.update({
-            "public_attributes":             buf.pub_attrs,
-            "protected_attributes":          buf.prot_attrs,
-            "private_attributes":            buf.priv_attrs,
-            "dunder_attributes":             buf.dunder_attrs,
-            "attributes":                    all_attrs,
-            "public_methods":                buf.pub_m,
-            "public_sync_methods":           buf.pub_sync_m,
-            "public_async_methods":          buf.pub_async_m,
-            "protected_methods":             buf.prot_m,
-            "protected_sync_methods":        buf.prot_sync_m,
-            "protected_async_methods":       buf.prot_async_m,
-            "private_methods":               buf.priv_m,
-            "private_sync_methods":          buf.priv_sync_m,
-            "private_async_methods":         buf.priv_async_m,
-            "dunder_methods":                buf.dunder_m,
-            "public_class_methods":          buf.pub_cm,
-            "public_class_sync_methods":     buf.pub_sync_cm,
-            "public_class_async_methods":    buf.pub_async_cm,
-            "protected_class_methods":       buf.prot_cm,
-            "protected_class_sync_methods":  buf.prot_sync_cm,
-            "protected_class_async_methods": buf.prot_async_cm,
-            "private_class_methods":         buf.priv_cm,
-            "private_class_sync_methods":    buf.priv_sync_cm,
-            "private_class_async_methods":   buf.priv_async_cm,
-            "public_static_methods":         buf.pub_sm,
-            "public_static_sync_methods":    buf.pub_sync_sm,
-            "public_static_async_methods":   buf.pub_async_sm,
-            "protected_static_methods":         buf.prot_sm,
-            "protected_static_sync_methods":    buf.prot_sync_sm,
-            "protected_static_async_methods":   buf.prot_async_sm,
-            "private_static_methods":        buf.priv_sm,
-            "private_static_sync_methods":   buf.priv_sync_sm,
-            "private_static_async_methods":  buf.priv_async_sm,
-            "properties":                    buf.all_props,
-            "public_properties":             buf.pub_props,
-            "protected_properties":          buf.prot_props,
-            "private_properties":            buf.priv_props,
-            "methods":                       all_methods,
-            "methods_set":                   frozenset(all_methods),
-        })
+        self._cache.update(
+            {
+                "public_attributes": buf.pub_attrs,
+                "protected_attributes": buf.prot_attrs,
+                "private_attributes": buf.priv_attrs,
+                "dunder_attributes": buf.dunder_attrs,
+                "attributes": all_attrs,
+                "public_methods": buf.pub_m,
+                "public_sync_methods": buf.pub_sync_m,
+                "public_async_methods": buf.pub_async_m,
+                "protected_methods": buf.prot_m,
+                "protected_sync_methods": buf.prot_sync_m,
+                "protected_async_methods": buf.prot_async_m,
+                "private_methods": buf.priv_m,
+                "private_sync_methods": buf.priv_sync_m,
+                "private_async_methods": buf.priv_async_m,
+                "dunder_methods": buf.dunder_m,
+                "public_class_methods": buf.pub_cm,
+                "public_class_sync_methods": buf.pub_sync_cm,
+                "public_class_async_methods": buf.pub_async_cm,
+                "protected_class_methods": buf.prot_cm,
+                "protected_class_sync_methods": buf.prot_sync_cm,
+                "protected_class_async_methods": buf.prot_async_cm,
+                "private_class_methods": buf.priv_cm,
+                "private_class_sync_methods": buf.priv_sync_cm,
+                "private_class_async_methods": buf.priv_async_cm,
+                "public_static_methods": buf.pub_sm,
+                "public_static_sync_methods": buf.pub_sync_sm,
+                "public_static_async_methods": buf.pub_async_sm,
+                "protected_static_methods": buf.prot_sm,
+                "protected_static_sync_methods": buf.prot_sync_sm,
+                "protected_static_async_methods": buf.prot_async_sm,
+                "private_static_methods": buf.priv_sm,
+                "private_static_sync_methods": buf.priv_sync_sm,
+                "private_static_async_methods": buf.priv_async_sm,
+                "properties": buf.all_props,
+                "public_properties": buf.pub_props,
+                "protected_properties": buf.prot_props,
+                "private_properties": buf.priv_props,
+                "methods": all_methods,
+                "methods_set": frozenset(all_methods),
+            },
+        )
 
     def getClass(self) -> type:
         """
@@ -731,7 +778,7 @@ class ReflectionConcrete(IReflectionConcrete):
         Returns
         -------
         list of type
-            A list containing all base classes in the method resolution order.
+            The immediate base classes declared by the reflected class.
         """
         # Return the immediate base classes of the reflected class
         return list(self._concrete.__bases__)
@@ -781,7 +828,7 @@ class ReflectionConcrete(IReflectionConcrete):
             _cache[cache_key] = src
             return src
 
-        except (TypeError, OSError):
+        except TypeError, OSError:
             # Return None if source code cannot be retrieved
             return None
 
@@ -809,12 +856,10 @@ class ReflectionConcrete(IReflectionConcrete):
             _cache["file_path"] = file_path
             return file_path
         except TypeError as e:
-            error_msg = (
-                f"Could not retrieve file for '{self._class_name}': {e}"
-            )
+            error_msg = f"Could not retrieve file for '{self._class_name}': {e}"
             raise ValueError(error_msg) from e
 
-    def getAnnotations(self) -> dict:
+    def getAnnotations(self) -> dict[str, object]:
         """
         Retrieve type annotations defined on the reflected class.
 
@@ -834,10 +879,14 @@ class ReflectionConcrete(IReflectionConcrete):
         # Read raw annotations using getattr to support Python 3.14+ (PEP 649)
         private_prefix = self._private_prefix
         prefix_len = self._private_prefix_len
-        raw: dict = getattr(self._concrete, "__annotations__", {})
+        raw = _inspect_annotations(self._concrete)
         # Strip private name-mangling prefix using a slice instead of str.replace
         annotations = {
-            (k[prefix_len:] if k.startswith(private_prefix) else k): v
+            (
+                k[prefix_len:]
+                if (k.startswith(private_prefix + "__") and not k.endswith("__"))
+                else k
+            ): v
             for k, v in raw.items()
         }
         _cache["annotations"] = annotations
@@ -884,7 +933,9 @@ class ReflectionConcrete(IReflectionConcrete):
         if "attributes" not in _cache:
             self._scanClass()
         attrs = _cache["attributes"]
-        return attrs.get(name, getattr(self._concrete, name, default))
+        if name in attrs:
+            return attrs[name]
+        return getattr(self._concrete, name, default)
 
     def setAttribute(self, name: str, value: object) -> bool:
         """
@@ -905,7 +956,9 @@ class ReflectionConcrete(IReflectionConcrete):
         Raises
         ------
         ValueError
-            If the attribute name is invalid or the value is callable.
+            If the attribute name is invalid.
+        TypeError
+            If the value is callable.
         """
         # Validate attribute name: must be a valid identifier and not a keyword
         if (
@@ -932,7 +985,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         # Mutate the class and invalidate the entire cache
         setattr(self._concrete, name, value)
-        self._cache.clear()
+        self.clearCache()
         return True
 
     def removeAttribute(self, name: str) -> bool:
@@ -967,7 +1020,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         # Remove the attribute and invalidate the entire cache
         delattr(self._concrete, name)
-        self._cache.clear()
+        self.clearCache()
         return True
 
     def getAttributes(self) -> dict:
@@ -1119,8 +1172,9 @@ class ReflectionConcrete(IReflectionConcrete):
         Raises
         ------
         ValueError
-            If the method name already exists, is invalid, or the object is not
-            callable.
+            If the method name already exists or is invalid.
+        TypeError
+            If the supplied method is not callable.
         """
         # Reject duplicate method names before any further validation
         if self.hasMethod(name):
@@ -1144,9 +1198,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         # Ensure the supplied value is callable
         if not callable(method):
-            error_msg = (
-                f"Cannot set method '{name}' to a non-callable value."
-            )
+            error_msg = f"Cannot set method '{name}' to a non-callable value."
             raise TypeError(error_msg)
 
         # Handle private method name mangling
@@ -1155,7 +1207,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         # Mutate the class and invalidate the entire cache
         setattr(self._concrete, name, method)
-        self._cache.clear()
+        self.clearCache()
         return True
 
     def removeMethod(self, name: str) -> bool:
@@ -1181,9 +1233,7 @@ class ReflectionConcrete(IReflectionConcrete):
         """
         # Verify the method exists before attempting removal
         if not self.hasMethod(name):
-            error_msg = (
-                f"Method '{name}' does not exist in class '{self._class_name}'."
-            )
+            error_msg = f"Method '{name}' does not exist in class '{self._class_name}'."
             raise ValueError(error_msg)
 
         # Handle name mangling for private methods
@@ -1192,7 +1242,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         # Remove the method and invalidate the entire cache
         delattr(self._concrete, name)
-        self._cache.clear()
+        self.clearCache()
         return True
 
     def getMethodSignature(self, name: str) -> inspect.Signature:
@@ -1212,7 +1262,9 @@ class ReflectionConcrete(IReflectionConcrete):
         Raises
         ------
         ValueError
-            If the method does not exist or is not callable.
+            If the method does not exist.
+        TypeError
+            If the retrieved member is not callable.
         """
         # Compute cache key once; reuse for both read and write operations
         cache_key = f"method_signature_{name}"
@@ -1222,9 +1274,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         # Validate method existence before inspection
         if not self.hasMethod(name):
-            error_msg = (
-                f"Method '{name}' does not exist in class '{self._class_name}'."
-            )
+            error_msg = f"Method '{name}' does not exist in class '{self._class_name}'."
             raise ValueError(error_msg)
 
         # Resolve private method name mangling before attribute access
@@ -1240,7 +1290,7 @@ class ReflectionConcrete(IReflectionConcrete):
             raise TypeError(error_msg)
 
         # Cache and return the method signature
-        sig = inspect.signature(method)
+        sig = _inspect_signature(method)
         _cache[cache_key] = sig
         return sig
 
@@ -1837,7 +1887,9 @@ class ReflectionConcrete(IReflectionConcrete):
         Raises
         ------
         ValueError
-            If the property does not exist or is not accessible.
+            If the property does not exist.
+        TypeError
+            If the requested member is not a property.
         """
         # Resolve private property name mangling for double underscore properties
         if name.startswith("__") and not name.endswith("__"):
@@ -1851,9 +1903,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         prop = getattr(self._concrete, name)
         if not isinstance(prop, property):
-            error_msg = (
-                f"'{name}' is not a property in class '{self._class_name}'."
-            )
+            error_msg = f"'{name}' is not a property in class '{self._class_name}'."
             raise TypeError(error_msg)
 
         # Invoke the property getter with the class as the receiver
@@ -1876,7 +1926,9 @@ class ReflectionConcrete(IReflectionConcrete):
         Raises
         ------
         ValueError
-            If the property does not exist or is not accessible.
+            If the property does not exist.
+        TypeError
+            If the requested member is not a property.
         """
         # Compute cache key once; reuse for both read and write operations
         cache_key = f"property_signature_{name}"
@@ -1890,20 +1942,17 @@ class ReflectionConcrete(IReflectionConcrete):
 
         if not hasattr(self._concrete, name):
             error_msg = (
-                f"Property '{name}' does not exist in class "
-                f"'{self._class_name}'."
+                f"Property '{name}' does not exist in class '{self._class_name}'."
             )
             raise ValueError(error_msg)
 
         prop = getattr(self._concrete, name)
         if not isinstance(prop, property):
-            error_msg = (
-                f"'{name}' is not a property in class '{self._class_name}'."
-            )
+            error_msg = f"'{name}' is not a property in class '{self._class_name}'."
             raise TypeError(error_msg)
 
         # Cache and return the signature of the property getter
-        sig = inspect.signature(prop.fget)
+        sig = _inspect_signature(prop.fget)
         _cache[cache_key] = sig
         return sig
 
@@ -1924,7 +1973,9 @@ class ReflectionConcrete(IReflectionConcrete):
         Raises
         ------
         ValueError
-            If the property does not exist or is not accessible.
+            If the property does not exist.
+        TypeError
+            If the requested member is not a property.
         """
         # Compute cache key once; reuse for both read and write operations
         cache_key = f"property_docstring_{name}"
@@ -1944,9 +1995,7 @@ class ReflectionConcrete(IReflectionConcrete):
 
         prop = getattr(self._concrete, name)
         if not isinstance(prop, property):
-            error_msg = (
-                f"'{name}' is not a property in class '{self._class_name}'."
-            )
+            error_msg = f"'{name}' is not a property in class '{self._class_name}'."
             raise TypeError(error_msg)
 
         # Cache and return the docstring of the property getter
@@ -1968,7 +2017,7 @@ class ReflectionConcrete(IReflectionConcrete):
         _cache = self._cache
         if "constructor_signature" in _cache:
             return _cache["constructor_signature"]
-        sig = inspect.signature(self._concrete.__init__)
+        sig = _inspect_signature(self._concrete.__init__)
         _cache["constructor_signature"] = sig
         return sig
 
@@ -2038,12 +2087,17 @@ class ReflectionConcrete(IReflectionConcrete):
         Clear the internal memory cache.
 
         Removes all cached entries stored in the reflection instance. Subsequent
-        method calls will recompute and cache results.
+        method calls will recompute and cache results. Shared dependency signatures
+        and registered invocation plans are also invalidated. Current class
+        identity is refreshed; the original private-name prefix is preserved
+        because Python does not remangle members when a class is renamed.
 
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Invalidate all cached reflection results
         self._cache.clear()
+        self._class_name = self._concrete.__name__
+        _clear_dependency_caches()

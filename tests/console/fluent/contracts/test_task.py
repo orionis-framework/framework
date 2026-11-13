@@ -1,10 +1,12 @@
+# ruff: noqa: ANN201, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from abc import ABC
 from orionis.console.fluent.contracts.task import ITask
 from orionis.test import TestCase
 
-class TestITaskContract(TestCase):
 
+class TestITaskContract(TestCase):
     def testITaskInheritsFromABC(self):
         """Test that ITask inherits from ABC.
 

@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class SessionDriver(StrEnum):
     """
     Enumeration of supported session storage drivers.

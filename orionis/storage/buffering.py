@@ -1,3 +1,4 @@
+# ruff: noqa: PLC0415, TC003
 """Provide storage operations.
 
 Includes ``read_chunks``, ``iterate_chunks``, ``spool_stream``.
@@ -5,20 +6,18 @@ Includes ``read_chunks``, ``iterate_chunks``, ``spool_stream``.
 
 from __future__ import annotations
 import asyncio
-import sys
 import tempfile
-from typing import TYPE_CHECKING
+from collections.abc import AsyncIterable, AsyncIterator, Callable, Iterator
+from typing import BinaryIO
 from orionis.support.concurrency import complete_on_cancel
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterable, AsyncIterator, Callable, Iterator
-    from typing import BinaryIO
 
 READ_BUFFER_SIZE = 1024 * 1024
 """Read buffer size used by ``buffering``."""
 
+
 async def _close_buffer(
-    close: Callable[[], object], primary: BaseException | None,
+    close: Callable[[], object],
+    primary: BaseException | None,
 ) -> None:
     """
     Drain one owned resource close without replacing an active failure.
@@ -33,7 +32,7 @@ async def _close_buffer(
     Returns
     -------
     None
-        Close once and observe a secondary failure when a primary already exists.
+        No return value.
 
     Raises
     ------
@@ -47,12 +46,20 @@ async def _close_buffer(
     except Exception as error:
         if primary is None:
             raise
-        from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
-        if not isinstance(primary, (
-            asyncio.CancelledError, KeyboardInterrupt, SystemExit, GeneratorExit,
-        )):
+        from orionis.failure.runtime import capture_nowait
+
+        if not isinstance(
+            primary,
+            (
+                asyncio.CancelledError,
+                KeyboardInterrupt,
+                SystemExit,
+                GeneratorExit,
+            ),
+        ):
             capture_nowait(primary, flow="storage", phase="stream")
         capture_nowait(error, flow="storage", phase="cleanup", operation="stream.close")
+
 
 async def read_chunks(
     opener: Callable[[], BinaryIO],
@@ -98,10 +105,11 @@ async def read_chunks(
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         handles.append(opener())
 
+    primary = None
     try:
         await complete_on_cancel(asyncio.to_thread(open_handle))
         handle = handles[0]
@@ -114,9 +122,13 @@ async def read_chunks(
             for offset in range(0, len(data), chunk_size):
                 yield data[offset : offset + chunk_size]
             read_size = batch_size
+    except BaseException as error:
+        primary = error
+        raise
     finally:
         if handles:
-            await _close_buffer(handles[0].close, sys.exception())
+            await _close_buffer(handles[0].close, primary)
+
 
 async def iterate_chunks(
     opener: Callable[[], Iterator[bytes]],
@@ -137,6 +149,7 @@ async def iterate_chunks(
         A cleanup failure does not replace the iterator's original failure.
     """
     iterators = []
+    exhausted = object()
 
     def open_iterator() -> None:
         """
@@ -145,7 +158,7 @@ async def iterate_chunks(
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         iterators.append(iter(opener()))
 
@@ -166,8 +179,8 @@ async def iterate_chunks(
         result = []
         size = 0
         for _ in range(limit):
-            chunk = next(iterators[0], b"")
-            if not chunk:
+            chunk = next(iterators[0], exhausted)
+            if chunk is exhausted:
                 break
             result.append(chunk)
             size += len(chunk)
@@ -175,6 +188,7 @@ async def iterate_chunks(
                 break
         return result
 
+    primary = None
     try:
         await complete_on_cancel(asyncio.to_thread(open_iterator))
         limit = 1
@@ -182,9 +196,13 @@ async def iterate_chunks(
             for chunk in batch:
                 yield chunk
             limit = 16
+    except BaseException as error:
+        primary = error
+        raise
     finally:
         if iterators and callable(close := getattr(iterators[0], "close", None)):
-            await _close_buffer(close, sys.exception())
+            await _close_buffer(close, primary)
+
 
 async def spool_stream(stream: AsyncIterable[bytes], *, max_size: int) -> BinaryIO:
     """
@@ -195,18 +213,26 @@ async def spool_stream(stream: AsyncIterable[bytes], *, max_size: int) -> Binary
     stream : collections.abc.AsyncIterable[bytes]
         Asynchronous byte-chunk producer.
     max_size : int
-        Maximum in-memory bytes before the buffer spills to disk.
+        Positive maximum in-memory bytes before the buffer spills to disk.
 
     Returns
     -------
     typing.BinaryIO
         Rewound temporary buffer owned and closed by the uploading driver.
 
+    Raises
+    ------
+    ValueError
+        If max_size is not a positive integer or is a boolean.
+
     Notes
     -----
     Cancellation drains native opening, writing, and seeking before cleanup.
     Cleanup failures do not replace the producer or buffer failure.
     """
+    if isinstance(max_size, bool) or not isinstance(max_size, int) or max_size < 1:
+        error_msg = "Spool memory limit must be a positive integer."
+        raise ValueError(error_msg)
     opening = asyncio.create_task(
         asyncio.to_thread(tempfile.SpooledTemporaryFile, max_size=max_size),
     )
@@ -215,8 +241,8 @@ async def spool_stream(stream: AsyncIterable[bytes], *, max_size: int) -> Binary
         async for chunk in stream:
             await complete_on_cancel(asyncio.to_thread(buffer.write, chunk))
         await complete_on_cancel(asyncio.to_thread(buffer.seek, 0))
-    except BaseException:
+    except BaseException as error:
         if not opening.cancelled() and opening.exception() is None:
-            await _close_buffer(opening.result().close, sys.exception())
+            await _close_buffer(opening.result().close, error)
         raise
     return buffer

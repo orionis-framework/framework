@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use explicit process arguments or locally constructed execution fixtures.
 import ast
 import logging
 import os
@@ -19,9 +22,13 @@ from tests.foundation.config.test_environment import (
     configuration_classes,
 )
 
+
 class TestConfigurationTemplates(ConfigurationTestCase):
     def _environmentKeys(
-        self, filename: str, *, include_commented: bool = True,
+        self,
+        filename: str,
+        *,
+        include_commented: bool = True,
     ) -> list[str]:
         """Parse active declarations and optional commented overrides.
 
@@ -87,9 +94,13 @@ class TestConfigurationTemplates(ConfigurationTestCase):
                     or node.func.attr != "get"
                 ):
                     continue
-                key = node.args[0] if node.args else next(
-                    (item.value for item in node.keywords if item.arg == "key"),
-                    None,
+                key = (
+                    node.args[0]
+                    if node.args
+                    else next(
+                        (item.value for item in node.keywords if item.arg == "key"),
+                        None,
+                    )
                 )
                 with self.subTest(module=module.__name__, line=node.lineno):
                     self.assertIsInstance(key, ast.Constant)
@@ -164,15 +175,19 @@ raise SystemExit(bool(errors) or count == 0)
 """
         with TemporaryDirectory() as directory:
             (Path(directory) / ".env").write_bytes((root / ".env.example").read_bytes())
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(
                 [sys.executable, "-B", "-c", script],
                 cwd=directory,
                 env={
-                    **environment, "PYTHONPATH": str(root),
+                    **environment,
+                    "PYTHONPATH": str(root),
                     "ORIONIS_AUDIT_ROOT": str(root),
                 },
-                capture_output=True, text=True, encoding="utf-8",
-                timeout=30, check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                timeout=30,
+                check=False,
             )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
@@ -355,11 +370,14 @@ raise SystemExit(bool(errors) or count == 0)
             Verify both configuration layers retain independent environment snapshots.
         """
         self.environment.values.update(
-            LOG_CHANNEL="stack", LOG_PATH="storage/first.log", LOG_RETENTION=168,
+            LOG_CHANNEL="stack",
+            LOG_PATH="storage/first.log",
+            LOG_RETENTION=168,
         )
         first = (Logging(), BootstrapLogging())
         self.environment.values.update(
-            LOG_CHANNEL="hourly", LOG_PATH="storage/hourly_{suffix}.log",
+            LOG_CHANNEL="hourly",
+            LOG_PATH="storage/hourly_{suffix}.log",
         )
         second = (Logging(), BootstrapLogging())
         for before, after in zip(first, second, strict=True):

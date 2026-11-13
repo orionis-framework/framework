@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415, S104, S606, SLF001, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Use explicit process arguments or locally constructed execution fixtures.
 """Start the application server using the selected runtime options."""
 
 import asyncio
@@ -25,9 +28,8 @@ Characters additionally allowed in the sanitized process name, besides alphanume
 _CPU_COUNT: int = os.cpu_count() or 1
 """Number of logical CPUs available; resolved once at import time."""
 
-class ServerCommand(BaseCommand):
 
-    # ruff: noqa: S606, S104, TC001, PLC0415, SLF001
+class ServerCommand(BaseCommand):
     """Start the application server using the selected runtime options."""
 
     timestamps = False
@@ -37,8 +39,7 @@ class ServerCommand(BaseCommand):
     signature = "serve"
     """Command signature and description."""
     description = (
-        "Initializes the Orionis server with Granian "
-        "(The Rust HTTP server for Python)."
+        "Initializes the Orionis server with Granian (The Rust HTTP server for Python)."
     )
     """
     Description identifier: ``Initializes the Orionis server with Granian (The Rust
@@ -186,9 +187,7 @@ class ServerCommand(BaseCommand):
         """
         from granian.constants import Interfaces
 
-        interface: str = (
-            self.getArgument("interface") or Interfaces.RSGI.value
-        )
+        interface: str = self.getArgument("interface") or Interfaces.RSGI.value
         self.__cmd.extend(["--interface", interface])
         self.__env["GRANIAN_INTERFACE"] = interface
 
@@ -217,14 +216,13 @@ class ServerCommand(BaseCommand):
         # Select the event loop backend for the current platform.
         from granian.constants import Loops
 
-        event_loop: str = (
-            Loops.uvloop.value if os.name != "nt" else Loops.auto.value
-        )
+        event_loop: str = Loops.uvloop.value if os.name != "nt" else Loops.auto.value
         self.__cmd.extend(["--loop", event_loop])
         self.__env["GRANIAN_LOOP"] = event_loop
 
     def __appendLoggingConfigurationToCommand(
-        self, app: IApplication,
+        self,
+        app: IApplication,
     ) -> None:
         """
         Append the logging-level flags to the command.
@@ -273,9 +271,7 @@ class ServerCommand(BaseCommand):
         """
         # Prefer compiled invalidation paths when available.
         watch_dirs: list[Path] = (
-            app.compiledInvalidationPathsDirs
-            if app.compiled
-            else [app.basePath]
+            app.compiledInvalidationPathsDirs if app.compiled else [app.basePath]
         )
         if watch_dirs and not app.isProduction():
             # Exclude paths that contain spaces (Granian CLI limitation).
@@ -294,7 +290,8 @@ class ServerCommand(BaseCommand):
         self.__env["GRANIAN_RELOAD"] = "0"
 
     def __appendStaticMountAndRouteToCommand(
-        self, app: IApplication,
+        self,
+        app: IApplication,
     ) -> None:
         """
         Append the static-file mount path and URL route to the command.
@@ -309,9 +306,7 @@ class ServerCommand(BaseCommand):
         None
             This method does not return a value.
         """
-        public_disk: dict = (
-            app.config("filesystems").get("disks", {}).get("public", {})
-        )
+        public_disk: dict = app.config("filesystems").get("disks", {}).get("public", {})
         mount = Path(public_disk.get("path", "storage/app/public"))
 
         # Resolve relative paths against the application root.
@@ -322,21 +317,28 @@ class ServerCommand(BaseCommand):
         # Normalize the URL route by stripping trailing slashes and spaces,
         # and collapsing multiple slashes. Granian CLI
         # does not allow spaces in routes.
-        route: str = public_disk.get("url", "/static")\
-                                .strip()\
-                                .rstrip("/")\
-                                .replace(" ", "")\
-                                .replace("//", "/")
+        route: str = (
+            public_disk.get("url", "/static")
+            .strip()
+            .rstrip("/")
+            .replace(" ", "")
+            .replace("//", "/")
+        )
 
         # Ensure the route starts with a slash for Granian CLI compatibility.
         if route and not route.startswith("/"):
             route = "/" + route
 
-        self.__cmd.extend([
-            "--static-path-mount", mount.as_posix(),
-            "--static-path-route", route,
-            "--static-path-dir-to-file", "index.html",
-        ])
+        self.__cmd.extend(
+            [
+                "--static-path-mount",
+                mount.as_posix(),
+                "--static-path-route",
+                route,
+                "--static-path-dir-to-file",
+                "index.html",
+            ],
+        )
         self.__env["GRANIAN_STATIC_PATH_MOUNT"] = mount.as_posix()
         self.__env["GRANIAN_STATIC_PATH_ROUTE"] = route
         self.__env["GRANIAN_STATIC_PATH_DIR_TO_FILE"] = "index.html"
@@ -440,7 +442,9 @@ class ServerCommand(BaseCommand):
                 self._inner = inner
 
             async def __rsgi__(
-                self, scope: object, protocol: object,
+                self,
+                scope: object,
+                protocol: object,
             ) -> object:
                 """Forward the RSGI request to the real application.
 
@@ -459,7 +463,8 @@ class ServerCommand(BaseCommand):
                 return await self._inner.__rsgi__(scope, protocol)
 
             def __rsgi_init__(
-                self, loop: asyncio.AbstractEventLoop,
+                self,
+                loop: asyncio.AbstractEventLoop,
             ) -> None:
                 """Accept the event-loop reference without side effects.
 
@@ -475,7 +480,8 @@ class ServerCommand(BaseCommand):
                 """
 
             def __rsgi_del__(
-                self, loop: asyncio.AbstractEventLoop,
+                self,
+                loop: asyncio.AbstractEventLoop,
             ) -> None:
                 """Accept the event-loop reference without side effects.
 
@@ -514,9 +520,7 @@ class ServerCommand(BaseCommand):
             log_enabled, log_level = False, LogLevels.warning
 
         # Resolve static-file configuration.
-        public_disk: dict = (
-            app.config("filesystems").get("disks", {}).get("public", {})
-        )
+        public_disk: dict = app.config("filesystems").get("disks", {}).get("public", {})
         mount = Path(public_disk.get("path", "storage/app/public"))
         if not mount.is_absolute():
             mount = Path(app.basePath) / mount
@@ -579,7 +583,10 @@ class ServerCommand(BaseCommand):
                 try:
                     _tk = await asyncio.create_subprocess_exec(
                         "C:\\Windows\\System32\\taskkill.exe",
-                        "/F", "/T", "/PID", str(proc.pid),
+                        "/F",
+                        "/T",
+                        "/PID",
+                        str(proc.pid),
                         stdout=asyncio.subprocess.DEVNULL,
                         stderr=asyncio.subprocess.DEVNULL,
                     )
@@ -650,10 +657,13 @@ class ServerCommand(BaseCommand):
             self.__setShutdownHandler(app)
 
             app_name = str(app.config("app.name") or "orionis-app")
-            process_name = "".join([
-                char for char in app_name.replace(" ", "-").lower()
-                if char.isalnum() or char in _EXTRA_ALLOWED
-            ])
+            process_name = "".join(
+                [
+                    char
+                    for char in app_name.replace(" ", "-").lower()
+                    if char.isalnum() or char in _EXTRA_ALLOWED
+                ],
+            )
             process_name = process_name[:64].lstrip("_-")
             if not process_name:
                 process_name = "orionis-app"

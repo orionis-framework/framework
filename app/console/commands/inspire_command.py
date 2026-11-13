@@ -1,9 +1,11 @@
+# ruff: noqa: RUF012, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 from orionis.console import Argument
 from orionis.console.base import BaseCommand
 from orionis.support.inspirational import Inspire
 
-class InspireCommand(BaseCommand):
 
+class InspireCommand(BaseCommand):
     # Command name, by convention in lowercase and starting with app.
     signature: str = "app:inspire"
 

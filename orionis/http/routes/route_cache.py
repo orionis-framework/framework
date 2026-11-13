@@ -49,8 +49,7 @@ class RouteCache(IRouteCache):
                         for path, cr in bucket["static"].items()
                     },
                     "dynamic": [
-                        self.__serializeCompiledRoute(cr)
-                        for cr in bucket["dynamic"]
+                        self.__serializeCompiledRoute(cr) for cr in bucket["dynamic"]
                     ],
                 }
                 for method, bucket in routes.items()
@@ -91,15 +90,18 @@ class RouteCache(IRouteCache):
         for method, bucket in cached["routes"].items():
             routes[method] = {"static": {}, "dynamic": []}
             for path, route_data in bucket["static"].items():
-                routes[method]["static"][path] = (
-                    self.__deserializeCompiledRoute(
-                        route_data, resolved_classes, method, static_path=path,
-                    )
+                routes[method]["static"][path] = self.__deserializeCompiledRoute(
+                    route_data,
+                    resolved_classes,
+                    method,
+                    static_path=path,
                 )
             for route_data in bucket["dynamic"]:
                 routes[method]["dynamic"].append(
                     self.__deserializeCompiledRoute(
-                        route_data, resolved_classes, method,
+                        route_data,
+                        resolved_classes,
+                        method,
                     ),
                 )
 
@@ -138,17 +140,12 @@ class RouteCache(IRouteCache):
             "priority_score": cr.priority_score,
             "kind": cr.kind,
             "public": cr.public,
-            "middleware": [
-                f"{m.__module__}.{m.__qualname__}"
-                for m in cr.middleware
-            ],
+            "middleware": [f"{m.__module__}.{m.__qualname__}" for m in cr.middleware],
             "without_middleware": [
-                f"{m.__module__}.{m.__qualname__}"
-                for m in cr.without_middleware
+                f"{m.__module__}.{m.__qualname__}" for m in cr.without_middleware
             ],
             "compiled_middlewares": [
-                f"{m.__module__}.{m.__qualname__}"
-                for m in cr.compiled_middlewares
+                f"{m.__module__}.{m.__qualname__}" for m in cr.compiled_middlewares
             ],
         }
 

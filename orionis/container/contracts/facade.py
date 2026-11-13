@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IFacade(ABC):
     """Define the contract for facade implementations."""
 
@@ -55,7 +56,7 @@ class IFacade(ABC):
         Returns
         -------
         None
-            Returns ``None`` after storing the currently resolved instance.
+            This method does not return a value.
         """
 
     @classmethod
@@ -67,5 +68,5 @@ class IFacade(ABC):
         Returns
         -------
         None
-            Returns ``None`` after clearing the cached pinned instance.
+            This method does not return a value.
         """

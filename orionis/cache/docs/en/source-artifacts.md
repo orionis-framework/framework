@@ -4,7 +4,7 @@ Use an artifact cache when a computed dictionary depends on source files.
 
 ## Rebuild when sources change
 
-`FileBasedCache` is synchronous and stores one complete dictionary, suitable for compiled metadata. During startup call `get()`; when it returns `None`, rebuild the result, call `save(data)`, and use that dictionary. It supplies no TTL, independent keys, or distributed locks.
+`FileBasedCache` is synchronous and stores one complete dictionary, suitable for compiled metadata. During startup call `get()`; when it returns `None`, rebuild the result, call `save(data)`, and use that dictionary. It supplies no TTL, independent keys, or distributed locks. The constructor resolves its directory once and requires a simple filename: empty names, `.` or `..`, separators, colons, and NUL are rejected.
 
 The fingerprint uses absolute paths, `st_mtime_ns`, and file size. It does not hash complete file contents: a change preserving those metadata can go unnoticed. Monitored directories add only `*.py`; `monitored_files` lets you name other individual files. Fingerprint lookup is memoized for 0.5 seconds; changes may remain unseen during that interval. This interval is distinct from an artifact TTL.
 
@@ -12,7 +12,7 @@ The fingerprint uses absolute paths, `st_mtime_ns`, and file size. It does not h
 
 ### Serialize framework types
 
-`from orionis.cache.serializer import Serializer` exposes `dumps`, `loads`, `dumpToFile`, and `loadFromFile`. Beyond containers and primitives it supports bytes, Path, dates/times, timedelta, Decimal, UUID, complex values, tuples, sets, frozensets, enums, types, and the `MISSING` sentinel. It uses `__type__` and `__value__` markers; avoid these names in business mappings that must round-trip unchanged.
+`from orionis.cache.serializer import Serializer` exposes `dumps`, `loads`, `dumpToFile`, and `loadFromFile`. Beyond containers and primitives it supports bytes, Path, dates/times, timedelta, Decimal, UUID, complex values, tuples, sets, frozensets, enums, types, and the `MISSING` sentinel. Importable nested enum and type references are supported, and enum values are encoded recursively. It uses `__type__` and `__value__` markers; avoid these names in business mappings that must round-trip unchanged.
 
 This format is for trusted local artifacts. Restoring enums and types can import modules by name: do not deserialize client-supplied payloads or files writable by untrusted users. It includes no signature or encryption. `loadFromFile` returns `None` for absent, empty, or unreadable files; corrupt JSON or an unknown marker can propagate an error. Treat the cache as regenerable and decide whether startup should discard it or fail.
 
@@ -36,7 +36,7 @@ with TemporaryDirectory() as directory:
     cache.save({"routes": ["/"]})
     print(cache.get())  # {'routes': ['/']}
 
-    source.write_text("VALUE = 2\n", encoding="utf-8")
+    source.write_text("VALUE = 200\n", encoding="utf-8")
     time.sleep(0.6)  # FileBasedCache refreshes its source hash every 0.5 s.
     print(cache.get())  # None
 ```
@@ -52,7 +52,7 @@ FileBasedCache(
 )
 ```
 
-`save(data)` writes a versioned payload and returns `(CACHE_VERSION, sources_hash)`; identical data and source hash skip the rewrite. `get()` returns the dictionary only when version and source hash still match, otherwise `None`. `clear()` reports whether the cache file existed. Only Python files from monitored directories participate, and the cache file itself is excluded.
+`save(data)` writes a versioned payload and returns `(CACHE_VERSION, sources_hash)`; identical data and source hash skip the rewrite. `get()` returns the dictionary only when version and source hash still match, otherwise `None`. A non-mapping envelope, metadata section, or data section is also a miss; `save()` can replace that malformed artifact. `clear()` reports whether the cache file existed. Only Python files from monitored directories participate, and the cache file itself is excluded.
 
 ---
 

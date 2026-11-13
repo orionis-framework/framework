@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import SimpleNamespace
 from orionis.http.layer.web.csrf_token import CSRFTokenMiddleware
 from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
@@ -5,6 +7,7 @@ from orionis.http.payload.estructures.headers import Headers
 from orionis.http.responses import Response
 from orionis.session.session import Session
 from orionis.test import TestCase
+
 
 class _Request:
     """Expose request metadata and count body access during CSRF checks."""
@@ -41,6 +44,7 @@ class _Request:
         self.bodyReads += 1
         return {}
 
+
 class _Terminal:
     """Count middleware continuation calls and return a concrete response."""
 
@@ -66,6 +70,7 @@ class _Terminal:
         self.calls += 1
         return self.response
 
+
 class TestCSRFLifecycle(TestCase):
     """Keep token generation and validation consistent for every request method."""
 
@@ -80,7 +85,8 @@ class TestCSRFLifecycle(TestCase):
         request = _Request("GET", [])
         terminal = _Terminal()
         response = await CSRFTokenMiddleware({"xsrf_cookie": True}).handle(
-            request, terminal,
+            request,
+            terminal,
         )
         self.assertEqual(request.state.csrf_token, "token")
         self.assertEqual(request.bodyReads, 0)

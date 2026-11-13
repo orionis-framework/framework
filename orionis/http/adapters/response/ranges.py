@@ -1,5 +1,6 @@
 """Provide http adapters response operations through ``parse_range``."""
 
+
 def parse_range(value: str | None, file_size: int) -> tuple[int, int] | None:
     """
     Parse a byte range into an interval with an exclusive end offset.

@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415
+# Load failure capture only when an I/O or decoding failure occurs.
+
 """Session store that persists each session as a JSON file on disk."""
 
 import asyncio
@@ -9,16 +12,16 @@ import time
 import msgspec
 import msgspec.json as _msgspec_json
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import Any
 from zlib import crc32
-from filelock import FileLock
+from filelock import BaseFileLock, FileLock
 from orionis.session.contracts.store import ISessionStore
 from orionis.session.entities.record import SessionRecord
 from orionis.session.exceptions import SessionStorageException
 
-if TYPE_CHECKING:
-    from pathlib import Path
-    from filelock import BaseFileLock
+from orionis.support.concurrency import complete_on_cancel
+
 
 class _SessionPayload(msgspec.Struct, frozen=True, gc=False):
     """
@@ -37,6 +40,7 @@ class _SessionPayload(msgspec.Struct, frozen=True, gc=False):
     id: str
     expires_at: datetime
     data: dict[str, Any]
+
 
 # Codecs built once: msgspec resolves the struct layout at construction time
 # instead of on every encode/decode call.
@@ -61,14 +65,21 @@ _LOCK_STRIPES: int = 64
 """Lock stripes value used by ``file``."""
 _VALID_ID = re.compile(r"[A-Za-z0-9_-]{1,255}\Z")
 """Compiled pattern used to recognize valid id."""
+_VALID_FILE = re.compile(r"[A-Za-z0-9_-]{1,255}\.json\Z")
+"""Recognize filenames that can be produced from valid session identifiers."""
+_VALID_TEMP = re.compile(r"[A-Za-z0-9_-]{1,255}\.json\.[0-9a-f]{16}\.tmp\Z")
+"""Recognize staging files created by the session writer."""
+
 
 class FileSessionStore(ISessionStore):
     """
     Session store that persists each session as a JSON file on disk.
 
     One JSON file per session, named ``{session_id}.json``, stored
-    inside *directory*.  The directory is created on instantiation when
-    it does not already exist.
+    inside *directory*. Resolve relative directories when constructing the
+    store and create the directory when it does not exist. Active worker
+    operations finish before caller cancellation propagates; cancellation does
+    not roll back a write or deletion that has already completed.
 
     Expired sessions are evicted lazily during
     :meth:`orionis.session.stores.file.FileSessionStore.read`, keeping
@@ -76,15 +87,10 @@ class FileSessionStore(ISessionStore):
     files can be triggered explicitly via
     :meth:`orionis.session.stores.file.FileSessionStore.gc`.
 
-    File layout
-    -----------
-    .. code-block:: json
-
-        {
-            "id": "...",
-            "expires_at": "2026-07-10T12:00:00+00:00",
-            "data": { ... }
-        }
+    Notes
+    -----
+    The JSON envelope stores ``id``, ``expires_at`` and ``data``. Payloads
+    must be JSON-compatible, and expiration is represented as a UTC timestamp.
 
     Parameters
     ----------
@@ -97,7 +103,7 @@ class FileSessionStore(ISessionStore):
 
     def __init__(self, directory: Path) -> None:
         """
-        Initialise the store and ensure the storage directory exists.
+        Resolve the storage directory and create it when missing.
 
         Parameters
         ----------
@@ -107,10 +113,11 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
-            Initialise the store and ensure the storage directory exists.
+            No return value.
         """
+        directory = directory.resolve()
         self._directory = directory
-        """Filesystem path to the session storage directory."""
+        """Canonical absolute directory containing the session files."""
         self._directory.mkdir(parents=True, exist_ok=True)
 
         # Writes run on worker threads, so publishing two payloads for the
@@ -218,7 +225,8 @@ class FileSessionStore(ISessionStore):
                 expires_at=payload.expires_at,
             )
         except (ValueError, msgspec.DecodeError) as error:
-            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            from orionis.failure.runtime import capture_nowait
+
             capture_nowait(
                 error,
                 flow="session",
@@ -283,7 +291,7 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
-            Atomically write *content* to *path*.
+            No return value.
 
         Raises
         ------
@@ -298,7 +306,8 @@ class FileSessionStore(ISessionStore):
             try:
                 tmp.unlink(missing_ok=True)
             except OSError as cleanup_error:
-                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                from orionis.failure.runtime import capture_nowait
+
                 capture_nowait(
                     cleanup_error,
                     flow="session",
@@ -325,7 +334,7 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
-            Publish *tmp* as *path*, retrying a transient sharing violation.
+            No return value.
 
         Raises
         ------
@@ -340,7 +349,8 @@ class FileSessionStore(ISessionStore):
             except PermissionError as error:
                 if attempt == last:
                     raise
-                from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                from orionis.failure.runtime import capture_nowait
+
                 capture_nowait(
                     error,
                     flow="session",
@@ -421,7 +431,7 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
-            Serialise *record* and store it atomically at *path*.
+            No return value.
         """
         with self._lock(path):
             self._writeFile(path, self._serialize(record))
@@ -448,21 +458,39 @@ class FileSessionStore(ISessionStore):
             self._writeRecord(path, record)
             return True
 
-    def _gcSweep(self) -> None:
-        """
-        Scan the store directory and remove stale or corrupt files.
+    def _deleteStaleTemp(self, path: Path, stale_before: float) -> None:
+        """Remove stale staging data after its session writer releases ownership.
 
-        Uses ``os.scandir`` for reduced object allocation and
-        filesystem cache reuse.  A session file is removed when it is
-        expired, contains invalid JSON, is structurally incomplete, or
-        cannot be read due to an I/O error.  Staging files left behind by
-        an interrupted write are reclaimed once they are old enough that
-        no writer can still be filling them.
+        Parameters
+        ----------
+        path : pathlib.Path
+            Staging file whose name matches the writer's format.
+        stale_before : float
+            Latest modification time eligible for cleanup, in epoch seconds.
 
         Returns
         -------
         None
-            Scan the store directory and remove stale or corrupt files.
+            No return value.
+        """
+        target = path.with_name(path.name.rsplit(".", 2)[0])
+        with self._lock(target):
+            if path.stat().st_mtime <= stale_before:
+                path.unlink()
+
+    def _gcSweep(self) -> None:
+        """
+        Scan the store directory and remove stale or corrupt files.
+
+        Scan with ``os.scandir`` and remove expired or corrupt session files.
+        Observe I/O failures without deleting unreadable files. Consider only
+        staging names produced by the writer, acquiring the corresponding
+        session lock before checking their age and removing them.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         stale_before = time.time() - _STALE_TEMP_SECONDS
         with os.scandir(self._directory) as it:
@@ -471,15 +499,16 @@ class FileSessionStore(ISessionStore):
                     continue
 
                 try:
-                    if entry.name.endswith(".tmp"):
+                    if _VALID_TEMP.fullmatch(entry.name):
                         if entry.stat().st_mtime <= stale_before:
-                            os.unlink(entry.path)  # noqa: PTH108
-                    elif entry.name.endswith(".json"):
+                            self._deleteStaleTemp(Path(entry.path), stale_before)
+                    elif _VALID_FILE.fullmatch(entry.name):
                         self._readRecord(self._directory / entry.name)
                 except FileNotFoundError:
                     pass
                 except OSError as error:
-                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                    from orionis.failure.runtime import capture_nowait
+
                     capture_nowait(
                         error,
                         flow="session",
@@ -508,7 +537,9 @@ class FileSessionStore(ISessionStore):
         orionis.session.entities.record.SessionRecord | None
             The live record, or ``None`` when absent, expired, or corrupt.
         """
-        return await asyncio.to_thread(self._readRecord, self._path(session_id))
+        return await complete_on_cancel(
+            asyncio.to_thread(self._readRecord, self._path(session_id)),
+        )
 
     async def write(self, record: SessionRecord) -> None:
         """
@@ -522,9 +553,11 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
-            Serialise and persist *record* to disk atomically.
+            No return value.
         """
-        await asyncio.to_thread(self._writeRecord, self._path(record.id), record)
+        await complete_on_cancel(
+            asyncio.to_thread(self._writeRecord, self._path(record.id), record),
+        )
 
     async def update(self, record: SessionRecord) -> bool:
         """
@@ -540,8 +573,8 @@ class FileSessionStore(ISessionStore):
         bool
             Whether the session still existed and was updated.
         """
-        return await asyncio.to_thread(
-            self._updateRecord, self._path(record.id), record,
+        return await complete_on_cancel(
+            asyncio.to_thread(self._updateRecord, self._path(record.id), record),
         )
 
     async def delete(self, session_id: str) -> bool:
@@ -559,7 +592,7 @@ class FileSessionStore(ISessionStore):
             True only when a session file was deleted.
         """
         path = self._path(session_id)
-        return await asyncio.to_thread(self._deleteFile, path)
+        return await complete_on_cancel(asyncio.to_thread(self._deleteFile, path))
 
     async def gc(self) -> None:
         """
@@ -575,6 +608,6 @@ class FileSessionStore(ISessionStore):
         Returns
         -------
         None
-            Remove all expired, corrupt, or incomplete session files.
+            No return value.
         """
-        await asyncio.to_thread(self._gcSweep)
+        await complete_on_cancel(asyncio.to_thread(self._gcSweep))

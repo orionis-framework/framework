@@ -2,12 +2,19 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.cache import (
-    Cache, Database, Drivers, File, Memcached, Memory, Redis, Stores,
+    Cache,
+    Database,
+    Drivers,
+    File,
+    Memcached,
+    Memory,
+    Redis,
+    Stores,
 )
+
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapCache(Cache):
-
     # ----------------------------------------------------------------------------------
     # default : Drivers | str, optional
     # --- The default cache store driver.
@@ -31,7 +38,6 @@ class BootstrapCache(Cache):
     # ----------------------------------------------------------------------------------
     stores: Stores | dict = field(
         default_factory=lambda: Stores(
-
             # --------------------------------------------------------------------------
             # file : File, optional
             # --- File-based cache store (default driver).
@@ -39,13 +45,11 @@ class BootstrapCache(Cache):
             file=File(
                 path=Env.get("CACHE_FILE_PATH", "storage/framework/cache/data"),
             ),
-
             # --------------------------------------------------------------------------
             # memory : Memory, optional
             # --- In-memory cache store (no persistence, process-scoped).
             # --------------------------------------------------------------------------
             memory=Memory(),
-
             # --------------------------------------------------------------------------
             # redis : Redis, optional
             # --- Redis cache store.
@@ -56,7 +60,6 @@ class BootstrapCache(Cache):
                 db=Env.get("REDIS_DB", 0),
                 password=Env.get("REDIS_PASSWORD", None),
             ),
-
             # --------------------------------------------------------------------------
             # memcached : Memcached, optional
             # --- Memcached cache store.
@@ -65,7 +68,6 @@ class BootstrapCache(Cache):
                 endpoint=Env.get("MEMCACHED_HOST", "127.0.0.1"),
                 port=Env.get("MEMCACHED_PORT", 11211),
             ),
-
             # --------------------------------------------------------------------------
             # database : Database, optional
             # --- Database cache store.

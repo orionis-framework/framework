@@ -1,13 +1,16 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import argparse
 import inspect
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.console.core.reactor import Reactor
 from orionis.console.entities.command import Command
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.test import TestCase
+
 
 def _make_mock_command(
     signature: str = "test:cmd",
@@ -44,6 +47,7 @@ def _make_mock_command(
         timestamps=timestamps,
         args=args,
     )
+
 
 def _make_reactor() -> tuple[
     Reactor,
@@ -118,6 +122,7 @@ def _make_reactor() -> tuple[
         mock_catch,
         mock_perf,
     )
+
 
 class TestReactor(TestCase):
     """Test suite for the Reactor console command dispatcher."""
@@ -373,10 +378,12 @@ class TestReactor(TestCase):
         """
         internal = _make_mock_command(signature="__internal__")
         normal = _make_mock_command(signature="normal:cmd")
-        self.mock_loader.all = AsyncMock(return_value={
-            "__internal__": internal,
-            "normal:cmd": normal,
-        })
+        self.mock_loader.all = AsyncMock(
+            return_value={
+                "__internal__": internal,
+                "normal:cmd": normal,
+            },
+        )
 
         result = await self.reactor.info()
 
@@ -395,11 +402,13 @@ class TestReactor(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        self.mock_loader.all = AsyncMock(return_value={
-            "z:cmd": _make_mock_command(signature="z:cmd"),
-            "a:cmd": _make_mock_command(signature="a:cmd"),
-            "m:cmd": _make_mock_command(signature="m:cmd"),
-        })
+        self.mock_loader.all = AsyncMock(
+            return_value={
+                "z:cmd": _make_mock_command(signature="z:cmd"),
+                "a:cmd": _make_mock_command(signature="a:cmd"),
+                "m:cmd": _make_mock_command(signature="m:cmd"),
+            },
+        )
 
         result = await self.reactor.info()
 
@@ -494,6 +503,44 @@ class TestReactor(TestCase):
         await self.reactor.call("log:cmd")
 
         self.mock_logger.info.assert_called_once()
+
+    async def testNonzeroResultsAreNotReportedAsSuccess(self) -> None:
+        """
+        Preserve failure exit codes and avoid successful completion feedback.
+
+        Returns
+        -------
+        None
+            Report each failure once, with a fallback log when no runtime exists.
+        """
+        for receipt in (None, object()):
+            with self.subTest(runtime=receipt is not None):
+                reactor, app, loader, executor, logger, _, _ = _make_reactor()
+                loader.get.return_value = _make_mock_command(signature="failed:cmd")
+                app.call.return_value = 7
+                with patch(
+                    "orionis.console.core.reactor.capture_result",
+                    new=AsyncMock(return_value=receipt),
+                ) as capture:
+                    self.assertEqual(await reactor.call("failed:cmd"), 7)
+                executor.done.assert_not_called()
+                executor.fail.assert_called_once_with(
+                    program="failed:cmd",
+                    time="0.5s",
+                )
+                logger.info.assert_not_called()
+                capture.assert_awaited_once_with(
+                    7,
+                    app=app,
+                    flow="console",
+                    phase="result",
+                    operation="failed:cmd",
+                )
+                if receipt is None:
+                    logger.error.assert_called_once()
+                    self.assertIn("exit code 7", logger.error.call_args.args[0])
+                else:
+                    logger.error.assert_not_called()
 
     async def testCallDoesNotRecreateClearedLogs(self) -> None:
         """Leave log files absent after the log cleanup command completes.

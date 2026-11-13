@@ -4,6 +4,7 @@ from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
 
+
 class BigInteger(ColumnDefinition):
     """A type for bigger ``int`` integers. Typically generates ``BIGINT``."""
 

@@ -1,7 +1,12 @@
+# ruff: noqa: PLR2004, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
+import unittest
 from orionis.test import TestCase
 from orionis.test.enums.status import TestStatus
 from orionis.test.executors.results import TestResultProcessor
+from orionis.test.executors.runner import TestRunner
+
 
 def _probe_subtests(case: TestCase) -> None:
     """Emit passing, failing and errored subtests.
@@ -24,6 +29,7 @@ def _probe_subtests(case: TestCase) -> None:
                 message = "Subtest raised an exception."
                 raise RuntimeError(message)
 
+
 def _probe_success(_case: TestCase) -> None:
     """Complete a test marked as an expected failure.
 
@@ -38,7 +44,60 @@ def _probe_success(_case: TestCase) -> None:
         Finish without producing the expected failure.
     """
 
+
 class TestResultProtocols(TestCase):
+    async def testClassFixtureFailuresAreReportedBeforeAnyTestStarts(self) -> None:
+        """Preserve setup errors and skips reported before the first test."""
+        for error in (
+            ValueError("fixture failed"),
+            unittest.SkipTest("fixture skipped"),
+        ):
+            with self.subTest(error=type(error).__name__):
+
+                def set_up_class(
+                    _cls: type,
+                    error: Exception = error,
+                ) -> None:
+                    """Raise the selected fixture outcome before test execution.
+
+                    Parameters
+                    ----------
+                    _cls : type
+                        Generated case class supplied by unittest.
+                    error : Exception
+                        Error or skip selected by the current scenario.
+
+                    Raises
+                    ------
+                    Exception
+                        Always raise the selected fixture outcome.
+                    """
+                    raise error
+
+                probe_type = type(
+                    "ProbeClassFixture",
+                    (unittest.TestCase,),
+                    {
+                        "setUpClass": classmethod(set_up_class),
+                        "testProbe": _probe_success,
+                    },
+                )
+                suite = unittest.TestLoader().loadTestsFromTestCase(probe_type)
+                result = await asyncio.to_thread(
+                    TestRunner(with_panel=False).run,
+                    suite,
+                )
+                reports = result.getTestResults()
+                self.assertEqual(len(reports), 1)
+                expected = (
+                    TestStatus.SKIPPED
+                    if isinstance(error, unittest.SkipTest)
+                    else TestStatus.ERRORED
+                )
+                self.assertEqual(reports[0].status, expected)
+                self.assertEqual(result.testsRun, 0)
+                self.assertEqual(reports[0].execution_time, 0.0)
+                self.assertEqual(result.wasSuccessful(), expected == TestStatus.SKIPPED)
 
     async def testSubtestFailuresReachExportedResults(self) -> None:
         """Export each failed subtest with its parent source metadata.
@@ -49,7 +108,9 @@ class TestResultProtocols(TestCase):
             Verify native cases report both assertion and exception failures.
         """
         probe_type = type(
-            "ProbeSubtests", (TestCase,), {"testProbe": _probe_subtests},
+            "ProbeSubtests",
+            (TestCase,),
+            {"testProbe": _probe_subtests},
         )
         processor = TestResultProcessor(verbosity=0)
         await asyncio.to_thread(probe_type("testProbe").run, processor)
@@ -76,7 +137,9 @@ class TestResultProtocols(TestCase):
             Verify a native case stops at its first failed subtest.
         """
         probe_type = type(
-            "ProbeSubtests", (TestCase,), {"testProbe": _probe_subtests},
+            "ProbeSubtests",
+            (TestCase,),
+            {"testProbe": _probe_subtests},
         )
         processor = TestResultProcessor(verbosity=0)
         processor.failfast = True
@@ -93,7 +156,9 @@ class TestResultProtocols(TestCase):
             Verify a native case records expected failures as skipped results.
         """
         probe_type = type(
-            "ProbeExpectedFailure", (TestCase,), {
+            "ProbeExpectedFailure",
+            (TestCase,),
+            {
                 "testProbe": _probe_subtests,
                 "__unittest_expecting_failure__": True,
             },
@@ -113,7 +178,9 @@ class TestResultProtocols(TestCase):
             Verify a native case preserves unexpected-success failure status.
         """
         probe_type = type(
-            "ProbeUnexpectedSuccess", (TestCase,), {
+            "ProbeUnexpectedSuccess",
+            (TestCase,),
+            {
                 "testProbe": _probe_success,
                 "__unittest_expecting_failure__": True,
             },

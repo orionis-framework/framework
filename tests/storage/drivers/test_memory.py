@@ -1,6 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import hashlib
+from typing import TYPE_CHECKING
 from datetime import UTC, datetime
 from orionis.storage.drivers.memory import MemoryStorageDriver
 from orionis.storage.entities.file_info import FileInfo
@@ -11,8 +14,11 @@ from orionis.storage.exceptions import (
 )
 from orionis.test import TestCase
 
-class TestMemoryStorageDriver(TestCase):
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
 
+
+class TestMemoryStorageDriver(TestCase):
     def setUp(self) -> None:
         """Create a fresh in-memory driver before each test.
 
@@ -22,7 +28,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._driver = MemoryStorageDriver()
 
@@ -36,7 +42,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("docs/a.txt", b"hello")
         self.assertEqual(await self._driver.read("docs/a.txt"), b"hello")
@@ -50,7 +56,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("a.txt", "ñandú")
         self.assertEqual(await self._driver.read("a.txt"), "ñandú".encode())
@@ -63,7 +69,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._driver.read("absent.txt")
@@ -77,7 +83,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StoragePathException):
             await self._driver.write("../evil.txt", b"x")
@@ -92,12 +98,11 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("big.bin", b"abcdefghij")
         chunks = [
-            chunk
-            async for chunk in self._driver.readStream("big.bin", chunk_size=4)
+            chunk async for chunk in self._driver.readStream("big.bin", chunk_size=4)
         ]
         self.assertEqual(chunks, [b"abcd", b"efgh", b"ij"])
 
@@ -109,16 +114,16 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
-        async def producer():
+        async def producer() -> AsyncIterator[bytes]:
             """Yield the next storage payload chunk.
 
             Yields
             ------
-            object
-                Value produced by the helper.
+            bytes
+                The next payload chunk.
             """
             yield b"one"
             yield b"two"
@@ -135,7 +140,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         async with self._driver.open("s.txt", "wb") as stream:
             await stream.write(b"streamed")
@@ -149,7 +154,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stream = self._driver.open("missing.txt", "rb")
         with self.assertRaises(StorageFileNotFoundException):
@@ -163,7 +168,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(UnsupportedStorageOperationException):
             self._driver.open("a.txt", "r")
@@ -178,7 +183,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await self._driver.exists("f.txt"))
         await self._driver.write("f.txt", b"x")
@@ -192,7 +197,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         self.assertTrue(await self._driver.delete("f.txt"))
@@ -208,7 +213,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("src.txt", b"data")
         await self._driver.copy("src.txt", "dst.txt")
@@ -223,7 +228,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("src.txt", b"data")
         await self._driver.move("src.txt", "dst.txt")
@@ -238,7 +243,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StorageFileNotFoundException):
             await self._driver.copy("nope.txt", "dst.txt")
@@ -253,7 +258,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.bin", b"12345")
         self.assertEqual(await self._driver.size("f.bin"), 5)
@@ -266,7 +271,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await self._driver.mimeType("photo.png"), "image/png")
 
@@ -278,7 +283,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         stamp = await self._driver.lastModified("f.txt")
@@ -293,7 +298,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         self.assertEqual(await self._driver.visibility("f.txt"), "private")
@@ -306,7 +311,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         await self._driver.setVisibility("f.txt", "public")
@@ -320,7 +325,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -334,7 +339,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.bin", b"payload")
         expected = hashlib.sha256(b"payload").hexdigest()
@@ -348,7 +353,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("docs/f.txt", b"abc", visibility="public")
         info = await self._driver.info("docs/f.txt")
@@ -369,7 +374,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("a/b/c.txt", b"x")
         self.assertTrue(await self._driver.directoryExists("a"))
@@ -384,7 +389,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.createDirectory("uploads")
         self.assertTrue(await self._driver.directoryExists("uploads"))
@@ -401,7 +406,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("d/one.txt", b"1")
         await self._driver.write("d/sub/two.txt", b"2")
@@ -419,7 +424,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("d/sub/deep/f.txt", b"x")
         self.assertEqual(await self._driver.directories("d"), ["d/sub"])
@@ -438,7 +443,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -452,7 +457,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = MemoryStorageDriver(base_url="/static/")
         await driver.write("img/a b.png", b"x")
@@ -466,7 +471,7 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._driver.write("f.txt", b"x")
         with self.assertRaises(UnsupportedStorageOperationException):
@@ -482,17 +487,16 @@ class TestMemoryStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         paths = [f"batch/{index}.bin" for index in range(50)]
-        await asyncio.gather(*[
-            self._driver.write(path, path.encode()) for path in paths
-        ])
+        await asyncio.gather(
+            *[self._driver.write(path, path.encode()) for path in paths],
+        )
 
-        contents = await asyncio.gather(*[
-            self._driver.read(path) for path in paths
-        ])
+        contents = await asyncio.gather(*[self._driver.read(path) for path in paths])
         self.assertEqual(contents, [path.encode() for path in paths])
         self.assertEqual(
-            await self._driver.files("batch", recursive=True), sorted(paths),
+            await self._driver.files("batch", recursive=True),
+            sorted(paths),
         )

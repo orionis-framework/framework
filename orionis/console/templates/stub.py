@@ -1,5 +1,6 @@
 """Load and render source templates used by code-generation commands."""
 
+import keyword
 import re
 from pathlib import Path
 
@@ -15,6 +16,7 @@ _CLASS_NAME_PLACEHOLDERS: tuple[str, str] = (
     "{{class_name}}",
 )
 """Class name placeholders definitions used by ``stub``."""
+
 
 class Stub:
     """Load and render source templates used by code-generation commands."""
@@ -106,7 +108,7 @@ class Stub:
         filename = parts[-1]
         suffix = Path(filename).suffix
         if suffix:
-            filename = filename[:-len(suffix)]
+            filename = filename[: -len(suffix)]
         parts[-1] = filename
 
         if any(_NAME_RE.fullmatch(part.lower()) is None for part in parts):
@@ -133,24 +135,30 @@ class Stub:
             return
 
         parts = self.__parseName()
-        self._directory_parts = tuple(part.lower() for part in parts[:-1])
+        directory_parts = tuple(part.lower() for part in parts[:-1])
         source_name = parts[-1]
 
         filename = source_name.lower()
         postfix = self._postfix
         if postfix and not filename.endswith(postfix.lower()):
             filename += "_" + postfix.lower()
-        self._filename = filename
 
         classname = "".join(
-            word[0].upper() + word[1:]
-            for word in source_name.split("_") if word
+            word[0].upper() + word[1:] for word in source_name.split("_") if word
         )
         prefix = self._prefix
         if prefix and not classname.casefold().startswith(prefix.casefold()):
             classname = prefix[0].upper() + prefix[1:] + classname
         if postfix and not classname.casefold().endswith(postfix.casefold()):
             classname += postfix[0].upper() + postfix[1:]
+        if any(
+            not name.isidentifier() or keyword.iskeyword(name)
+            for name in (*directory_parts, filename, classname)
+        ):
+            error_msg = f"Invalid Python component name '{self._class_name}'."
+            raise ValueError(error_msg)
+        self._directory_parts = directory_parts
+        self._filename = filename
         self._classname = classname
 
     def __loadTemplate(self) -> str:
@@ -212,7 +220,6 @@ class Stub:
 
         # Iterate over each replacement key-value pair and apply them to the content.
         for key, value in self._replacements.items():
-
             # Reject invalid replacement types before modifying the content.
             if not isinstance(key, str) or not isinstance(value, str):
                 error_msg: str = (

@@ -1,18 +1,20 @@
 # Identidades y autenticación de navegador
 
-El modelo debe implementar `IAuthenticatable`. La combinación usual es `Model` con `Authenticatable`; añade `Authorizable` para permisos, roles o tokens. Los mixins evitan herencia directa de los contratos ABC, que entraría en conflicto con la metaclase del ORM.
+El proveedor nativo requiere un modelo concreto de Orionis que implemente `IAuthenticatable`. La combinación usual es `Model` con `Authenticatable`; añade `Authorizable` para permisos, roles o tokens. Los mixins evitan herencia directa de los contratos ABC, que entraría en conflicto con la metaclase del ORM.
 
 ```python
 from orionis.auth import Authenticatable, Authorizable
-from orionis.orm import Integer, Model, String
+from orionis.orm import Boolean, Integer, Model, String
+
 
 class User(Model, Authenticatable, Authorizable):
     id = Integer().primary().autoIncrement()
     email = String(255).unique()
     password = String(255)
+    active = Boolean().default(True)
 ```
 
-Guárdalo en un módulo de aplicación y configura `AUTH_MODEL` con su path, por defecto `app.models.user.User`. `AUTH_USERNAME` es `email`. `Authenticatable` obtiene la clave de metadata ORM y lee el hash desde `AUTH_PASSWORD="password"`; sobrescribe esa variable de clase para otra columna. Guarda hashes mediante [hashing](../../../hashing/docs/es/README.md), nunca la contraseña de entrada.
+Guárdalo en un módulo de aplicación y configura `AUTH_MODEL` con su path, por defecto `app.models.user.User`. `AUTH_USERNAME` es `email`. `Authenticatable` obtiene la clave de metadata ORM y lee el hash desde `AUTH_PASSWORD="password"`; sobrescribe esa variable de clase para otra columna. El login con contraseña exige además que `active` sea exactamente `True`; un estado ausente, nulo o falso impide autenticar. Guarda hashes mediante [hashing](../../../hashing/docs/es/README.md), nunca la contraseña de entrada.
 
 ## Login y logout
 
@@ -20,12 +22,14 @@ Guárdalo en un módulo de aplicación y configura `AUTH_MODEL` con su path, por
 from orionis.http import Request, response
 from orionis.support.facades import Auth
 
+
 async def login(request: Request):
     values = await request.data()
     credentials = {"email": values.get("email"), "password": values.get("password")}
     if not await Auth.attempt(credentials):
         return response.json({"message": "Invalid credentials"}, 401)
     return response.redirect("/home", 303)
+
 
 async def logout():
     await Auth.logout()

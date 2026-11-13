@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from enum import Enum
 from orionis.container.enums.lifetimes import Lifetime
@@ -9,8 +11,8 @@ _EXPECTED_VALUES = {
     "SCOPED": 3,
 }
 
-class TestLifetimeMembers(TestCase):
 
+class TestLifetimeMembers(TestCase):
     def testEnumDeclaresExactlyTheExpectedMembers(self) -> None:
         """
         Declare exactly the three documented lifecycle members.
@@ -21,7 +23,7 @@ class TestLifetimeMembers(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(
             set(Lifetime.__members__),
@@ -35,7 +37,7 @@ class TestLifetimeMembers(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         actual = {member.name: member.value for member in Lifetime}
         self.assertEqual(actual, _EXPECTED_VALUES)
@@ -47,7 +49,7 @@ class TestLifetimeMembers(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         for member in Lifetime:
             self.assertIsInstance(member, Enum)
@@ -55,8 +57,8 @@ class TestLifetimeMembers(TestCase):
             self.assertIs(Lifetime(member.value), member)
         self.assertEqual(len({member: member.name for member in Lifetime}), 3)
 
-class TestLifetimeLookup(TestCase):
 
+class TestLifetimeLookup(TestCase):
     def testUnknownValueRaisesValueError(self) -> None:
         """
         Raise ValueError when constructing a Lifetime from an unknown value.
@@ -64,7 +66,7 @@ class TestLifetimeLookup(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Lifetime(0)
@@ -76,13 +78,13 @@ class TestLifetimeLookup(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(KeyError):
             _ = Lifetime["UNKNOWN"]
 
-class TestLifetimeRepresentation(TestCase):
 
+class TestLifetimeRepresentation(TestCase):
     def testTextualFormsExposeTheMemberName(self) -> None:
         """
         Include the member name in both ``str()`` and ``repr()`` output.
@@ -90,7 +92,7 @@ class TestLifetimeRepresentation(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         for member in Lifetime:
             self.assertIn(member.name, str(member))

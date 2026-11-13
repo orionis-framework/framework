@@ -4,6 +4,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Self
 
+
 class IHasher(ABC):
     """
     Define the contract implemented by every password hashing driver.

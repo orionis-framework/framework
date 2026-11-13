@@ -1,3 +1,5 @@
+# ruff: noqa: PLR0913
+# Keep established public and external protocol names and signatures.
 """Provide http operations through ``UnsupportedMediaTypeException``, ``Request``."""
 
 from __future__ import annotations
@@ -33,6 +35,7 @@ _BEARER_PREFIX = "bearer "
 _BEARER_PREFIX_LEN = 7
 """Bearer prefix len value used by ``request``."""
 
+
 def _asgi_server_authority(
     server: tuple[str, int | None],
     scheme: str,
@@ -58,6 +61,7 @@ def _asgi_server_authority(
     default_port = 80 if scheme in ("http", "ws") else 443
     return host if port is None or port == default_port else f"{host}:{port}"
 
+
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Mapping
     from xml.etree.ElementTree import Element as XMLElement
@@ -65,6 +69,7 @@ if TYPE_CHECKING:
     from orionis.http.payload.contracts.body_stream import IBodyStream
     from orionis.http.payload.estructures.headers import Headers
     from orionis.http.payload.form_data import FormData
+
 
 class UnsupportedMediaTypeException(Exception):
     """
@@ -75,6 +80,7 @@ class UnsupportedMediaTypeException(Exception):
     message : str, optional
         Description of the unsupported media type.
     """
+
 
 class Request(IRequest):
     """
@@ -172,7 +178,7 @@ class Request(IRequest):
     )
     """Declare the instance attribute slots reserved by this class."""
 
-    def __init__(  # noqa: PLR0913 - Preserve injected streams and transport options.
+    def __init__(  # Preserve injected streams and transport options.
         self,
         interface: Interface,
         adapter: TransportAdapter,
@@ -212,9 +218,7 @@ class Request(IRequest):
         self.__adapter = adapter
         # Reuse the enum member directly when the caller already passes one.
         self.__interface = (
-            interface
-            if isinstance(interface, Interface)
-            else Interface(interface)
+            interface if isinstance(interface, Interface) else Interface(interface)
         )
         self.__body_stream: IBodyStream | None = body_stream
         self.__body_limits = (
@@ -273,7 +277,8 @@ class Request(IRequest):
         stream = self.__body_stream
         if stream is None:
             stream = BodyStream(
-                self.__interface, self.__receive_or_protocol,
+                self.__interface,
+                self.__receive_or_protocol,
                 self.__body_limits.max_body_size,
                 max_buffer_size=self.__body_limits.max_buffer_size,
             )
@@ -323,9 +328,7 @@ class Request(IRequest):
         scheme: str = self.scheme
         path: str = self.path
         query_bytes: bytes = scope.get("query_string", b"")
-        query: str = (
-            query_bytes.decode("latin-1") if query_bytes else ""
-        )
+        query: str = query_bytes.decode("latin-1") if query_bytes else ""
 
         headers = self.headers
 

@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify configured loaders, escaping and environment extensions."""
+
 import tempfile
 from pathlib import Path
 import jinja2
@@ -7,13 +11,15 @@ from orionis.view.environment import ViewEnvironment
 from orionis.view.exceptions import ViewException
 from orionis.view.extensions import CsrfExtension
 
+
 class _StubApp:
     """Application double exposing view configuration and a base path."""
 
     __slots__ = ("basePath", "requested", "view_config")
 
     def __init__(self, view_config: object, base_path: Path) -> None:
-        """Store view configuration and the application base path.
+        """
+        Store view configuration and the application base path.
 
         Parameters
         ----------
@@ -21,6 +27,11 @@ class _StubApp:
             Configuration returned for the view section.
         base_path : Path
             Base directory used to resolve relative paths.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.view_config: object = view_config
         self.basePath: Path = base_path
@@ -43,25 +54,23 @@ class _StubApp:
         self.requested.append(key)
         return self.view_config
 
-class TestViewEnvironment(TestCase):
 
+class TestViewEnvironment(TestCase):
     def setUp(self) -> None:
         """
         Create an isolated temporary directory before each test.
 
         Provides a fresh, writable directory used as the template search
         path so every test operates on its own filesystem state.
+
+        Returns
+        -------
+        None
+            No return value.
         """
+        super().setUp()
         self._tmpdir = tempfile.TemporaryDirectory()
-
-    def tearDown(self) -> None:
-        """
-        Remove the temporary directory after each test.
-
-        Ensures all files created during the test are cleaned up
-        regardless of whether the test passed or failed.
-        """
-        self._tmpdir.cleanup()
+        self.enterContext(self._tmpdir)
 
     def _buildApp(
         self,
@@ -127,6 +136,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that a correctly configured application mock produces
         a valid ViewEnvironment instance.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         self.assertIsInstance(env, ViewEnvironment)
@@ -137,6 +151,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that the internal Jinja2 environment is correctly
         built and accessible through the public accessor.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         jinja_env = env.getJinjaEnvironment()
@@ -147,17 +166,27 @@ class TestViewEnvironment(TestCase):
         Retain the application FileSystemLoader behind built-in templates.
 
         Configured views remain available alongside the framework namespace.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv(paths=[self._tmpdir.name])
         jinja_env = env.getJinjaEnvironment()
         self.assertIsInstance(jinja_env.loader.loaders[1], jinja2.FileSystemLoader)
 
-    def testMultiplePathsUsesChoiceLoader(self) -> None:
+    async def testMultiplePathsUsesChoiceLoader(self) -> None:
         """
         Use a ChoiceLoader when multiple template paths are configured.
 
         Validates that the Jinja2 environment loader is a ChoiceLoader
         when two or more search paths are provided.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         dir1 = Path(self._tmpdir.name) / "views1"
         dir2 = Path(self._tmpdir.name) / "views2"
@@ -165,7 +194,18 @@ class TestViewEnvironment(TestCase):
         dir2.mkdir()
         env = self._buildEnv(paths=[str(dir1), str(dir2)])
         jinja_env = env.getJinjaEnvironment()
-        self.assertIsInstance(jinja_env.loader, jinja2.ChoiceLoader)
+        self.assertIsInstance(jinja_env.loader.loaders[1], jinja2.ChoiceLoader)
+        (dir1 / "same.html").write_text("first", encoding="utf-8")
+        (dir2 / "same.html").write_text("second", encoding="utf-8")
+        (dir2 / "later.html").write_text("fallback", encoding="utf-8")
+        self.assertEqual(
+            await jinja_env.get_template("same.html").render_async(),
+            "first",
+        )
+        self.assertEqual(
+            await jinja_env.get_template("later.html").render_async(),
+            "fallback",
+        )
 
     def testAsyncIsEnabled(self) -> None:
         """
@@ -173,6 +213,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that the enable_async flag is True on the environment
         so render_async can be called on every template.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         jinja_env = env.getJinjaEnvironment()
@@ -184,6 +229,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that addGlobal makes the value accessible by name
         in the underlying Jinja2 environment globals mapping.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         jinja_env = env.getJinjaEnvironment()
@@ -196,6 +246,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that calling addGlobal twice with the same name updates
         the value rather than raising an error.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         jinja_env = env.getJinjaEnvironment()
@@ -209,6 +264,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that addFilter makes the callable accessible by name
         in the underlying Jinja2 environment filters mapping.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         jinja_env = env.getJinjaEnvironment()
@@ -222,6 +282,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that addTest makes the callable accessible by name
         in the underlying Jinja2 environment tests mapping.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         jinja_env = env.getJinjaEnvironment()
@@ -250,6 +315,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that addExtension wraps Jinja2 import or type errors
         as ViewException to maintain a consistent exception hierarchy.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         invalid_ext = "invalid.module.that.does.not.exist.Extension"
@@ -262,6 +332,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that ViewEnvironment creates the cache directory during
         construction so OrionisBytecodeCache can write files immediately.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         cache_path = Path(self._tmpdir.name) / "jinja_cache"
         env = self._buildEnv(cache_path_str=str(cache_path))
@@ -275,6 +350,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that the bytecode cache is only activated when a
         cache_path is explicitly provided in the view configuration.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv(cache_path_str=None)
         jinja_env = env.getJinjaEnvironment()
@@ -286,6 +366,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that getJinjaEnvironment is idempotent and does not
         create a new environment object on each invocation.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         self.assertIs(env.getJinjaEnvironment(), env.getJinjaEnvironment())
@@ -296,6 +381,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that the container is queried exactly once with the
         expected configuration key.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         app = self._buildApp()
         ViewEnvironment(app)
@@ -307,6 +397,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that the environment does not require a raw mapping
         when the container returns the typed configuration object.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         config = ViewConfig(
             paths=[self._tmpdir.name],
@@ -325,6 +420,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that configuration files can declare portable paths
         such as ``resources/views``.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         views_dir = Path(self._tmpdir.name) / "resources"
         views_dir.mkdir()
@@ -338,6 +438,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that deployments pointing at directories outside the
         project root keep working.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         absolute = Path(self._tmpdir.name).resolve()
         env = self._buildEnv(paths=[str(absolute)])
@@ -350,6 +455,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that a relative cache path is anchored to the project
         root instead of the current working directory.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self._buildEnv(cache_path_str="storage/views")
         expected = Path(self._tmpdir.name) / "storage" / "views"
@@ -361,6 +471,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that an absolute cache path is never prefixed with the
         application base path.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         absolute = Path(self._tmpdir.name).resolve() / "absolute_cache"
         self._buildEnv(cache_path_str=str(absolute))
@@ -371,6 +486,11 @@ class TestViewEnvironment(TestCase):
         Propagate the autoescape flag from the configuration.
 
         Validates that HTML escaping honours the declared setting.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         self.assertTrue(env.getJinjaEnvironment().autoescape("application.html"))
@@ -382,7 +502,7 @@ class TestViewEnvironment(TestCase):
         Returns
         -------
         None
-            Assert built-in escaping independently of the application flag.
+            No return value.
         """
         app = self._buildApp()
         app.view_config["autoescape"] = False
@@ -396,6 +516,11 @@ class TestViewEnvironment(TestCase):
         Propagate the auto_reload flag from the configuration.
 
         Validates that template reloading honours the declared setting.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         self.assertFalse(env.getJinjaEnvironment().auto_reload)
@@ -405,6 +530,11 @@ class TestViewEnvironment(TestCase):
         Propagate the compiled-template cache size from configuration.
 
         Validates that the LRU cache is sized as declared.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         self.assertEqual(env.getJinjaEnvironment().cache.capacity, 100)
@@ -415,6 +545,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that generated markup is byte-faithful to the source
         template file.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         self.assertTrue(env.getJinjaEnvironment().keep_trailing_newline)
@@ -425,6 +560,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that absent template variables render as empty output
         instead of raising.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         self.assertIs(env.getJinjaEnvironment().undefined, jinja2.Undefined)
@@ -435,6 +575,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that the extension becomes available to every template
         compiled afterwards.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         env.addExtension(CsrfExtension)
@@ -450,6 +595,11 @@ class TestViewEnvironment(TestCase):
 
         Validates that the ViewException keeps the underlying Jinja2 or
         import failure as its cause.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         env = self._buildEnv()
         with self.assertRaises(ViewException) as ctx:

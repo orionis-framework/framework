@@ -34,7 +34,7 @@ print(NAME, (major, minor, patch))
 
 ### Compatibility metadata
 
-`PYTHON_REQUIRES` stores the minimum interpreter as `(major, minor)`, making direct comparison with `sys.version_info` possible. It is intentionally not a packaging requirement string; the manifest derives the equivalent `>=major.minor` form.
+`PYTHON_REQUIRES` stores the minimum interpreter as `(major, minor)`, making direct comparison with `sys.version_info` possible. It is intentionally not a packaging requirement string. The manifest declares the equivalent `>=major.minor` form independently; repository tests verify that both declarations agree.
 
 ### Project locations
 
@@ -91,8 +91,16 @@ import orionis.metadata as metadata
 
 values = {name: getattr(metadata, name) for name in metadata.__all__}
 assert set(values) == {
-    "API", "AUTHOR", "AUTHOR_EMAIL", "DESCRIPTION", "DOCS",
-    "FRAMEWORK", "NAME", "PYTHON_REQUIRES", "SKELETON", "VERSION",
+    "API",
+    "AUTHOR",
+    "AUTHOR_EMAIL",
+    "DESCRIPTION",
+    "DOCS",
+    "FRAMEWORK",
+    "NAME",
+    "PYTHON_REQUIRES",
+    "SKELETON",
+    "VERSION",
 }
 assert all(isinstance(value, (str, tuple)) for value in values.values())
 ```
@@ -151,7 +159,7 @@ The application version guard and console information commands consume these con
 
 ## Performance and concurrency
 
-Import work is limited to binding strings, one tuple, and package re-exports. There is no I/O, locking, caching, mutable collection, async work, or per-request state. Concurrent reads are safe under normal Python module semantics.
+Beyond Python's normal module loading, import work is limited to binding strings, one tuple, and package re-exports. There is no application I/O, locking, caching, async work, or per-request state. The exported values are immutable; module attributes and the `__all__` list remain ordinary mutable Python objects. Concurrent reads are safe under normal Python module semantics.
 
 ## Compatibility
 

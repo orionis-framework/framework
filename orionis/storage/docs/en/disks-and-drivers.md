@@ -15,7 +15,7 @@ The shipped configuration supports names `local`, `public`, `s3`, `azure`, and `
 | Azure Blob | `azure` (`azure-storage-blob>=12.30.2`) | Connection string or account/key; `AZURE_CONTAINER`; optional URL. |
 | GCS | `gcs` (`google-cloud-storage>=3.14.1`) | Project, bucket, optional key file or SDK default credentials. |
 
-The aggregate `storage` extra installs all three SDKs. Driver construction is lazy and does not validate a network connection; first I/O may raise `MissingStorageDependencyException` with installation guidance or an SDK exception. Credentials and permissions follow provider policies. `StorageManager` has no common failover or retry policy.
+The aggregate `storage` extra installs all three SDKs. Driver construction is lazy and does not validate a network connection. Concurrent first accesses publish a single SDK client per driver; first I/O may raise `MissingStorageDependencyException` with installation guidance or an SDK exception. Credentials and permissions follow provider policies. `StorageManager` has no common failover or retry policy.
 
 ### Visibility and publication
 
@@ -71,7 +71,7 @@ Relative local paths are anchored below the application base path. Empty cloud c
 
 ## Integration with Orionis
 
-`StorageProvider` is deferrable, binds `IStorageManager` to a singleton, and pins the `Storage` facade. The HTTP layer buffers/spools multipart files; `StorageManager.uploaded()` wraps them without coupling storage drivers to requests. Schema file/image rules understand the uploaded-file contract.
+When the deferrable `StorageProvider` boots, it binds `IStorageManager` as a singleton and pins the `Storage` facade. Application boot alone need not load a deferred provider; call `await Storage.pin()` before the first synchronous `Storage.disk()` access. The HTTP layer buffers/spools multipart files; `StorageManager.uploaded()` wraps them without coupling storage drivers to requests. Schema file/image rules understand the uploaded-file contract.
 
 Public local disks normally pair `PUBLIC_URL=/static` with the application's static-file routing. Storage configuration does not create a public route automatically in isolation; routing and deployment must expose the matching directory intentionally.
 
@@ -84,8 +84,11 @@ from orionis.support.facades import Storage
 
 
 async def publish_manifest() -> str:
+    await Storage.pin()
     file = await Storage.disk("public").put(
-        "build/manifest.json", '{"version": 1}', visibility="public",
+        "build/manifest.json",
+        '{"version": 1}',
+        visibility="public",
     )
     return await file.url()
 ```
@@ -93,18 +96,19 @@ async def publish_manifest() -> str:
 ## Errors and edge cases
 
 - Invalid or escaping paths raise `StoragePathException`; missing files raise `StorageFileNotFoundException` where the operation requires existence.
+- Local permission and I/O failures propagate as their original `PermissionError`/`OSError`, including in existence checks and listings. Only absent or non-directory paths use the operation's documented missing-path result, such as `False`, an empty list, or `StorageFileNotFoundException`.
 - Unsupported features such as local signed URLs raise `UnsupportedStorageOperationException` instead of returning misleading data.
 - Unknown disks and drivers raise `DiskNotFoundException` and `DriverNotSupportedException`.
 - Copy/move targets are normalized; overwrite semantics follow the driver contract and backend behavior.
 - `mimeType()` is inference/provider metadata, not content validation. Hash/checksum support and ETag meaning vary by provider.
-- Cloud listing is eventually subject to provider consistency, pagination, credentials, and network failures.
+- Cloud listing is subject to provider consistency, pagination, credentials, and network failures. S3 batch deletion checks per-object failures and raises the SDK's `ClientError`; some objects may already have been deleted.
 - Open streams must be closed; write streams may publish data during close/flush.
 
 
 
 ## Concurrency and limits
 
-Wrappers are lightweight; each disk is built and cached by its manager. Local `write()` and `writeStream()` publish with unique temporary files and replacement: readers do not observe mixed bytes, but concurrent writers follow final-replacement semantics. An `exists()` then `write()` sequence does not guarantee create-if-absent. Memory is ephemeral and does not synchronize threads or processes. Cloud drivers depend on their SDK, network, and service consistency.
+Each manager constructs and publishes one disk instance per name, including concurrent calls from threads. This does not make an async driver usable across event loops. Local `write()` and `writeStream()` publish with unique temporary files and replacement: readers do not observe mixed bytes, but concurrent writers follow final-replacement semantics. An `exists()` then `write()` sequence does not guarantee create-if-absent. Memory is ephemeral and does not synchronize threads or processes. Cloud drivers depend on their SDK, network, and service consistency.
 
 There are no multi-file transactions, business locks, or common compare-and-swap operation. Coordinate same-key work in application code. Bound size, temporary disk use, and concurrency: spooling protects RAM at the cost of local I/O and does not make work unlimited.
 

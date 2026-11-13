@@ -1,10 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.mail import enums as enums_package
 from orionis.mail.enums.encryption import MailEncryption
 from orionis.mail.enums.status import MailStatus
 from orionis.test import TestCase
 
-class TestMailEnumsPackage(TestCase):
 
+class TestMailEnumsPackage(TestCase):
     def testDeclaresBothEnumerationsAsPublicExports(self) -> None:
         """Expose the encryption and status enumerations from the package.
 

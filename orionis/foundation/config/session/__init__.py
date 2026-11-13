@@ -17,9 +17,13 @@ __all__ = [
 _EXPORTS = {
     "SameSitePolicy": ("orionis.foundation.config.session.enums", "SameSitePolicy"),
     "Session": ("orionis.foundation.config.session.entities.session", "Session"),
-    "SessionDriver": ("orionis.foundation.config.session.enums.drivers", "SessionDriver"),
+    "SessionDriver": (
+        "orionis.foundation.config.session.enums.drivers",
+        "SessionDriver",
+    ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -41,6 +45,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep the connection-manager contract available for command injection.
 """Render connection details and a table summary."""
 
 from typing import ClassVar
@@ -8,6 +10,7 @@ from orionis.database.contracts.connection_manager import IConnectionManager
 
 _KIB: int = 1024
 """Kib value used by ``show``."""
+
 
 def format_bytes(size: int | None) -> str:
     """
@@ -32,10 +35,9 @@ def format_bytes(size: int | None) -> str:
         value /= _KIB
     return f"{value:.1f} TiB"
 
+
 class DbShowCommand(MigrationCommand):
     """Render connection details and a table summary."""
-
-    # ruff: noqa: TC001, E501
 
     timestamps: bool = False
     """Timestamps flag used by ``DbShowCommand``."""
@@ -60,7 +62,7 @@ class DbShowCommand(MigrationCommand):
     ]
     """Command-line argument declarations accepted by this command."""
 
-    async def handle(self, conn_manager: IConnectionManager) -> None: # NOSONAR
+    async def handle(self, conn_manager: IConnectionManager) -> None:  # NOSONAR
         """
         Fetch metadata and render the database summary.
 
@@ -97,7 +99,10 @@ class DbShowCommand(MigrationCommand):
                 ["Driver", inspector.driver],
                 ["Database", str(inspector.config.get("database") or "N/A")],
                 ["Size", format_bytes(size)],
-                ["Open connections", str(connections) if connections is not None else "N/A"],
+                [
+                    "Open connections",
+                    str(connections) if connections is not None else "N/A",
+                ],
                 ["Tables", str(len(tables))],
                 ["Views", str(view_count)],
                 ["Materialized views", str(materialized_count)],

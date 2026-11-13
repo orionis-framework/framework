@@ -1,3 +1,5 @@
+# ruff: noqa: PLR2004, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import smtplib
 from typing import TYPE_CHECKING, Self
 from unittest.mock import patch
@@ -9,6 +11,7 @@ from tests.mail.transports.test_smtp import _MESSAGE, RecordingClient, SmtpBound
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+
 
 class TestSmtpBatch(TestCase):
     """Reuse one SMTP connection while retaining partial outcomes without retries."""
@@ -64,7 +67,9 @@ class TestSmtpBatch(TestCase):
         original = RecordingClient.sendmail
 
         def send(
-            client: RecordingClient, *args: object, **kwargs: object,
+            client: RecordingClient,
+            *args: object,
+            **kwargs: object,
         ) -> Mapping[str, tuple[int, bytes]]:
             """
             Disconnect on the second delivery and forward all earlier sends.

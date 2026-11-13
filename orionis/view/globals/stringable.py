@@ -1,21 +1,27 @@
+# ruff: noqa: ANN401, TC003
+# Keep public callback and application annotations resolvable at runtime.
+# Preserve heterogeneous template payload values.
 """Provide view globals operations through ``_global_stringable``."""
 
 from __future__ import annotations
+
+from collections.abc import Callable
 from typing import Any
+
 from orionis.support.types.stringable import Stringable
 
-# ruff: noqa: ANN401
 
-def _global_stringable() -> Any:
+def _global_stringable() -> Callable[..., Stringable]:
     """
     Build the ``stringable`` template global.
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable wrapping a value in a :class:`orionis.support.types.Stringable`
         instance.
     """
+
     def stringable(value: Any = "") -> Stringable:
         """
         Wrap a value in a fluent :class:`orionis.support.types.Stringable` instance.

@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S102, S603, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use explicit process arguments or locally constructed execution fixtures.
 from __future__ import annotations
 import ast
 import os
@@ -36,14 +39,20 @@ _COMMANDS = {
     "websocket": BootstrapWebsocketCommand,
 }
 _HTTP_KEYS = (
-    "app_http_controllers", "app_http_middleware", "app_http_schemas",
+    "app_http_controllers",
+    "app_http_middleware",
+    "app_http_schemas",
     "app_http_schemas_rules",
 )
 _MCP_KEYS = (
-    "app_mcp_servers", "app_mcp_tools", "app_mcp_resources", "app_mcp_prompts",
+    "app_mcp_servers",
+    "app_mcp_tools",
+    "app_mcp_resources",
+    "app_mcp_prompts",
 )
 _CONSOLE_KEYS = ("app_console_commands", "app_console_listeners")
 _ROOT = Path(__file__).resolve().parents[4]
+
 
 class _Application:
     """Expose the effective paths and routing registrations of a project."""
@@ -70,7 +79,8 @@ class _Application:
         self.routing: dict[str, list[Path]] = {}
 
     def path(
-        self, key: str | None = None,
+        self,
+        key: str | None = None,
     ) -> dict[str, Path] | Path | None:
         """
         Return effective paths through the public application interface.
@@ -89,7 +99,8 @@ class _Application:
         return self.paths if key is None else self.paths.get(key)
 
     def routingPaths(
-        self, key: str | None = None,
+        self,
+        key: str | None = None,
     ) -> dict[str, list[Path]] | list[Path] | None:
         """
         Return configured routing files without inventing defaults.
@@ -106,6 +117,7 @@ class _Application:
         """
         # Expose only route registrations explicitly loaded by the test.
         return self.routing if key is None else self.routing.get(key)
+
 
 def _project(root: Path, configuration: str = "") -> tuple[_Application, Path]:
     """
@@ -138,6 +150,7 @@ def _project(root: Path, configuration: str = "") -> tuple[_Application, Path]:
     )
     return _Application(root), bootstrap
 
+
 def _routing_calls(source: str) -> list[ast.Call]:
     """
     Find route registration calls without relying on textual formatting.
@@ -154,11 +167,13 @@ def _routing_calls(source: str) -> list[ast.Call]:
     """
     # Match calls structurally so whitespace cannot affect the assertion.
     return [
-        node for node in ast.walk(ast.parse(source))
+        node
+        for node in ast.walk(ast.parse(source))
         if isinstance(node, ast.Call)
         and isinstance(node.func, ast.Attribute)
         and node.func.attr == "withRouting"
     ]
+
 
 def _snapshot(root: Path) -> dict[str, tuple[bytes, int]]:
     """
@@ -177,10 +192,13 @@ def _snapshot(root: Path) -> dict[str, tuple[bytes, int]]:
     # Include timestamps to detect rewrites that preserve file contents.
     return {
         path.relative_to(root).as_posix(): (
-            path.read_bytes(), path.stat().st_mtime_ns,
+            path.read_bytes(),
+            path.stat().st_mtime_ns,
         )
-        for path in root.rglob("*") if path.is_file()
+        for path in root.rglob("*")
+        if path.is_file()
     }
+
 
 def _execute_bootstrap(path: Path) -> Application:
     """
@@ -208,8 +226,9 @@ def _execute_bootstrap(path: Path) -> Application:
         for name in tuple(sys.modules):
             if name == "bootstrap" or name.startswith("bootstrap."):
                 del sys.modules[name]
-        exec(compile(path.read_bytes(), str(path), "exec"), namespace)  # noqa: S102
+        exec(compile(path.read_bytes(), str(path), "exec"), namespace)
     return namespace["app"]
+
 
 class TestBootstrapCommands(TestCase):
     """Exercise native commands and persistent application integration."""
@@ -238,7 +257,9 @@ class TestBootstrapCommands(TestCase):
         """
         # Check the same native registry used by Reactor discovery.
         commands = [
-            *_COMMANDS.values(), BootstrapConfigCommand, BootstrapLifespanCommand,
+            *_COMMANDS.values(),
+            BootstrapConfigCommand,
+            BootstrapLifespanCommand,
         ]
         for command in commands:
             with self.subTest(command=command.__name__):
@@ -289,7 +310,8 @@ class TestBootstrapCommands(TestCase):
                 calls = _routing_calls(bootstrap.read_text(encoding="utf-8"))
                 self.assertEqual(len(calls), 1)
                 self.assertEqual(
-                    [keyword.arg for keyword in calls[0].keywords], [context],
+                    [keyword.arg for keyword in calls[0].keywords],
+                    [context],
                 )
                 self.assertEqual(
                     ast.literal_eval(calls[0].keywords[0].value),
@@ -373,7 +395,8 @@ class TestBootstrapCommands(TestCase):
             self.assertEqual(route.read_bytes(), b"")
             self.assertEqual(route.stat().st_mtime_ns, before)
             self.assertEqual(
-                _execute_bootstrap(bootstrap).routingPaths("api"), [route.resolve()],
+                _execute_bootstrap(bootstrap).routingPaths("api"),
+                [route.resolve()],
             )
 
     async def testHelperConfiguredRoutesFailBeforeReplacingOtherContexts(
@@ -399,7 +422,8 @@ class TestBootstrapCommands(TestCase):
             route = root / "routes" / "web.py"
             route.parent.mkdir(parents=True)
             route.write_text(
-                "from orionis.support.facades import Route\n", encoding="utf-8",
+                "from orionis.support.facades import Route\n",
+                encoding="utf-8",
             )
             app = _execute_bootstrap(bootstrap)
             self.assertEqual(app.routingPaths("web"), [route.resolve()])
@@ -452,12 +476,14 @@ class TestBootstrapCommands(TestCase):
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
             _, bootstrap = _project(
-                root, "app.withRouting(api='endpoints/public.py', health='/ready')\n",
+                root,
+                "app.withRouting(api='endpoints/public.py', health='/ready')\n",
             )
             route = root / "endpoints" / "public.py"
             route.parent.mkdir(parents=True)
             route.write_text(
-                "from orionis.support.facades import Route\n", encoding="utf-8",
+                "from orionis.support.facades import Route\n",
+                encoding="utf-8",
             )
             app = _execute_bootstrap(bootstrap)
             source = bootstrap.read_bytes()
@@ -566,8 +592,11 @@ class TestBootstrapCommands(TestCase):
                 app, bootstrap = _project(root)
                 app.paths["routes"] = root / "project" / "routing" / "definitions"
                 keys = (
-                    _MCP_KEYS if context == "ai" else _CONSOLE_KEYS
-                    if context == "console" else _HTTP_KEYS
+                    _MCP_KEYS
+                    if context == "ai"
+                    else _CONSOLE_KEYS
+                    if context == "console"
+                    else _HTTP_KEYS
                 )
                 for key in keys:
                     app.paths[key] = root / "components" / "custom" / key
@@ -645,10 +674,14 @@ class TestBootstrapCommands(TestCase):
                 keyword.arg: ast.literal_eval(keyword.value)
                 for keyword in calls[0].keywords
             }
-            self.assertEqual(values, {
-                "web": "custom/web.py", "health": "/health/custom",
-                "ai": "routes/ai.py",
-            })
+            self.assertEqual(
+                values,
+                {
+                    "web": "custom/web.py",
+                    "health": "/health/custom",
+                    "ai": "routes/ai.py",
+                },
+            )
 
     def testCustomBootstrapEntryPointIsUpdated(self) -> None:
         """
@@ -742,14 +775,16 @@ class TestBootstrapCommands(TestCase):
             ast.parse(lifespan.read_text(encoding="utf-8"))
             tree = ast.parse(bootstrap.read_text(encoding="utf-8"))
             registrations = [
-                node for node in ast.walk(tree)
+                node
+                for node in ast.walk(tree)
                 if isinstance(node, ast.Call)
                 and isinstance(node.func, ast.Name)
                 and node.func.id == "register_lifespan_callbacks"
             ]
             self.assertEqual(len(registrations), 1)
             imports = [
-                alias for node in ast.walk(tree)
+                alias
+                for node in ast.walk(tree)
                 if isinstance(node, ast.ImportFrom)
                 for alias in node.names
                 if alias.name == "register_lifespan_callbacks"
@@ -796,12 +831,16 @@ class TestBootstrapCommands(TestCase):
             self.assertEqual(lifespan.stat().st_mtime_ns, before)
             real_app = _execute_bootstrap(bootstrap)
             with patch.object(
-                real_app, "_Application__bootEagerProviders", AsyncMock(),
+                real_app,
+                "_Application__bootEagerProviders",
+                AsyncMock(),
             ):
                 await real_app._Application__onStartup(Runtime.CLI)
-            callback = next(iter(
-                real_app._Application__hook_events[None][Lifespan.STARTUP],
-            ))
+            callback = next(
+                iter(
+                    real_app._Application__hook_events[None][Lifespan.STARTUP],
+                ),
+            )
             self.assertEqual(callback.__globals__["events"], ["started"])
 
     async def testUnsafeLifespanBootstrapReportsFailureWithoutChangingIt(self) -> None:
@@ -848,8 +887,7 @@ class TestBootstrapCommands(TestCase):
             app, _ = _project(root)
             lifespan = root / "bootstrap" / "lifespan.py"
             lifespan.write_text(
-                "async def register_lifespan_callbacks(app):\n"
-                "    pass\n",
+                "async def register_lifespan_callbacks(app):\n    pass\n",
                 encoding="utf-8",
             )
             before = _snapshot(root)
@@ -877,9 +915,7 @@ class TestBootstrapCommands(TestCase):
             app, _ = _project(root)
             lifespan = root / "bootstrap" / "lifespan.py"
             lifespan.write_text(
-                "return None\n\n"
-                "def register_lifespan_callbacks(app):\n"
-                "    pass\n",
+                "return None\n\ndef register_lifespan_callbacks(app):\n    pass\n",
                 encoding="utf-8",
             )
             ast.parse(lifespan.read_text(encoding="utf-8"))
@@ -914,8 +950,10 @@ class TestBootstrapCommands(TestCase):
             original_open = Path.open
 
             def failing_open(
-                path: Path, mode: str = "r",
-                *args: object, **kwargs: object,
+                path: Path,
+                mode: str = "r",
+                *args: object,
+                **kwargs: object,
             ) -> IO[str] | IO[bytes] | MagicMock:
                 """
                 Fail only writes to the new route after persisting some bytes.
@@ -1019,7 +1057,8 @@ class TestBootstrapCommands(TestCase):
             root = Path(temporary)
             app, bootstrap = _project(root, "app.withRouting(ai=load_ai_routes())\n")
             app.routing["ai"] = [
-                root / "dynamic" / "tools.py", root / "dynamic" / "resources.py",
+                root / "dynamic" / "tools.py",
+                root / "dynamic" / "resources.py",
             ]
             source = bootstrap.read_bytes()
             Bootstrapper(app).routing("ai")
@@ -1052,19 +1091,30 @@ class TestBootstrapCommands(TestCase):
                 "NO_COLOR": "1",
             }
             for command in ("bootstrap:console", "bootstrap:console", "list"):
-                result = subprocess.run(  # noqa: S603
+                result = subprocess.run(
                     [sys.executable, "-B", str(reactor), command],
-                    cwd=root, env=environment, capture_output=True, text=True,
-                    encoding="utf-8", timeout=45, check=False,
+                    cwd=root,
+                    env=environment,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    timeout=45,
+                    check=False,
                 )
                 self.assertEqual(
-                    result.returncode, 0,
+                    result.returncode,
+                    0,
                     f"{command}: {result.stdout}\n{result.stderr}",
                 )
                 if command == "list":
                     for context in (*_COMMANDS, "config", "lifespan"):
                         self.assertIn(f"bootstrap:{context}", result.stdout)
             self.assertTrue((root / "routes" / "console.py").is_file())
-            self.assertEqual(len(_routing_calls(
-                bootstrap.read_text(encoding="utf-8"),
-            )), 1)
+            self.assertEqual(
+                len(
+                    _routing_calls(
+                        bootstrap.read_text(encoding="utf-8"),
+                    ),
+                ),
+                1,
+            )

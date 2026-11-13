@@ -21,7 +21,8 @@ _CONFIG_ENTITIES: tuple[tuple[str, str, str], ...] = (
     ("mcp", "orionis.foundation.config.mcp.entities.mcp", "McpConfig"),
     ("queue", "orionis.foundation.config.queue.entities.queue", "Queue"),
     (
-        "realtime", "orionis.foundation.config.realtime.entities.realtime",
+        "realtime",
+        "orionis.foundation.config.realtime.entities.realtime",
         "RealtimeConfig",
     ),
     (
@@ -34,6 +35,7 @@ _CONFIG_ENTITIES: tuple[tuple[str, str, str], ...] = (
     ("view", "orionis.foundation.config.view.entities.view", "View"),
 )
 """Config entities definitions used by ``core_config``."""
+
 
 def get_core_config_mapping() -> MappingProxyType:
     """
@@ -51,6 +53,7 @@ def get_core_config_mapping() -> MappingProxyType:
             for key, module, name in _CONFIG_ENTITIES
         },
     )
+
 
 def __getattr__(name: str) -> object:
     """Build and cache the compatibility configuration export on first access.
@@ -82,6 +85,7 @@ def __getattr__(name: str) -> object:
             raise AttributeError(message)
     globals()[name] = value
     return value
+
 
 def __dir__() -> list[str]:
     """List loaded attributes and configuration exports.

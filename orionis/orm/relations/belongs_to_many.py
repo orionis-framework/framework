@@ -1,21 +1,23 @@
+# ruff: noqa: ANN401, PLR0913, SLF001, TC001
+# Preserve dynamic pivot identities, explicit keys, and private connection state.
+# Retain runtime annotations for the relation interface.
 """Many-to-many relationship backed by an intermediate pivot table."""
 
-from __future__ import annotations
+import orionis.orm as _orm
 import asyncio
 from collections import defaultdict
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 from orionis.orm.contracts.belongs_to_many_relation import IBelongsToManyRelation
 from orionis.orm.metaclass import snake_case
 from orionis.orm.query.raw_builder import RawQueryBuilder
 from orionis.orm.relations.relation import Relation
 from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from orionis.orm.model import Model
-    from orionis.orm.query.expressions import AggregateFunction, WhereClause
+from orionis.orm.query.expressions import AggregateFunction, WhereClause
 
-class BelongsToManyRelation[TRelated: "Model"](
+
+class BelongsToManyRelation[TRelated: _orm.Model](
     Relation[TRelated],
     IBelongsToManyRelation,
 ):
@@ -55,9 +57,9 @@ class BelongsToManyRelation[TRelated: "Model"](
     )
     """Declare the instance attribute slots reserved by this class."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
-        parent: Model,
+        parent: _orm.Model,
         related: type[TRelated],
         table: str | None,
         foreign_pivot_key: str | None,
@@ -95,7 +97,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         parent_cls = type(parent)
         self._table = table or self._defaultPivotTable(parent_cls, related)
@@ -142,7 +144,10 @@ class BelongsToManyRelation[TRelated: "Model"](
         super().__init__(parent, related)
 
     @staticmethod
-    def _defaultPivotTable(parent_cls: type[Model], related: type[Model]) -> str:
+    def _defaultPivotTable(
+        parent_cls: type[_orm.Model],
+        related: type[_orm.Model],
+    ) -> str:
         """
         Derive the conventional pivot table name for two model classes.
 
@@ -176,12 +181,12 @@ class BelongsToManyRelation[TRelated: "Model"](
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         value = getattr(self._parent, self._parent_key)
         self._parent_keys = (value,) if value is not None else ()
 
-    def addEagerConstraints(self, models: list[Model]) -> None:
+    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
         """
         Capture every parent key involved in an eager-loaded batch.
 
@@ -193,7 +198,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         keys = {
             value
@@ -218,6 +223,8 @@ class BelongsToManyRelation[TRelated: "Model"](
         builder = RawQueryBuilder()
         if self._connection_name is not None:
             builder.connection(self._connection_name)
+        builder._resolved_connection = self._resolved_connection
+        builder._connection_manager = self._connection_manager
         return builder.table(self._table)
 
     async def getResults(self) -> Collection:
@@ -226,7 +233,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Returns
         -------
-        collections.abc.Collection
+        orionis.support.types.Collection
             Related models; empty when the parent has no key or no
             pivot row links it to anything.
         """
@@ -234,7 +241,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
     def match(
         self,
-        models: list[Model],
+        models: list[_orm.Model],
         results: Collection,
         name: str,
     ) -> None:
@@ -245,7 +252,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         ----------
         models : list of orionis.orm.Model
             Parent instances being eager loaded together.
-        results : collections.abc.Collection
+        results : orionis.support.types.Collection
             Related rows produced by ``getEager``.
         name : str
             Relationship name the results are stored under.
@@ -253,16 +260,22 @@ class BelongsToManyRelation[TRelated: "Model"](
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
-        by_related_key = {getattr(row, self._related_key): row for row in results}
+        parents_by_related: dict[Any, set[Any]] = defaultdict(set)
+        for parent_key, related_keys in self._related_map.items():
+            for related_key in related_keys:
+                parents_by_related[related_key].add(parent_key)
+        grouped: dict[Any, list[TRelated]] = defaultdict(list)
+        for row in results:
+            for parent_key in parents_by_related.get(
+                getattr(row, self._related_key),
+                (),
+            ):
+                grouped[parent_key].append(row)
         for model in models:
             parent_value = getattr(model, self._parent_key)
-            related_keys = self._related_map.get(parent_value, ())
-            items = [
-                by_related_key[key] for key in related_keys if key in by_related_key
-            ]
-            model.setRelation(name, Collection(items))
+            model.setRelation(name, Collection(grouped.get(parent_value)))
 
     # ── Pivot resolution ──────────────────────────────────────────────────
 
@@ -302,7 +315,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         Returns
         -------
         None
-            This method clears the cached pivot state in place.
+            No return value.
         """
         constraint = self._pivot_constraint
         if constraint is not None:
@@ -323,8 +336,8 @@ class BelongsToManyRelation[TRelated: "Model"](
             Independent relationship builder with copied query state.
         """
         duplicate = super().clone()
-        duplicate._pivot_wheres = self._pivot_wheres.copy()  # noqa: SLF001
-        duplicate._prepare_lock = None  # noqa: SLF001
+        duplicate._pivot_wheres = self._pivot_wheres.copy()
+        duplicate._prepare_lock = None
         return duplicate
 
     async def _resolvePivotMap(self) -> dict[Any, list[Any]]:
@@ -360,7 +373,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
         Returns
         -------
-        collections.abc.Collection
+        orionis.support.types.Collection
             Collection of hydrated related model instances.
         """
         if not await self._prepare():
@@ -384,7 +397,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         self,
         function: AggregateFunction,
         column: str,
-    ) -> Any:  # noqa: ANN401
+    ) -> Any:
         """
         Constrain an aggregate query to the resolved pivot membership.
 
@@ -462,7 +475,7 @@ class BelongsToManyRelation[TRelated: "Model"](
     def wherePivot(
         self,
         column: str,
-        *args: Any,  # noqa: ANN401
+        *args: Any,
     ) -> BelongsToManyRelation[TRelated]:
         """
         Filter the pivot rows considered by this relationship query.
@@ -487,7 +500,7 @@ class BelongsToManyRelation[TRelated: "Model"](
 
     async def attach(
         self,
-        ids: Any,  # noqa: ANN401
+        ids: Any,
         attributes: dict[str, Any] | None = None,
     ) -> int:
         """
@@ -511,17 +524,19 @@ class BelongsToManyRelation[TRelated: "Model"](
         rows: list[dict[str, Any]] = []
         if isinstance(ids, dict):
             for key, extra in ids.items():
-                rows.append({
-                    self._foreign_pivot_key: parent_value,
-                    self._related_pivot_key: self._extractId(key),
-                    **extra,
-                })
+                rows.append(
+                    {
+                        **extra,
+                        self._foreign_pivot_key: parent_value,
+                        self._related_pivot_key: self._extractId(key),
+                    },
+                )
         else:
             rows.extend(
                 {
+                    **(attributes or {}),
                     self._foreign_pivot_key: parent_value,
                     self._related_pivot_key: related_id,
-                    **(attributes or {}),
                 }
                 for related_id in self._normalizeIds(ids)
             )
@@ -532,7 +547,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         self._invalidatePivot()
         return result.row_count
 
-    async def detach(self, ids: Any = None) -> int:  # noqa: ANN401
+    async def detach(self, ids: Any = None) -> int:
         """
         Unlink the parent from the given related records.
 
@@ -626,7 +641,7 @@ class BelongsToManyRelation[TRelated: "Model"](
         rows = await builder.get()
         return [row[self._related_pivot_key] for row in rows]
 
-    def _normalizeIds(self, ids: Any) -> list[Any]:  # noqa: ANN401
+    def _normalizeIds(self, ids: Any) -> list[Any]:
         """
         Normalize a scalar, model, or iterable of either into id values.
 
@@ -644,7 +659,7 @@ class BelongsToManyRelation[TRelated: "Model"](
             return [self._extractId(item) for item in ids]
         return [self._extractId(ids)]
 
-    def _extractId(self, item: Any) -> Any:  # noqa: ANN401
+    def _extractId(self, item: Any) -> Any:
         """
         Extract the related key value from a scalar or model instance.
 
@@ -658,11 +673,6 @@ class BelongsToManyRelation[TRelated: "Model"](
         typing.Any
             Related id value.
         """
-        # Imported locally: importing the Model class at module level
-        # would cycle back through relations/mixin.py, which this module
-        # is imported by.
-        from orionis.orm.model import Model  # noqa: PLC0415
-
-        if isinstance(item, Model):
+        if isinstance(item, _orm.Model):
             return getattr(item, self._related_key)
         return item

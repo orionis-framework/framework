@@ -422,7 +422,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33215"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33283"> 
                     
                 </input>
 
@@ -468,7 +468,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33216"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33284"> 
                     
                 </input>
 
@@ -520,7 +520,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33217"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33285"> 
                     
                 </input>
 
@@ -802,11 +802,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33218"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33286"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId33218">
+                <label class="lbl-toggle" for="expandableItemId33286">
                     
                     
                 </label>
@@ -977,7 +977,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ISession</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L10" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></p><p><a href="classIndex.html#orionis.session.contracts.ISession">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ISession</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L12" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></p><p><a href="classIndex.html#orionis.session.contracts.ISession">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -995,7 +995,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2006">
+          <table class="children sortable" id="id2019">
   
   
   <tr class="method">
@@ -1087,32 +1087,32 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
     
     <td>Property</td>
     <td><code><a href="#dirty" class="internal-link" title="orionis.session.contracts.ISession.dirty">dirty</a></code></td>
-    <td><tt class="rst-docutils rst-literal">True</tt> if pending changes must be written to the backing store.</td>
+    <td>Report whether changes require persistence.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#id" class="internal-link" title="orionis.session.contracts.ISession.id">id</a></code></td>
-    <td>Current session identifier, or <tt class="rst-docutils rst-literal">None</tt> before the first write.</td>
+    <td>Return the current session identifier.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#invalidated" class="internal-link" title="orionis.session.contracts.ISession.invalidated">invalidated</a></code></td>
-    <td><tt class="rst-docutils rst-literal">True</tt> when the session has been marked for full deletion.</td>
+    <td>Report whether the session has been invalidated.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#isNew" class="internal-link" title="orionis.session.contracts.ISession.isNew">is<wbr></wbr>New</a></code></td>
-    <td><tt class="rst-docutils rst-literal">True</tt> for sessions not loaded from a backing store.</td>
+    <td>Report whether the session has a new storage identity.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#started" class="internal-link" title="orionis.session.contracts.ISession.started">started</a></code></td>
-    <td><tt class="rst-docutils rst-literal">True</tt> once the session has been activated by a write.</td>
+    <td>Report whether the session has been activated.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#wantsRegenerate" class="internal-link" title="orionis.session.contracts.ISession.wantsRegenerate">wants<wbr></wbr>Regenerate</a></code></td>
-    <td><tt class="rst-docutils rst-literal">True</tt> when the session ID should be rotated before saving.</td>
+    <td>Report whether the session requests identifier rotation.</td>
   </tr>
 </table>
           
@@ -1134,7 +1134,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">all</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L338">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L340">
       
       (source)
     </a>
@@ -1161,7 +1161,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">clear</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L172">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L174">
       
       (source)
     </a>
@@ -1173,7 +1173,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Remove all data from this session.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Remove all data from this session.</td></tr></table></div>
+    <div><p>Remove all data from this session.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1188,7 +1188,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">flash</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code>Any</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L183">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L185">
       
       (source)
     </a>
@@ -1200,7 +1200,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Store <em>value</em> under <em>key</em> for exactly one subsequent request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Flash data key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Flash data value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store <em>value</em> under <em>key</em> for exactly one subsequent request.</td></tr></table></div>
+    <div><p>Store <em>value</em> under <em>key</em> for exactly one subsequent request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Flash data key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Flash data value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1215,7 +1215,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">flashErrors</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">errors: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | <a href="https://docs.python.org/3/builtins/exceptions.html#Exception" class="intersphinx-link">Exception</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L257">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L259">
       
       (source)
     </a>
@@ -1227,7 +1227,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Flash validation errors for the next request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">errors:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>] | Exception</code></td><td class="fieldArgDesc">Mapping of field to message(s), or a validation exception.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Flash validation errors for the next request.</td></tr></table></div>
+    <div><p>Flash validation errors for the next request.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">errors:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>] | Exception</code></td><td class="fieldArgDesc">Mapping of field to message(s), or a validation exception.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1242,7 +1242,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">flashInput</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">values: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L222">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L224">
       
       (source)
     </a>
@@ -1255,7 +1255,7 @@ responsibility of the <tt class="rst-docutils rst-literal">SessionManager</tt>.<
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
     <div><p>Flash a submitted form payload so the next request can repopulate it.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">values:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Submitted payload to remember.  Credential-like fields are
-stripped before storing.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Flash a submitted form payload so the next request can repopulate it.</td></tr></table></div>
+stripped before storing.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1270,7 +1270,7 @@ stripped before storing.</td></tr></table><table class="fieldTable"><tr class="f
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">forget</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L156">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L158">
       
       (source)
     </a>
@@ -1282,7 +1282,7 @@ stripped before storing.</td></tr></table><table class="fieldTable"><tr class="f
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Remove <em>key</em> from session data (no-op when absent).</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Session data key to remove.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Remove <em>key</em> from session data (no-op when absent).</td></tr></table></div>
+    <div><p>Remove <em>key</em> from session data (no-op when absent).</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Session data key to remove.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1297,7 +1297,7 @@ stripped before storing.</td></tr></table><table class="fieldTable"><tr class="f
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code>Any</code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L106">
       
       (source)
     </a>
@@ -1324,7 +1324,7 @@ stripped before storing.</td></tr></table><table class="fieldTable"><tr class="f
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getErrors</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L273">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L275">
       
       (source)
     </a>
@@ -1351,7 +1351,7 @@ stripped before storing.</td></tr></table><table class="fieldTable"><tr class="f
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getFlash</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code>Any</code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L201">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L203">
       
       (source)
     </a>
@@ -1381,7 +1381,7 @@ ones inherited from the previous one.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getOldInput</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code>Any</code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L239">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L241">
       
       (source)
     </a>
@@ -1408,7 +1408,7 @@ ones inherited from the previous one.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getPreviousUrl</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">default: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L300">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L302">
       
       (source)
     </a>
@@ -1435,7 +1435,7 @@ ones inherited from the previous one.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">has</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L140">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L142">
       
       (source)
     </a>
@@ -1462,7 +1462,7 @@ ones inherited from the previous one.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">invalidate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L327">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L329">
       
       (source)
     </a>
@@ -1474,7 +1474,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Mark the session for full deletion and clear in-memory data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Mark the session for full deletion and clear in-memory data.</td></tr></table></div>
+    <div><p>Mark the session for full deletion and clear in-memory data.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1489,7 +1489,7 @@ ones inherited from the previous one.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">put</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code>Any</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L122">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L124">
       
       (source)
     </a>
@@ -1501,7 +1501,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Store <em>value</em> under <em>key</em>, activating the session on the first call.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Session data key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Value to store.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Store <em>value</em> under <em>key</em>, activating the session on the first call.</td></tr></table></div>
+    <div><p>Store <em>value</em> under <em>key</em>, activating the session on the first call.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Session data key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Value to store.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1516,7 +1516,7 @@ ones inherited from the previous one.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">regenerate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L316">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L318">
       
       (source)
     </a>
@@ -1528,7 +1528,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Request a session ID rotation (e.g. immediately after login).</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Request a session ID rotation (e.g. immediately after login).</td></tr></table></div>
+    <div><p>Request a session ID rotation (e.g. immediately after login).</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1543,7 +1543,7 @@ ones inherited from the previous one.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setPreviousUrl</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">url: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L284">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L286">
       
       (source)
     </a>
@@ -1555,7 +1555,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Remember the page the user is currently viewing.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">url:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Absolute URL of the current page.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Remember the page the user is currently viewing.</td></tr></table></div>
+    <div><p>Remember the page the user is currently viewing.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">url:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Absolute URL of the current page.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -1569,7 +1569,7 @@ ones inherited from the previous one.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L27">
       
       (source)
     </a>
@@ -1596,7 +1596,7 @@ ones inherited from the previous one.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">dirty</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L56">
       
       (source)
     </a>
@@ -1608,7 +1608,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p><tt class="rst-docutils rst-literal">True</tt> if pending changes must be written to the backing store.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Report whether changes require persistence.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when tracked changes require a backing-store write.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1623,7 +1623,7 @@ ones inherited from the previous one.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">id</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L32">
       
       (source)
     </a>
@@ -1635,7 +1635,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p>Current session identifier, or <tt class="rst-docutils rst-literal">None</tt> before the first write.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Return the current session identifier.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code>str | None</code></td><td class="fieldArgDesc">Identifier, or None before activation.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1650,7 +1650,7 @@ ones inherited from the previous one.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">invalidated</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L68">
       
       (source)
     </a>
@@ -1662,7 +1662,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p><tt class="rst-docutils rst-literal">True</tt> when the session has been marked for full deletion.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Report whether the session has been invalidated.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when the session is marked for full deletion.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1677,7 +1677,7 @@ ones inherited from the previous one.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">isNew</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L78">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L80">
       
       (source)
     </a>
@@ -1689,7 +1689,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p><tt class="rst-docutils rst-literal">True</tt> for sessions not loaded from a backing store.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Report whether the session has a new storage identity.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True until the current identifier has been persisted.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1704,7 +1704,7 @@ ones inherited from the previous one.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">started</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L44">
       
       (source)
     </a>
@@ -1716,7 +1716,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p><tt class="rst-docutils rst-literal">True</tt> once the session has been activated by a write.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Report whether the session has been activated.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True after activation or restoration from a store.</td></tr></table></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1731,7 +1731,7 @@ ones inherited from the previous one.</p>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">wantsRegenerate</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/contracts/session.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/contracts/session.py#L92">
       
       (source)
     </a>
@@ -1743,7 +1743,7 @@ ones inherited from the previous one.</p>
   </div>
   <div class="functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.session.session.Session.html" class="internal-link">orionis.session.session.Session</a></code></div>
-    <div><p><tt class="rst-docutils rst-literal">True</tt> when the session ID should be rotated before saving.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Result of the operation described above.</td></tr></table></div>
+    <div><p>Report whether the session requests identifier rotation.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">True when the identifier should be rotated before saving.</td></tr></table></div>
     
   </div>
 </div>
@@ -1757,7 +1757,7 @@ ones inherited from the previous one.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

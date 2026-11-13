@@ -1,10 +1,12 @@
+# ruff: noqa: TC001
+# Resolve public middleware, context, and injection annotations at runtime.
 """Provide auth middleware operations.
 
 Includes ``ResolveIdentityMiddleware``, ``ResolveSessionIdentityMiddleware``,
 ``ResolveTokenIdentityMiddleware``.
 """
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import (
     authentication_lock,
@@ -18,11 +20,11 @@ from orionis.auth.remember import apply_remember_cookie
 from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.http.middleware import BaseMiddleware
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.context import IAuthenticationContext
-    from orionis.http.layer.contracts.middleware import NextCallable
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
+from orionis.auth.contracts.context import IAuthenticationContext
+from orionis.http.layer.contracts.middleware import NextCallable
+from orionis.http.request import Request
+from orionis.http.responses import Response
+
 
 class ResolveIdentityMiddleware(BaseMiddleware):
     """
@@ -41,8 +43,6 @@ class ResolveIdentityMiddleware(BaseMiddleware):
         class ResolveApiIdentity(ResolveIdentityMiddleware):
             guard = "token"
     """
-
-    # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_manager", "_permissions")
     """Declare the instance attribute slots reserved by this class."""
@@ -73,8 +73,7 @@ class ResolveIdentityMiddleware(BaseMiddleware):
         Returns
         -------
         None
-            Middleware instances are built once at boot and stay
-            stateless afterwards.
+            No return value.
         """
         self._manager = manager
         """Manager exposing the configured guards."""
@@ -146,6 +145,7 @@ class ResolveIdentityMiddleware(BaseMiddleware):
             bind_auth_context(context)
             return context
 
+
 class ResolveSessionIdentityMiddleware(ResolveIdentityMiddleware):
     """Resolve a web identity from the session without requiring a login."""
 
@@ -174,6 +174,7 @@ class ResolveSessionIdentityMiddleware(ResolveIdentityMiddleware):
         result = await super().handle(request, call_next)
         apply_remember_cookie(request, result)
         return result
+
 
 class ResolveTokenIdentityMiddleware(ResolveIdentityMiddleware):
     """Resolve an API identity from a Bearer token while allowing guests."""

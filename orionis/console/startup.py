@@ -17,11 +17,14 @@ _FRAME = "⠋ Inicializando Orionis..."
 _ASCII_FRAME = "- Inicializando Orionis..."
 """Ascii frame identifier: ``- Inicializando Orionis...``."""
 
+
 class _OutputProxy:
     """Delegate output while retiring a startup message before its first write."""
 
     def __init__(
-        self, stream: TextIO | BinaryIO, feedback: _StartupFeedback,
+        self,
+        stream: TextIO | BinaryIO,
+        feedback: _StartupFeedback,
     ) -> None:
         """
         Initialize a stream proxy with shared startup feedback.
@@ -140,6 +143,7 @@ class _OutputProxy:
         """
         return self._stream.__exit__(*arguments)
 
+
 class _StartupFeedback:
     """Own the temporary streams and clear the message once, without a thread."""
 
@@ -209,7 +213,7 @@ class _StartupFeedback:
         try:
             self.stderr.write("\r" + " " * len(self.frame) + "\r")
             self.stderr.flush()
-        except (OSError, ValueError, UnicodeError): # NOSONAR
+        except OSError, ValueError, UnicodeError:  # NOSONAR
             # Feedback must never replace a command's error or exit status.
             pass
         finally:
@@ -231,7 +235,8 @@ class _StartupFeedback:
         with self.lock:
             self.clear()
 
-def _interactive_frame(arguments: Sequence[str] | None) -> str | None: # NOSONAR
+
+def _interactive_frame(arguments: Sequence[str] | None) -> str | None:  # NOSONAR
     """
     Select a startup message for an eligible interactive console.
 
@@ -264,23 +269,24 @@ def _interactive_frame(arguments: Sequence[str] | None) -> str | None: # NOSONAR
     try:
         if not sys.stdout.isatty() or not sys.stderr.isatty():
             return None
-    except (AttributeError, OSError, ValueError):
+    except AttributeError, OSError, ValueError:
         return None
 
     frame = _FRAME
     try:
         frame.encode(getattr(sys.stderr, "encoding", None) or "utf-8")
-    except (LookupError, UnicodeError):
+    except LookupError, UnicodeError:
         frame = _ASCII_FRAME
     try:
         columns = os.get_terminal_size(sys.stderr.fileno()).columns
-    except (AttributeError, OSError, ValueError):
+    except AttributeError, OSError, ValueError:
         try:
             columns = int(os.environ.get("COLUMNS", "80"))
         except ValueError:
             columns = 80
     # Filling the last column may wrap; in a narrow terminal omit the message.
     return frame if len(frame) < columns else None
+
 
 def stop_startup_feedback() -> None:
     """
@@ -298,6 +304,7 @@ def stop_startup_feedback() -> None:
         if isinstance(stream, _OutputProxy):
             stream.feedback.finish()
             return
+
 
 @contextmanager
 def startup_feedback(arguments: Sequence[str] | None) -> Generator[None]:
@@ -330,7 +337,7 @@ def startup_feedback(arguments: Sequence[str] | None) -> Generator[None]:
         try:
             try:
                 feedback.start()
-            except (OSError, ValueError, UnicodeError): # NOSONAR
+            except OSError, ValueError, UnicodeError:  # NOSONAR
                 feedback.finish()
             yield
         finally:

@@ -21,7 +21,7 @@ class IWorkers(ABC):
         Returns
         -------
         None
-            This method updates the class-level RAM allocation and returns nothing.
+            No return value.
 
         Notes
         -----

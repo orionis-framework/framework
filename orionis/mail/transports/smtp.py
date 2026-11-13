@@ -1,11 +1,17 @@
+# ruff: noqa: ARG001, PLC0415, TC001, TC003
+# Preserve the uniform factory signature and runtime annotations.
+# Load central failure reporting only when cleanup fails.
 """Use one verified SMTP connection per message, entirely on a worker."""
 
 import smtplib
 import ssl
+from collections.abc import Iterable, Mapping
 from itertools import islice
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from orionis.aio import Loop
+from orionis.foundation.contracts.application import IApplication
 from orionis.mail.contracts.transport import IMailTransport
+from orionis.mail.entities.prepared import PreparedMail
 from orionis.mail.entities.result import MailResult
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from orionis.mail.enums.encryption import MailEncryption
@@ -14,17 +20,13 @@ from orionis.mail.exceptions import MailBatchException, MailTransportException
 from orionis.mail.functions import sanitize_reason
 from orionis.support.concurrency import BoundedExecutor
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
-    from orionis.foundation.contracts.application import IApplication
-    from orionis.mail.entities.prepared import PreparedMail
-
 _SMTP_READY = 220
 """Smtp ready value used by ``smtp``."""
 _MAX_BATCH = 100
 """Max batch value used by ``smtp``."""
 _BATCH_WORKERS = BoundedExecutor(4, max_pending=16, name="orionis-smtp-batch")
 """Batch workers used by ``smtp``."""
+
 
 class SmtpTransport(IMailTransport):
     """
@@ -238,7 +240,8 @@ class SmtpTransport(IMailTransport):
                 try:
                     client.close()
                 except OSError as cleanup_error:
-                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                    from orionis.failure.runtime import capture_nowait
+
                     capture_nowait(
                         cleanup_error,
                         flow="mail",
@@ -298,6 +301,7 @@ class SmtpTransport(IMailTransport):
             rejected_recipients=rejected,
         )
 
+
 def _mail_options(client: smtplib.SMTP, message: PreparedMail) -> list[str]:
     """
     Require advertised SMTPUTF8 support for international mailbox addresses.
@@ -327,6 +331,7 @@ def _mail_options(client: smtplib.SMTP, message: PreparedMail) -> list[str]:
         raise MailTransportException(error_msg)
     return ["SMTPUTF8", "BODY=8BITMIME"]
 
+
 def _tls_context() -> ssl.SSLContext:
     """
     Require trusted certificates, hostname verification, and TLS 1.2 or newer.
@@ -342,8 +347,9 @@ def _tls_context() -> ssl.SSLContext:
     context.minimum_version = ssl.TLSVersion.TLSv1_2
     return context
 
+
 def create_smtp_transport(
-    app: IApplication,  # noqa: ARG001
+    app: IApplication,
     config: Mapping[str, object],
 ) -> IMailTransport:
     """

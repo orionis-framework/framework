@@ -1,4 +1,6 @@
-# ruff: noqa: S603
+# ruff: noqa: PLC0415, PT009, PT027, S603, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 
 from __future__ import annotations
 import importlib
@@ -14,6 +16,7 @@ _PACKAGES = (
     "orionis.aio",
     "orionis.auth",
     "orionis.auth.context",
+    "orionis.auth.contracts",
     "orionis.auth.guards",
     "orionis.auth.identity",
     "orionis.auth.middleware",
@@ -81,6 +84,7 @@ _PACKAGES = (
     "orionis.view.globals",
 )
 
+
 def run_import_probe(source: str) -> dict[str, object]:
     """
     Run an import probe in a fresh Python interpreter.
@@ -104,16 +108,21 @@ def run_import_probe(source: str) -> dict[str, object]:
     json.JSONDecodeError
         If standard output is not valid JSON.
     """
-    completed = subprocess.run(
-        [sys.executable, "-B", "-c", source],
-        cwd=_ROOT,
-        capture_output=True,
-        check=True,
-        text=True,
-        encoding="utf-8",
-        timeout=60,
-    )
+    try:
+        completed = subprocess.run(
+            [sys.executable, "-B", "-c", source],
+            cwd=_ROOT,
+            capture_output=True,
+            check=True,
+            text=True,
+            encoding="utf-8",
+            timeout=60,
+        )
+    except subprocess.CalledProcessError as error:
+        error.add_note(f"Import probe stderr:\n{error.stderr}")
+        raise
     return json.loads(completed.stdout)
+
 
 class TestLazyImports(TestCase):
     """Exercise public exports without requiring eager subsystem imports."""
@@ -362,7 +371,8 @@ class TestLazyImports(TestCase):
                     self.assertIs(vars(package)[exported_name], value)
                     module, attribute = package._EXPORTS[exported_name]
                     self.assertIs(
-                        value, getattr(importlib.import_module(module), attribute),
+                        value,
+                        getattr(importlib.import_module(module), attribute),
                     )
             with self.assertRaisesRegex(AttributeError, "has no attribute"):
                 _ = package.missing_public_export
@@ -431,10 +441,13 @@ class TestLazyImports(TestCase):
         from orionis.foundation.core_scheduler import CORE_SCHEDULER
 
         for metadata in (
-            *CORE_KERNELS.values(), CORE_SCHEDULER, CORE_EXCEPTION_HANDLER,
+            *CORE_KERNELS.values(),
+            CORE_SCHEDULER,
+            CORE_EXCEPTION_HANDLER,
         ):
             implementation = getattr(
-                importlib.import_module(metadata["module"]), metadata["class"],
+                importlib.import_module(metadata["module"]),
+                metadata["class"],
             )
             self.assertEqual(implementation.__module__, metadata["module"])
             self.assertEqual(implementation.__name__, metadata["class"])

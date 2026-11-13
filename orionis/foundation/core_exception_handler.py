@@ -2,6 +2,7 @@
 
 from types import MappingProxyType
 
+
 def get_core_exception_handler_mapping() -> MappingProxyType:
     """
     Return an immutable mapping for the default exception handler.
@@ -15,6 +16,7 @@ def get_core_exception_handler_mapping() -> MappingProxyType:
     return MappingProxyType(
         {"module": "orionis.failure.base.handler", "class": "BaseExceptionHandler"},
     )
+
 
 CORE_EXCEPTION_HANDLER: MappingProxyType = get_core_exception_handler_mapping()
 """Core exception handler used by ``core_exception_handler``."""

@@ -11,13 +11,21 @@ from orionis.support.facades import Schema
 
 
 async def create_projects() -> None:
+    """Create the project table and its declared constraints."""
+
     async with Schema.create("projects") as table:
         table.id()
+
         table.string("name", 120)
+
         table.string("slug", 160)
+
         table.boolean("active").default(True)
+
         table.timestamps()
+
         table.unique("slug")
+
         table.index("active")
 ```
 
@@ -25,18 +33,26 @@ An exception in the body prevents creation. `timestamps()` adds nullable `create
 
 Table constraints use `primaryKey(*columns)`, `unique(*columns, name=None)`, `index(*columns, name=None, unique=False)`, `foreignKey(column, ref_table, ref_column, name=None)`, and `comment(text)`. For example, `table.foreignKey("owner_id", "users", "id")` references `users.id`. An ORM relationship does not automatically create a foreign key: declare the constraint and enable enforcement in the backend. See [types and constraints](../../../orm/docs/en/schema-and-type-reference.md) for composite keys and the full type catalog.
 
+Repeated column names and an empty `primaryKey()` raise `ValueError` before DDL executes. The blueprint exposes declared column factories; it does not forward arbitrary attributes of the `Column` class. A table creation context rejects overlapping entries and consumes each declaration once.
+
 ## Share a versioned definition
 
 Models accept `table_definition`. Sharing definitions keeps migrations and models consistent, but historical migrations should import a stable version rather than the model's future state.
 
 ```python
 from orionis.orm import Integer, String
+
 from orionis.orm.schema.table import TableDefinition
 
+
 project_id = Integer().primary().autoIncrement()
+
 project_id.name = "id"
+
 project_name = String(120)
+
 project_name.name = "name"
+
 
 PROJECTS_V1 = TableDefinition(
     name="projects",
@@ -46,6 +62,8 @@ PROJECTS_V1 = TableDefinition(
 ```
 
 `await Schema.createFromDefinition(PROJECTS_V1)` materializes that definition. `await Schema.createFromModel(Project)` uses the model's current metadata; this suits bootstrap and temporary databases, but changing the model would alter replay of a migration importing it directly.
+
+Treat each `TableDefinition` and its column builders as stable after compilation: the compiler caches their SQL metadata and does not detect in-place edits. The frozen definition wrapper does not make its nested dictionary or builders immutable. Create a new definition for each schema version.
 
 ## Select a connection and drop tables
 

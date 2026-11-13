@@ -23,6 +23,10 @@ Output methods are synchronous. Calling them from `async handle()` does not make
 
 `exitSuccess()` and `exitError()` raise `SystemExit`; return an integer from `handle` when you intend to report a code to Reactor. `exception(error)` renders diagnostics; `dump(...)` and `Dumper` help development. `dd` terminates after dumping and should not remain in operational code.
 
+The exit helpers preserve `finally` blocks and normal flushing of buffered output. `VarDumper.redirectOutput()` temporarily uses the interpreter's original streams and restores the current caller's streams after printing, including failed prints and repeated calls.
+
+The HTTP debug printer keeps timers local to each request context. Repeated `start()` calls reuse its worker; `stop()` drains accepted lines or propagates a writer failure without hanging. Its bounded queue still drops excess debug lines when full; it is not a durable logging backend.
+
 ## Display progress
 
 ```python

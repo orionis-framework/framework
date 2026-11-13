@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import functools
 import threading
 from orionis.background.contracts.task import IBackgroundTask
 from orionis.background.task import BackgroundTask, is_async_callable
 from orionis.test import TestCase
+
 
 class _SyncCallable:
     """Callable object used to prove non-function callables are supported."""
@@ -10,14 +13,7 @@ class _SyncCallable:
     __slots__ = ("calls",)
 
     def __init__(self) -> None:
-        """
-        Initialise the invocation log.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
+        """Initialise the invocation log."""
         self.calls: list[tuple[object, ...]] = []
 
     def __call__(self, *args: object) -> None:
@@ -29,12 +25,9 @@ class _SyncCallable:
         *args : object
             Positional arguments received by the callable.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
         """
         self.calls.append(args)
+
 
 class _AsyncCallable:
     """Callable object whose invocation returns a coroutine."""
@@ -42,14 +35,7 @@ class _AsyncCallable:
     __slots__ = ("calls",)
 
     def __init__(self) -> None:
-        """
-        Initialise the invocation log.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
+        """Initialise the invocation log."""
         self.calls: list[tuple[object, ...]] = []
 
     async def __call__(self, *args: object) -> None:
@@ -61,15 +47,12 @@ class _AsyncCallable:
         *args : object
             Positional arguments received by the callable.
 
-        Returns
-        -------
-        None
-            This method does not return a value.
         """
         self.calls.append(args)
 
+
 class TestIsAsyncCallable(TestCase):
-    """Validate the detection of callables that return an awaitable."""
+    """Validate detection of declared coroutine callables."""
 
     def testDetectsCoroutineFunctions(self) -> None:
         """Detect coroutine functions as awaitable callables.
@@ -77,20 +60,10 @@ class TestIsAsyncCallable(TestCase):
         Validates the most common case, where the target is declared with
         the async keyword.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         async def async_func() -> None:
-            """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run an asynchronous test callable."""
 
         self.assertTrue(is_async_callable(async_func))
 
@@ -100,10 +73,6 @@ class TestIsAsyncCallable(TestCase):
         Validates that objects behaving like coroutine functions are not
         mistaken for blocking callables.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertTrue(is_async_callable(_AsyncCallable()))
 
@@ -113,10 +82,6 @@ class TestIsAsyncCallable(TestCase):
         Validates that pre-binding arguments never hides the awaitable
         nature of the wrapped callable.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         async def async_func(value: int) -> None:
@@ -127,10 +92,6 @@ class TestIsAsyncCallable(TestCase):
             value : int
                 Value supplied for ``value``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
 
         self.assertTrue(is_async_callable(functools.partial(async_func, 1)))
@@ -142,20 +103,10 @@ class TestIsAsyncCallable(TestCase):
         Validates that blocking functions and objects keep being routed to
         the executor.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
 
         self.assertFalse(is_async_callable(sync_func))
         self.assertFalse(is_async_callable(_SyncCallable()))
@@ -167,12 +118,9 @@ class TestIsAsyncCallable(TestCase):
         Validates that the inspection is safe for values lacking a call
         implementation instead of raising.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertFalse(is_async_callable(42))
+
 
 class TestBackgroundTaskConstruction(TestCase):
     """Validate how a task captures its callable and its arguments."""
@@ -183,20 +131,10 @@ class TestBackgroundTaskConstruction(TestCase):
         Validates that tasks stay lightweight, which matters because one
         instance may be created per HTTP response.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
 
         self.assertFalse(hasattr(BackgroundTask(sync_func), "__dict__"))
 
@@ -206,21 +144,11 @@ class TestBackgroundTaskConstruction(TestCase):
         Validates that building a task only records the callable and
         produces none of its side effects.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
             calls.append(1)
 
         BackgroundTask(sync_func)
@@ -232,10 +160,6 @@ class TestBackgroundTaskConstruction(TestCase):
         Validates that positional arguments are kept as a tuple and
         keyword arguments as a mapping, ready for a later invocation.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func(*args: int, **kwargs: int) -> None:
@@ -248,10 +172,6 @@ class TestBackgroundTaskConstruction(TestCase):
             **kwargs : int
                 Arguments forwarded to the callable.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
 
         task = BackgroundTask(sync_func, 1, 2, offset=3)
@@ -264,20 +184,10 @@ class TestBackgroundTaskConstruction(TestCase):
         Validates that the sync/async decision is resolved during
         construction rather than on every invocation.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         async def async_func() -> None:
-            """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run an asynchronous test callable."""
 
         self.assertTrue(BackgroundTask(async_func)._BackgroundTask__is_async)
 
@@ -287,20 +197,10 @@ class TestBackgroundTaskConstruction(TestCase):
         Validates that functions and callable objects alike are routed to
         the executor branch instead of being awaited directly.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
 
         self.assertFalse(BackgroundTask(sync_func)._BackgroundTask__is_async)
         self.assertFalse(BackgroundTask(_SyncCallable())._BackgroundTask__is_async)
@@ -311,10 +211,6 @@ class TestBackgroundTaskConstruction(TestCase):
         Validates that an object implementing an async call method is
         awaited instead of being run in a thread and silently dropped.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertTrue(BackgroundTask(_AsyncCallable())._BackgroundTask__is_async)
 
@@ -324,10 +220,6 @@ class TestBackgroundTaskConstruction(TestCase):
         Validates that a partially applied coroutine function is still
         recognised as asynchronous instead of being sent to a thread.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         async def async_func(value: int) -> None:
@@ -338,10 +230,6 @@ class TestBackgroundTaskConstruction(TestCase):
             value : int
                 Value supplied for ``value``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
 
         task = BackgroundTask(functools.partial(async_func, 1))
@@ -353,22 +241,13 @@ class TestBackgroundTaskConstruction(TestCase):
         Validates that a task can be consumed by any collaborator that
         depends only on the abstract contract.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
 
         self.assertIsInstance(BackgroundTask(sync_func), IBackgroundTask)
+
 
 class TestBackgroundTaskSynchronousExecution(TestCase):
     """Validate the executor branch used for synchronous callables."""
@@ -379,21 +258,11 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that awaiting the task runs the wrapped function body
         exactly once.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
             calls.append(1)
 
         await BackgroundTask(sync_func)()
@@ -405,10 +274,6 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that arguments captured at construction reach the
         wrapped function unchanged.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[int, int]] = []
 
@@ -422,10 +287,6 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
             second : int
                 Value supplied for ``second``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((first, second))
 
@@ -438,10 +299,6 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that keyword arguments survive the partial binding used
         by the executor branch.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[str, str]] = []
 
@@ -455,10 +312,6 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
             right : str
                 Value supplied for ``right``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((left, right))
 
@@ -471,10 +324,6 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that a mixed call signature is reconstructed exactly as
         the caller declared it.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[int, int, str]] = []
 
@@ -490,10 +339,6 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
             label : str
                 Value supplied for ``label``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((first, second, label))
 
@@ -506,21 +351,11 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that blocking code never runs on the thread owning the
         event loop, which is what keeps the loop responsive.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         observed: list[int] = []
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
             observed.append(threading.get_ident())
 
         await BackgroundTask(sync_func)()
@@ -532,10 +367,6 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that any object implementing ``__call__`` can be wrapped
         and invoked with its arguments.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         target = _SyncCallable()
 
@@ -548,10 +379,6 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that a task is a fire-and-forget unit of work and never
         surfaces the value produced by the wrapped callable.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func() -> str:
@@ -567,23 +394,11 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         self.assertIsNone(await BackgroundTask(sync_func)())
 
     async def testAwaitsCoroutineReturnedBySynchronousCallable(self) -> None:
-        """Complete an awaitable returned by a worker thread callable.
-
-        Returns
-        -------
-        None
-            Assertions verify that the returned coroutine runs to completion.
-        """
+        """Complete an awaitable returned by a worker thread callable."""
         calls: list[str] = []
 
         async def finish() -> None:
-            """Record completion on the event loop.
-
-            Returns
-            -------
-            None
-                Records the final effect.
-            """
+            """Record completion on the event loop."""
             calls.append("completed")
 
         def create_coroutine() -> object:
@@ -606,21 +421,11 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that each await performs a new invocation instead of
         caching the first result.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
             calls.append(1)
 
         task = BackgroundTask(sync_func)
@@ -634,19 +439,10 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that an exception thrown by a synchronous callable is
         re-raised to whoever awaited the task.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func() -> None:
             """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
 
             Raises
             ------
@@ -665,15 +461,12 @@ class TestBackgroundTaskSynchronousExecution(TestCase):
         Validates that the constructor performs no validation, so the
         resulting TypeError only appears once the task is awaited.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         task = BackgroundTask(42)  # type: ignore[arg-type]
 
         with self.assertRaises(TypeError):
             await task()
+
 
 class TestBackgroundTaskAsynchronousExecution(TestCase):
     """Validate the direct-await branch used for coroutine functions."""
@@ -684,21 +477,11 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         Validates that the coroutine is driven to completion and its side
         effects are observable.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         async def async_func() -> None:
-            """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run an asynchronous test callable."""
             calls.append(1)
 
         await BackgroundTask(async_func)()
@@ -710,10 +493,6 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         Validates that arguments captured at construction reach the
         coroutine unchanged.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[int, int]] = []
 
@@ -727,10 +506,6 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
             second : int
                 Value supplied for ``second``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((first, second))
 
@@ -743,10 +518,6 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         Validates that keyword arguments are applied when the coroutine is
         created.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[str, str]] = []
 
@@ -760,10 +531,6 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
             right : str
                 Value supplied for ``right``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((left, right))
 
@@ -776,21 +543,11 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         Validates that asynchronous callables are awaited directly instead
         of being offloaded to the default executor.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         observed: list[int] = []
 
         async def async_func() -> None:
-            """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run an asynchronous test callable."""
             observed.append(threading.get_ident())
 
         await BackgroundTask(async_func)()
@@ -802,10 +559,6 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         Validates that pre-bound arguments are honoured and the coroutine
         is awaited rather than scheduled in a thread.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[int, int]] = []
 
@@ -819,10 +572,6 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
             second : int
                 Value supplied for ``second``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((first, second))
 
@@ -836,10 +585,6 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         offloaded to a thread it would have been created and discarded,
         leaving no trace of the invocation.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         target = _AsyncCallable()
 
@@ -852,10 +597,6 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         Validates that the value produced by the coroutine is dropped, as
         background work reports no result to its caller.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         async def async_func() -> str:
@@ -876,21 +617,11 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         Validates that a fresh coroutine is created on every invocation,
         which is what makes the task re-entrant.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         async def async_func() -> None:
-            """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run an asynchronous test callable."""
             calls.append(1)
 
         task = BackgroundTask(async_func)
@@ -904,19 +635,10 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         Validates that an exception thrown by an asynchronous callable is
         re-raised to whoever awaited the task.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         async def async_func() -> None:
             """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
 
             Raises
             ------
@@ -929,6 +651,7 @@ class TestBackgroundTaskAsynchronousExecution(TestCase):
         with self.assertRaises(ValueError):
             await BackgroundTask(async_func)()
 
+
 class TestBackgroundTaskRunMethod(TestCase):
     """Validate the explicit run entry point of a single task."""
 
@@ -938,21 +661,11 @@ class TestBackgroundTaskRunMethod(TestCase):
         Validates that the contract method produces the same effect as
         invoking the task directly.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         def sync_func() -> None:
-            """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run a synchronous test callable."""
             calls.append(1)
 
         await BackgroundTask(sync_func).run()
@@ -964,21 +677,11 @@ class TestBackgroundTaskRunMethod(TestCase):
         Validates that the contract method awaits asynchronous callables
         exactly like the direct invocation path.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         calls: list[int] = []
 
         async def async_func() -> None:
-            """Run an asynchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
-            """
+            """Run an asynchronous test callable."""
             calls.append(1)
 
         await BackgroundTask(async_func).run()
@@ -990,10 +693,6 @@ class TestBackgroundTaskRunMethod(TestCase):
         Validates that the run method delegates to the same invocation
         logic and therefore honours the stored arguments.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         received: list[tuple[int, str]] = []
 
@@ -1007,10 +706,6 @@ class TestBackgroundTaskRunMethod(TestCase):
             label : str
                 Value supplied for ``label``.
 
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
             """
             received.append((value, label))
 
@@ -1023,19 +718,10 @@ class TestBackgroundTaskRunMethod(TestCase):
         Validates that the run method does not swallow errors thrown by
         the wrapped callable.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func() -> None:
             """Run a synchronous test callable.
-
-            Returns
-            -------
-            None
-                Initializes or completes the operation described above.
 
             Raises
             ------
@@ -1054,10 +740,6 @@ class TestBackgroundTaskRunMethod(TestCase):
         Validates that the run method matches the None return type
         declared by the contract.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
 
         def sync_func() -> str:

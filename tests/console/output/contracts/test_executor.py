@@ -1,11 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.output.contracts.executor import IExecutor
 from orionis.console.output.executor import Executor
 from orionis.test import TestCase
 
-class TestIExecutorContract(TestCase):
 
+class TestIExecutorContract(TestCase):
     # ------------------------------------------------------------------ #
     #  Abstract class characteristics                                    #
     # ------------------------------------------------------------------ #

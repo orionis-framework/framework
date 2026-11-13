@@ -1,36 +1,76 @@
+# ruff: noqa: TC001
+# Keep dependency-signature return types available to runtime introspection.
 """Inspect abstract class declarations and their members."""
 
 from __future__ import annotations
 import inspect
 import keyword
+from abc import update_abstractmethods
 from typing import TYPE_CHECKING, NamedTuple
 from orionis.introspection.abstract.contracts.reflection import (
     IReflectionAbstract,
 )
-from orionis.introspection.dependencies.reflection import ReflectDependencies
+from orionis.introspection.dependencies.entities.signature import Signature
+from orionis.introspection.dependencies.reflection import (
+    ReflectDependencies,
+    _clear_dependency_caches,
+    _inspect_annotations,
+    _inspect_signature,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
 
 # Store the coroutine function predicate used by reflection.
 _ISCORO: Callable[..., bool] = inspect.iscoroutinefunction
 
 # Dunder attributes built into the language, excluded from user-defined detection
-_EXCLUDED_DUNDER_ATTRS: frozenset[str] = frozenset({
-    "__class__", "__delattr__", "__dir__", "__doc__", "__eq__", "__format__",
-    "__ge__", "__getattribute__", "__gt__", "__hash__", "__init__",
-    "__init_subclass__", "__le__", "__lt__", "__module__", "__ne__", "__new__",
-    "__reduce__", "__reduce_ex__", "__repr__", "__setattr__", "__sizeof__",
-    "__str__", "__subclasshook__", "__firstlineno__", "__annotations__",
-    "__static_attributes__", "__dict__", "__weakref__", "__slots__", "__mro__",
-    "__subclasses__", "__bases__", "__base__", "__flags__",
-    "__abstractmethods__", "__code__", "__defaults__",
-    "__kwdefaults__", "__closure__",
-})
+_EXCLUDED_DUNDER_ATTRS: frozenset[str] = frozenset(
+    {
+        "__class__",
+        "__delattr__",
+        "__dir__",
+        "__doc__",
+        "__eq__",
+        "__format__",
+        "__ge__",
+        "__getattribute__",
+        "__gt__",
+        "__hash__",
+        "__init__",
+        "__init_subclass__",
+        "__le__",
+        "__lt__",
+        "__module__",
+        "__ne__",
+        "__new__",
+        "__reduce__",
+        "__reduce_ex__",
+        "__repr__",
+        "__setattr__",
+        "__sizeof__",
+        "__str__",
+        "__subclasshook__",
+        "__firstlineno__",
+        "__annotations__",
+        "__static_attributes__",
+        "__dict__",
+        "__weakref__",
+        "__slots__",
+        "__mro__",
+        "__subclasses__",
+        "__bases__",
+        "__base__",
+        "__flags__",
+        "__abstractmethods__",
+        "__code__",
+        "__defaults__",
+        "__kwdefaults__",
+        "__closure__",
+    },
+)
 """Dunder attributes built into the language, excluded from user-defined detection."""
+
 
 class _Flags(NamedTuple):
     """
@@ -52,6 +92,7 @@ class _Flags(NamedTuple):
     is_private: bool
     is_prot: bool
     is_pub: bool
+
 
 class ReflectionAbstract(IReflectionAbstract):
     """Inspect abstract class declarations and their members."""
@@ -78,7 +119,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            This method does not return a value.
 
         Raises
         ------
@@ -86,8 +127,13 @@ class ReflectionAbstract(IReflectionAbstract):
             If ``abstract`` is not an abstract base class.
         """
         # Validate that the provided class is indeed an abstract base class
-        if not inspect.isabstract(abstract):
-            msg = f"The class '{abstract.__name__}' is not an abstract base class."
+        if not isinstance(abstract, type) or not inspect.isabstract(abstract):
+            name = (
+                abstract.__name__
+                if isinstance(abstract, type)
+                else type(abstract).__name__
+            )
+            msg = f"The class '{name}' is not an abstract base class."
             raise TypeError(msg)
 
         # Capture frequently accessed class metadata into slots at construction time
@@ -100,7 +146,8 @@ class ReflectionAbstract(IReflectionAbstract):
         """Abstract module obtained from ``abstract.__module__``."""
         # Python strips the leading underscores of the class name when it
         # mangles private members, so the prefix must be built the same way.
-        self._private_prefix: str = f"_{abstract_name.lstrip('_')}"
+        class_name = abstract_name.lstrip("_")
+        self._private_prefix: str = f"_{class_name}" if class_name else ""
         """
         Python strips the leading underscores of the class name when it mangles
         private members, so the prefix must be built the same way.
@@ -140,7 +187,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            This method does not return a value.
         """
         self._cache[key] = value
 
@@ -172,7 +219,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            This method does not return a value.
 
         Notes
         -----
@@ -187,7 +234,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            This method does not return a value.
 
         Notes
         -----
@@ -206,7 +253,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            This method does not return a value.
 
         Notes
         -----
@@ -217,26 +264,54 @@ class ReflectionAbstract(IReflectionAbstract):
         # Drop every member-related cache entry after a mutation, forcing a re-scan
         cache = self._cache
         for key in (
-            "attributes", "public_attributes", "protected_attributes",
-            "private_attributes", "dunder_attributes",
-            "methods", "public_methods", "protected_methods", "private_methods",
-            "public_sync_methods", "public_async_methods",
-            "protected_sync_methods", "protected_async_methods",
-            "private_sync_methods", "private_async_methods",
-            "public_class_methods", "protected_class_methods", "private_class_methods",
-            "public_class_sync_methods", "public_class_async_methods",
-            "protected_class_sync_methods", "protected_class_async_methods",
-            "private_class_sync_methods", "private_class_async_methods",
-            "public_static_methods", "protected_static_methods",
+            "attributes",
+            "public_attributes",
+            "protected_attributes",
+            "private_attributes",
+            "dunder_attributes",
+            "methods",
+            "public_methods",
+            "protected_methods",
+            "private_methods",
+            "public_sync_methods",
+            "public_async_methods",
+            "protected_sync_methods",
+            "protected_async_methods",
+            "private_sync_methods",
+            "private_async_methods",
+            "public_class_methods",
+            "protected_class_methods",
+            "private_class_methods",
+            "public_class_sync_methods",
+            "public_class_async_methods",
+            "protected_class_sync_methods",
+            "protected_class_async_methods",
+            "private_class_sync_methods",
+            "private_class_async_methods",
+            "public_static_methods",
+            "protected_static_methods",
             "private_static_methods",
-            "public_static_sync_methods", "public_static_async_methods",
-            "protected_static_sync_methods", "protected_static_async_methods",
-            "private_static_sync_methods", "private_static_async_methods",
+            "public_static_sync_methods",
+            "public_static_async_methods",
+            "protected_static_sync_methods",
+            "protected_static_async_methods",
+            "private_static_sync_methods",
+            "private_static_async_methods",
             "dunder_methods",
-            "properties", "public_properties",
-            "protected_properties", "private_properties",
+            "properties",
+            "public_properties",
+            "protected_properties",
+            "private_properties",
         ):
             cache.pop(key, None)
+        for key in tuple(cache):
+            if key.endswith(("_signature", "_property_docstring")):
+                del cache[key]
+        cache.pop("dependencies_constructor", None)
+        _clear_dependency_caches()
+        update_abstractmethods(self._abstract)
+        self._abstract_name = self._abstract.__name__
+        self._abstract_module = self._abstract.__module__
         self._scanned = False
 
     def _makeBuckets(self, prefix_len: int) -> dict:
@@ -257,18 +332,42 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         return {
             "_n": prefix_len,
-            "pub_attrs": {}, "prot_attrs": {}, "priv_attrs": {}, "dund_attrs": {},
-            "pub_methods": [], "pub_sync": [], "pub_async": [],
-            "prot_methods": [], "prot_sync": [], "prot_async": [],
-            "priv_methods": [], "priv_sync": [], "priv_async": [],
-            "pub_cm": [], "pub_cm_sync": [], "pub_cm_async": [],
-            "prot_cm": [], "prot_cm_sync": [], "prot_cm_async": [],
-            "priv_cm": [], "priv_cm_sync": [], "priv_cm_async": [],
-            "pub_sm": [], "pub_sm_sync": [], "pub_sm_async": [],
-            "prot_sm": [], "prot_sm_sync": [], "prot_sm_async": [],
-            "priv_sm": [], "priv_sm_sync": [], "priv_sm_async": [],
+            "pub_attrs": {},
+            "prot_attrs": {},
+            "priv_attrs": {},
+            "dund_attrs": {},
+            "pub_methods": [],
+            "pub_sync": [],
+            "pub_async": [],
+            "prot_methods": [],
+            "prot_sync": [],
+            "prot_async": [],
+            "priv_methods": [],
+            "priv_sync": [],
+            "priv_async": [],
+            "pub_cm": [],
+            "pub_cm_sync": [],
+            "pub_cm_async": [],
+            "prot_cm": [],
+            "prot_cm_sync": [],
+            "prot_cm_async": [],
+            "priv_cm": [],
+            "priv_cm_sync": [],
+            "priv_cm_async": [],
+            "pub_sm": [],
+            "pub_sm_sync": [],
+            "pub_sm_async": [],
+            "prot_sm": [],
+            "prot_sm_sync": [],
+            "prot_sm_async": [],
+            "priv_sm": [],
+            "priv_sm_sync": [],
+            "priv_sm_async": [],
             "dund_methods": [],
-            "props_all": [], "pub_props": [], "prot_props": [], "priv_props": [],
+            "props_all": [],
+            "pub_props": [],
+            "prot_props": [],
+            "priv_props": [],
         }
 
     def _classifyProperty(self, attr: str, flags: _Flags, b: dict) -> None:
@@ -287,7 +386,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Update ``b`` in place with normalized property names.
+            This method does not return a value.
         """
         n = b["_n"]
         if flags.is_private:
@@ -302,7 +401,11 @@ class ReflectionAbstract(IReflectionAbstract):
             b["pub_props"].append(attr)
 
     def _classifyStatic(
-        self, attr: str, value: staticmethod, flags: _Flags, b: dict,
+        self,
+        attr: str,
+        value: staticmethod,
+        flags: _Flags,
+        b: dict,
     ) -> None:
         """
         Classify a static method by visibility and coroutine status.
@@ -321,7 +424,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Update ``b`` with normalized static method names.
+            This method does not return a value.
         """
         # Route the static method into visibility and sync/async buckets.
         n = b["_n"]
@@ -340,7 +443,11 @@ class ReflectionAbstract(IReflectionAbstract):
             (b["pub_sm_async"] if is_coro else b["pub_sm_sync"]).append(attr)
 
     def _classifyClassMethod(
-        self, attr: str, value: classmethod, flags: _Flags, b: dict,
+        self,
+        attr: str,
+        value: classmethod,
+        flags: _Flags,
+        b: dict,
     ) -> None:
         """
         Classify a class method into reflection buckets.
@@ -359,7 +466,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Update ``b`` with normalized class method names.
+            This method does not return a value.
         """
         # Route the class method into the correct visibility and sync/async buckets.
         n = b["_n"]
@@ -378,7 +485,11 @@ class ReflectionAbstract(IReflectionAbstract):
             (b["pub_cm_async"] if is_coro else b["pub_cm_sync"]).append(attr)
 
     def _classifyCallable(
-            self, attr: str, value: object, flags: _Flags, b: dict[str, object],
+        self,
+        attr: str,
+        value: object,
+        flags: _Flags,
+        b: dict[str, object],
     ) -> None:
         """
         Classify a regular callable by visibility and coroutine type.
@@ -397,7 +508,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Update method name buckets for visibility and sync/async groups.
+            This method does not return a value.
         """
         n = b["_n"]
         if flags.is_dunder:
@@ -417,7 +528,11 @@ class ReflectionAbstract(IReflectionAbstract):
             (b["pub_async"] if is_coro else b["pub_sync"]).append(attr)
 
     def _classifyDataAttr(
-            self, attr: str, value: object, flags: _Flags, b: dict[str, object],
+        self,
+        attr: str,
+        value: object,
+        flags: _Flags,
+        b: dict[str, object],
     ) -> None:
         """
         Classify a non-callable attribute into visibility buckets.
@@ -436,7 +551,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Update attribute name/value buckets by visibility.
+            This method does not return a value.
         """
         # Route the data attribute into the appropriate visibility bucket.
         n = b["_n"]
@@ -464,7 +579,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Update cached attribute views in place.
+            This method does not return a value.
         """
         # Write all classified attribute buckets into the instance cache.
         cache = self._cache
@@ -491,7 +606,7 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Update cached method and property views in place.
+            This method does not return a value.
         """
         # Write all classified method and property buckets into the instance cache
         cache = self._cache
@@ -537,9 +652,15 @@ class ReflectionAbstract(IReflectionAbstract):
         cache["protected_properties"] = b["prot_props"]
         cache["private_properties"] = b["priv_props"]
         cache["methods"] = [
-            *pub_m, *prot_m, *priv_m,
-            *pub_cm, *prot_cm, *priv_cm,
-            *pub_sm, *prot_sm, *priv_sm,
+            *pub_m,
+            *prot_m,
+            *priv_m,
+            *pub_cm,
+            *prot_cm,
+            *priv_cm,
+            *pub_sm,
+            *prot_sm,
+            *priv_sm,
         ]
 
     def _scanClass(self) -> None:
@@ -552,15 +673,16 @@ class ReflectionAbstract(IReflectionAbstract):
         Returns
         -------
         None
-            Update internal cache buckets in place.
+            This method does not return a value.
         """
         private_prefix = self._private_prefix
+        mangled_prefix = f"{private_prefix}__"
         class_dict: dict = self._abstract.__dict__
         b = self._makeBuckets(len(private_prefix))
 
         for attr, value in class_dict.items():
             is_dunder = attr.startswith("__") and attr.endswith("__")
-            is_private = not is_dunder and attr.startswith(private_prefix)
+            is_private = not is_dunder and attr.startswith(mangled_prefix)
             is_prot = not is_dunder and not is_private and attr.startswith("_")
             flags = _Flags(is_dunder, is_private, is_prot, not attr.startswith("_"))
 
@@ -646,7 +768,7 @@ class ReflectionAbstract(IReflectionAbstract):
         cache = self._cache
         if (v := cache.get("base_classes")) is not None:
             return v
-            # Normalize to list for a consistent, mutable return type.
+        # Normalize to list for a consistent, mutable return type.
         result: list[type] = list(self._abstract.__bases__)
         cache["base_classes"] = result
         return result
@@ -704,25 +826,31 @@ class ReflectionAbstract(IReflectionAbstract):
         cache["file_path"] = result
         return result
 
-    def getAnnotations(self) -> dict:
+    def getAnnotations(self) -> dict[str, object]:
         """
         Retrieve type annotations for class attributes.
 
         Returns
         -------
-        dict
+        dict[str, object]
             Dictionary mapping attribute names to their annotated types.
             Private attribute names are normalized by removing name mangling
-            prefixes.
+            prefixes. Unavailable native annotations remain forward references.
         """
         cache = self._cache
         if (v := cache.get("annotations")) is not None:
             return v
         private_prefix = self._private_prefix
+        mangled_prefix = f"{private_prefix}__"
         annotations: dict = {}
         # Normalize private attribute name mangling in a single loop
-        for k, v in getattr(self._abstract, "__annotations__", {}).items():
-            annotations[k.replace(private_prefix, "") if private_prefix in k else k] = v
+        for name, value in _inspect_annotations(self._abstract).items():
+            normalized = (
+                name[len(private_prefix) :]
+                if name.startswith(mangled_prefix) and not name.endswith("__")
+                else name
+            )
+            annotations[normalized] = value
         cache["annotations"] = annotations
         return annotations
 
@@ -758,10 +886,6 @@ class ReflectionAbstract(IReflectionAbstract):
         object or None
             Value of the specified class attribute, or None if not found.
 
-        Raises
-        ------
-        ValueError
-            If the attribute does not exist or is inaccessible.
         """
         # Trigger scan if needed, then look up directly in the aggregated dict
         self._ensureScanned()
@@ -787,8 +911,9 @@ class ReflectionAbstract(IReflectionAbstract):
         Raises
         ------
         ValueError
-            If the attribute name is invalid, is a Python keyword, or if the
-            value is callable.
+            If the attribute name is invalid or is a Python keyword.
+        TypeError
+            If the value is callable.
         """
         if (
             not isinstance(name, str)
@@ -895,7 +1020,7 @@ class ReflectionAbstract(IReflectionAbstract):
         dict
             Dictionary mapping private attribute names (with name mangling
             removed) to their values. Only includes attributes starting with
-            _ClassName that are not callable, static methods, class methods,
+            _ClassName__ that are not callable, static methods, class methods,
             or properties.
         """
         self._ensureScanned()
@@ -1013,7 +1138,7 @@ class ReflectionAbstract(IReflectionAbstract):
             msg = f"'{name}' is not callable in class '{self._abstract_name}'."
             raise TypeError(msg)
         # Compute and cache the signature object
-        result: inspect.Signature = inspect.signature(method)
+        result: inspect.Signature = _inspect_signature(method)
         cache[cache_key] = result
         return result
 
@@ -1112,7 +1237,7 @@ class ReflectionAbstract(IReflectionAbstract):
         """
         Return all private instance method names.
 
-        Private methods are those with name-mangling (start with _ClassName).
+        Private methods have a complete ``_ClassName__`` mangling prefix.
         Excludes static methods, class methods, properties, and dunder methods.
 
         Returns
@@ -1506,7 +1631,7 @@ class ReflectionAbstract(IReflectionAbstract):
         if not isinstance(prop, property):
             msg = f"'{name}' is not a property in class '{self._abstract_name}'."
             raise TypeError(msg)
-        result: inspect.Signature = inspect.signature(prop.fget)
+        result: inspect.Signature = _inspect_signature(prop.fget)
         cache[cache_key] = result
         return result
 
@@ -1598,8 +1723,8 @@ class ReflectionAbstract(IReflectionAbstract):
         # Apply Python name-mangling for private (non-dunder) method names
         if method_name.startswith("__") and not method_name.endswith("__"):
             method_name = f"{self._private_prefix}{method_name}"
-        result: Signature = (
-            ReflectDependencies(self._abstract).methodSignature(method_name)
+        result: Signature = ReflectDependencies(self._abstract).methodSignature(
+            method_name,
         )
         cache[cache_key] = result
         return result
@@ -1609,7 +1734,9 @@ class ReflectionAbstract(IReflectionAbstract):
         Clear all cached reflection data.
 
         Removes all cached entries stored in the reflection instance. Forces
-        fresh computation on subsequent method calls.
+        fresh computation on subsequent method calls and invalidates shared
+        dependency signatures and their registered consumers. Refreshes the
+        class name and module while preserving its declared private-name prefix.
 
         Returns
         -------
@@ -1620,3 +1747,6 @@ class ReflectionAbstract(IReflectionAbstract):
         # access triggers a full re-inspection of the abstract class.
         self._cache.clear()
         self._scanned = False
+        self._abstract_name = self._abstract.__name__
+        self._abstract_module = self._abstract.__module__
+        _clear_dependency_caches()

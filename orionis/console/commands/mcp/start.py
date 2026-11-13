@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Run one explicitly registered local MCP server."""
 
 import sys
@@ -6,7 +8,6 @@ from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.mcp.contracts.manager import IMcpManager
 
-# ruff: noqa: TC001
 
 class McpStartCommand(BaseCommand):
     """Run one explicitly registered local MCP server."""
@@ -22,7 +23,9 @@ class McpStartCommand(BaseCommand):
     """
     arguments: ClassVar[list[Argument]] = [
         Argument(
-            name_or_flags="name", type_=str, required=True,
+            name_or_flags="name",
+            type_=str,
+            required=True,
             help="Local server handle.",
         ),
     ]

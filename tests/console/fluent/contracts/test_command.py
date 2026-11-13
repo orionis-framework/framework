@@ -1,10 +1,12 @@
+# ruff: noqa: ANN202, ARG002, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.test import TestCase
 
-class TestICommand(TestCase):
 
+class TestICommand(TestCase):
     def testIsAbstractClass(self) -> None:
         """Verify that ICommand is an abstract class.
 
@@ -144,7 +146,7 @@ class TestICommand(TestCase):
         """
 
         class Partial(ICommand):
-            def timestamp(self, *, enabled: bool = True): # noqa: ARG002
+            def timestamp(self, *, enabled: bool = True):
                 """Return the command after accepting its timestamp.
 
                 Parameters
@@ -159,7 +161,7 @@ class TestICommand(TestCase):
                 """
                 return self
 
-            def description(self, desc: str): # noqa: ARG002
+            def description(self, desc: str):
                 """Return the command after accepting its description.
 
                 Parameters
@@ -190,7 +192,7 @@ class TestICommand(TestCase):
         """
 
         class Concrete(ICommand):
-            def timestamp(self, *, enabled: bool = True): # noqa: ARG002
+            def timestamp(self, *, enabled: bool = True):
                 """Return the command after accepting its timestamp.
 
                 Parameters
@@ -205,7 +207,7 @@ class TestICommand(TestCase):
                 """
                 return self
 
-            def description(self, desc: str): # noqa: ARG002
+            def description(self, desc: str):
                 """Return the command after accepting its description.
 
                 Parameters
@@ -220,7 +222,7 @@ class TestICommand(TestCase):
                 """
                 return self
 
-            def arguments(self, args: list): # noqa: ARG002
+            def arguments(self, args: list):
                 """Return the command after accepting its arguments.
 
                 Parameters

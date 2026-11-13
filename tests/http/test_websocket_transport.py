@@ -1,12 +1,18 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from dataclasses import FrozenInstanceError
 from types import SimpleNamespace
 from granian._granian import RSGIProtocolClosed, RSGIProtocolError
 from orionis.http import (
-    WebSocketDisconnected, WebSocketMessage, WebSocketMessageType, WebSocketState,
+    WebSocketDisconnected,
+    WebSocketMessage,
+    WebSocketMessageType,
+    WebSocketState,
 )
 from orionis.test import TestCase
 from tests.http.test_websocket import _ASGIPeer, _RSGIPeer
+
 
 class _ControlledASGIPeer(_ASGIPeer):
     """Expose deterministic barriers around writes and injected server errors."""
@@ -58,6 +64,7 @@ class _ControlledASGIPeer(_ASGIPeer):
             await super().send(event)
         finally:
             self.active -= 1
+
 
 class _FailingRSGIPeer(_RSGIPeer):
     """Inject Granian errors and controlled binary writes."""
@@ -112,6 +119,7 @@ class _FailingRSGIPeer(_RSGIPeer):
         await super().send_bytes(data)
 
     send_bytes = sendBytes
+
 
 class TestWebSocketTransportContract(TestCase):
     """Validate public state, cancellation, normalized messages and real APIs."""
@@ -177,12 +185,19 @@ class TestWebSocketTransportContract(TestCase):
         peer.scope["subprotocols"] = ["orionis.json.v1"]
         socket = peer.socket()
         await socket.accept(
-            subprotocol="orionis.json.v1", headers={"X-Handshake": "ready"},
+            subprotocol="orionis.json.v1",
+            headers={"X-Handshake": "ready"},
         )
-        self.assertEqual(peer.sent, [{
-            "type": "websocket.accept", "subprotocol": "orionis.json.v1",
-            "headers": [(b"x-handshake", b"ready")],
-        }])
+        self.assertEqual(
+            peer.sent,
+            [
+                {
+                    "type": "websocket.accept",
+                    "subprotocol": "orionis.json.v1",
+                    "headers": [(b"x-handshake", b"ready")],
+                },
+            ],
+        )
         older = _ASGIPeer()
         older.scope.pop("asgi")
         socket = older.socket()
@@ -204,8 +219,10 @@ class TestWebSocketTransportContract(TestCase):
             Verify validation has no transport side effects.
         """
         for headers in (
-            {"Sec-WebSocket-Protocol": "unsafe"}, {":status": "101"},
-            {"X-Test": "bad\r\nvalue"}, {"bad name": "value"},
+            {"Sec-WebSocket-Protocol": "unsafe"},
+            {":status": "101"},
+            {"X-Test": "bad\r\nvalue"},
+            {"bad name": "value"},
         ):
             peer = _ASGIPeer()
             with self.assertRaises(ValueError):
@@ -228,15 +245,23 @@ class TestWebSocketTransportContract(TestCase):
         """
         peer = _ASGIPeer()
         peer.events.get_nowait()
-        peer.events.put_nowait({
-            "type": "websocket.disconnect", "code": 1001, "reason": "departed",
-        })
+        peer.events.put_nowait(
+            {
+                "type": "websocket.disconnect",
+                "code": 1001,
+                "reason": "departed",
+            },
+        )
         socket = peer.socket()
         with self.assertRaises(WebSocketDisconnected) as caught:
             await socket.accept()
-        self.assertEqual((caught.exception.code, caught.exception.reason), (
-            1001, "departed",
-        ))
+        self.assertEqual(
+            (caught.exception.code, caught.exception.reason),
+            (
+                1001,
+                "departed",
+            ),
+        )
         self.assertTrue(socket.closed)
         self.assertEqual(peer.sent, [])
 
@@ -253,8 +278,10 @@ class TestWebSocketTransportContract(TestCase):
         socket = peer.socket()
         await socket.accept()
         for payload in (
-            {"text": "both", "bytes": b"both"}, {},
-            {"text": None, "bytes": None}, {"bytes": "not bytes"},
+            {"text": "both", "bytes": b"both"},
+            {},
+            {"text": None, "bytes": None},
+            {"bytes": "not bytes"},
         ):
             peer.events.put_nowait({"type": "websocket.receive", **payload})
             with self.assertRaises(RuntimeError):
@@ -273,8 +300,10 @@ class TestWebSocketTransportContract(TestCase):
         socket = peer.socket()
         await socket.accept()
         for payload in (
-            {"text": "Hola 🌎"}, {"bytes": b"\x00\xff"},
-            {"bytes": b'{"binary":true}'}, {"text": "item"},
+            {"text": "Hola 🌎"},
+            {"bytes": b"\x00\xff"},
+            {"bytes": b'{"binary":true}'},
+            {"text": "item"},
         ):
             peer.events.put_nowait({"type": "websocket.receive", **payload})
         peer.events.put_nowait({"type": "websocket.disconnect", "code": 1000})
@@ -328,10 +357,13 @@ class TestWebSocketTransportContract(TestCase):
         peer.release.set()
         await asyncio.gather(first, second)
         self.assertEqual(peer.peak, 1)
-        self.assertEqual(peer.sent[1:], [
-            {"type": "websocket.send", "text": "first"},
-            {"type": "websocket.send", "bytes": b"second"},
-        ])
+        self.assertEqual(
+            peer.sent[1:],
+            [
+                {"type": "websocket.send", "text": "first"},
+                {"type": "websocket.send", "bytes": b"second"},
+            ],
+        )
 
     async def testCancelledWriteRequiresClosureAndReleasesSendLock(self) -> None:
         """
@@ -508,7 +540,9 @@ class TestWebSocketTransportContract(TestCase):
         peer = _ASGIPeer()
         socket = peer.socket()
         results = await asyncio.gather(
-            socket.accept(), socket.accept(), return_exceptions=True,
+            socket.accept(),
+            socket.accept(),
+            return_exceptions=True,
         )
         self.assertIsNone(results[0])
         self.assertIsInstance(results[1], RuntimeError)

@@ -1,11 +1,11 @@
+# ruff: noqa: TC003
+# Keep the context-manager traceback annotation available at runtime.
 """Contract for a database transaction usable as an async context manager."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from types import TracebackType
 
-if TYPE_CHECKING:
-    from types import TracebackType
 
 class ITransaction(ABC):
     """

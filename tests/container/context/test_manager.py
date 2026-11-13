@@ -1,50 +1,22 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
 from orionis.test import TestCase
 
+
 class TestScopeManager(TestCase):
-
     def setUp(self) -> None:
-        """Reset the active scope before each test to guarantee isolation.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        ScopedContext.setCurrentScope(None)
-
-    def tearDown(self) -> None:
-        """Reset the active scope after each test to avoid state leakage.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        ScopedContext.setCurrentScope(None)
+        """Isolate the active scope and restore its original value during cleanup."""
+        super().setUp()
+        token = ScopedContext.setCurrentScope(None)
+        self.addCleanup(ScopedContext.reset, token)
 
     # ------------------------------------------------------------------
     # __init__
     # ------------------------------------------------------------------
-
-    def testInitCreatesEmptyInstancesDict(self) -> None:
-        """
-        Test that a newly created ScopeManager contains no stored instances.
-
-        Verifies that after construction the internal storage is empty and
-        that arbitrary key lookups return None.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        sm = ScopeManager()
-        self.assertNotIn("any_key", sm)
-        self.assertIsNone(sm["any_key"])
 
     # ------------------------------------------------------------------
     # __getitem__
@@ -60,7 +32,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         self.assertIsNone(sm["missing"])
@@ -76,7 +48,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         obj = object()
@@ -96,7 +68,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["str_key"] = "hello"
@@ -119,11 +91,11 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["k"] = "original"
-        sm["k"] = "updated" # NOSONAR
+        sm["k"] = "updated"  # NOSONAR
         self.assertEqual(sm["k"], "updated")
 
     def testSetitemWithNoneValue(self) -> None:
@@ -136,7 +108,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["k"] = None
@@ -154,7 +126,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["present"] = "value"
@@ -167,27 +139,10 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         self.assertNotIn("absent", sm)
-
-    def testContainsReturnsFalseAfterClear(self) -> None:
-        """
-        Test that 'in' returns False for a previously stored key after clear().
-
-        Ensures that clear() removes all key-presence information from the
-        internal dictionary.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        sm = ScopeManager()
-        sm["k"] = "v"
-        sm.clear()
-        self.assertNotIn("k", sm)
 
     # ------------------------------------------------------------------
     # clear
@@ -203,7 +158,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["a"] = 1
@@ -224,7 +179,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm.clear()  # Should not raise
@@ -245,7 +200,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm.set("key", "value")
@@ -259,7 +214,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm.set("key", "first")
@@ -279,7 +234,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
 
@@ -309,7 +264,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm1 = ScopeManager()
         sm2 = ScopeManager()
@@ -338,7 +293,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         result = await sm.__aenter__()
@@ -358,7 +313,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["key"] = "value"
@@ -382,7 +337,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsNone(ScopedContext.getCurrentScope())
 
@@ -403,7 +358,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -436,7 +391,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["k"] = "direct_value"
@@ -450,7 +405,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         result = await sm.get("missing")
@@ -467,10 +422,10 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
-        async def _make_value() -> str: # NOSONAR
+        async def _make_value() -> str:  # NOSONAR
             """Return the marker used by asynchronous resolution.
 
             Returns
@@ -500,10 +455,10 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
-        async def _worker() -> int: # NOSONAR
+        async def _worker() -> int:  # NOSONAR
             """Return the marker produced by the worker.
 
             Returns
@@ -535,7 +490,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["k"] = "resolved_value"
@@ -549,7 +504,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         with self.assertRaises(KeyError):
@@ -565,7 +520,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         sm = ScopeManager()
         sm["k"] = None
@@ -582,10 +537,10 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
-        async def _produce() -> str: # NOSONAR
+        async def _produce() -> str:  # NOSONAR
             """Produce the value delivered by asynchronous resolution.
 
             Returns
@@ -607,7 +562,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         async with ScopeManager() as scope:
             self.assertTrue(scope.isActive)
@@ -623,7 +578,7 @@ class TestScopeManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entered = asyncio.Event()
         finished = asyncio.Event()

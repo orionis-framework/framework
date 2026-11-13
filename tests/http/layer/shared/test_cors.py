@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.environment import Env
 from orionis.http.layer.shared.cors import CORSException, CORSMiddleware
 from orionis.http.responses import Response
 from orionis.test import TestCase
 from tests.http.test_support import make_adapter, replace_attribute
+
 
 class TestCORSLifecycle(TestCase):
     """Exercise preflight and ordinary cross-origin response behavior."""
@@ -16,7 +19,9 @@ class TestCORSLifecycle(TestCase):
             Responses allow arbitrary origins, methods and requested headers.
         """
         with replace_attribute(
-            Env, "get", lambda _key, default=None: default,
+            Env,
+            "get",
+            lambda _key, default=None: default,
         ):
             middleware = CORSMiddleware({})
 
@@ -26,17 +31,21 @@ class TestCORSLifecycle(TestCase):
                 self.assertIsNone(middleware.before(adapter))
                 response = middleware.after(adapter, Response())
                 self.assertEqual(
-                    response.getHeader("access-control-allow-origin"), ["*"],
+                    response.getHeader("access-control-allow-origin"),
+                    ["*"],
                 )
                 self.assertIsNone(
                     response.getHeader("access-control-allow-credentials"),
                 )
 
-                preflight = make_adapter([
-                    (b"origin", origin),
-                    (b"access-control-request-method", b"PATCH"),
-                    (b"access-control-request-headers", b"x-token, content-type"),
-                ], method="OPTIONS")
+                preflight = make_adapter(
+                    [
+                        (b"origin", origin),
+                        (b"access-control-request-method", b"PATCH"),
+                        (b"access-control-request-headers", b"x-token, content-type"),
+                    ],
+                    method="OPTIONS",
+                )
                 preflight_response = middleware.before(preflight)
                 if preflight_response is None:
                     self.fail("Expected a CORS preflight response.")
@@ -63,7 +72,9 @@ class TestCORSLifecycle(TestCase):
             Default and normalized wildcard origins retain credential validation.
         """
         with replace_attribute(
-            Env, "get", lambda _key, default=None: default,
+            Env,
+            "get",
+            lambda _key, default=None: default,
         ):
             for config in ({}, {"allow_origins": []}, {"allow_origins": None}):
                 with (
@@ -80,18 +91,86 @@ class TestCORSLifecycle(TestCase):
         None
             Unlisted origins receive no cross-origin permission headers.
         """
-        middleware = CORSMiddleware({
-            "allow_origins": ["https://example.com"],
-            "allow_origin_regex": None,
-        })
+        middleware = CORSMiddleware(
+            {
+                "allow_origins": ["https://example.com"],
+                "allow_origin_regex": None,
+            },
+        )
         adapter = make_adapter([(b"origin", b"https://other.example")])
         response = middleware.after(adapter, Response())
         self.assertIsNone(response.getHeader("access-control-allow-origin"))
-        preflight = make_adapter([
-            (b"origin", b"https://other.example"),
-            (b"access-control-request-method", b"GET"),
-        ], method="OPTIONS")
+        preflight = make_adapter(
+            [
+                (b"origin", b"https://other.example"),
+                (b"access-control-request-method", b"GET"),
+            ],
+            method="OPTIONS",
+        )
         self.assertIsNone(middleware.before(preflight))
+
+    def testOriginRegexMustMatchTheWholeSerializedOrigin(self) -> None:
+        """Do not grant credentialed CORS from a trusted-looking origin prefix.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        middleware = CORSMiddleware(
+            {
+                "allow_origins": ["https://explicit.test"],
+                "allow_origin_regex": r"https://[a-z]+\.trusted\.test",
+                "allow_credentials": True,
+            },
+        )
+        for origin, accepted in (
+            ("https://app.trusted.test", True),
+            ("https://app.trusted.test.other.test", False),
+        ):
+            with self.subTest(origin=origin):
+                adapter = make_adapter([(b"origin", origin.encode())])
+                response = middleware.after(adapter, Response())
+                self.assertEqual(
+                    response.hasHeader("access-control-allow-origin"),
+                    accepted,
+                )
+                preflight = make_adapter(
+                    [
+                        (b"origin", origin.encode()),
+                        (b"access-control-request-method", b"GET"),
+                    ],
+                    method="OPTIONS",
+                )
+                self.assertEqual(middleware.before(preflight) is not None, accepted)
+
+    def testWildcardMethodsIncludeTheSupportedQueryVerb(self) -> None:
+        """Permit browser preflights for the framework's QUERY route helper.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        middleware = CORSMiddleware(
+            {
+                "allow_origins": ["https://example.test"],
+                "allow_methods": ["*"],
+            },
+        )
+        preflight = make_adapter(
+            [
+                (b"origin", b"https://example.test"),
+                (b"access-control-request-method", b"QUERY"),
+            ],
+            method="OPTIONS",
+        )
+        response = middleware.before(preflight)
+        self.assertIsNotNone(response)
+        self.assertIn(
+            "QUERY",
+            response.getHeader("access-control-allow-methods")[0].split(", "),
+        )
 
     def testChecksOrdinaryRequestOriginOnlyWhenWritingHeaders(self) -> None:
         """Defer ordinary request origin validation until a response exists.
@@ -124,7 +203,9 @@ class TestCORSLifecycle(TestCase):
             return True
 
         with replace_attribute(
-            CORSMiddleware, "_CORSMiddleware__isAllowedOrigin", allowed_origin,
+            CORSMiddleware,
+            "_CORSMiddleware__isAllowedOrigin",
+            allowed_origin,
         ):
             self.assertIsNone(middleware.before(adapter))
             self.assertEqual(origins, [])
@@ -143,25 +224,34 @@ class TestCORSLifecycle(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        middleware = CORSMiddleware({
-            "allow_origins": ["https://example.com"],
-            "allow_credentials": True, "allow_methods": ["GET", "POST"],
-            "allow_headers": ["*"],
-        })
-        adapter = make_adapter([
-            (b"origin", b"https://example.com"),
-            (b"access-control-request-method", b"POST"),
-            (b"access-control-request-headers", b"x-token"),
-        ], method="OPTIONS")
+        middleware = CORSMiddleware(
+            {
+                "allow_origins": ["https://example.com"],
+                "allow_credentials": True,
+                "allow_methods": ["GET", "POST"],
+                "allow_headers": ["*"],
+            },
+        )
+        adapter = make_adapter(
+            [
+                (b"origin", b"https://example.com"),
+                (b"access-control-request-method", b"POST"),
+                (b"access-control-request-headers", b"x-token"),
+            ],
+            method="OPTIONS",
+        )
         response = middleware.before(adapter)
         self.assertEqual(response.getStatusCode(), 204)
         self.assertEqual(
-            response.getHeader("access-control-allow-credentials"), ["true"],
+            response.getHeader("access-control-allow-credentials"),
+            ["true"],
         )
         self.assertEqual(
-            response.getHeader("access-control-allow-headers"), ["x-token"],
+            response.getHeader("access-control-allow-headers"),
+            ["x-token"],
         )
         self.assertEqual(
-            response.getHeader("access-control-allow-methods"), ["GET, POST"],
+            response.getHeader("access-control-allow-methods"),
+            ["GET, POST"],
         )
         self.assertIn("origin", response.getHeader("vary")[0])

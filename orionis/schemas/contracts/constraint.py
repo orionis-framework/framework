@@ -1,12 +1,12 @@
+# ruff: noqa: TC001
+# Preserve the public rule result type for runtime dependency reflection.
 """Define the contract for rule implementations."""
 
 from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
-from typing import TYPE_CHECKING
+from orionis.schemas.entities.failure import ValidationFailure
 
-if TYPE_CHECKING:
-    from orionis.schemas.entities.failure import ValidationFailure
 
 class IRule(ABC):
     """Define the contract for rule implementations."""
@@ -28,7 +28,7 @@ class IRule(ABC):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
 
     @abstractmethod
@@ -39,7 +39,7 @@ class IRule(ABC):
         instance: object,
     ) -> bool:
         """
-        Asynchronously evaluate whether the current value satisfies this rule.
+        Evaluate asynchronously whether the current value satisfies this rule.
 
         Parameters
         ----------

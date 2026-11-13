@@ -1,3 +1,5 @@
+# ruff: noqa: S310, TRY004
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Download and validate missing configuration before creating local files."""
 
 import hashlib
@@ -32,6 +34,7 @@ _TIMEOUT = 30
 """Timeout value used by ``_config``."""
 _SHA_LENGTH = 40
 """Sha length value used by ``_config``."""
+
 
 class ConfigBootstrapper:
     """Download and validate missing configuration before creating local files."""
@@ -98,10 +101,12 @@ class ConfigBootstrapper:
         for destination, kind in resources:
             self._safeDestination(root, destination)
             existed = self._createResource(destination, kind, pending)
-            result.append((
-                "EXISTS" if existed else "CREATED",
-                display_path(self.app, destination),
-            ))
+            result.append(
+                (
+                    "EXISTS" if existed else "CREATED",
+                    display_path(self.app, destination),
+                ),
+            )
         return result
 
     @staticmethod
@@ -172,9 +177,7 @@ class ConfigBootstrapper:
             or (kind == "blob" and not destination.is_file())
         ):
             expected = "directory" if kind == "tree" else "regular file"
-            error_msg = (
-                f"Configuration resource '{destination}' is not a {expected}."
-            )
+            error_msg = f"Configuration resource '{destination}' is not a {expected}."
             raise OSError(error_msg)
 
     @classmethod
@@ -266,7 +269,7 @@ class ConfigBootstrapper:
             Complete response body from an HTTP 200 response.
         """
         # Request the format expected by the tree or raw-content endpoint.
-        request = Request(  # noqa: S310 - URLs are built from fixed HTTPS origins.
+        request = Request(  # URLs are built from fixed HTTPS origins.
             url,
             headers={
                 "Accept": (
@@ -279,17 +282,17 @@ class ConfigBootstrapper:
         )
         # Reject unsuccessful responses and identify transport failures.
         try:
-            with urlopen(request, timeout=_TIMEOUT) as response:  # noqa: S310
+            with urlopen(request, timeout=_TIMEOUT) as response:
                 if response.status != HTTPStatus.OK:
                     error_msg = f"Cannot download '{url}': HTTP {response.status}."
                     raise RuntimeError(error_msg)
                 return response.read()
-        except (HTTPError, URLError, HTTPException, OSError) as error: # NOSONAR
+        except (HTTPError, URLError, HTTPException, OSError) as error:  # NOSONAR
             error_msg = f"Cannot download '{url}': {error}."
             raise RuntimeError(error_msg) from error
 
     @classmethod
-    def _entries(cls) -> list[dict[str, Any]]: # NOSONAR
+    def _entries(cls) -> list[dict[str, Any]]:  # NOSONAR
         """
         Validate the master tree and retain regular configuration entries.
 
@@ -301,7 +304,7 @@ class ConfigBootstrapper:
         # Reject incomplete manifests before considering individual paths.
         try:
             manifest = json.loads(cls._download(_TREE_URL))
-        except (ValueError, UnicodeError) as error: # NOSONAR
+        except (ValueError, UnicodeError) as error:  # NOSONAR
             error_msg = f"Invalid configuration tree from '{_TREE_URL}': {error}."
             raise RuntimeError(error_msg) from error
         if not isinstance(manifest, dict) or manifest.get("truncated") is not False:
@@ -310,7 +313,7 @@ class ConfigBootstrapper:
         tree = manifest.get("tree")
         if not isinstance(tree, list):
             error_msg = "GitHub returned an invalid configuration tree for master."
-            raise RuntimeError(error_msg)  # noqa: TRY004 - Invalid remote response.
+            raise RuntimeError(error_msg)  # Invalid remote response.
         entries: list[dict[str, Any]] = []
         seen: set[str] = set()
         # Validate portable paths, entry types, and blob metadata together.
@@ -318,7 +321,7 @@ class ConfigBootstrapper:
             if not isinstance(entry, dict) or not isinstance(entry.get("path"), str):
                 error_msg = "GitHub returned an invalid configuration tree entry."
                 # Report malformed remote data consistently with download errors.
-                raise RuntimeError(error_msg)  # noqa: TRY004
+                raise RuntimeError(error_msg)
             path = entry["path"]
             if not path.startswith("config/"):
                 continue
@@ -342,9 +345,7 @@ class ConfigBootstrapper:
                     character not in "0123456789abcdef" for character in entry["sha"]
                 )
             ):
-                error_msg = (
-                    f"Invalid metadata for remote configuration file '{path}'."
-                )
+                error_msg = f"Invalid metadata for remote configuration file '{path}'."
                 raise RuntimeError(error_msg)
             seen.add(path.casefold())
             entries.append(entry)

@@ -6,6 +6,7 @@ from threading import Lock
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.support.facades.datetime import DateTime
 
+
 class ChunkedSuffixResolver(SuffixResolver):
     """Resolve log suffixes for configured time chunks."""
 

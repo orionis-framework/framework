@@ -375,7 +375,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5587"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5617"> 
                     
                 </input>
 
@@ -670,7 +670,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Schema</span>(<a href="orionis.database.contracts.schema.ISchema.html" class="internal-link" title="orionis.database.contracts.schema.ISchema">ISchema</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L25" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.schema.schema.Schema.__init__">Schema(conn_manager)</a></code></p><p><a href="classIndex.html#orionis.database.schema.schema.Schema">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Schema</span>(<a href="orionis.database.contracts.schema.ISchema.html" class="internal-link" title="orionis.database.contracts.schema.ISchema">ISchema</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L26" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.schema.schema.Schema.__init__">Schema(conn_manager)</a></code></p><p><a href="classIndex.html#orionis.database.schema.schema.Schema">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -678,7 +678,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id559">
+          <table class="children sortable" id="id567">
   
   
   <tr class="method">
@@ -792,7 +792,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__addTimestampColumns</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">definition: <code>Timestamps</code>, </span><span class="rst-sig-param">bucket: <code><a href="orionis.database.schema.definition_bucket.DefinitionBucket.html" class="internal-link" title="orionis.database.schema.definition_bucket.DefinitionBucket">DefinitionBucket</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L343">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L342">
       
       (source)
     </a>
@@ -804,7 +804,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Expand a <tt class="rst-docutils rst-literal">Timestamps</tt> marker into its two nullable columns.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="orionis.database.schema.Timestamps.html" class="internal-link">orionis.database.schema.Timestamps</a></code></td><td class="fieldArgDesc">The timestamps marker carrying the <tt class="rst-docutils rst-literal">timezone</tt> flag.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bucket:</span><code><a href="orionis.database.schema.definition_bucket.DefinitionBucket.html" class="internal-link">orionis.database.schema.definition_bucket.DefinitionBucket</a></code></td><td class="fieldArgDesc">Accumulator updated in place with the new columns.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The <tt class="rst-docutils rst-literal">bucket</tt> accumulator is mutated in place.</td></tr></table></div>
+    <div><p>Expand a <tt class="rst-docutils rst-literal">Timestamps</tt> marker into its two nullable columns.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="orionis.database.schema.Timestamps.html" class="internal-link">orionis.database.schema.Timestamps</a></code></td><td class="fieldArgDesc">The timestamps marker carrying the <tt class="rst-docutils rst-literal">timezone</tt> flag.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bucket:</span><code><a href="orionis.database.schema.definition_bucket.DefinitionBucket.html" class="internal-link">orionis.database.schema.definition_bucket.DefinitionBucket</a></code></td><td class="fieldArgDesc">Accumulator updated in place with the new columns.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -818,8 +818,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">__buildTable</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">definitions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.database.schema.definitions.html#SchemaDefinition" class="internal-link" title="orionis.database.schema.definitions.SchemaDefinition">SchemaDefinition</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code>TableDefinition</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L228">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__buildTable</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">definitions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.database.schema.definitions.html#SchemaDefinition" class="internal-link" title="orionis.database.schema.definitions.SchemaDefinition">SchemaDefinition</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="orionis.orm.schema.table.TableDefinition.html" class="internal-link" title="orionis.orm.schema.table.TableDefinition">TableDefinition</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L229">
       
       (source)
     </a>
@@ -831,7 +831,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build the table definition from a name and its definitions.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The name of the table to build, possibly <tt class="rst-docutils rst-literal">schema.table</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definitions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Schema definitions collected for the table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link">orionis.orm.schema.TableDefinition</a></code></td><td class="fieldArgDesc">The complete table definition ready for compilation.</td></tr></table></div>
+    <div><p>Build the table definition from a name and its definitions.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">The name of the table to build, possibly <tt class="rst-docutils rst-literal">schema.table</tt>.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definitions:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code></td><td class="fieldArgDesc">Schema definitions collected for the table.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.orm.schema.table.TableDefinition.html" class="internal-link" title="orionis.orm.schema.table.TableDefinition">orionis.orm.schema.TableDefinition</a></code></td><td class="fieldArgDesc">The complete table definition ready for compilation.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -846,7 +846,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__classifyDefinition</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">definition: <code><a href="orionis.orm.schema.column.ColumnDefinition.html" class="internal-link" title="orionis.orm.schema.column.ColumnDefinition">ColumnDefinition</a> | Comment | ForeignKey | Index | PrimaryKey | Unique</code>, </span><span class="rst-sig-param">bucket: <code><a href="orionis.database.schema.definition_bucket.DefinitionBucket.html" class="internal-link" title="orionis.database.schema.definition_bucket.DefinitionBucket">DefinitionBucket</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L291">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L292">
       
       (source)
     </a>
@@ -859,7 +859,7 @@
   <div class="docstring functionBody">
     
     <div><p>Route a single schema definition into the shared bucket.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code>ColumnDefinition | Comment | ForeignKey | Index |</code></td><td class="fieldArgDesc">PrimaryKey | Unique
-The schema definition to classify.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bucket:</span><code><a href="orionis.database.schema.definition_bucket.DefinitionBucket.html" class="internal-link">orionis.database.schema.definition_bucket.DefinitionBucket</a></code></td><td class="fieldArgDesc">Accumulator updated in place with the classified data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The <tt class="rst-docutils rst-literal">bucket</tt> accumulator is mutated in place.</td></tr></table></div>
+The schema definition to classify.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bucket:</span><code><a href="orionis.database.schema.definition_bucket.DefinitionBucket.html" class="internal-link">orionis.database.schema.definition_bucket.DefinitionBucket</a></code></td><td class="fieldArgDesc">Accumulator updated in place with the classified data.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -874,7 +874,7 @@ The schema definition to classify.</td></tr><tr><td class="fieldArgContainer"><s
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__collectDefinitions</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">definitions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.database.schema.definitions.html#SchemaDefinition" class="internal-link" title="orionis.database.schema.definitions.SchemaDefinition">SchemaDefinition</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L252">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L253">
       
       (source)
     </a>
@@ -901,7 +901,7 @@ The schema definition to classify.</td></tr><tr><td class="fieldArgContainer"><s
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">conn_manager: <code>IConnectionManager</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L35">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L36">
       
       (source)
     </a>
@@ -913,7 +913,7 @@ The schema definition to classify.</td></tr><tr><td class="fieldArgContainer"><s
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize the Schema instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">conn<wbr></wbr>_manager:</span><code><a href="orionis.database.contracts.IConnectionManager.html" class="internal-link">orionis.database.contracts.IConnectionManager</a></code></td><td class="fieldArgDesc">The connection manager for database operations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialize the Schema instance.</td></tr></table></div>
+    <div><p>Initialize the Schema instance.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">conn<wbr></wbr>_manager:</span><code><a href="orionis.database.contracts.IConnectionManager.html" class="internal-link">orionis.database.contracts.IConnectionManager</a></code></td><td class="fieldArgDesc">The connection manager for database operations.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -928,7 +928,7 @@ The schema definition to classify.</td></tr><tr><td class="fieldArgContainer"><s
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__parseTableName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L404">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L403">
       
       (source)
     </a>
@@ -956,7 +956,7 @@ and the table name.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__resolveConnection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>IConnection</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L212">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L213">
       
       (source)
     </a>
@@ -983,7 +983,7 @@ and the table name.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__setPrimaryKey</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">column_names: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>, </span><span class="rst-sig-param">kwargs: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L368">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L367">
       
       (source)
     </a>
@@ -996,7 +996,7 @@ and the table name.</td></tr></table></div>
   <div class="docstring functionBody">
     
     <div><p>Assign the primary key columns, rejecting duplicate definitions.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">column<wbr></wbr>_names:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Names of the columns composing the primary key.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">kwargs:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Accumulated <tt class="rst-docutils rst-literal">TableDefinition</tt> keyword arguments, updated
-in place.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">The <tt class="rst-docutils rst-literal">kwargs</tt> mapping is mutated in place.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a primary key was already defined.</td></tr></table></div>
+in place.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If a primary key was already defined.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1011,7 +1011,7 @@ in place.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td 
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_createTable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">definitions: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="orionis.database.schema.definitions.html#SchemaDefinition" class="internal-link" title="orionis.database.schema.definitions.SchemaDefinition">SchemaDefinition</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L189">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L190">
       
       (source)
     </a>
@@ -1038,7 +1038,7 @@ in place.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">connection</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L58">
       
       (source)
     </a>
@@ -1065,7 +1065,7 @@ in place.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">create</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.database.schema.table_creation.TableCreation.html" class="internal-link" title="orionis.database.schema.table_creation.TableCreation">TableCreation</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L84">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L85">
       
       (source)
     </a>
@@ -1099,8 +1099,8 @@ the table after a successful block.</td></tr></table></div>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">createFromDefinition</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">definition: <code>TableDefinition</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L108">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">createFromDefinition</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">definition: <code><a href="orionis.orm.schema.table.TableDefinition.html" class="internal-link" title="orionis.orm.schema.table.TableDefinition">TableDefinition</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L109">
       
       (source)
     </a>
@@ -1112,7 +1112,7 @@ the table after a successful block.</td></tr></table></div>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.database.contracts.schema.ISchema.html#createFromDefinition" class="internal-link">orionis.database.contracts.schema.ISchema.createFromDefinition</a></code></div>
-    <div><p>Create a table from its reusable, versioned definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="orionis.orm.schema.TableDefinition.html" class="internal-link">orionis.orm.schema.TableDefinition</a></code></td><td class="fieldArgDesc">Schema shared with a model through <tt class="rst-docutils rst-literal">table_definition</tt>.
+    <div><p>Create a table from its reusable, versioned definition.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">definition:</span><code><a href="orionis.orm.schema.table.TableDefinition.html" class="internal-link" title="orionis.orm.schema.table.TableDefinition">orionis.orm.schema.TableDefinition</a></code></td><td class="fieldArgDesc">Schema shared with a model through <tt class="rst-docutils rst-literal">table_definition</tt>.
 Historical migrations should import a versioned definition
 that remains unchanged when the model adopts a newer version.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether table creation completed successfully.</td></tr></table></div>
   </div>
@@ -1129,7 +1129,7 @@ that remains unchanged when the model adopts a newer version.</td></tr></table><
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">createFromModel</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">model: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Model]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L126">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L127">
       
       (source)
     </a>
@@ -1161,7 +1161,7 @@ definition so later model changes do not alter migration replay.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">drop</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L170">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L171">
       
       (source)
     </a>
@@ -1188,7 +1188,7 @@ non-default schema, use the <tt class="rst-docutils rst-literal">schema.table</t
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L29">
       
       (source)
     </a>
@@ -1215,7 +1215,7 @@ non-default schema, use the <tt class="rst-docutils rst-literal">schema.table</t
   <div class="functionHeader">
     
     <span class="py-defname">__conn_manager</span>: <code>IConnectionManager</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L51">
       
       (source)
     </a>
@@ -1242,7 +1242,7 @@ non-default schema, use the <tt class="rst-docutils rst-literal">schema.table</t
   <div class="functionHeader">
     
     <span class="py-defname">__connection_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L53">
       
       (source)
     </a>
@@ -1269,7 +1269,7 @@ non-default schema, use the <tt class="rst-docutils rst-literal">schema.table</t
   <div class="functionHeader">
     
     <span class="py-defname">__connection_selected</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/schema/schema.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/schema/schema.py#L55">
       
       (source)
     </a>
@@ -1295,7 +1295,7 @@ non-default schema, use the <tt class="rst-docutils rst-literal">schema.table</t
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -1,18 +1,20 @@
+# ruff: noqa: TC001, TC003
+# Preserve callable and dependency signature annotations for runtime inspection.
 """Inspect callable signatures, parameters and invocation metadata."""
 
 from __future__ import annotations
 import inspect
 import types
-from typing import TYPE_CHECKING
+from collections.abc import Callable
 from orionis.introspection.callables.contracts.reflection import (
     IReflectionCallable,
 )
-from orionis.introspection.dependencies.reflection import ReflectDependencies
-
-if TYPE_CHECKING:
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
+from orionis.introspection.dependencies.entities.signature import Signature
+from orionis.introspection.dependencies.reflection import (
+    ReflectDependencies,
+    _clear_dependency_caches,
+    _inspect_signature,
+)
 
 # Global sentinel: distinguishes "not yet cached" from None as a legitimate cached value
 _UNSET: object = object()
@@ -21,21 +23,20 @@ Global sentinel: distinguishes "not yet cached" from None as a legitimate cached
 value.
 """
 
-class ReflectionCallable(IReflectionCallable):
 
-    # Explicit slots remove the per-instance __dict__ and speed up attribute access
+class ReflectionCallable(IReflectionCallable):
     """Inspect callable signatures, parameters and invocation metadata."""
 
     __slots__ = ("_cache", "_docstring", "_function", "_module", "_name")
-    """Explicit slots remove the per-instance __dict__ and speed up attribute access."""
+    """Store the callable, cached results, and descriptive metadata snapshots."""
 
-    def __init__(self, fn: callable) -> None:
+    def __init__(self, fn: Callable) -> None:
         """
         Initialize the reflection wrapper with a callable object.
 
         Parameters
         ----------
-        fn : callable
+        fn : collections.abc.Callable
             The function, method, or lambda to be wrapped.
 
         Raises
@@ -57,7 +58,7 @@ class ReflectionCallable(IReflectionCallable):
                 f"Expected a function, method, or lambda, got {type(fn).__name__}"
             )
             raise TypeError(error_msg)
-        # Store the callable and pre-compute its immutable read-only properties
+        # Keep descriptive metadata until explicit cache invalidation.
         self._function = fn
         """The function, method, or lambda to be wrapped."""
         self._name: str = fn.__name__
@@ -143,13 +144,13 @@ class ReflectionCallable(IReflectionCallable):
         # Silent removal: does not raise if the key is absent
         self._cache.pop(key, None)
 
-    def getCallable(self) -> callable:
+    def getCallable(self) -> Callable:
         """
         Return the callable function associated with this instance.
 
         Returns
         -------
-        callable
+        collections.abc.Callable
             The function object encapsulated by this instance.
         """
         return self._function
@@ -273,7 +274,7 @@ class ReflectionCallable(IReflectionCallable):
         cached = _cache.get("signature", _UNSET)
         if cached is not _UNSET:
             return cached  # type: ignore[return-value]
-        result = inspect.signature(self._function)
+        result = _inspect_signature(self._function)
         _cache["signature"] = result
         return result
 
@@ -304,8 +305,9 @@ class ReflectionCallable(IReflectionCallable):
         """
         Clear all cached reflection data.
 
-        Removes all cached entries stored in the reflection instance. Forces
-        fresh computation on subsequent method calls.
+        Remove local results, refresh descriptive metadata, and invalidate shared
+        dependency signatures and registered consumer plans. Subsequent calls
+        observe changes to the callable's defaults, signature, and annotations.
 
         Returns
         -------
@@ -314,3 +316,7 @@ class ReflectionCallable(IReflectionCallable):
         """
         # Evict all entries, including any keys stored externally via the cache protocol
         self._cache.clear()
+        self._name = self._function.__name__
+        self._module = self._function.__module__
+        self._docstring = self._function.__doc__ or ""
+        _clear_dependency_caches()

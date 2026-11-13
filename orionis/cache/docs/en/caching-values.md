@@ -53,7 +53,7 @@ If a cache read fails, decide in application code whether to regenerate from the
 
 ### Cache-aside resolution
 
-`remember(key, ttl, resolver)` reads with a private sentinel, so a stored `None` is a cache hit. On a miss it invokes a zero-argument sync or async resolver, stores the result, and returns it. It does not coalesce concurrent misses; use `lock()` around expensive regeneration when needed.
+`remember(key, ttl, resolver)` reads with a private sentinel, so a stored `None` is a cache hit. On a miss it invokes a zero-argument sync or async resolver, stores the result, and returns it. It does not coalesce concurrent misses; use `rememberOnce()` to share a local in-flight resolution, or `lock()` with a second read before regeneration.
 
 ### Cache a resolver result, including `None`
 
@@ -81,9 +81,9 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-The sentinel prevents the stored `None` from being treated as another miss.
+Orionis JSON stores distinguish a stored `None` from an absent key. A custom backend that represents both as the same raw `None` cannot provide that distinction atomically.
 
-### Use atomic add and pull
+### Add conditionally and read before deleting
 
 ```python
 import asyncio
@@ -96,8 +96,8 @@ async def main() -> None:
     cache = CacheRepository(build())
     print(await cache.add("ticket", "A"))  # True
     print(await cache.add("ticket", "B"))  # False
-    print(await cache.pull("ticket"))       # A
-    print(await cache.has("ticket"))        # False
+    print(await cache.pull("ticket"))  # A
+    print(await cache.has("ticket"))  # False
 
 
 asyncio.run(main())
@@ -120,6 +120,7 @@ CacheRepository(backend: Any, prefix: str = "")
 | `getMany(keys)` | Return a mapping preserving the requested unprefixed keys. |
 | `setMany(values, ttl=None)` | Store a mapping with one shared TTL. |
 | `remember(key, ttl, resolver)` | Return cached data or compute/store a sync or async result. |
+| `rememberOnce(key, ttl, resolver, *, wait_timeout=10, lease=None)` | Share a concurrent resolution on the same backend, prefix, key, and loop. |
 | `rememberForever(key, resolver)` | `remember` without expiry. |
 | `pull(key)` | Read and then delete; missing returns `None`. |
 | `add(key, value, ttl=None)` | Atomically store only if absent; conflicts return `False`. |

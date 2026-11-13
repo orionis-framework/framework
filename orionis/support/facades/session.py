@@ -3,6 +3,7 @@
 from orionis.container.facades.facade import ScopedFacade
 from orionis.session.contracts.session import ISession
 
+
 class Session(ScopedFacade):
     """Resolve the session service through the application facade."""
 

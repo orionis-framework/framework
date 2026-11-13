@@ -5,6 +5,7 @@ from orionis.environment import Env
 from orionis.foundation.config.validation import validate_integer, validate_seconds
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Worker(BaseEntity):
     """

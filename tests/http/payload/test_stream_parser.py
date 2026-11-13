@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 from threading import Event, get_ident
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Callable
 
 _BOUNDARY = b"orionis-boundary"
+
 
 class _CountingBuffer(bytearray):
     """Count indexed padding-byte reads performed by the delimiter scanner."""
@@ -45,6 +48,7 @@ class _CountingBuffer(bytearray):
             self.paddingReads += 1
         return value
 
+
 async def stream_chunks(chunks: list[bytes]) -> AsyncIterator[bytes]:
     """
     Yield supplied transport chunks in order.
@@ -61,6 +65,7 @@ async def stream_chunks(chunks: list[bytes]) -> AsyncIterator[bytes]:
     """
     for chunk in chunks:
         yield chunk
+
 
 def multipart_body(value: bytes, disposition: bytes = b'name="field"') -> bytes:
     """
@@ -79,9 +84,17 @@ def multipart_body(value: bytes, disposition: bytes = b'name="field"') -> bytes:
         A body with one named part and a closing delimiter.
     """
     return (
-        b"--" + _BOUNDARY + b"\r\nContent-Disposition: form-data; "
-        + disposition + b"\r\n\r\n" + value + b"\r\n--" + _BOUNDARY + b"--\r\n"
+        b"--"
+        + _BOUNDARY
+        + b"\r\nContent-Disposition: form-data; "
+        + disposition
+        + b"\r\n\r\n"
+        + value
+        + b"\r\n--"
+        + _BOUNDARY
+        + b"--\r\n"
     )
+
 
 def upload_factory(
     upload: UploadedFile,
@@ -125,6 +138,7 @@ def upload_factory(
 
     return create_upload
 
+
 class TestMultipartStreaming(TestCase):
     """Exercise multipart framing, limits, and resource ownership."""
 
@@ -139,7 +153,8 @@ class TestMultipartStreaming(TestCase):
         body = multipart_body(b"value")
         for position in range(len(body) + 1):
             parser = MultipartStreamParser(
-                stream_chunks([body[:position], body[position:]]), _BOUNDARY,
+                stream_chunks([body[:position], body[position:]]),
+                _BOUNDARY,
             )
             with self.subTest(position=position):
                 self.assertEqual((await parser.parse()).get("field"), "value")
@@ -154,7 +169,7 @@ class TestMultipartStreaming(TestCase):
         """
         body = multipart_body(b"value")
         parser = MultipartStreamParser(
-            stream_chunks([body[index:index + 1] for index in range(len(body))]),
+            stream_chunks([body[index : index + 1] for index in range(len(body))]),
             _BOUNDARY,
         )
         self.assertEqual((await parser.parse()).get("field"), "value")
@@ -169,7 +184,8 @@ class TestMultipartStreaming(TestCase):
         """
         value = b"start--" + _BOUNDARY + b"\r\n--" + _BOUNDARY + b"X\r\nend"
         parser = MultipartStreamParser(
-            stream_chunks([multipart_body(value)]), _BOUNDARY,
+            stream_chunks([multipart_body(value)]),
+            _BOUNDARY,
         )
         self.assertEqual((await parser.parse()).get("field"), value.decode())
 
@@ -185,7 +201,8 @@ class TestMultipartStreaming(TestCase):
         body = multipart_body(value)
         for position in range(len(body) + 1):
             parser = MultipartStreamParser(
-                stream_chunks([body[:position], body[position:]]), _BOUNDARY,
+                stream_chunks([body[:position], body[position:]]),
+                _BOUNDARY,
             )
             with self.subTest(position=position):
                 self.assertEqual((await parser.parse()).get("field"), value.decode())
@@ -198,11 +215,16 @@ class TestMultipartStreaming(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        body = multipart_body(b"value").replace(
-            b"--" + _BOUNDARY + b"\r\n", b"--" + _BOUNDARY + b" \t\r\n",
-        ).replace(b"--\r\n", b"-- \t\r\n")
+        body = (
+            multipart_body(b"value")
+            .replace(
+                b"--" + _BOUNDARY + b"\r\n",
+                b"--" + _BOUNDARY + b" \t\r\n",
+            )
+            .replace(b"--\r\n", b"-- \t\r\n")
+        )
         parser = MultipartStreamParser(
-            stream_chunks([body[index:index + 1] for index in range(len(body))]),
+            stream_chunks([body[index : index + 1] for index in range(len(body))]),
             _BOUNDARY,
         )
         self.assertEqual((await parser.parse()).get("field"), "value")
@@ -216,7 +238,8 @@ class TestMultipartStreaming(TestCase):
             Assertions verify the behavior described above.
         """
         parser = MultipartStreamParser(
-            stream_chunks([multipart_body(b"value")[:-2]]), _BOUNDARY,
+            stream_chunks([multipart_body(b"value")[:-2]]),
+            _BOUNDARY,
         )
         self.assertEqual((await parser.parse()).get("field"), "value")
 
@@ -231,10 +254,11 @@ class TestMultipartStreaming(TestCase):
         padding = b" \t" * 256
         value = b"body\r\n--" + _BOUNDARY + b"--" + padding + b"X\r\ntail"
         body = b"preamble\r\n" + multipart_body(value).replace(
-            b"--" + _BOUNDARY + b"\r\n", b"--" + _BOUNDARY + padding + b"\r\n",
+            b"--" + _BOUNDARY + b"\r\n",
+            b"--" + _BOUNDARY + padding + b"\r\n",
         ).replace(b"--\r\n", b"--" + padding + b"\r\n")
         parser = MultipartStreamParser(
-            stream_chunks([body[index:index + 1] for index in range(len(body))]),
+            stream_chunks([body[index : index + 1] for index in range(len(body))]),
             _BOUNDARY,
         )
         buffer = _CountingBuffer()
@@ -293,7 +317,8 @@ class TestMultipartStreaming(TestCase):
             Assertions verify the behavior described above.
         """
         parser = MultipartStreamParser(
-            stream_chunks([multipart_body(b"value")]), _BOUNDARY,
+            stream_chunks([multipart_body(b"value")]),
+            _BOUNDARY,
             max_header_size=16,
         )
         with self.assertRaisesRegex(ValueError, "headers exceed"):
@@ -321,7 +346,9 @@ class TestMultipartStreaming(TestCase):
             Assertions verify the behavior described above.
         """
         parser = MultipartStreamParser(
-            stream_chunks([multipart_body(b"value")]), _BOUNDARY, max_part_size=4,
+            stream_chunks([multipart_body(b"value")]),
+            _BOUNDARY,
+            max_part_size=4,
         )
         with self.assertRaisesRegex(ValueError, "Part size"):
             await parser.parse()
@@ -336,8 +363,9 @@ class TestMultipartStreaming(TestCase):
         """
         body = multipart_body(b"value")
         parser = MultipartStreamParser(
-            stream_chunks([body[index:index + 1] for index in range(len(body))]),
-            _BOUNDARY, max_part_size=5,
+            stream_chunks([body[index : index + 1] for index in range(len(body))]),
+            _BOUNDARY,
+            max_part_size=5,
         )
         self.assertEqual((await parser.parse()).get("field"), "value")
         self.assertEqual(parser.current_part_size, 5)
@@ -351,7 +379,9 @@ class TestMultipartStreaming(TestCase):
             Assertions verify the behavior described above.
         """
         parser = MultipartStreamParser(
-            stream_chunks([multipart_body(b"value")]), _BOUNDARY, max_fields=0,
+            stream_chunks([multipart_body(b"value")]),
+            _BOUNDARY,
+            max_fields=0,
         )
         with self.assertRaisesRegex(ValueError, "Too many fields"):
             await parser.parse()
@@ -367,7 +397,8 @@ class TestMultipartStreaming(TestCase):
         upload = UploadedFile("file.txt", None, memory_threshold=1)
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(b"value", b'name="f"; filename="f"')]),
-            _BOUNDARY, max_part_size=4,
+            _BOUNDARY,
+            max_part_size=4,
         )
         with (
             replace_attribute(multipart_part, "UploadedFile", upload_factory(upload)),
@@ -420,7 +451,8 @@ class TestMultipartStreaming(TestCase):
         """
         parser = MultipartStreamParser(
             stream_chunks([multipart_body(b"value", b'name="f"; filename="f"')]),
-            _BOUNDARY, memory_threshold=1,
+            _BOUNDARY,
+            memory_threshold=1,
         )
         with await parser.parse() as form:
             upload = form.get("f")
@@ -573,7 +605,9 @@ class TestMultipartStreaming(TestCase):
         # Python 3.14 reports failures from cancelled shields through this hook.
         failures = []
         with replace_attribute(
-            asyncio.get_running_loop(), "call_exception_handler", failures.append,
+            asyncio.get_running_loop(),
+            "call_exception_handler",
+            failures.append,
         ):
             task = asyncio.create_task(complete_in_thread(fail_after_release))
             try:

@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import importlib
 import sys
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 from orionis.introspection.modules.inspector import ModuleInspector
 from orionis.test import TestCase
 
@@ -43,8 +46,8 @@ _PACKAGE_MODULE_NAMES = ("frozen_sample_module", "reexport_sample_module")
 # discoverModules
 # ---------------------------------------------------------------------------
 
-class TestModuleInspectorDiscoverModules(TestCase):
 
+class TestModuleInspectorDiscoverModules(TestCase):
     def testReturnsEmptySetForEmptyDirectory(self) -> None:
         """
         Assert that discoverModules returns an empty set for an empty tree.
@@ -52,7 +55,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -66,7 +69,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -86,12 +89,11 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
-        ``rglob('*.py')`` also matches directories, so the ``is_file`` guard
-        must discard them.
+        A Python-like suffix does not make a directory an importable file.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -108,7 +110,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -123,7 +125,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -139,7 +141,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -155,7 +157,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -171,7 +173,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -188,7 +190,7 @@ class TestModuleInspectorDiscoverModules(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp) / "base"
@@ -198,12 +200,13 @@ class TestModuleInspectorDiscoverModules(TestCase):
             with self.assertRaises(ValueError):
                 ModuleInspector.discoverModules(base, target)
 
+
 # ---------------------------------------------------------------------------
 # loadClass
 # ---------------------------------------------------------------------------
 
-class TestModuleInspectorLoadClass(TestCase):
 
+class TestModuleInspectorLoadClass(TestCase):
     def testResolvesClassFromValidModule(self) -> None:
         """
         Assert that loadClass retrieves a class from a valid module.
@@ -211,7 +214,7 @@ class TestModuleInspectorLoadClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         klass = ModuleInspector.loadClass(
             module_path="pathlib",
@@ -226,46 +229,35 @@ class TestModuleInspectorLoadClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         klass = ModuleInspector.loadClass(
             metadata={"module": "pathlib", "class": "Path"},
         )
         self.assertIs(klass, Path)
 
-    def testCachesResolvedClasses(self) -> None:
-        """
-        Assert that repeated lookups return the very same class object.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        first = ModuleInspector.loadClass(
-            module_path="pathlib",
-            class_name="Path",
-        )
-        second = ModuleInspector.loadClass(
-            module_path="pathlib",
-            class_name="Path",
-        )
-        self.assertIs(first, second)
+    def testRepeatedLoadsReturnTheDeclaredClass(self) -> None:
+        """Retain class identity across repeated imports of an unchanged module."""
+        first = ModuleInspector.loadClass("pathlib", "Path")
+        second = ModuleInspector.loadClass("pathlib", "Path")
+        self.assertIs(first, Path)
+        self.assertIs(second, Path)
 
     def testImportsModulesNotPresentInSysModules(self) -> None:
-        """
-        Assert that loadClass imports a module absent from ``sys.modules``.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        klass = ModuleInspector.loadClass(
-            module_path="xml.dom.minidom",
-            class_name="Document",
-        )
-        self.assertTrue(isinstance(klass, type))
+        """Import a fresh file instead of relying on a stdlib module's state."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            name = "orionis_inspector_fresh_fixture"
+            (root / f"{name}.py").write_text("class Sample: pass\n", encoding="utf-8")
+            with (
+                patch.object(sys, "path", [str(root), *sys.path]),
+                patch.dict(sys.modules),
+            ):
+                sys.modules.pop(name, None)
+                importlib.invalidate_caches()
+                self.assertNotIn(name, sys.modules)
+                klass = ModuleInspector.loadClass(name, "Sample")
+                self.assertIs(klass, sys.modules[name].Sample)
 
     def testRaisesImportErrorForUnknownModule(self) -> None:
         """
@@ -274,7 +266,7 @@ class TestModuleInspectorLoadClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ImportError):
             ModuleInspector.loadClass(
@@ -289,7 +281,7 @@ class TestModuleInspectorLoadClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             ModuleInspector.loadClass(
@@ -304,7 +296,7 @@ class TestModuleInspectorLoadClass(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ModuleInspector.loadClass(
@@ -312,34 +304,16 @@ class TestModuleInspectorLoadClass(TestCase):
                 class_name="sep",
             )
 
+
 # ---------------------------------------------------------------------------
 # fileImportsAny
 # ---------------------------------------------------------------------------
 
+
 class TestModuleInspectorFileImportsAny(TestCase):
-
     def setUp(self) -> None:
-        """
-        Create an isolated temporary directory for the sample files.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self._tmp = tempfile.TemporaryDirectory()
-        self._root = Path(self._tmp.name)
-
-    def tearDown(self) -> None:
-        """
-        Remove the temporary directory created for the sample files.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self._tmp.cleanup()
+        """Create an owned source directory and register cleanup immediately."""
+        self._root = Path(self.enterContext(tempfile.TemporaryDirectory()))
 
     def writeSource(self, name: str, payload: str | bytes) -> Path:
         """
@@ -371,7 +345,7 @@ class TestModuleInspectorFileImportsAny(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = ModuleInspector.fileImportsAny(
             file_path=self._root / "missing.py",
@@ -386,7 +360,7 @@ class TestModuleInspectorFileImportsAny(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         path = self.writeSource("from_import.py", "from pathlib import Path\n")
         result = ModuleInspector.fileImportsAny(
@@ -402,7 +376,7 @@ class TestModuleInspectorFileImportsAny(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         path = self.writeSource("plain_import.py", "import json\nimport os\n")
         result = ModuleInspector.fileImportsAny(
@@ -418,7 +392,7 @@ class TestModuleInspectorFileImportsAny(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         path = self.writeSource("unrelated.py", "import json\nx = 1\n")
         result = ModuleInspector.fileImportsAny(
@@ -434,7 +408,7 @@ class TestModuleInspectorFileImportsAny(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         path = self.writeSource("broken.py", "def (:\n")
         result = ModuleInspector.fileImportsAny(
@@ -450,7 +424,7 @@ class TestModuleInspectorFileImportsAny(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         path = self.writeSource("latin.py", b"# \xff\xfe import os\n")
         result = ModuleInspector.fileImportsAny(
@@ -459,23 +433,16 @@ class TestModuleInspectorFileImportsAny(TestCase):
         )
         self.assertFalse(result)
 
+
 # ---------------------------------------------------------------------------
 # discoverFrozenDataclasses
 # ---------------------------------------------------------------------------
 
+
 class TestModuleInspectorFrozenDataclasses(TestCase):
-
     def setUp(self) -> None:
-        """
-        Publish two throwaway modules on ``sys.path`` for the discovery tests.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self._tmp = tempfile.TemporaryDirectory()
-        root = Path(self._tmp.name)
+        """Scope generated modules, the import path and their source directory."""
+        root = Path(self.enterContext(tempfile.TemporaryDirectory()))
         (root / "frozen_sample_module.py").write_text(
             _FROZEN_MODULE_SOURCE,
             encoding="utf-8",
@@ -484,22 +451,12 @@ class TestModuleInspectorFrozenDataclasses(TestCase):
             _REEXPORT_MODULE_SOURCE,
             encoding="utf-8",
         )
-        sys.path.insert(0, str(root))
-        importlib.invalidate_caches()
-
-    def tearDown(self) -> None:
-        """
-        Remove the throwaway modules from ``sys.path`` and ``sys.modules``.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        sys.path.remove(str(Path(self._tmp.name)))
+        self.enterContext(patch.dict(sys.modules))
         for name in _PACKAGE_MODULE_NAMES:
             sys.modules.pop(name, None)
-        self._tmp.cleanup()
+        self.enterContext(patch.object(sys, "path", [str(root), *sys.path]))
+        importlib.invalidate_caches()
+        self.addCleanup(importlib.invalidate_caches)
 
     def testReturnsOnlyFrozenDataclassesDeclaredInTheModule(self) -> None:
         """
@@ -508,7 +465,7 @@ class TestModuleInspectorFrozenDataclasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -526,7 +483,7 @@ class TestModuleInspectorFrozenDataclasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         found = ModuleInspector.discoverFrozenDataclasses({"frozen_sample_module"})
         file_name, module_path, class_name, klass = next(iter(found))
@@ -542,7 +499,7 @@ class TestModuleInspectorFrozenDataclasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         found = ModuleInspector.discoverFrozenDataclasses({"reexport_sample_module"})
         self.assertEqual(found, set())
@@ -554,7 +511,7 @@ class TestModuleInspectorFrozenDataclasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(ModuleInspector.discoverFrozenDataclasses(set()), set())
 
@@ -565,7 +522,7 @@ class TestModuleInspectorFrozenDataclasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(RuntimeError):
             ModuleInspector.discoverFrozenDataclasses(

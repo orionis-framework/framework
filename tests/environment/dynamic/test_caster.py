@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import base64
 from pathlib import Path
 from orionis.environment.dynamic.caster import EnvironmentCaster
@@ -18,10 +21,12 @@ _LONE_SURROGATE: str = "\ud800"
 # Test doubles
 # ---------------------------------------------------------------------------
 
+
 class _ExtendedCaster(EnvironmentCaster):
     """Caster advertising a type hint that has no dispatch branch."""
 
     OPTIONS = frozenset({*EnvironmentCaster.OPTIONS, "unknown"})
+
 
 class _UncoercibleValue:
     """Value that cannot be coerced to a boolean."""
@@ -54,6 +59,7 @@ class _UncoercibleValue:
         """
         return "<uncoercible>"
 
+
 class _UnprintableOnceValue:
     """Value whose first string conversion fails and then recovers."""
 
@@ -65,7 +71,7 @@ class _UnprintableOnceValue:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.conversions: int = 0
 
@@ -87,6 +93,7 @@ class _UnprintableOnceValue:
             error_msg = "value is not printable"
             raise ValueError(error_msg)
         return "recovered"
+
 
 def build_caster(type_hint: str, value: object) -> EnvironmentCaster:
     """
@@ -112,12 +119,13 @@ def build_caster(type_hint: str, value: object) -> EnvironmentCaster:
     caster._EnvironmentCaster__value_raw = value
     return caster
 
+
 # ---------------------------------------------------------------------------
 # TestEnvironmentCasterSupportedTypes
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterSupportedTypes(TestCase):
 
+class TestEnvironmentCasterSupportedTypes(TestCase):
     def testExposesEveryEnumeratedTypeAsAnOption(self) -> None:
         """Expose every enumerated value type as a supported option.
 
@@ -127,7 +135,7 @@ class TestEnvironmentCasterSupportedTypes(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         expected = frozenset(member.value for member in EnvironmentValueType)
         self.assertEqual(EnvironmentCaster.supportedTypes(), expected)
@@ -141,7 +149,7 @@ class TestEnvironmentCasterSupportedTypes(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(EnvironmentCaster.supportedTypes(), frozenset)
 
@@ -153,16 +161,17 @@ class TestEnvironmentCasterSupportedTypes(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(EnvironmentCaster.supportedTypes(), EnvironmentCaster.OPTIONS)
+
 
 # ---------------------------------------------------------------------------
 # TestEnvironmentCasterParseTyped
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterParseTyped(TestCase):
 
+class TestEnvironmentCasterParseTyped(TestCase):
     def testParsesIntegersWithoutBuildingACaster(self) -> None:
         """Parse an integer through the allocation-free fast path.
 
@@ -172,7 +181,7 @@ class TestEnvironmentCasterParseTyped(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster.parseTyped("int: 42 "), 42)
 
@@ -185,11 +194,11 @@ class TestEnvironmentCasterParseTyped(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster.parseTyped("int:abc")
-        self.assertIn("Cannot convert 'abc' to int", str(ctx.exception))
+        self.assertEqual(str(ctx.exception), "Cannot convert environment value to int.")
 
     def testParsesFloatsWithoutBuildingACaster(self) -> None:
         """Parse a float through the allocation-free fast path.
@@ -199,7 +208,7 @@ class TestEnvironmentCasterParseTyped(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster.parseTyped("float: 3.5 "), 3.5)
 
@@ -212,11 +221,14 @@ class TestEnvironmentCasterParseTyped(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster.parseTyped("float:abc")
-        self.assertIn("Cannot convert 'abc' to float", str(ctx.exception))
+        self.assertEqual(
+            str(ctx.exception),
+            "Cannot convert environment value to float.",
+        )
 
     def testParsesEveryTruthyBooleanSpelling(self) -> None:
         """Parse every truthy spelling through the fast path.
@@ -227,24 +239,22 @@ class TestEnvironmentCasterParseTyped(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for word in _TRUE_WORDS:
             self.assertTrue(EnvironmentCaster.parseTyped(f"bool: {word.upper()} "))
 
-    def testTreatsAnyOtherBooleanSpellingAsFalse(self) -> None:
-        """Treat unknown boolean spellings as ``False`` on the fast path.
-
-        Validates the documented asymmetry with the full parser, which
-        instead rejects unknown spellings.
+    def testParsesEveryFalsyBooleanSpelling(self) -> None:
+        """Parse every supported false spelling consistently on the fast path.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        for word in (*_FALSE_WORDS, "maybe"):
-            self.assertFalse(EnvironmentCaster.parseTyped(f"bool:{word}"))
+        for word in _FALSE_WORDS:
+            with self.subTest(word=word):
+                self.assertFalse(EnvironmentCaster.parseTyped(f"bool:{word}"))
 
     def testKeepsTrailingWhitespaceOnStrings(self) -> None:
         """Preserve trailing whitespace when parsing a string entry.
@@ -255,7 +265,7 @@ class TestEnvironmentCasterParseTyped(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster.parseTyped("str:  hello "), "hello ")
 
@@ -268,7 +278,7 @@ class TestEnvironmentCasterParseTyped(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster.parseTyped("list:[1, 2]"), [1, 2])
         self.assertEqual(EnvironmentCaster.parseTyped("dict:{'a': 1}"), {"a": 1})
@@ -276,12 +286,13 @@ class TestEnvironmentCasterParseTyped(TestCase):
         self.assertEqual(EnvironmentCaster.parseTyped("set:{1, 2}"), {1, 2})
         self.assertEqual(EnvironmentCaster.parseTyped("base64:aGVsbG8="), "hello")
 
+
 # ---------------------------------------------------------------------------
 # TestEnvironmentCasterConstruction
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterConstruction(TestCase):
 
+class TestEnvironmentCasterConstruction(TestCase):
     def testDetectsAKnownTypeHint(self) -> None:
         """Detect a known type hint written before the first colon.
 
@@ -291,7 +302,7 @@ class TestEnvironmentCasterConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("int:42").get(), 42)
 
@@ -304,7 +315,7 @@ class TestEnvironmentCasterConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("  INT : 42").get(), 42)
 
@@ -317,7 +328,7 @@ class TestEnvironmentCasterConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         caster = EnvironmentCaster("https://example.test")
         self.assertEqual(caster.get(), "https://example.test")
@@ -330,7 +341,7 @@ class TestEnvironmentCasterConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("plain").get(), "plain")
 
@@ -342,7 +353,7 @@ class TestEnvironmentCasterConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("   plain").get(), "plain")
 
@@ -355,24 +366,10 @@ class TestEnvironmentCasterConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = [1, 2, 3]
         self.assertIs(EnvironmentCaster(payload).get(), payload)
-
-    def testStoresNoneWhenTheTypedPayloadIsEmpty(self) -> None:
-        """Store ``None`` when a typed entry carries no payload.
-
-        Validates the guard that prevents an empty payload from being
-        mistaken for an empty string.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(ValueError):
-            EnvironmentCaster("int:").get()
 
     def testDoesNotExposeAnInstanceDictionary(self) -> None:
         """Keep caster instances free of an instance dictionary.
@@ -383,16 +380,17 @@ class TestEnvironmentCasterConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(EnvironmentCaster("int:1"), "__dict__"))
+
 
 # ---------------------------------------------------------------------------
 # TestEnvironmentCasterGet
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterGet(TestCase):
 
+class TestEnvironmentCasterGet(TestCase):
     def testParsesEveryPrimitiveType(self) -> None:
         """Parse every primitive type declared by a hint.
 
@@ -402,7 +400,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("str:  text ").get(), "text ")
         self.assertEqual(EnvironmentCaster("int: -7 ").get(), -7)
@@ -417,7 +415,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for word in _TRUE_WORDS:
             self.assertTrue(EnvironmentCaster(f"bool:{word}").get())
@@ -430,7 +428,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for word in _FALSE_WORDS:
             self.assertFalse(EnvironmentCaster(f"bool:{word}").get())
@@ -444,7 +442,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster("bool:maybe").get()
@@ -459,7 +457,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for entry, expected in (("int:abc", "to int"), ("float:abc", "to float")):
             with self.assertRaises(ValueError) as ctx:
@@ -475,7 +473,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("list: [1, 2] ").get(), [1, 2])
         self.assertEqual(EnvironmentCaster("dict: {'a': 1} ").get(), {"a": 1})
@@ -491,7 +489,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for entry in ("list:{'a': 1}", "dict:[1, 2]", "tuple:[1, 2]", "set:[1, 2]"):
             with self.assertRaises((TypeError, ValueError)):
@@ -506,7 +504,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for entry in ("list:[1,", "dict:{'a':", "tuple:(1,", "set:{1,"):
             with self.assertRaises((SyntaxError, ValueError)):
@@ -521,26 +519,24 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError) as ctx:
             EnvironmentCaster("list:{'a': 1}").get()
         self.assertIn("type hint 'list'", str(ctx.exception))
 
-    def testWrapsUnexpectedFailuresAsValueError(self) -> None:
-        """Wrap unexpected failures into a ``ValueError``.
-
-        Validates the last-resort handler that keeps the caster from
-        leaking arbitrary exception types to its callers.
+    def testRejectsEmptyNumericPayload(self) -> None:
+        """Reject an empty integer payload with its declared type in the error.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster("int:").get()
-        self.assertIn("Error processing value", str(ctx.exception))
+        self.assertIn("Error processing environment value", str(ctx.exception))
+        self.assertIn("type hint 'int'", str(ctx.exception))
 
     def testDecodesBase64Payloads(self) -> None:
         """Decode a base64 payload back into readable text.
@@ -550,7 +546,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("base64:aGVsbG8=").get(), "hello")
 
@@ -563,7 +559,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         encoded = base64.b64encode(_NON_UTF8).decode("utf-8")
         self.assertEqual(EnvironmentCaster(f"base64:{encoded}").get(), _NON_UTF8)
@@ -577,7 +573,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         caster = EnvironmentCaster(b"aGVsbG8=")
         caster.to("base64")
@@ -592,7 +588,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster("base64:not-base64!").get()
@@ -607,7 +603,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         caster = EnvironmentCaster("path:C:\\\\data\\\\logs")
         self.assertNotIn("\\", str(caster.get()))
@@ -621,7 +617,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         caster = EnvironmentCaster(Path("/var/log/app"))
         caster.to("path")
@@ -636,7 +632,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         caster = build_caster("path", _UnprintableOnceValue())
         with self.assertRaises(ValueError) as ctx:
@@ -651,7 +647,7 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("plain value").get(), "plain value")
 
@@ -664,16 +660,17 @@ class TestEnvironmentCasterGet(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_ExtendedCaster("unknown:payload").get(), "payload")
+
 
 # ---------------------------------------------------------------------------
 # TestEnvironmentCasterTo
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterTo(TestCase):
 
+class TestEnvironmentCasterTo(TestCase):
     def testSerialisesEveryPrimitiveType(self) -> None:
         """Serialise every primitive type with its hint prefix.
 
@@ -683,7 +680,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster("text").to("str"), "str:text")
         self.assertEqual(EnvironmentCaster(42).to("int"), "int:42")
@@ -700,7 +697,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster([1, 2]).to("list"), "list:[1, 2]")
         self.assertEqual(EnvironmentCaster({"a": 1}).to("dict"), "dict:{'a': 1}")
@@ -716,7 +713,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         caster = EnvironmentCaster(42)
         self.assertEqual(caster.to(EnvironmentValueType.INT), "int:42")
@@ -730,7 +727,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster(" 42 ").to("int"), "int:42")
         self.assertEqual(EnvironmentCaster(" 2.5 ").to("float"), "float:2.5")
@@ -744,7 +741,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster(42).to("float"), "float:42.0")
         self.assertEqual(EnvironmentCaster(2.9).to("int"), "int:2")
@@ -758,7 +755,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for type_hint in ("int", "float"):
             with self.assertRaises(ValueError):
@@ -772,7 +769,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for type_hint in ("int", "float"):
             with self.assertRaises(ValueError) as ctx:
@@ -788,7 +785,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for word in _TRUE_WORDS:
             self.assertEqual(EnvironmentCaster(word).to("bool"), "bool:true")
@@ -803,7 +800,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             EnvironmentCaster("maybe").to("bool")
@@ -817,7 +814,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(EnvironmentCaster([1, 2]).to("bool"), "bool:true")
         self.assertEqual(EnvironmentCaster([]).to("bool"), "bool:false")
@@ -830,7 +827,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster(_UncoercibleValue()).to("bool")
@@ -845,7 +842,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for type_hint in ("list", "dict", "tuple", "set"):
             with self.assertRaises(ValueError) as ctx:
@@ -860,7 +857,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster(42).to("str")
@@ -875,7 +872,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = EnvironmentCaster("logs/app.log").to("path")
         self.assertTrue(stored.startswith("path:"))
@@ -889,7 +886,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         absolute = Path.cwd() / "logs"
         stored = EnvironmentCaster(absolute).to("path")
@@ -903,7 +900,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         stored = EnvironmentCaster("\\\\var\\\\log").to("path")
         self.assertNotIn("\\", stored)
@@ -916,7 +913,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster(42).to("path")
@@ -931,7 +928,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             EnvironmentCaster("aGVsbG8=").to("base64"),
@@ -946,7 +943,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             EnvironmentCaster("hi!").to("base64"),
@@ -962,26 +959,27 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             EnvironmentCaster(b"hello").to("base64"),
             f"base64:{base64.b64encode(b'hello').decode('utf-8')}",
         )
 
-    def testRejectsBinaryPayloadsThatAreNotUtf8(self) -> None:
-        """Reject binary payloads that cannot be decoded as UTF-8.
-
-        Validates the guard placed before the base64 validity check.
+    def testRoundTripsBinaryPayloadsThatAreNotUtf8(self) -> None:
+        """Encode arbitrary binary data without requiring a UTF-8 conversion.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        with self.assertRaises(ValueError) as ctx:
-            EnvironmentCaster(_NON_UTF8).to("base64")
-        self.assertIn("Cannot decode bytes to UTF-8", str(ctx.exception))
+        stored = EnvironmentCaster(_NON_UTF8).to("base64")
+        self.assertEqual(
+            stored,
+            f"base64:{base64.b64encode(_NON_UTF8).decode('ascii')}",
+        )
+        self.assertEqual(EnvironmentCaster.parseTyped(stored), _NON_UTF8)
 
     def testRejectsTextualPayloadsThatCannotBeEncoded(self) -> None:
         """Reject textual payloads that cannot be encoded as UTF-8.
@@ -992,7 +990,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster(_LONE_SURROGATE).to("base64")
@@ -1006,7 +1004,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster(42).to("base64")
@@ -1020,7 +1018,7 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             EnvironmentCaster("text").to("decimal")
@@ -1035,18 +1033,19 @@ class TestEnvironmentCasterTo(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             _ExtendedCaster("text").to("unknown")
         self.assertIn("is not supported for conversion", str(ctx.exception))
 
+
 # ---------------------------------------------------------------------------
 # TestEnvironmentCasterRoundTrip
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterRoundTrip(TestCase):
 
+class TestEnvironmentCasterRoundTrip(TestCase):
     def testRestoresEveryValueThroughAFullRoundTrip(self) -> None:
         """Restore every supported value through a write and read cycle.
 
@@ -1056,7 +1055,7 @@ class TestEnvironmentCasterRoundTrip(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for value, type_hint in (
             ("text", "str"),

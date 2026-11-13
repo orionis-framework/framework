@@ -10,6 +10,7 @@ _MIN_SECRET_BYTES: int = 32
 _MAX_SECRET_BYTES: int = 128
 """Max secret bytes value used by ``tokens``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Tokens(BaseEntity):
     """

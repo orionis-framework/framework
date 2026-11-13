@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import argparse
 from unittest.mock import MagicMock, patch
@@ -8,8 +10,10 @@ from orionis.test import TestCase
 #  Helpers                                                           #
 # ------------------------------------------------------------------ #
 
+
 def _make_parser(
-    *flags_or_positionals: str, **kwargs: object,
+    *flags_or_positionals: str,
+    **kwargs: object,
 ) -> argparse.ArgumentParser:
     """
     Build an ArgumentParser with the requested arguments for test use.
@@ -31,8 +35,8 @@ def _make_parser(
         parser.add_argument(flag, **kwargs)
     return parser
 
-class TestHelpCommand(TestCase):
 
+class TestHelpCommand(TestCase):
     # ------------------------------------------------------------------ #
     #  parseActions — return structure                                   #
     # ------------------------------------------------------------------ #
@@ -105,8 +109,17 @@ class TestHelpCommand(TestCase):
         parser = argparse.ArgumentParser(add_help=True)
         result = HelpCommand.parseActions(parser._actions)
         expected_fields = {
-            "action_class", "dest", "flags", "nargs", "const",
-            "default", "type", "choices", "required", "help", "metavar",
+            "action_class",
+            "dest",
+            "flags",
+            "nargs",
+            "const",
+            "default",
+            "type",
+            "choices",
+            "required",
+            "help",
+            "metavar",
         }
         self.assertTrue(expected_fields.issubset(result["help"].keys()))
 

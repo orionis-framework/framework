@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import tempfile
 from pathlib import Path
 from orionis.localization.contracts.loader import ITranslationLoader
@@ -7,6 +9,7 @@ from orionis.localization.exceptions import (
 )
 from orionis.localization.loader import TranslationLoader
 from orionis.test import TestCase
+
 
 def write_source(path: Path, payload: str) -> None:
     """
@@ -26,6 +29,7 @@ def write_source(path: Path, payload: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(payload, encoding="utf-8")
 
+
 class _LoaderFixture(TestCase):
     """Provide an isolated language directory for every test."""
 
@@ -40,22 +44,10 @@ class _LoaderFixture(TestCase):
         -------
         None
         """
-        self._temporary = tempfile.TemporaryDirectory()
-        self._root = Path(self._temporary.name)
+        super().setUp()
+        self._root = Path(self.enterContext(tempfile.TemporaryDirectory()))
         self._loader = TranslationLoader(self._root)
 
-    def tearDown(self) -> None:
-        """
-        Remove the temporary language directory.
-
-        Guarantees that no fixture file survives the test that created
-        it.
-
-        Returns
-        -------
-        None
-        """
-        self._temporary.cleanup()
 
 class TestTranslationLoaderDefinition(_LoaderFixture):
     """Validate the structural contract of the loader."""
@@ -69,7 +61,7 @@ class TestTranslationLoaderDefinition(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(self._loader, ITranslationLoader)
 
@@ -82,9 +74,10 @@ class TestTranslationLoaderDefinition(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(self._loader, "__dict__"))
+
 
 class TestTranslationLoaderRootFiles(_LoaderFixture):
     """Validate decoding of the root JSON file of a locale."""
@@ -98,7 +91,7 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es.json", '{"Welcome": "Bienvenido"}')
         self.assertEqual(self._loader.load("es")["Welcome"], "Bienvenido")
@@ -112,7 +105,7 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(
             self._root / "es.json",
@@ -131,7 +124,7 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es.json", '{"Total": 5, "Ready": true}')
         loaded = self._loader.load("es")
@@ -147,7 +140,7 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(
             self._root / "es.json",
@@ -156,6 +149,7 @@ class TestTranslationLoaderRootFiles(_LoaderFixture):
         loaded = self._loader.load("es")
         self.assertEqual(loaded["Goodbye"], "Adi\u00f3s")
         self.assertEqual(loaded["Welcome"], "\u3088\u3046\u3053\u305d")
+
 
 class TestTranslationLoaderGroupedFiles(_LoaderFixture):
     """Validate decoding of the grouped files of a locale."""
@@ -169,7 +163,7 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(
             self._root / "es" / "validation.json",
@@ -187,7 +181,7 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(
             self._root / "es" / "validation.json",
@@ -207,7 +201,7 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es" / "limits.json", '{"max": 10}')
         self.assertEqual(self._loader.load("es")["limits.max"], "10")
@@ -221,7 +215,7 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es" / "auth.json", '{"failed": "Fallo"}')
         write_source(self._root / "es" / "passwords.json", '{"reset": "Listo"}')
@@ -238,11 +232,12 @@ class TestTranslationLoaderGroupedFiles(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es" / "auth.json", '{"failed": "Grouped"}')
         write_source(self._root / "es.json", '{"auth.failed": "Root"}')
         self.assertEqual(self._loader.load("es")["auth.failed"], "Root")
+
 
 class TestTranslationLoaderMissingSources(_LoaderFixture):
     """Validate the behaviour when translation sources are absent."""
@@ -256,7 +251,7 @@ class TestTranslationLoaderMissingSources(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._loader.load("fr"), {})
 
@@ -269,11 +264,12 @@ class TestTranslationLoaderMissingSources(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         (self._root / "es").mkdir()
         write_source(self._root / "es" / "notes.txt", "ignored")
         self.assertEqual(self._loader.load("es"), {})
+
 
 class TestTranslationLoaderInvalidSources(_LoaderFixture):
     """Validate the errors raised for unusable translation files."""
@@ -287,7 +283,7 @@ class TestTranslationLoaderInvalidSources(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es.json", "{broken")
         with self.assertRaises(TranslationSyntaxException):
@@ -302,7 +298,7 @@ class TestTranslationLoaderInvalidSources(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es.json", '["Bienvenido"]')
         with self.assertRaises(TranslationSyntaxException):
@@ -317,7 +313,7 @@ class TestTranslationLoaderInvalidSources(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es" / "auth.json", '"Fallo"')
         with self.assertRaises(TranslationSyntaxException):
@@ -332,7 +328,7 @@ class TestTranslationLoaderInvalidSources(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         (self._root / "es.json").write_bytes(
             '{"Goodbye": "Adi\u00f3s"}'.encode("latin-1"),
@@ -349,10 +345,11 @@ class TestTranslationLoaderInvalidSources(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TranslationFileNotFoundException):
             self._loader._TranslationLoader__readFile(self._root / "ghost.json")
+
 
 class TestTranslationLoaderDiscovery(_LoaderFixture):
     """Validate discovery of the locales available on disk."""
@@ -366,7 +363,7 @@ class TestTranslationLoaderDiscovery(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es.json", "{}")
         write_source(self._root / "en.json", "{}")
@@ -382,7 +379,7 @@ class TestTranslationLoaderDiscovery(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es.json", "{}")
         (self._root / "cache").mkdir()
@@ -397,7 +394,7 @@ class TestTranslationLoaderDiscovery(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         write_source(self._root / "es.json", "{}")
         write_source(self._root / "readme.txt", "ignored")
@@ -412,7 +409,7 @@ class TestTranslationLoaderDiscovery(_LoaderFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         loader = TranslationLoader(self._root / "missing")
         self.assertEqual(loader.availableLocales(), ())

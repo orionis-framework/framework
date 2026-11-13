@@ -17,6 +17,7 @@ EXPECTED_EXPORTS = {
     "ScopeNotFoundException": ("orionis.orm.exceptions", "ScopeNotFoundException"),
 }
 
+
 class TestExceptionsPackage(TestCase):
     """Verify the orionis.orm.exceptions public export surface."""
 
@@ -26,6 +27,6 @@ class TestExceptionsPackage(TestCase):
         Returns
         -------
         None
-            Verify exact exported names and identities without shadowing modules.
+            No return value.
         """
         assert_package_exports(self, "orionis.orm.exceptions", EXPECTED_EXPORTS)

@@ -1,20 +1,20 @@
+# ruff: noqa: TC003
+# Keep public callback and iterator annotations resolvable during reflection.
 """Provide collection operations over an ordered sequence of values."""
 
 from __future__ import annotations
 import contextlib
 import json
 import operator
-import random
 import secrets
 from functools import reduce
 from itertools import groupby
-from typing import TYPE_CHECKING, Any, Self
+from random import SystemRandom
+from collections.abc import Callable, Iterator
+from typing import Any, Self, cast
 from dotty_dict import dotty
 from orionis.support.types.contracts.collection import ICollection
 from orionis.support.types.uniqueness import unique_items
-
-if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
 
 # Map comparison names to their implementations.
 _OPERATORS: dict[str, Any] = {
@@ -35,6 +35,7 @@ Sentinel object: distinguishes "attribute absent" from a legitimate None value i
 getattr calls, eliminating the hasattr+getattr double-lookup.
 """
 
+
 class Collection(ICollection):
     """Provide collection operations over an ordered sequence of values."""
 
@@ -52,14 +53,14 @@ class Collection(ICollection):
 
     def __init__(
         self: Self,
-        items: list[Any] | None = None,
+        items: list[Any] | dict[Any, Any] | None = None,
     ) -> None:
         """
         Initialize a new Collection instance.
 
         Parameters
         ----------
-        items : list[typing.Any] or None, optional
+        items : list[typing.Any] | dict[typing.Any, typing.Any] | None, optional
             Initial items for the collection (default is None).
 
         Returns
@@ -67,7 +68,7 @@ class Collection(ICollection):
         None
             This method does not return a value.
         """
-        self._items = items or []
+        self._items = items if items is not None else []
         """Initial items for the collection (default is None)."""
         self.__appends__ = []
         """Computed attributes appended when collection items are serialized."""
@@ -148,13 +149,13 @@ class Collection(ICollection):
                 result = item
         return result
 
-    def all(self: Self) -> list[Any]:
+    def all(self: Self) -> list[Any] | dict[Any, Any]:
         """
         Return all items in the collection.
 
         Returns
         -------
-        list of typing.Any
+        list[typing.Any] | dict[typing.Any, typing.Any]
             All items contained in the collection.
         """
         return self._items
@@ -181,7 +182,7 @@ class Collection(ICollection):
         result = 0
 
         # Get values using the key or use all items if key is None
-        items = self.__getValue(key) or self._items
+        items = self._items if key is None else self.__getValue(key)
 
         # Return zero when there are no values to average.
         if not items:
@@ -211,7 +212,7 @@ class Collection(ICollection):
         """
         # Get values using the key or use all items if key is None
         result = 0
-        items = self.__getValue(key) or self._items
+        items = self._items if key is None else self.__getValue(key)
         try:
             return max(items)
         except TypeError, ValueError:
@@ -236,7 +237,7 @@ class Collection(ICollection):
             The minimum value found, or 0 if not found or on error.
         """
         result = 0
-        items = self.__getValue(key) or self._items
+        items = self._items if key is None else self.__getValue(key)
         try:
             return min(items)
         except TypeError, ValueError:
@@ -329,7 +330,7 @@ class Collection(ICollection):
 
     def diff(
         self: Self,
-        items: list[Any] | Collection,
+        items: list[Any] | ICollection,
     ) -> Collection:
         """
         Return items not present in the given collection.
@@ -645,14 +646,14 @@ class Collection(ICollection):
                 if method:
                     results.append(mapper(item, **kwargs))
                 else:
-                    results.append(cls(item))
+                    results.append(cls(item, **kwargs))
             except TypeError, AttributeError, ValueError:
                 results.append(None)
         return self.__class__(results)
 
     def merge(
         self: Self,
-        items: list[Any] | Collection,
+        items: list[Any] | ICollection,
     ) -> Collection:
         """
         Merge the collection with the given items.
@@ -673,7 +674,7 @@ class Collection(ICollection):
             If items cannot be merged due to incompatible types.
         """
         # Ensure items is a list or Collection before merging
-        if not isinstance(items, (list, Collection)):
+        if not isinstance(items, (list, ICollection)):
             error_msg = "Unable to merge incompatible types"
             raise TypeError(error_msg)
 
@@ -775,9 +776,11 @@ class Collection(ICollection):
         typing.Any
             The removed item, or None if not found.
         """
-        # Retrieve the value at the specified key, then remove it from the collection
-        value = self.get(key)
-        self.forget(key)
+        try:
+            value = self[key]
+        except IndexError, KeyError:
+            return None
+        del self[key]
         return value
 
     def push(
@@ -863,9 +866,9 @@ class Collection(ICollection):
                 raise ValueError(error_msg)
 
         # Return random items based on count
-        if count:
+        if count is not None:
             # Select 'count' random items and update the collection
-            self._items = random.sample(self._items, k=count)  # NOSONAR
+            self._items = SystemRandom().sample(self._items, k=count)
             return self
 
         # Return a single random item
@@ -1041,7 +1044,7 @@ class Collection(ICollection):
         """
         result = 0
         # Get values using the key or use all items if key is None
-        items = self.__getValue(key) or self._items
+        items = self._items if key is None else self.__getValue(key)
         with contextlib.suppress(TypeError):
             result = sum(items)
         return result
@@ -1231,7 +1234,7 @@ class Collection(ICollection):
     def whereIn(
         self: Self,
         key: str,
-        values: list[Any] | Collection,
+        values: list[Any] | ICollection,
     ) -> Collection:
         """
         Filter items where a given key's value is in a list of values.
@@ -1278,7 +1281,7 @@ class Collection(ICollection):
     def whereNotIn(
         self: Self,
         key: str,
-        values: list[Any] | Collection,
+        values: list[Any] | ICollection,
     ) -> Collection:
         """
         Filter items where a given key's value is not in a list of values.
@@ -1324,7 +1327,7 @@ class Collection(ICollection):
 
     def zip(
         self: Self,
-        items: list[Any] | Collection,
+        items: list[Any] | ICollection,
     ) -> Collection:
         """
         Zip the collection with the given items by index.
@@ -1341,11 +1344,11 @@ class Collection(ICollection):
 
         Raises
         ------
-        ValueError
+        TypeError
             If the 'items' parameter is not a list or Collection.
         """
         # Validate input type first
-        if not isinstance(items, (list, Collection)):
+        if not isinstance(items, (list, ICollection)):
             error_msg = "The 'items' parameter must be a list or a Collection"
             raise TypeError(error_msg)
 
@@ -1419,7 +1422,7 @@ class Collection(ICollection):
         list[typing.Any] | None
             List of extracted values, or None if key is not provided.
         """
-        if not key:
+        if key is None:
             return None
 
         items: list[Any] = []
@@ -1499,7 +1502,7 @@ class Collection(ICollection):
         """
         # Evaluate the value if it is callable, otherwise return as is
         if callable(value):
-            return value()  # NOSONAR
+            return cast("Callable[[], object]", value)()
         return value
 
     def __checkIsCallable(
@@ -1801,7 +1804,7 @@ class Collection(ICollection):
     @classmethod
     def __getItems(
         cls: type[Self],
-        items: list[Any] | Collection | object,
+        items: object,
     ) -> list[Any] | object:
         """
         Extract the underlying items from a Collection or return the input as-is.
@@ -1819,6 +1822,6 @@ class Collection(ICollection):
             original input.
         """
         # If the input is a Collection, extract its items using the all() method
-        if isinstance(items, Collection):
+        if isinstance(items, ICollection):
             items = items.all()
         return items

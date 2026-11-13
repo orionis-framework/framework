@@ -3,6 +3,7 @@
 import re
 import unicodedata
 
+
 class Comment:
     """Describe a database schema comment."""
 
@@ -18,7 +19,7 @@ class Comment:
         Returns
         -------
         None
-            Initialize a Comment instance.
+            No return value.
         """
         # Normaliza Unicode
         text = unicodedata.normalize("NFC", text)

@@ -285,7 +285,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId37026"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId37126"> 
                     
                 </input>
 
@@ -543,11 +543,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Jinja2Engine</span>(<a href="orionis.view.contracts.engine.IViewEngine.html" class="internal-link" title="orionis.view.contracts.engine.IViewEngine">IViewEngine</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L27" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.view.engine.Jinja2Engine.__init__">Jinja2Engine(environment)</a></code></p><p><a href="classIndex.html#orionis.view.engine.Jinja2Engine">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Jinja2Engine</span>(<a href="orionis.view.contracts.engine.IViewEngine.html" class="internal-link" title="orionis.view.contracts.engine.IViewEngine">IViewEngine</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L30" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.view.engine.Jinja2Engine.__init__">Jinja2Engine(environment)</a></code></p><p><a href="classIndex.html#orionis.view.engine.Jinja2Engine">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Jinja2-based implementation of <code><a href="orionis.view.contracts.engine.IViewEngine.html" class="internal-link">orionis.view.contracts.engine.IViewEngine</a></code>.</p>
+          <div><p>Render templates with Jinja2 through the view-engine contract.</p>
 <p>Converts dot-notation template names to filesystem paths and delegates
 all rendering to Jinja2's async rendering pipeline (<tt class="rst-docutils rst-literal">render_async</tt>).
 The synchronous <tt class="rst-docutils rst-literal">render</tt> method of Jinja2 is <strong>never</strong> called from
@@ -556,7 +556,7 @@ this class.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2211">
+          <table class="children sortable" id="id2228">
   
   
   <tr class="staticmethod">
@@ -625,7 +625,7 @@ this class.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_normalisePath</span><span class="function-signature">(<span class="rst-sig-param">template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L164">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L170">
       
       (source)
     </a>
@@ -664,7 +664,7 @@ present.</li>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">environment: <code><a href="orionis.view.contracts.environment.IViewEnvironment.html" class="internal-link" title="orionis.view.contracts.environment.IViewEnvironment">IViewEnvironment</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L43">
       
       (source)
     </a>
@@ -677,7 +677,7 @@ present.</li>
   <div class="docstring functionBody">
     
     <div><p>Initialise the engine with the configured view environment.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">environment:</span><code><a href="orionis.view.contracts.environment.IViewEnvironment.html" class="internal-link">orionis.view.contracts.environment.IViewEnvironment</a></code></td><td class="fieldArgDesc">View environment providing the configured Jinja2
-<tt class="rst-docutils rst-literal">Environment</tt> instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Initialise the engine with the configured view environment.</td></tr></table></div>
+<tt class="rst-docutils rst-literal">Environment</tt> instance.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -692,7 +692,7 @@ present.</li>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_load</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>jinja2.Template</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L72">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L73">
       
       (source)
     </a>
@@ -719,7 +719,7 @@ present.</li>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">render</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">context: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L106">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L107">
       
       (source)
     </a>
@@ -732,12 +732,12 @@ present.</li>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.view.contracts.engine.IViewEngine.html#render" class="internal-link">orionis.view.contracts.engine.IViewEngine.render</a></code></div>
     <div><p>Render a template asynchronously using Jinja2.</p>
-<p>Dot-notation identifiers are converted to slash-delimited paths
-with a <tt class="rst-docutils rst-literal">.html</tt> suffix automatically appended when the name
-carries no extension (e.g. <tt class="rst-docutils rst-literal">'users.index'</tt> → <tt class="rst-docutils rst-literal">'users/index.html'</tt>).</p>
+<p>Interpret identifiers without <tt class="rst-docutils rst-literal">/</tt> as dot notation, including their
+final segment (<tt class="rst-docutils rst-literal">'users.index'</tt> becomes <tt class="rst-docutils rst-literal">'users/index.html'</tt>).
+Include <tt class="rst-docutils rst-literal">/</tt> to pass a relative filename with an extension directly.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Template identifier using dot notation or a direct relative
 path.  A <tt class="rst-docutils rst-literal">.html</tt> suffix is appended when absent.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>]</code></td><td class="fieldArgDesc">Variables made available inside the template during rendering.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Rendered HTML string.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.exceptions.ViewTemplateNotFoundException.html" class="internal-link">orionis.view.exceptions.ViewTemplateNotFoundException</a></code></td><td>When the template file cannot be located by the configured
-loaders.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.exceptions.ViewRenderException.html" class="internal-link">orionis.view.exceptions.ViewRenderException</a></code></td><td>When Jinja2 raises any error during rendering.</td></tr></table></div>
+loaders.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.exceptions.ViewRenderException.html" class="internal-link">orionis.view.exceptions.ViewRenderException</a></code></td><td>When Jinja2 raises a template error while loading or rendering.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.support.concurrency.WorkQueueFullError.html" class="internal-link">orionis.support.concurrency.WorkQueueFullError</a></code></td><td>When the bounded template workers cannot admit a cold load.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -752,7 +752,7 @@ loaders.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">warmup</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">*templates: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L89">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L90">
       
       (source)
     </a>
@@ -764,7 +764,7 @@ loaders.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.view.contracts.engine.IViewEngine.html#warmup" class="internal-link">orionis.view.contracts.engine.IViewEngine.warmup</a></code></div>
-    <div><p>Compile known templates before serving requests, without rendering globals.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*templates:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Template identifiers, including known includes and parent templates.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Jinja's existing bounded and bytecode caches receive compiled templates.</td></tr></table></div>
+    <div><p>Compile known templates before serving requests, without rendering globals.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">*templates:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Template identifiers, including known includes and parent templates.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -778,7 +778,7 @@ loaders.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L40">
       
       (source)
     </a>
@@ -805,7 +805,7 @@ loaders.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.
   <div class="functionHeader">
     
     <span class="py-defname">_environment</span>: <code><a href="orionis.view.contracts.environment.IViewEnvironment.html" class="internal-link" title="orionis.view.contracts.environment.IViewEnvironment">IViewEnvironment</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L58">
       
       (source)
     </a>
@@ -833,7 +833,7 @@ instance.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_jinja</span>: <code>jinja2.Environment</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L65">
       
       (source)
     </a>
@@ -861,7 +861,7 @@ reference stays valid for the whole application lifetime.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_load_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/engine.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/engine.py#L70">
       
       (source)
     </a>
@@ -887,7 +887,7 @@ reference stays valid for the whole application lifetime.</p></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

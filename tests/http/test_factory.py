@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -15,6 +17,7 @@ from orionis.http.responses import (
     StreamingResponse,
 )
 from orionis.test import TestCase
+
 
 class _Money:
     """Domain value object that no JSON encoder handles natively."""
@@ -35,6 +38,7 @@ class _Money:
             Completes the operation described above.
         """
         self.amount = amount
+
 
 class _StubPendingView:
     """Stand-in for the pending view returned by the view facade."""
@@ -58,6 +62,7 @@ class _StubPendingView:
         """
         self.template = template
         self.context = context
+
 
 class _StubViewFacade:
     """Facade double capturing the arguments the factory forwards."""
@@ -84,8 +89,8 @@ class _StubViewFacade:
         cls.calls.append((template, context))
         return _StubPendingView(template, context)
 
-class TestResponseFactoryView(TestCase):
 
+class TestResponseFactoryView(TestCase):
     def setUp(self) -> None:
         """Install a view facade double for the duration of the test.
 
@@ -143,8 +148,8 @@ class TestResponseFactoryView(TestCase):
         self.assertEqual(result.template, "auth.login")
         self.assertEqual(result.context, {})
 
-class TestResponseFactoryHtml(TestCase):
 
+class TestResponseFactoryHtml(TestCase):
     def testHtmlUsesSaneDefaults(self) -> None:
         """Build an empty ``200`` HTML response by default.
 
@@ -181,8 +186,8 @@ class TestResponseFactoryHtml(TestCase):
         self.assertEqual(result.getStatusCode(), 201)
         self.assertEqual(result.getHeader("x-source"), ["factory"])
 
-class TestResponseFactoryJson(TestCase):
 
+class TestResponseFactoryJson(TestCase):
     def testJsonSerialisesTheContent(self) -> None:
         """Serialise the payload and advertise the JSON content type.
 
@@ -247,8 +252,8 @@ class TestResponseFactoryJson(TestCase):
         self.assertEqual(result.getStatusCode(), 422)
         self.assertEqual(result.getHeader("x-trace"), ["abc"])
 
-class TestResponseFactoryText(TestCase):
 
+class TestResponseFactoryText(TestCase):
     def testTextUsesSaneDefaults(self) -> None:
         """Build an empty ``200`` plain-text response by default.
 
@@ -282,8 +287,8 @@ class TestResponseFactoryText(TestCase):
         self.assertEqual(result.getStatusCode(), 410)
         self.assertEqual(result.getHeader("x-reason"), ["expired"])
 
-class TestResponseFactoryRedirect(TestCase):
 
+class TestResponseFactoryRedirect(TestCase):
     def testRedirectDefaultsToFound(self) -> None:
         """Redirect with ``302`` and the target in the location header.
 
@@ -314,8 +319,8 @@ class TestResponseFactoryRedirect(TestCase):
         self.assertEqual(result.getStatusCode(), 301)
         self.assertEqual(result.getHeader("x-legacy"), ["yes"])
 
-class TestResponseFactoryStream(TestCase):
 
+class TestResponseFactoryStream(TestCase):
     async def testStreamAcceptsASynchronousIterable(self) -> None:
         """Adapt a synchronous byte iterable into a streaming response.
 
@@ -353,6 +358,7 @@ class TestResponseFactoryStream(TestCase):
         self.assertEqual(result.getHeader("x-partial"), ["1"])
         self.assertEqual(result.getMediaType(), "application/octet-stream")
 
+
 class _FileFactoryTestCase(TestCase):
     """Base case providing a temporary file on disk."""
 
@@ -383,8 +389,8 @@ class _FileFactoryTestCase(TestCase):
         """
         self._tmp.cleanup()
 
-class TestResponseFactoryFile(_FileFactoryTestCase):
 
+class TestResponseFactoryFile(_FileFactoryTestCase):
     def testFileGuessesTheMediaType(self) -> None:
         """Serve a file and infer its media type from the extension.
 
@@ -428,8 +434,8 @@ class TestResponseFactoryFile(_FileFactoryTestCase):
             ['attachment; filename="invoice.pdf"'],
         )
 
-class TestResponseFactoryDownload(_FileFactoryTestCase):
 
+class TestResponseFactoryDownload(_FileFactoryTestCase):
     def testDownloadFallsBackToTheFileName(self) -> None:
         """Advertise the file name when no override is supplied.
 
@@ -470,8 +476,8 @@ class TestResponseFactoryDownload(_FileFactoryTestCase):
         self.assertEqual(result.getHeader("x-export"), ["1"])
         self.assertEqual(result.getMediaType(), "text/plain")
 
-class TestResponseFactoryBareResponses(TestCase):
 
+class TestResponseFactoryBareResponses(TestCase):
     def testNoContentDefaultsToStatus204(self) -> None:
         """Build an empty ``204`` response by default.
 
@@ -532,8 +538,8 @@ class TestResponseFactoryBareResponses(TestCase):
         self.assertEqual(result.getStatusCode(), 200)
         self.assertIsNone(result.getMediaType())
 
-class TestResponseFactoryInstance(TestCase):
 
+class TestResponseFactoryInstance(TestCase):
     def testFactoryIsStateless(self) -> None:
         """Keep the shared factory free of per-instance state.
 

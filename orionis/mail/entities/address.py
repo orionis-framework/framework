@@ -9,10 +9,10 @@ from orionis.mail.functions import header_value
 
 if TYPE_CHECKING:
     from email.headerregistry import AddressHeader
-    from orionis.mail.types import Recipients
 
 _HEADERS = HeaderRegistry()
 """Headers used by ``address``."""
+
 
 @dataclass(frozen=True, slots=True)
 class Address:
@@ -98,6 +98,11 @@ class Address:
             domain=mailbox.domain,
         )
 
+
+type Recipients = str | Address | list[str | Address] | tuple[str | Address, ...]
+"""Accepted recipient declaration, re-exported by ``orionis.mail.types``."""
+
+
 def one_address(value: str | Address, name: str | None = None) -> Address:
     """
     Normalize exactly one mailbox and reject ambiguous names.
@@ -125,6 +130,7 @@ def one_address(value: str | Address, name: str | None = None) -> Address:
         return value
     error_msg = "Use a string with an optional name, or one Address without name."
     raise MailCompositionException(error_msg)
+
 
 def addresses(value: Recipients, name: str | None = None) -> tuple[Address, ...]:
     """

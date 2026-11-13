@@ -1,3 +1,5 @@
+# ruff: noqa: TC001, TC002, TC003
+# Retain engine and callback types for runtime annotation resolution.
 """Provide database operations.
 
 Includes ``resolve_driver``, ``missing_dependency_error``, ``build_engine_url``,
@@ -7,7 +9,7 @@ Includes ``resolve_driver``, ``missing_dependency_error``, ``build_engine_url``,
 from __future__ import annotations
 from asyncio import create_task, ensure_future
 import re
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import Any, Protocol
 from sqlalchemy import URL, event
 from sqlalchemy.dialects import registry
 from sqlalchemy.pool import AsyncAdaptedQueuePool, QueuePool
@@ -17,13 +19,12 @@ from orionis.database.exceptions import (
 )
 from orionis.database.threaded.worker import _wait_for_completion
 
-if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
-    from sqlalchemy.engine import Connection as SqlConnection
-    from sqlalchemy.engine.interfaces import Dialect
-    from sqlalchemy.exc import NoSuchModuleError
-    from sqlalchemy.ext.asyncio import AsyncEngine
-    from orionis.database.threaded.engine import ThreadedEngine
+from collections.abc import Awaitable, Callable
+from sqlalchemy.engine import Connection as SqlConnection
+from sqlalchemy.engine.interfaces import Dialect
+from sqlalchemy.exc import NoSuchModuleError
+from sqlalchemy.ext.asyncio import AsyncEngine
+from orionis.database.threaded.engine import ThreadedEngine
 
 # Map of Orionis driver names to SQLAlchemy async dialect names.
 _ASYNC_DIALECTS: dict[str, str] = {
@@ -107,11 +108,20 @@ _SQLITE_MEMORY_MARKERS: frozenset[str] = frozenset({":memory:", ""})
 """SQLite database markers that identify an in-memory database."""
 
 _REDSHIFT_CONNECT_OPTIONS: tuple[str, ...] = (
-    "ssl", "sslmode", "timeout", "iam", "region", "cluster_identifier",
-    "db_user", "profile", "is_serverless", "serverless_work_group",
+    "ssl",
+    "sslmode",
+    "timeout",
+    "iam",
+    "region",
+    "cluster_identifier",
+    "db_user",
+    "profile",
+    "is_serverless",
+    "serverless_work_group",
     "serverless_acct_id",
 )
 """Redshift connect options definitions used by ``dialect``."""
+
 
 class _MySQLParameterEscaper:
     """Escape binary parameters independently of aiomysql's removed converter."""
@@ -131,7 +141,7 @@ class _MySQLParameterEscaper:
         Returns
         -------
         None
-            Initialize a connection-local converter without global mutations.
+            No return value.
         """
         self._original = original
         """Original escape method owned by this connection."""
@@ -171,7 +181,7 @@ def _configure_mysql_binary_parameters(dbapi_connection: object) -> None:
     Returns
     -------
     None
-        Replace only this connection's binary escape path when available.
+        No return value.
     """
     connection = getattr(dbapi_connection, "driver_connection", None)
     if connection is None:
@@ -179,6 +189,7 @@ def _configure_mysql_binary_parameters(dbapi_connection: object) -> None:
     original = getattr(connection, "escape", None)
     if callable(original) and not isinstance(original, _MySQLParameterEscaper):
         connection.escape = _MySQLParameterEscaper(original)
+
 
 def resolve_driver(config: dict[str, Any]) -> str:
     """
@@ -203,11 +214,11 @@ def resolve_driver(config: dict[str, Any]) -> str:
     if driver not in _ASYNC_DIALECTS:
         supported = ", ".join(sorted(_ASYNC_DIALECTS))
         error_msg = (
-            f"Unsupported database driver '{driver}'. "
-            f"Supported drivers: {supported}."
+            f"Unsupported database driver '{driver}'. Supported drivers: {supported}."
         )
         raise UnsupportedDriverException(error_msg)
     return driver
+
 
 def missing_dependency_error(
     driver: str,
@@ -243,6 +254,7 @@ def missing_dependency_error(
     )
     return MissingDatabaseDependencyException(error_msg)
 
+
 def build_engine_url(
     config: dict[str, Any],
     *,
@@ -272,7 +284,8 @@ def build_engine_url(
     driver = resolve_driver(config)
     if driver == "redshift":
         registry.register(
-            "redshift.redshift_connector", "orionis.database.redshift",
+            "redshift.redshift_connector",
+            "orionis.database.redshift",
             "RedshiftDialect",
         )
     dialects = _SYNC_DIALECTS if sync else _ASYNC_DIALECTS
@@ -282,6 +295,7 @@ def build_engine_url(
     if driver == "oracle":
         return _oracle_url(config, dialect)
     return _server_url(driver, config, dialect)
+
 
 def engine_options(
     config: dict[str, Any],
@@ -306,7 +320,9 @@ def engine_options(
     """
     driver = resolve_driver(config)
     options: dict[str, Any] = {
-        "echo": False, "future": True, "hide_parameters": True,
+        "echo": False,
+        "future": True,
+        "hide_parameters": True,
     }
 
     if driver == "sqlite":
@@ -320,9 +336,13 @@ def engine_options(
 
     if driver == "redshift":
         connect_args = {"ssl": True, "sslmode": "verify-full", "timeout": 30}
-        connect_args.update({
-            name: config[name] for name in _REDSHIFT_CONNECT_OPTIONS if name in config
-        })
+        connect_args.update(
+            {
+                name: config[name]
+                for name in _REDSHIFT_CONNECT_OPTIONS
+                if name in config
+            },
+        )
         connect_args["sslmode"] = _enum_value(connect_args["sslmode"])
         options["connect_args"] = connect_args
         return options
@@ -342,8 +362,11 @@ def engine_options(
 
     return options
 
-def _pgsql_connect_args( # NOSONAR
-    config: dict[str, Any], *, sync: bool = False,
+
+def _pgsql_connect_args(
+    config: dict[str, Any],
+    *,
+    sync: bool = False,
 ) -> dict[str, Any]:
     """
     Build asyncpg or libpq connect arguments for PostgreSQL.
@@ -363,20 +386,9 @@ def _pgsql_connect_args( # NOSONAR
     dict
         Driver connect arguments; empty when nothing is configured.
     """
-    connect_args: dict[str, Any] = {}
     if sync:
-        for key, source in (("sslmode", "sslmode"), ("client_encoding", "charset")):
-            value = _config_text(config, source)
-            if value:
-                connect_args[key] = value
-        search_path = _config_text(config, "search_path")
-        if search_path:
-            escaped = "".join(
-                "\\" + character if character == "\\" or character.isspace()
-                else character for character in search_path
-            )
-            connect_args["options"] = "-csearch_path=" + escaped
-        return connect_args
+        return _pgsql_sync_connect_args(config)
+    connect_args: dict[str, Any] = {}
 
     # asyncpg accepts libpq-style ssl mode strings directly.
     sslmode = _config_text(config, "sslmode")
@@ -395,8 +407,38 @@ def _pgsql_connect_args( # NOSONAR
 
     return connect_args
 
+
+def _pgsql_sync_connect_args(config: dict[str, Any]) -> dict[str, Any]:
+    """Build libpq connection arguments with one escaped search-path option.
+
+    Parameters
+    ----------
+    config : dict[str, typing.Any]
+        PostgreSQL connection settings for the blocking driver.
+
+    Returns
+    -------
+    dict[str, typing.Any]
+        SSL, client encoding and safely escaped startup options.
+    """
+    connect_args: dict[str, Any] = {}
+    for key, source in (("sslmode", "sslmode"), ("client_encoding", "charset")):
+        value = _config_text(config, source)
+        if value:
+            connect_args[key] = value
+    search_path = _config_text(config, "search_path")
+    if search_path:
+        escaped = "".join(
+            "\\" + character if character == "\\" or character.isspace() else character
+            for character in search_path
+        )
+        connect_args["options"] = "-csearch_path=" + escaped
+    return connect_args
+
+
 def configure_engine(
-    engine: AsyncEngine | ThreadedEngine, config: dict[str, Any],
+    engine: AsyncEngine | ThreadedEngine,
+    config: dict[str, Any],
 ) -> None:
     """
     Apply driver-specific session settings to a freshly built engine.
@@ -415,12 +457,13 @@ def configure_engine(
     Returns
     -------
     None
-        This function does not return a value.
+        No return value.
     """
     statements = _session_statements(config)
     driver = resolve_driver(config)
     if (driver, engine.sync_engine.dialect.driver) in {
-        ("sqlserver", "aioodbc"), ("oracle", "oracledb"),
+        ("sqlserver", "aioodbc"),
+        ("oracle", "oracledb"),
     }:
         _configure_async_native_creation(engine, driver)
     sqlite = driver == "sqlite"
@@ -451,7 +494,7 @@ def configure_engine(
         Returns
         -------
         None
-            This callback does not return a value.
+            No return value.
         """
         if sqlite:
             dbapi_connection.isolation_level = None
@@ -479,7 +522,7 @@ def _begin_sqlite_transaction(connection: SqlConnection) -> None:
     Returns
     -------
     None
-        Start the transaction before statements or savepoints.
+        No return value.
     """
     statement = (
         "BEGIN IMMEDIATE"
@@ -499,7 +542,7 @@ class _AsyncDBAPIClient(Protocol):
         Returns
         -------
         None
-            Close the client and release its database resources.
+            No return value.
         """
         ...
 
@@ -511,7 +554,8 @@ class _AsyncNativeCreator:
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, creator: Callable[..., Awaitable[_AsyncDBAPIClient]],
+        self,
+        creator: Callable[..., Awaitable[_AsyncDBAPIClient]],
     ) -> None:
         """
         Store the native database client factory.
@@ -524,13 +568,15 @@ class _AsyncNativeCreator:
         Returns
         -------
         None
-            Retain the factory for later connection attempts.
+            No return value.
         """
         self._creator = creator
         """Factory that asynchronously creates a native database client."""
 
     async def __call__(
-        self, *args: object, **kwargs: object,
+        self,
+        *args: object,
+        **kwargs: object,
     ) -> _AsyncDBAPIClient:
         """
         Create a native client and collect it if cancellation arrives late.
@@ -547,6 +593,7 @@ class _AsyncNativeCreator:
         orionis.database.dialect._AsyncDBAPIClient
             Created native database client.
         """
+
         async def close_late(client: _AsyncDBAPIClient) -> None:
             """
             Close a client created after its caller was cancelled.
@@ -559,7 +606,7 @@ class _AsyncNativeCreator:
             Returns
             -------
             None
-                Release the late client's database handle.
+                No return value.
             """
             await _wait_for_completion(create_task(client.close()))
 
@@ -583,8 +630,9 @@ def _configure_async_native_creation(engine: AsyncEngine, driver: str) -> None:
     Returns
     -------
     None
-        Register the native connection creation event listener.
+        No return value.
     """
+
     @event.listens_for(engine.sync_engine, "do_connect")
     def protect_native_creator(
         dialect: Dialect,
@@ -609,7 +657,7 @@ def _configure_async_native_creation(engine: AsyncEngine, driver: str) -> None:
         Returns
         -------
         None
-            Replace the creator with its cancellation-safe wrapper.
+            No return value.
         """
         creator = parameters.get("async_creator_fn")
         if not isinstance(creator, _AsyncNativeCreator):
@@ -620,6 +668,7 @@ def _configure_async_native_creation(engine: AsyncEngine, driver: str) -> None:
                     else dialect.loaded_dbapi.oracledb.connect_async
                 )
             parameters["async_creator_fn"] = _AsyncNativeCreator(creator)
+
 
 def _session_statements(config: dict[str, Any]) -> tuple[str, ...]:
     """
@@ -641,6 +690,7 @@ def _session_statements(config: dict[str, Any]) -> tuple[str, ...]:
     if driver == "mysql":
         return _mysql_session_commands(config)
     return ()
+
 
 def _mysql_session_commands(config: dict[str, Any]) -> tuple[str, ...]:
     """
@@ -679,6 +729,7 @@ def _mysql_session_commands(config: dict[str, Any]) -> tuple[str, ...]:
 
     return tuple(commands)
 
+
 def _sqlite_url(config: dict[str, Any], dialect: str) -> URL:
     """
     Build the engine URL for a SQLite connection.
@@ -703,6 +754,7 @@ def _sqlite_url(config: dict[str, Any], dialect: str) -> URL:
         database = ":memory:"
     return URL.create(dialect, database=database)
 
+
 def _config_text(config: dict[str, Any], key: str) -> str | None:
     """
     Extract a trimmed text value from a configuration mapping.
@@ -721,6 +773,7 @@ def _config_text(config: dict[str, Any], key: str) -> str | None:
     """
     value = str(config.get(key, "") or "").strip()
     return value or None
+
 
 def _server_url(driver: str, config: dict[str, Any], dialect: str) -> URL:
     """
@@ -746,16 +799,13 @@ def _server_url(driver: str, config: dict[str, Any], dialect: str) -> URL:
     return URL.create(
         dialect,
         username=_config_text(config, "username"),
-        password=(
-            config.get("password")
-            if driver == "redshift"
-            else _config_text(config, "password")
-        ),
+        password=config.get("password"),
         host=_config_text(config, "host"),
         port=int(config["port"]) if config.get("port") else None,
         database=_config_text(config, "database"),
         query=_server_query(driver, config),
     )
+
 
 def _server_query(driver: str, config: dict[str, Any]) -> dict[str, str]:
     """
@@ -794,6 +844,7 @@ def _server_query(driver: str, config: dict[str, Any]) -> dict[str, str]:
 
     return query
 
+
 def _oracle_url(config: dict[str, Any], dialect: str) -> URL:
     """
     Build the engine URL for an Oracle connection.
@@ -816,19 +867,20 @@ def _oracle_url(config: dict[str, Any], dialect: str) -> URL:
         return URL.create(
             dialect,
             username=_config_text(config, "username"),
-            password=_config_text(config, "password"),
+            password=config.get("password"),
         )
 
     sid = _config_text(config, "sid")
     return URL.create(
         dialect,
         username=_config_text(config, "username"),
-        password=_config_text(config, "password"),
+        password=config.get("password"),
         host=_config_text(config, "host"),
         port=int(config["port"]) if config.get("port") else None,
         database=sid,
         query=_oracle_query(config, sid),
     )
+
 
 def _oracle_query(config: dict[str, Any], sid: str | None) -> dict[str, str]:
     """
@@ -851,6 +903,7 @@ def _oracle_query(config: dict[str, Any], sid: str | None) -> dict[str, str]:
         return {"service_name": service_name}
     return {}
 
+
 def _is_sqlite_memory(config: dict[str, Any]) -> bool:
     """
     Report whether a SQLite configuration targets an in-memory database.
@@ -867,6 +920,7 @@ def _is_sqlite_memory(config: dict[str, Any]) -> bool:
     """
     database = str(config.get("database", "") or "")
     return database in _SQLITE_MEMORY_MARKERS
+
 
 def _sqlite_pragmas(config: dict[str, Any]) -> tuple[str, ...]:
     """
@@ -903,13 +957,14 @@ def _sqlite_pragmas(config: dict[str, Any]) -> tuple[str, ...]:
 
     return tuple(pragmas)
 
-def _normalize_switch(value: Any) -> str:  # noqa: ANN401
+
+def _normalize_switch(value: object) -> str:
     """
     Normalize a boolean-like configuration value to ``ON`` or ``OFF``.
 
     Parameters
     ----------
-    value : typing.Any
+    value : object
         Boolean, string, or enum member describing the switch state.
 
     Returns
@@ -922,13 +977,14 @@ def _normalize_switch(value: Any) -> str:  # noqa: ANN401
         return "ON" if value else "OFF"
     return "ON" if str(raw).strip().upper() in {"ON", "TRUE", "1"} else "OFF"
 
-def _yes_no(value: Any) -> str:  # noqa: ANN401
+
+def _yes_no(value: object) -> str:
     """
     Normalize a boolean-like configuration value to ``yes`` or ``no``.
 
     Parameters
     ----------
-    value : typing.Any
+    value : object
         Boolean, string, or enum member describing the switch state.
 
     Returns
@@ -941,13 +997,14 @@ def _yes_no(value: Any) -> str:  # noqa: ANN401
     raw = str(_enum_value(value)).strip().upper()
     return "yes" if raw in {"YES", "ON", "TRUE", "1"} else "no"
 
-def _enum_value(value: Any) -> str:  # noqa: ANN401
+
+def _enum_value(value: object) -> str:
     """
     Extract the primitive value from a possible enum member.
 
     Parameters
     ----------
-    value : typing.Any
+    value : object
         Enum member, string, or ``None``.
 
     Returns

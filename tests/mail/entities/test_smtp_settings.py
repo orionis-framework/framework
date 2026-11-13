@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from dataclasses import asdict
 from orionis.foundation.config.mail.entities.smtp import Smtp
 from orionis.mail.entities.smtp_settings import SmtpSettings
@@ -7,8 +9,8 @@ from orionis.test import TestCase
 
 _CREDENTIAL = "p@ss:word"
 
-class TestSmtpSettings(TestCase):
 
+class TestSmtpSettings(TestCase):
     def testEmptyUrlUsesFieldsAndDoesNotMutateConfig(self) -> None:
         """Resolve the standalone fields when no URL was configured.
 
@@ -90,11 +92,13 @@ class TestSmtpSettings(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        settings = SmtpSettings.fromConfig({
-            "url": "smtp://user:encoded%40value@smtp.example.com",
-            "username": None,
-            "password": None,
-        })
+        settings = SmtpSettings.fromConfig(
+            {
+                "url": "smtp://user:encoded%40value@smtp.example.com",
+                "username": None,
+                "password": None,
+            },
+        )
         self.assertEqual(settings.username, "user")
         self.assertEqual(settings.password, "encoded@value")
 
@@ -156,11 +160,13 @@ class TestSmtpSettings(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        settings = SmtpSettings.fromConfig({
-            "url": "smtp://user:url%40secret@smtp.example.com",
-            "username": "field-user",
-            "password": "field-secret",
-        })
+        settings = SmtpSettings.fromConfig(
+            {
+                "url": "smtp://user:url%40secret@smtp.example.com",
+                "username": "field-user",
+                "password": "field-secret",
+            },
+        )
         self.assertIn("url@secret", settings.sensitive)
         self.assertIn("field-secret", settings.sensitive)
         self.assertNotIn(None, settings.sensitive)
@@ -238,3 +244,25 @@ class TestSmtpSettings(TestCase):
 
         overridden = Smtp(url="smtps://smtp.example.com", port=-1, timeout=None)
         self.assertEqual(SmtpSettings.fromConfig(asdict(overridden)).port, 465)
+
+    def testRejectsNonPrintableEndpointCharactersBeforeTransport(self) -> None:
+        """Reject invisible endpoint characters without exposing URL credentials.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for character in ("\x7f", "\x80", "\u200b", "\ud800"):
+            host = f"smtp{character}.example.test"
+            for config in (
+                {"host": host},
+                {"url": f"smtp://user:{_CREDENTIAL}@{host}"},
+            ):
+                with self.subTest(
+                    character=ascii(character),
+                    setting=next(iter(config)),
+                ):
+                    with self.assertRaises(MailConfigurationException) as failure:
+                        SmtpSettings.fromConfig(config)
+                    self.assertNotIn(_CREDENTIAL, str(failure.exception))

@@ -131,7 +131,9 @@ async def main() -> None:
         smtp_utf8=False,
     )
     with TemporaryDirectory() as root:
-        result = await FileTransport(Path(root)).send(prepared, mailer="file", driver="file")
+        result = await FileTransport(Path(root)).send(
+            prepared, mailer="file", driver="file"
+        )
         assert result.file_path is not None
         assert result.file_path.read_bytes() == prepared.mime
         print(result.status)
@@ -147,15 +149,17 @@ asyncio.run(main())
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from orionis.mail.enums.encryption import MailEncryption
 
-settings = SmtpSettings.fromConfig({
-    "url": "smtps://user:secret@mail.example.com",
-    "host": "ignored.example.com",
-    "port": 587,
-    "encryption": "TLS",
-    "username": "",
-    "password": "",
-    "timeout": 10,
-})
+settings = SmtpSettings.fromConfig(
+    {
+        "url": "smtps://user:secret@mail.example.com",
+        "host": "ignored.example.com",
+        "port": 587,
+        "encryption": "TLS",
+        "username": "",
+        "password": "",
+        "timeout": 10,
+    }
+)
 assert settings.host == "mail.example.com"
 assert settings.port == 465
 assert settings.encryption is MailEncryption.SSL

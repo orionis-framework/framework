@@ -2,12 +2,19 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.filesystems import (
-    GCS, S3, Azure, DiskName, Disks, Filesystems, Local, Public,
+    GCS,
+    S3,
+    Azure,
+    DiskName,
+    Disks,
+    Filesystems,
+    Local,
+    Public,
 )
+
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapFilesystems(Filesystems):
-
     # ----------------------------------------------------------------------------------
     # default : DiskName | str, optional
     # --- Sets the default filesystem disk name.
@@ -26,7 +33,6 @@ class BootstrapFilesystems(Filesystems):
 
     disks: Disks | dict = field(
         default_factory=lambda: Disks(
-
             # --------------------------------------------------------------------------
             # local : Local, optional
             # --- Local disk stores files in 'storage/app/private'.
@@ -36,7 +42,6 @@ class BootstrapFilesystems(Filesystems):
             local=Local(
                 path=Env.get("LOCAL_PATH", "storage/app/private"),
             ),
-
             # --------------------------------------------------------------------------
             # public : Public, optional
             # --- Public disk stores files in 'storage/app/public'.
@@ -47,7 +52,6 @@ class BootstrapFilesystems(Filesystems):
                 path=Env.get("PUBLIC_PATH", "storage/app/public"),
                 url=Env.get("PUBLIC_URL", "/static"),
             ),
-
             # --------------------------------------------------------------------------
             # s3 : S3, optional
             # --- AWS S3 disk uses S3 entity for cloud storage.
@@ -65,7 +69,6 @@ class BootstrapFilesystems(Filesystems):
                 endpoint=Env.get("S3_ENDPOINT", None),
                 use_path_style_endpoint=Env.get("S3_USE_PATH_STYLE_ENDPOINT", False),
             ),
-
             # --------------------------------------------------------------------------
             # azure : Azure, optional
             # --- Azure disk uses Azure entity for Blob Storage.
@@ -80,7 +83,6 @@ class BootstrapFilesystems(Filesystems):
                 container=Env.get("AZURE_CONTAINER", ""),
                 url=Env.get("AZURE_URL", None),
             ),
-
             # --------------------------------------------------------------------------
             # gcs : GCS, optional
             # --- GCS disk uses GCS entity for Google Cloud Storage.

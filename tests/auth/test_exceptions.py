@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.auth import exceptions
 from orionis.auth.exceptions import (
     AuthConfigurationException,
@@ -24,6 +26,7 @@ _SPECIALISED = (
     TokenException,
 )
 
+
 class TestExceptionHierarchy(TestCase):
     """Validate the exception hierarchy exposed by the module."""
 
@@ -36,7 +39,7 @@ class TestExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(AuthException, Exception))
 
@@ -49,7 +52,7 @@ class TestExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for exception in _SPECIALISED:
             self.assertTrue(issubclass(exception, AuthException), exception)
@@ -63,7 +66,7 @@ class TestExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(len(set(_SPECIALISED)), len(_SPECIALISED))
         for exception in _SPECIALISED:
@@ -71,23 +74,6 @@ class TestExceptionHierarchy(TestCase):
             for other in others:
                 self.assertFalse(issubclass(exception, other), exception)
 
-    def testAuthorizationIsNeverConfusedWithAuthentication(self) -> None:
-        """Compare the two failures the HTTP layer maps to a status.
-
-        Validates that "not logged in" and "not allowed" stay two
-        independent branches of the hierarchy.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertFalse(
-            issubclass(AuthorizationException, AuthenticationException),
-        )
-        self.assertFalse(
-            issubclass(AuthenticationException, AuthorizationException),
-        )
 
 class TestExceptionModuleSurface(TestCase):
     """Validate what the exception module publishes."""
@@ -101,11 +87,9 @@ class TestExceptionModuleSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        published = {
-            name for name in vars(exceptions) if not name.startswith("_")
-        }
+        published = {name for name in vars(exceptions) if not name.startswith("_")}
         expected = {AuthException.__name__} | {
             exception.__name__ for exception in _SPECIALISED
         }
@@ -120,11 +104,12 @@ class TestExceptionModuleSurface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for exception in (AuthException, *_SPECIALISED):
             docstring = exception.__doc__ or ""
             self.assertTrue(docstring.strip(), exception.__name__)
+
 
 class TestExceptionBehaviour(TestCase):
     """Validate how the failures behave once raised."""
@@ -138,12 +123,8 @@ class TestExceptionBehaviour(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        exception
-            Raised when the helper reaches this failure path.
         """
         for exception in (AuthException, *_SPECIALISED):
             error_msg = f"Failure raised by {exception.__name__}."
@@ -160,14 +141,8 @@ class TestExceptionBehaviour(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        cause
-            Raised when the helper reaches this failure path.
-        exception
-            Raised when the helper reaches this failure path.
         """
         for exception in (AuthException, *_SPECIALISED):
             cause = ValueError("underlying failure")
@@ -187,18 +162,15 @@ class TestExceptionBehaviour(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        exception
-            Raised when the helper reaches this failure path.
         """
         for exception in _SPECIALISED:
             error_msg = "Caught through the module base."
             with self.assertRaises(AuthException) as captured:
                 raise exception(error_msg)
             self.assertIsInstance(captured.exception, exception)
+
 
 class TestHttpStatusMapping(TestCase):
     """Validate how the failures become HTTP responses."""
@@ -212,7 +184,7 @@ class TestHttpStatusMapping(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         status, _ = _HTTP_STATUS_MAP[AuthenticationException]
         self.assertEqual(status, HTTPStatus.UNAUTHORIZED)
@@ -226,7 +198,7 @@ class TestHttpStatusMapping(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         status, _ = _HTTP_STATUS_MAP[AuthorizationException]
         self.assertEqual(status, HTTPStatus.FORBIDDEN)
@@ -240,7 +212,7 @@ class TestHttpStatusMapping(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertNotEqual(
             _HTTP_STATUS_MAP[AuthenticationException],

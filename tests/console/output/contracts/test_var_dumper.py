@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from unittest.mock import MagicMock, patch
@@ -5,8 +7,8 @@ from orionis.console.output.contracts.var_dumper import IVarDumper
 from orionis.console.output.var_dumper import VarDumper
 from orionis.test import TestCase
 
-class TestIVarDumperContract(TestCase):
 
+class TestIVarDumperContract(TestCase):
     # ------------------------------------------------------------------ #
     #  Abstract class characteristics                                    #
     # ------------------------------------------------------------------ #

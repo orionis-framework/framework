@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 import asyncio
 from pathlib import Path
@@ -18,6 +21,7 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Callable, Iterator
     from typing import BinaryIO
 
+
 class _AsgiEvent(TypedDict, total=False):
     type: str
     status: int
@@ -25,8 +29,8 @@ class _AsgiEvent(TypedDict, total=False):
     body: bytes
     more_body: bool
 
-class _RsgiHeaders:
 
+class _RsgiHeaders:
     def __init__(self) -> None:
         """
         Expose the header accessor required by the RSGI interface.
@@ -65,6 +69,7 @@ class _RsgiHeaders:
         """
         return ["one", "two"]
 
+
 def _request(range_header: str | None = None) -> ASGITransportAdapter:
     """
     Build a GET request with an optional byte range.
@@ -79,14 +84,216 @@ def _request(range_header: str | None = None) -> ASGITransportAdapter:
     ASGITransportAdapter
         Transport adapter containing the request headers.
     """
-    return ASGITransportAdapter({
-        "method": "GET",
-        "headers": [] if range_header is None else [
-            (b"range", range_header.encode("ascii")),
-        ],
-    })
+    return ASGITransportAdapter(
+        {
+            "method": "GET",
+            "headers": []
+            if range_header is None
+            else [
+                (b"range", range_header.encode("ascii")),
+            ],
+        },
+    )
+
 
 class TestResponseTransport(TestCase):
+    async def testHeadAndFailedDeliveryCloseTransferredSynchronousGenerators(
+        self,
+    ) -> None:
+        """Close a suspended synchronous source even if its async wrapper never starts.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for protocol_name in ("asgi", "rsgi"):
+            for method in ("HEAD", "GET"):
+                with self.subTest(protocol=protocol_name, method=method):
+                    closed = []
+
+                    def chunks(record: list[bool] = closed) -> Iterator[bytes]:
+                        """Retain a source resource until explicit closure.
+
+                        Parameters
+                        ----------
+                        record : list[bool]
+                            Source-owned closure journal.
+
+                        Yields
+                        ------
+                        bytes
+                            Fixed byte chunks.
+                        """
+                        try:
+                            yield b"prepared"
+                            yield b"body"
+                        finally:
+                            record.append(True)
+
+                    async def send(_message: dict) -> None:
+                        """Fail after delivery starts.
+
+                        Parameters
+                        ----------
+                        _message : dict
+                            Outgoing ASGI frame.
+
+                        Returns
+                        -------
+                        None
+                            No return value.
+                        """
+                        raise ConnectionError
+
+                    def fail(*_args: object) -> None:
+                        """Reject a synchronous transport delivery.
+
+                        Parameters
+                        ----------
+                        *_args : object
+                            RSGI response arguments.
+
+                        Returns
+                        -------
+                        None
+                            No return value.
+                        """
+                        raise ConnectionError
+
+                    source = chunks()
+                    self.assertEqual(next(source), b"prepared")
+                    response = StreamingResponse(source)
+                    adapter = ASGITransportAdapter({"method": method})
+                    try:
+                        with self.assertRaises(ConnectionError):
+                            if protocol_name == "asgi":
+                                await ASGIResponseAdapter().send(
+                                    adapter,
+                                    response,
+                                    None,
+                                    send,
+                                )
+                            else:
+                                await RSGIResponseAdapter().send(
+                                    adapter,
+                                    response,
+                                    SimpleNamespace(
+                                        response_empty=fail,
+                                        response_stream=fail,
+                                    ),
+                                )
+                        self.assertEqual(closed, [True])
+                    finally:
+                        source.close()
+
+    async def testHeadClosesUnstartedRegularStreamsOnBothTransports(self) -> None:
+        """Release stream-owned resources without advancing a HEAD response body.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+
+        async def check(protocol_name: str) -> None:
+            """Keep source observations owned by one protocol scenario.
+
+            Parameters
+            ----------
+            protocol_name : str
+                Adapter variant to exercise.
+
+            Returns
+            -------
+            None
+                No return value.
+            """
+            with self.subTest(protocol=protocol_name):
+                reads = []
+                closes = []
+
+                class Source:
+                    """Record iterator admission separately from source cleanup."""
+
+                    def __aiter__(self) -> Source:
+                        """Return this source without reading a chunk.
+
+                        Returns
+                        -------
+                        Source
+                            The owned iterator.
+                        """
+                        return self
+
+                    async def __anext__(self) -> bytes:
+                        """Reject any attempt to consume the HEAD body.
+
+                        Returns
+                        -------
+                        bytes
+                            Never returned.
+                        """
+                        reads.append(True)
+                        raise StopAsyncIteration
+
+                    async def aclose(self) -> None:
+                        """Record source cleanup.
+
+                        Returns
+                        -------
+                        None
+                            No return value.
+                        """
+                        closes.append(True)
+
+                async def send(_message: dict) -> None:
+                    """Accept protocol messages without retaining their payloads.
+
+                    Parameters
+                    ----------
+                    _message : dict
+                        Outgoing ASGI response frame.
+
+                    Returns
+                    -------
+                    None
+                        No return value.
+                    """
+                    return
+
+                def empty(_status: int, _headers: list) -> None:
+                    """Accept an empty RSGI response.
+
+                    Parameters
+                    ----------
+                    _status : int
+                        HTTP status code.
+                    _headers : list
+                        Outgoing headers.
+
+                    Returns
+                    -------
+                    None
+                        No return value.
+                    """
+                    return
+
+                response = StreamingResponse(Source())
+                request = ASGITransportAdapter({"method": "HEAD"})
+                if protocol_name == "asgi":
+                    await ASGIResponseAdapter().send(request, response, None, send)
+                else:
+                    await RSGIResponseAdapter().send(
+                        request,
+                        response,
+                        SimpleNamespace(response_empty=empty),
+                    )
+                self.assertEqual(reads, [])
+                self.assertEqual(closes, [True])
+
+        for protocol_name in ("asgi", "rsgi"):
+            await check(protocol_name)
 
     def testRangesCoverPrefixSuffixAndMalformedInput(self) -> None:
         """Parse one bounded interval and ignore malformed or empty intervals.
@@ -97,11 +304,20 @@ class TestResponseTransport(TestCase):
             Assertions verify the behavior described above.
         """
         cases = {
-            None: None, "bytes=0-2": (0, 3), "bytes=4-": (4, 10),
-            "bytes=-3": (7, 10), "bytes=-20": (0, 10), "bytes=-0": None,
-            "bytes=2-99": (2, 10), "bytes=10-": None, "bytes=5-2": None,
-            "bytes=-": None, "bytes=1-2,4-5": None, "items=1-2": None,
-            "bytes=+1-2": None, "bytes=1-+2": None,
+            None: None,
+            "bytes=0-2": (0, 3),
+            "bytes=4-": (4, 10),
+            "bytes=-3": (7, 10),
+            "bytes=-20": (0, 10),
+            "bytes=-0": None,
+            "bytes=2-99": (2, 10),
+            "bytes=10-": None,
+            "bytes=5-2": None,
+            "bytes=-": None,
+            "bytes=1-2,4-5": None,
+            "items=1-2": None,
+            "bytes=+1-2": None,
+            "bytes=1-+2": None,
             "bytes=" + "9" * 5000 + "-": None,
         }
         for value, expected in cases.items():
@@ -117,14 +333,19 @@ class TestResponseTransport(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        asgi = ASGITransportAdapter({
-            "headers": [(b"X-Test", b"one"), (b"x-test", b"two")],
-            "client": ("::1", 1234),
-        })
+        asgi = ASGITransportAdapter(
+            {
+                "headers": [(b"X-Test", b"one"), (b"x-test", b"two")],
+                "client": ("::1", 1234),
+            },
+        )
         scope_headers = _RsgiHeaders()
-        rsgi = RSGITransportAdapter(SimpleNamespace(
-            headers=scope_headers, client="::1:1234",
-        ))
+        rsgi = RSGITransportAdapter(
+            SimpleNamespace(
+                headers=scope_headers,
+                client="::1:1234",
+            ),
+        )
         for adapter in (asgi, rsgi):
             self.assertEqual(adapter.headers().getAll("x-test"), ["one", "two"])
             self.assertEqual(adapter.client(), "::1")
@@ -319,8 +540,10 @@ class TestResponseTransport(TestCase):
                 if protocol_name == "asgi":
                     await ASGIResponseAdapter().send(_request(), response, None, send)
                 else:
+
                     def response_stream(
-                        _status: int, _headers: list[tuple[str, str]],
+                        _status: int,
+                        _headers: list[tuple[str, str]],
                     ) -> SimpleNamespace:
                         """
                         Return a transport that rejects streamed chunks.
@@ -413,7 +636,10 @@ class TestResponseTransport(TestCase):
                     self.assertRaises(ConnectionError),
                 ):
                     await ASGIResponseAdapter().send(
-                        _request(range_header), response, None, send,
+                        _request(range_header),
+                        response,
+                        None,
+                        send,
                     )
                 self.assertTrue(handles[0].closed)
 
@@ -546,7 +772,10 @@ class TestResponseTransport(TestCase):
                 events.append(event)
 
             await ASGIResponseAdapter().send(
-                _request("bytes=-3"), FileResponse(path), None, send,
+                _request("bytes=-3"),
+                FileResponse(path),
+                None,
+                send,
             )
             self.assertEqual(events[0]["status"], 206)
             headers = dict(events[0]["headers"])
@@ -599,7 +828,9 @@ class TestResponseTransport(TestCase):
 
             protocol = SimpleNamespace(response_file_range=response_file_range)
             await RSGIResponseAdapter().send(
-                _request("bytes=-3"), FileResponse(path), protocol,
+                _request("bytes=-3"),
+                FileResponse(path),
+                protocol,
             )
             status, headers, _, start, end = calls[0]
             self.assertEqual((status, start, end), (206, 7, 10))
@@ -636,6 +867,9 @@ class TestResponseTransport(TestCase):
 
         for _ in range(2):
             await adapter.send(
-                ASGITransportAdapter({"method": "HEAD"}), Response(), None, send,
+                ASGITransportAdapter({"method": "HEAD"}),
+                Response(),
+                None,
+                send,
             )
         self.assertEqual(bodies, [b"", b""])

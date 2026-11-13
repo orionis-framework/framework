@@ -3,6 +3,7 @@
 from orionis.container.facades.facade import Facade
 from orionis.mail.contracts.manager import IMailManager
 
+
 class Mail(Facade):
     """Resolve the mail service through the application facade."""
 

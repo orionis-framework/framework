@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IStdClass(ABC):
     """Define the contract for std class implementations."""
 
@@ -32,7 +33,7 @@ class IStdClass(ABC):
         Returns
         -------
         None
-            This method does not return a value. Attributes are updated in-place.
+            No return value.
 
         Raises
         ------
@@ -53,7 +54,7 @@ class IStdClass(ABC):
         Returns
         -------
         None
-            This method does not return a value. Attributes are removed in-place.
+            No return value.
 
         Raises
         ------

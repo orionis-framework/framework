@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import socket
 from threading import get_ident
 from typing import Annotated
@@ -6,10 +8,12 @@ from orionis.schemas.schema import Schema
 from orionis.schemas.validator import Schema as Validator
 from orionis.test import TestCase
 
+
 class _UrlPayload(Schema):
     """Declare a native DNS rule for asynchronous schema validation."""
 
     url: Annotated[str, ActiveUrl()]
+
 
 class _Resolver:
     """Record resolver threads without consulting an external DNS server."""
@@ -22,7 +26,7 @@ class _Resolver:
         Returns
         -------
         None
-            Queries will succeed unless a test supplies a failure.
+            No return value.
         """
         self.calls: list[tuple[int, str]] = []
         self.failure: OSError | UnicodeError | None = None
@@ -56,6 +60,7 @@ class _Resolver:
             raise self.failure
         return []
 
+
 class TestActiveUrlAsync(TestCase):
     """Verify DNS thread ownership and rejection semantics without network I/O."""
 
@@ -65,7 +70,7 @@ class TestActiveUrlAsync(TestCase):
         Returns
         -------
         None
-            DNS calls are captured by a test-owned double.
+            No return value.
         """
         self._original = socket.getaddrinfo
         self._resolver = _Resolver()
@@ -77,7 +82,7 @@ class TestActiveUrlAsync(TestCase):
         Returns
         -------
         None
-            Subsequent tests use the original resolver.
+            No return value.
         """
         socket.getaddrinfo = self._original
 
@@ -87,11 +92,12 @@ class TestActiveUrlAsync(TestCase):
         Returns
         -------
         None
-            The URL is accepted and the resolver runs in another thread.
+            No return value.
         """
         thread_id = get_ident()
         payload = await Validator.validate(
-            {"url": "https://service.example/path"}, _UrlPayload,
+            {"url": "https://service.example/path"},
+            _UrlPayload,
         )
         self.assertEqual(payload.url, "https://service.example/path")
         self.assertEqual(len(self._resolver.calls), 1)
@@ -105,7 +111,7 @@ class TestActiveUrlAsync(TestCase):
         Returns
         -------
         None
-            Inputs without a usable hostname trigger no resolver calls.
+            No return value.
         """
         rule = ActiveUrl()
         for value in (None, 42):
@@ -120,13 +126,15 @@ class TestActiveUrlAsync(TestCase):
         Returns
         -------
         None
-            DNS and hostname encoding failures retain the active_url rule code.
+            No return value.
         """
         message = "Resolver rejected the hostname"
         for failure in (socket.gaierror(message), UnicodeError(message)):
             self._resolver.failure = failure
             result = await ActiveUrl().validate(
-                "url", "https://service.example", None,
+                "url",
+                "https://service.example",
+                None,
             )
             self.assertIsNotNone(result)
             self.assertEqual(result.rule, "active_url")

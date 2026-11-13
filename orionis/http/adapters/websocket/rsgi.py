@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 _NORMAL_CLOSE = 1000
 """Normal close value used by ``rsgi``."""
 
+
 class RSGIWebSocketTransport(IWebSocketTransport):
     """Adapt Granian's actual RSGI WebsocketProtocol and accepted transport."""
 
@@ -52,7 +53,9 @@ class RSGIWebSocketTransport(IWebSocketTransport):
         return False
 
     async def accept(
-        self, *, subprotocol: str | None = None,
+        self,
+        *,
+        subprotocol: str | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> None:
         """

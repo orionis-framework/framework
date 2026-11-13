@@ -1,6 +1,6 @@
 # Leer y escribir configuración de entorno
 
-Cada bloque de esta página es un programa independiente. Ejecuta el ejemplo de `DotEnv` en un proceso nuevo: la primera construcción del singleton determina su archivo para todo el proceso.
+Cada bloque de esta página es un programa independiente. Ejecútalo en un proceso nuevo desde un directorio temporal: la primera construcción del singleton determina su archivo para todo el proceso. `only_os=True` limita la modificación solicitada; no omite la carga inicial del `.env`.
 
 ## Inicio rápido
 
@@ -22,7 +22,9 @@ print("7 fallback")
 
 ### Valores tipados
 
-Los hints son `str`, `int`, `float`, `bool`, `list`, `dict`, `tuple`, `set`, `path` y `base64`. El almacenamiento tipado usa `<hint>:<payload>`. Contenedores emplean literales seguros; rutas se normalizan a POSIX; Base64 retorna texto UTF-8 cuando es posible y bytes en otro caso.
+Los hints son `str`, `int`, `float`, `bool`, `list`, `dict`, `tuple`, `set`, `path` y `base64`. El almacenamiento tipado usa `<hint>:<payload>`. Los contenedores emplean literales seguros. La serialización de rutas expande `~`, resuelve rutas relativas y normaliza los separadores a POSIX. Base64 devuelve texto UTF-8 cuando es posible y bytes en otro caso.
+
+`EnvironmentCaster(value).to("base64")` también acepta bytes binarios que no sean UTF-8. Los valores que ya contienen Base64 válido se conservan; los demás strings o bytes se codifican. Esta interfaz directa admite más tipos que `Env.set` con hint, cuyo validador acepta strings, números, booleanos y contenedores literales.
 
 ### Ruta singleton
 
@@ -40,7 +42,7 @@ Usa `Env.set("WORKERS", 4, "int")`; el archivo guarda `int:4` y lecturas posteri
 
 ### Aplicar una edición externa
 
-Llama `Env.reload()` tras cambiar el `.env` fuera del proceso. Sobrescribe valores coincidentes y refresca `all()`. Una clave borrada del archivo sale del caché, pero `python-dotenv` no elimina automáticamente una variable que ya existe en el proceso.
+Llama `Env.reload()` tras cambiar el `.env` fuera del proceso. Lee e interpola el archivo una sola vez, y usa esos mismos valores para sobrescribir coincidencias en el proceso y refrescar `all()`. Una clave borrada del archivo sale del caché; una variable ya existente en el proceso se conserva.
 
 ## Ejemplos
 
@@ -95,14 +97,16 @@ El archivo admite sintaxis dotenv y estos prefijos:
 
 | Prefijo | Valor parseado |
 |---|---|
-| `str:` | String sin espacios iniciales del valor. |
+| `str:` | String sin espacios iniciales del valor; un payload vacío produce `""`. |
 | `int:`, `float:` | Número Python. |
-| `bool:` | `true/1/yes/on/enabled` o `false/0/no/off/disabled`. |
+| `bool:` | `true/1/yes/on/enabled` o `false/0/no/off/disabled`, sin distinguir mayúsculas; otras formas lanzan `ValueError`. |
 | `list:`, `dict:`, `tuple:`, `set:` | Contenedor literal Python correspondiente. |
 | `path:` | String de ruta POSIX normalizada. |
-| `base64:` | String UTF-8 decodificado o bytes raw. |
+| `base64:` | String UTF-8 decodificado o bytes; un payload vacío produce `""`. |
 
 Sin prefijo, `none`, `null`, `nan` y `nil` se vuelven `None`; literales seguros se parsean con `ast.literal_eval`.
+
+Asigna `1`, `true`, `t`, `yes` o `y` a `PYTHON_DOTENV_DISABLED` (sin distinguir mayúsculas) para impedir la publicación automática de valores del archivo en `os.environ`. `all()` sigue mostrando los valores del archivo, y las operaciones explícitas `set` y `unset` siguen modificando el entorno del proceso.
 
 ## Fuentes y siguientes pasos
 

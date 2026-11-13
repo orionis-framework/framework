@@ -1,7 +1,10 @@
+# ruff: noqa: ANN001, ANN202, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.test import TestCase
+
 
 class TestIReactor(TestCase):
     """Test suite for the IReactor abstract interface."""
@@ -150,7 +153,7 @@ class TestIReactor(TestCase):
         """
 
         class PartialReactor(IReactor):
-            def command(self, signature, handler): # NOSONAR
+            def command(self, signature, handler):  # NOSONAR
                 """Accept command registration in the test double.
 
                 Parameters

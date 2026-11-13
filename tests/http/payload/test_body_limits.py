@@ -1,3 +1,5 @@
+# ruff: noqa: PERF401, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from dataclasses import fields
 from inspect import signature
 from typing import TYPE_CHECKING
@@ -145,7 +147,7 @@ class TestBodyLimits(TestCase):
                 self.assertRaises(PayloadTooLargeException),
             ):
                 async for chunk in stream.stream():
-                    received.append(chunk)  # noqa: PERF401 - Preserve yielded prefix.
+                    received.append(chunk)  # Preserve yielded prefix.
             self.assertEqual(received, [b"12"])
             self.assertTrue(stream.isConsumed)
             self.assertFalse(stream.isBuffered)
@@ -159,13 +161,19 @@ class TestBodyLimits(TestCase):
             Separate request size from contiguous buffering size.
         """
         stream = BodyStream(
-            Interface.ASGI, _BodyReceive([b"123", b"45"]), 8, max_buffer_size=4,
+            Interface.ASGI,
+            _BodyReceive([b"123", b"45"]),
+            8,
+            max_buffer_size=4,
         )
         with self.assertRaises(PayloadTooLargeException):
             await stream.read()
         self.assertFalse(stream.isBuffered)
         streamed = BodyStream(
-            Interface.ASGI, _BodyReceive([b"123", b"45"]), 8, max_buffer_size=4,
+            Interface.ASGI,
+            _BodyReceive([b"123", b"45"]),
+            8,
+            max_buffer_size=4,
         )
         self.assertEqual([chunk async for chunk in streamed.stream()], [b"123", b"45"])
 
@@ -185,6 +193,39 @@ class TestBodyLimits(TestCase):
         self.assertEqual([chunk async for chunk in stream.stream()], [b"1234"])
         self.assertEqual(receive.calls, calls)
 
+    async def testDisconnectCannotPublishAPartiallyBufferedBody(self) -> None:
+        """Reject a disconnect instead of treating it as the final request frame.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        messages = iter(
+            (
+                {"type": "http.request", "body": b"partial", "more_body": True},
+                {"type": "http.disconnect"},
+            ),
+        )
+
+        async def receive() -> dict[str, object]:
+            """Read the next transport event from the deterministic fixture.
+
+            Returns
+            -------
+            dict[str, object]
+                Request fragment or disconnect event.
+            """
+            return next(messages)
+
+        stream = BodyStream(Interface.ASGI, receive)
+        with self.assertRaises(ConnectionError):
+            await stream.read()
+        self.assertTrue(stream.isConsumed)
+        self.assertFalse(stream.isBuffered)
+        with self.assertRaisesRegex(RuntimeError, "already consumed"):
+            await stream.read()
+
     async def testDefaultStreamAndBufferLimitsAreFinite(self) -> None:
         """Reject oversize bodies even when callers omit explicit limits.
 
@@ -197,12 +238,14 @@ class TestBodyLimits(TestCase):
             item.name: item.metadata["default"] for item in fields(HTTPBodyLimits)
         }
         stream = BodyStream(
-            Interface.ASGI, _BodyReceive([b"x" * (defaults["max_body_size"] + 1)]),
+            Interface.ASGI,
+            _BodyReceive([b"x" * (defaults["max_body_size"] + 1)]),
         )
         with self.assertRaises(PayloadTooLargeException):
             await anext(stream.stream())
         stream = BodyStream(
-            Interface.ASGI, _BodyReceive([b"x" * (defaults["max_buffer_size"] + 1)]),
+            Interface.ASGI,
+            _BodyReceive([b"x" * (defaults["max_buffer_size"] + 1)]),
         )
         with self.assertRaises(PayloadTooLargeException):
             await stream.read()
@@ -235,7 +278,9 @@ class TestMultipartBudgets(TestCase):
         body = multipart_body(b"ok")
         for chunks in ([b"prefix\r\n", body], [body, b"trailing epilogue"]):
             parser = MultipartStreamParser(
-                stream_chunks(chunks), _BOUNDARY, max_body_size=len(body),
+                stream_chunks(chunks),
+                _BOUNDARY,
+                max_body_size=len(body),
             )
             with (
                 self.subTest(chunks=chunks),
@@ -254,7 +299,9 @@ class TestMultipartBudgets(TestCase):
         one = multipart_body(b"x" * 80)
         body = one[: -(len(_BOUNDARY) + 8)] + b"\r\n" + one
         parser = MultipartStreamParser(
-            stream_chunks([body]), _BOUNDARY, max_memory_size=240,
+            stream_chunks([body]),
+            _BOUNDARY,
+            max_memory_size=240,
         )
         with self.assertRaises(PayloadTooLargeException):
             await parser.parse()
@@ -268,7 +315,9 @@ class TestMultipartBudgets(TestCase):
             Confirm file payloads do not consume the retained memory budget.
         """
         parser = MultipartStreamParser(
-            stream_chunks([multipart_body(b"x" * 100)]), _BOUNDARY, max_field_size=50,
+            stream_chunks([multipart_body(b"x" * 100)]),
+            _BOUNDARY,
+            max_field_size=50,
         )
         with self.assertRaises(PayloadTooLargeException):
             await parser.parse()
@@ -296,6 +345,7 @@ class TestMultipartBudgets(TestCase):
         with self.assertRaises(ValueError):
             MultipartStreamParser(stream_chunks([]), b"x" * 71)
         parser = MultipartStreamParser(
-            stream_chunks([multipart_body(b"ok")]), _BOUNDARY,
+            stream_chunks([multipart_body(b"ok")]),
+            _BOUNDARY,
         )
         self.assertEqual((await parser.parse()).get("field"), "ok")

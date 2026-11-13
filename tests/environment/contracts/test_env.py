@@ -1,8 +1,11 @@
+# ruff: noqa: ARG003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from abc import ABC
 from inspect import isabstract, signature
 from typing import Any
 from orionis.environment import Env
 from orionis.environment.contracts.env import IEnv
+from orionis.environment.enums.value_type import EnvironmentValueType
 from orionis.test import TestCase
 
 # Abstract surface the contract is expected to publish.
@@ -14,10 +17,9 @@ _EXPECTED_ABSTRACTS: frozenset[str] = frozenset(
 # Test doubles
 # ---------------------------------------------------------------------------
 
+
 class _CompleteEnv(IEnv):
     """Minimal implementation covering the whole contract."""
-
-    # ruff: noqa: FBT001
 
     __slots__ = ()
 
@@ -43,8 +45,8 @@ class _CompleteEnv(IEnv):
     def set(
         cls,
         key: str,
-        value: str | float | bool | list | dict | tuple | set,
-        type_hint: str | None = None,
+        value: object,
+        type_hint: str | EnvironmentValueType | None = None,
         *,
         only_os: bool = False,
     ) -> bool:
@@ -54,9 +56,9 @@ class _CompleteEnv(IEnv):
         ----------
         key : str
             Value supplied for ``key``.
-        value : str | float | bool | list | dict | tuple | set
+        value : object
             Value supplied for ``value``.
-        type_hint : str | None
+        type_hint : str | EnvironmentValueType | None
             Value supplied for ``type_hint``.
         only_os : bool
             Value supplied for ``only_os``.
@@ -108,6 +110,7 @@ class _CompleteEnv(IEnv):
         """
         return True
 
+
 class _IncompleteEnv(IEnv):
     """Implementation that deliberately leaves most methods unimplemented."""
 
@@ -131,12 +134,13 @@ class _IncompleteEnv(IEnv):
         """
         return default
 
+
 # ---------------------------------------------------------------------------
 # TestEnvContract
 # ---------------------------------------------------------------------------
 
-class TestEnvContract(TestCase):
 
+class TestEnvContract(TestCase):
     def testIsAnAbstractBaseClass(self) -> None:
         """Expose the environment contract as an abstract base class.
 
@@ -146,7 +150,7 @@ class TestEnvContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(IEnv, ABC))
         self.assertTrue(isabstract(IEnv))
@@ -160,7 +164,7 @@ class TestEnvContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(IEnv.__abstractmethods__, _EXPECTED_ABSTRACTS)
 
@@ -173,7 +177,7 @@ class TestEnvContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(IEnv.__dict__.get("__slots__"), ())
 
@@ -186,7 +190,7 @@ class TestEnvContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             IEnv()
@@ -200,7 +204,7 @@ class TestEnvContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             _IncompleteEnv()
@@ -214,16 +218,17 @@ class TestEnvContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(_CompleteEnv.get("KEY", "default"), "default")
-        self.assertTrue(_CompleteEnv.set("KEY", "value"))
-        self.assertTrue(_CompleteEnv.unset("KEY"))
-        self.assertEqual(_CompleteEnv.all(), {})
-        self.assertTrue(_CompleteEnv.reload())
+        service = _CompleteEnv()
+        self.assertEqual(service.get("KEY", "default"), "default")
+        self.assertTrue(service.set("KEY", "value", EnvironmentValueType.STR))
+        self.assertTrue(service.unset("KEY"))
+        self.assertEqual(service.all(), {})
+        self.assertTrue(service.reload())
 
-    def testMatchesTheParameterNamesOfTheImplementation(self) -> None:
-        """Match the parameter names published by the shipped facade.
+    def testMatchesTheSignaturesOfTheImplementation(self) -> None:
+        """Match the resolved signatures published by the shipped facade.
 
         Validates that ``Env`` can be substituted wherever the contract is
         expected without changing call sites.
@@ -231,12 +236,13 @@ class TestEnvContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in sorted(_EXPECTED_ABSTRACTS):
-            expected = list(signature(getattr(IEnv, name)).parameters)
-            actual = list(signature(getattr(Env, name)).parameters)
-            self.assertEqual(actual, expected)
+            with self.subTest(method=name):
+                expected = signature(getattr(IEnv, name), eval_str=True)
+                actual = signature(getattr(Env, name), eval_str=True)
+                self.assertEqual(actual, expected)
 
     def testIsImplementedByTheShippedFacade(self) -> None:
         """Recognise the shipped facade as a valid implementation.
@@ -247,7 +253,7 @@ class TestEnvContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(Env, IEnv))
         self.assertEqual(Env.__abstractmethods__, frozenset())

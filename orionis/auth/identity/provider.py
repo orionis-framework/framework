@@ -1,7 +1,8 @@
+# ruff: noqa: FBT003, S105, TC001, TC003
+# Keep runtime injection types, the password field name, and SQL boolean values.
 """Resolve identities from an Orionis model declared in configuration."""
 
 import importlib
-from typing import TYPE_CHECKING
 from uuid import UUID
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 from orionis.auth.contracts.identity_provider import IIdentityProvider
@@ -10,26 +11,32 @@ from orionis.foundation.contracts.application import IApplication
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.orm.schema.types.column_type import ColumnType
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from orionis.orm.model import Model
+from collections.abc import Mapping
+import orionis.orm as _orm
 
 # Fallbacks applied when the configuration section is absent.
 _DEFAULT_MODEL: str = "app.models.user.User"
 """Fallbacks applied when the configuration section is absent."""
 _DEFAULT_USERNAME: str = "email"
 """Default username identifier: ``email``."""
-_DEFAULT_PASSWORD: str = "password"  # noqa: S105
-"""Default password identifier: ``password``."""
-_INTEGER_KEY_TYPES = frozenset({
-    ColumnType.BIG_INTEGER, ColumnType.INTEGER, ColumnType.SMALL_INTEGER,
-    ColumnType.BIGINT, ColumnType.INT, ColumnType.SMALLINT,
-})
-"""Integer key types used by ``provider``."""
+_DEFAULT_PASSWORD: str = "password"
+"""Submitted credential field holding the plaintext password."""
+_INTEGER_KEY_TYPES = frozenset(
+    {
+        ColumnType.BIG_INTEGER,
+        ColumnType.INTEGER,
+        ColumnType.SMALL_INTEGER,
+        ColumnType.BIGINT,
+        ColumnType.INT,
+        ColumnType.SMALLINT,
+    },
+)
+"""Column types restored to integer keys before identity lookup."""
 _MAX_IDENTIFIER_LENGTH = 255
-"""Max identifier length value used by ``provider``."""
+"""Maximum character count accepted in a stored identity key."""
 _MAX_PASSWORD_LENGTH = 4096
-"""Max password length value used by ``provider``."""
+"""Maximum submitted password character count before invoking the hasher."""
+
 
 class ModelIdentityProvider(IIdentityProvider):
     """
@@ -46,8 +53,6 @@ class ModelIdentityProvider(IIdentityProvider):
     is a pure function of the configuration. A concurrent first import
     may resolve the same class twice with no observable difference.
     """
-
-    # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = (
         "__hasher",
@@ -71,11 +76,9 @@ class ModelIdentityProvider(IIdentityProvider):
         Returns
         -------
         None
-            The model class stays unresolved until the first lookup.
+            No return value.
         """
-        self.__model_path: str = (
-            app.config("auth.identity.model") or _DEFAULT_MODEL
-        )
+        self.__model_path: str = app.config("auth.identity.model") or _DEFAULT_MODEL
         """Import path of the configured authenticatable model."""
         self.__username_field: str = (
             app.config("auth.identity.username") or _DEFAULT_USERNAME
@@ -83,10 +86,10 @@ class ModelIdentityProvider(IIdentityProvider):
         """Model field used to locate an identity by username."""
         self.__hasher = hasher
         """Hashing service used to verify submitted passwords."""
-        self.__model: type[Model] | None = None
-        """Model selected for generation or persistence."""
+        self.__model: type[_orm.Model] | None = None
+        """Cached concrete identity model, resolved on the first lookup."""
 
-    def model(self) -> type[Model]:
+    def model(self) -> type[_orm.Model]:
         """
         Return the model class backing the authenticated identity.
 
@@ -98,8 +101,9 @@ class ModelIdentityProvider(IIdentityProvider):
         Raises
         ------
         orionis.auth.IdentityProviderException
-            When the path cannot be imported or the resolved class does
-            not implement :class:`orionis.auth.contracts.IAuthenticatable`.
+            When the path cannot be imported or the resolved class is not a
+            concrete Orionis model implementing
+            :class:`orionis.auth.contracts.IAuthenticatable`.
         """
         resolved = self.__model
         if resolved is not None:
@@ -110,18 +114,20 @@ class ModelIdentityProvider(IIdentityProvider):
             module = importlib.import_module(module_path)
             resolved = getattr(module, class_name)
         except (ImportError, AttributeError, ValueError) as exc:
-            error_msg = (
-                f"Unable to import the authenticatable model "
-                f"'{self.__model_path}'."
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                f"Unable to import the authenticatable model '{self.__model_path}'."
             )
             raise IdentityProviderException(error_msg) from exc
 
-        if not isinstance(resolved, type) or not issubclass(
-            resolved, IAuthenticatable,
+        if (
+            not isinstance(resolved, type)
+            or not issubclass(resolved, _orm.Model)
+            or resolved.__meta__ is None
+            or not issubclass(resolved, IAuthenticatable)
         ):
             error_msg = (
                 f"The authenticatable model '{self.__model_path}' must "
-                f"implement IAuthenticatable."
+                f"be a concrete Orionis Model implementing IAuthenticatable."
             )
             raise IdentityProviderException(error_msg)
 
@@ -140,7 +146,7 @@ class ModelIdentityProvider(IIdentityProvider):
         Returns
         -------
         orionis.auth.contracts.IAuthenticatable | None
-            Matching identity, or ``None`` when it no longer exists.
+            Matching identity, or ``None`` when the key is invalid or no row matches.
         """
         if identifier is None:
             return None
@@ -169,6 +175,10 @@ class ModelIdentityProvider(IIdentityProvider):
         if (
             not isinstance(identifier, (int, str, UUID))
             or isinstance(identifier, bool)
+            or (
+                isinstance(identifier, int)
+                and int.bit_length(identifier) > _MAX_IDENTIFIER_LENGTH * 4
+            )
             or not str(identifier)
             or len(str(identifier)) > _MAX_IDENTIFIER_LENGTH
         ):
@@ -181,7 +191,7 @@ class ModelIdentityProvider(IIdentityProvider):
             if column.column_type is ColumnType.UUID:
                 identifier = UUID(str(identifier))
                 return identifier if column.as_uuid else str(identifier)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return None
         return str(identifier)
 
@@ -237,15 +247,20 @@ class ModelIdentityProvider(IIdentityProvider):
         model = self.model()
         if "remember_token" not in model.__meta__.columns:
             return False
-        query = model.query().where(
-            identity.getAuthIdentifierName(), identity.getAuthIdentifier(),
-        ).where(identity.AUTH_PASSWORD, identity.getAuthPassword())
+        query = (
+            model.query()
+            .where(
+                identity.getAuthIdentifierName(),
+                identity.getAuthIdentifier(),
+            )
+            .where(identity.AUTH_PASSWORD, identity.getAuthPassword())
+        )
         if expected is None:
             query.whereNull("remember_token")
         else:
             query.where("remember_token", expected)
         if token is not None:
-            query.where("active", True)  # noqa: FBT003 (SQL value)
+            query.where("active", True)
         return await query.update({"remember_token": token}) == 1
 
     async def validateCredentials(

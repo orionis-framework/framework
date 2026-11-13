@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import argparse
 import re
 import sys
@@ -43,6 +45,7 @@ dev = [{include-group = "lint"}, "pytest>=8", "ruff>=0.16"]
 "group:dev" = "Development and quality checks."
 """
 
+
 class _StubApp:
     """Expose the application root to the install command."""
 
@@ -62,6 +65,7 @@ class _StubApp:
             Initialize the root consumed by the command.
         """
         self.basePath = root
+
 
 class _StubProcess:
     """Record child cleanup and provide deterministic installer results."""
@@ -121,6 +125,7 @@ class _StubProcess:
         self.returncode = 130
         return self.returncode
 
+
 class _RecordingInstaller:
     """Capture the executable, interpreter and arguments used to install."""
 
@@ -179,6 +184,7 @@ class _RecordingInstaller:
             raise self.failure
         return self.process
 
+
 class _RecordingPrompt:
     """Supply selection input without accessing the real terminal."""
 
@@ -221,6 +227,7 @@ class _RecordingPrompt:
             raise self.failure
         return self.answer
 
+
 class _RecordingConfirm:
     """Supply confirmation input without accessing the real terminal."""
 
@@ -255,6 +262,7 @@ class _RecordingConfirm:
         self.calls.append(question)
         return self.answer
 
+
 class TestInstallCommand(TestCase):
     """Verify the catalog, selection and interpreter-scoped installation."""
 
@@ -284,8 +292,12 @@ class TestInstallCommand(TestCase):
         self.original_bindings = {
             name: getattr(install_module, name)
             for name in (
-                "which", "create_subprocess_exec", "Prompt", "Confirm",
-                "_PACKAGE_MANIFEST", "_SOURCE_MANIFEST",
+                "which",
+                "create_subprocess_exec",
+                "Prompt",
+                "Confirm",
+                "_PACKAGE_MANIFEST",
+                "_SOURCE_MANIFEST",
             )
         }
         install_module.__dict__.update(
@@ -344,9 +356,13 @@ class TestInstallCommand(TestCase):
         None
             Set command arguments and the simulated terminal capability.
         """
-        self.command.setArguments({
-            "list": False, "options": list(names), "yes": confirmed,
-        })
+        self.command.setArguments(
+            {
+                "list": False,
+                "options": list(names),
+                "yes": confirmed,
+            },
+        )
         self.command._console.is_interactive = interactive
 
     async def testFallsBackToTheApplicationManifest(self) -> None:
@@ -358,12 +374,22 @@ class TestInstallCommand(TestCase):
             Assertions verify the purposes and manifest path without requirements.
         """
         self._writeManifest()
+        # This assertion requires enough columns for the entire temporary path.
+        self.command._console.width = max(
+            self.command._console.width,
+            len(str(self.root / "pyproject.toml")) + 16,
+        )
 
         self.assertEqual(await self.command.handle(self.app), 0)
         rendered = self.output.getvalue()
         for expected in (
-            "s3", "mysql", "dev", "lint", "Amazon S3 file storage",
-            "MySQL and MariaDB connections", "Development and quality checks",
+            "s3",
+            "mysql",
+            "dev",
+            "lint",
+            "Amazon S3 file storage",
+            "MySQL and MariaDB connections",
+            "Development and quality checks",
             str(self.root / "pyproject.toml"),
         ):
             self.assertIn(expected, rendered)
@@ -394,7 +420,8 @@ class TestInstallCommand(TestCase):
         self.assertEqual(await self.command.handle(self.app), 0)
         self.assertEqual(self.installer.calls[0][0][6:], ("boto3>=1",))
         self.assertEqual(
-            self.installer.calls[0][1]["cwd"], self.package_manifest.parent,
+            self.installer.calls[0][1]["cwd"],
+            self.package_manifest.parent,
         )
         rendered = self.output.getvalue()
         self.assertIn("Amazon S3 file storage", rendered)
@@ -416,7 +443,8 @@ class TestInstallCommand(TestCase):
 
         self.assertEqual(await self.command.handle(self.app), 0)
         self.assertEqual(
-            self.installer.calls[0][0][6:], ("aiomysql>=0.3", "pymysql>=1"),
+            self.installer.calls[0][0][6:],
+            ("aiomysql>=0.3", "pymysql>=1"),
         )
         self.assertEqual(self.installer.calls[0][1]["cwd"], self.source_manifest.parent)
 
@@ -464,9 +492,7 @@ class TestInstallCommand(TestCase):
             Assertions verify purposes, row counts and width constraints.
         """
         options = {
-            "extra:storage": tuple(
-                f"cloud-driver-{index}>=1.0" for index in range(7)
-            ),
+            "extra:storage": tuple(f"cloud-driver-{index}>=1.0" for index in range(7)),
             "group:dev": ("ruff>=0.16", "pytest>=8"),
             "extra:empty": (),
         }
@@ -481,7 +507,8 @@ class TestInstallCommand(TestCase):
             self.command._console = RichConsole(file=self.output, width=width)
 
             self.command._InstallCommand__renderOptions(
-                self.root / "pyproject.toml", options,
+                self.root / "pyproject.toml",
+                options,
             )
 
             lines = self.output.getvalue().splitlines()
@@ -668,13 +695,29 @@ class TestInstallCommand(TestCase):
         self.assertEqual(await self.command.handle(self.app), 0)
 
         args, kwargs = self.installer.calls[0]
-        self.assertEqual(args, (
-            "uv-test-executable", "pip", "install", "--python", sys.executable,
-            "--", "boto3>=1", "aiomysql>=0.3", "pymysql>=1",
-        ))
-        self.assertEqual(kwargs, {
-            "cwd": self.root, "stdin": DEVNULL, "stdout": PIPE, "stderr": STDOUT,
-        })
+        self.assertEqual(
+            args,
+            (
+                "uv-test-executable",
+                "pip",
+                "install",
+                "--python",
+                sys.executable,
+                "--",
+                "boto3>=1",
+                "aiomysql>=0.3",
+                "pymysql>=1",
+            ),
+        )
+        self.assertEqual(
+            kwargs,
+            {
+                "cwd": self.root,
+                "stdin": DEVNULL,
+                "stdout": PIPE,
+                "stderr": STDOUT,
+            },
+        )
         self.assertIn("Packages installed successfully", self.output.getvalue())
         self.assertEqual(self.prompt.calls, [])
         self.assertEqual(self.confirm.calls, [])
@@ -692,7 +735,8 @@ class TestInstallCommand(TestCase):
 
         self.assertEqual(await self.command.handle(self.app), 0)
         self.assertEqual(
-            self.installer.calls[0][0][-2:], ("ruff>=0.16", "pytest>=8"),
+            self.installer.calls[0][0][-2:],
+            ("ruff>=0.16", "pytest>=8"),
         )
 
     async def testAcceptsInteractiveNumbersAndCommaSeparatedSelections(self) -> None:
@@ -710,9 +754,14 @@ class TestInstallCommand(TestCase):
         self.assertEqual(await self.command.handle(self.app), 0)
         self.assertEqual(len(self.prompt.calls), 1)
         self.assertEqual(len(self.confirm.calls), 1)
-        self.assertEqual(self.installer.calls[0][0][-3:], (
-            "boto3>=1", "aiomysql>=0.3", "pymysql>=1",
-        ))
+        self.assertEqual(
+            self.installer.calls[0][0][-3:],
+            (
+                "boto3>=1",
+                "aiomysql>=0.3",
+                "pymysql>=1",
+            ),
+        )
 
     async def testDeduplicatesRepeatedOptionsAndOverlappingGroups(self) -> None:
         """Install each identical requirement only once across selected options.
@@ -728,7 +777,8 @@ class TestInstallCommand(TestCase):
         self.assertEqual(await self.command.handle(self.app), 0)
         self.assertEqual(len(self.installer.calls), 1)
         self.assertEqual(
-            self.installer.calls[0][0][6:], ("ruff>=0.16", "pytest>=8"),
+            self.installer.calls[0][0][6:],
+            ("ruff>=0.16", "pytest>=8"),
         )
 
     async def testRejectsUnknownNamesAndOutOfRangeNumbers(self) -> None:
@@ -801,7 +851,8 @@ class TestInstallCommand(TestCase):
 
         self.assertEqual(await self.command.handle(self.app), 0)
         self.assertEqual(
-            self.installer.calls[0][0][5:], ("--", "--target=elsewhere"),
+            self.installer.calls[0][0][5:],
+            ("--", "--target=elsewhere"),
         )
 
     async def testDeclinedConfirmationDoesNotInstall(self) -> None:
@@ -991,6 +1042,7 @@ class TestInstallCommand(TestCase):
             self.assertEqual(await self.command.handle(self.app), 1)
         self.assertEqual(self.installer.calls, [])
 
+
 class TestInstallIntegration(TestCase):
     """Exercise real uv installation without network access or project mutation."""
 
@@ -1015,7 +1067,7 @@ class TestInstallIntegration(TestCase):
         self.manifest_path = self.root / "pyproject.toml"
         self.manifest_content = (
             '[project]\nname = "install-probe-app"\n'
-            '[project.optional-dependencies]\n'
+            "[project.optional-dependencies]\n"
             f'probe = ["{_PROBE_NAME} @ {wheel_path.as_uri()}"]\n'
         )
         self.manifest_path.write_text(self.manifest_content, encoding="utf-8")
@@ -1065,8 +1117,7 @@ class TestInstallIntegration(TestCase):
         contents = {
             f"{_PROBE_NAME}/__init__.py": "VALUE = 'isolated installation'\n",
             f"{dist_info}/METADATA": (
-                "Metadata-Version: 2.1\n"
-                f"Name: {_PROBE_NAME}\nVersion: 0.0.1\n"
+                f"Metadata-Version: 2.1\nName: {_PROBE_NAME}\nVersion: 0.0.1\n"
             ),
             f"{dist_info}/WHEEL": (
                 "Wheel-Version: 1.0\nGenerator: orionis-test\n"
@@ -1100,12 +1151,18 @@ class TestInstallIntegration(TestCase):
             Assertions verify the package, interpreter and unchanged manifest.
         """
         self.assertEqual(
-            await self.command.handle(self.app), 0, self.output.getvalue(),
+            await self.command.handle(self.app),
+            0,
+            self.output.getvalue(),
         )
         process = await create_subprocess_exec(
-            str(self.python_path), "-I", "-B", "-c",
+            str(self.python_path),
+            "-I",
+            "-B",
+            "-c",
             f"import {_PROBE_NAME}; print({_PROBE_NAME}.VALUE)",
-            stdout=PIPE, stderr=STDOUT,
+            stdout=PIPE,
+            stderr=STDOUT,
         )
         output, _ = await process.communicate()
 

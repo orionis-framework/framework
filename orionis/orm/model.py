@@ -1,13 +1,16 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Retain runtime annotations and dynamic attribute values.
 """Base class of the Orionis active-record models."""
 
 from __future__ import annotations
 import uuid
 from copy import deepcopy
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any, ClassVar, Self
+from collections.abc import Callable
+from typing import Any, ClassVar, Self
 from orionis.orm.attributes import AttributesMixin, serialize_for_storage
 from orionis.orm.events import EventsMixin
-from orionis.orm.metaclass import ModelMeta
+from orionis.orm.metaclass import ModelMeta, ModelMetadata
 from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.orm.query.expressions import (
     DeletePlan,
@@ -20,12 +23,9 @@ from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.soft_deletes import SoftDeletesMixin
 from orionis.orm.state import StateMixin
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.database.contracts.connection import IConnection
-    from orionis.orm.metaclass import ModelMetadata
-    from orionis.orm.schema.table import TableDefinition
-    from orionis.support.types.collection import Collection
+from orionis.database.contracts.connection import IConnection
+from orionis.orm.schema.table import TableDefinition
+from orionis.support.types.collection import Collection
 
 # Instance slots managed directly by the model machinery.
 _INTERNAL_ATTRIBUTES: frozenset[str] = frozenset(
@@ -35,9 +35,11 @@ _INTERNAL_ATTRIBUTES: frozenset[str] = frozenset(
         "_exists",
         "_original",
         "_relations",
+        "_read_connection",
     },
 )
 """Instance slots managed directly by the model machinery."""
+
 
 class Model(
     AttributesMixin,
@@ -58,7 +60,14 @@ class Model(
 
     __abstract__ = True
     """Abstract flag used by ``Model``."""
-    __slots__ = ("_attributes", "_changes", "_exists", "_original", "_relations")
+    __slots__ = (
+        "_attributes",
+        "_changes",
+        "_exists",
+        "_original",
+        "_read_connection",
+        "_relations",
+    )
     """Declare the instance attribute slots reserved by this class."""
 
     # ── Declarative configuration ───────────────────────────────────────────
@@ -139,7 +148,7 @@ class Model(
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -151,12 +160,13 @@ class Model(
         object.__setattr__(self, "_changes", {})
         object.__setattr__(self, "_exists", False)
         object.__setattr__(self, "_relations", {})
+        object.__setattr__(self, "_read_connection", None)
         if attributes:
             self.fill(attributes)
 
     # ── Attribute access ────────────────────────────────────────────────────
 
-    def __getattr__(self: Self, key: str) -> Any:  # noqa: ANN401
+    def __getattr__(self: Self, key: str) -> Any:
         """
         Serve column values and accessor-backed attributes.
 
@@ -195,7 +205,7 @@ class Model(
         error_msg = f"'{type(self).__name__}' object has no attribute '{key}'"
         raise AttributeError(error_msg)
 
-    def __setattr__(self: Self, key: str, value: Any) -> None:  # noqa: ANN401
+    def __setattr__(self: Self, key: str, value: Any) -> None:
         """
         Route column assignments into the attribute store.
 
@@ -209,7 +219,7 @@ class Model(
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         if key in _INTERNAL_ATTRIBUTES:
             object.__setattr__(self, key, value)
@@ -261,6 +271,7 @@ class Model(
         object.__setattr__(instance, "_changes", {})
         object.__setattr__(instance, "_exists", True)
         object.__setattr__(instance, "_relations", {})
+        object.__setattr__(instance, "_read_connection", None)
         return instance
 
     # ── Query entry points ──────────────────────────────────────────────────
@@ -352,7 +363,7 @@ class Model(
         return await cls.query().get()
 
     @classmethod
-    async def find(cls: type[Self], key: Any) -> Model | None:  # noqa: ANN401
+    async def find(cls: type[Self], key: Any) -> Model | None:
         """
         Retrieve a model by its primary key.
 
@@ -369,7 +380,7 @@ class Model(
         return await cls.query().find(key)
 
     @classmethod
-    async def findOrFail(cls: type[Self], key: Any) -> Model:  # noqa: ANN401
+    async def findOrFail(cls: type[Self], key: Any) -> Model:
         """
         Retrieve a model by primary key or raise when absent.
 
@@ -432,7 +443,7 @@ class Model(
         Returns
         -------
         orionis.orm.Model
-            Persisted model instance.
+            Model instance, left unsaved if a before-write listener vetoes it.
 
         Raises
         ------
@@ -446,7 +457,7 @@ class Model(
         return instance
 
     @classmethod
-    async def destroy(cls: type[Self], *keys: Any) -> int:  # noqa: ANN401
+    async def destroy(cls: type[Self], *keys: Any) -> int:
         """
         Delete the models matching the given primary keys.
 
@@ -480,7 +491,7 @@ class Model(
         -------
         bool
             ``True`` when the operation succeeds or nothing changed,
-            ``False`` when a listener vetoed the write.
+            ``False`` when a listener vetoed the write or no stored row matched.
 
         Raises
         ------
@@ -497,6 +508,8 @@ class Model(
 
         saved = await self._performUpdate() if exists else await self._performInsert()
 
+        if not saved:
+            return False
         await self.fireEvent("updated" if exists else "created")
         await self.fireEvent("saved")
         return saved
@@ -537,7 +550,7 @@ class Model(
         -------
         bool
             ``True`` when a row was deleted or stamped, ``False`` for
-            unsaved models or when a listener vetoed the operation.
+            unsaved models, missing rows, or a listener veto.
 
         Raises
         ------
@@ -555,7 +568,8 @@ class Model(
         else:
             deleted = await self._performForceDelete()
 
-        await self.fireEvent("deleted")
+        if deleted:
+            await self.fireEvent("deleted")
         return deleted
 
     async def _performForceDelete(self: Self) -> bool:
@@ -582,7 +596,7 @@ class Model(
                 ),
             ],
         )
-        deleted = await self.getConnection().delete(plan)
+        deleted = await self._persistenceConnection().delete(plan)
         self._exists = False
         """Exists flag used by ``Model``."""
         return deleted > 0
@@ -613,7 +627,7 @@ class Model(
         return now
 
     @classmethod
-    def newUniqueId(cls: type[Self]) -> Any:  # noqa: ANN401
+    def newUniqueId(cls: type[Self]) -> Any:
         """
         Produce a client-generated primary key value.
 
@@ -629,7 +643,22 @@ class Model(
 
     # ── Internal persistence helpers ────────────────────────────────────────
 
-    def _primaryKeyValue(self: Self) -> Any:  # noqa: ANN401
+    def _persistenceConnection(self: Self) -> IConnection:
+        """
+        Keep a hydrated row's writes on the connection that supplied it.
+
+        New instances use the overridable class connection hook. Models hydrated
+        by a query retain that query's connection, including explicit overrides.
+
+        Returns
+        -------
+        orionis.database.contracts.IConnection
+            Connection owning the stored row, or the class-selected connection.
+        """
+        connection = self._read_connection
+        return connection if connection is not None else self.getConnection()
+
+    def _primaryKeyValue(self: Self) -> Any:
         """
         Return the primary key value identifying the stored row.
 
@@ -677,7 +706,7 @@ class Model(
 
         values = serialize_for_storage(meta, self._attributes)
         plan = InsertPlan(table=meta.table, values=[values])
-        result = await self.getConnection().insert(plan)
+        result = await self._persistenceConnection().insert(plan)
 
         # Adopt the database-generated primary key.
         generated = result.last_insert_id
@@ -728,7 +757,7 @@ class Model(
                 ),
             ],
         )
-        affected = await self.getConnection().update(plan)
+        affected = await self._persistenceConnection().update(plan)
 
         if affected > 0:
             self._changes = deepcopy(dirty)

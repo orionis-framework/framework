@@ -1,11 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.container.exceptions.container import CircularDependencyException
 from orionis.test import TestCase
 
 _MESSAGE = "A -> B -> A"
 
-class TestCircularDependencyException(TestCase):
 
+class TestCircularDependencyException(TestCase):
     def testInheritsFromTheBuiltinException(self) -> None:
         """
         Derive from Exception so generic handlers can still catch it.
@@ -13,7 +15,7 @@ class TestCircularDependencyException(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertTrue(issubclass(CircularDependencyException, Exception))
 
@@ -24,7 +26,7 @@ class TestCircularDependencyException(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         exc = CircularDependencyException()
         self.assertEqual(exc.args, ())
@@ -37,7 +39,7 @@ class TestCircularDependencyException(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         exc = CircularDependencyException(_MESSAGE)
         self.assertEqual(exc.args, (_MESSAGE,))
@@ -49,7 +51,7 @@ class TestCircularDependencyException(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -66,7 +68,7 @@ class TestCircularDependencyException(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------

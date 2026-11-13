@@ -1,11 +1,12 @@
+# ruff: noqa: TC001
+# Keep the public connection protocol available to runtime reflection.
 """Define the contract for connection manager implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from orionis.database.contracts.connection import IConnection
 
-if TYPE_CHECKING:
-    from orionis.database.contracts.connection import IConnection
 
 class IConnectionManager(ABC):
     """Define the contract for connection manager implementations."""
@@ -56,7 +57,7 @@ class IConnectionManager(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -107,7 +108,7 @@ class IConnectionManager(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -129,7 +130,7 @@ class IConnectionManager(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     @abstractmethod

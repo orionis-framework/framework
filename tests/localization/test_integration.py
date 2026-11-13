@@ -1,7 +1,10 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.foundation.application import Application
 from orionis.support.facades.lang import Lang
 from orionis.test import TestCase
 from orionis.view.contracts.environment import IViewEnvironment
+
 
 class TestLangFacadeIntegration(TestCase):
     """Validate the Lang facade against the booted application."""
@@ -15,7 +18,7 @@ class TestLangFacadeIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Lang.get("Welcome", locale="es"), "Bienvenido")
         self.assertEqual(Lang.get("Welcome", locale="en"), "Welcome")
@@ -29,11 +32,15 @@ class TestLangFacadeIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
-            Lang.get("Hello :name", locale="es", name="Carlos"),
-            "Hello Carlos",
+            Lang.get(
+                "This password reset link expires in :minutes minutes.",
+                locale="es",
+                minutes=7,
+            ),
+            "Este enlace de recuperación expira en 7 minutos.",
         )
 
     def testEchoesKeysWithoutTranslation(self) -> None:
@@ -44,7 +51,7 @@ class TestLangFacadeIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Lang.get("Unknown Key"), "Unknown Key")
 
@@ -57,7 +64,7 @@ class TestLangFacadeIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         line = "There is one apple|There are :count apples"
         self.assertEqual(Lang.choice(line, 1), "There is one apple")
@@ -72,7 +79,7 @@ class TestLangFacadeIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = Lang.getLocale()
         try:
@@ -92,11 +99,12 @@ class TestLangFacadeIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         locales = Lang.availableLocales()
         self.assertIn("en", locales)
         self.assertIn("es", locales)
+
 
 class TestTranslationTemplateIntegration(TestCase):
     """Validate the translation globals inside real Jinja2 templates."""
@@ -128,7 +136,7 @@ class TestTranslationTemplateIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rendered = await self._render('{{ __("Welcome", locale="es") }}')
         self.assertEqual(rendered, "Bienvenido")
@@ -141,12 +149,13 @@ class TestTranslationTemplateIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rendered = await self._render(
-            '{{ trans("Hello :name", locale="es", name="Ana") }}',
+            '{{ trans("This password reset link expires in :minutes minutes.", '
+            'locale="es", minutes=15) }}',
         )
-        self.assertEqual(rendered, "Hello Ana")
+        self.assertEqual(rendered, "Este enlace de recuperación expira en 15 minutos.")
 
     async def testChoiceGlobalPluralizesInsideTemplates(self) -> None:
         """Pluralize a line through the choice template global.
@@ -157,7 +166,7 @@ class TestTranslationTemplateIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rendered = await self._render(
             '{{ choice("There is one apple|There are :count apples", 3) }}',
@@ -173,7 +182,7 @@ class TestTranslationTemplateIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rendered = await self._render('<html lang="{{ locale() }}">')
         self.assertEqual(rendered, f'<html lang="{Lang.getLocale()}">')
@@ -187,7 +196,7 @@ class TestTranslationTemplateIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rendered = await self._render('{{ locales()|join(",") }}')
         for locale in ("en", "es"):
@@ -202,7 +211,7 @@ class TestTranslationTemplateIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = Lang.getLocale()
         try:

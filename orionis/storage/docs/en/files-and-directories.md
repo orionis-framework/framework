@@ -34,11 +34,11 @@ asyncio.run(example())
 
 ## Save a business result
 
-After generating a report, choose a disk and a stable logical path. In a booted application, use `await Storage.disk("local").put("reports/42.txt", content)`. `disk()` is synchronous; `put()` is async and returns a `File`. Retain the object or its `path()` for later operations. The logical path contains neither physical directories nor provider credentials.
+After generating a report, choose a disk and a stable logical path. In a booted application, call `await Storage.pin()` once before using `await Storage.disk("local").put("reports/42.txt", content)`. `disk()` is synchronous; `put()` is async and returns a `File`. Retain the object or its `path()` for later operations. The logical path contains neither physical directories nor provider credentials.
 
 `disk.file(path)` and `disk.directory(path)` only create references; they do not check existence. `await file.exists()` helps presentation, but checking then reading can race: catch `StorageFileNotFoundException` around the read that matters. No transaction spans database and storage. When publishing a row and a file, design cleanup or compensation if either operation fails.
 
-`write()` and `put()` replace content. `copyTo()` and `moveTo()` operate within the same disk. They return a new object; after a move, the original object still points to its previous path. `rename(name)` keeps the directory and rejects separators. To copy across disks, pass chunks between their file references: another disk name is not a destination path.
+`write()` and `put()` replace content. `copyTo()` and `moveTo()` operate within the same disk. They return a new object; after a move, the original object still points to its previous path. In memory and cloud, moving an existing source to the same normalized path leaves its content intact; the source must still exist. `rename(name)` keeps the directory and rejects empty names, separators, and the dot segments `.` and `..`. To copy across disks, pass chunks between their file references: another disk name is not a destination path.
 
 ### Read metadata and delete
 
@@ -64,7 +64,7 @@ A disk is a named driver boundary. `disk.file(path)` and `disk.directory(path)` 
 
 ### Safe root-relative paths
 
-Paths use `/`, ignore empty/`.` components, resolve internal `..`, and reject traversal above the disk root, null bytes, colons, and an empty file target. Local drivers additionally resolve filesystem paths beneath their configured root and defend against symlink escapes.
+Paths use `/`, ignore empty/`.` components, resolve internal `..`, and reject traversal above the disk root, null bytes, colons, and an empty file target. Local drivers resolve paths beneath their configured root inside the native operation and reject escapes through symbolic links or Windows junctions. Recursive listings do not enter junctions. Ordinary user files ending in `.tmp` remain visible; only the framework's reserved `.<16 hexadecimal digits>.tmp` staging names are hidden.
 
 ### Work with directory listings
 
@@ -80,7 +80,8 @@ async def example() -> None:
     reports = disk.directory("reports")
     assert [item.path() for item in await reports.files()] == ["reports/summary.txt"]
     assert sorted(item.path() for item in await reports.allFiles()) == [
-        "reports/2026/january.txt", "reports/summary.txt",
+        "reports/2026/january.txt",
+        "reports/summary.txt",
     ]
 
 
@@ -96,7 +97,9 @@ from orionis.storage import Disk, MemoryStorageDriver, Visibility
 
 async def example() -> None:
     file = await Disk("memory", MemoryStorageDriver()).put(
-        "assets/app.css", "body{}", Visibility.PUBLIC,
+        "assets/app.css",
+        "body{}",
+        Visibility.PUBLIC,
     )
     info = await file.info()
     assert info.size == 6
@@ -130,7 +133,9 @@ else:
 
 The root is represented by `disk.directory()` and may exist before any file has been stored. Object storage can derive directories from implicit prefixes: do not assume empty directories are identical persistent entities across providers. Listings materialize as lists, not public paginated cursors. Account for memory and SDK request counts when traversing large trees.
 
-`lastModified` is a timezone-aware UTC timestamp; `createdAt` may be `None` when a provider exposes no creation time. A snapshot does not update after a write: request another `info()` for later state.
+`lastModified` is a timezone-aware UTC timestamp; `createdAt` may be `None` when a provider exposes no creation time. Hashing accepts fixed-size digest algorithms; extendable-output algorithms such as SHAKE raise `UnsupportedStorageOperationException`.
+
+A snapshot does not update after a write: request another `info()` for later state.
 
 ---
 

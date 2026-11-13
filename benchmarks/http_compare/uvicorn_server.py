@@ -1,6 +1,7 @@
 import socket
 from importlib import import_module
-from uvicorn.config import Config # pyright: ignore[reportMissingImports]
+from uvicorn.config import Config  # pyright: ignore[reportMissingImports]
+
 
 class TcpNoDelayConfig(Config):
     """Keep TCP_NODELAY enabled on sockets shared by benchmark workers."""
@@ -29,6 +30,7 @@ class TcpNoDelayConfig(Config):
             raise
         return listener
 
+
 def main() -> None:
     """
     Run Uvicorn's unchanged CLI using the benchmark socket configuration.
@@ -45,6 +47,7 @@ def main() -> None:
         entrypoint.main()
     finally:
         entrypoint.Config = native_config
+
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
@@ -8,11 +10,13 @@ from orionis.test import TestCase
 # Fixtures: dataclasses used across all tests
 # ---------------------------------------------------------------------------
 
+
 class Color(Enum):
     """Simple enum fixture for testing enum serialization."""
 
     RED = "red"
     BLUE = "blue"
+
 
 @dataclass
 class SimpleEntity(BaseEntity):
@@ -22,11 +26,13 @@ class SimpleEntity(BaseEntity):
     count: int = 0
     active: bool = True
 
+
 @dataclass
 class EnumEntity(BaseEntity):
     """Entity containing an Enum field."""
 
     color: Color = Color.RED
+
 
 @dataclass
 class NullableEntity(BaseEntity):
@@ -34,11 +40,13 @@ class NullableEntity(BaseEntity):
 
     value: int | None = None
 
+
 @dataclass
 class FactoryEntity(BaseEntity):
     """Entity using default_factory for a list field."""
 
     items: list = field(default_factory=list)
+
 
 @dataclass
 class MetadataEntity(BaseEntity):
@@ -46,56 +54,28 @@ class MetadataEntity(BaseEntity):
 
     score: int = field(default=0, metadata={"label": "Score", "default": 42})
 
+
 @dataclass
 class NestedEntity(BaseEntity):
     """Entity that nests another BaseEntity (as an inner dataclass)."""
 
     inner: SimpleEntity = field(default_factory=SimpleEntity)
 
+
 @dataclass
 class EmptyEntity(BaseEntity):
     """Entity with no fields."""
+
 
 # ---------------------------------------------------------------------------
 # Test class
 # ---------------------------------------------------------------------------
 
+
 class TestBaseEntity(TestCase):
-
-    # ------------------------------------------------ __post_init__
-
-    def testPostInitIsCallable(self):
-        """Confirm __post_init__ is defined and callable.
-
-        Validates that BaseEntity exposes __post_init__ as a method
-        that can be called without raising errors.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        entity = SimpleEntity()
-        entity.__post_init__()  # must not raise
-
-    def testPostInitReturnsNone(self):
-        """Return None from __post_init__.
-
-        Validates that the default __post_init__ implementation
-        returns None explicitly.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        entity = SimpleEntity()
-        result = entity.__post_init__() # NOSONAR
-        self.assertIsNone(result)
-
     # ------------------------------------------------ toDict - basic
 
-    def testToDictReturnsDict(self):
+    def testToDictReturnsDict(self) -> None:
         """Return a dict from toDict.
 
         Validates that toDict produces a plain dict instance.
@@ -103,12 +83,12 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         self.assertIsInstance(entity.toDict(), dict)
 
-    def testToDictContainsAllFields(self):
+    def testToDictContainsAllFields(self) -> None:
         """Include all dataclass fields in toDict output.
 
         Validates that every declared field appears as a key
@@ -117,7 +97,7 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity(name="orionis", count=3, active=False)
         result = entity.toDict()
@@ -125,7 +105,7 @@ class TestBaseEntity(TestCase):
         self.assertIn("count", result)
         self.assertIn("active", result)
 
-    def testToDictPreservesValues(self):
+    def testToDictPreservesValues(self) -> None:
         """Preserve field values in toDict output.
 
         Validates that the values in the resulting dict match
@@ -134,7 +114,7 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity(name="test", count=7, active=False)
         result = entity.toDict()
@@ -142,7 +122,7 @@ class TestBaseEntity(TestCase):
         self.assertEqual(result["count"], 7)
         self.assertFalse(result["active"])
 
-    def testToDictConvertsEnumToValue(self):
+    def testToDictConvertsEnumToValue(self) -> None:
         """Convert Enum fields to their primitive values.
 
         Validates that Enum instances are serialized as their
@@ -151,14 +131,14 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = EnumEntity(color=Color.BLUE)
         result = entity.toDict()
         self.assertEqual(result["color"], "blue")
         self.assertNotIsInstance(result["color"], Enum)
 
-    def testToDictWithNullableNone(self):
+    def testToDictWithNullableNone(self) -> None:
         """Serialize None value for optional fields.
 
         Validates that a field with a None value is represented
@@ -167,13 +147,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = NullableEntity(value=None)
         result = entity.toDict()
         self.assertIsNone(result["value"])
 
-    def testToDictWithNullableValue(self):
+    def testToDictWithNullableValue(self) -> None:
         """Serialize a non-None optional field value.
 
         Validates that an optional field set to an int is
@@ -182,13 +162,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = NullableEntity(value=99)
         result = entity.toDict()
         self.assertEqual(result["value"], 99)
 
-    def testToDictWithDefaultFactory(self):
+    def testToDictWithDefaultFactory(self) -> None:
         """Serialize list default_factory fields correctly.
 
         Validates that a field using default_factory is included
@@ -197,13 +177,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = FactoryEntity()
         result = entity.toDict()
         self.assertEqual(result["items"], [])
 
-    def testToDictWithPopulatedList(self):
+    def testToDictWithPopulatedList(self) -> None:
         """Serialize a populated list field.
 
         Validates that a list field with items is serialized
@@ -212,13 +192,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = FactoryEntity(items=[1, 2, 3])
         result = entity.toDict()
         self.assertEqual(result["items"], [1, 2, 3])
 
-    def testToDictEmptyEntity(self):
+    def testToDictEmptyEntity(self) -> None:
         """Return empty dict for entity with no fields.
 
         Validates that toDict produces an empty dict when
@@ -227,12 +207,12 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = EmptyEntity()
         self.assertEqual(entity.toDict(), {})
 
-    def testToDictIsShallowCopyOnMutation(self):
+    def testToDictDoesNotFollowLaterFieldAssignment(self) -> None:
         """Confirm toDict result is independent from entity mutation.
 
         Validates that modifying the entity after calling toDict
@@ -241,20 +221,20 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity(name="original")
         result = entity.toDict()
         entity.name = "changed"
         self.assertEqual(result["name"], "original")
 
-    def testToDictCopiesMutableNestedValues(self):
+    def testToDictCopiesMutableNestedValues(self) -> None:
         """Copy nested containers so serialized values do not alias fields.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         @dataclass
@@ -266,13 +246,13 @@ class TestBaseEntity(TestCase):
         result["payload"]["items"].append(2)
         self.assertEqual(entity.payload, {"items": [1]})
 
-    def testToDictKeepsEnumsInsideContainers(self):
+    def testToDictKeepsEnumsInsideContainers(self) -> None:
         """Keep enum values inside containers consistent with asdict.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         @dataclass
@@ -281,13 +261,13 @@ class TestBaseEntity(TestCase):
 
         self.assertEqual(ContainerEntity().toDict()["colors"], [Color.RED])
 
-    def testSlottedEntityDoesNotInheritAnInstanceDictionary(self):
+    def testSlottedEntityDoesNotInheritAnInstanceDictionary(self) -> None:
         """Keep slotted entity instances free of an inherited dictionary.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         @dataclass(slots=True)
@@ -300,7 +280,7 @@ class TestBaseEntity(TestCase):
 
     # ------------------------------------------------ getFields - basic
 
-    def testGetFieldsReturnsList(self):
+    def testGetFieldsReturnsList(self) -> None:
         """Return a list from getFields.
 
         Validates that getFields produces a list instance.
@@ -308,12 +288,12 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         self.assertIsInstance(entity.getFields(), list)
 
-    def testGetFieldsCountMatchesDataclassFields(self):
+    def testGetFieldsCountMatchesDataclassFields(self) -> None:
         """Return one entry per declared dataclass field.
 
         Validates that the length of getFields output equals the
@@ -322,13 +302,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         result = entity.getFields()
         self.assertEqual(len(result), 3)
 
-    def testGetFieldsContainsRequiredKeys(self):
+    def testGetFieldsContainsRequiredKeys(self) -> None:
         """Include required keys in each field dict.
 
         Validates that each element in getFields output contains
@@ -337,7 +317,7 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         for entry in entity.getFields():
@@ -346,7 +326,7 @@ class TestBaseEntity(TestCase):
             self.assertIn("default", entry)
             self.assertIn("metadata", entry)
 
-    def testGetFieldsNameMatchesDeclaredField(self):
+    def testGetFieldsNameMatchesDeclaredField(self) -> None:
         """Report correct field names in getFields output.
 
         Validates that the 'name' key in each entry matches the
@@ -355,7 +335,7 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         names = [f["name"] for f in entity.getFields()]
@@ -363,7 +343,7 @@ class TestBaseEntity(TestCase):
         self.assertIn("count", names)
         self.assertIn("active", names)
 
-    def testGetFieldsTypesIsAlwaysList(self):
+    def testGetFieldsTypesIsAlwaysList(self) -> None:
         """Return 'types' as a list in every field entry.
 
         Validates that the 'types' value in each field dict is
@@ -372,13 +352,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         for entry in entity.getFields():
             self.assertIsInstance(entry["types"], list)
 
-    def testGetFieldsSimpleTypeContainsTypeName(self):
+    def testGetFieldsSimpleTypeContainsTypeName(self) -> None:
         """Include the type name for simple-typed fields.
 
         Validates that the 'types' list for a plain int field
@@ -387,13 +367,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         count_field = next(f for f in entity.getFields() if f["name"] == "count")
         self.assertIn("int", count_field["types"])
 
-    def testGetFieldsDefaultValueReflectsDeclared(self):
+    def testGetFieldsDefaultValueReflectsDeclared(self) -> None:
         """Report the declared default in the 'default' key.
 
         Validates that the 'default' value in the field dict
@@ -402,13 +382,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         name_field = next(f for f in entity.getFields() if f["name"] == "name")
         self.assertEqual(name_field["default"], "default")
 
-    def testGetFieldsDefaultForIntField(self):
+    def testGetFieldsDefaultForIntField(self) -> None:
         """Report correct int default in getFields.
 
         Validates that an int field with a default of 0 is
@@ -417,13 +397,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         count_field = next(f for f in entity.getFields() if f["name"] == "count")
         self.assertEqual(count_field["default"], 0)
 
-    def testGetFieldsDefaultFactory(self):
+    def testGetFieldsDefaultFactory(self) -> None:
         """Report the result of default_factory in 'default'.
 
         Validates that a field using default_factory has its
@@ -432,13 +412,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = FactoryEntity()
         items_field = next(f for f in entity.getFields() if f["name"] == "items")
         self.assertEqual(items_field["default"], [])
 
-    def testGetFieldsMetadataIsDict(self):
+    def testGetFieldsMetadataIsDict(self) -> None:
         """Return metadata as a dict in each field entry.
 
         Validates that the 'metadata' key in each field dict
@@ -447,13 +427,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         for entry in entity.getFields():
             self.assertIsInstance(entry["metadata"], dict)
 
-    def testGetFieldsEmptyMetadataForPlainField(self):
+    def testGetFieldsEmptyMetadataForPlainField(self) -> None:
         """Return empty metadata for fields without metadata.
 
         Validates that fields declared without explicit metadata
@@ -462,13 +442,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity()
         name_field = next(f for f in entity.getFields() if f["name"] == "name")
         self.assertEqual(name_field["metadata"], {})
 
-    def testGetFieldsMetadataPreservesCustomKeys(self):
+    def testGetFieldsMetadataPreservesCustomKeys(self) -> None:
         """Include custom metadata keys in the field entry.
 
         Validates that metadata declared with field() is preserved
@@ -477,36 +457,31 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = MetadataEntity()
-        score_field = next(
-            f for f in entity.getFields() if f["name"] == "score"
-        )
+        score_field = next(f for f in entity.getFields() if f["name"] == "score")
         self.assertIn("label", score_field["metadata"])
         self.assertEqual(score_field["metadata"]["label"], "Score")
 
-    def testGetFieldsMetadataDefaultOverridesFieldDefault(self):
-        """Use metadata default as fallback when field has no default.
+    def testGetFieldsDeclaredDefaultTakesPrecedenceOverMetadata(self) -> None:
+        """Preserve a declared default even when metadata supplies another.
 
-        Validates that when no field default is set but metadata
-        contains a 'default' key, that value is used.
+        The dataclass default takes precedence over the metadata default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = MetadataEntity()
-        score_field = next(
-            f for f in entity.getFields() if f["name"] == "score"
-        )
+        score_field = next(f for f in entity.getFields() if f["name"] == "score")
         # field.default = 0, so 'default' is taken from field.default
         self.assertEqual(score_field["default"], 0)
 
     # ------------------------------------------------ getFields - enum
 
-    def testGetFieldsEnumDefaultIsSerializedValue(self):
+    def testGetFieldsEnumDefaultIsSerializedValue(self) -> None:
         """Serialize Enum defaults to their primitive values.
 
         Validates that if the default value of a field is an Enum,
@@ -515,18 +490,16 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = EnumEntity()
-        color_field = next(
-            f for f in entity.getFields() if f["name"] == "color"
-        )
+        color_field = next(f for f in entity.getFields() if f["name"] == "color")
         self.assertEqual(color_field["default"], "red")
         self.assertNotIsInstance(color_field["default"], Enum)
 
     # ------------------------------------------------ getFields - union types
 
-    def testGetFieldsUnionTypeReturnsMultipleTypes(self):
+    def testGetFieldsUnionTypeReturnsMultipleTypes(self) -> None:
         """Report multiple type strings for union-typed fields.
 
         Validates that a field with a union type (int | None)
@@ -535,15 +508,13 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = NullableEntity()
-        value_field = next(
-            f for f in entity.getFields() if f["name"] == "value"
-        )
+        value_field = next(f for f in entity.getFields() if f["name"] == "value")
         self.assertGreater(len(value_field["types"]), 1)
 
-    def testGetFieldsUnionTypeContainsIntAndNone(self):
+    def testGetFieldsUnionTypeContainsIntAndNone(self) -> None:
         """Include 'int' and 'None' in union type list.
 
         Validates that a field typed as int | None reports both
@@ -552,19 +523,17 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = NullableEntity()
-        value_field = next(
-            f for f in entity.getFields() if f["name"] == "value"
-        )
+        value_field = next(f for f in entity.getFields() if f["name"] == "value")
         types_str = " ".join(value_field["types"])
         self.assertIn("int", types_str)
         self.assertIn("None", types_str)
 
     # ------------------------------------------------ getFields - empty entity
 
-    def testGetFieldsEmptyEntityReturnsList(self):
+    def testGetFieldsEmptyEntityReturnsList(self) -> None:
         """Return empty list for entity with no fields.
 
         Validates that getFields returns an empty list when the
@@ -573,14 +542,14 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = EmptyEntity()
         self.assertEqual(entity.getFields(), [])
 
     # ------------------------------------------------ nested entity
 
-    def testToDictNestedEntityIsConverted(self):
+    def testToDictNestedEntityIsConverted(self) -> None:
         """Recursively convert nested entities in toDict.
 
         Validates that a field containing another dataclass is
@@ -589,14 +558,14 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = NestedEntity()
         result = entity.toDict()
         self.assertIsInstance(result["inner"], dict)
         self.assertIn("name", result["inner"])
 
-    def testGetFieldsNestedEntityDefaultIsDict(self):
+    def testGetFieldsNestedEntityDefaultIsDict(self) -> None:
         """Serialize nested dataclass defaults as dicts in getFields.
 
         Validates that a field whose default is a nested dataclass
@@ -605,17 +574,15 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = NestedEntity()
-        inner_field = next(
-            f for f in entity.getFields() if f["name"] == "inner"
-        )
+        inner_field = next(f for f in entity.getFields() if f["name"] == "inner")
         self.assertIsInstance(inner_field["default"], dict)
 
     # ---------------------------------------- inheritance / extensibility
 
-    def testSubclassCanOverridePostInit(self):
+    def testSubclassCanOverridePostInit(self) -> None:
         """Allow subclasses to override __post_init__.
 
         Validates that a subclass can extend __post_init__ to
@@ -624,7 +591,7 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         @dataclass
@@ -637,7 +604,7 @@ class TestBaseEntity(TestCase):
                 Returns
                 -------
                 None
-                    Completes the operation described above.
+                    No return value.
 
                 Raises
                 ------
@@ -653,7 +620,7 @@ class TestBaseEntity(TestCase):
         with self.assertRaises(ValueError):
             ValidatedEntity(value=-1)
 
-    def testToDictPreservesTypesAfterUpdate(self):
+    def testToDictPreservesTypesAfterUpdate(self) -> None:
         """Preserve attribute types after direct mutation in toDict.
 
         Validates that modifying a field directly and calling
@@ -662,7 +629,7 @@ class TestBaseEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SimpleEntity(count=1)
         entity.count = 42

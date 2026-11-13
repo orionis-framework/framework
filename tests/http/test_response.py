@@ -1,3 +1,5 @@
+# ruff: noqa: DTZ001, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 from datetime import UTC, date, datetime, time, timedelta, timezone
@@ -17,6 +19,7 @@ from orionis.http.responses import (
     PlainTextResponse,
     RedirectResponse,
     Response,
+    ResponseTemplate,
     StreamingResponse,
 )
 from orionis.session.flash import ERRORS_KEY, OLD_INPUT_KEY
@@ -27,15 +30,18 @@ if TYPE_CHECKING:
 
 _CREDENTIAL_FIELD: str = "password"
 
+
 class _Colour(Enum):
     """Enumeration used to exercise the JSON fallback encoder."""
 
     RED = "red"
 
+
 class _Opaque:
     """Object that no JSON encoder in the framework knows how to render."""
 
     __slots__ = ()
+
 
 async def _async_chunks() -> AsyncIterator[bytes]:
     """
@@ -48,6 +54,7 @@ async def _async_chunks() -> AsyncIterator[bytes]:
     """
     yield b"first"
     yield b"second"
+
 
 async def _drain(stream: AsyncIterator[bytes]) -> list[bytes]:
     """
@@ -65,7 +72,41 @@ async def _drain(stream: AsyncIterator[bytes]) -> list[bytes]:
     """
     return [chunk async for chunk in stream]
 
+
 class TestResponseConstruction(TestCase):
+    def testHeaderExportsRejectUnsafeNamesAndValuesIncludingCachedCopies(self) -> None:
+        """Validate emitted headers even after mutable access or template reuse.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        invalid = (
+            ("X-Value", "one\r\ntwo"),
+            ("X-Value", "one\x00two"),
+            ("X-Value", "one\x7ftwo"),
+            ("Invalid:Name", "value"),
+            ("Two Words", "value"),
+            ("", "value"),
+        )
+        for exporter in ("getRawHeaders", "getStringHeaders"):
+            for name, value in invalid:
+                with self.subTest(exporter=exporter, name=name, value=value):
+                    with self.assertRaises(ValueError):
+                        response = Response(headers={name: value})
+                        getattr(response, exporter)()
+                    with self.assertRaises(ValueError):
+                        response = ResponseTemplate(headers={"X-Valid": "yes"}).make()
+                        response.setHeader(name, value)
+                        getattr(response, exporter)()
+            response = ResponseTemplate(headers={"X-Value": "valid"}).make()
+            response.getHeader("X-Value").append("one\ntwo")
+            with self.assertRaises(ValueError):
+                getattr(response, exporter)()
+        valid = Response(headers={"X-Value": "caf\xe9\tlabel"})
+        self.assertEqual(valid.getStringHeaders(), [("x-value", "caf\xe9\tlabel")])
+        self.assertEqual(valid.getRawHeaders(), [(b"x-value", b"caf\xe9\tlabel")])
 
     def testRejectsANonIntegerStatusCode(self) -> None:
         """Reject a status code that is not an integer.
@@ -217,8 +258,8 @@ class TestResponseConstruction(TestCase):
         """
         self.assertFalse(hasattr(Response(), "__dict__"))
 
-class TestResponseRender(TestCase):
 
+class TestResponseRender(TestCase):
     def testRendersNoneAsAnEmptyBody(self) -> None:
         """Render a missing body as zero bytes.
 
@@ -294,8 +335,8 @@ class TestResponseRender(TestCase):
         """
         self.assertEqual(Response(content=42).getBody(), b"42")
 
-class TestResponseHeaders(TestCase):
 
+class TestResponseHeaders(TestCase):
     def testAddHeaderCreatesTheEntry(self) -> None:
         """Create the header entry on the first write.
 
@@ -425,8 +466,8 @@ class TestResponseHeaders(TestCase):
         result.addHeader("x-a", "2")
         self.assertEqual(result.getStringHeaders(), [("x-a", "1"), ("x-a", "2")])
 
-class TestResponseCookies(TestCase):
 
+class TestResponseCookies(TestCase):
     def testSetsACookieWithFrameworkDefaults(self) -> None:
         """Emit a cookie scoped to the root path with lax same-site.
 
@@ -507,7 +548,12 @@ class TestResponseCookies(TestCase):
             "sid",
             "1",
             expires=datetime(
-                2026, 1, 2, 5, 4, 5,
+                2026,
+                1,
+                2,
+                5,
+                4,
+                5,
                 tzinfo=timezone(timedelta(hours=2)),
             ),
         )
@@ -723,8 +769,8 @@ class TestResponseCookies(TestCase):
         self.assertIs(result.withoutCookie("sid"), result)
         self.assertIn("Max-Age=0", result.getHeader("set-cookie")[0])
 
-class TestResponseFlash(TestCase):
 
+class TestResponseFlash(TestCase):
     def testNothingIsQueuedByDefault(self) -> None:
         """Allocate no flash bag for a plain response.
 
@@ -828,8 +874,8 @@ class TestResponseFlash(TestCase):
         self.assertIs(result.withInput({}), result)
         self.assertIs(result.withErrors({}), result)
 
-class TestResponseAccessors(TestCase):
 
+class TestResponseAccessors(TestCase):
     def testExposesTheStatusCodeAndMediaType(self) -> None:
         """Expose the status code and media type given at construction time.
 
@@ -899,8 +945,8 @@ class TestResponseAccessors(TestCase):
         await result.runBackground()
         self.assertEqual(executed, ["done"])
 
-class TestHtmlResponse(TestCase):
 
+class TestHtmlResponse(TestCase):
     def testAdvertisesTheHtmlContentType(self) -> None:
         """Set the HTML content type when none is supplied.
 
@@ -951,8 +997,8 @@ class TestHtmlResponse(TestCase):
         self.assertEqual(result.getBody(), b"")
         self.assertEqual(result.getStatusCode(), 200)
 
-class TestPlainTextResponse(TestCase):
 
+class TestPlainTextResponse(TestCase):
     def testAdvertisesThePlainTextContentType(self) -> None:
         """Set the plain-text content type when none is supplied.
 
@@ -983,8 +1029,8 @@ class TestPlainTextResponse(TestCase):
         result = PlainTextResponse("a,b", headers={"content-type": "text/csv"})
         self.assertEqual(result.getHeader("content-type"), ["text/csv"])
 
-class TestJsonResponse(TestCase):
 
+class TestJsonResponse(TestCase):
     def testSerialisesThroughTheFastPath(self) -> None:
         """Serialise the payload with the compact encoder by default.
 
@@ -1114,8 +1160,8 @@ class TestJsonResponse(TestCase):
         )
         self.assertEqual(result.getBody(), b'{"value":"opaque"}')
 
-class TestJsonResponseDefaultEncoder(TestCase):
 
+class TestJsonResponseDefaultEncoder(TestCase):
     def testEncodesTemporalValuesAsIsoStrings(self) -> None:
         """Render datetimes, dates and times in ISO 8601.
 
@@ -1202,8 +1248,8 @@ class TestJsonResponseDefaultEncoder(TestCase):
             JSONResponse._defaultEncoder(_Opaque())
         self.assertIn("_Opaque", str(captured.exception))
 
-class TestRedirectResponse(TestCase):
 
+class TestRedirectResponse(TestCase):
     def testRejectsANonStringUrl(self) -> None:
         """Reject a redirect target that is not a string.
 
@@ -1292,8 +1338,8 @@ class TestRedirectResponse(TestCase):
         )
         self.assertEqual(result.getHeader("content-type"), ["text/html"])
 
-class TestStreamingResponse(TestCase):
 
+class TestStreamingResponse(TestCase):
     async def testAcceptsAnAsynchronousIterable(self) -> None:
         """Stream the chunks produced by an asynchronous iterable.
 
@@ -1425,8 +1471,8 @@ class TestStreamingResponse(TestCase):
         )
         self.assertEqual(result.getHeader("content-type"), ["text/csv"])
 
-class TestFileResponse(TestCase):
 
+class TestFileResponse(TestCase):
     def setUp(self) -> None:
         """Create a temporary file served by the response under test.
 

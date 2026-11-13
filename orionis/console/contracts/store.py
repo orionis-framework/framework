@@ -11,6 +11,7 @@ if TYPE_CHECKING:
         Scheduler as ConfigScheduler,
     )
 
+
 class IScheduleStore(ABC):
     """Define the contract for schedule store implementations."""
 

@@ -1,15 +1,21 @@
+# ruff: noqa: ANN401, TC001
+# Keep runtime injection types; resolve optional backend classes dynamically.
 """Hash passwords with Argon2id."""
 
-from typing import TYPE_CHECKING, Any, Self
+import base64
+from threading import Lock
+from typing import Any, Self
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
 from orionis.hashing.execution import HASH_WORKERS
 from orionis.hashing.hashers.functions import import_hasher_backend
+from orionis.hashing.hashers.functions import ARGON2_MAX_COST as _MAX_COST
+from orionis.hashing.hashers.functions import ARGON2_MAX_THREADS as _MAX_THREADS
+from orionis.hashing.hashers.functions import (
+    ARGON2_MEMORY_PER_THREAD as _MEMORY_PER_THREAD,
+)
 
-if TYPE_CHECKING:
-    from orionis.support.concurrency import BoundedExecutor
-
-# ruff: noqa: ANN401
+from orionis.support.concurrency import BoundedExecutor
 
 # Backend location and distribution name reported when it is missing
 _BACKEND_MODULE: str = "pwdlib.hashers.argon2"
@@ -19,27 +25,25 @@ _BACKEND_CLASS: str = "Argon2Hasher"
 _BACKEND_PACKAGE: str = "pwdlib[argon2]"
 """Backend package identifier: ``pwdlib[argon2]``."""
 
-# Default cost parameters recommended for interactive logins
 DEFAULT_MEMORY: int = 65536
-"""Default cost parameters recommended for interactive logins."""
+"""Default per-operation memory cost in kibibytes."""
 DEFAULT_THREADS: int = 4
-"""Default threads value used by ``argon2_hasher``."""
+"""Default number of parallel Argon2 lanes."""
 DEFAULT_TIME: int = 3
-"""Default time value used by ``argon2_hasher``."""
+"""Default number of passes over the allocated memory."""
+
 
 class Argon2Hasher(IHasher):
     """Hash passwords with Argon2id.
 
-    Argon2id won the Password Hashing Competition and is the recommended
-    default driver of the framework.
+    Use Argon2id as the framework's default password-hashing algorithm.
 
     Concurrency
     -----------
-    No locks are used. The backend class and the backend instance are
-    cached on first use: a concurrent first use from several threads may
-    build them twice, and the last write wins. Hashing operations only read
-    that cache, and the fluent setters drop it so later calls rebuild the
-    backend with the new cost parameters.
+    A short lock protects parameter snapshots and cache publication. Backend
+    construction and hashing run outside the lock. An operation already using
+    previous parameters can finish after a setter, but cannot restore them
+    in the shared cache.
     """
 
     __slots__ = (
@@ -47,6 +51,7 @@ class Argon2Hasher(IHasher):
         "_backend_class",
         "_executor",
         "_memory",
+        "_state_lock",
         "_threads",
         "_time",
     )
@@ -66,32 +71,36 @@ class Argon2Hasher(IHasher):
         Parameters
         ----------
         memory : int
-            Memory cost in kibibytes.
+            Memory cost in kibibytes, at least eight per lane and at most
+            ``2**32 - 1``.
         threads : int
-            Degree of parallelism.
+            Degree of parallelism from one through ``2**24 - 1``.
         time : int
-            Number of iterations.
+            Number of iterations from one through ``2**32 - 1``.
         executor : orionis.support.concurrency.BoundedExecutor | None
             Caller-owned dedicated executor, or the shared bounded hashing pool.
 
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------
         orionis.hashing.exceptions.HashConfigurationException
-            If any cost parameter is not a positive integer.
+            If a cost exceeds native bounds or memory is insufficient per lane.
         """
         self._memory = self._validate("memory", memory)
         """Memory cost in kibibytes."""
+        self._state_lock = Lock()
+        """Lock protecting cost snapshots and backend cache publication."""
         self._executor = HASH_WORKERS if executor is None else executor
         """Caller-owned dedicated executor, or the shared bounded hashing pool."""
         self._threads = self._validate("threads", threads)
         """Degree of parallelism."""
         self._time = self._validate("time", time)
         """Number of iterations."""
+        self._validateMemory(self._memory, self._threads)
 
         # The backend is imported and built on first use to keep the
         # driver constructible even when the dependency is absent.
@@ -106,7 +115,7 @@ class Argon2Hasher(IHasher):
     @staticmethod
     def _validate(name: str, value: int) -> int:
         """
-        Ensure a cost parameter is a strictly positive integer.
+        Ensure a cost parameter fits the native algorithm's integer range.
 
         Parameters
         ----------
@@ -123,15 +132,45 @@ class Argon2Hasher(IHasher):
         Raises
         ------
         orionis.hashing.exceptions.HashConfigurationException
-            If the value is not an integer greater than zero.
+            If the value is not a positive integer within the native range.
         """
-        if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+        maximum = _MAX_THREADS if name == "threads" else _MAX_COST
+        if (
+            not isinstance(value, int)
+            or isinstance(value, bool)
+            or not 1 <= value <= maximum
+        ):
             error_msg = (
-                f"The Argon2 '{name}' option must be an integer greater "
-                f"than zero, got {value!r}."
+                f"The Argon2 '{name}' option must be an integer between "
+                f"1 and {maximum}, got {value!r}."
             )
             raise HashConfigurationException(error_msg)
         return value
+
+    @staticmethod
+    def _validateMemory(memory: int, threads: int) -> None:
+        """Require enough configured memory for every Argon2 lane.
+
+        Parameters
+        ----------
+        memory : int
+            Validated memory cost in kibibytes.
+        threads : int
+            Validated parallelism.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        orionis.hashing.exceptions.HashConfigurationException
+            If fewer than eight kibibytes are available per lane.
+        """
+        if memory < _MEMORY_PER_THREAD * threads:
+            error_msg = "Argon2 memory must be at least 8 KiB per thread."
+            raise HashConfigurationException(error_msg)
 
     def _backendClass(self: Self) -> Any:
         """
@@ -188,9 +227,17 @@ class Argon2Hasher(IHasher):
         typing.Any
             Backend instance reused across calls.
         """
-        if self._backend is None:
-            self._backend = self._build(self._memory, self._threads, self._time)
-        return self._backend
+        with self._state_lock:
+            if self._backend is not None:
+                return self._backend
+            parameters = self._memory, self._threads, self._time
+        backend = self._build(*parameters)
+        with self._state_lock:
+            if parameters == (self._memory, self._threads, self._time):
+                if self._backend is None:
+                    self._backend = backend
+                return self._backend
+        return backend
 
     def _make(
         self: Self,
@@ -222,19 +269,32 @@ class Argon2Hasher(IHasher):
         Raises
         ------
         orionis.hashing.exceptions.HashConfigurationException
-            If any override is not a positive integer.
+            If an override exceeds native bounds or leaves insufficient memory
+            for the selected parallelism.
         """
         # Reuse the cached backend unless the call overrides a cost value
         if rounds is None and memory is None and threads is None:
             backend = self._default()
         else:
-            backend = self._build(
-                self._memory if memory is None else self._validate("memory", memory),
-                self._threads
-                if threads is None
-                else self._validate("threads", threads),
-                self._time if rounds is None else self._validate("time", rounds),
+            with self._state_lock:
+                configured_memory = self._memory
+                configured_threads = self._threads
+                configured_time = self._time
+            selected_memory = (
+                configured_memory
+                if memory is None
+                else self._validate("memory", memory)
             )
+            selected_threads = (
+                configured_threads
+                if threads is None
+                else self._validate("threads", threads)
+            )
+            selected_time = (
+                configured_time if rounds is None else self._validate("time", rounds)
+            )
+            self._validateMemory(selected_memory, selected_threads)
+            backend = self._build(selected_memory, selected_threads, selected_time)
 
         return backend.hash(value)
 
@@ -268,7 +328,8 @@ class Argon2Hasher(IHasher):
         Raises
         ------
         orionis.hashing.exceptions.HashConfigurationException
-            If any override is not a positive integer.
+            If an override exceeds native bounds or leaves insufficient memory
+            for the selected parallelism.
         """
         return await self._executor.run(
             self._make,
@@ -334,7 +395,11 @@ class Argon2Hasher(IHasher):
         # Hashes from another algorithm must always be regenerated
         if not hashed or not self._identify(hashed):
             return True
-        return self._default().check_needs_rehash(hashed)
+        backend = self._default()
+        try:
+            return backend.check_needs_rehash(hashed)
+        except ValueError:
+            return True
 
     def _identify(self: Self, hashed: str) -> bool:
         """
@@ -350,7 +415,23 @@ class Argon2Hasher(IHasher):
         bool
             ``True`` when the hash belongs to this driver.
         """
-        return self._backendClass().identify(hashed)
+        if not self._backendClass().identify(hashed):
+            return False
+        try:
+            encoded = hashed.decode("ascii") if isinstance(hashed, bytes) else hashed
+            fields = encoded.rsplit("$", 2)
+            for field in fields[-2:]:
+                if not field or "=" in field:
+                    return False
+                decoded = base64.b64decode(
+                    field + "=" * (-len(field) % 4),
+                    validate=True,
+                )
+                if base64.b64encode(decoded).decode("ascii").rstrip("=") != field:
+                    return False
+        except ValueError:
+            return False
+        return True
 
     def getAlgorithm(self: Self) -> str:
         """
@@ -380,12 +461,12 @@ class Argon2Hasher(IHasher):
         Raises
         ------
         orionis.hashing.exceptions.HashConfigurationException
-            If the value is not a positive integer.
+            If the value is outside the native time-cost range.
         """
-        self._time = self._validate("time", rounds)
-
-        # Drop the cached backend so the new cost takes effect
-        self._backend = None
+        validated = self._validate("time", rounds)
+        with self._state_lock:
+            self._time = validated
+            self._backend = None
         return self
 
     def setMemory(self: Self, memory: int) -> Self:
@@ -405,10 +486,14 @@ class Argon2Hasher(IHasher):
         Raises
         ------
         orionis.hashing.exceptions.HashConfigurationException
-            If the value is not a positive integer.
+            If the value is outside the native memory range or insufficient
+            for the configured parallelism.
         """
-        self._memory = self._validate("memory", memory)
-        self._backend = None
+        validated = self._validate("memory", memory)
+        with self._state_lock:
+            self._validateMemory(validated, self._threads)
+            self._memory = validated
+            self._backend = None
         return self
 
     def setThreads(self: Self, threads: int) -> Self:
@@ -428,8 +513,12 @@ class Argon2Hasher(IHasher):
         Raises
         ------
         orionis.hashing.exceptions.HashConfigurationException
-            If the value is not a positive integer.
+            If the value is outside the native parallelism range or requires
+            more memory than configured.
         """
-        self._threads = self._validate("threads", threads)
-        self._backend = None
+        validated = self._validate("threads", threads)
+        with self._state_lock:
+            self._validateMemory(self._memory, validated)
+            self._threads = validated
+            self._backend = None
         return self

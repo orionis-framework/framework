@@ -1,6 +1,6 @@
-import ast
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
-import textwrap
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.hash_manager import HashManager
@@ -9,26 +9,8 @@ from orionis.test import TestCase
 # Members the manager adds on top of the plain hashing contract.
 _MANAGER_METHODS: frozenset[str] = frozenset({"driver", "getDefaultDriver"})
 
-def abstract_body_statements(method: object) -> list[ast.stmt]:
-    """
-    Return the statements declared inside the body of a method.
-
-    Parameters
-    ----------
-    method : object
-        Function object whose source is parsed.
-
-    Returns
-    -------
-    list[ast.stmt]
-        Statements found in the body, empty when the source does not
-        define a plain function.
-    """
-    node = ast.parse(textwrap.dedent(inspect.getsource(method))).body[0]
-    return node.body if isinstance(node, ast.FunctionDef) else []
 
 class TestIHashManagerDefinition(TestCase):
-
     def testExtendsTheHasherContract(self) -> None:
         """Extend the plain hashing contract instead of duplicating it.
 
@@ -37,7 +19,7 @@ class TestIHashManagerDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(IHashManager, IHasher))
 
@@ -49,7 +31,7 @@ class TestIHashManagerDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             IHashManager()  # type: ignore[abstract]
@@ -63,7 +45,7 @@ class TestIHashManagerDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(IHashManager.__dict__.get("__slots__"), ())
 
@@ -76,30 +58,34 @@ class TestIHashManagerDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             IHashManager.__abstractmethods__,
             IHasher.__abstractmethods__ | _MANAGER_METHODS,
         )
 
-    def testAbstractMethodsCarryNoImplementation(self) -> None:
-        """Keep the added abstract methods free of executable bodies.
-
-        Validates that no dead code hides behind the contract.
+    def testPartialImplementationsRemainAbstract(self) -> None:
+        """Require both driver-resolution members before allowing instantiation.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        for name in _MANAGER_METHODS:
-            statements = abstract_body_statements(getattr(IHashManager, name))
-            self.assertEqual(len(statements), 1, msg=name)
-            self.assertIsInstance(statements[0], ast.Expr, msg=name)
+        for missing in _MANAGER_METHODS:
+            with self.subTest(missing=missing):
+                methods = {
+                    name: getattr(HashManager, name)
+                    for name in IHashManager.__abstractmethods__
+                    if name != missing
+                }
+                incomplete = type("IncompleteHashManager", (IHashManager,), methods)
+                with self.assertRaises(TypeError):
+                    incomplete()
+
 
 class TestIHashManagerImplementation(TestCase):
-
     def testManagerImplementsTheContract(self) -> None:
         """Register HashManager as the implementation of the contract.
 
@@ -108,7 +94,7 @@ class TestIHashManagerImplementation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(HashManager, IHashManager))
 
@@ -121,7 +107,7 @@ class TestIHashManagerImplementation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(HashManager.__abstractmethods__, frozenset())
 
@@ -134,13 +120,13 @@ class TestIHashManagerImplementation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in IHashManager.__abstractmethods__:
-            expected = inspect.signature(getattr(IHashManager, name))
-            actual = inspect.signature(getattr(HashManager, name))
+            expected = inspect.signature(getattr(IHashManager, name), eval_str=True)
+            actual = inspect.signature(getattr(HashManager, name), eval_str=True)
             self.assertEqual(
-                list(expected.parameters),
-                list(actual.parameters),
+                expected.replace(parameters=tuple(expected.parameters.values())[1:]),
+                actual.replace(parameters=tuple(actual.parameters.values())[1:]),
                 msg=name,
             )

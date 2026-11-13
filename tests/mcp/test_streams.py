@@ -1,6 +1,10 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
+import inspect
 from orionis.mcp.streams import OwnedStream
 from orionis.test import TestCase
+
 
 class _Source:
     """A stateful source that owns cleanup before iteration starts."""
@@ -52,8 +56,62 @@ class _Source:
         await self.release.wait()
         self.closes += 1
 
+
 class TestOwnedStreams(TestCase):
     """Keep cleanup reliable when delivery never starts or is cancelled twice."""
+
+    async def testRejectedCleanupTaskClosesCoroutineAndCanBeRetried(self) -> None:
+        """Retain source ownership when a task factory rejects cleanup admission.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        source = _Source()
+        stream = OwnedStream(source)
+        loop = asyncio.get_running_loop()
+        factory = loop.get_task_factory()
+        rejected = []
+        failure = TypeError("Cleanup task rejected")
+
+        def reject(_loop, coroutine, **_kwargs: object):
+            """Record the unscheduled coroutine and reject its admission.
+
+            Parameters
+            ----------
+            _loop : object
+                Current event loop.
+            coroutine : object
+                Coroutine offered to the factory.
+            **_kwargs : object
+                Task creation options.
+
+            Returns
+            -------
+            None
+                No return value.
+            """
+            rejected.append(coroutine)
+            raise failure
+
+        loop.set_task_factory(reject)
+        try:
+            with self.assertRaises(TypeError) as caught:
+                await stream.aclose()
+        finally:
+            loop.set_task_factory(factory)
+        try:
+            self.assertIs(caught.exception, failure)
+            self.assertEqual(
+                [inspect.getcoroutinestate(item) for item in rejected],
+                [inspect.CORO_CLOSED],
+            )
+        finally:
+            for coroutine in rejected:
+                coroutine.close()
+            await stream.aclose()
+        self.assertEqual((source.reads, source.closes), (0, 1))
 
     async def testUnstartedOuterClosesSourceOnce(self):
         """Close both owners before the outer generator enters its body.

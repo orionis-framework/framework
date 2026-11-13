@@ -1,11 +1,11 @@
+# ruff: noqa: TC001
+# Keep public contract annotations available for runtime inspection.
 """Declare durable terminal failure inspection and removal."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.queues.entities.failed_job import FailedJob
+from orionis.queues.entities.reserved_job import ReservedJob
 
-if TYPE_CHECKING:
-    from orionis.queues.entities.failed_job import FailedJob
-    from orionis.queues.entities.reserved_job import ReservedJob
 
 class IFailedJobRepository(ABC):
     """Declare durable terminal failure inspection and removal."""

@@ -5,6 +5,7 @@ from orionis.foundation.enums.runtimes import Runtime
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
+
 async def on_startup() -> None:
     """
     Handle application startup.
@@ -15,6 +16,7 @@ async def on_startup() -> None:
         Complete the callback without additional startup behavior.
     """
     # Add application startup behavior here.
+
 
 async def on_shutdown() -> None:
     """
@@ -27,6 +29,7 @@ async def on_shutdown() -> None:
     """
     # Add application shutdown behavior here.
 
+
 async def on_startup_cli() -> None:
     """
     Handle CLI startup.
@@ -37,6 +40,7 @@ async def on_startup_cli() -> None:
         Complete the callback without additional CLI startup behavior.
     """
     # Add CLI startup behavior here.
+
 
 async def on_shutdown_cli() -> None:
     """
@@ -49,6 +53,7 @@ async def on_shutdown_cli() -> None:
     """
     # Add CLI shutdown behavior here.
 
+
 async def on_startup_http() -> None:
     """
     Handle HTTP startup.
@@ -60,6 +65,7 @@ async def on_startup_http() -> None:
     """
     # Add HTTP startup behavior here.
 
+
 async def on_shutdown_http() -> None:
     """
     Handle HTTP shutdown.
@@ -70,6 +76,7 @@ async def on_shutdown_http() -> None:
         Complete the callback without additional HTTP shutdown behavior.
     """
     # Add HTTP shutdown behavior here.
+
 
 def register_lifespan_callbacks(app: IApplication) -> None:
     """

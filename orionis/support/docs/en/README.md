@@ -20,8 +20,6 @@ The package deliberately has two levels of API. `orionis.support.facades` and `o
 
 Continue with: [container](../../../container/docs/en/README.md) · [schemas](../../../schemas/docs/en/README.md).
 
-Examples that require bootstrap, a request, or external services state that context. Verification for this reconstruction is distinct from historical notes; a production integration is not assumed to have been executed.
-
 ## Bounded execution and performance
 
 Import `threaded` and `BoundedExecutor` from `orionis.support.concurrency`. Decorate a blocking synchronous handler with `@threaded` to execute it away from the application loop while preserving its DI signature and copying context variables. The shared callback pool admits four running and 32 pending calls. Dependencies must support worker threads; pure Python CPU work still competes for the GIL. Ordinary synchronous handlers retain their existing execution behavior.

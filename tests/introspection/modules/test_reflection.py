@@ -1,6 +1,9 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import os as _os_mod
 import sys
 import types
+from unittest.mock import patch
 from orionis.introspection.modules.reflection import ReflectionModule
 from orionis.test import TestCase
 
@@ -12,14 +15,15 @@ from orionis.test import TestCase
 
 _FIXTURE_NAME = "_orionis_module_test_fixture"
 
+
 def _build_fixture() -> types.ModuleType:
     """
-    Build and register a synthetic test module in sys.modules.
+    Build an unregistered synthetic test module.
 
     Returns
     -------
     types.ModuleType
-        The synthetic module registered under _FIXTURE_NAME.
+        The synthetic module, ready for scoped registration.
     """
     mod = types.ModuleType(_FIXTURE_NAME)
 
@@ -42,7 +46,7 @@ def _build_fixture() -> types.ModuleType:
         """
         return 1
 
-    async def public_async_fn() -> int: # NOSONAR
+    async def public_async_fn() -> int:
         """
         Return a fixed integer as a public asynchronous fixture.
 
@@ -64,7 +68,7 @@ def _build_fixture() -> types.ModuleType:
         """
         return 3
 
-    async def _protected_async_fn() -> int: # NOSONAR
+    async def _protected_async_fn() -> int:
         """
         Return a fixed integer as a protected asynchronous fixture.
 
@@ -91,10 +95,8 @@ def _build_fixture() -> types.ModuleType:
     # Inject a module-level import so getImports() has something to find
     mod.os = _os_mod
 
-    sys.modules[_FIXTURE_NAME] = mod
     return mod
 
-_FIXTURE_MODULE = _build_fixture()
 
 # ---------------------------------------------------------------------------
 # Synthetic fixture module exposing private members
@@ -104,19 +106,19 @@ _FIXTURE_MODULE = _build_fixture()
 
 _PRIVATE_FIXTURE_NAME = "_orionis_module_test_private_fixture"
 
+
 def _build_private_fixture() -> types.ModuleType:
     """
-    Build and register a synthetic module exposing private members.
+    Build an unregistered synthetic module exposing private members.
 
     Returns
     -------
     types.ModuleType
-        The synthetic module registered under _PRIVATE_FIXTURE_NAME.
+        The synthetic module, ready for scoped registration.
 
     Notes
     -----
-    Members are injected through ``__dict__`` because attribute assignment
-    written literally would be subject to name mangling rules.
+    Explicit namespace keys preserve the intended double-underscore names.
     """
     mod = types.ModuleType(_PRIVATE_FIXTURE_NAME)
 
@@ -134,7 +136,7 @@ def _build_private_fixture() -> types.ModuleType:
         """
         return 5
 
-    async def _private_async_fn() -> int: # NOSONAR
+    async def _private_async_fn() -> int:
         """
         Return a fixed integer as a private asynchronous fixture.
 
@@ -152,10 +154,8 @@ def _build_private_fixture() -> types.ModuleType:
     namespace["__private_sync_fn"] = _private_sync_fn
     namespace["__private_async_fn"] = _private_async_fn
 
-    sys.modules[_PRIVATE_FIXTURE_NAME] = mod
     return mod
 
-_PRIVATE_FIXTURE_MODULE = _build_private_fixture()
 
 # Real module used for getFile / getSourceCode tests
 _REAL_MODULE = "orionis.introspection.modules.reflection"
@@ -183,8 +183,25 @@ _CACHED_GETTERS = (
     "getImports",
 )
 
-class TestReflectionModuleInit(TestCase):
 
+class _ModuleTestCase(TestCase):
+    """Give every module-reflection case an isolated import namespace."""
+
+    def setUp(self) -> None:
+        """Register fresh fixtures and restore the previous modules after the test."""
+        super().setUp()
+        self.enterContext(
+            patch.dict(
+                sys.modules,
+                {
+                    _FIXTURE_NAME: _build_fixture(),
+                    _PRIVATE_FIXTURE_NAME: _build_private_fixture(),
+                },
+            ),
+        )
+
+
+class TestReflectionModuleInit(_ModuleTestCase):
     def testInitWithValidModuleSucceeds(self) -> None:
         """
         Assert that a valid importable module name creates an instance.
@@ -192,7 +209,7 @@ class TestReflectionModuleInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rm = ReflectionModule(_FIXTURE_NAME)
         self.assertIsInstance(rm, ReflectionModule)
@@ -204,7 +221,7 @@ class TestReflectionModuleInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionModule(123)
@@ -216,7 +233,7 @@ class TestReflectionModuleInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionModule("")
@@ -228,13 +245,13 @@ class TestReflectionModuleInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionModule("this.module.does.not.exist.xyz")
 
-class TestReflectionModuleCacheProtocol(TestCase):
 
+class TestReflectionModuleCacheProtocol(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule for cache protocol tests.
@@ -242,8 +259,9 @@ class TestReflectionModuleCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testSetAndGetCacheItem(self) -> None:
@@ -253,7 +271,7 @@ class TestReflectionModuleCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rm["test_key"] = "test_value"
         self.assertEqual(self.rm["test_key"], "test_value")
@@ -265,7 +283,7 @@ class TestReflectionModuleCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rm["present"] = 1
         self.assertIn("present", self.rm)
@@ -277,7 +295,7 @@ class TestReflectionModuleCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("absent_key_xyz", self.rm)
 
@@ -288,14 +306,14 @@ class TestReflectionModuleCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rm["to_delete"] = "bye"
         del self.rm["to_delete"]
         self.assertNotIn("to_delete", self.rm)
 
-class TestReflectionModuleGetModule(TestCase):
 
+class TestReflectionModuleGetModule(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule wrapping the synthetic fixture.
@@ -303,8 +321,9 @@ class TestReflectionModuleGetModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testGetModuleReturnsSameObject(self) -> None:
@@ -314,7 +333,7 @@ class TestReflectionModuleGetModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.rm.getModule(), sys.modules[_FIXTURE_NAME])
 
@@ -325,12 +344,12 @@ class TestReflectionModuleGetModule(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getModule(), types.ModuleType)
 
-class TestReflectionModuleClasses(TestCase):
 
+class TestReflectionModuleClasses(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a fresh ReflectionModule for class-related tests.
@@ -338,10 +357,10 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         # Re-build fixture to guarantee isolation between mutation tests
-        _build_fixture()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testGetClassesReturnsDict(self) -> None:
@@ -351,7 +370,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getClasses(), dict)
 
@@ -362,7 +381,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("PublicClass", self.rm.getClasses())
 
@@ -373,7 +392,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("PublicClass", self.rm.getPublicClasses())
 
@@ -384,7 +403,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("_ProtectedClass", self.rm.getPublicClasses())
 
@@ -395,7 +414,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_ProtectedClass", self.rm.getProtectedClasses())
 
@@ -406,7 +425,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.rm.getPrivateClasses(), {})
 
@@ -417,7 +436,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(self.rm.hasClass("PublicClass"))
 
@@ -428,7 +447,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(self.rm.hasClass("NonExistentXyz"))
 
@@ -439,7 +458,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         cls = self.rm.getClass("PublicClass")
         self.assertIsNotNone(cls)
@@ -452,7 +471,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rm.getClass("NonExistentXyz"))
 
@@ -463,7 +482,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
 
         class InjectedClass:
@@ -482,7 +501,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             self.rm.setClass("Bad", "not_a_class")
@@ -494,7 +513,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self.rm.setClass("123invalid", int)
@@ -506,7 +525,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self.rm.setClass("class", int)
@@ -518,7 +537,7 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
 
         class TempClass:
@@ -536,13 +555,13 @@ class TestReflectionModuleClasses(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self.rm.removeClass("NonExistentXyz")
 
-class TestReflectionModuleConstants(TestCase):
 
+class TestReflectionModuleConstants(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule for constant discovery tests.
@@ -550,8 +569,9 @@ class TestReflectionModuleConstants(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testGetConstantsReturnsDict(self) -> None:
@@ -561,7 +581,7 @@ class TestReflectionModuleConstants(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getConstants(), dict)
 
@@ -572,7 +592,7 @@ class TestReflectionModuleConstants(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("PUBLIC_CONST", self.rm.getConstants())
 
@@ -583,7 +603,7 @@ class TestReflectionModuleConstants(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("PUBLIC_CONST", self.rm.getPublicConstants())
 
@@ -594,7 +614,7 @@ class TestReflectionModuleConstants(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getProtectedConstants(), dict)
 
@@ -605,7 +625,7 @@ class TestReflectionModuleConstants(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getPrivateConstants(), dict)
 
@@ -616,7 +636,7 @@ class TestReflectionModuleConstants(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.rm.getConstant("PUBLIC_CONST"), 42)
 
@@ -627,12 +647,12 @@ class TestReflectionModuleConstants(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rm.getConstant("NONEXISTENT_XYZ"))
 
-class TestReflectionModulePublicFunctions(TestCase):
 
+class TestReflectionModulePublicFunctions(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule for public function tests.
@@ -640,8 +660,9 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testGetFunctionsReturnsDict(self) -> None:
@@ -651,7 +672,7 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getFunctions(), dict)
 
@@ -662,7 +683,7 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("public_sync_fn", self.rm.getFunctions())
 
@@ -673,7 +694,7 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("public_sync_fn", self.rm.getPublicFunctions())
 
@@ -684,7 +705,7 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("_protected_sync_fn", self.rm.getPublicFunctions())
 
@@ -695,7 +716,7 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("public_sync_fn", self.rm.getPublicSyncFunctions())
 
@@ -706,7 +727,7 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("public_async_fn", self.rm.getPublicSyncFunctions())
 
@@ -717,7 +738,7 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("public_async_fn", self.rm.getPublicAsyncFunctions())
 
@@ -728,12 +749,12 @@ class TestReflectionModulePublicFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("public_sync_fn", self.rm.getPublicAsyncFunctions())
 
-class TestReflectionModuleProtectedFunctions(TestCase):
 
+class TestReflectionModuleProtectedFunctions(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule for protected function tests.
@@ -741,8 +762,9 @@ class TestReflectionModuleProtectedFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testGetProtectedFunctionsContainsProtectedSyncFn(self) -> None:
@@ -752,7 +774,7 @@ class TestReflectionModuleProtectedFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protected_sync_fn", self.rm.getProtectedFunctions())
 
@@ -763,7 +785,7 @@ class TestReflectionModuleProtectedFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("public_sync_fn", self.rm.getProtectedFunctions())
 
@@ -774,7 +796,7 @@ class TestReflectionModuleProtectedFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protected_sync_fn", self.rm.getProtectedSyncFunctions())
 
@@ -785,7 +807,7 @@ class TestReflectionModuleProtectedFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn(
             "_protected_async_fn",
@@ -799,7 +821,7 @@ class TestReflectionModuleProtectedFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protected_async_fn", self.rm.getProtectedAsyncFunctions())
 
@@ -810,15 +832,15 @@ class TestReflectionModuleProtectedFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn(
             "_protected_sync_fn",
             self.rm.getProtectedAsyncFunctions(),
         )
 
-class TestReflectionModulePrivateFunctions(TestCase):
 
+class TestReflectionModulePrivateFunctions(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule for private function tests.
@@ -826,8 +848,9 @@ class TestReflectionModulePrivateFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testGetPrivateFunctionsReturnsDict(self) -> None:
@@ -837,7 +860,7 @@ class TestReflectionModulePrivateFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getPrivateFunctions(), dict)
 
@@ -848,7 +871,7 @@ class TestReflectionModulePrivateFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getPrivateSyncFunctions(), dict)
 
@@ -859,12 +882,12 @@ class TestReflectionModulePrivateFunctions(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getPrivateAsyncFunctions(), dict)
 
-class TestReflectionModuleImports(TestCase):
 
+class TestReflectionModuleImports(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule for import discovery tests.
@@ -872,8 +895,9 @@ class TestReflectionModuleImports(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testGetImportsReturnsDict(self) -> None:
@@ -883,7 +907,7 @@ class TestReflectionModuleImports(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rm.getImports(), dict)
 
@@ -894,12 +918,12 @@ class TestReflectionModuleImports(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("os", self.rm.getImports())
 
-class TestReflectionModuleFileAndSource(TestCase):
 
+class TestReflectionModuleFileAndSource(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule wrapping the real reflection module.
@@ -907,8 +931,9 @@ class TestReflectionModuleFileAndSource(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_REAL_MODULE)
 
     def testGetFileReturnsNonEmptyString(self) -> None:
@@ -918,7 +943,7 @@ class TestReflectionModuleFileAndSource(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         path = self.rm.getFile()
         self.assertIsInstance(path, str)
@@ -931,7 +956,7 @@ class TestReflectionModuleFileAndSource(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         path = self.rm.getFile()
         self.assertTrue(path.endswith((".py", ".pyc")))
@@ -943,7 +968,7 @@ class TestReflectionModuleFileAndSource(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         src = self.rm.getSourceCode()
         self.assertIsInstance(src, str)
@@ -956,7 +981,7 @@ class TestReflectionModuleFileAndSource(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("ReflectionModule", self.rm.getSourceCode())
 
@@ -967,14 +992,14 @@ class TestReflectionModuleFileAndSource(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         first = self.rm.getSourceCode()
         second = self.rm.getSourceCode()
         self.assertIs(first, second)
 
-class TestReflectionModuleClearCache(TestCase):
 
+class TestReflectionModuleClearCache(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule for cache clearing tests.
@@ -982,8 +1007,9 @@ class TestReflectionModuleClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testClearCacheReturnsNone(self) -> None:
@@ -993,7 +1019,7 @@ class TestReflectionModuleClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rm.clearCache())
 
@@ -1004,7 +1030,7 @@ class TestReflectionModuleClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rm["sentinel"] = "value"
         self.rm.clearCache()
@@ -1017,7 +1043,7 @@ class TestReflectionModuleClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         # Populate the classes cache
         _ = self.rm.getClasses()
@@ -1028,8 +1054,8 @@ class TestReflectionModuleClearCache(TestCase):
         # Recompute and check result is still valid
         self.assertIsInstance(self.rm.getClasses(), dict)
 
-class TestReflectionModulePrivateMembers(TestCase):
 
+class TestReflectionModulePrivateMembers(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule wrapping the private-member fixture.
@@ -1037,8 +1063,9 @@ class TestReflectionModulePrivateMembers(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_PRIVATE_FIXTURE_NAME)
 
     def testGetPrivateClassesContainsMangledClass(self) -> None:
@@ -1048,7 +1075,7 @@ class TestReflectionModulePrivateMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__PrivateClass", self.rm.getPrivateClasses())
 
@@ -1059,7 +1086,7 @@ class TestReflectionModulePrivateMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__PRIVATE_CONST", self.rm.getPrivateConstants())
 
@@ -1070,7 +1097,7 @@ class TestReflectionModulePrivateMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_PROTECTED_CONST", self.rm.getProtectedConstants())
 
@@ -1081,7 +1108,7 @@ class TestReflectionModulePrivateMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         private = self.rm.getPrivateFunctions()
         self.assertIn("__private_sync_fn", private)
@@ -1094,7 +1121,7 @@ class TestReflectionModulePrivateMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sync_functions = self.rm.getPrivateSyncFunctions()
         self.assertIn("__private_sync_fn", sync_functions)
@@ -1107,14 +1134,14 @@ class TestReflectionModulePrivateMembers(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         async_functions = self.rm.getPrivateAsyncFunctions()
         self.assertIn("__private_async_fn", async_functions)
         self.assertNotIn("__private_sync_fn", async_functions)
 
-class TestReflectionModuleMemoization(TestCase):
 
+class TestReflectionModuleMemoization(_ModuleTestCase):
     def testCachedGettersReturnTheSameObjectOnSecondCall(self) -> None:
         """
         Assert that every memoized getter returns the cached instance.
@@ -1122,7 +1149,7 @@ class TestReflectionModuleMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -1141,13 +1168,13 @@ class TestReflectionModuleMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rm = ReflectionModule(_REAL_MODULE)
         self.assertIs(rm.getFile(), rm.getFile())
 
-class TestReflectionModuleSourceErrors(TestCase):
 
+class TestReflectionModuleSourceErrors(_ModuleTestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionModule wrapping a module without a file.
@@ -1155,8 +1182,9 @@ class TestReflectionModuleSourceErrors(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
+        super().setUp()
         self.rm = ReflectionModule(_FIXTURE_NAME)
 
     def testGetFileRaisesTypeErrorForModulesWithoutFile(self) -> None:
@@ -1166,7 +1194,7 @@ class TestReflectionModuleSourceErrors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             self.rm.getFile()
@@ -1178,8 +1206,7 @@ class TestReflectionModuleSourceErrors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self.rm.getSourceCode()
-

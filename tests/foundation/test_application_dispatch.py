@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from unittest.mock import patch
 from orionis.foundation.config.http.entitites.http import HTTP
@@ -10,6 +12,7 @@ from tests.foundation.test_application_async import (
     _new_application,
     _StubKernel,
 )
+
 
 def lifecycle_events(application):
     """Record startup generator boundaries without writing server output.
@@ -27,6 +30,7 @@ def lifecycle_events(application):
     application.events.append("start")
     yield
     application.events.append("ready")
+
 
 class TestApplicationDispatch(TestCase):
     """Exercise direct requests without server-created helper tasks."""
@@ -70,16 +74,23 @@ class TestApplicationDispatch(TestCase):
         loop = asyncio.get_running_loop()
         with patch.object(loop, "create_task") as create_task:
             asgi_result = await application._Application__handleHttpAsgi(
-                scope, receive, send,
+                scope,
+                receive,
+                send,
             )
             rsgi_result = await application._Application__handleHttpRsgi(
-                scope, protocol,
+                scope,
+                protocol,
             )
         create_task.assert_not_called()
         self.assertEqual((asgi_result, rsgi_result), ("response", "response"))
-        self.assertEqual(received, [
-            (caller, (scope, receive, send)), (caller, (scope, protocol)),
-        ])
+        self.assertEqual(
+            received,
+            [
+                (caller, (scope, receive, send)),
+                (caller, (scope, protocol)),
+            ],
+        )
         self.assertEqual(receive.awaitCount, 0)
 
     async def testDirectCancellationRunsHandlerCleanup(self) -> None:
@@ -97,11 +108,13 @@ class TestApplicationDispatch(TestCase):
                 gate = _AsyncGate()
                 setattr(application, f"_Application__kernel_http_{interface}", gate.run)
                 callback = getattr(
-                    application, f"_Application__handleHttp{interface.capitalize()}",
+                    application,
+                    f"_Application__handleHttp{interface.capitalize()}",
                 )
                 arguments = (
                     ({}, _AsyncCall(), _AsyncCall())
-                    if interface == "asgi" else ({}, object())
+                    if interface == "asgi"
+                    else ({}, object())
                 )
                 task = asyncio.create_task(callback(*arguments))
                 await asyncio.wait_for(gate.entered.wait(), timeout=2)
@@ -138,9 +151,11 @@ class TestApplicationDispatch(TestCase):
 
         application._Application__kernel_http_asgi = read_body
         failure = OSError("transport failed")
-        with self.assertRaises(OSError) as error: # NOSONAR
+        with self.assertRaises(OSError) as error:  # NOSONAR
             await application._Application__handleHttpAsgi(
-                {}, _AsyncCall(side_effect=failure), _AsyncCall(),
+                {},
+                _AsyncCall(side_effect=failure),
+                _AsyncCall(),
             )
         self.assertIs(error.exception, failure)
 
@@ -190,7 +205,9 @@ class TestApplicationDispatch(TestCase):
                     """
                     app.events.append("kernel")
 
-                application._Application__hook_events[Runtime.HTTP][Lifespan.STARTUP].add(hook)
+                application._Application__hook_events[Runtime.HTTP][
+                    Lifespan.STARTUP
+                ].add(hook)
                 kernel.bootAction.sideEffect = boot
                 with patch(
                     "orionis.foundation.lifespan.startup.startup_orionis_generator",
@@ -198,11 +215,14 @@ class TestApplicationDispatch(TestCase):
                 ):
                     await application._Application__onStartup(Runtime.HTTP, interface)
                 self.assertEqual(
-                    application.events, ["start", "hook", "kernel", "ready"],
+                    application.events,
+                    ["start", "hook", "kernel", "ready"],
                 )
                 self.assertEqual(application.config("app.interface"), interface)
                 await application._Application__handleHttpAsgi(
-                    {}, _AsyncCall(), _AsyncCall(),
+                    {},
+                    _AsyncCall(),
+                    _AsyncCall(),
                 )
                 await application._Application__handleHttpRsgi({}, object())
                 self.assertEqual(kernel.bootAction.awaitCount, 1)

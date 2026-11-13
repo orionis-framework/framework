@@ -29,6 +29,7 @@ _MEDIA_TYPE_PARTS = 2
 _MAX_REASON_LENGTH = 512
 """Max reason length value used by ``functions``."""
 
+
 def header_value(value: str, label: str) -> str:
     """
     Validate a single unstructured header value.
@@ -56,6 +57,7 @@ def header_value(value: str, label: str) -> str:
         error_msg = f"{label} must be text without control characters."
         raise MailCompositionException(error_msg)
     return value
+
 
 def attachment_name(value: str) -> str:
     """
@@ -92,6 +94,7 @@ def attachment_name(value: str) -> str:
         raise MailAttachmentException(error_msg)
     return value
 
+
 def media_type(value: str) -> str:
     """
     Validate a bare MIME type without header parameters.
@@ -118,6 +121,7 @@ def media_type(value: str) -> str:
         error_msg = "Attachment MIME types must contain only a type/subtype pair."
         raise MailAttachmentException(error_msg)
     return value.lower()
+
 
 def freeze_owned(value: object, active: frozenset[int] = frozenset()) -> object:
     """
@@ -157,6 +161,7 @@ def freeze_owned(value: object, active: frozenset[int] = frozenset()) -> object:
     if isinstance(value, (set, frozenset)):
         return frozenset(freeze_owned(item, ancestors) for item in value)
     return tuple(freeze_owned(item, ancestors) for item in value)
+
 
 def sanitize_reason(value: str | bytes, sensitive: tuple[str, ...] = ()) -> str:
     """

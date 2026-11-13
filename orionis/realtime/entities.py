@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True, slots=True)
 class BroadcastResult:
     """Count delivered and failed recipients without retaining connections."""

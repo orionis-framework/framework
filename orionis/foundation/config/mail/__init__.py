@@ -22,13 +22,17 @@ __all__ = [
 
 _EXPORTS = {
     "File": ("orionis.foundation.config.mail.entities.file", "File"),
-    "FromAddress": ("orionis.foundation.config.mail.entities.from_address", "FromAddress"),
+    "FromAddress": (
+        "orionis.foundation.config.mail.entities.from_address",
+        "FromAddress",
+    ),
     "Mail": ("orionis.foundation.config.mail.entities.mail", "Mail"),
     "MailDriver": ("orionis.foundation.config.mail.enums.drivers", "MailDriver"),
     "Mailers": ("orionis.foundation.config.mail.entities.mailers", "Mailers"),
     "Smtp": ("orionis.foundation.config.mail.entities.smtp", "Smtp"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -50,6 +54,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

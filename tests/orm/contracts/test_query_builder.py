@@ -1,7 +1,10 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.orm.contracts.query_builder import IQueryBuilder
 from orionis.orm.query_builder import QueryBuilder
 from orionis.test import TestCase
 from tests.orm.contracts.test_base_builder import assert_contract_surface
+
 
 class TestQueryBuilderContract(TestCase):
     """Verify the DB gateway's connection, SQL, and transaction interface."""
@@ -12,7 +15,7 @@ class TestQueryBuilderContract(TestCase):
         Returns
         -------
         None
-            Verify connection scoping and SQL and transaction entry points.
+            No return value.
         """
         expected = frozenset(
             {
@@ -37,6 +40,6 @@ class TestQueryBuilderContract(TestCase):
         Returns
         -------
         None
-            Verify the interface explicitly declares empty slots.
+            No return value.
         """
         self.assertEqual(IQueryBuilder.__dict__.get("__slots__"), ())

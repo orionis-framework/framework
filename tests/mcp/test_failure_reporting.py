@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN202, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Exercise central failure delivery through real MCP execution boundaries."""
 
 import asyncio
@@ -149,7 +151,8 @@ class TestMcpFailureReporting(TestCase):
             return SimpleNamespace(handleFailure=handle_failure)
 
         embedder = SimpleNamespace(
-            call=self.app.call, getExceptionHandler=get_handler,
+            call=self.app.call,
+            getExceptionHandler=get_handler,
         )
         diagnostic = StringIO()
         with patch("sys.stderr", diagnostic):
@@ -174,7 +177,10 @@ class TestMcpFailureReporting(TestCase):
 
     async def testTranslatedResourceFailureReportsOriginalOnce(self) -> None:
         """Deduplicate a resource error across its protocol translation."""
-        response = await self.client.request("resources/read", {"uri": "memory://broken"})
+        response = await self.client.request(
+            "resources/read",
+            {"uri": "memory://broken"},
+        )
         self.assertEqual(response.message["error"]["code"], -32603)
         self.assertEqual(len(self.handler.events), 1)
         self.assertIs(type(self.handler.events[0][0]), OSError)
@@ -222,8 +228,10 @@ class TestMcpFailureReporting(TestCase):
                 events = SimpleNamespace(aclose=AsyncMock(side_effect=cleanup))
                 expected = cleanup if use_cleanup else original
                 with (
-                    patch("orionis.mcp.transport.http.EventStreamResponse",
-                          side_effect=original),
+                    patch(
+                        "orionis.mcp.transport.http.EventStreamResponse",
+                        side_effect=original,
+                    ),
                     self.assertRaises(type(expected)) as caught,
                 ):
                     await transport._streamResponse(events, 200)
@@ -277,7 +285,9 @@ class TestMcpFailureReporting(TestCase):
                         await anext(OwnedStream(source))
 
                 with patch.object(
-                    _Source, "__anext__", AsyncMock(side_effect=original),
+                    _Source,
+                    "__anext__",
+                    AsyncMock(side_effect=original),
                 ) as read:
                     owner = asyncio.create_task(consume(source, mode))
                     if mode == "caller":
@@ -286,7 +296,8 @@ class TestMcpFailureReporting(TestCase):
                         source.release.set()
                     expected = (
                         asyncio.CancelledError
-                        if mode in ("caller", "pending") else ValueError
+                        if mode in ("caller", "pending")
+                        else ValueError
                     )
                     with self.assertRaises(expected) as caught:
                         await owner
@@ -319,8 +330,10 @@ class TestMcpFailureReporting(TestCase):
             await asyncio.Event().wait()
 
         with (
-            patch("orionis.mcp.transport.http.EventStreamResponse",
-                  side_effect=ValueError("response")),
+            patch(
+                "orionis.mcp.transport.http.EventStreamResponse",
+                side_effect=ValueError("response"),
+            ),
             patch.object(_Handler, "handleFailure", stalled),
         ):
             task = asyncio.create_task(transport._streamResponse(events, 200))
@@ -334,7 +347,9 @@ class TestMcpFailureReporting(TestCase):
     async def testStdioEofObservesBothCleanupFailuresWithoutOutput(self) -> None:
         """Inspect every drained task when input ends with active requests."""
         transport = _NoDispatchStdio(
-            self.app, self.client.dispatcher.server, McpConfig(),
+            self.app,
+            self.client.dispatcher.server,
+            McpConfig(),
             self.client.dispatcher.bus,
         )
         await transport.run(None, None)
@@ -359,7 +374,8 @@ class TestMcpFailureReporting(TestCase):
                 elif chaining == "suppressed":
                     primary.__suppress_context__ = True
                 chain = (
-                    primary.__cause__, primary.__context__,
+                    primary.__cause__,
+                    primary.__context__,
                     primary.__suppress_context__,
                 )
                 secondary = OSError("cleanup")
@@ -381,12 +397,16 @@ class TestMcpFailureReporting(TestCase):
                     await anext(OwnedStream(Source()))
                 self.assertIs(caught.exception, primary)
                 self.assertEqual(
-                    (primary.__cause__, primary.__context__,
-                     primary.__suppress_context__),
+                    (
+                        primary.__cause__,
+                        primary.__context__,
+                        primary.__suppress_context__,
+                    ),
                     chain,
                 )
                 self.assertEqual(
-                    [error for error, _ in self.handler.events], [primary, secondary],
+                    [error for error, _ in self.handler.events],
+                    [primary, secondary],
                 )
                 self.assertEqual(
                     self.handler.events[1][1].parent_event_id,
@@ -417,7 +437,8 @@ class TestMcpFailureReporting(TestCase):
         with self.assertRaises(BaseExceptionGroup) as caught:
             await self.client.tool("grouped")
         self.assertEqual(
-            [event[0] for event in self.handler.events], [caught.exception],
+            [event[0] for event in self.handler.events],
+            [caught.exception],
         )
         self.assertIsInstance(caught.exception.exceptions[1], asyncio.CancelledError)
 
@@ -425,7 +446,9 @@ class TestMcpFailureReporting(TestCase):
         """Observe malformed input while preserving the JSON-RPC parse response."""
         reader, writer = _Reader(), _Writer()
         transport = McpStdioTransport(
-            self.app, self.client.dispatcher.server, McpConfig(),
+            self.app,
+            self.client.dispatcher.server,
+            McpConfig(),
             self.client.dispatcher.bus,
         )
         task = asyncio.create_task(transport.run(reader, writer))
@@ -445,7 +468,9 @@ class TestMcpFailureReporting(TestCase):
         """Keep cancellation notifications response-free even when malformed."""
         reader, writer = _Reader(), _Writer()
         transport = McpStdioTransport(
-            self.app, self.client.dispatcher.server, McpConfig(),
+            self.app,
+            self.client.dispatcher.server,
+            McpConfig(),
             self.client.dispatcher.bus,
         )
         reader.queue.put_nowait(

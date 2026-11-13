@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Run an asynchronous worker over prioritized logical queues."""
 
 from typing import ClassVar
@@ -5,8 +7,9 @@ from orionis.console.args.argument import Argument
 from orionis.console.base.command import BaseCommand
 from orionis.console.commands.queue._signals import WorkerSignals
 from orionis.console.enums.actions import ArgumentAction
-from orionis.queues.contracts.manager import IQueueManager  # noqa: TC001
+from orionis.queues.contracts.manager import IQueueManager
 from orionis.queues.exceptions import QueueError
+
 
 class QueueWorkCommand(BaseCommand):
     """Run an asynchronous worker over prioritized logical queues."""
@@ -54,7 +57,8 @@ class QueueWorkCommand(BaseCommand):
         queue_argument = self.getArgument("queue")
         queues = (
             tuple(name.strip() for name in queue_argument.split(","))
-            if queue_argument is not None else None
+            if queue_argument is not None
+            else None
         )
         try:
             worker = await manager.worker(

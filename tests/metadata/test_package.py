@@ -1,6 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis import metadata
 from orionis.metadata import framework
 from orionis.test import TestCase
+
 
 class TestMetadataPackageExports(TestCase):
     """Re-export contract of the ``orionis.metadata`` package."""

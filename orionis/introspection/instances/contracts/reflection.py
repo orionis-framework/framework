@@ -1,18 +1,18 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Public annotations remain available to runtime inspection.
 """Define the contract for reflection instance implementations."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-if TYPE_CHECKING:
-    import inspect
-    from collections.abc import Callable
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
+import inspect
+from collections.abc import Callable
+from orionis.introspection.dependencies.entities.signature import (
+    Signature,
+)
+
 
 class IReflectionInstance(ABC):
-
-    # ruff :noqa: ANN401
     """Define the contract for reflection instance implementations."""
 
     @abstractmethod
@@ -127,13 +127,13 @@ class IReflectionInstance(ABC):
         """
 
     @abstractmethod
-    def getAnnotations(self) -> dict[str, type]:
+    def getAnnotations(self) -> dict[str, object]:
         """
         Retrieve type annotations of the class.
 
         Returns
         -------
-        dict[str, type]
+        dict[str, object]
             Dictionary mapping attribute names to their type annotations.
         """
 
@@ -171,11 +171,6 @@ class IReflectionInstance(ABC):
             Value of the specified attribute if it exists, otherwise the provided
             ``default`` value.
 
-        Raises
-        ------
-        AttributeError
-            If the attribute does not exist and no default value is provided.
-
         Notes
         -----
         This method first checks the instance's attributes dictionary for the
@@ -204,7 +199,9 @@ class IReflectionInstance(ABC):
         Raises
         ------
         AttributeError
-            If the attribute name is invalid, is a keyword, or the value is callable.
+            If the attribute name is invalid or is a keyword.
+        TypeError
+            If the value is callable.
         """
 
     @abstractmethod
@@ -346,14 +343,15 @@ class IReflectionInstance(ABC):
         Raises
         ------
         AttributeError
-            If the name is not a valid identifier, is a keyword, or the method
-            is not callable.
+            If the name is not a valid identifier or is a keyword.
+        TypeError
+            If the supplied method is not callable.
         """
 
     @abstractmethod
     def removeMethod(self, name: str) -> None:
         """
-        Remove a method from the instance.
+        Remove an instance override or a method declared on its class.
 
         Parameters
         ----------
@@ -363,7 +361,7 @@ class IReflectionInstance(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -912,8 +910,8 @@ class IReflectionInstance(ABC):
             Structured representation of the constructor dependencies. Contains:
 
             - ``resolved``: dictionary of resolved dependencies with names and values.
-            - ``unresolved``: list of unresolved dependencies (parameter names
-              without default values or annotations).
+            - ``unresolved``: dictionary of dependencies without sufficient
+              type or default information.
         """
 
     @abstractmethod
@@ -932,8 +930,8 @@ class IReflectionInstance(ABC):
             Structured representation of the method dependencies, including:
 
             - ``resolved``: dictionary of resolved dependencies with names and values.
-            - ``unresolved``: list of unresolved dependencies (parameter names
-              without default values or annotations).
+            - ``unresolved``: dictionary of dependencies without sufficient
+              type or default information.
 
         Raises
         ------
@@ -952,5 +950,5 @@ class IReflectionInstance(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """

@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 from __future__ import annotations
 import importlib
 import json
@@ -11,6 +14,7 @@ from orionis.console.base.command import BaseCommand
 from orionis.console.core.loader import Loader
 
 _ROOT = Path(__file__).resolve().parents[3]
+
 
 class StartupCommand(BaseCommand):
     """Provide an importable command for cached resolution checks."""
@@ -28,6 +32,7 @@ class StartupCommand(BaseCommand):
         None
             Leave application state and output unchanged.
         """
+
 
 def command_metadata(command: type[BaseCommand]) -> dict:
     """
@@ -52,6 +57,7 @@ def command_metadata(command: type[BaseCommand]) -> dict:
         "timestamps": command.timestamps,
         "arguments": [],
     }
+
 
 class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
     """Verify command cache usage without booting unrelated services."""
@@ -124,17 +130,23 @@ class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
         """
         selected = command_metadata(StartupCommand)
         unrelated = dict(selected, module_path="startup.unused", signature="unused")
-        loader, persistence = self.makeLoader({
-            StartupCommand.signature: selected,
-            "unused": unrelated,
-        })
+        loader, persistence = self.makeLoader(
+            {
+                StartupCommand.signature: selected,
+                "unused": unrelated,
+            },
+        )
 
         with (
             patch.object(
-                loader, "_Loader__loadCoreCommands", new_callable=AsyncMock,
+                loader,
+                "_Loader__loadCoreCommands",
+                new_callable=AsyncMock,
             ) as core,
             patch.object(
-                loader, "_Loader__loadCustomCommands", new_callable=AsyncMock,
+                loader,
+                "_Loader__loadCustomCommands",
+                new_callable=AsyncMock,
             ) as custom,
             patch.object(loader, "_Loader__loadFluentCommands") as fluent,
             patch(
@@ -208,13 +220,19 @@ class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
 
         with (
             patch.object(
-                loader, "_Loader__loadCoreCommands", side_effect=core_commands,
+                loader,
+                "_Loader__loadCoreCommands",
+                side_effect=core_commands,
             ),
             patch.object(
-                loader, "_Loader__loadCustomCommands", side_effect=custom_commands,
+                loader,
+                "_Loader__loadCustomCommands",
+                side_effect=custom_commands,
             ),
             patch.object(
-                loader, "_Loader__loadFluentCommands", side_effect=fluent_commands,
+                loader,
+                "_Loader__loadFluentCommands",
+                side_effect=fluent_commands,
             ),
         ):
             command = await loader.get(StartupCommand.signature)
@@ -290,10 +308,14 @@ class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
 
             with (
                 patch.object(
-                    invalidated, "_Loader__loadCoreCommands", side_effect=core_commands,
+                    invalidated,
+                    "_Loader__loadCoreCommands",
+                    side_effect=core_commands,
                 ),
                 patch.object(
-                    invalidated, "_Loader__loadCustomCommands", new_callable=AsyncMock,
+                    invalidated,
+                    "_Loader__loadCustomCommands",
+                    new_callable=AsyncMock,
                 ),
                 patch.object(invalidated, "_Loader__loadFluentCommands"),
             ):
@@ -304,6 +326,7 @@ class TestLoaderStartup(unittest.IsolatedAsyncioTestCase):
                 Loader(app)._Loader__persistence.get(),
                 {StartupCommand.signature: updated},
             )
+
 
 if __name__ == "__main__":
     unittest.main()

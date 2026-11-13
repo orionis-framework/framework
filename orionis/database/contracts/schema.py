@@ -1,13 +1,14 @@
+# ruff: noqa: E402, TC001
+# Preserve runtime annotations for public schema contract reflection.
+# Resolve the fluent context after defining the contract to break its import cycle.
 """Define the contract for schema implementations."""
 
 from __future__ import annotations
 from abc import abstractmethod, ABC
-from typing import TYPE_CHECKING, Self
+from typing import Self
+from orionis.orm.model import Model
+from orionis.orm.schema.table import TableDefinition
 
-if TYPE_CHECKING:
-    from orionis.database.schema.table_creation import TableCreation
-    from orionis.orm.model import Model
-    from orionis.orm.schema.table import TableDefinition
 
 class ISchema(ABC):
     """Define the contract for schema implementations."""
@@ -109,3 +110,6 @@ class ISchema(ABC):
         bool
             ``True`` when the table is dropped without errors.
         """
+
+
+from orionis.database.schema.table_creation import TableCreation

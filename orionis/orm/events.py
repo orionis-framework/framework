@@ -1,23 +1,26 @@
+# ruff: noqa: ANN401, TC003
+# Retain runtime annotations and dynamic attribute values.
 """Lifecycle event behavior shared by every model."""
 
 from __future__ import annotations
 import inspect
-from typing import TYPE_CHECKING, Any
+from collections.abc import Callable
+from typing import Any
 from orionis.orm.exceptions import OrmException
 from orionis.orm.metaclass import MODEL_EVENTS
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
 # Events whose listeners can abort the operation by returning ``False``.
-_HALTABLE_EVENTS: frozenset[str] = frozenset({
-    "saving",
-    "creating",
-    "updating",
-    "deleting",
-    "restoring",
-})
+_HALTABLE_EVENTS: frozenset[str] = frozenset(
+    {
+        "saving",
+        "creating",
+        "updating",
+        "deleting",
+        "restoring",
+    },
+)
 """Events whose listeners can abort the operation by returning ``False``."""
+
 
 class EventsMixin:
     """
@@ -63,8 +66,7 @@ class EventsMixin:
         if event not in MODEL_EVENTS:
             supported = ", ".join(MODEL_EVENTS)
             error_msg = (
-                f"Unsupported model event '{event}'. Supported events: "
-                f"{supported}."
+                f"Unsupported model event '{event}'. Supported events: {supported}."
             )
             raise OrmException(error_msg)
         meta = cls.__meta__
@@ -72,7 +74,7 @@ class EventsMixin:
         return cls
 
     @classmethod
-    def observe(cls, observer: Any) -> type:  # noqa: ANN401
+    def observe(cls, observer: Any) -> type:
         """
         Register every lifecycle method exposed by an observer.
 
@@ -107,7 +109,7 @@ class EventsMixin:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         meta = cls.__meta__
         if event is None:

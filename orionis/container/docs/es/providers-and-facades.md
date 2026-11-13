@@ -33,7 +33,7 @@ await container.invoke(function, *args, **kwargs)
 await container.call(instance, "method", *args, **kwargs)
 ```
 
-Ambos inyectan parámetros anotados faltantes y esperan resultados async. `invoke` rechaza clases; `call` distingue atributo ausente/no callable.
+Ambos inyectan parámetros anotados faltantes y esperan funciones declaradas con `async def`. Los resultados de callables síncronos se devuelven sin modificar. `invoke` rechaza clases; `call` distingue un atributo ausente de uno no invocable.
 
 #### Scopes
 
@@ -42,11 +42,11 @@ async with container.beginScope() as scope:
     service = await container.make(ScopedContract)
 ```
 
-`getCurrentScope()` devuelve manager o `None`. Un scope entra una vez. `scope.set/get/resolve` admiten valores/corrutinas; `resolve` lanza `KeyError` si falta.
+`getCurrentScope()` devuelve el manager o `None`. Un scope entra una vez. `scope.set/get/resolve` admiten valores y corrutinas; `resolve` lanza `KeyError` si la clave falta o el valor resuelto es `None`.
 
 ### `ServiceProvider` y `DeferrableProvider`
 
-Hereda `ServiceProvider`, implementa `register` síncrono y opcionalmente `boot` async. Registro define bindings; boot hace trabajo que necesita providers completos. El diferible implementa `provides()`.
+Hereda `ServiceProvider` y sobrescribe `register` síncrono para definir bindings o `boot` async para inicializar servicios. Ambos hooks base son opcionales y no realizan acciones. Boot hace trabajo que necesita los providers registrados. El diferible implementa `provides()`.
 
 ### `Facade` y `ScopedFacade`
 
@@ -109,19 +109,23 @@ from abc import ABC, abstractmethod
 from orionis.container.providers import ServiceProvider
 from orionis.container.facades import Facade
 
+
 class ICatalog(ABC):
     @abstractmethod
     def names(self) -> list[str]:
         raise NotImplementedError
 
+
 class MemoryCatalog(ICatalog):
     def names(self) -> list[str]:
         return ["book", "lamp"]
+
 
 class CatalogFacade(Facade):
     @classmethod
     def getFacadeAccessor(cls) -> type:
         return ICatalog
+
 
 class CatalogProvider(ServiceProvider):
     def register(self) -> None:

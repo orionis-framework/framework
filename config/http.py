@@ -2,13 +2,20 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.http import (
-    HTTP, Cors, HTTPBodyLimits, HTTPCsrf, HTTPProxies, HTTPRateLimit, HTTPSecurity,
-    HTTPWebSocket, Redis,
+    HTTP,
+    Cors,
+    HTTPBodyLimits,
+    HTTPCsrf,
+    HTTPProxies,
+    HTTPRateLimit,
+    HTTPSecurity,
+    HTTPWebSocket,
+    Redis,
 )
+
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapHTTP(HTTP):
-
     # ----------------------------------------------------------------------------------
     # body_limits : HTTPBodyLimits | dict, optional
     # --- Finite per-request budgets and immediate overload rejection per worker.
@@ -85,46 +92,39 @@ class BootstrapHTTP(HTTP):
     # ----------------------------------------------------------------------------------
     rate_limit: HTTPRateLimit | dict = field(
         default_factory=lambda: HTTPRateLimit(
-
             # --------------------------------------------------------------------------
             # rate_limit_enabled : bool, optional
             # --- Enable or disable global rate limiting.
             # --- Uses 'RATE_LIMIT_ENABLED' env var or False if not set.
             # --------------------------------------------------------------------------
             rate_limit_enabled=Env.get("RATE_LIMIT_ENABLED", False),
-
             # --------------------------------------------------------------------------
             # rate_limit_requests : int, optional
             # --- Maximum number of requests allowed per time window.
             # --- Uses 'RATE_LIMIT_REQUESTS' env var or 100 if not set.
             # --------------------------------------------------------------------------
             rate_limit_requests=Env.get("RATE_LIMIT_REQUESTS", 100),
-
             # --------------------------------------------------------------------------
             # rate_limit_window_seconds : int, optional
             # --- Time window in seconds for rate limit counting.
             # --- Uses 'RATE_LIMIT_WINDOW' env var or 60 if not set.
             # --------------------------------------------------------------------------
             rate_limit_window_seconds=Env.get("RATE_LIMIT_WINDOW", 60),
-
             # --------------------------------------------------------------------------
             # rate_limit_store : str, optional
             # --- Select memory for per-process quotas or redis for shared quotas.
             # --------------------------------------------------------------------------
             rate_limit_store=Env.get("RATE_LIMIT_STORE", "memory"),
-
             # --------------------------------------------------------------------------
             # rate_limit_max_keys : int, optional
             # --- Reject new clients instead of evicting active memory quotas.
             # --------------------------------------------------------------------------
             rate_limit_max_keys=Env.get("RATE_LIMIT_MAX_KEYS", 10_000),
-
             # --------------------------------------------------------------------------
             # rate_limit_max_events : int, optional
             # --- Reject new events instead of evicting active memory quotas.
             # --------------------------------------------------------------------------
             rate_limit_max_events=Env.get("RATE_LIMIT_MAX_EVENTS", 100_000),
-
             # --------------------------------------------------------------------------
             # rate_limit_redis : Redis | dict, optional
             # --- Redis connection settings for shared quotas; the connection is lazy.
@@ -135,15 +135,14 @@ class BootstrapHTTP(HTTP):
                 db=Env.get("REDIS_DB", 0),
                 password=Env.get("REDIS_PASSWORD", None),
             ),
-
             # --------------------------------------------------------------------------
             # rate_limit_redis_prefix : str, optional
             # --- Namespace prefix used for Redis quota keys.
             # --------------------------------------------------------------------------
             rate_limit_redis_prefix=Env.get(
-                "RATE_LIMIT_REDIS_PREFIX", "orionis:http:rate-limit",
+                "RATE_LIMIT_REDIS_PREFIX",
+                "orionis:http:rate-limit",
             ),
-
             # --------------------------------------------------------------------------
             # rate_limit_redis_timeout_seconds : int, optional
             # --- Timeout in seconds for each complete Redis attempt.
@@ -158,43 +157,36 @@ class BootstrapHTTP(HTTP):
     # ----------------------------------------------------------------------------------
     cors: Cors | dict = field(
         default_factory=lambda: Cors(
-
             # --------------------------------------------------------------------------
             # allow_origins : list[str], optional
             # --- List of allowed origins. Defaults to ["*"] (all origins).
             # --------------------------------------------------------------------------
             allow_origins=Env.get("CORS_ALLOW_ORIGINS", ["*"]),
-
             # --------------------------------------------------------------------------
             # allow_origin_regex : str | None, optional
             # --- Regex pattern to match allowed origins. Defaults to None.
             # --------------------------------------------------------------------------
             allow_origin_regex=Env.get("CORS_ALLOW_ORIGIN_REGEX", None),
-
             # --------------------------------------------------------------------------
             # allow_methods : list[str], optional
             # --- List of allowed HTTP methods. Defaults to ["*"] (all methods).
             # --------------------------------------------------------------------------
             allow_methods=Env.get("CORS_ALLOW_METHODS", ["*"]),
-
             # --------------------------------------------------------------------------
             # allow_headers : list[str], optional
             # --- List of allowed HTTP headers. Defaults to ["*"] (all headers).
             # --------------------------------------------------------------------------
             allow_headers=Env.get("CORS_ALLOW_HEADERS", ["*"]),
-
             # --------------------------------------------------------------------------
             # expose_headers : list[str], optional
             # --- List of headers exposed to the browser. Defaults to [].
             # --------------------------------------------------------------------------
             expose_headers=Env.get("CORS_EXPOSE_HEADERS", []),
-
             # --------------------------------------------------------------------------
             # allow_credentials : bool, optional
             # --- Allow credentials (cookies, authorization headers). Defaults to False.
             # --------------------------------------------------------------------------
             allow_credentials=Env.get("CORS_ALLOW_CREDENTIALS", False),
-
             # --------------------------------------------------------------------------
             # max_age : int | None, optional
             # --- Max time in seconds to cache preflight response. Defaults to 600.
@@ -209,60 +201,51 @@ class BootstrapHTTP(HTTP):
     # ----------------------------------------------------------------------------------
     csrf: HTTPCsrf | dict = field(
         default_factory=lambda: HTTPCsrf(
-
             # --------------------------------------------------------------------------
             # enabled : bool, optional
             # --- Enable or disable CSRF validation for all web routes.
             # --- Uses 'CSRF_ENABLED' env var or True if not set.
             # --------------------------------------------------------------------------
             enabled=Env.get("CSRF_ENABLED", True),
-
             # --------------------------------------------------------------------------
             # token_length : int, optional
             # --- Byte length of the generated CSRF token.
             # --- 32 bytes = 256 bits of entropy (minimum recommended).
             # --------------------------------------------------------------------------
             token_length=Env.get("CSRF_TOKEN_LENGTH", 32),
-
             # --------------------------------------------------------------------------
             # session_key : str, optional
             # --- Session key under which the CSRF token is stored.
             # --- Defaults to '_csrf_token'.
             # --------------------------------------------------------------------------
             session_key=Env.get("CSRF_SESSION_KEY", "_csrf_token"),
-
             # --------------------------------------------------------------------------
             # xsrf_cookie : bool, optional
             # --- Set a readable XSRF-TOKEN cookie (Angular / Axios pattern).
             # --- Uses 'CSRF_XSRF_COOKIE' env var or False if not set.
             # --------------------------------------------------------------------------
             xsrf_cookie=Env.get("CSRF_XSRF_COOKIE", False),
-
             # --------------------------------------------------------------------------
             # cookie_name : str, optional
             # --- Name of the XSRF double-submit cookie. Defaults to 'XSRF-TOKEN'.
             # --------------------------------------------------------------------------
             cookie_name=Env.get("CSRF_COOKIE_NAME", "XSRF-TOKEN"),
-
             # --------------------------------------------------------------------------
             # cookie_secure : bool, optional
             # --- Force the Secure flag on the XSRF cookie.
             # --- Automatically promoted to True on HTTPS regardless.
             # --------------------------------------------------------------------------
             cookie_secure=Env.get("CSRF_COOKIE_SECURE", False),
-
             # --------------------------------------------------------------------------
             # cookie_same_site : str, optional
             # --- SameSite policy: 'lax', 'strict', or 'none'. Defaults to 'lax'.
             # --------------------------------------------------------------------------
             cookie_same_site=Env.get("CSRF_COOKIE_SAME_SITE", "lax"),
-
             # --------------------------------------------------------------------------
             # cookie_path : str, optional
             # --- Path attribute for the XSRF cookie. Defaults to '/'.
             # --------------------------------------------------------------------------
             cookie_path=Env.get("CSRF_COOKIE_PATH", "/"),
-
             # --------------------------------------------------------------------------
             # cookie_domain : str | None, optional
             # --- Domain attribute for the XSRF cookie. None omits it.

@@ -1,25 +1,25 @@
+# ruff: noqa: PLC0415, TC001, TC003
+# Keep runtime factory annotations and lazily observe cleanup failures.
 """Publish complete private .eml files atomically without overwriting."""
 
 import os
 import secrets
+from collections.abc import Mapping
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import TYPE_CHECKING
 from orionis.aio import Loop
+from orionis.foundation.contracts.application import IApplication
 from orionis.mail.contracts.transport import IMailTransport
+from orionis.mail.entities.prepared import PreparedMail
 from orionis.mail.entities.result import MailResult
 from orionis.mail.enums.status import MailStatus
 from orionis.mail.exceptions import MailConfigurationException, MailTransportException
-
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from orionis.foundation.contracts.application import IApplication
-    from orionis.mail.entities.prepared import PreparedMail
 
 _DEFAULT_OUTPUT_PATH = "storage/mail"
 """Default output path identifier: ``storage/mail``."""
 _DIRECTORY_MODE = 0o700
 """Directory mode value used by ``file``."""
+
 
 class FileTransport(IMailTransport):
     """
@@ -138,7 +138,8 @@ class FileTransport(IMailTransport):
                 try:
                     temporary.unlink(missing_ok=True)
                 except OSError as cleanup_error:
-                    from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+                    from orionis.failure.runtime import capture_nowait
+
                     capture_nowait(
                         cleanup_error,
                         flow="mail",
@@ -146,6 +147,7 @@ class FileTransport(IMailTransport):
                         operation="file.publish",
                     )
         return final
+
 
 def create_file_transport(
     app: IApplication,
@@ -178,7 +180,6 @@ def create_file_transport(
 
     path = Path(raw)
     if not path.is_absolute():
-
         # A Windows drive-relative or root-relative path has an anchor but no
         # drive, so it cannot be resolved against the application root.
         if path.anchor:

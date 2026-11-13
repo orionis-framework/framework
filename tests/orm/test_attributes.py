@@ -1,3 +1,6 @@
+# ruff: noqa: DTZ001, PT009, PT027, S105, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Exercise required hook signatures, synthetic secrets, and declared column names.
 from __future__ import annotations
 import uuid
 from datetime import UTC, date, datetime
@@ -10,6 +13,7 @@ from orionis.orm.exceptions import OrmException
 from orionis.orm.schema.types import Uuid
 from orionis.test import TestCase
 
+
 class _Doc(Model):
     id = Integer().primary().autoIncrement()
     body = Text().nullable()
@@ -18,6 +22,7 @@ class _Doc(Model):
     label = String().nullable()
 
     casts: ClassVar[dict[str, str]] = {"body": "json"}
+
 
 class TestCastHandlers(TestCase):
     def testIntAndFloatCasts(self) -> None:
@@ -28,7 +33,7 @@ class TestCastHandlers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(get_cast_handler("int")("42"), 42)
         self.assertEqual(get_cast_handler("float")("2.5"), 2.5)
@@ -41,7 +46,7 @@ class TestCastHandlers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = get_cast_handler("bool")
         for truthy in ("1", "true", "YES", " on "):
@@ -59,7 +64,7 @@ class TestCastHandlers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = get_cast_handler("datetime")
         now = datetime.now(UTC)
@@ -77,7 +82,7 @@ class TestCastHandlers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = get_cast_handler("date")
         today = date(2026, 7, 24)
@@ -94,7 +99,7 @@ class TestCastHandlers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = get_cast_handler("json")
         self.assertEqual(handler('{"a": 1}'), {"a": 1})
@@ -109,7 +114,7 @@ class TestCastHandlers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = get_cast_handler("uuid")
         value = uuid.uuid4()
@@ -124,7 +129,7 @@ class TestCastHandlers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(OrmException):
             get_cast_handler("decimal128")
@@ -138,10 +143,11 @@ class TestCastHandlers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(get_cast_handler(" INT "), get_cast_handler("int"))
         self.assertIs(get_cast_handler("Bool"), get_cast_handler("bool"))
+
 
 class TestSerializeForStorage(TestCase):
     def testJsonStructureOnNonJsonColumnIsDumped(self) -> None:
@@ -152,7 +158,7 @@ class TestSerializeForStorage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _Doc.__meta__
         result = serialize_for_storage(meta, {"body": {"a": 1}})
@@ -166,7 +172,7 @@ class TestSerializeForStorage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _Doc.__meta__
         payload = {"a": 1}
@@ -181,7 +187,7 @@ class TestSerializeForStorage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _Doc.__meta__
         value = uuid.uuid4()
@@ -196,7 +202,7 @@ class TestSerializeForStorage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _Doc.__meta__
         value = uuid.uuid4()
@@ -211,12 +217,13 @@ class TestSerializeForStorage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _Doc.__meta__
         result = serialize_for_storage(meta, {"body": None, "ghost": 5})
         self.assertIsNone(result["body"])
         self.assertEqual(result["ghost"], 5)
+
 
 class TestAttributeHelpers(TestCase):
     def testGetAttributeReturnsDefaultWhenAbsent(self) -> None:
@@ -227,7 +234,7 @@ class TestAttributeHelpers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         doc = _Doc()
         self.assertIsNone(doc.getAttribute("label"))
@@ -241,7 +248,7 @@ class TestAttributeHelpers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         doc = _Doc()
         doc.body = '{"k": true}'
@@ -255,10 +262,11 @@ class TestAttributeHelpers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         doc = _Doc({"label": "x"})
         self.assertEqual(doc.serialize(), doc.toDict())
+
 
 class TestAccessorsAndMutators(feature_fixtures._ModelFeatureTestCase):
     """Attribute transformation on read and write."""
@@ -271,7 +279,7 @@ class TestAccessorsAndMutators(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         account = await feature_fixtures.Account.query().firstOrFail()
@@ -286,10 +294,10 @@ class TestAccessorsAndMutators(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         account = feature_fixtures.Account({"first_name": "Cid", "last_name": "Kane"})
-        account.secret = "plain"  # noqa: S105
+        account.secret = "plain"
         self.assertEqual(account.getOriginal("secret"), None)
         self.assertEqual(account._attributes["secret"], "nialp")
 
@@ -301,7 +309,7 @@ class TestAccessorsAndMutators(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         account = await feature_fixtures.Account.query().firstOrFail()
@@ -315,7 +323,7 @@ class TestAccessorsAndMutators(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         account = await feature_fixtures.Account.query().firstOrFail()
@@ -323,6 +331,7 @@ class TestAccessorsAndMutators(feature_fixtures._ModelFeatureTestCase):
         self.assertEqual(data["display_name"], "Ada Lovelace")
         self.assertEqual(data["role"], "ADMIN")
         self.assertNotIn("secret", data)
+
 
 class TestSerializationIsolation(TestCase):
     """Exercise attribute state and serialization without database access."""
@@ -333,7 +342,7 @@ class TestSerializationIsolation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = state_fixtures._Record({"name": "original"})
         result = record.toDict()

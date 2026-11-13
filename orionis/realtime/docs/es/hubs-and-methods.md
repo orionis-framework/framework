@@ -26,10 +26,12 @@ import asyncio
 from orionis.realtime import Hub, remote
 from orionis.realtime.metadata import compile_hub
 
+
 class MathHub(Hub):
     @remote(name="sum")
     async def add(self, first: int, second: int = 2) -> int:
         return first + second
+
 
 methods = compile_hub(MathHub)
 assert asyncio.run(methods["sum"].bind([3], {})) == {"first": 3, "second": 2}
@@ -40,6 +42,8 @@ El ejemplo puede compilarse sin servidor. Para servirlo declara `Route.hub("/rea
 ## Datos y servicios
 
 Anota cada argumento remoto. Tipos de datos compatibles con msgspec se convierten desde argumentos del cliente; tipos de servicios se resuelven con el contenedor y no pueden ser suplantados por un valor del payload. Los schemas Orionis anidados, incluidos los contenidos en colecciones o structs ordinarios, ejecutan sus reglas síncronas o asíncronas antes del despacho. Las llamadas directas a `bind()` requieren `await`; dentro de un loop existente usa `await methods["sum"].bind([3], {})`. Se admiten defaults y parámetros keyword-only.
+
+La conversión sigue siendo estricta salvo que una anotación utilice `Coerce` explícitamente. La preparación compartida de schemas aplica ese marcador a schemas opcionales, colecciones, wrappers Struct y escalares marcados sin modificar los datos del llamador. Las instancias Struct existentes se expanden y revalidan, sin omitir tipos de campo ni constraints nativos.
 
 Para un servicio de aplicación importable `Calculator`, un método puede declarar `async def add(self, first: int, calculator: Calculator, second: int = 2) -> int`. Registra/resuelve Calculator normalmente en el contenedor. Mantén el import disponible en runtime cuando la reflexión lo requiera; no escondas todas las anotaciones de inyección en `TYPE_CHECKING` sin una estrategia de resolución.
 

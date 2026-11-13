@@ -1,20 +1,20 @@
+# ruff: noqa: ANN401, TC001
 """Fluent query builder over a plain table name."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
+from orionis.database.contracts.connection import IConnection
+from orionis.orm.collections.paginator import Paginator
 from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 from orionis.orm.exceptions import InvalidQueryException
 from orionis.orm.query.base_builder import QueryBuilderBase
 from orionis.orm.resolver import ConnectionResolver
 from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from orionis.database.contracts.connection import IConnection
-    from orionis.orm.collections.paginator import Paginator
-
 # Default page size used by pagination.
 _DEFAULT_PER_PAGE: int = 15
 """Default page size used by pagination."""
+
 
 class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
     """
@@ -122,7 +122,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
         rows = await self._connection().select(probe)
         return rows[0] if rows else None
 
-    async def value(self, column: str) -> Any:  # noqa: ANN401
+    async def value(self, column: str) -> Any:
         """
         Return a single column value of the first matching row.
 
@@ -199,6 +199,10 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
         orionis.database.contracts.IConnection
             Named connection, or the default one.
         """
+        if self._resolved_connection is not None:
+            return self._resolved_connection
+        if self._connection_manager is not None:
+            return self._connection_manager.connection(self._connection_name)
         return ConnectionResolver.connection(self._connection_name)
 
     def _assertTarget(self) -> None:
@@ -208,7 +212,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------

@@ -1,7 +1,10 @@
+# ruff: noqa: TC001, TC003, TRY004
+# Preserve runtime annotations used to inspect the fluent schema API.
+# Missing virtual factory attributes must raise AttributeError.
 """Fluent collector of column definitions for a single table."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from collections.abc import Callable
 from orionis.database.schema.column import Column
 from orionis.database.schema.comment import Comment
 from orionis.database.schema.foreign import ForeignKey
@@ -9,9 +12,8 @@ from orionis.database.schema.index import Index
 from orionis.database.schema.primary import PrimaryKey
 from orionis.database.schema.unique import Unique
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.orm.schema.column import ColumnDefinition
+from orionis.orm.schema.column import ColumnDefinition
+
 
 class Blueprint:
     """
@@ -37,7 +39,7 @@ class Blueprint:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.__columns: list[ColumnDefinition] = []
         """Column definitions included in the table schema."""
@@ -77,10 +79,11 @@ class Blueprint:
         if cached is not None:
             return cached
 
-        factory = getattr(Column, name, None)
-        if factory is None or not callable(factory):
+        descriptor = vars(Column).get(name)
+        if not isinstance(descriptor, staticmethod):
             error_msg = f"'{type(self).__name__}' object has no attribute {name!r}."
             raise AttributeError(error_msg)
+        factory = descriptor.__func__
 
         def _build(*args: object, **kwargs: object) -> ColumnDefinition:
             """
@@ -117,7 +120,7 @@ class Blueprint:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.dateTime("created_at", timezone=timezone).nullable()
         self.dateTime("updated_at", timezone=timezone).nullable()
@@ -251,7 +254,8 @@ class Blueprint:
     def definitions(
         self,
     ) -> tuple[
-        ColumnDefinition | Comment | ForeignKey | Index | PrimaryKey | Unique, ...,
+        ColumnDefinition | Comment | ForeignKey | Index | PrimaryKey | Unique,
+        ...,
     ]:
         """
         Return every column and table-level constraint declared so far.

@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class Runtime(StrEnum):
     """
     Define runtime environments for the framework.

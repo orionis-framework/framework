@@ -4,6 +4,7 @@ from __future__ import annotations
 from aiocache.backends.redis import RedisCache
 from orionis.cache.serializers.json import MsgspecSerializer
 
+
 def build(
     endpoint: str = "127.0.0.1",
     port: int = 6379,

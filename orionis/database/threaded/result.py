@@ -1,11 +1,13 @@
+# ruff: noqa: PLC0415, TC002, TC003
+# Keep native result and collection annotations available to runtime reflection.
 """Retain materialized Core results without exposing a live DBAPI cursor."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from collections.abc import Iterable, Mapping
+from sqlalchemy.engine import CursorResult
+from orionis.database.threaded.worker import _diagnostic_error
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
-    from sqlalchemy.engine import CursorResult
 
 class ThreadedResult:
     """Retain materialized Core results without exposing a live DBAPI cursor."""
@@ -25,8 +27,9 @@ class ThreadedResult:
         Returns
         -------
         None
-            Store a memory-only result with the original row count and key.
+            No return value.
         """
+        primary: BaseException | None = None
         try:
             self.rowcount = result.rowcount
             """Rowcount obtained from ``result.rowcount``."""
@@ -37,9 +40,23 @@ class ThreadedResult:
             )
             """Primary-key values returned for the inserted row."""
             self._result = result.freeze()() if result.returns_rows else None
-            """Live Core result to consume and close before releasing its connection."""
+            """Buffered rows retained after the live cursor has been closed."""
+        except BaseException as error:
+            primary = error
+            raise
         finally:
-            result.close()
+            try:
+                result.close()
+            except Exception as error:
+                if primary is None:
+                    raise
+                from orionis.failure.runtime import capture_nowait
+
+                capture_nowait(
+                    _diagnostic_error(error),
+                    flow="database",
+                    phase="cleanup",
+                )
 
     def mappings(self) -> Iterable[Mapping[str, Any]]:
         """

@@ -9,9 +9,11 @@ from orionis.http import Request, response
 from orionis.schemas import Schema
 from orionis.schemas.validator import Schema as Validator
 
+
 class Preferences(Schema):
     theme: str
     compact: bool = False
+
 
 async def save_preferences(request: Request):
     values = await request.data()
@@ -49,7 +51,9 @@ Puedes crear un registro para construir Requests de infraestructura sin modifica
 ```python
 from orionis.http.payload.media_types import DEFAULT_MEDIA_TYPES
 
-registry = DEFAULT_MEDIA_TYPES.extend({"application/vnd.example.label": lambda raw: raw.decode("utf-8")})
+registry = DEFAULT_MEDIA_TYPES.extend(
+    {"application/vnd.example.label": lambda raw: raw.decode("utf-8")}
+)
 parser = registry.get("application/vnd.example.label")
 assert parser is not None and parser(b"ready") == "ready"
 assert DEFAULT_MEDIA_TYPES.get("application/vnd.example.label") is None

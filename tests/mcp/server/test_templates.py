@@ -1,7 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from uritemplate import URITemplate
 from orionis.mcp.server.primitives import Resource
 from orionis.mcp.server.templates import UriMatcher
 from orionis.test import TestCase
+
 
 def _inverse(variables: dict[str, object]) -> staticmethod:
     """Bind fixture variables outside the test's iteration scope.
@@ -40,6 +43,7 @@ def _inverse(variables: dict[str, object]) -> staticmethod:
 
     return staticmethod(match)
 
+
 class TestTemplates(TestCase):
     """Use automatic matching only where inverse semantics are unambiguous."""
 
@@ -52,37 +56,45 @@ class TestTemplates(TestCase):
             Expansion and inverse verification preserve the declared URI contract.
         """
         cases = (
-            ("{name}", {"name": "café /?#+%"},
-             "caf%C3%A9%20%2F%3F%23%2B%25"),
+            ("{name}", {"name": "café /?#+%"}, "caf%C3%A9%20%2F%3F%23%2B%25"),
             ("{+path}", {"path": "a/b?x=1#part"}, "a/b?x=1#part"),
             ("{#name}", {"name": "a b"}, "#a%20b"),
             ("{name:2}", {"name": "é猫tail"}, "%C3%A9%E7%8C%AB"),
             ("{name:9999}", {"name": "value"}, "value"),
             ("{/items*}", {"items": ["a/b", "c d"]}, "/a%2Fb/c%20d"),
-            ("{?keys*}", {"keys": {"a&b": "x=y", "empty": ""}},
-             "?a%26b=x%3Dy&empty="),
-            ("{;name,empty,missing}", {"name": "a/b", "empty": ""},
-             ";name=a%2Fb;empty"),
-            ("{?missing,empty,nil,items}{&flag}",
-             {"empty": "", "nil": None, "items": [], "flag": True},
-             "?empty=&flag=true"),
+            ("{?keys*}", {"keys": {"a&b": "x=y", "empty": ""}}, "?a%26b=x%3Dy&empty="),
+            (
+                "{;name,empty,missing}",
+                {"name": "a/b", "empty": ""},
+                ";name=a%2Fb;empty",
+            ),
+            (
+                "{?missing,empty,nil,items}{&flag}",
+                {"empty": "", "nil": None, "items": [], "flag": True},
+                "?empty=&flag=true",
+            ),
             ("{?missing}", {}, ""),
             ("{?flag,zero}", {"flag": False, "zero": 0}, "?flag=false&zero=0"),
             ("{var_dict}", {"var_dict": "value"}, "value"),
-            ("{?keys*}", {"keys": {"z": "last", "a": "first"}},
-             "?z=last&a=first"),
-            ("{?items*}", {"items": (True, False, 0)},
-             "?items=true&items=false&items=0"),
+            ("{?keys*}", {"keys": {"z": "last", "a": "first"}}, "?z=last&a=first"),
+            (
+                "{?items*}",
+                {"items": (True, False, 0)},
+                "?items=true&items=false&items=0",
+            ),
             ("café/{name}", {"name": "é"}, "caf%C3%A9/%C3%A9"),
-            ("{x.y}/{percent%20name}",
-             {"x.y": "a", "percent%20name": "b"}, "a/b"),
+            ("{x.y}/{percent%20name}", {"x.y": "a", "percent%20name": "b"}, "a/b"),
         )
         for expression, values, expected in cases:
             with self.subTest(expression=expression):
-                definition = type("Fixture", (Resource,), {
-                    "uri_template": "demo://root/" + expression,
-                    "match": _inverse(values),
-                })
+                definition = type(
+                    "Fixture",
+                    (Resource,),
+                    {
+                        "uri_template": "demo://root/" + expression,
+                        "match": _inverse(values),
+                    },
+                )
                 matcher = UriMatcher.compile(definition)
                 uri = "demo://root/" + expected
                 self.assertEqual(matcher.match(uri), values)
@@ -95,17 +107,28 @@ class TestTemplates(TestCase):
         None
             Encoded separators stay inside the variable and UTF-8 remains strict.
         """
-        definition = type("Encoded", (Resource,), {
-            "uri_template": "demo://root/{name}",
-        })
+        definition = type(
+            "Encoded",
+            (Resource,),
+            {
+                "uri_template": "demo://root/{name}",
+            },
+        )
         matcher = UriMatcher.compile(definition)
-        self.assertEqual(matcher.match("demo://root/caf%c3%a9%2f%252F"), {
-            "name": "café/%2F",
-        })
+        self.assertEqual(
+            matcher.match("demo://root/caf%c3%a9%2f%252F"),
+            {
+                "name": "café/%2F",
+            },
+        )
         self.assertEqual(matcher.match("demo://root/"), {"name": ""})
-        unicode_literal = type("UnicodeLiteral", (Resource,), {
-            "uri_template": "demo://café/{name}",
-        })
+        unicode_literal = type(
+            "UnicodeLiteral",
+            (Resource,),
+            {
+                "uri_template": "demo://café/{name}",
+            },
+        )
         self.assertEqual(
             UriMatcher.compile(unicode_literal).match("demo://caf%C3%A9/%E7%8C%AB"),
             {"name": "猫"},
@@ -123,10 +146,14 @@ class TestTemplates(TestCase):
             Invalid inverse values cannot pass URI verification silently.
         """
         for value in (["first", "second"], {"first": "second"}):
-            definition = type("CompositePrefix", (Resource,), {
-                "uri_template": "demo://root/{items:2}",
-                "match": _inverse({"items": value}),
-            })
+            definition = type(
+                "CompositePrefix",
+                (Resource,),
+                {
+                    "uri_template": "demo://root/{items:2}",
+                    "match": _inverse({"items": value}),
+                },
+            )
             with (
                 self.subTest(value=value),
                 self.assertRaisesRegex(ValueError, "prefix"),

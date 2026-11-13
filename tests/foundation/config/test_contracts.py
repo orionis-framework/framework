@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import ast
 import re
 import tempfile
@@ -13,6 +16,7 @@ from tests.foundation.config.test_environment import (
     ConfigurationTestCase,
     configuration_classes,
 )
+
 
 class TestConfigurationContracts(ConfigurationTestCase):
     def testAllDefaultsAndSerializedConfigurationsConstruct(self) -> None:
@@ -57,10 +61,13 @@ class TestConfigurationContracts(ConfigurationTestCase):
             for field in fields(cls):
                 with self.subTest(entity=cls.__name__, field=field.name):
                     if issubclass(cls, Cors) and field.name in (
-                        "allow_origins", "allow_methods", "allow_headers",
+                        "allow_origins",
+                        "allow_methods",
+                        "allow_headers",
                     ):
                         self.assertEqual(
-                            getattr(cls(**{field.name: None}), field.name), ["*"],
+                            getattr(cls(**{field.name: None}), field.name),
+                            ["*"],
                         )
                     elif type(None) in get_args(annotations[field.name]):
                         values = {field.name: None}
@@ -83,7 +90,9 @@ class TestConfigurationContracts(ConfigurationTestCase):
             "BootstrapAppAuth": ("session", "redirect_to", "/login"),
             "BootstrapCache": ("prefix", None, ""),
             "BootstrapMcp": (
-                "allowed_origins", None, ["https://inspector.orionis-framework.com"],
+                "allowed_origins",
+                None,
+                ["https://inspector.orionis-framework.com"],
             ),
         }
         self.environment.values["APP_KEY"] = bytes(range(32))

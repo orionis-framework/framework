@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from granian.rsgi import HTTPProtocol, Scope, WebsocketProtocol
 
+
 class IKernelHTTP(ABC):
     """Define the contract for kernel http implementations."""
 

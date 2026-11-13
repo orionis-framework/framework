@@ -1,7 +1,10 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a date comes strictly after a reference moment."""
 
 from orionis.schemas.rules.temporal import resolve_moment, to_datetime
 from orionis.schemas.rule import Rule
+
 
 class After(Rule):
     """
@@ -11,8 +14,6 @@ class After(Rule):
     ``datetime``/``date`` value, or ``None`` to compare against the current
     moment.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_reference",)
     """Declare the instance attribute slots reserved by this class."""
@@ -42,7 +43,7 @@ class After(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
         """
         super().__init__(message=message)
         self._reference: object = reference
@@ -76,9 +77,9 @@ class After(Rule):
         """
         moment = to_datetime(value)
 
-        # Leave non-date values to the type layer, which already reports them.
+        # Reject malformed text; delegate unrelated types to the type layer.
         if moment is None:
-            return True
+            return not isinstance(value, str)
 
         reference = resolve_moment(self._reference, instance)
         if reference is None:

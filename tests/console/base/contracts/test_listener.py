@@ -1,11 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from abc import ABC
 from orionis.console.base.contracts.listener import IBaseTaskListener
 from orionis.test import TestCase
 
-class TestIBaseTaskListener(TestCase):
 
+class TestIBaseTaskListener(TestCase):
     def testIsAbstractClass(self) -> None:
         """
         Verify that IBaseTaskListener is an abstract class.
@@ -177,6 +179,8 @@ class TestIBaseTaskListener(TestCase):
                 self.assertTrue(hasattr(IBaseTaskListener, method_name))
                 # Verify method is in abstract methods
                 abstract_methods = getattr(
-                    IBaseTaskListener, "__abstractmethods__", set(),
+                    IBaseTaskListener,
+                    "__abstractmethods__",
+                    set(),
                 )
                 self.assertIn(method_name, abstract_methods)

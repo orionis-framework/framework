@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -10,6 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 _MISSING = object()
+
 
 @contextmanager
 def replace_attribute(target: object, name: str, value: object) -> Iterator[None]:
@@ -43,6 +46,7 @@ def replace_attribute(target: object, name: str, value: object) -> Iterator[None
         else:
             setattr(target, name, original)
 
+
 def make_adapter(
     headers: list[tuple[bytes, bytes]],
     method: str = "GET",
@@ -74,10 +78,12 @@ def make_adapter(
         },
     )
 
+
 class _InheritedValue:
     """Expose a class-owned value for instance override checks."""
 
     value: ClassVar[int] = 1
+
 
 class _DescriptorOwner:
     """Expose a descriptor whose original object must survive replacement."""
@@ -93,11 +99,13 @@ class _DescriptorOwner:
         """
         return 1
 
+
 @dataclass(slots=True)
 class _SlottedValue:
     """Store a replaceable value without an instance dictionary."""
 
     value: int = 1
+
 
 class TestTemporaryAttributeReplacement(TestCase):
     """Verify restoration of attributes used to isolate HTTP collaborators."""

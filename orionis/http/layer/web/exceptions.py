@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+
 class CSRFTokenMismatchException(Exception):
     """
     Raised when the CSRF token does not match the session token.

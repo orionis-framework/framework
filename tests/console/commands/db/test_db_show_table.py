@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import argparse
 from unittest.mock import AsyncMock, Mock, patch
 from orionis.console.commands.db._inspection import DatabaseInspector
@@ -6,6 +8,7 @@ from orionis.console.commands.db.table import DbTableCommand
 from orionis.database.connection import Connection
 from orionis.database.exceptions import QueryException
 from orionis.test import TestCase
+
 
 class _Manager:
     """Provide two isolated in-memory connections to the commands."""
@@ -63,6 +66,7 @@ class _Manager:
         """
         return self.connections[name]
 
+
 class _RecordingConnection:
     """Record catalog reads while delegating to a real SQLite connection."""
 
@@ -111,6 +115,7 @@ class _RecordingConnection:
         """
         await self.delegate.disconnect()
 
+
 class _CatalogConnection:
     """Return a fixed table name from a catalog query."""
 
@@ -150,6 +155,7 @@ class _CatalogConnection:
         if "FROM svv_mv_info" in query:
             return []
         return self.rows
+
 
 class _FailingMetadataConnection:
     """Raise a configured failure when metadata is queried."""
@@ -191,6 +197,7 @@ class _FailingMetadataConnection:
             The configured failure.
         """
         raise self.failure
+
 
 class TestDbShowTableCommands(TestCase):
     """Validate real catalog inspection and named connection selection."""
@@ -365,8 +372,7 @@ class TestDbShowTableCommands(TestCase):
         """
         connection = self.manager.connection("reports")
         await connection.statement(
-            "CREATE UNIQUE INDEX child_parent_label_idx "
-            "ON child(parent_id, label)",
+            "CREATE UNIQUE INDEX child_parent_label_idx ON child(parent_id, label)",
         )
         recording = _RecordingConnection(connection)
         inspector = DatabaseInspector(self.manager, "reports")
@@ -453,28 +459,36 @@ class TestDbShowTableCommands(TestCase):
         inspector = DatabaseInspector(self.manager, "reports")
         inspector.driver = "pgsql"
         catalog = Mock()
-        catalog.select = AsyncMock(side_effect=[
-            [{
-                "name": "parent_id",
-                "type": "integer",
-                "nullable": "NO",
-                "default_value": None,
-                "primary_key": 0,
-            }],
-            [{
-                "name": "child_parent_id_idx",
-                "definition": "parent_id",
-                "non_unique": 1,
-                "primary_key": False,
-            }],
-            [{
-                "name": "child_parent_id_fkey",
-                "column_name": "parent_id",
-                "ref_table": "public.parent",
-                "ref_column": "id",
-                "on_delete": "CASCADE",
-            }],
-        ])
+        catalog.select = AsyncMock(
+            side_effect=[
+                [
+                    {
+                        "name": "parent_id",
+                        "type": "integer",
+                        "nullable": "NO",
+                        "default_value": None,
+                        "primary_key": 0,
+                    },
+                ],
+                [
+                    {
+                        "name": "child_parent_id_idx",
+                        "definition": "parent_id",
+                        "non_unique": 1,
+                        "primary_key": False,
+                    },
+                ],
+                [
+                    {
+                        "name": "child_parent_id_fkey",
+                        "column_name": "parent_id",
+                        "ref_table": "public.parent",
+                        "ref_column": "id",
+                        "on_delete": "CASCADE",
+                    },
+                ],
+            ],
+        )
         inspector.connection = catalog
 
         columns, indexes, keys = await inspector._serverDetails("public.child")
@@ -498,28 +512,36 @@ class TestDbShowTableCommands(TestCase):
         inspector = DatabaseInspector(self.manager, "reports")
         inspector.driver = "oracle"
         catalog = Mock()
-        catalog.select = AsyncMock(side_effect=[
-            [{
-                "name": "ParentId",
-                "type": "NUMBER",
-                "nullable": "N",
-                "default_value": None,
-                "primary_key": 0,
-            }],
-            [{
-                "name": "ChildParentIdx",
-                "definition": "ParentId",
-                "non_unique": 1,
-                "primary_key": 1,
-            }],
-            [{
-                "name": "ChildParentFk",
-                "column_name": "ParentId",
-                "ref_table": "APP.Parent",
-                "ref_column": "Id",
-                "on_delete": "CASCADE",
-            }],
-        ])
+        catalog.select = AsyncMock(
+            side_effect=[
+                [
+                    {
+                        "name": "ParentId",
+                        "type": "NUMBER",
+                        "nullable": "N",
+                        "default_value": None,
+                        "primary_key": 0,
+                    },
+                ],
+                [
+                    {
+                        "name": "ChildParentIdx",
+                        "definition": "ParentId",
+                        "non_unique": 1,
+                        "primary_key": 1,
+                    },
+                ],
+                [
+                    {
+                        "name": "ChildParentFk",
+                        "column_name": "ParentId",
+                        "ref_table": "APP.Parent",
+                        "ref_column": "Id",
+                        "on_delete": "CASCADE",
+                    },
+                ],
+            ],
+        )
         inspector.connection = catalog
 
         _, indexes, keys = await inspector._serverDetails("Child")
@@ -544,10 +566,12 @@ class TestDbShowTableCommands(TestCase):
         inspector = DatabaseInspector(self.manager, "reports")
         inspector.driver = "oracle"
         catalog = Mock()
-        catalog.select = AsyncMock(side_effect=[
-            [{"name": "PARENT"}],
-            [{"name": "CHILD_MV"}],
-        ])
+        catalog.select = AsyncMock(
+            side_effect=[
+                [{"name": "PARENT"}],
+                [{"name": "CHILD_MV"}],
+            ],
+        )
         inspector.connection = catalog
         self.assertEqual(await inspector.listTables(), ["PARENT"])
         self.assertEqual(await inspector.listMaterializedViews(), ["CHILD_MV"])
@@ -657,26 +681,33 @@ class TestDbShowTableCommands(TestCase):
         inspector = DatabaseInspector(self.manager, "reports")
         inspector.driver = "redshift"
         catalog = Mock()
-        catalog.select = AsyncMock(side_effect=[
-            [{"name": "analytics.events"}, {"name": "analytics.summary"}],
-            [{"name": "analytics.summary"}],
-            [{"name": "analytics.active"}], [{"name": "analytics.summary"}],
-            [{"name": "analytics.summary"}],
-            [{"name": "analytics.active"}], [{"name": "analytics.summary"}],
-            [{"object_count": 2}], [{"count": 3}],
-        ])
+        catalog.select = AsyncMock(
+            side_effect=[
+                [{"name": "analytics.events"}, {"name": "analytics.summary"}],
+                [{"name": "analytics.summary"}],
+                [{"name": "analytics.active"}],
+                [{"name": "analytics.summary"}],
+                [{"name": "analytics.summary"}],
+                [{"name": "analytics.active"}],
+                [{"name": "analytics.summary"}],
+                [{"object_count": 2}],
+                [{"count": 3}],
+            ],
+        )
         inspector.connection = catalog
         self.assertEqual(await inspector.listTables(), ["analytics.events"])
         self.assertEqual(await inspector.listViews(), ["analytics.active"])
         self.assertEqual(
-            await inspector.listMaterializedViews(), ["analytics.summary"],
+            await inspector.listMaterializedViews(),
+            ["analytics.summary"],
         )
         self.assertEqual(await inspector.listTypes(), [])
         self.assertEqual(await inspector.listDomains(), [])
         self.assertEqual(await inspector.viewCounts(), (1, 2))
         self.assertEqual(await inspector.connectionCount(), 3)
         self.assertEqual(
-            inspector.quoteIdentifier("analytics.events"), '"analytics"."events"',
+            inspector.quoteIdentifier("analytics.events"),
+            '"analytics"."events"',
         )
         self.assertEqual(
             inspector._resolveTableName("events", ["analytics.events"]),
@@ -704,30 +735,46 @@ class TestDbShowTableCommands(TestCase):
         inspector = DatabaseInspector(self.manager, "reports")
         inspector.driver = "redshift"
         catalog = Mock()
-        catalog.select = AsyncMock(side_effect=[
-            [{"bytes": 2097152}], [{"name": "analytics.events", "bytes": 1048576}],
-            [{"name": "analytics.events", "bytes": 1048576}],
-            [{"name": "analytics.events"}],
-            [],
-        ])
+        catalog.select = AsyncMock(
+            side_effect=[
+                [{"bytes": 2097152}],
+                [{"name": "analytics.events", "bytes": 1048576}],
+                [{"name": "analytics.events", "bytes": 1048576}],
+                [{"name": "analytics.events"}],
+                [],
+            ],
+        )
         inspector.connection = catalog
         self.assertEqual(await inspector.databaseSize(), 2097152)
         self.assertEqual(await inspector.tableSize("analytics.events"), 1048576)
-        self.assertEqual(await inspector.tableSizes(["analytics.events"]), {
-            "analytics.events": 1048576,
-        })
         self.assertEqual(
-            await inspector._findTableName("analytics.events"), "analytics.events",
+            await inspector.tableSizes(["analytics.events"]),
+            {
+                "analytics.events": 1048576,
+            },
+        )
+        self.assertEqual(
+            await inspector._findTableName("analytics.events"),
+            "analytics.events",
         )
         calls = catalog.select.await_args_list
         self.assertIn("size * 1048576", calls[1].args[0])
         self.assertEqual(calls[1].args[1], {"schema": "analytics", "table": "events"})
-        self.assertEqual(calls[3].args[1], {
-            "kind": "TABLE", "schema": "analytics", "table": "events",
-        })
-        self.assertEqual(calls[4].args[1], {
-            "schema": "analytics", "table": "events",
-        })
+        self.assertEqual(
+            calls[3].args[1],
+            {
+                "kind": "TABLE",
+                "schema": "analytics",
+                "table": "events",
+            },
+        )
+        self.assertEqual(
+            calls[4].args[1],
+            {
+                "schema": "analytics",
+                "table": "events",
+            },
+        )
 
     async def testRedshiftOptionalMetricsHandlePermissionErrors(self) -> None:
         """Keep inspection usable when optional activity and size views are restricted.
@@ -763,17 +810,28 @@ class TestDbShowTableCommands(TestCase):
         inspector = DatabaseInspector(self.manager, "reports")
         inspector.driver = "redshift"
         catalog = Mock()
-        catalog.select = AsyncMock(side_effect=[
-            [{
-                "name": "parent_id", "type": "bigint", "nullable": "NO",
-                "default_value": None, "primary_key": 1,
-            }],
-            [{
-                "name": "events_parent_fkey", "column_name": "parent_id",
-                "ref_table": "analytics.parent", "ref_column": "id",
-                "on_delete": "NO ACTION",
-            }],
-        ])
+        catalog.select = AsyncMock(
+            side_effect=[
+                [
+                    {
+                        "name": "parent_id",
+                        "type": "bigint",
+                        "nullable": "NO",
+                        "default_value": None,
+                        "primary_key": 1,
+                    },
+                ],
+                [
+                    {
+                        "name": "events_parent_fkey",
+                        "column_name": "parent_id",
+                        "ref_table": "analytics.parent",
+                        "ref_column": "id",
+                        "on_delete": "NO ACTION",
+                    },
+                ],
+            ],
+        )
         inspector.connection = catalog
         columns, indexes, keys = await inspector._serverDetails("analytics.events")
         self.assertTrue(columns[0]["primary"])

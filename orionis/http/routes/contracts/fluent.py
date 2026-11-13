@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
     from orionis.http.routes.types import MiddlewareInput
 
+
 class IFluentRoute(ABC):
     """Define the contract for fluent route implementations."""
 
@@ -81,6 +82,7 @@ class IFluentRoute(ABC):
         TypeError
             If enabled is not a boolean.
         """
+
     @abstractmethod
     def middleware(
         self,

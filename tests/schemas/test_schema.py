@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Annotated, get_args, get_origin
@@ -16,48 +18,60 @@ from orionis.test import TestCase
 # Schema fixtures
 # ---------------------------------------------------------------------------
 
+
 class _BasicSchema(Schema):
     name: str
     age: int
+
 
 class _DefaultSchema(Schema):
     label: str = "default"
     count: int = 0
 
+
 class _AnnotatedSchema(Schema):
     score: Annotated[int, GreaterThan(0)]
+
 
 class _WithDocMetaSchema(Schema):
     name: Annotated[str, Title("Full name"), Description("The person's full name.")]
 
+
 class _RuleSchema(Schema):
     password: Annotated[str, StrongPassword()]
+
 
 class _MultiAnnotationSchema(Schema):
     token: Annotated[str, MinLength(4), Message("Token too short.")]
 
+
 class _NestedChild(Schema):
     city: str
+
 
 class _ParentWithNested(Schema):
     child: _NestedChild
     count: int
 
+
 class _ValueSchema(Schema):
     value: object
+
 
 class _PlainStruct(msgspec.Struct, rename="camel", tag="location", omit_defaults=True):
     city_name: str
     country_code: str = "PE"
 
+
 class _FieldlessSchema(Schema):
     pass
+
 
 class _DoubleMessageSchema(Schema):
     code: Annotated[str, Message("First message."), Message("Second message.")]
 
-class TestSchemaMeta(TestCase):
 
+class TestSchemaMeta(TestCase):
     def testSchemaSubclassUsesSchemaMeta(self) -> None:
         """Confirm that Schema subclasses have SchemaMeta as their metaclass.
 
@@ -67,35 +81,9 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(_BasicSchema, SchemaMeta)
-
-    def testOrionisMataAttached(self) -> None:
-        """Confirm __orionis_meta__ is attached to Schema subclasses.
-
-        Validates that the SchemaMeta pipeline populates __orionis_meta__
-        on the finished class.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertTrue(hasattr(_BasicSchema, "__orionis_meta__"))
-
-    def testOrionisConstraintsAttached(self) -> None:
-        """Confirm __orionis_constraints__ is attached to Schema subclasses.
-
-        Validates that the SchemaMeta pipeline populates
-        __orionis_constraints__ on the finished class.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertTrue(hasattr(_BasicSchema, "__orionis_constraints__"))
 
     def testSimpleSchemaHasNoOrionisMetaEntries(self) -> None:
         """Confirm plain Schema fields produce an empty __orionis_meta__.
@@ -106,9 +94,10 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_BasicSchema.__orionis_meta__, {})
+        self.assertEqual(_BasicSchema.__orionis_constraints__, {})
 
     def testAnnotatedConstraintIsEnforced(self) -> None:
         """Confirm Annotated constraints are enforced during schema validation.
@@ -120,7 +109,7 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(msgspec.ValidationError):
             msgspec.convert({"score": -1}, type=_AnnotatedSchema)
@@ -135,7 +124,7 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         fields = {f.name: f for f in msgspec.structs.fields(_WithDocMetaSchema)}
         self.assertIn("name", fields)
@@ -157,7 +146,7 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _BasicSchema(name="Alice", age=30)
         self.assertIsInstance(instance, msgspec.Struct)
@@ -171,7 +160,7 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _DefaultSchema()
         self.assertEqual(instance.label, "default")
@@ -186,7 +175,7 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _RuleSchema.__orionis_meta__
         self.assertIn("password", meta)
@@ -203,7 +192,7 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         constraints = _MultiAnnotationSchema.__orionis_constraints__
         self.assertIn("token", constraints)
@@ -219,7 +208,7 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(hasattr(_ParentWithNested, "__orionis_meta__"))
         self.assertTrue(hasattr(_ParentWithNested, "__orionis_constraints__"))
@@ -233,7 +222,7 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_FieldlessSchema.__orionis_meta__, {})
         self.assertEqual(_FieldlessSchema.__orionis_constraints__, {})
@@ -247,13 +236,13 @@ class TestSchemaMeta(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         constraints = _DoubleMessageSchema.__orionis_constraints__
         self.assertEqual(constraints["code"]["type"], "First message.")
 
-class TestSchemaInstantiation(TestCase):
 
+class TestSchemaInstantiation(TestCase):
     def testDirectInstantiationWithKeywordArguments(self) -> None:
         """Instantiate a Schema directly with keyword arguments.
 
@@ -263,7 +252,7 @@ class TestSchemaInstantiation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _BasicSchema(name="Carol", age=28)
         self.assertEqual(instance.name, "Carol")
@@ -278,14 +267,14 @@ class TestSchemaInstantiation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _DefaultSchema(label="custom", count=5)
         self.assertEqual(instance.label, "custom")
         self.assertEqual(instance.count, 5)
 
-class TestSchemaInvalidCustomRule(TestCase):
 
+class TestSchemaInvalidCustomRule(TestCase):
     def testUnsupportedMetadataObjectRaisesTypeError(self) -> None:
         """Raise TypeError when an unsupported metadata object is used in Annotated.
 
@@ -296,7 +285,7 @@ class TestSchemaInvalidCustomRule(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _BadMeta:
@@ -307,8 +296,8 @@ class TestSchemaInvalidCustomRule(TestCase):
             class _BadSchema(Schema):
                 field: Annotated[str, _BadMeta()]
 
-class TestSchemaToDict(TestCase):
 
+class TestSchemaToDict(TestCase):
     def testToDictReturnsEveryField(self) -> None:
         """Convert a schema instance into a plain dictionary.
 
@@ -317,7 +306,7 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = _BasicSchema(name="Alice", age=30).toDict()
         self.assertEqual(result, {"name": "Alice", "age": 30})
@@ -330,7 +319,7 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_DefaultSchema().toDict(), {"label": "default", "count": 0})
 
@@ -342,7 +331,7 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = _ParentWithNested(child=_NestedChild(city="Lima"), count=1)
         self.assertEqual(
@@ -357,7 +346,7 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assert recursive conversion across multiple schema levels.
+            No return value.
         """
         instance = _ValueSchema(
             value=_ParentWithNested(child=_NestedChild(city="Lima"), count=1),
@@ -374,7 +363,7 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assert preservation of Python field names and default values.
+            No return value.
         """
         instance = _ValueSchema(value=_PlainStruct(city_name="Lima"))
         self.assertEqual(
@@ -389,7 +378,7 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assert conversion within containers without changing types or keys.
+            No return value.
         """
         child = _NestedChild(city="Lima")
         plain = _PlainStruct(city_name="Paris", country_code="FR")
@@ -425,7 +414,7 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assert preservation of scalar and unsupported object values.
+            No return value.
         """
         values = (
             None,
@@ -450,7 +439,7 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assert source ownership and independent converted containers.
+            No return value.
         """
         child = _NestedChild(city="Lima")
         source = {"children": [child]}
@@ -475,6 +464,6 @@ class TestSchemaToDict(TestCase):
         Returns
         -------
         None
-            Assert an empty dictionary for a fieldless schema.
+            No return value.
         """
         self.assertEqual(_FieldlessSchema().toDict(), {})

@@ -1,12 +1,14 @@
+# ruff: noqa: ANN401, TC003
+# Preserve dynamically registered provider results and runtime annotations.
 """Generate fake data with optional and unique value constraints."""
 
 from functools import lru_cache
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from random import Random
+from collections.abc import Callable
+from random import Random
+
 
 def _camel_case(name: str) -> str:
     """Normalize a provider method while retaining its original word casing.
@@ -25,6 +27,7 @@ def _camel_case(name: str) -> str:
         return name
     first, *rest = name.split("_")
     return first + "".join(word[:1].upper() + word[1:] for word in rest)
+
 
 @lru_cache(maxsize=128)
 def _provider_aliases(names: tuple[str, ...]) -> MappingProxyType[str, str]:
@@ -50,6 +53,7 @@ def _provider_aliases(names: tuple[str, ...]) -> MappingProxyType[str, str]:
             aliases[alias] = name
     return MappingProxyType(aliases)
 
+
 class _ProviderState:
     """Retain the random generator and locale state for fake-data providers."""
 
@@ -67,7 +71,7 @@ class _ProviderState:
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         self.backend: Any = backend
         """Instance-local data generator."""
@@ -82,11 +86,12 @@ class _ProviderState:
         Returns
         -------
         None
-            Replace the immutable name table and advance this instance's revision.
+            No return value.
         """
         self.aliases = _provider_aliases(tuple(dir(self.backend)))
         """Aliases produced by ``_provider_aliases``."""
         self.revision += 1
+
 
 class _ProviderView:
     """Expose fake-data provider methods through a configured view."""
@@ -108,7 +113,7 @@ class _ProviderView:
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         self._backend: Any = backend
         """Backend object dispatching this view's calls."""
@@ -119,7 +124,7 @@ class _ProviderView:
         self._cache: dict[str, Callable[..., Any]] = {}
         """Cache policy or cached state used by this component."""
 
-    def __getattr__(self, name: str) -> Any:  # noqa: ANN401
+    def __getattr__(self, name: str) -> Any:
         """
         Return a bound camelCase provider method.
 
@@ -166,11 +171,13 @@ class _ProviderView:
             Public facade members and callable provider aliases.
         """
         methods = {
-            alias for alias, name in self._state.aliases.items()
+            alias
+            for alias, name in self._state.aliases.items()
             if callable(getattr(self._state.backend, name))
         }
         methods.update(name for name in super().__dir__() if "_" not in name)
         return sorted(methods)
+
 
 class UniqueFake(_ProviderView):
     """Generate fake values while tracking and rejecting duplicates."""
@@ -185,7 +192,7 @@ class UniqueFake(_ProviderView):
         Returns
         -------
         None
-            Previously generated values become eligible for reuse.
+            No return value.
         """
         self._backend.clear()
 
@@ -201,7 +208,8 @@ class UniqueFake(_ProviderView):
         Returns
         -------
         orionis.orm.factories.UniqueFake
-            View sharing the backend's unique pool and dispatch lifecycle.
+            View initially sharing the backend's uniqueness history. Clearing a
+            view starts an independent history for that view, matching Faker.
         """
         return UniqueFake(self._backend.exclude_types(types), self._state)
 
@@ -221,11 +229,13 @@ class UniqueFake(_ProviderView):
         """
         return UniqueFake(self._backend[locale], self._state)
 
+
 class OptionalFake(_ProviderView):
     """Generate optional fake values according to a configured probability."""
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
+
 
 class Fake(_ProviderView):
     """Generate fake values through the configured data providers."""
@@ -244,7 +254,7 @@ class Fake(_ProviderView):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         super().__init__(backend, _ProviderState(backend))
         self._unique: UniqueFake | None = None
@@ -334,7 +344,7 @@ class Fake(_ProviderView):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         self._backend.add_provider(provider)
         self._state.refresh()
@@ -350,7 +360,7 @@ class Fake(_ProviderView):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         self._backend.seed_instance(seed)
 
@@ -367,7 +377,7 @@ class Fake(_ProviderView):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         self._backend.seed_locale(locale, seed)
 
@@ -408,7 +418,7 @@ class Fake(_ProviderView):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         if not name.isidentifier() or "_" in name or name == "seed":
             error_msg = "Formatter names must be public camelCase identifiers."
@@ -423,9 +433,9 @@ class Fake(_ProviderView):
     def format(
         self,
         formatter: str,
-        *args: Any,  # noqa: ANN401
-        **kwargs: Any,  # noqa: ANN401
-    ) -> Any:  # noqa: ANN401
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
         """
         Generate a value from a named camelCase formatter.
 

@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PLR2004, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Verify that failure observation begins after successful runtime startup."""
 
 import asyncio
@@ -7,7 +9,11 @@ from orionis.aio.loop import Loop
 from orionis.container.context.manager import ScopeManager
 from orionis.failure.entities.handling import FailureHandling
 from orionis.failure.runtime import (
-    FailureRuntime, capture, capture_nowait, current_operation, operation,
+    FailureRuntime,
+    capture,
+    capture_nowait,
+    current_operation,
+    operation,
 )
 from orionis.foundation.application import _await_http_tasks
 from orionis.foundation.enums.lifespan import Lifespan
@@ -109,9 +115,12 @@ class TestFailureLifecycle(TestCase):
         secondary = OSError("send")
         app._Application__onStartup = AsyncMock()
         app._Application__onShutdown = AsyncMock(side_effect=primary)
-        receive = AsyncMock(side_effect=[
-            {"type": "lifespan.startup"}, {"type": "lifespan.shutdown"},
-        ])
+        receive = AsyncMock(
+            side_effect=[
+                {"type": "lifespan.startup"},
+                {"type": "lifespan.shutdown"},
+            ],
+        )
         send = AsyncMock(side_effect=[None, secondary])
         with self.assertRaises(ValueError) as caught:
             await app({"type": "lifespan"}, receive, send)
@@ -119,7 +128,8 @@ class TestFailureLifecycle(TestCase):
         self.assertEqual([error for error, _ in handler.events], [primary, secondary])
         self.assertEqual(handler.reports, [primary, secondary])
         self.assertEqual(
-            handler.events[1][1].parent_event_id, handler.events[0][1].event_id,
+            handler.events[1][1].parent_event_id,
+            handler.events[0][1].event_id,
         )
         self.assertEqual(send.await_count, 2)
         self.assertFalse(app._failure_runtime.active)
@@ -205,7 +215,8 @@ class TestFailureLifecycle(TestCase):
         self.assertIs(secondary.__context__, primary)
         self.assertEqual([error for error, _ in handler.events], [primary, secondary])
         self.assertEqual(
-            handler.events[1][1].parent_event_id, handler.events[0][1].event_id,
+            handler.events[1][1].parent_event_id,
+            handler.events[0][1].event_id,
         )
 
     async def testConcurrentFirstRequestsWaitForHandlerPreparation(self) -> None:
@@ -290,7 +301,8 @@ class TestFailureLifecycle(TestCase):
         self.assertIs(caught.exception, primary)
         self.assertEqual([error for error, _ in handler.events], [primary, secondary])
         self.assertEqual(
-            handler.events[1][1].parent_event_id, handler.events[0][1].event_id,
+            handler.events[1][1].parent_event_id,
+            handler.events[0][1].event_id,
         )
 
     async def testCommandFailureSurvivesShutdownFailure(self) -> None:
@@ -311,7 +323,8 @@ class TestFailureLifecycle(TestCase):
         self.assertEqual([error for error, _ in handler.events], [primary, secondary])
         self.assertEqual(handler.reports, [primary, secondary])
         self.assertEqual(
-            handler.events[1][1].parent_event_id, handler.events[0][1].event_id,
+            handler.events[1][1].parent_event_id,
+            handler.events[0][1].event_id,
         )
         self.assertFalse(app._failure_runtime.active)
 
@@ -367,9 +380,13 @@ class TestFailureLifecycle(TestCase):
         secondary = OSError("cleanup")
         with operation(app, flow="worker", operation="import", isolated=True):
             receipt = await capture(primary)
-            await asyncio.create_task(capture(
-                secondary, phase="cleanup", parent_event_id=receipt.event_id,
-            ))
+            await asyncio.create_task(
+                capture(
+                    secondary,
+                    phase="cleanup",
+                    parent_event_id=receipt.event_id,
+                ),
+            )
         self.assertIsNone(secondary.__cause__)
         self.assertIsNone(secondary.__context__)
         self.assertEqual([error for error, _ in handler.events], [primary, secondary])
@@ -474,7 +491,9 @@ class TestFailureLifecycle(TestCase):
         app._Application__booted = True
         app._Application__exception_handler_resolved = RecordingHandler
         with patch.object(
-            app, "build", AsyncMock(return_value=RecordingHandler()),
+            app,
+            "build",
+            AsyncMock(return_value=RecordingHandler()),
         ) as build:
             resolved = await asyncio.gather(
                 *(app.getExceptionHandler() for _ in range(8)),
@@ -675,7 +694,8 @@ class TestFailureLifecycle(TestCase):
         app._Application__kernel_cli = command
         with patch.object(app._failure_runtime, "drain", drain):
             results = await asyncio.gather(
-                app.handleCommand(["first"]), app.handleCommand(["second"]),
+                app.handleCommand(["first"]),
+                app.handleCommand(["second"]),
             )
         self.assertEqual(results, [0, 0])
         logger.aclose.assert_awaited_once()

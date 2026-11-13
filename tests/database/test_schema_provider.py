@@ -1,9 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.database.contracts.schema import ISchema
 from orionis.database.schema.schema import Schema
 from orionis.database.schema_provider import SchemaProvider
 from orionis.test import TestCase
+
 
 class _CaptureApp:
     """Application stub capturing transient and singleton registrations."""
@@ -14,7 +17,7 @@ class _CaptureApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.transient_bindings: list[tuple[type, type]] = []
         self.singleton_bindings: list[tuple[type, type]] = []
@@ -32,7 +35,7 @@ class _CaptureApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.transient_bindings.append((contract, implementation))
 
@@ -49,12 +52,12 @@ class _CaptureApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.singleton_bindings.append((contract, implementation))
 
-class TestSchemaProvider(TestCase):
 
+class TestSchemaProvider(TestCase):
     def testProviderInheritsFrameworkBase(self) -> None:
         """Extend the framework ServiceProvider base.
 
@@ -63,7 +66,7 @@ class TestSchemaProvider(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(SchemaProvider, ServiceProvider))
 
@@ -76,27 +79,12 @@ class TestSchemaProvider(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _CaptureApp()
         provider = SchemaProvider(app)  # type: ignore[arg-type]
         provider.register()
         self.assertEqual(app.transient_bindings, [(ISchema, Schema)])
-
-    def testRegisterNeverBindsSchemaAsSingleton(self) -> None:
-        """Avoid registering Schema with a singleton lifetime.
-
-        Validates that a shared instance is never accidentally reused
-        across independent schema-building calls.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        app = _CaptureApp()
-        provider = SchemaProvider(app)  # type: ignore[arg-type]
-        provider.register()
         self.assertEqual(app.singleton_bindings, [])
 
     async def testBootIsANoOpInheritedFromTheBase(self) -> None:
@@ -108,7 +96,7 @@ class TestSchemaProvider(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _CaptureApp()
         provider = SchemaProvider(app)  # type: ignore[arg-type]
@@ -116,3 +104,4 @@ class TestSchemaProvider(TestCase):
         result = await provider.boot()
         self.assertIsNone(result)
         self.assertEqual(app.transient_bindings, [(ISchema, Schema)])
+        self.assertEqual(app.singleton_bindings, [])

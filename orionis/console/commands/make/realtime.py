@@ -5,6 +5,7 @@ Includes ``MakeRealtimeSocket``, ``MakeRealtimeHub``.
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeRealtimeSocket(MakeStubCommand):
     """Generate an invokable realtime WebSocket handler."""
 
@@ -22,6 +23,7 @@ class MakeRealtimeSocket(MakeStubCommand):
     """Success label identifier: ``Realtime socket``."""
     postfix: str | None = "Socket"
     """Postfix identifier: ``Socket``."""
+
 
 class MakeRealtimeHub(MakeStubCommand):
     """Generate a realtime hub with a typed remote operation."""

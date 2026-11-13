@@ -8,13 +8,18 @@ Streaming avoids assembling an entire body in memory and delivers results as the
 import asyncio
 from orionis.http import response
 
+
 async def export_rows():
     yield b"id,name\n"
     yield b"1,Ada\n"
 
+
 async def example():
     result = response.stream(export_rows(), media_type="text/csv")
-    assert b"".join([chunk async for chunk in result.getStream()]) == b"id,name\n1,Ada\n"
+    assert (
+        b"".join([chunk async for chunk in result.getStream()]) == b"id,name\n1,Ada\n"
+    )
+
 
 asyncio.run(example())
 ```
@@ -26,12 +31,15 @@ asyncio.run(example())
 ```python
 from orionis.http import ServerSentEvent, response
 
+
 async def progress_events():
     for step in range(3):
         yield ServerSentEvent(event="progress", id=str(step), data=str(step))
 
+
 async def progress():
     return response.eventStream(progress_events())
+
 
 frame = ServerSentEvent(event="progress", id="7", retry=1500, data="ready").encode()
 assert b"event: progress\n" in frame
@@ -45,6 +53,10 @@ An `id` identifies an event; this module neither stores events nor automatically
 ## Cancellation and closing
 
 Consumption is lazy and follows delivery pace. Use `try/finally` in producers that open cursors, files or subscriptions. Adapter tests cover disconnects, cancellation and iterator closure. Do not suppress `CancelledError` while leaving a producer running. Cleanup through `aclose()`, when provided, must finish before releasing the scope.
+
+HEAD does not advance a response stream, but still invokes its available `aclose()`. If admission of an SSE sender or disconnect watcher fails, unscheduled coroutines are closed and any admitted sender is cancelled and joined before the failure propagates.
+
+A synchronous source transfers its iterator cleanup to the response wrapper as well. Its close hook runs on exhaustion, failed delivery or HEAD, including when the wrapper has never been iterated.
 
 `HTTP_MONITOR_DISCONNECTS` controls additional monitoring for ordinary HTTP requests; SSE/WebSocket and endpoint policies may use their own mechanisms. Verify your adapter and deployment settings. A proxy can still buffer output even when the application yields chunks; test the entire path.
 

@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401, SLF001
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Adapt a Granian RSGI scope to the transport adapter contract."""
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ if TYPE_CHECKING:
 _MISSING: Any = object()
 """Sentinel that marks per-request lazy fields as "not yet resolved"."""
 
+
 class RSGITransportAdapter(TransportAdapter):
     """
     Adapt a Granian RSGI scope to the transport adapter contract.
@@ -22,8 +25,6 @@ class RSGITransportAdapter(TransportAdapter):
     None
         This class exposes request data accessors and state overrides.
     """
-
-    # ruff: noqa: ANN401
 
     # Store scope data, request state, and resolved fields.
     __slots__ = (
@@ -143,7 +144,7 @@ class RSGITransportAdapter(TransportAdapter):
         orionis.http.payload.estructures.headers.Headers
             Return parsed headers as lowercase name/value pairs.
         """
-        return Headers._fromRSGI(self.__scope.headers)  # noqa: SLF001
+        return Headers._fromRSGI(self.__scope.headers)
 
     def client(self: Self) -> str | None:
         """

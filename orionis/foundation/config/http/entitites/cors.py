@@ -18,6 +18,7 @@ _ALLOWED_HTTP_METHODS: frozenset[str] = frozenset(
 )
 """Module-level frozenset: avoids recreating the set per __validateAllowMethods call."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Cors(BaseEntity):
     """

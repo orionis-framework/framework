@@ -1,3 +1,5 @@
+# ruff: noqa: C901
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Provide console commands bootstrap operations.
 
 Includes ``BootstrapEditError``, ``BootstrapEditor``.
@@ -25,8 +27,10 @@ _REPLACE_BACKOFF_SECONDS = 0.005
 _WINDOWS_REPLACE_ERRORS = frozenset({5, 32, 33})
 """Access denied, sharing violation, and lock violation."""
 
+
 class BootstrapEditError(ValueError):
     """A bootstrap cannot be updated without guessing about application flow."""
+
 
 class BootstrapEditor:
     """Plan surgical Python edits and publish them without clobbering changes.
@@ -34,8 +38,6 @@ class BootstrapEditor:
     The editor deliberately does not execute user code. Unsupported or ambiguous
     construction flows fail before any file is changed.
     """
-
-    # ruff: noqa:C901
 
     def __init__(self, path: Path, base_path: Path) -> None:
         """
@@ -89,7 +91,8 @@ class BootstrapEditor:
         self.scope = self._parents[self.assignment]
         """Dependency-injection scope associated with the current operation."""
         if not isinstance(
-            self.scope, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef),
+            self.scope,
+            (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef),
         ):
             error_msg = (
                 f"Conditional Application construction in {self.path} "
@@ -133,7 +136,9 @@ class BootstrapEditor:
 
     @staticmethod
     def _isConstructor(
-        node: ast.AST, constructors: set[str], modules: set[str],
+        node: ast.AST,
+        constructors: set[str],
+        modules: set[str],
     ) -> bool:
         """
         Identify an application constructor beneath chained builder calls.
@@ -378,7 +383,8 @@ class BootstrapEditor:
             if self._rootName(node) == self.app_name or node in initializer_nodes:
                 statement = self._statement(node)
                 if not isinstance(
-                    statement, (ast.Expr, ast.Assign, ast.AnnAssign, ast.Return),
+                    statement,
+                    (ast.Expr, ast.Assign, ast.AnnAssign, ast.Return),
                 ):
                     error_msg = (
                         f"Conditional {method}() in {self.path} "
@@ -583,7 +589,11 @@ class BootstrapEditor:
         return start, start, content + self.newline
 
     def _after(
-        self, statement: ast.stmt, lines: list[str], *, separate: bool = True,
+        self,
+        statement: ast.stmt,
+        lines: list[str],
+        *,
+        separate: bool = True,
     ) -> tuple[int, int, str]:
         """
         Plan an insertion after a standalone statement.
@@ -642,7 +652,8 @@ class BootstrapEditor:
         """
         # Append within the same scope while retaining existing import groups.
         imports = [
-            node for node in self.body
+            node
+            for node in self.body
             if isinstance(node, (ast.Import, ast.ImportFrom))
             and node.end_lineno < self.assignment.lineno
         ]
@@ -658,7 +669,7 @@ class BootstrapEditor:
             start = end = self._offsets[self.assignment.lineno - 1]
         return start, end, content
 
-    def _registration(self, lines: list[str]) -> list[tuple[int, int, str]]: # NOSONAR
+    def _registration(self, lines: list[str]) -> list[tuple[int, int, str]]:  # NOSONAR
         """
         Plan registration before application initialization or factory return.
 
@@ -708,7 +719,8 @@ class BootstrapEditor:
                 return [
                     (suffix_start, suffix_end, ""),
                     self._after(
-                        statement, [*lines, f"{self.app_name}.{create.func.attr}()"],
+                        statement,
+                        [*lines, f"{self.app_name}.{create.func.attr}()"],
                     ),
                 ]
             return [self._before(statement, lines)]
@@ -721,7 +733,11 @@ class BootstrapEditor:
         return [self._after(self.assignment, lines)]
 
     def routing(
-        self, context: str, route_path: Path | list[Path], *, registered: bool = False,
+        self,
+        context: str,
+        route_path: Path | list[Path],
+        *,
+        registered: bool = False,
     ) -> str | None:
         """
         Register a missing route context while preserving other arguments.
@@ -797,19 +813,23 @@ class BootstrapEditor:
         """
         # Check later helper invocations that can overwrite direct routing.
         helpers = {
-            node.name: node for node in [*self.tree.body, *self.body]
+            node.name: node
+            for node in [*self.tree.body, *self.body]
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
         }
         boundary = self._end(routing or self.assignment)
         for node in self._nodes:
             if not (
-                isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
-                and node.func.id in helpers and self._end(node) > boundary
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id in helpers
+                and self._end(node) > boundary
             ):
                 continue
             helper = helpers[node.func.id]
             if isinstance(helper, ast.AsyncFunctionDef) and not isinstance(
-                self._parents.get(node), ast.Await,
+                self._parents.get(node),
+                ast.Await,
             ):
                 continue
             parameters = self._helperApplicationParameters(helper, node)
@@ -822,7 +842,9 @@ class BootstrapEditor:
                 raise BootstrapEditError(error_msg)
 
     def _helperApplicationParameters(
-        self, helper: ast.FunctionDef | ast.AsyncFunctionDef, call: ast.Call,
+        self,
+        helper: ast.FunctionDef | ast.AsyncFunctionDef,
+        call: ast.Call,
     ) -> set[str]:
         """
         Identify helper names that can reference the selected application.
@@ -849,14 +871,16 @@ class BootstrapEditor:
                 parameters.add(parameter.arg)
         named = {arg.arg for arg in [*helper.args.args, *helper.args.kwonlyargs]}
         parameters.update(
-            keyword.arg for keyword in call.keywords
+            keyword.arg
+            for keyword in call.keywords
             if keyword.arg in named and self._rootName(keyword.value) == self.app_name
         )
         # A local helper can also close over the application without receiving
         # an explicit argument. Module helpers cannot capture a factory local.
         arguments = {arg.arg for arg in [*positional, *helper.args.kwonlyargs]}
         local_bindings = {
-            node.id for node in self._scopeNodes(helper)
+            node.id
+            for node in self._scopeNodes(helper)
             if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store)
         }
         if (
@@ -867,11 +891,10 @@ class BootstrapEditor:
         return parameters
 
     def _helperReplacesRouting(
-        self, helper: ast.FunctionDef | ast.AsyncFunctionDef, parameters: set[str],
+        self,
+        helper: ast.FunctionDef | ast.AsyncFunctionDef,
+        parameters: set[str],
     ) -> bool:
-        # A supplied parameter can still reference the original application
-        # after an alias assignment or a conditional rebind. Treat its routing
-        # mutations as unsafe instead of assuming that rebinding isolates it.
         """
         Detect routing mutations through helper parameters or closures.
 
@@ -887,15 +910,33 @@ class BootstrapEditor:
         bool
             Return whether the helper can replace application routing.
         """
-        # Retain aliases that may reference the application after rebinding.
+        nodes = list(self._scopeNodes(helper))
+        aliases = set(parameters)
+        # Keep possible aliases across branches and repeated loop iterations.
+        while True:
+            previous_size = len(aliases)
+            for node in nodes:
+                if isinstance(node, ast.Assign):
+                    targets = node.targets
+                elif isinstance(node, ast.AnnAssign):
+                    targets = [node.target]
+                else:
+                    continue
+                if self._rootName(node.value) in aliases:
+                    aliases.update(
+                        target.id for target in targets if isinstance(target, ast.Name)
+                    )
+            if len(aliases) == previous_size:
+                break
         return any(
-            isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
             and node.func.attr == "withRouting"
-            and self._rootName(node) in parameters
-            for node in self._scopeNodes(helper)
+            and self._rootName(node) in aliases
+            for node in nodes
         )
 
-    def _appendKeyword( # NOSONAR
+    def _appendKeyword(  # NOSONAR
         self,
         call: ast.Call,
         context: str,
@@ -993,7 +1034,7 @@ class BootstrapEditor:
                         f"Cannot locate the routing argument boundary in {self.path}."
                     )
                     raise BootstrapEditError(error_msg)
-                line_offset = sum(map(len, tail_lines[:token.end[0] - 1]))
+                line_offset = sum(map(len, tail_lines[: token.end[0] - 1]))
                 end = start + line_offset + token.end[1]
         except tokenize.TokenError:
             # The suffix can contain closing parentheses whose opening tokens
@@ -1045,9 +1086,7 @@ class BootstrapEditor:
         try:
             relative = resolved.relative_to(self.base_path).with_suffix("")
         except ValueError as exc:
-            error_msg = (
-                f"Lifespan module {resolved} is outside the application import root."
-            )
+            error_msg = f"Lifespan module {resolved} is outside the application root."
             raise BootstrapEditError(error_msg) from exc
         if not all(part.isidentifier() for part in relative.parts):
             error_msg = f"Lifespan module {relative} is not a valid Python module path."
@@ -1077,7 +1116,8 @@ class BootstrapEditor:
         return self._edited(edits)
 
     def _lifespanBindings(  # NOSONAR
-        self, module: str,
+        self,
+        module: str,
     ) -> tuple[set[str], set[str], set[str]]:
         """
         Recognize visible direct and module imports for lifespan callbacks.
@@ -1164,9 +1204,17 @@ class BootstrapEditor:
                 and node.func.attr == "register_lifespan_callbacks"
             ):
                 callback = ast.unparse(node.func.value) in modules
-            argument = node.args[0] if node.args else next(
-                (keyword.value for keyword in node.keywords if keyword.arg == "app"),
-                None,
+            argument = (
+                node.args[0]
+                if node.args
+                else next(
+                    (
+                        keyword.value
+                        for keyword in node.keywords
+                        if keyword.arg == "app"
+                    ),
+                    None,
+                )
             )
             if callback and self._rootName(argument) == self.app_name:
                 statement = self._statement(node)
@@ -1286,7 +1334,9 @@ class BootstrapEditor:
         temporary = None
         try:
             with tempfile.NamedTemporaryFile(
-                dir=self.path.parent, prefix=".bootstrap-", delete=False,
+                dir=self.path.parent,
+                prefix=".bootstrap-",
+                delete=False,
             ) as handle:
                 temporary = Path(handle.name)
                 handle.write(content)
@@ -1303,12 +1353,11 @@ class BootstrapEditor:
                 try:
                     temporary.replace(self.path)
                 except PermissionError as error:
-                    if (
-                        getattr(error, "winerror", None) not in _WINDOWS_REPLACE_ERRORS
-                        or attempt == _REPLACE_ATTEMPTS - 1
-                    ):
+                    winerror = getattr(error, "winerror", None)
+                    retryable = winerror in _WINDOWS_REPLACE_ERRORS
+                    if not retryable or attempt == _REPLACE_ATTEMPTS - 1:
                         raise
-                    sleep(_REPLACE_BACKOFF_SECONDS * (1 << attempt))
+                    sleep(_REPLACE_BACKOFF_SECONDS * 2**attempt)
                 else:
                     break
             return True

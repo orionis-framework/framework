@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401, TC003
+# Retain runtime annotations and dynamic attribute values.
 """Provide orm operations.
 
 Includes ``snake_case``, ``pluralize``, ``ModelMetadata``, ``ModelMeta``.
@@ -7,14 +9,12 @@ from __future__ import annotations
 import re
 from copy import copy
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
-from orionis.orm.attributes import get_cast_handler
+from collections.abc import Callable
+from typing import Any
+from orionis.orm import attributes as attributes_module
 from orionis.orm.exceptions import OrmConfigurationException
 from orionis.orm.schema.column import ColumnDefinition
 from orionis.orm.schema.table import TableDefinition
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 # Pattern splitting CamelCase words for snake_case conversion.
 _CAMEL_BOUNDARY = re.compile(r"(?<!^)(?=[A-Z])")
@@ -61,86 +61,89 @@ MODEL_EVENTS: tuple[str, ...] = (
 """Lifecycle events a model can dispatch."""
 
 # Builder entry points forwarded from the model class via the metaclass.
-_FORWARDED_BUILDER_METHODS: frozenset[str] = frozenset({
-    "addSelect",
-    "avg",
-    "count",
-    "crossJoin",
-    "distinct",
-    "doesntExist",
-    "exists",
-    "forPage",
-    "fullJoin",
-    "get",
-    "groupBy",
-    "having",
-    "havingRaw",
-    "join",
-    "joinSub",
-    "latest",
-    "leftJoin",
-    "leftJoinSub",
-    "limit",
-    "load",
-    "lockForUpdate",
-    "max",
-    "min",
-    "offset",
-    "oldest",
-    "orHaving",
-    "orWhere",
-    "orWhereColumn",
-    "orWhereExists",
-    "orWhereIn",
-    "orWhereNotExists",
-    "orWhereNotIn",
-    "orWhereNotNull",
-    "orWhereNull",
-    "orWhereRaw",
-    "orderBy",
-    "paginate",
-    "pluck",
-    "rightJoin",
-    "rightJoinSub",
-    "scope",
-    "select",
-    "selectRaw",
-    "selectSub",
-    "sharedLock",
-    "skip",
-    "sum",
-    "take",
-    "toSql",
-    "union",
-    "unionAll",
-    "value",
-    "where",
-    "whereBetween",
-    "whereColumn",
-    "whereContains",
-    "whereEndsWith",
-    "whereExists",
-    "whereILike",
-    "whereIn",
-    "whereLike",
-    "whereNotBetween",
-    "whereNotExists",
-    "whereNotILike",
-    "whereNotIn",
-    "whereNotLike",
-    "whereNotNull",
-    "whereNull",
-    "whereRaw",
-    "whereRegexpMatch",
-    "whereStartsWith",
-    "withRelations",
-    "withTrashed",
-    "withoutGlobalScope",
-    "withoutGlobalScopes",
-    "withoutTrashed",
-    "onlyTrashed",
-})
+_FORWARDED_BUILDER_METHODS: frozenset[str] = frozenset(
+    {
+        "addSelect",
+        "avg",
+        "count",
+        "crossJoin",
+        "distinct",
+        "doesntExist",
+        "exists",
+        "forPage",
+        "fullJoin",
+        "get",
+        "groupBy",
+        "having",
+        "havingRaw",
+        "join",
+        "joinSub",
+        "latest",
+        "leftJoin",
+        "leftJoinSub",
+        "limit",
+        "load",
+        "lockForUpdate",
+        "max",
+        "min",
+        "offset",
+        "oldest",
+        "orHaving",
+        "orWhere",
+        "orWhereColumn",
+        "orWhereExists",
+        "orWhereIn",
+        "orWhereNotExists",
+        "orWhereNotIn",
+        "orWhereNotNull",
+        "orWhereNull",
+        "orWhereRaw",
+        "orderBy",
+        "paginate",
+        "pluck",
+        "rightJoin",
+        "rightJoinSub",
+        "scope",
+        "select",
+        "selectRaw",
+        "selectSub",
+        "sharedLock",
+        "skip",
+        "sum",
+        "take",
+        "toSql",
+        "union",
+        "unionAll",
+        "value",
+        "where",
+        "whereBetween",
+        "whereColumn",
+        "whereContains",
+        "whereEndsWith",
+        "whereExists",
+        "whereILike",
+        "whereIn",
+        "whereLike",
+        "whereNotBetween",
+        "whereNotExists",
+        "whereNotILike",
+        "whereNotIn",
+        "whereNotLike",
+        "whereNotNull",
+        "whereNull",
+        "whereRaw",
+        "whereRegexpMatch",
+        "whereStartsWith",
+        "withRelations",
+        "withTrashed",
+        "withoutGlobalScope",
+        "withoutGlobalScopes",
+        "withoutTrashed",
+        "onlyTrashed",
+    },
+)
 """Builder entry points forwarded from the model class via the metaclass."""
+
 
 def snake_case(name: str) -> str:
     """
@@ -160,6 +163,7 @@ def snake_case(name: str) -> str:
         snake_case version of the name.
     """
     return _CAMEL_BOUNDARY.sub("_", name.lstrip("_")).lower()
+
 
 def pluralize(word: str) -> str:
     """
@@ -182,6 +186,7 @@ def pluralize(word: str) -> str:
     if word.endswith(_ES_SUFFIXES):
         return word + "es"
     return word + "s"
+
 
 @dataclass(slots=True, eq=False)
 class ModelMetadata:
@@ -305,6 +310,7 @@ class ModelMetadata:
                 attributes[key] = handler(value)
         return attributes
 
+
 class ModelMeta(type):
     """
     Metaclass discovering model columns and building their metadata.
@@ -315,12 +321,12 @@ class ModelMeta(type):
     table name and primary key, and precompiles cast handlers.
     """
 
-    def __new__( # NOSONAR
+    def __new__(
         mcs: type[ModelMeta],
         name: str,
         bases: tuple[type, ...],
         namespace: dict[str, Any],
-        **kwargs: Any,  # noqa: ANN401
+        **kwargs: Any,
     ) -> type:
         """
         Create the model class and attach its metadata.
@@ -362,17 +368,8 @@ class ModelMeta(type):
         # Timestamp columns are tracked only when actually declared.
         created = str(getattr(cls, "CREATED_AT", "created_at"))
         updated = str(getattr(cls, "UPDATED_AT", "updated_at"))
-        deleted = str(getattr(cls, "DELETED_AT", "deleted_at"))
         timestamps = bool(getattr(cls, "timestamps", True))
-        soft_deletes = bool(getattr(cls, "soft_deletes", False))
-        deleted_column = deleted if soft_deletes and deleted in columns else None
-
-        # A soft delete column must accept NULL to mark a live row.
-        if deleted_column is not None and not columns[deleted_column].is_nullable:
-            if getattr(cls, "table_definition", None) is not None:
-                error_msg = "The shared soft delete column must be nullable."
-                raise OrmConfigurationException(error_msg)
-            columns[deleted_column] = copy(columns[deleted_column]).nullable()
+        deleted_column = mcs._resolveDeletedColumn(cls, columns)
 
         cls.__meta__ = ModelMetadata(
             table_name=table.name,
@@ -381,7 +378,8 @@ class ModelMeta(type):
             primary_key=table.primary_key,
             casts=casts,
             cast_lookup={
-                key: get_cast_handler(cast) for key, cast in casts.items()
+                key: attributes_module.get_cast_handler(cast)
+                for key, cast in casts.items()
             },
             fillable=frozenset(getattr(cls, "fillable", ()) or ()),
             guarded=frozenset(getattr(cls, "guarded", ()) or ()),
@@ -402,7 +400,7 @@ class ModelMeta(type):
         )
         return cls
 
-    def __getattr__(cls, name: str) -> Any:  # noqa: ANN401
+    def __getattr__(cls, name: str) -> Any:
         """
         Forward chainable builder entry points from the model class.
 
@@ -433,9 +431,7 @@ class ModelMeta(type):
             name in _FORWARDED_BUILDER_METHODS or name in meta.scopes
         ):
             return getattr(cls.query(), name)
-        error_msg = (
-            f"type object '{cls.__name__}' has no attribute '{name}'"
-        )
+        error_msg = f"type object '{cls.__name__}' has no attribute '{name}'"
         raise AttributeError(error_msg)
 
     # ── Discovery helpers ───────────────────────────────────────────────────
@@ -484,13 +480,49 @@ class ModelMeta(type):
             error_msg = "Declare columns in table_definition or on the model."
             raise OrmConfigurationException(error_msg)
         for key, expected in (
-            ("table", definition.name), ("primary_key", definition.primary_key),
+            ("table", definition.name),
+            ("primary_key", definition.primary_key),
         ):
             configured = getattr(owner, key, None)
             if configured is not None and configured != expected:
                 error_msg = f"Model.{key} conflicts with table_definition."
                 raise OrmConfigurationException(error_msg)
         return definition
+
+    @staticmethod
+    def _resolveDeletedColumn(
+        owner: type,
+        columns: dict[str, ColumnDefinition],
+    ) -> str | None:
+        """
+        Resolve a nullable delete column without modifying a shared schema.
+
+        Parameters
+        ----------
+        owner : type
+            Model class declaring its soft-delete policy.
+        columns : dict of str to ColumnDefinition
+            Bound columns belonging to the model's table.
+
+        Returns
+        -------
+        str or None
+            Declared delete column, or None when soft deletion is unavailable.
+
+        Raises
+        ------
+        OrmConfigurationException
+            If a shared schema declares a non-nullable delete column.
+        """
+        name = str(getattr(owner, "DELETED_AT", "deleted_at"))
+        if not getattr(owner, "soft_deletes", False) or name not in columns:
+            return None
+        if not columns[name].is_nullable:
+            if getattr(owner, "table_definition", None) is not None:
+                error_msg = "The shared soft delete column must be nullable."
+                raise OrmConfigurationException(error_msg)
+            columns[name] = copy(columns[name]).nullable()
+        return name
 
     @staticmethod
     def _collectPending(
@@ -523,8 +555,9 @@ class ModelMeta(type):
         # Register own columns and detach them from the class body.
         for key, value in namespace.items():
             if isinstance(value, ColumnDefinition):
-                value.name = key
-                pending[key] = value
+                bound = copy(value)
+                bound.name = key
+                pending[key] = bound
                 delattr(owner, key)
 
         return pending
@@ -567,8 +600,9 @@ class ModelMeta(type):
         # Register own columns and detach them from the class body.
         for key, value in namespace.items():
             if isinstance(value, ColumnDefinition):
-                value.name = key
-                columns[key] = value
+                bound = copy(value)
+                bound.name = key
+                columns[key] = bound
                 delattr(owner, key)
 
         return columns
@@ -631,7 +665,9 @@ class ModelMeta(type):
             Primary key column name.
         """
         declared = namespace.get("primary_key") or getattr(
-            owner, "primary_key", None,
+            owner,
+            "primary_key",
+            None,
         )
         if isinstance(declared, str) and declared.strip():
             return declared.strip()
@@ -725,7 +761,8 @@ class ModelMeta(type):
                 # Scopes are declared as classmethods/staticmethods, whose
                 # raw descriptors are not always callable themselves.
                 if not callable(value) and not isinstance(
-                    value, (classmethod, staticmethod),
+                    value,
+                    (classmethod, staticmethod),
                 ):
                     continue
                 entry = ModelMeta._behaviourEntry(name)

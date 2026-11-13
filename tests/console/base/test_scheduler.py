@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from unittest.mock import Mock
@@ -5,8 +7,8 @@ from orionis.console.base.contracts.scheduler import IBaseScheduler
 from orionis.console.base.scheduler import BaseScheduler
 from orionis.test import TestCase
 
-class TestBaseScheduler(TestCase):
 
+class TestBaseScheduler(TestCase):
     def setUp(self) -> None:
         """Set up test fixtures.
 
@@ -117,58 +119,6 @@ class TestBaseScheduler(TestCase):
             await self.scheduler.tasks(self.mock_schedule)
         error_message = str(context.exception)
         self.assertIn("Subclasses must implement the 'tasks' method", error_message)
-
-    async def testOnStartedMethodExecutesWithoutError(self) -> None:
-        """Verify that onStarted method executes without raising exceptions.
-
-        Tests that the base implementation of onStarted completes successfully
-        and doesn't raise any errors when called.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        await self.scheduler.onStarted(self.mock_event)
-
-    async def testOnPausedMethodExecutesWithoutError(self) -> None:
-        """Verify that onPaused method executes without raising exceptions.
-
-        Tests that the base implementation of onPaused completes successfully
-        and doesn't raise any errors when called.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        await self.scheduler.onPaused(self.mock_event)
-
-    async def testOnResumedMethodExecutesWithoutError(self) -> None:
-        """Verify that onResumed method executes without raising exceptions.
-
-        Tests that the base implementation of onResumed completes successfully
-        and doesn't raise any errors when called.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        await self.scheduler.onResumed(self.mock_event)
-
-    async def testOnShutdownMethodExecutesWithoutError(self) -> None:
-        """Verify that onShutdown method executes without raising exceptions.
-
-        Tests that the base implementation of onShutdown completes successfully
-        and doesn't raise any errors when called.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        await self.scheduler.onShutdown(self.mock_event)
 
     async def testEventMethodsReturnNone(self) -> None:
         """Verify that event handler methods return None.

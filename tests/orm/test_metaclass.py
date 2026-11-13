@@ -1,3 +1,6 @@
+# ruff: noqa: N815, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Exercise required hook signatures, synthetic secrets, and declared column names.
 from __future__ import annotations
 import ast
 import re
@@ -10,6 +13,7 @@ from orionis.orm.metaclass import pluralize, snake_case
 from orionis.orm.schema.table import TableDefinition
 from orionis.test import TestCase
 
+
 class _User(Model):
     id = Integer().primary().autoIncrement()
     name = String()
@@ -18,19 +22,24 @@ class _User(Model):
     casts: ClassVar[dict[str, str]] = {"active": "bool"}
     hidden: ClassVar[list[str]] = ["active"]
 
+
 class _Category(Model):
     id = Integer().primary()
 
+
 class _Box(Model):
     id = Integer().primary()
+
 
 class _Account(Model):
     table = "ledger_accounts"
     id = Integer().primary()
 
+
 class _CustomKey(Model):
     uuid = String().primary()
     incrementing = False
+
 
 class _BaseAudit(Model):
     __abstract__ = True
@@ -39,10 +48,12 @@ class _BaseAudit(Model):
 
     casts: ClassVar[dict[str, str]] = {"id": "int"}
 
+
 class _Invoice(_BaseAudit):
     total = Integer()
 
     casts: ClassVar[dict[str, str]] = {"total": "int"}
+
 
 class TestNamingHelpers(TestCase):
     def testSnakeCaseSplitsCamelWords(self) -> None:
@@ -53,7 +64,7 @@ class TestNamingHelpers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(snake_case("UserProfile"), "user_profile")
         self.assertEqual(snake_case("User"), "user")
@@ -66,12 +77,13 @@ class TestNamingHelpers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(pluralize("user"), "users")
         self.assertEqual(pluralize("category"), "categories")
         self.assertEqual(pluralize("box"), "boxes")
         self.assertEqual(pluralize("day"), "days")
+
 
 class TestModelMetaclass(TestCase):
     def testTableNameDerivedFromClassName(self) -> None:
@@ -82,7 +94,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_User.__meta__.table_name, "users")
         self.assertEqual(_Category.__meta__.table_name, "categories")
@@ -96,7 +108,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_Account.__meta__.table_name, "ledger_accounts")
 
@@ -108,7 +120,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _User.__meta__
         self.assertEqual(set(meta.columns), {"id", "name", "active"})
@@ -124,7 +136,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_User.__meta__.primary_key, "id")
         self.assertEqual(_CustomKey.__meta__.primary_key, "uuid")
@@ -138,7 +150,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _User.__meta__
         self.assertIn("active", meta.cast_lookup)
@@ -152,7 +164,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(_BaseAudit.__meta__)
         meta = _Invoice.__meta__
@@ -171,7 +183,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(_User.__meta__.created_column)
         self.assertIsNone(_User.__meta__.updated_column)
@@ -184,7 +196,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         open_meta = _User.__meta__
         self.assertTrue(open_meta.isFillable("name"))
@@ -223,7 +235,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Frozen(Model):
@@ -244,12 +256,12 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Renamed(Model):
             id = Integer().primary()
-            createdOn = String().nullable()  # noqa: N815
+            createdOn = String().nullable()
             CREATED_AT: ClassVar[str] = "createdOn"
 
         meta = _Renamed.__meta__
@@ -264,13 +276,13 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         meta = _User.__meta__
         row = {"id": 1, "name": "a", "active": None}
         self.assertIsNone(meta.applyCasts(row)["active"])
         row_cast = meta.applyCasts({"id": 1, "active": 1})
-        self.assertIs(row_cast["active"], True)
+        self.assertIs(row_cast["active"], expr2=True)
 
     def testBaseModelHasNoMetadata(self) -> None:
         """Keep the abstract base model without metadata.
@@ -280,7 +292,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(Model.__meta__)
 
@@ -292,10 +304,10 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(AttributeError):
-            _User.totallyUnknownAttribute  # noqa: B018
+            _ = _User.totallyUnknownAttribute
 
     def testForwardedMethodOnAbstractModelRaisesAttributeError(self) -> None:
         """Raise AttributeError for forwarded methods on an abstract model.
@@ -306,7 +318,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             Model.where("name", "x")
@@ -319,7 +331,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _NoFlaggedPrimary(Model):
@@ -337,7 +349,7 @@ class TestModelMetaclass(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _ConcreteParent(Model):
@@ -352,6 +364,7 @@ class TestModelMetaclass(TestCase):
             {"id", "name", "extra"},
         )
 
+
 class TestModelQueryForwarding(TestCase):
     def testForwardedClassEntryPointsStartBuilders(self) -> None:
         """Start builders from forwarded class-level entry points.
@@ -361,25 +374,13 @@ class TestModelQueryForwarding(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = plan_fixtures._Item.where("name", "a")
         self.assertEqual(len(builder._plan.wheres), 1)
         chained = plan_fixtures._Item.orderBy("name").limit(1)
         self.assertEqual(chained._plan.limit_value, 1)
 
-    def testUnknownClassAttributeRaises(self) -> None:
-        """Raise AttributeError for non-forwarded class attributes.
-
-        Validates the metaclass forwarding guard.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(AttributeError):
-            _ = plan_fixtures._Item.notAQueryMethod
 
 class TestSharedModelSchema(TestCase):
     """Exercise attribute state and serialization without database access."""
@@ -390,7 +391,7 @@ class TestSharedModelSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         definition = TableDefinition(
             name="shared_records",
@@ -417,7 +418,7 @@ class TestSharedModelSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         definition = TableDefinition(
             name="records",
@@ -443,7 +444,7 @@ class TestSharedModelSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Parent(Model):
@@ -462,7 +463,7 @@ class TestSharedModelSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         definition = TableDefinition(
             name="records",
@@ -479,11 +480,13 @@ class TestSharedModelSchema(TestCase):
             )
         self.assertFalse(definition.columns["deleted_at"].is_nullable)
 
+
 _ROOT = Path(__file__).resolve().parents[2]
 
 _METHOD_NAME = re.compile(r"_{0,2}[a-z][a-zA-Z0-9]*\Z")
 
 _FUNCTION_NAME = re.compile(r"_?[a-z][a-z0-9_]*\Z")
+
 
 class TestDatabaseNamingConventions(TestCase):
     """Check public and internal Python names across the database and ORM."""
@@ -494,7 +497,7 @@ class TestDatabaseNamingConventions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failures = []
         for package in ("database", "orm"):

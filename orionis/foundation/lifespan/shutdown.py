@@ -29,6 +29,7 @@ _BEFORE_SHUTDOWN_PANEL: Panel = Panel(
 )
 """Pre-built static panel displayed while the server is stopping."""
 
+
 def before_shutdown_orionis_generator() -> None:
     """
     Render a brief shutdown panel before the server stops accepting requests.
@@ -39,6 +40,7 @@ def before_shutdown_orionis_generator() -> None:
         Leave the shutdown panel visible while lifecycle hooks execute.
     """
     _console.print(_BEFORE_SHUTDOWN_PANEL)
+
 
 def after_shutdown_orionis_generator(
     start_at: int,
@@ -95,6 +97,7 @@ def after_shutdown_orionis_generator(
 
     _console.print(table)
     _console.line()
+
 
 def shutdown_orionis_generator(
     app: IApplication,

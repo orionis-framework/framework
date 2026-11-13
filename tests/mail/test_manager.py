@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from email import policy
 from email.parser import BytesParser
@@ -28,8 +30,8 @@ if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
     from orionis.storage.contracts.manager import IStorageManager
 
-class TestMailManager(TestCase):
 
+class TestMailManager(TestCase):
     def setUp(self) -> None:
         """Construct a manager with real views and memory-backed storage.
 

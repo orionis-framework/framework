@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401, PLC0415, SLF001, TC003
+# Keep reflected callables available and use backend compare-and-set tokens explicitly.
 """Async cache repository backed by a configurable storage backend."""
 
 import asyncio
@@ -5,19 +7,18 @@ import inspect
 import math
 from contextlib import nullcontext
 from contextvars import ContextVar
-from typing import TYPE_CHECKING, Any, Self
+from collections.abc import Callable
+from typing import Any, Self
 from weakref import WeakValueDictionary
 from orionis.cache.contracts.repository import ICacheRepository
 from orionis.cache.exceptions import CacheStoreException
 from orionis.cache.locks.coalescing import resolver_lease
-from orionis.cache.locks.lock import CacheLock
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
+from orionis.cache.locks.lock import CacheLock, _is_backend
 
 # Sentinel that distinguishes a missing cache key from a stored None value.
 _MISSING = object()
 """Sentinel that distinguishes a missing cache key from a stored None value."""
+
 
 class _Flight:
     """Retain a completed result only while its concurrent waiters exist."""
@@ -29,20 +30,46 @@ class _Flight:
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         self.lock = asyncio.Lock()
         """Synchronization primitive controlling access to lock."""
         self.value = _MISSING
         """Payload retained for subsequent resolution or restoration."""
 
+
 _FLIGHTS: WeakValueDictionary[tuple, _Flight] = WeakValueDictionary()
 """Flights used by ``repository``."""
-_RESOLVING: ContextVar[frozenset[tuple]] = ContextVar(
+
+
+class _Resolution:
+    """Mark one active resolver without retaining its result in child contexts."""
+
+    def __init__(self, identity: tuple) -> None:
+        """Retain the resolver identity and its current ownership state.
+
+        Parameters
+        ----------
+        identity : tuple
+            Loop, backend identity and prefixed key being resolved.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self.identity = identity
+        """Loop, backend identity and key belonging to this resolver."""
+        self.active = True
+        """Whether the originating resolver still owns the coalesced call."""
+
+
+_RESOLVING: ContextVar[tuple[_Resolution, ...]] = ContextVar(
     "orionis-cache-resolving",
-    default=frozenset(),
+    default=(),
 )
 """Context-local resolving isolated between asynchronous tasks."""
+
 
 class CacheRepository(ICacheRepository):
     """Async cache repository backed by a configurable storage backend.
@@ -50,8 +77,6 @@ class CacheRepository(ICacheRepository):
     Wraps a low-level backend with optional key-prefix support and exposes
     a higher-level API (get, set, remember, lock, …).
     """
-
-    # ruff: noqa: ANN401, PLC0415, SLF001
 
     __slots__ = ("_backend", "_prefix")
     """Declare the instance attribute slots reserved by this class."""
@@ -70,7 +95,7 @@ class CacheRepository(ICacheRepository):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         # Store the backend and prefix for use in all subsequent operations.
         self._backend = backend
@@ -100,7 +125,10 @@ class CacheRepository(ICacheRepository):
     # ── Public API ──────────────────────────────────────────────────────────
 
     async def replace(
-        self: Self, key: str, value: Any, ttl: float | None = None,
+        self: Self,
+        key: str,
+        value: Any,
+        ttl: float | None = None,
     ) -> bool:
         """
         Replace a live entry without resurrecting a deleted key.
@@ -286,7 +314,9 @@ class CacheRepository(ICacheRepository):
         Return the cached value for *key*, computing it on a cache miss.
 
         If the key is absent, call *resolver* (sync or async), persist the
-        result for *ttl* seconds, and return it.
+        result for *ttl* seconds, and return it. Configured Orionis JSON stores
+        distinguish cached None from missing data; custom stores must preserve
+        that distinction in their serialized representation or read operation.
 
         Parameters
         ----------
@@ -305,7 +335,7 @@ class CacheRepository(ICacheRepository):
         """
         # Use a sentinel so that a legitimately stored None is not treated
         # as a cache miss.
-        cached = await self._backend.get(self._k(key), default=_MISSING)
+        cached = await self._getCached(key)
         if cached is not _MISSING:
             return cached
 
@@ -317,6 +347,41 @@ class CacheRepository(ICacheRepository):
         # Persist the resolved value before returning it.
         await self.set(key, value, ttl=ttl)
         return value
+
+    async def _getCached(self, key: str) -> object:
+        """Read a value without confusing serialized null with a missing key.
+
+        Parameters
+        ----------
+        key : str
+            Unprefixed cache key to read.
+
+        Returns
+        -------
+        object
+            Decoded value, including None, or the private missing sentinel.
+        """
+        backend = self._backend
+        if not _is_backend(backend, "aiocache.base", "BaseCache"):
+            return await backend.get(self._k(key), default=_MISSING)
+
+        def load(raw: object) -> object:
+            """Wrap a decoded value before aiocache applies its None default.
+
+            Parameters
+            ----------
+            raw : object
+                Serialized backend value, or None for a missing wire entry.
+
+            Returns
+            -------
+            object
+                One-item decoded tuple or the private missing sentinel.
+            """
+            return _MISSING if raw is None else (backend.serializer.loads(raw),)
+
+        value = await backend.get(self._k(key), default=_MISSING, loads_fn=load)
+        return value if value is _MISSING else value[0]
 
     async def rememberOnce(
         self: Self,
@@ -357,11 +422,11 @@ class CacheRepository(ICacheRepository):
             error_msg = "Cache lease must be finite and positive."
             raise ValueError(error_msg)
         identity = (asyncio.get_running_loop(), id(self._backend), self._k(key))
-        resolving = _RESOLVING.get()
-        if identity in resolving:
+        resolving = tuple(owner for owner in _RESOLVING.get() if owner.active)
+        if any(owner.identity == identity for owner in resolving):
             error_msg = "A coalesced cache resolver cannot recursively resolve its key."
             raise RuntimeError(error_msg)
-        cached = await self._backend.get(self._k(key), default=_MISSING)
+        cached = await self._getCached(key)
         if cached is not _MISSING:
             return cached
         flight = _FLIGHTS.get(identity)
@@ -370,7 +435,8 @@ class CacheRepository(ICacheRepository):
             _FLIGHTS[identity] = flight
         async with asyncio.timeout(wait_timeout):
             await flight.lock.acquire()
-        token = _RESOLVING.set(resolving | {identity})
+        owner = _Resolution(identity)
+        token = _RESOLVING.set((*resolving, owner))
         try:
             if flight.value is not _MISSING:
                 return flight.value
@@ -388,6 +454,7 @@ class CacheRepository(ICacheRepository):
                 flight.value = await self.remember(key, ttl, resolver)
                 return flight.value
         finally:
+            owner.active = False
             _RESOLVING.reset(token)
             flight.lock.release()
 
@@ -425,7 +492,7 @@ class CacheRepository(ICacheRepository):
             Cached value, or ``None`` when the key is absent.
         """
         # Use the sentinel to distinguish a missing key from a stored None.
-        value = await self._backend.get(self._k(key), default=_MISSING)
+        value = await self._getCached(key)
         if value is _MISSING:
             return None
         # Remove the key after successfully reading it.
@@ -510,7 +577,9 @@ class CacheRepository(ICacheRepository):
         key : str
             Resource key to lock.
         timeout : float | None, optional
-            Maximum lock duration in seconds.  ``None`` means no timeout.
+            Store-specific acquisition deadline or lease duration in seconds.
+            None leaves file/database acquisition unbounded and uses the
+            default lease for database and aiocache backends.
 
         Returns
         -------

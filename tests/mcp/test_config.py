@@ -1,11 +1,43 @@
+# ruff: noqa: ANN201, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import math
 from dataclasses import FrozenInstanceError, fields
+from unittest.mock import Mock
 from orionis.foundation.config.mcp.entities.mcp import McpConfig
+from orionis.foundation.contracts.application import IApplication
 from orionis.mcp.config import McpConfig as PublicMcpConfig
+from orionis.mcp.provider import McpProvider
 from orionis.test import TestCase
+
 
 class TestMcpConfig(TestCase):
     """Verify finite budgets and an explicit browser-origin trust boundary."""
+
+    def testProviderRejectsFalsyInvalidConfigurationBeforeRegistration(self) -> None:
+        """Only absent configuration or a valid mapping may select defaults.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for configured in (False, 0, 0.0, "", [], ()):
+            with self.subTest(configured=configured):
+                app = Mock(spec=IApplication)
+                app.config.return_value = configured
+                with self.assertRaises(TypeError):
+                    McpProvider(app).register()
+                app.instance.assert_not_called()
+                app.singleton.assert_not_called()
+        for configured in (None, {}, McpConfig(subscription_keepalive=2)):
+            with self.subTest(configured=configured):
+                app = Mock(spec=IApplication)
+                app.config.return_value = configured
+                McpProvider(app).register()
+                actual = app.instance.call_args_list[0].args[1]
+                self.assertIsInstance(actual, McpConfig)
+                if isinstance(configured, McpConfig):
+                    self.assertIs(actual, configured)
 
     def testDefaultsExportOneConfigTypeWithFrozenFields(self):
         """Keep shared configuration fields frozen and origin lists independent.

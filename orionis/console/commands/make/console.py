@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Generate a custom command for the Orionis CLI."""
 
 import re
@@ -13,7 +15,6 @@ _SIGNATURE_RE: re.Pattern[str] = re.compile(
 )
 """Compiled pattern used to recognize signature re."""
 
-# ruff: noqa: TC001
 
 class MakeConsoleCommand(MakeStubCommand):
     """Generate a custom command for the Orionis CLI."""
@@ -84,7 +85,7 @@ class MakeConsoleCommand(MakeStubCommand):
         self,
         app: IApplication,
         reactor: IReactor,
-    ) -> None:
+    ) -> int | None:
         """
         Validate a command signature and create its file on a worker thread.
 
@@ -97,8 +98,8 @@ class MakeConsoleCommand(MakeStubCommand):
 
         Returns
         -------
-        None
-            Write success or error details to the command output.
+        int or None
+            Return 1 after reporting a generation error, or None on success.
         """
         self.newLine()
         try:
@@ -127,6 +128,7 @@ class MakeConsoleCommand(MakeStubCommand):
             self.success(f"Console command [{file_path}] created successfully.")
         except (OSError, TypeError, ValueError) as error:
             self.error(error)
+            return 1
         finally:
             self.newLine()
-
+        return None

@@ -1,9 +1,12 @@
-"""Measure field values and recognize empty data without consuming it."""
+"""Measure field values, inspect emptiness and read uploaded file content."""
 
 import asyncio
 from collections.abc import Sized
 from decimal import Decimal
+from math import nan
 from numbers import Number
+
+from orionis.support.concurrency import complete_on_cancel
 
 # Bytes per kilobyte, the unit size rules use to express file sizes.
 KILOBYTE = 1024
@@ -16,6 +19,7 @@ _FILE_ATTRIBUTES = ("read", "size", "filename")
 Attributes an uploaded file exposes, used for structural detection so the schema
 layer stays decoupled from the HTTP payload package.
 """
+
 
 def is_file(value: object) -> bool:
     """
@@ -32,6 +36,7 @@ def is_file(value: object) -> bool:
         Return ``True`` when the value exposes the uploaded-file protocol.
     """
     return all(hasattr(value, name) for name in _FILE_ATTRIBUTES)
+
 
 def is_empty(value: object) -> bool:
     """
@@ -63,9 +68,14 @@ def is_empty(value: object) -> bool:
         return getattr(value, "size", None) == 0
     return isinstance(value, Sized) and len(value) == 0
 
+
 async def read_content(value: object) -> bytes | None:
     """
     Read uploaded-file content without blocking the event loop.
+
+    Invoke the upload's synchronous read protocol in a worker and leave
+    ownership with its caller. Finish any running read before propagating
+    cancellation so the caller can safely release the upload afterward.
 
     Parameters
     ----------
@@ -85,13 +95,14 @@ async def read_content(value: object) -> bytes | None:
         return None
 
     try:
-        content = await asyncio.to_thread(reader)
-    except OSError:
+        content = await complete_on_cancel(asyncio.to_thread(reader))
+    except OSError, ValueError:
         return None
 
     return content if isinstance(content, bytes) else None
 
-def measure(value: object) -> float | None:
+
+def measure(value: object) -> Decimal | float | None:
     """
     Compute the comparable size of a value.
 
@@ -105,8 +116,10 @@ def measure(value: object) -> float | None:
 
     Returns
     -------
-    float | None
-        Comparable size, or ``None`` when the value has no measurable size.
+    decimal.Decimal | float | None
+        Comparable size preserving decimal precision, or ``None`` when the value
+        has no measurable size. Represent decimal NaNs as a floating-point NaN
+        so ordinary ordered comparisons fail without signaling an exception.
     """
     # Booleans are integers in Python but never carry a comparable size.
     if isinstance(value, bool):
@@ -116,7 +129,7 @@ def measure(value: object) -> float | None:
         return value
 
     if isinstance(value, Decimal):
-        return float(value)
+        return nan if value.is_nan() else value
 
     if is_file(value):
         size = getattr(value, "size", None)

@@ -1,10 +1,17 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Run fixed import probes and CLI fixtures using the active interpreter.
 import asyncio
+import inspect
 import subprocess
 import sys
 import tempfile
 from contextlib import ExitStack, redirect_stdout
 from io import BytesIO, StringIO, TextIOWrapper
+from importlib import import_module
 from pathlib import Path
+from types import FunctionType
+from typing import get_type_hints
 from unittest.mock import patch
 from orionis.console.commands.make.mcp import (
     MakeMcpPrompt,
@@ -33,11 +40,70 @@ from orionis.support.facades.mcp import Mcp
 from orionis.support.facades.router import Route
 from orionis.test import TestCase
 
+_RUNTIME_MODULES = (
+    "orionis.mcp.context",
+    "orionis.mcp.contracts.event_bus",
+    "orionis.mcp.contracts.manager",
+    "orionis.mcp.dispatcher",
+    "orionis.mcp.invoker",
+    "orionis.mcp.manager",
+    "orionis.mcp.normalization",
+    "orionis.mcp.reporting",
+    "orionis.mcp.responses",
+    "orionis.mcp.protocol.mrtr",
+    "orionis.mcp.server.catalog",
+    "orionis.mcp.server.compiler",
+    "orionis.mcp.server.extension",
+    "orionis.mcp.server.primitives",
+    "orionis.mcp.server.templates",
+    "orionis.mcp.subscriptions.event_bus",
+    "orionis.mcp.transport.headers",
+    "orionis.mcp.transport.http",
+    "orionis.mcp.transport.policy",
+    "orionis.mcp.transport.standard_io",
+    "orionis.mcp.transport.stdio",
+)
+
+
+def _runtime_targets() -> list[type | FunctionType]:
+    """Collect actual public declarations without supplying artificial namespaces.
+
+    Returns
+    -------
+    list[type | types.FunctionType]
+        Public classes, functions and their directly declared methods.
+    """
+    targets: list[type | FunctionType] = []
+    for module_name in _RUNTIME_MODULES:
+        module = import_module(module_name)
+        for name, value in tuple(vars(module).items()):
+            if (
+                name.startswith("_")
+                or getattr(value, "__module__", None) != module_name
+            ):
+                continue
+            if isinstance(value, FunctionType):
+                targets.append(value)
+            elif inspect.isclass(value):
+                targets.append(value)
+                for member in vars(value).values():
+                    if isinstance(member, (classmethod, staticmethod)):
+                        function = member.__func__
+                    elif isinstance(member, property):
+                        function = member.fget
+                    else:
+                        function = member
+                    if inspect.isfunction(function):
+                        targets.append(function)
+    return targets
+
+
 class ExampleServer(Server):
     """Supply importable metadata for native route-cache reconstruction."""
 
     name = "Integration server"
     version = "1.0.0"
+
 
 class _Consumer:
     """Request the same manager through ordinary constructor injection."""
@@ -56,6 +122,7 @@ class _Consumer:
             Complete the documented checks or setup without a return value.
         """
         self.manager = manager
+
 
 def _application(root: Path, ai: str | None = None):
     # A native Reactor test command already owns a scope. A separate test app
@@ -93,6 +160,7 @@ def _application(root: Path, ai: str | None = None):
     finally:
         reset_scope(token)
 
+
 def _facades(app):
     """Resolve facades from the configured application.
 
@@ -113,8 +181,77 @@ def _facades(app):
         stack.enter_context(patch.object(facade, "_pinned_instance", None))
     return stack
 
+
 class TestMcpIntegration(TestCase):
     """Connect public registrations to real containers, router and event bus."""
+
+    def testPublicRuntimeAnnotationsResolveWithoutInjectedNamespaces(self) -> None:
+        """Allow native DI and reflection to resolve every declared MCP type.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for target in _runtime_targets():
+            with self.subTest(target=f"{target.__module__}.{target.__qualname__}"):
+                get_type_hints(target)
+
+    def testRuntimeTypesPreserveColdImportsAndNativeRequestIdentity(self) -> None:
+        """Resolve public types after independent imports without eager HTTP parsing.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        script = """
+import importlib
+import sys
+from typing import get_type_hints
+
+entry = sys.argv[1]
+importlib.import_module(entry)
+if entry in {
+    "orionis.mcp.context", "orionis.mcp.invoker",
+    "orionis.mcp.server.compiler", "orionis.mcp.transport.stdio",
+}:
+    assert "orionis.http.request" not in sys.modules
+
+from tests.mcp.test_integration import _runtime_targets
+for target in _runtime_targets():
+    get_type_hints(target)
+from orionis.mcp.context import McpContext, McpRequest
+from orionis.mcp.contracts.manager import IMcpManager
+from orionis.http.request import Request
+from orionis.http.responses import Response
+assert McpContext is McpRequest
+assert get_type_hints(McpRequest)["native_request"] == Request | None
+assert get_type_hints(IMcpManager.dispatchHttp)["return"] is Response
+print("MCP runtime annotations resolved")
+"""
+        for entry in (
+            "orionis.mcp.context",
+            "orionis.mcp.invoker",
+            "orionis.mcp.server.compiler",
+            "orionis.mcp.contracts.manager",
+            "orionis.mcp.manager",
+            "orionis.mcp.transport.stdio",
+            "orionis.mcp.transport.http",
+            "orionis.mcp",
+        ):
+            with self.subTest(entry=entry):
+                result = subprocess.run(
+                    [sys.executable, "-B", "-c", script, entry],
+                    cwd=Path(__file__).resolve().parents[2],
+                    capture_output=True,
+                    check=False,
+                    text=True,
+                    encoding="utf-8",
+                    timeout=30,
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("MCP runtime annotations resolved", result.stdout)
 
     async def testFluentAndGroupPrefixesResolveAfterRegistration(self):
         """Respect native path mutations without searching every incoming request.
@@ -287,6 +424,7 @@ class TestMcpIntegration(TestCase):
                     await asyncio.wait_for(waiter, timeout=1)
                 self.assertEqual(bus.listenerCount, 0)
 
+
 class TestMcpCli(TestCase):
     """Protect the protocol stream and generate usable native declarations."""
 
@@ -312,9 +450,9 @@ class TestMcpCli(TestCase):
                 source = (app.basePath / generated).read_text(encoding="utf-8")
                 compile(source, generated, "exec")
                 self.assertIn("class Example", source)
-                with self.assertRaises(FileExistsError): # NOSONAR
+                with self.assertRaises(FileExistsError):  # NOSONAR
                     command().createFile(app, "example")
-                with self.assertRaises(ValueError): # NOSONAR
+                with self.assertRaises(ValueError):  # NOSONAR
                     command().createFile(app, "../../escape")
 
     def testEarlyStdoutBoundaryIsNestedAndRestored(self):

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from unittest.mock import AsyncMock, Mock
 from orionis.database.connection_manager import ConnectionManager
@@ -10,6 +12,7 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer, String
 from orionis.test import TestCase
 
+
 class _CurrentModel(Model):
     table = "schema_models"
     connection = "model_connection"
@@ -17,10 +20,12 @@ class _CurrentModel(Model):
     id = Integer().primary().autoIncrement()
     name = String(80)
 
+
 class _DefaultModel(Model):
     table = "schema_defaults"
     timestamps = False
     id = Integer().primary().autoIncrement()
+
 
 class TestModelSchemaSelection(TestCase):
     """Select table metadata and connections without database reflection."""
@@ -31,7 +36,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.connection = Mock()
         self.connection.createTable = AsyncMock(return_value=True)
@@ -46,7 +51,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         definition = _CurrentModel.__meta__.table
         self.assertTrue(await self.schema.createFromDefinition(definition))
@@ -59,7 +64,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await self.schema.createFromModel(_CurrentModel))
         self.connection.createTable.assert_awaited_once_with(
@@ -73,7 +78,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.schema.connection("override").createFromModel(_CurrentModel)
         self.manager.connection.assert_called_once_with("override")
@@ -84,7 +89,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.schema.connection(None).createFromModel(_CurrentModel)
         self.manager.connection.assert_called_once_with(None)
@@ -97,7 +102,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for invalid in (Model, object, _CurrentModel()):
             with self.subTest(invalid=invalid), self.assertRaises(TypeError):
@@ -110,7 +115,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         target = Mock()
         target.createTable = AsyncMock(return_value=True)
@@ -121,7 +126,8 @@ class TestModelSchemaSelection(TestCase):
             await self.schema.drop("schema_defaults")
         self.assertEqual(target.createTable.await_count, 2)
         target.dropTable.assert_awaited_once_with(
-            name="schema_defaults", schema=None,
+            name="schema_defaults",
+            schema=None,
         )
         self.manager.connection.assert_not_called()
 
@@ -131,7 +137,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with migration_connection_scope(Mock()):
             await self.schema.connection(None).createFromModel(_DefaultModel)
@@ -143,11 +149,12 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.schema.drop("reporting.entries")
         self.connection.dropTable.assert_awaited_once_with(
-            name="entries", schema="reporting",
+            name="entries",
+            schema="reporting",
         )
 
     async def testMalformedTableNamesNeverReachTheConnection(self) -> None:
@@ -156,7 +163,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in ("", ".table", "schema.", "one.two.three"):
             with self.subTest(name=name), self.assertRaises(ValueError):
@@ -169,7 +176,7 @@ class TestModelSchemaSelection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         async with self.schema.create("users") as table:
             table.integer("id").primary()
@@ -177,15 +184,17 @@ class TestModelSchemaSelection(TestCase):
             table.timestamps()
         definition = self.connection.createTable.await_args.args[0]
         self.assertEqual(
-            definition.columnNames(), ("id", "name", "created_at", "updated_at"),
+            definition.columnNames(),
+            ("id", "name", "created_at", "updated_at"),
         )
         self.assertTrue(definition.columns["name"].is_unique)
         self.assertTrue(definition.columns["created_at"].is_nullable)
 
+
 class _SchemaApp:
     """Provide a private in-memory SQLite database for schema integration."""
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Return the connection configuration requested by the manager.
 
         Parameters
@@ -198,12 +207,15 @@ class _SchemaApp:
         dict
             Value produced by the helper.
         """
+        if key != "database":
+            raise KeyError(key)
         return {
             "default": "sqlite",
             "connections": {
                 "sqlite": {"driver": "sqlite", "database": ":memory:"},
             },
         }
+
 
 class TestVersionedSchemaIntegration(TestCase):
     """Replay a historical schema after the active model adopts a new one."""
@@ -214,7 +226,7 @@ class TestVersionedSchemaIntegration(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         initial = TableDefinition(
             name="versioned_users",
@@ -250,7 +262,8 @@ class TestVersionedSchemaIntegration(TestCase):
             await schema.createFromModel(VersionedUser)
             columns = await connection.select("PRAGMA table_info(versioned_users)")
             self.assertEqual(
-                [row["name"] for row in columns], ["id", "name", "email"],
+                [row["name"] for row in columns],
+                ["id", "name", "email"],
             )
         finally:
             await manager.disconnect()

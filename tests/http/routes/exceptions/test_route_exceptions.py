@@ -1,9 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.routes.exceptions.fallback_route_already_registered import (
     FallbackRouteAlreadyRegisteredException,
 )
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.test import TestCase
+
 
 class TestRouteExceptions(TestCase):
     """Unit tests for HTTP route exception classes."""

@@ -16,6 +16,12 @@ Secciones core:
 
 Las entidades son dataclasses congeladas que normalizan dicts/enums anidados. Variables de entorno se leen en default factories; consulta cada subsistema para todas las opciones.
 
+La configuración Argon2 comparte los límites nativos del driver: memoria y coste temporal no superan `2**32 - 1`, el paralelismo no supera `2**24 - 1` y debe haber al menos 8 KiB por lane. Validar estos límites no ejecuta hashing ni reserva la memoria configurada.
+
+`withConfigPaths` admite texto, objetos path o `None` para los directorios conocidos. Un valor inválido lanza `TypeError` sin reemplazar el mapa existente. `None` conserva el valor predeterminado; las claves desconocidas siguen ignorándose.
+
+El cifrado de aplicación usa `AES-256-GCM` por defecto y también acepta `AES-128-GCM`. La configuración rechaza CBC heredado antes de generar o guardar una clave. Los datos cifrados previamente con CBC son incompatibles y no se descifran; cambiar el algoritmo no migra los datos existentes.
+
 ## Ejemplos
 
 ### Validar configuración nativa
@@ -50,6 +56,7 @@ Una dataclass frozen declarada en `config/payments.py` se descubre como sección
 
 ```python
 from dataclasses import dataclass
+
 
 @dataclass(frozen=True, kw_only=True)
 class Payments:

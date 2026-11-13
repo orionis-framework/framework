@@ -1,3 +1,5 @@
+# ruff: noqa: PLR0913
+# Keep established public and external protocol names and signatures.
 """Define application configuration, lifecycle and runtime entry points."""
 
 from __future__ import annotations
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
 
 _SENTINEL = object()
 """Sentinel distinguishing sentinel from ordinary values."""
+
 
 class IApplication(IContainer, ABC):
     """Define application configuration, lifecycle and runtime entry points."""
@@ -228,9 +231,9 @@ class IApplication(IContainer, ABC):
         Raises
         ------
         TypeError
-            If ``lifespan`` is not a ``Lifespan`` or a callback is not callable.
+            If the event/runtime type is invalid or a callback is not callable.
         ValueError
-            If no callbacks are provided.
+            If no callbacks are provided or the runtime selector is unknown.
 
         Notes
         -----
@@ -301,7 +304,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def withRouting(  # noqa: PLR0913
+    def withRouting(
         self: Self,
         api: str | list[str] | None = None,
         web: str | list[str] | None = None,
@@ -744,6 +747,8 @@ class IApplication(IContainer, ABC):
         ------
         RuntimeError
             If bootstrap configuration is locked.
+        TypeError
+            If a known directory override is not a string, path, or ``None``.
         """
 
     @abstractmethod

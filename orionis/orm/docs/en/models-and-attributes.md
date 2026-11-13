@@ -61,8 +61,10 @@ async def publish(article: Article) -> bool:
     return await article.save()
 ```
 
-`save()` inserts new instances and updates only dirty attributes of retrieved instances. It returns `False` when a before-event vetoes the operation. `await Article.create({...})` returns the instance, but currently does not surface a `save()` veto as a boolean result: construct the model and inspect `await model.save()` when persistence must be explicitly checked.
+`save()` inserts new instances and updates only dirty attributes of retrieved instances. It returns `False` when a before-event vetoes the operation or an update finds no stored row. Successful after-events are not emitted for that failed write. `await Article.create({...})` returns the instance, but currently does not surface a `save()` veto as a boolean result: construct the model and inspect `await model.save()` when persistence must be explicitly checked.
+
+Models retrieved through a selected connection retain that exact connection for later instance writes. New instances use their model connection policy.
 
 `find(id)` and `first()` return a model or `None`; their `OrFail` variants raise `ModelNotFoundException`. Instance `update({...})` returns a boolean; `delete()` returns a boolean and respects soft deletes. [Builder operations](querying.md) return counts and differ from each instance's lifecycle.
 
-`getDirty`, `isDirty`, `isClean`, `getOriginal`, `wasChanged`, and `getChanges` describe changes before/after save. They are not optimistic locking: concurrent writers can overwrite changes. Use [transactions](../../../database/docs/en/transactions.md) and appropriate locks where the backend supports them.
+`getDirty`, `isDirty`, `isClean`, `getOriginal`, `wasChanged`, and `getChanges` describe changes before/after save. A newly assigned attribute is dirty even when it has no original value. `syncOriginal()` publishes a new original snapshot only after every value has been copied successfully. They are not optimistic locking: concurrent writers can overwrite changes. Use [transactions](../../../database/docs/en/transactions.md) and appropriate locks where the backend supports them.

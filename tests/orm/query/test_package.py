@@ -15,6 +15,7 @@ EXPECTED_EXPORTS = {
     "WhereType": ("orionis.orm.query.expressions", "WhereType"),
 }
 
+
 class TestQueryPackage(TestCase):
     """Verify the orionis.orm.query public export surface."""
 
@@ -24,6 +25,6 @@ class TestQueryPackage(TestCase):
         Returns
         -------
         None
-            Verify exact exported names and identities without shadowing modules.
+            No return value.
         """
         assert_package_exports(self, "orionis.orm.query", EXPECTED_EXPORTS)

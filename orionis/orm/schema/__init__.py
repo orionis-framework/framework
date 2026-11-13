@@ -105,56 +105,63 @@ __all__ = [
     "Uuid",
 ]
 
+_TYPES_MODULE = "orionis.orm.schema.types"
+"""Module exporting logical column declarations."""
+
+_CONSTRAINTS_MODULE = "orionis.orm.schema.constraints"
+"""Module exporting table and foreign-key constraints."""
+
 _EXPORTS = {
-    "BigInteger": ("orionis.orm.schema.types", "BigInteger"),
-    "Boolean": ("orionis.orm.schema.types", "Boolean"),
+    "BigInteger": (_TYPES_MODULE, "BigInteger"),
+    "Boolean": (_TYPES_MODULE, "Boolean"),
     "ColumnDefinition": ("orionis.orm.schema.column", "ColumnDefinition"),
     "ColumnOptions": ("orionis.orm.schema.column", "ColumnOptions"),
-    "ColumnType": ("orionis.orm.schema.types", "ColumnType"),
-    "CompositeForeignKey": ("orionis.orm.schema.constraints", "CompositeForeignKey"),
-    "Date": ("orionis.orm.schema.types", "Date"),
-    "DateTime": ("orionis.orm.schema.types", "DateTime"),
-    "Double": ("orionis.orm.schema.types", "Double"),
-    "Enum": ("orionis.orm.schema.types", "Enum"),
-    "Float": ("orionis.orm.schema.types", "Float"),
-    "ForeignReference": ("orionis.orm.schema.constraints", "ForeignReference"),
-    "Integer": ("orionis.orm.schema.types", "Integer"),
-    "Interval": ("orionis.orm.schema.types", "Interval"),
-    "LargeBinary": ("orionis.orm.schema.types", "LargeBinary"),
-    "MatchType": ("orionis.orm.schema.types", "MatchType"),
-    "Numeric": ("orionis.orm.schema.types", "Numeric"),
-    "NumericCommon": ("orionis.orm.schema.types", "NumericCommon"),
-    "PickleType": ("orionis.orm.schema.types", "PickleType"),
-    "SchemaType": ("orionis.orm.schema.types", "SchemaType"),
-    "SmallInteger": ("orionis.orm.schema.types", "SmallInteger"),
-    "StrictArray": ("orionis.orm.schema.types", "StrictArray"),
-    "StrictBigInt": ("orionis.orm.schema.types", "StrictBigInt"),
-    "StrictBinary": ("orionis.orm.schema.types", "StrictBinary"),
-    "StrictBlob": ("orionis.orm.schema.types", "StrictBlob"),
-    "StrictChar": ("orionis.orm.schema.types", "StrictChar"),
-    "StrictClob": ("orionis.orm.schema.types", "StrictClob"),
-    "StrictDecimal": ("orionis.orm.schema.types", "StrictDecimal"),
-    "StrictDoublePrecision": ("orionis.orm.schema.types", "StrictDoublePrecision"),
-    "StrictInt": ("orionis.orm.schema.types", "StrictInt"),
-    "StrictJson": ("orionis.orm.schema.types", "StrictJson"),
-    "StrictNChar": ("orionis.orm.schema.types", "StrictNChar"),
-    "StrictNVarChar": ("orionis.orm.schema.types", "StrictNVarChar"),
-    "StrictReal": ("orionis.orm.schema.types", "StrictReal"),
-    "StrictSmallInt": ("orionis.orm.schema.types", "StrictSmallInt"),
-    "StrictTimestamp": ("orionis.orm.schema.types", "StrictTimestamp"),
-    "StrictVarBinary": ("orionis.orm.schema.types", "StrictVarBinary"),
-    "StrictVarChar": ("orionis.orm.schema.types", "StrictVarChar"),
-    "String": ("orionis.orm.schema.types", "String"),
+    "ColumnType": (_TYPES_MODULE, "ColumnType"),
+    "CompositeForeignKey": (_CONSTRAINTS_MODULE, "CompositeForeignKey"),
+    "Date": (_TYPES_MODULE, "Date"),
+    "DateTime": (_TYPES_MODULE, "DateTime"),
+    "Double": (_TYPES_MODULE, "Double"),
+    "Enum": (_TYPES_MODULE, "Enum"),
+    "Float": (_TYPES_MODULE, "Float"),
+    "ForeignReference": (_CONSTRAINTS_MODULE, "ForeignReference"),
+    "Integer": (_TYPES_MODULE, "Integer"),
+    "Interval": (_TYPES_MODULE, "Interval"),
+    "LargeBinary": (_TYPES_MODULE, "LargeBinary"),
+    "MatchType": (_TYPES_MODULE, "MatchType"),
+    "Numeric": (_TYPES_MODULE, "Numeric"),
+    "NumericCommon": (_TYPES_MODULE, "NumericCommon"),
+    "PickleType": (_TYPES_MODULE, "PickleType"),
+    "SchemaType": (_TYPES_MODULE, "SchemaType"),
+    "SmallInteger": (_TYPES_MODULE, "SmallInteger"),
+    "StrictArray": (_TYPES_MODULE, "StrictArray"),
+    "StrictBigInt": (_TYPES_MODULE, "StrictBigInt"),
+    "StrictBinary": (_TYPES_MODULE, "StrictBinary"),
+    "StrictBlob": (_TYPES_MODULE, "StrictBlob"),
+    "StrictChar": (_TYPES_MODULE, "StrictChar"),
+    "StrictClob": (_TYPES_MODULE, "StrictClob"),
+    "StrictDecimal": (_TYPES_MODULE, "StrictDecimal"),
+    "StrictDoublePrecision": (_TYPES_MODULE, "StrictDoublePrecision"),
+    "StrictInt": (_TYPES_MODULE, "StrictInt"),
+    "StrictJson": (_TYPES_MODULE, "StrictJson"),
+    "StrictNChar": (_TYPES_MODULE, "StrictNChar"),
+    "StrictNVarChar": (_TYPES_MODULE, "StrictNVarChar"),
+    "StrictReal": (_TYPES_MODULE, "StrictReal"),
+    "StrictSmallInt": (_TYPES_MODULE, "StrictSmallInt"),
+    "StrictTimestamp": (_TYPES_MODULE, "StrictTimestamp"),
+    "StrictVarBinary": (_TYPES_MODULE, "StrictVarBinary"),
+    "StrictVarChar": (_TYPES_MODULE, "StrictVarChar"),
+    "String": (_TYPES_MODULE, "String"),
     "TableDefinition": ("orionis.orm.schema.table", "TableDefinition"),
-    "TableIndex": ("orionis.orm.schema.constraints", "TableIndex"),
-    "Text": ("orionis.orm.schema.types", "Text"),
-    "Time": ("orionis.orm.schema.types", "Time"),
-    "Unicode": ("orionis.orm.schema.types", "Unicode"),
-    "UnicodeText": ("orionis.orm.schema.types", "UnicodeText"),
-    "UniqueConstraint": ("orionis.orm.schema.constraints", "UniqueConstraint"),
-    "Uuid": ("orionis.orm.schema.types", "Uuid"),
+    "TableIndex": (_CONSTRAINTS_MODULE, "TableIndex"),
+    "Text": (_TYPES_MODULE, "Text"),
+    "Time": (_TYPES_MODULE, "Time"),
+    "Unicode": (_TYPES_MODULE, "Unicode"),
+    "UnicodeText": (_TYPES_MODULE, "UnicodeText"),
+    "UniqueConstraint": (_CONSTRAINTS_MODULE, "UniqueConstraint"),
+    "Uuid": (_TYPES_MODULE, "Uuid"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -176,6 +183,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

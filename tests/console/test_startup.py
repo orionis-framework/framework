@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import io
 import os
 import sys
@@ -9,8 +11,8 @@ from orionis.console.startup import startup_feedback, stop_startup_feedback
 _FRAME = "⠋ Inicializando Orionis..."
 _CLEAR = "\r" + " " * len(_FRAME) + "\r"
 
-class _BinaryStream(io.BytesIO):
 
+class _BinaryStream(io.BytesIO):
     def __init__(self, events: list[tuple[str, str | bytes]], name: str) -> None:
         """
         Initialize a byte buffer that records writes in a shared log.
@@ -48,11 +50,15 @@ class _BinaryStream(io.BytesIO):
         self.events.append((self.name, value))
         return super().write(value)
 
-class _Terminal(io.StringIO):
 
+class _Terminal(io.StringIO):
     def __init__(
-        self, events: list[tuple[str, str | bytes]], name: str,
-        *, terminal: bool = True, encoding: str = "utf-8",
+        self,
+        events: list[tuple[str, str | bytes]],
+        name: str,
+        *,
+        terminal: bool = True,
+        encoding: str = "utf-8",
     ) -> None:
         """
         Initialize a text stream with configurable terminal metadata.
@@ -131,8 +137,8 @@ class _Terminal(io.StringIO):
         self.events.append((self.name, value))
         return super().write(value)
 
-class TestStartupFeedback(unittest.TestCase):
 
+class TestStartupFeedback(unittest.TestCase):
     def setUp(self) -> None:
         """
         Create interactive streams and isolate terminal detection.
@@ -148,10 +154,12 @@ class TestStartupFeedback(unittest.TestCase):
         self.enterContext(patch.object(sys, "stdout", self.stdout))
         self.enterContext(patch.object(sys, "stderr", self.stderr))
         self.enterContext(patch.dict(os.environ, {}, clear=True))
-        self.enterContext(patch(
-            "orionis.console.startup.os.get_terminal_size",
-            return_value=os.terminal_size((80, 24)),
-        ))
+        self.enterContext(
+            patch(
+                "orionis.console.startup.os.get_terminal_size",
+                return_value=os.terminal_size((80, 24)),
+            ),
+        )
 
     def testAppearsBeforeBootstrapAndClearsBeforeFirstStdout(self) -> None:
         """
@@ -168,10 +176,14 @@ class TestStartupFeedback(unittest.TestCase):
             self.assertEqual(sys.stdout.write("\x1b[32mRUNNING\x1b[0m\n"), 17)
             self.assertIs(sys.stdout, self.stdout)
             self.assertIs(sys.stderr, self.stderr)
-        self.assertEqual(self.events, [
-            ("stderr", _FRAME), ("stderr", _CLEAR),
-            ("stdout", "\x1b[32mRUNNING\x1b[0m\n"),
-        ])
+        self.assertEqual(
+            self.events,
+            [
+                ("stderr", _FRAME),
+                ("stderr", _CLEAR),
+                ("stdout", "\x1b[32mRUNNING\x1b[0m\n"),
+            ],
+        )
 
     def testClearsBeforeFirstStderrAndPreservesProgress(self) -> None:
         """
@@ -186,7 +198,8 @@ class TestStartupFeedback(unittest.TestCase):
             sys.stderr.write("\rprogress 1")
             sys.stderr.write("\rprogress 2\n")
         self.assertEqual(
-            self.stderr.getvalue(), _FRAME + _CLEAR + "\rprogress 1\rprogress 2\n",
+            self.stderr.getvalue(),
+            _FRAME + _CLEAR + "\rprogress 1\rprogress 2\n",
         )
 
     def testEmptyWritesAndFlushDoNotRetireFeedback(self) -> None:
@@ -259,10 +272,14 @@ class TestStartupFeedback(unittest.TestCase):
                 with startup_feedback(["reactor", "binary"]):
                     writer = getattr(sys, name).buffer
                     self.assertEqual(writer.write(b"\x1b[32m\xff\r\n"), 8)
-                self.assertEqual(self.events, [
-                    ("stderr", _FRAME), ("stderr", _CLEAR),
-                    (name, b"\x1b[32m\xff\r\n"),
-                ])
+                self.assertEqual(
+                    self.events,
+                    [
+                        ("stderr", _FRAME),
+                        ("stderr", _CLEAR),
+                        (name, b"\x1b[32m\xff\r\n"),
+                    ],
+                )
                 self.assertTrue(stream.buffer.getvalue().endswith(b"\x1b[32m\xff\r\n"))
 
     def testCachedProxiesRemainUsableAfterCleanup(self) -> None:
@@ -348,7 +365,8 @@ class TestStartupFeedback(unittest.TestCase):
             Assert executable tokens and paths do not enable protocol feedback.
         """
         for arguments in (
-            ["mcp:start"], ["reactor", "mcp:start"],
+            ["mcp:start"],
+            ["reactor", "mcp:start"],
             ["C:\\project\\reactor.py", "mcp:start"],
         ):
             with self.subTest(arguments=arguments), startup_feedback(arguments):
@@ -380,10 +398,13 @@ class TestStartupFeedback(unittest.TestCase):
         None
             Assert no message when its length equals the available columns.
         """
-        with patch(
-            "orionis.console.startup.os.get_terminal_size",
-            return_value=os.terminal_size((len(_FRAME), 24)),
-        ), startup_feedback(["reactor", "list"]):
+        with (
+            patch(
+                "orionis.console.startup.os.get_terminal_size",
+                return_value=os.terminal_size((len(_FRAME), 24)),
+            ),
+            startup_feedback(["reactor", "list"]),
+        ):
             self.assertIs(sys.stdout, self.stdout)
         self.assertEqual(self.events, [])
 
@@ -447,7 +468,8 @@ class TestStartupFeedback(unittest.TestCase):
                 self.assertFalse(worker.is_alive())
         self.assertEqual(self.events[:2], [("stderr", _FRAME), ("stderr", _CLEAR)])
         self.assertCountEqual(
-            self.events[2:], [("stdout", "one\n"), ("stderr", "two\n")],
+            self.events[2:],
+            [("stdout", "one\n"), ("stderr", "two\n")],
         )
 
     def testCleanupPreservesReplacementStreams(self) -> None:
@@ -461,7 +483,7 @@ class TestStartupFeedback(unittest.TestCase):
         """
         replacement = io.StringIO()
         with startup_feedback(["reactor", "list"]):
-            sys.stdout = replacement
+            self.enterContext(patch.object(sys, "stdout", replacement))
         self.assertIs(sys.stdout, replacement)
         self.assertIs(sys.stderr, self.stderr)
         self.assertEqual(self.stderr.getvalue(), _FRAME + _CLEAR)
@@ -477,7 +499,9 @@ class TestStartupFeedback(unittest.TestCase):
         """
         with (
             patch.object(
-                self.stderr, "write", side_effect=OSError("terminal unavailable"),
+                self.stderr,
+                "write",
+                side_effect=OSError("terminal unavailable"),
             ),
             startup_feedback(["reactor", "list"]),
         ):
@@ -497,7 +521,8 @@ class TestStartupFeedback(unittest.TestCase):
         """
         with (
             patch(
-                "orionis.console.startup.os.get_terminal_size", side_effect=OSError,
+                "orionis.console.startup.os.get_terminal_size",
+                side_effect=OSError,
             ),
             patch.dict(os.environ, {"COLUMNS": "10"}),
             startup_feedback(["reactor", "list"]),
@@ -523,7 +548,11 @@ class TestStartupFeedback(unittest.TestCase):
             # A native or subprocess writer uses the original file descriptor.
             self.stdout.write("native output\n")
         stop_startup_feedback()
-        self.assertEqual(self.events, [
-            ("stderr", _FRAME), ("stderr", _CLEAR),
-            ("stdout", "native output\n"),
-        ])
+        self.assertEqual(
+            self.events,
+            [
+                ("stderr", _FRAME),
+                ("stderr", _CLEAR),
+                ("stdout", "native output\n"),
+            ],
+        )

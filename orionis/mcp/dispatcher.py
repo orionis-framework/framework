@@ -1,3 +1,5 @@
+# ruff: noqa: BLE001, PLR0913, TC001
+# Public boundaries report before sanitizing; retain runtime types and capture context.
 """Provide mcp operations through ``DispatchResult``, ``McpDispatcher``."""
 
 import asyncio
@@ -5,11 +7,15 @@ import base64
 from collections.abc import AsyncIterator, Mapping
 from dataclasses import dataclass, replace
 import inspect
-from typing import TYPE_CHECKING, Literal, cast
+from typing import Literal, cast
 import msgspec
+import orionis.http as http_module
+from orionis.container.contracts.container import IContainer
 from orionis.failure.runtime import capture_result, operation
 from orionis.http.adapters.response.streams import await_cleanup
 from orionis.mcp.context import McpRequest
+from orionis.mcp.config import McpConfig
+from orionis.mcp.contracts.event_bus import IMcpEventBus
 from orionis.mcp.exceptions import (
     McpAuthorizationException,
     McpInvalidParams,
@@ -56,29 +62,25 @@ from orionis.mcp.protocol.validation import validate_result
 from orionis.mcp.responses import McpResponse
 from orionis.mcp.reporting import report
 from orionis.mcp.normalization import (
+    CacheOptions,
+    buffered_size,
     response_items,
     tool_result,
     prompt_result,
     resource_result,
     progress_params,
+    validated_output,
 )
 from orionis.mcp.server.compiler import (
+    CompiledCatalog,
     CompiledMcpServer,
-    validate_output,
+    CompiledPrimitive,
     validate_payload,
     validate_prompt_arguments,
 )
 from orionis.mcp.server.templates import validate_uri
 from orionis.mcp.streams import OwnedStream
 from orionis.schemas.exceptions.validation import ValidationException
-
-if TYPE_CHECKING:
-    from orionis.mcp.config import McpConfig
-    from orionis.container.contracts.container import IContainer
-    from orionis.http.request import Request
-    from orionis.mcp.contracts.event_bus import IMcpEventBus
-    from orionis.mcp.server.compiler import CompiledPrimitive, CompiledCatalog
-    from orionis.mcp.normalization import CacheOptions
 
 type TransportName = Literal["http", "stdio", "test"]
 """Type alias for ``Literal['http', 'stdio', 'test']``."""
@@ -105,6 +107,7 @@ _RESULT_TYPES = {
 }
 """Result types definitions used by ``dispatcher``."""
 
+
 @dataclass(frozen=True, slots=True)
 class DispatchResult:
     """Encoded JSON or a lazy stream of encoded notifications and final result."""
@@ -126,11 +129,18 @@ class DispatchResult:
         """
         return not isinstance(self.body, bytes)
 
+
 class McpDispatcher:
     """Perform no connection negotiation and retain no request or identity."""
 
     __slots__ = (
-        "_extensions", "_list_sources", "_server_id", "app", "bus", "config", "server",
+        "_extensions",
+        "_list_sources",
+        "_server_id",
+        "app",
+        "bus",
+        "config",
+        "server",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -181,10 +191,14 @@ class McpDispatcher:
         self._list_sources = {
             "tools/list": (compiled.tools.values(), ListToolsResult, "tools"),
             "resources/list": (
-                compiled.resources.values(), ListResourcesResult, "resources",
+                compiled.resources.values(),
+                ListResourcesResult,
+                "resources",
             ),
             "resources/templates/list": (
-                compiled.templates, ListResourceTemplatesResult, "resourceTemplates",
+                compiled.templates,
+                ListResourceTemplatesResult,
+                "resourceTemplates",
             ),
             "prompts/list": (compiled.prompts.values(), ListPromptsResult, "prompts"),
         }
@@ -234,7 +248,7 @@ class McpDispatcher:
         data: bytes,
         *,
         transport: TransportName = "test",
-        native_request: Request | None = None,
+        native_request: http_module.Request | None = None,
     ) -> DispatchResult:
         """
         Decode and dispatch one envelope without adding transport framing.
@@ -270,7 +284,10 @@ class McpDispatcher:
             params = self.decode(envelope)
         except McpProtocolException as exc:
             await self._report(
-                exc, transport=transport, phase="decode", expected=True,
+                exc,
+                transport=transport,
+                phase="decode",
+                expected=True,
             )
             return DispatchResult(
                 encode_error(exc, envelope.id if envelope else msgspec.UNSET),
@@ -280,7 +297,10 @@ class McpDispatcher:
             await self._report(exc, transport=transport, phase="decode")
             raise
         return await self.dispatch(
-            envelope, params, transport=transport, native_request=native_request,
+            envelope,
+            params,
+            transport=transport,
+            native_request=native_request,
         )
 
     async def dispatch(
@@ -289,7 +309,7 @@ class McpDispatcher:
         params: RequestParams,
         *,
         transport: TransportName = "test",
-        native_request: Request | None = None,
+        native_request: http_module.Request | None = None,
     ) -> DispatchResult:
         """
         Execute a decoded request with shared policy checks and dependency bindings.
@@ -320,7 +340,9 @@ class McpDispatcher:
         if envelope.id is msgspec.UNSET:
             return DispatchResult(b"", 202)
         with operation(
-            self.app, flow="mcp", operation=envelope.method,
+            self.app,
+            flow="mcp",
+            operation=envelope.method,
             correlation_id=str(envelope.id),
         ):
             try:
@@ -339,21 +361,31 @@ class McpDispatcher:
                 return DispatchResult(self._encode(request, result))
             except McpProtocolException as exc:
                 await self._report(
-                    exc, transport=transport, phase="dispatch", expected=True,
-                    correlation_id=envelope.id, operation_name=envelope.method,
+                    exc,
+                    transport=transport,
+                    phase="dispatch",
+                    expected=True,
+                    correlation_id=envelope.id,
+                    operation_name=envelope.method,
                 )
                 return DispatchResult(encode_error(exc, envelope.id), exc.status)
-            except Exception as exc:  # noqa: BLE001 - Public protocol boundary.
+            except Exception as exc:
                 await self._report(
-                    exc, transport=transport, phase="dispatch",
-                    correlation_id=envelope.id, operation_name=envelope.method,
+                    exc,
+                    transport=transport,
+                    phase="dispatch",
+                    correlation_id=envelope.id,
+                    operation_name=envelope.method,
                 )
                 error = McpProtocolException(-32603, _INTERNAL_ERROR, status=500)
                 return DispatchResult(encode_error(error, envelope.id), error.status)
             except BaseException as exc:
                 await self._report(
-                    exc, transport=transport, phase="dispatch",
-                    correlation_id=envelope.id, operation_name=envelope.method,
+                    exc,
+                    transport=transport,
+                    phase="dispatch",
+                    correlation_id=envelope.id,
+                    operation_name=envelope.method,
                 )
                 raise
 
@@ -362,7 +394,7 @@ class McpDispatcher:
         envelope: JsonRpcRequest,
         params: RequestParams,
         transport: TransportName,
-        native: Request | None,
+        native: http_module.Request | None,
     ) -> McpRequest:
         """
         Build request context from the current envelope and typed parameters.
@@ -457,7 +489,8 @@ class McpDispatcher:
         if primitive is None:
             msg = "Unknown or unavailable primitive"
             raise McpInvalidParams(
-                msg, data={"uri": request.uri} if request.uri else msgspec.UNSET,
+                msg,
+                data={"uri": request.uri} if request.uri else msgspec.UNSET,
             )
         return await self._invoke(primitive, request)
 
@@ -586,7 +619,8 @@ class McpDispatcher:
                 return None
             msg = "Unknown or unavailable primitive"
             raise McpInvalidParams(
-                msg, data={"uri": request.uri} if request.uri else msgspec.UNSET,
+                msg,
+                data={"uri": request.uri} if request.uri else msgspec.UNSET,
             )
         if (
             primitive.authorization is not None
@@ -703,20 +737,7 @@ class McpDispatcher:
             return result
         expected = _RESULT_TYPES[request.method]
         if isinstance(result, expected):
-            if isinstance(result, CallToolResult) and result.isError is True:
-                await capture_result(
-                    "tool_error", app=self.app, flow="mcp", phase="result",
-                    operation=request.method, correlation_id=str(request.id),
-                    expected=True, metadata={"transport": request.transport},
-                )
-            if isinstance(result, CallToolResult) and result.isError is not True:
-                await validate_output(primitive, result.structuredContent)
-            if isinstance(result, ReadResourceResult):
-                result = msgspec.structs.replace(
-                    result, **self._cache(primitive, request),
-                )
-            validate_result(result, request.method)
-            return result
+            return await self._normalizeTyped(primitive, request, result)
         responses = response_items(result)
         if request.method == _TOOL_METHOD:
             normalized = await tool_result(primitive, responses)
@@ -724,16 +745,73 @@ class McpDispatcher:
             normalized = prompt_result(primitive.description, responses)
         else:
             normalized = resource_result(
-                primitive, request, responses, self._cache(primitive, request),
+                primitive,
+                request,
+                responses,
+                self._cache(primitive, request),
             )
         validate_result(normalized, request.method)
         if isinstance(normalized, CallToolResult) and normalized.isError is True:
             await capture_result(
-                "tool_error", app=self.app, flow="mcp", phase="result",
-                operation=request.method, correlation_id=str(request.id),
-                expected=True, metadata={"transport": request.transport},
+                "tool_error",
+                app=self.app,
+                flow="mcp",
+                phase="result",
+                operation=request.method,
+                correlation_id=str(request.id),
+                expected=True,
+                metadata={"transport": request.transport},
             )
         return normalized
+
+    async def _normalizeTyped(
+        self,
+        primitive: CompiledPrimitive,
+        request: McpRequest,
+        result: object,
+    ) -> object:
+        """
+        Validate an existing protocol result without changing observation order.
+
+        Parameters
+        ----------
+        primitive : orionis.mcp.server.compiler.CompiledPrimitive
+            Output schema and resource cache policy.
+        request : orionis.mcp.McpRequest
+            Result method and reporting context.
+        result : object
+            Result already matching the requested protocol result type.
+
+        Returns
+        -------
+        object
+            Validated result with normalized data and resource metadata.
+        """
+        if isinstance(result, CallToolResult) and result.isError is True:
+            await capture_result(
+                "tool_error",
+                app=self.app,
+                flow="mcp",
+                phase="result",
+                operation=request.method,
+                correlation_id=str(request.id),
+                expected=True,
+                metadata={"transport": request.transport},
+            )
+        if isinstance(result, CallToolResult) and result.isError is not True:
+            value, _text = await validated_output(
+                primitive,
+                result.structuredContent,
+            )
+            if value is not result.structuredContent:
+                result = msgspec.structs.replace(result, structuredContent=value)
+        if isinstance(result, ReadResourceResult):
+            result = msgspec.structs.replace(
+                result,
+                **self._cache(primitive, request),
+            )
+        validate_result(result, request.method)
+        return result
 
     async def _stream(
         self,
@@ -783,7 +861,7 @@ class McpDispatcher:
                         Notification(method="notifications/progress", params=params),
                     )
                     continue
-                used += len(msgspec.json.encode(item))
+                used += buffered_size(item)
                 if used > self.config.max_response_size:
                     error = "Response exceeds configured budget"
                     raise ValueError(error)
@@ -797,7 +875,7 @@ class McpDispatcher:
         except McpProtocolException as exc:
             await self._report(exc, request, phase="stream", expected=True)
             yield encode_error(exc, request.id)
-        except Exception as exc:  # noqa: BLE001 - Public protocol boundary.
+        except Exception as exc:
             await self._report(exc, request, phase="stream")
             yield self._streamError(request)
         except BaseException as exc:
@@ -822,15 +900,22 @@ class McpDispatcher:
             Encoded tool-error result for tool calls, or an internal JSON-RPC error.
         """
         if request.method == _TOOL_METHOD:
-            return self._encode(request, CallToolResult(
-                content=(TextContent(text="Tool execution failed"),), isError=True,
-            ))
+            return self._encode(
+                request,
+                CallToolResult(
+                    content=(TextContent(text="Tool execution failed"),),
+                    isError=True,
+                ),
+            )
         return encode_error(
-            McpProtocolException(-32603, _INTERNAL_ERROR), request.id,
+            McpProtocolException(-32603, _INTERNAL_ERROR),
+            request.id,
         )
 
     async def _finishStream(
-        self, request: McpRequest, source: AsyncIterator[object],
+        self,
+        request: McpRequest,
+        source: AsyncIterator[object],
         original: BaseException | None,
     ) -> None:
         """
@@ -982,8 +1067,11 @@ class McpDispatcher:
         return {"ttlMs": cache.ttl_ms, "cacheScope": cache.scope}
 
     def _encode(
-        self, request: McpRequest, result: object,
-        *, internal_meta: dict[str, object] | None = None,
+        self,
+        request: McpRequest,
+        result: object,
+        *,
+        internal_meta: dict[str, object] | None = None,
     ) -> bytes:
         """
         Validate a result, attach server metadata, and encode its response.
@@ -1019,7 +1107,9 @@ class McpDispatcher:
             message = "Result metadata exceeds configured limit"
             raise ValueError(message)
         metadata = {
-            **result.meta, **(internal_meta or {}), SERVER_INFO: self.server.info,
+            **result.meta,
+            **(internal_meta or {}),
+            SERVER_INFO: self.server.info,
         }
         result = msgspec.structs.replace(result, meta=metadata)
         encoded = msgspec.json.encode(ResultResponse(id=request.id, result=result))
@@ -1143,7 +1233,8 @@ class McpDispatcher:
         uris = []
         if self._supports("resources", "subscribe"):
             uris = [
-                uri for uri in dict.fromkeys(filters.resourceSubscriptions)
+                uri
+                for uri in dict.fromkeys(filters.resourceSubscriptions)
                 if await self._subscriptionResource(request, uri)
             ]
         accepted = SubscriptionFilter(
@@ -1191,6 +1282,34 @@ class McpDispatcher:
             return instance is not None
         finally:
             self.app.instance(McpRequest, request, override=True)
+
+    @staticmethod
+    def _subscriptionNotification(
+        method: str,
+        uri: str | None,
+        metadata: dict[str, object],
+    ) -> bytes:
+        """
+        Encode one change event while retaining subscription metadata ownership.
+
+        Parameters
+        ----------
+        method : str
+            Notification method from the event source.
+        uri : str or None
+            Authorized resource URI, when this event identifies a resource.
+        metadata : dict[str, object]
+            Subscription metadata retained by the surrounding stream.
+
+        Returns
+        -------
+        bytes
+            Encoded change notification.
+        """
+        params: dict[str, object] = {"_meta": metadata}
+        if uri is not None:
+            params["uri"] = uri
+        return msgspec.json.encode(Notification(method=method, params=params))
 
     async def _subscriptionStream(
         self,
@@ -1248,10 +1367,12 @@ class McpDispatcher:
                 except StopAsyncIteration:
                     break
                 pending = None
-                params: dict[str, object] = {"_meta": metadata}
-                if uri is not None:
-                    params["uri"] = uri
-                yield msgspec.json.encode(Notification(method=method, params=params))
+                if uri is not None and not await self._subscriptionResource(
+                    request,
+                    uri,
+                ):
+                    continue
+                yield self._subscriptionNotification(method, uri, metadata)
             if request.transport == "stdio":
                 yield msgspec.json.encode(
                     Notification(
@@ -1268,8 +1389,11 @@ class McpDispatcher:
             await self._finishSubscription(request, pending, source, original)
 
     async def _finishSubscription(
-        self, request: McpRequest, pending: asyncio.Future | None,
-        source: object, original: BaseException | None,
+        self,
+        request: McpRequest,
+        pending: asyncio.Future | None,
+        source: object,
+        original: BaseException | None,
     ) -> None:
         """
         Join pending subscription work and close the owned event source.
@@ -1304,7 +1428,8 @@ class McpDispatcher:
                 )
                 for failure in results:
                     if isinstance(failure, BaseException) and not isinstance(
-                        failure, StopAsyncIteration,
+                        failure,
+                        StopAsyncIteration,
                     ):
                         await self._report(failure, request, phase="cleanup")
         finally:
@@ -1354,25 +1479,31 @@ class McpDispatcher:
         )
         if isinstance(response, InputRequiredResult):
             return response
-        if (
-            len(msgspec.json.encode(response))
-            > self.config.tool_search_max_output_bytes
-        ):
-            message = "Catalog output limit exceeded"
-            raise McpInvalidParams(message)
         if response.is_error:
             await capture_result(
-                "tool_error", app=self.app, flow="mcp", phase="catalog",
-                operation=request.method, correlation_id=str(request.id),
-                expected=True, metadata={"transport": request.transport},
+                "tool_error",
+                app=self.app,
+                flow="mcp",
+                phase="catalog",
+                operation=request.method,
+                correlation_id=str(request.id),
+                expected=True,
+                metadata={"transport": request.transport},
             )
-        return CallToolResult(
-            content=response.content, structuredContent=response.structured_content,
+        result = CallToolResult(
+            content=response.content,
+            structuredContent=response.structured_content,
             isError=response.is_error,
         )
+        if len(msgspec.json.encode(result)) > self.config.tool_search_max_output_bytes:
+            message = "Catalog output limit exceeded"
+            raise McpInvalidParams(message)
+        return result
 
     async def _searchCatalog(
-        self, catalog: CompiledCatalog, request: McpRequest,
+        self,
+        catalog: CompiledCatalog,
+        request: McpRequest,
     ) -> McpResponse:
         """
         Rank catalog text and return only request-accessible tool matches.
@@ -1415,7 +1546,9 @@ class McpDispatcher:
         return McpResponse.structured({"tools": matches})
 
     async def _executeCatalog(
-        self, catalog: CompiledCatalog, request: McpRequest,
+        self,
+        catalog: CompiledCatalog,
+        request: McpRequest,
     ) -> McpResponse | InputRequiredResult:
         """
         Execute catalog tool calls sequentially with shared validation and access.
@@ -1456,7 +1589,8 @@ class McpDispatcher:
                 request,
                 arguments=cast("Mapping[str, object]", call.get("arguments", {})),
                 params={
-                    **request.params, "name": call["name"],
+                    **request.params,
+                    "name": call["name"],
                     "arguments": call.get("arguments", {}),
                 },
             )
@@ -1524,10 +1658,15 @@ class McpDispatcher:
             raise McpInvalidParams(error)
         return final
 
-    async def _report(  # noqa: PLR0913 - Explicit error-only context fields.
-        self, exception: BaseException, request: McpRequest | None = None,
-        *, transport: str = "in-process", phase: str = "execution",
-        expected: bool = False, correlation_id: str | int | None = None,
+    async def _report(
+        self,
+        exception: BaseException,
+        request: McpRequest | None = None,
+        *,
+        transport: str = "in-process",
+        phase: str = "execution",
+        expected: bool = False,
+        correlation_id: str | int | None = None,
         operation_name: str | None = None,
     ) -> None:
         """
@@ -1567,12 +1706,15 @@ class McpDispatcher:
                 exception = exception.__cause__
                 expected = False
         await report(
-            exception, self.app,
+            exception,
+            self.app,
             transport=request.transport if request is not None else transport,
-            phase=phase, expected=expected,
+            phase=phase,
+            expected=expected,
             operation=request.method if request is not None else operation_name,
             correlation_id=request.id if request is not None else correlation_id,
         )
+
 
 async def _close(source: object) -> None:
     """

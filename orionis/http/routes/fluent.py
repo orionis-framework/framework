@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Build route definitions through chainable routing options."""
 
 from __future__ import annotations
@@ -16,6 +18,7 @@ if TYPE_CHECKING:
     from orionis.http.middleware import BaseMiddleware
     from orionis.http.routes.types import MiddlewareInput, RouteAction
     from orionis.realtime.hub import Hub
+
 
 class FluentRoute(IFluentRoute):
     """
@@ -54,15 +57,17 @@ class FluentRoute(IFluentRoute):
         Wire protocol selected for the realtime hub route.
     """
 
-    _ALLOWED_METHODS: frozenset[str] = frozenset({
-        "GET",
-        "POST",
-        "PUT",
-        "DELETE",
-        "PATCH",
-        "QUERY",
-        "WEBSOCKET",
-    })
+    _ALLOWED_METHODS: frozenset[str] = frozenset(
+        {
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "PATCH",
+            "QUERY",
+            "WEBSOCKET",
+        },
+    )
     """Allowed methods used by ``FluentRoute``."""
 
     def __init__(
@@ -239,7 +244,7 @@ class FluentRoute(IFluentRoute):
         ValueError
             If the route is HTTP or the codec is unsupported.
         """
-        from orionis.realtime.hub import Hub  # noqa: PLC0415
+        from orionis.realtime.hub import Hub
 
         if not isinstance(hub, type) or not issubclass(hub, Hub):
             error_msg = "Hub routes require a Hub subclass"
@@ -463,7 +468,8 @@ class FluentRoute(IFluentRoute):
             "method": self.__method,
             "protocol": (
                 RouteProtocol.WEBSOCKET
-                if self.__method == "WEBSOCKET" else RouteProtocol.HTTP
+                if self.__method == "WEBSOCKET"
+                else RouteProtocol.HTTP
             ),
             "path": self.__path,
             "class": self.__class,

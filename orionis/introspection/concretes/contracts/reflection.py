@@ -1,19 +1,19 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Public annotations remain available to runtime inspection.
 """Define the contract for reflection concrete implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
-if TYPE_CHECKING:
-    import inspect
-    from collections.abc import Callable
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
+import inspect
+from collections.abc import Callable
+from orionis.introspection.dependencies.entities.signature import (
+    Signature,
+)
+
 
 class IReflectionConcrete(ABC):
-
-    # ruff: noqa: ANN401
     """Define the contract for reflection concrete implementations."""
 
     @abstractmethod
@@ -79,7 +79,7 @@ class IReflectionConcrete(ABC):
         Returns
         -------
         list of type
-            A list containing all base classes in the method resolution order.
+            The immediate base classes declared by the reflected class.
         """
 
     @abstractmethod
@@ -116,7 +116,7 @@ class IReflectionConcrete(ABC):
         """
 
     @abstractmethod
-    def getAnnotations(self) -> dict:
+    def getAnnotations(self) -> dict[str, object]:
         """
         Retrieve type annotations defined on the reflected class.
 
@@ -183,7 +183,9 @@ class IReflectionConcrete(ABC):
         Raises
         ------
         ValueError
-            If the attribute name is invalid or the value is callable.
+            If the attribute name is invalid.
+        TypeError
+            If the value is callable.
         """
 
     @abstractmethod
@@ -333,8 +335,9 @@ class IReflectionConcrete(ABC):
         Raises
         ------
         ValueError
-            If the method name already exists, is invalid, or the object is not
-            callable.
+            If the method name already exists or is invalid.
+        TypeError
+            If the supplied method is not callable.
         """
 
     @abstractmethod
@@ -378,7 +381,9 @@ class IReflectionConcrete(ABC):
         Raises
         ------
         ValueError
-            If the method does not exist or is not callable.
+            If the method does not exist.
+        TypeError
+            If the retrieved member is not callable.
         """
 
     @abstractmethod
@@ -843,7 +848,9 @@ class IReflectionConcrete(ABC):
         Raises
         ------
         ValueError
-            If the property does not exist or is not accessible.
+            If the property does not exist.
+        TypeError
+            If the requested member is not a property.
         """
 
     @abstractmethod
@@ -864,7 +871,9 @@ class IReflectionConcrete(ABC):
         Raises
         ------
         ValueError
-            If the property does not exist or is not accessible.
+            If the property does not exist.
+        TypeError
+            If the requested member is not a property.
         """
 
     @abstractmethod
@@ -885,7 +894,9 @@ class IReflectionConcrete(ABC):
         Raises
         ------
         ValueError
-            If the property does not exist or is not accessible.
+            If the property does not exist.
+        TypeError
+            If the requested member is not a property.
         """
 
     @abstractmethod
@@ -946,5 +957,5 @@ class IReflectionConcrete(ABC):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """

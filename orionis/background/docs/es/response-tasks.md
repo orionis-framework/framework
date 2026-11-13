@@ -24,8 +24,8 @@ def record_delivery(message_id: int) -> None:
 task = BackgroundTask(record_delivery, 42)
 response = Response("accepted", status_code=202, background=task)
 
-print(response.getStatusCode())       # 202
-print(response.background is task)    # True
+print(response.getStatusCode())  # 202
+print(response.background is task)  # True
 ```
 
 El fragmento construye la respuesta sin ejecutar la tarea. El adaptador ASGI/RSGI activo la llama después de completar el cuerpo.
@@ -48,7 +48,7 @@ Una respuesta posee como máximo un `BackgroundTask`. Como `BackgroundTasks` her
 
 ### Clasificación de callables
 
-Al construirse, `BackgroundTask` detecta funciones corrutina, objetos callable async y wrappers `functools.partial` de funciones async. Estos se ejecutan directamente en el loop actual. Los demás callables se ejecutan mediante `run_in_executor(None, ...)`; si uno devuelve un awaitable, la tarea espera después ese resultado en el loop.
+Al construirse, `BackgroundTask` detecta funciones corrutina, objetos callable async y wrappers `functools.partial` de funciones async. Estos se ejecutan directamente en el loop actual. Los demás callables se ejecutan en el ejecutor predeterminado del loop con una copia de las variables de contexto del llamador. Los cambios de contexto del worker no se propagan de vuelta. Si un callable síncrono devuelve un awaitable, la tarea espera ese resultado en el loop y descarta su valor final.
 
 ### Colecciones ordenadas
 
@@ -110,7 +110,7 @@ async def after_import() -> None:
     await BackgroundTask(refresh_index, 17).run()
 ```
 
-Llamar `after_import` imprime `indexed:17` y registra el éxito.
+Esperar `after_import()` imprime `indexed:17` y registra el éxito.
 
 
 ### Conservar argumentos con nombre en trabajo síncrono
@@ -146,7 +146,7 @@ async def run_delivery() -> None:
         print(str(error))
 ```
 
-La tarea registra el fallo y deja disponible el `RuntimeError` original para quien llama. En una colección, las tareas posteriores se omiten.
+La tarea reporta el fallo mediante el runtime de fallos de Orionis activo y vuelve a lanzar el `RuntimeError` original. Sin un runtime activo, utiliza el logger alternativo. Un fallo de ese logger no reemplaza el error original de aplicación. En una colección, las tareas posteriores no se ejecutan.
 
 ## Configuración
 
@@ -156,13 +156,13 @@ El módulo no consume claves de configuración ni variables de entorno de Orioni
 
 `orionis.http.responses.Response` acepta un `BackgroundTask` en su argumento `background`. Los adaptadores ASGI y RSGI esperan `runBackground()` después de entregar cuerpos en memoria, streams ordinarios, archivos, respuestas vacías y framing HEAD. Los controladores de registro y restablecimiento de contraseña de Orionis usan este mecanismo para enviar correo fuera de la ruta crítica de la respuesta.
 
-El módulo usa la fachada `Log` para registros de éxito y fallo. No tiene provider ni binding propio en el contenedor.
+Cada invocación abre una operación aislada de fallos de background y conserva el runtime de reporte de la aplicación activa. Los fallos utilizan el manejador centralizado; la fachada `Log` registra el éxito y actúa como alternativa cuando no hay un runtime de fallos activo. El módulo no tiene provider ni binding propio en el contenedor.
 
 ## Errores y casos límite
 
 - La construcción no rechaza un objeto no callable; al invocarlo sigue la ruta síncrona, registra el `TypeError` resultante y lo vuelve a lanzar.
 - Las excepciones nunca se ocultan. Un elemento fallido impide ejecutar todos los posteriores de la colección.
-- `asyncio.CancelledError` es `BaseException`, no `Exception`, por lo que el manejador de logging no lo intercepta.
+- La cancelación de callables async se propaga normalmente. Para un callable síncrono, la cancelación espera a que termine el worker antes de propagarse, de modo que no se liberen sus recursos mientras aún los usa. Un fallo tardío del worker se reporta mediante el mecanismo centralizado. Un awaitable devuelto después de la cancelación se libera sin ejecutarse; los resultados corrutina se cierran y se solicita la cancelación de futures en su loop propietario abierto. También se observa la excepción de un future que falla antes de poder cancelarlo. Este fallo o el de un hook síncrono de limpieza se reporta con la fase `cancelled_cleanup`, mientras el llamador sigue recibiendo `CancelledError`.
 - El estilo del callable se clasifica una vez al construir. Reemplazar internals no está soportado.
 - Fallos de entrega de la respuesta o ciertas rutas de desconexión de streams pueden impedir el trabajo de fondo. Usa `orionis.queues` para trabajo durable o con reintentos.
 - Se admite una función síncrona que devuelve un awaitable: la función se ejecuta en el ejecutor y el awaitable continúa después en el event loop.
@@ -183,7 +183,7 @@ BackgroundTask(func: Callable, *args: object, **kwargs: object)
 
 El constructor guarda el callable y los argumentos, y clasifica el callable una sola vez. No valida que pueda llamarse ni ejecuta trabajo. Invoca una instancia mediante `await task()` o `await task.run()`; ambos devuelven `None`.
 
-Si tiene éxito, registra un mensaje informativo con el nombre del callable. Si falla, registra un error y vuelve a lanzar la excepción original. Un objeto callable sin `__qualname__` se identifica por el nombre de su clase.
+Si tiene éxito, registra un mensaje informativo con el nombre del callable. Si falla, reporta mediante el runtime activo o el logger alternativo y vuelve a lanzar la excepción original. Un fallo del registro de éxito también se reporta y se propaga, aunque el callable ya haya terminado. Un objeto callable sin `__qualname__` se identifica por el nombre de su clase.
 
 ### `BackgroundTasks`
 

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from sqlalchemy.dialects import registry as sqlalchemy_registry
 from orionis.database.compiler import SQLCompiler
@@ -44,6 +46,12 @@ from orionis.orm.schema.types import (
 )
 from orionis.test import TestCase
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sqlalchemy.sql.elements import ClauseElement
+
+
 def _make_table() -> TableDefinition:
     """Build a small table definition used across the compiler tests.
 
@@ -61,8 +69,8 @@ def _make_table() -> TableDefinition:
         column.name = key
     return TableDefinition(name="users", columns=columns, primary_key="id")
 
-class TestSQLCompiler(TestCase):
 
+class TestSQLCompiler(TestCase):
     def setUp(self) -> None:
         """Create a fresh compiler and table definition per test.
 
@@ -71,12 +79,12 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._compiler = SQLCompiler()
         self._table = _make_table()
 
-    def _sql(self, statement) -> str:
+    def _sql(self, statement: ClauseElement) -> str:
         """Render a statement to normalized lowercase SQL.
 
         Parameters
@@ -101,7 +109,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         sql = self._sql(self._compiler.compileSelect(SelectPlan(table=self._table)))
         self.assertIn("select", sql)
@@ -115,7 +123,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table, columns=("name",))
         sql = self._sql(self._compiler.compileSelect(plan))
@@ -130,7 +138,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(WhereClause(column="active", value=True))
@@ -149,7 +157,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(WhereClause(column="name", value=None))
@@ -164,7 +172,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -181,7 +189,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -198,7 +206,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.orders.append(
@@ -220,7 +228,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(WhereClause(column="ghost", value=1))
@@ -235,7 +243,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._table,
@@ -252,7 +260,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._table,
@@ -271,7 +279,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = InsertPlan(table=self._table, values=[{"name": "john"}])
         sql = self._sql(self._compiler.compileInsert(plan))
@@ -285,7 +293,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(QueryException):
             self._compiler.compileInsert(InsertPlan(table=self._table))
@@ -298,7 +306,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = UpdatePlan(
             table=self._table,
@@ -317,7 +325,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(QueryException):
             self._compiler.compileUpdate(UpdatePlan(table=self._table))
@@ -330,7 +338,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = DeletePlan(
             table=self._table,
@@ -350,7 +358,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         compiler = SQLCompiler(prefix="app_")
         sql = str(
@@ -366,7 +374,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -383,7 +391,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -400,7 +408,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -420,7 +428,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cases = (
             (WhereType.STARTS_WITH, ("like", "|| '%'")),
@@ -444,7 +452,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -461,7 +469,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table, distinct=True)
         sql = self._sql(self._compiler.compileSelect(plan))
@@ -475,7 +483,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -492,7 +500,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -516,7 +524,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -533,7 +541,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.wheres.append(
@@ -550,7 +558,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table)
         plan.groups.append("active")
@@ -567,7 +575,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._table,
@@ -589,7 +597,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {
             "id": Integer().primary().autoIncrement(),
@@ -627,7 +635,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {
             "id": Integer().primary(),
@@ -650,7 +658,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {
             "id": Integer().primary().autoIncrement(),
@@ -672,7 +680,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ddl = str(self._compiler.compileCreateTable(self._table)).lower()
         self.assertIn("create table", ddl)
@@ -687,7 +695,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ddl = str(self._compiler.compileDropTable("users")).lower()
         self.assertIn("drop table", ddl)
@@ -705,12 +713,14 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         column = NumericCommon()
         column.name = "value"
         table = TableDefinition(
-            name="mixins", columns={"value": column}, primary_key="value",
+            name="mixins",
+            columns={"value": column},
+            primary_key="value",
         )
         with self.assertRaises(QueryException):
             SQLCompiler().compileCreateTable(table)
@@ -724,7 +734,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._table,
@@ -744,7 +754,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {"tenant_id": Integer(), "user_id": Integer()}
         for key, column in columns.items():
@@ -767,7 +777,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {
             "id": Integer().primary().autoIncrement(),
@@ -782,7 +792,8 @@ class TestSQLCompiler(TestCase):
             primary_key="id",
             unique_constraints=(
                 UniqueConstraint(
-                    columns=("tenant_id", "slug"), name="uq_pages_slug",
+                    columns=("tenant_id", "slug"),
+                    name="uq_pages_slug",
                 ),
             ),
         )
@@ -799,7 +810,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {"order_id": Integer(), "product_id": Integer()}
         for key, column in columns.items():
@@ -831,12 +842,14 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {"id": BigInteger().primary().autoIncrement()}
         columns["id"].name = "id"
         table = TableDefinition(
-            name="probes", columns=columns, primary_key="id",
+            name="probes",
+            columns=columns,
+            primary_key="id",
         )
 
         engine_table = SQLCompiler()._sqlTable(table)
@@ -855,12 +868,14 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {"id": BigInteger().primary().autoIncrement()}
         columns["id"].name = "id"
         table = TableDefinition(
-            name="probes", columns=columns, primary_key="id",
+            name="probes",
+            columns=columns,
+            primary_key="id",
         )
 
         engine_table = SQLCompiler()._sqlTable(table)
@@ -879,7 +894,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {"owner_id": BigInteger()}
         columns["owner_id"].name = "owner_id"
@@ -901,7 +916,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {
             "id": Integer().primary().autoIncrement(),
@@ -914,9 +929,7 @@ class TestSQLCompiler(TestCase):
             name="people",
             columns=columns,
             primary_key="id",
-            indexes=(
-                TableIndex(columns=("first_name", "last_name"), name="ix_name"),
-            ),
+            indexes=(TableIndex(columns=("first_name", "last_name"), name="ix_name"),),
         )
         engine_table = SQLCompiler()._sqlTable(table)
         index_names = {index.name for index in engine_table.indexes}
@@ -931,7 +944,7 @@ class TestSQLCompiler(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         columns = {"id": Integer().primary().autoIncrement()}
         for key, column in columns.items():
@@ -946,6 +959,7 @@ class TestSQLCompiler(TestCase):
         engine_table = SQLCompiler()._sqlTable(table)
         self.assertEqual(engine_table.schema, "reporting")
         self.assertEqual(engine_table.comment, "Audit trail table.")
+
 
 def _make_posts_table() -> TableDefinition:
     """Build a small "posts" table definition referencing "users".
@@ -964,6 +978,7 @@ def _make_posts_table() -> TableDefinition:
         column.name = key
     return TableDefinition(name="posts", columns=columns, primary_key="id")
 
+
 class TestSQLCompilerJoins(TestCase):
     """Compile SELECT plans spanning multiple table sources."""
 
@@ -973,13 +988,13 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._compiler = SQLCompiler()
         self._users = _make_table()
         self._posts = _make_posts_table()
 
-    def _sql(self, statement) -> str:
+    def _sql(self, statement: ClauseElement) -> str:
         """Render a statement to normalized lowercase SQL.
 
         Parameters
@@ -1003,7 +1018,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1029,7 +1044,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1054,7 +1069,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1072,7 +1087,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1099,7 +1114,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1116,7 +1131,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1142,7 +1157,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1169,7 +1184,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1195,7 +1210,7 @@ class TestSQLCompilerJoins(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(
             table=self._users,
@@ -1212,4 +1227,3 @@ class TestSQLCompilerJoins(TestCase):
         plan.wheres.append(WhereClause(column="posts.title", value="Hello"))
         sql = self._sql(self._compiler.compileSelect(plan))
         self.assertIn("where posts.title", sql)
-

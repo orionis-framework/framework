@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class SQLServerCharset(Enum):
     """
     Enumerate SQLCHAR encodings documented for SQL Server ODBC on Linux and macOS.

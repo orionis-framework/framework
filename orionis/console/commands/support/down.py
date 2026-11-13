@@ -2,6 +2,7 @@
 
 from orionis.console.commands.support.maintenance import MaintenanceModeCommand
 
+
 class DownCommand(MaintenanceModeCommand):
     """Place the application in runtime maintenance mode."""
 

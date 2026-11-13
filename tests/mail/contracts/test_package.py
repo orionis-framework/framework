@@ -1,10 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.mail import contracts as contracts_package
 from orionis.mail.contracts.manager import IMailManager
 from orionis.mail.contracts.transport import IMailTransport
 from orionis.test import TestCase
 
-class TestMailContractsPackage(TestCase):
 
+class TestMailContractsPackage(TestCase):
     def testDeclaresBothContractsAsPublicExports(self) -> None:
         """Expose the manager and transport contracts from the package root.
 

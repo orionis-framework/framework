@@ -174,6 +174,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_customVariables" class="internal-link" title="orionis.mcp.server.templates.UriMatcher._customVariables">_custom<wbr></wbr>Variables</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#match" class="internal-link" title="orionis.mcp.server.templates.UriMatcher.match">match</a></code>
             </div>
         
@@ -275,7 +285,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15722"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId15800"> 
                     
                 </input>
 
@@ -306,6 +316,16 @@
 
         
             <div class="itemName"><code><a href="#compile" class="internal-link" title="orionis.mcp.server.templates.UriMatcher.compile">compile</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_customVariables" class="internal-link" title="orionis.mcp.server.templates.UriMatcher._customVariables">_custom<wbr></wbr>Variables</a></code>
             </div>
         
 
@@ -616,7 +636,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">UriMatcher</span>: <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L179" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#compile" class="internal-link" title="orionis.mcp.server.templates.UriMatcher.compile">UriMatcher.compile(definition)</a></code></p><p><a href="classIndex.html#orionis.mcp.server.templates.UriMatcher">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">UriMatcher</span>: <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L186" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#compile" class="internal-link" title="orionis.mcp.server.templates.UriMatcher.compile">UriMatcher.compile(definition)</a></code></p><p><a href="classIndex.html#orionis.mcp.server.templates.UriMatcher">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -624,7 +644,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1501">
+          <table class="children sortable" id="id1513">
   
   
   <tr class="classmethod">
@@ -632,6 +652,11 @@
     <td>Class Method</td>
     <td><code><a href="#compile" class="internal-link" title="orionis.mcp.server.templates.UriMatcher.compile">compile</a></code></td>
     <td>Require an explicit inverse for RFC operators with ambiguous matching.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_customVariables" class="internal-link" title="orionis.mcp.server.templates.UriMatcher._customVariables">_custom<wbr></wbr>Variables</a></code></td>
+    <td>Validate the result of a configured custom inverse matcher.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -688,7 +713,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">compile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">definition: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>Resource]</code></span>) -&gt; <code><a href="orionis.mcp.server.templates.UriMatcher.html" class="internal-link" title="orionis.mcp.server.templates.UriMatcher">UriMatcher</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L196">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L203">
       
       (source)
     </a>
@@ -705,6 +730,33 @@
 </div><div class="basemethod">
   
   
+  <a name="orionis.mcp.server.templates.UriMatcher._customVariables">
+    
+  </a>
+  <a name="_customVariables">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_customVariables</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">uri: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">custom: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L253">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_customVariables" title="orionis.mcp.server.templates.UriMatcher._customVariables">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Validate the result of a configured custom inverse matcher.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">uri:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">URI already validated by the public matching entry point.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">custom:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">collections.abc.Callable</a></code></td><td class="fieldArgDesc">Configured inverse matcher, already narrowed to a callable.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Copied declared variables, or None when the custom matcher declines.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.mcp.server.templates.UriMatcher.match">
     
   </a>
@@ -715,7 +767,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">match</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">uri: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L246">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L283">
       
       (source)
     </a>
@@ -741,7 +793,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">captures</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L191">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L198">
       
       (source)
     </a>
@@ -768,7 +820,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">custom</span>: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>], <wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L193">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L200">
       
       (source)
     </a>
@@ -795,7 +847,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">expander</span>: <code>URITemplate</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L187">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L194">
       
       (source)
     </a>
@@ -822,7 +874,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">pattern</span>: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L189">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L196">
       
       (source)
     </a>
@@ -849,7 +901,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">template</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L183">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L190">
       
       (source)
     </a>
@@ -876,7 +928,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">variable_names</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/mcp/server/templates.py#L185">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mcp/server/templates.py#L192">
       
       (source)
     </a>
@@ -902,7 +954,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

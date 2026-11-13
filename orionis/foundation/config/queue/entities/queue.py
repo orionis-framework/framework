@@ -14,6 +14,7 @@ from orionis.support.entities.base import BaseEntity
 _CONNECTION_ENTITIES = {"sync": Sync, "database": Database, "redis": Redis}
 """Connection entities definitions used by ``queue``."""
 
+
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Queue(BaseEntity):
     """
@@ -258,7 +259,10 @@ class Queue(BaseEntity):
                 namespace = ("database", settings.connection, settings.table)
             else:
                 namespace = (
-                    "redis", settings.endpoint, settings.port, settings.db,
+                    "redis",
+                    settings.endpoint,
+                    settings.port,
+                    settings.db,
                     settings.prefix,
                 )
             if namespace in namespaces:

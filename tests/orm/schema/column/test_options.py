@@ -1,8 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema options behavior."""
+
 from dataclasses import FrozenInstanceError, fields
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types import ColumnType, Integer
 from orionis.test import TestCase
+
 
 class TestColumnOptions(TestCase):
     """Verify immutable options and their transfer to column definitions."""
@@ -13,7 +18,7 @@ class TestColumnOptions(TestCase):
         Returns
         -------
         None
-            Verify each declared option is visible on the resulting column.
+            No return value.
         """
         item = Integer()
         marker = object()
@@ -57,7 +62,7 @@ class TestColumnOptions(TestCase):
         Returns
         -------
         None
-            Verify default semantics and rejection of reassigned options.
+            No return value.
         """
         options = ColumnOptions()
         self.assertIsNone(options.length)

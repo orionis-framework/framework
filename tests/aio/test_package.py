@@ -1,10 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis import aio
 from orionis.aio import loop as loop_module
 from orionis.aio.loop import Loop
 from orionis.test import TestCase
 
-class TestAioPackageExports(TestCase):
 
+class TestAioPackageExports(TestCase):
     def testAllPublishesOnlyTheLoopManager(self) -> None:
         """
         Publish the loop manager as the single public export.
@@ -30,7 +32,7 @@ class TestAioPackageExports(TestCase):
         Validates that only the exported class and the implementation
         submodule are reachable from the package.
         """
-        public = {name for name in vars(aio) if not name.startswith("_")}
+        public = {name for name in dir(aio) if not name.startswith("_")}
         self.assertEqual(public, {"Loop", "loop"})
 
     def testSubmoduleIsReachableThroughThePackage(self) -> None:

@@ -1,17 +1,18 @@
+# ruff: noqa: TC001, TC003
+# Public invocation plans and their dependency annotations are inspected at runtime.
 """A reusable unbound handler plan; payloads never become keyword mappings."""
 
 import inspect
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal, cast, get_type_hints
+from typing import Literal, cast, get_type_hints
 import msgspec
 from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.http.contracts.request import IRequest
 from orionis.mcp.context import McpRequest
+from orionis.container.contracts.container import IContainer
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.container.contracts.container import IContainer
 
 @dataclass(frozen=True, slots=True)
 class _Parameter:
@@ -34,6 +35,7 @@ class _Parameter:
     """Type, default or lookup metadata used to resolve this argument."""
     positional: bool
     """Whether this argument must be passed positionally."""
+
 
 def _classify(
     parameter: inspect.Parameter,
@@ -104,8 +106,12 @@ def _classify(
         )
         raise TypeError(message)
     return _Parameter(
-        parameter.name, source, value, parameter.kind is parameter.POSITIONAL_ONLY,
+        parameter.name,
+        source,
+        value,
+        parameter.kind is parameter.POSITIONAL_ONLY,
     )
+
 
 @dataclass(frozen=True, slots=True)
 class McpInvoker:
@@ -161,7 +167,8 @@ class McpInvoker:
             message = f"MCP {definition.__name__}.{method} must be a regular method."
             raise TypeError(message)
         hints = get_type_hints(
-            function, localns={**vars(definition), definition.__name__: definition},
+            function,
+            localns={**vars(definition), definition.__name__: definition},
         )
         parameters = tuple(inspect.signature(function).parameters.values())
         if receiver != "none":
@@ -274,7 +281,9 @@ class McpInvoker:
 
     @staticmethod
     def _clientValue(
-        parameter: _Parameter, request: McpRequest, payload: object,
+        parameter: _Parameter,
+        request: McpRequest,
+        payload: object,
     ) -> object:
         """
         Read only parameters explicitly declared as client-controlled input.

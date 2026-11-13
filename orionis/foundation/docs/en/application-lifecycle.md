@@ -14,6 +14,10 @@ Before `create()`, fluent `with...` methods build mutable bootstrap metadata. Cr
 
 ASGI `http`, `websocket`, and `lifespan` scopes dispatch through `Application.__call__`; RSGI uses the protocol hooks. `handleCommand()` owns CLI startup, command execution, and guaranteed shutdown. HTTP startup publishes both ASGI and RSGI handlers before readiness is reported.
 
+If a task factory rejects an HTTP handler or its disconnect monitor, Application closes unadmitted coroutines and cancels/drains an already admitted handler before propagating the admission error.
+
+Repeated construction of the same Application class reuses its singleton and original root. `boot()` and `aclose()` do not reset route declarations or reload modules. The ordinary facades retain process-level application bindings; use a separate process for another independent application root.
+
 ## Common workflows
 
 ### Bootstrap a web application
@@ -26,7 +30,7 @@ Use `await app.boot()` when a worker needs registered and fully booted eager pro
 
 ### Change request-time configuration
 
-Read with dot notation (`app.config("http.cors.allowed_origins")`) and set with a second argument. Missing or unreachable keys return `None`; writes create intermediate dictionaries. Reset when a test or worker must discard runtime overrides.
+Read with dot notation (`app.config("http.cors.allow_origins")`) and set with a second argument. Missing or unreachable keys return `None`; writes create intermediate dictionaries. Reset when a test or worker must discard runtime overrides.
 
 ### Enter maintenance mode
 
@@ -34,7 +38,7 @@ The configured `app.maintenance` is the fallback. The shared `storage/framework/
 
 ## Integration with Orionis
 
-Foundation loads 20 core providers in deterministic order, auto-discovers concrete providers under `app/providers`, registers eager providers, and publishes deferred-provider metadata before eager registration. Synchronous provider `boot` runs during creation; async boot runs during `boot()` or a runtime startup.
+Foundation loads core providers in deterministic order, auto-discovers concrete providers under `app/providers`, registers eager providers, and publishes deferred-provider metadata before eager registration. Synchronous provider `boot` runs during creation; async boot runs during `boot()` or a runtime startup.
 
 It resolves the CLI and HTTP kernels from metadata, validates route-file facade imports, injects the configured scheduler/exception handler, and exposes itself as `IApplication` with alias `x-orionis-IApplication`. All service modules ultimately consume its config, container, paths, scopes, or lifecycle.
 
@@ -70,6 +74,8 @@ app.on(Lifespan.SHUTDOWN, close_resources, runtime=Runtime.HTTP)
 
 Global and runtime hooks are stored in sets. Do not rely on registration order to initialize dependent resources: put that sequence into one callback that performs both steps. A deferred provider registers and boots when one of its services is resolved; `areProvidersBooted` describes eager providers only.
 
+Unknown runtime selectors raise `ValueError` rather than registering global hooks; non-string selectors other than `None` raise `TypeError`. Existing `"http"` and `"cli"` values remain accepted. Only `None` selects global callbacks.
+
 ## Resources in a headless process
 
 Save this as a standalone program. The provider registers a dependency and its `boot` performs initialization requiring an event loop. The temporary application does not discover checkout providers. Close your own resources afterward: `boot()` alone does not run a kernel's shutdown sequence.
@@ -82,9 +88,11 @@ from orionis import Application
 from orionis.environment.core.dot_env import DotEnv
 from orionis.container.providers import ServiceProvider
 
+
 class Catalog:
     def __init__(self) -> None:
         self.ready = False
+
 
 class CatalogProvider(ServiceProvider):
     def register(self) -> None:
@@ -93,6 +101,7 @@ class CatalogProvider(ServiceProvider):
     async def boot(self) -> None:
         catalog = await self.app.make(Catalog)
         catalog.ready = True
+
 
 async def main() -> None:
     with TemporaryDirectory() as directory:
@@ -103,9 +112,13 @@ async def main() -> None:
         app.create()
         assert app.isCreated
         await app.boot()
-        assert app.areProvidersBooted
-        assert not app.isHttpReady
-        assert (await app.make(Catalog)).ready
+        try:
+            assert app.areProvidersBooted
+            assert not app.isHttpReady
+            assert (await app.make(Catalog)).ready
+        finally:
+            await app.aclose()
+
 
 asyncio.run(main())
 ```

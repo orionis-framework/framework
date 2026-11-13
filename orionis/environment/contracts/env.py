@@ -1,15 +1,14 @@
+# ruff: noqa: TC001
+# Resolve public enum annotations at runtime.
 """Define the contract for env implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, TYPE_CHECKING
+from typing import Any
+from orionis.environment.enums.value_type import EnvironmentValueType
 
-if TYPE_CHECKING:
-    from orionis.environment.enums.value_type import EnvironmentValueType
 
 class IEnv(ABC):
-
-    # ruff: noqa: FBT001
     """Define the contract for env implementations."""
 
     __slots__ = ()
@@ -45,7 +44,7 @@ class IEnv(ABC):
     def set(
         cls,
         key: str,
-        value: str | float | bool | list | dict | tuple | set,
+        value: object,
         type_hint: str | EnvironmentValueType | None = None,
         *,
         only_os: bool = False,
@@ -57,8 +56,9 @@ class IEnv(ABC):
         ----------
         key : str
             Name of the environment variable to set or update.
-        value : str | float | bool | list | dict | tuple | set
-            Value to assign to the environment variable.
+        value : object
+            Value to serialize according to the hint, or its ordinary text form
+            when no hint is supplied.
         type_hint : str | EnvironmentValueType | None, optional
             Type hint for the variable. Supported types: 'str', 'int', 'float',
             'bool', 'list', 'dict', 'tuple', 'set', 'base64', 'path'.
@@ -68,8 +68,7 @@ class IEnv(ABC):
         Returns
         -------
         bool
-            True if the environment variable was set successfully, otherwise
-            False.
+            True after the environment variable is successfully assigned.
         """
 
     @classmethod
@@ -94,8 +93,7 @@ class IEnv(ABC):
         Returns
         -------
         bool
-            True if the environment variable was removed successfully,
-            False otherwise.
+            True after removal, including when the variable was already absent.
         """
 
     @classmethod

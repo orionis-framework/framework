@@ -1,5 +1,8 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.enums.status import WebSocketStatus
 from orionis.test import TestCase
+
 
 class TestWebSocketStatus(TestCase):
     """Unit tests for the WebSocketStatus enumeration."""

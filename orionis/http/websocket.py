@@ -26,23 +26,48 @@ _MAX_CUSTOM_CLOSE = 4999
 """Max custom close value used by ``websocket``."""
 _MAX_CLOSE_REASON = 123
 """Max close reason value used by ``websocket``."""
-_VALID_CLOSE_CODES = frozenset({
-    1000, 1001, 1002, 1003, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014,
-})
+_VALID_CLOSE_CODES = frozenset(
+    {
+        1000,
+        1001,
+        1002,
+        1003,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1012,
+        1013,
+        1014,
+    },
+)
 """Valid close codes used by ``websocket``."""
+
 
 class WebSocket:
     """Own one server-independent connection with direct awaited messaging."""
 
     __slots__ = (
-        "_accepted", "_adapter", "_close_code", "_close_reason",
-        "_connection_state", "_max_message_size", "_params", "_receive_lock",
-        "_send_lock", "_state", "_transport",
+        "_accepted",
+        "_adapter",
+        "_close_code",
+        "_close_reason",
+        "_connection_state",
+        "_max_message_size",
+        "_params",
+        "_receive_lock",
+        "_send_lock",
+        "_state",
+        "_transport",
     )
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, transport: IWebSocketTransport, adapter: TransportAdapter, *,
+        self,
+        transport: IWebSocketTransport,
+        adapter: TransportAdapter,
+        *,
         params: Mapping[str, object] | None = None,
         max_message_size: int = _DEFAULT_MESSAGE_LIMIT,
     ) -> None:
@@ -196,7 +221,9 @@ class WebSocket:
         return self._params
 
     async def accept(
-        self, *, subprotocol: str | None = None,
+        self,
+        *,
+        subprotocol: str | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> None:
         """
@@ -526,7 +553,8 @@ class WebSocket:
             If the status is not an HTTP error code.
         """
         if (
-            isinstance(status_code, bool) or not isinstance(status_code, int)
+            isinstance(status_code, bool)
+            or not isinstance(status_code, int)
             or not _MIN_HTTP_ERROR <= status_code <= _MAX_HTTP_ERROR
         ):
             error_msg = "WebSocket rejection status must be between 400 and 599"
@@ -544,7 +572,8 @@ class WebSocket:
                 self._disconnected(int(WebSocketStatus.POLICY_VIOLATION))
 
     async def close(
-        self, code: WebSocketStatus | int = WebSocketStatus.NORMAL_CLOSURE,
+        self,
+        code: WebSocketStatus | int = WebSocketStatus.NORMAL_CLOSURE,
         reason: str = "",
     ) -> None:
         """
@@ -572,9 +601,12 @@ class WebSocket:
         if self.closed:
             return
         if (
-            isinstance(code, bool) or not isinstance(code, int)
-            or (code not in _VALID_CLOSE_CODES
-                and not _MIN_CUSTOM_CLOSE <= code <= _MAX_CUSTOM_CLOSE)
+            isinstance(code, bool)
+            or not isinstance(code, int)
+            or (
+                code not in _VALID_CLOSE_CODES
+                and not _MIN_CUSTOM_CLOSE <= code <= _MAX_CUSTOM_CLOSE
+            )
             or not isinstance(reason, str)
             or len(reason.encode("utf-8")) > _MAX_CLOSE_REASON
         ):
@@ -585,7 +617,8 @@ class WebSocket:
                 return
             pending = self._connection_state is WebSocketState.CONNECTING
             if (
-                not pending and not self.supportsCloseDetails
+                not pending
+                and not self.supportsCloseDetails
                 and (code != WebSocketStatus.NORMAL_CLOSURE or reason)
             ):
                 error_msg = "Transport does not expose WebSocket close code or reason"

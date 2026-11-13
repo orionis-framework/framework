@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema strict decimal behavior."""
+
 from __future__ import annotations
 from orionis.orm.schema.types import (
     StrictDecimal,
@@ -6,33 +10,6 @@ from orionis.orm.schema.types.column_type import ColumnType
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
 
-class TestStrictDecimal(TestCase):
-    def testDecimalCarriesPrecisionAndScale(self) -> None:
-        """Store precision and scale on decimal columns.
-
-        Validates the decimal shape parameters.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        column = StrictDecimal(12, 4)
-        self.assertEqual(column.precision, 12)
-        self.assertEqual(column.scale, 4)
-
-    def testDecimalRejectsInconsistentShape(self) -> None:
-        """Raise ValueError when the scale exceeds the precision.
-
-        Validates the decimal shape guard.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(ValueError):
-            StrictDecimal(2, 5)
 
 class TestStrictDecimalOptions(TestCase):
     """Verify StrictDecimal constructor metadata consumed by the compiler."""
@@ -43,7 +20,7 @@ class TestStrictDecimalOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = StrictDecimal()
         assert_column_options(
@@ -77,7 +54,7 @@ class TestStrictDecimalOptions(TestCase):
         Returns
         -------
         None
-            Verify all precision and scale validation branches.
+            No return value.
         """
         self.assertIsNone(StrictDecimal(None, None).precision)
         shapes = (
@@ -87,6 +64,7 @@ class TestStrictDecimalOptions(TestCase):
             (-1, 0),
             (2, -1),
             (2, 3),
+            (2, 5),
             (2.5, 1),
             (4, "1"),
         )

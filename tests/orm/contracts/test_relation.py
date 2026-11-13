@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.orm.contracts.relation import IRelation
 from orionis.orm.relations.relation import Relation
 from orionis.test import TestCase
@@ -14,6 +16,7 @@ RELATION_METHODS = MODEL_METHODS | frozenset(
     },
 )
 
+
 class TestRelationContract(TestCase):
     """Verify relation templates extend model queries without dynamic state."""
 
@@ -23,16 +26,7 @@ class TestRelationContract(TestCase):
         Returns
         -------
         None
-            Verify the relation contract remains a full model query interface.
+            No return value.
         """
         assert_contract_surface(self, IRelation, Relation, RELATION_METHODS)
-
-    def testContractDeclaresEmptySlots(self) -> None:
-        """Prevent the relation interface from introducing a dictionary.
-
-        Returns
-        -------
-        None
-            Verify empty slots are declared on the interface itself.
-        """
         self.assertEqual(IRelation.__dict__.get("__slots__"), ())

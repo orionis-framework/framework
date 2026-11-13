@@ -38,13 +38,20 @@ The web application applies this data to its session. `withErrors()` accepts nor
 
 `setHeader()` replaces a header's values; `addHeader()` appends one. `getHeader()` returns a list or `None`; lookups ignore case. Do not insert newlines in names or values. `withCookie()` supports chaining; `setCookie()` returns `None`.
 
+Outgoing headers reject invalid field-name tokens and unsafe control characters before transport emission, including mutations through returned header lists and template copies. Horizontal tabs and Latin-1 field values remain accepted.
+
 Built-in response types initialize standard metadata directly where possible, without sharing mutable headers between responses. Custom headers keep their existing precedence, including redirect and file metadata overrides. Subclasses still use their header hooks during construction; JSON serialization and stream consumption remain unchanged.
 
 ```python
 from orionis.http import response
 
 result = response.text("saved").withCookie(
-    "theme", "dark", secure=True, http_only=True, same_site="lax", max_age=3600,
+    "theme",
+    "dark",
+    secure=True,
+    http_only=True,
+    same_site="lax",
+    max_age=3600,
 )
 result.deleteCookie("obsolete", path="/")
 assert result.hasHeader("set-cookie")
@@ -54,7 +61,7 @@ Delete a cookie using the same `path` and `domain` used to create it. `Secure`, 
 
 ## Files and safe reuse
 
-`response.file(path, media_type=..., filename=...)` verifies an existing regular file and delivers it as a stream. `download(path, filename=...)` adds attachment disposition. Resolve paths from authorized identifiers rather than arbitrary client paths. Adapters implement conditional and range delivery; consult their tests before depending on a specific case. A file can disappear between construction and reading.
+`response.file(path, media_type=..., filename=...)` verifies an existing regular file and delivers it as a stream. `download(path, filename=...)` adds attachment disposition. Resolve paths from authorized identifiers rather than arbitrary client paths. Adapters support one byte interval per request, not automatic conditional-request handling. A file can disappear between construction and reading.
 
 `ResponseTemplate` retains encoded content and base headers and creates independent responses with `make()`. Do not reuse one mutable response across requests. `background` work runs after delivery and cleanup; it is not a durable queue and does not guarantee execution after process failure.
 
@@ -62,7 +69,9 @@ Delete a cookie using the same `path` and `domain` used to create it. `Secure`, 
 ```python
 from orionis.http import ResponseTemplate
 
-template = ResponseTemplate("ready", headers={"X-Service": "catalog"}, media_type="text/plain")
+template = ResponseTemplate(
+    "ready", headers={"X-Service": "catalog"}, media_type="text/plain"
+)
 first = template.make()
 second = template.make()
 first.setHeader("X-Request-ID", "one")

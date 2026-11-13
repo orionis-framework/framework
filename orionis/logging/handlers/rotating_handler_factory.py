@@ -1,9 +1,11 @@
+# ruff: noqa: TC003
+# Resolve public factory return types and the callable registry at runtime.
 """Construct rotating log handlers from channel configuration."""
 
 from __future__ import annotations
-from logging import FileHandler
+from collections.abc import Callable
+from logging import FileHandler, Handler
 from pathlib import Path
-from typing import TYPE_CHECKING
 from orionis.logging.handlers.advanced_rotating_file_handler import (
     AdvancedRotatingFileHandler,
 )
@@ -13,12 +15,12 @@ from orionis.logging.handlers.hourly_suffix_resolver import HourlySuffixResolver
 from orionis.logging.handlers.monthly_suffix_resolver import MonthlySuffixResolver
 from orionis.logging.handlers.weekly_suffix_resolver import WeeklySuffixResolver
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from logging import Handler
 
 def _create_stack(
-    _channel_config: dict, app_root: str, path_template: str, level: int,
+    _channel_config: dict,
+    app_root: str,
+    path_template: str,
+    level: int,
 ) -> Handler:
     """
     Create a non-rotating file handler for the stack channel.
@@ -45,8 +47,12 @@ def _create_stack(
     handler.setLevel(level)
     return handler
 
+
 def _create_hourly(
-    channel_config: dict, app_root: str, path_template: str, level: int,
+    channel_config: dict,
+    app_root: str,
+    path_template: str,
+    level: int,
 ) -> Handler:
     """
     Create an hourly rotating file handler.
@@ -80,8 +86,12 @@ def _create_hourly(
     handler.setLevel(level)
     return handler
 
+
 def _create_daily(
-    channel_config: dict, app_root: str, path_template: str, level: int,
+    channel_config: dict,
+    app_root: str,
+    path_template: str,
+    level: int,
 ) -> Handler:
     """
     Create a daily rotating file handler.
@@ -116,8 +126,12 @@ def _create_daily(
     handler.setLevel(level)
     return handler
 
+
 def _create_weekly(
-    channel_config: dict, app_root: str, path_template: str, level: int,
+    channel_config: dict,
+    app_root: str,
+    path_template: str,
+    level: int,
 ) -> Handler:
     """
     Create a weekly rotating file handler.
@@ -152,8 +166,12 @@ def _create_weekly(
     handler.setLevel(level)
     return handler
 
+
 def _create_monthly(
-    channel_config: dict, app_root: str, path_template: str, level: int,
+    channel_config: dict,
+    app_root: str,
+    path_template: str,
+    level: int,
 ) -> Handler:
     """
     Create a monthly rotating file handler.
@@ -188,8 +206,12 @@ def _create_monthly(
     handler.setLevel(level)
     return handler
 
+
 def _create_chunked(
-    channel_config: dict, app_root: str, path_template: str, level: int,
+    channel_config: dict,
+    app_root: str,
+    path_template: str,
+    level: int,
 ) -> Handler:
     """
     Create a size-based rotating file handler.
@@ -226,6 +248,7 @@ def _create_chunked(
     handler.setLevel(level)
     return handler
 
+
 # Mapping of channel types to their respective handler creation functions
 _CHANNEL_CREATORS: dict[str, Callable[[dict, str, str, int], Handler]] = {
     "stack": _create_stack,
@@ -236,6 +259,7 @@ _CHANNEL_CREATORS: dict[str, Callable[[dict, str, str, int], Handler]] = {
     "chunked": _create_chunked,
 }
 """Mapping of channel types to their respective handler creation functions."""
+
 
 class RotatingHandlerFactory:
     """Construct rotating log handlers from channel configuration."""
@@ -267,7 +291,6 @@ class RotatingHandlerFactory:
         path_template: str = channel_config.get("path", "storage/logs/default.log")
         level: int = channel_config.get("level", 20)  # Default to INFO
 
-        # O(1) dict lookup replaces linear if-chain (M4)
         creator = _CHANNEL_CREATORS.get(channel_name)
         if creator is None:
             return None

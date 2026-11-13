@@ -1,3 +1,6 @@
+# ruff: noqa: ASYNC109, TC001, TC003
+# Keep the existing boundary behavior and deliberately shaped fixtures.
+# Retain runtime annotations without eagerly accessing a partially defined Hub.
 """Provide realtime operations.
 
 Includes ``validate_identifier``, ``validate_group``, ``ClientTarget``,
@@ -5,14 +8,11 @@ Includes ``validate_identifier``, ``validate_group``, ``ClientTarget``,
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from collections.abc import Iterable
+from orionis.realtime.contracts.manager import IConnectionManager
 from orionis.realtime.decorators import validate_remote_name
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-    from orionis.realtime.contracts.manager import IConnectionManager
-    from orionis.realtime.entities import BroadcastResult
-    from orionis.realtime.hub import Hub
+from orionis.realtime.entities import BroadcastResult
+import orionis.realtime.hub as hub_module
 
 _MAX_IDENTIFIER = 128
 """Max identifier value used by ``clients``."""
@@ -110,7 +110,7 @@ class ClientTarget:
     def __init__(
         self,
         manager: IConnectionManager,
-        hub: type[Hub],
+        hub: type[hub_module.Hub],
         *,
         connection_ids: tuple[str, ...] | str | None = None,
         group: str | None = None,
@@ -171,7 +171,8 @@ class ClientTarget:
             return self._ids
         selected = (
             self._manager.groupIds(self._hub, self._group)
-            if self._group is not None else self._manager.connectionIds(self._hub)
+            if self._group is not None
+            else self._manager.connectionIds(self._hub)
         )
         if self._excluded is not None:
             return tuple(value for value in selected if value != self._excluded)
@@ -209,8 +210,10 @@ class ClientTarget:
         )
 
     async def invoke(
-        self, target: str, *args: object,
-        timeout: float | None = None,  # noqa: ASYNC109 # NOSONAR
+        self,
+        target: str,
+        *args: object,
+        timeout: float | None = None,  # NOSONAR
     ) -> object:
         """
         Invoke one selected client and await its correlated completion.
@@ -264,7 +267,7 @@ class HubClients:
     def __init__(
         self,
         manager: IConnectionManager,
-        hub: type[Hub],
+        hub: type[hub_module.Hub],
         caller_id: str | None = None,
     ) -> None:
         """
@@ -379,7 +382,9 @@ class HubClients:
         """
         validate_identifier(connection_id, "Connection identifier")
         return ClientTarget(
-            self._manager, self._hub, connection_ids=connection_id,
+            self._manager,
+            self._hub,
+            connection_ids=connection_id,
         )
 
     def clients(self, connection_ids: Iterable[str]) -> ClientTarget:

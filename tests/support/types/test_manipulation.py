@@ -1,12 +1,15 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.support.types.stringable import Stringable
 from orionis.test import TestCase
+
 
 class TestStringableManipulation(TestCase):
     """Unit tests for Stringable string-manipulation operations."""
 
     # --------------------------------------------------------------- replace
 
-    def testReplaceSubstringCaseSensitive(self):
+    def testReplaceSubstringCaseSensitive(self) -> None:
         """Replace a substring in case-sensitive mode.
 
         Validates that `replace` substitutes the exact match of the
@@ -15,12 +18,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("Hello World").replace("World", "Python")
         self.assertEqual(result, Stringable("Hello Python"))
 
-    def testReplaceSubstringCaseInsensitive(self):
+    def testReplaceSubstringCaseInsensitive(self) -> None:
         """Replace a substring in case-insensitive mode.
 
         Validates that `replace` with case_sensitive=False substitutes
@@ -29,14 +32,16 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("Hello World").replace(
-            "world", "Python", case_sensitive=False,
+            "world",
+            "Python",
+            case_sensitive=False,
         )
         self.assertEqual(result, Stringable("Hello Python"))
 
-    def testReplaceMultipleSearchAndReplace(self):
+    def testReplaceMultipleSearchAndReplace(self) -> None:
         """Replace multiple substrings in one call using lists.
 
         Validates that `replace` accepts parallel lists for search and
@@ -45,12 +50,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("a b c").replace(["a", "b"], ["x", "y"])
         self.assertEqual(result, Stringable("x y c"))
 
-    def testReplaceRaisesOnMismatchedLists(self):
+    def testReplaceRaisesOnMismatchedLists(self) -> None:
         """Raise ValueError when search and replace lists differ in length.
 
         Ensures `replace` enforces equal-length lists when both arguments
@@ -59,14 +64,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("abc").replace(["a", "b"], ["x"])
 
     # ---------------------------------------------------------- replaceFirst
 
-    def testReplaceFirstReplacesOnlyFirstOccurrence(self):
+    def testReplaceFirstReplacesOnlyFirstOccurrence(self) -> None:
         """Replace only the first occurrence of the search string.
 
         Validates that `replaceFirst` leaves subsequent occurrences of
@@ -75,12 +80,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("aaa").replaceFirst("a", "b")
         self.assertEqual(result, Stringable("baa"))
 
-    def testReplaceFirstRaisesTypeErrorOnNonString(self):
+    def testReplaceFirstRaisesTypeErrorOnNonString(self) -> None:
         """Raise TypeError when search or replace is not a string.
 
         Ensures `replaceFirst` validates both argument types before
@@ -89,14 +94,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").replaceFirst(1, "x")
 
     # ----------------------------------------------------------- replaceLast
 
-    def testReplaceLastReplacesOnlyLastOccurrence(self):
+    def testReplaceLastReplacesOnlyLastOccurrence(self) -> None:
         """Replace only the last occurrence of the search string.
 
         Validates that `replaceLast` targets only the final match,
@@ -105,12 +110,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("aaa").replaceLast("a", "b")
         self.assertEqual(result, Stringable("aab"))
 
-    def testReplaceLastNoChangeWhenNotFound(self):
+    def testReplaceLastNoChangeWhenNotFound(self) -> None:
         """Return unchanged string when search is absent.
 
         Ensures `replaceLast` returns the original Stringable when the
@@ -119,14 +124,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").replaceLast("x", "y")
         self.assertEqual(result, Stringable("hello"))
 
     # ---------------------------------------------------------- replaceStart
 
-    def testReplaceStartReplacesAtBeginning(self):
+    def testReplaceStartReplacesAtBeginning(self) -> None:
         """Replace the matching prefix at the start of the string.
 
         Validates that `replaceStart` substitutes the search string
@@ -135,12 +140,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("helloWorld").replaceStart("hello", "hi")
         self.assertEqual(result, Stringable("hiWorld"))
 
-    def testReplaceStartNoChangeWhenNotAtStart(self):
+    def testReplaceStartNoChangeWhenNotAtStart(self) -> None:
         """Return unchanged string when search is not at the start.
 
         Ensures `replaceStart` does not modify the string when the
@@ -149,14 +154,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("worldHello").replaceStart("hello", "hi")
         self.assertEqual(result, Stringable("worldHello"))
 
     # ------------------------------------------------------------ replaceEnd
 
-    def testReplaceEndReplacesAtTheEnd(self):
+    def testReplaceEndReplacesAtTheEnd(self) -> None:
         """Replace the matching suffix at the end of the string.
 
         Validates that `replaceEnd` substitutes the search string only
@@ -165,12 +170,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("helloWorld").replaceEnd("World", "Python")
         self.assertEqual(result, Stringable("helloPython"))
 
-    def testReplaceEndNoChangeWhenNotAtEnd(self):
+    def testReplaceEndNoChangeWhenNotAtEnd(self) -> None:
         """Return unchanged string when search is not at the end.
 
         Ensures `replaceEnd` does not modify the string when the search
@@ -179,14 +184,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("WorldHello").replaceEnd("World", "Python")
         self.assertEqual(result, Stringable("WorldHello"))
 
     # ---------------------------------------------------------- replaceArray
 
-    def testReplaceArraySubstitutesSequentially(self):
+    def testReplaceArraySubstitutesSequentially(self) -> None:
         """Replace a substring sequentially with elements from a list.
 
         Validates that `replaceArray` substitutes each occurrence of the
@@ -195,12 +200,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("? ? ?").replaceArray("?", ["a", "b", "c"])
         self.assertEqual(result, Stringable("a b c"))
 
-    def testReplaceArrayRaisesTypeErrorWhenReplaceNotList(self):
+    def testReplaceArrayRaisesTypeErrorWhenReplaceNotList(self) -> None:
         """Raise TypeError when replace argument is not a list.
 
         Ensures `replaceArray` validates the type of its replace
@@ -209,12 +214,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").replaceArray("l", "x")
 
-    def testReplaceArrayRaisesTypeErrorWhenItemNotString(self):
+    def testReplaceArrayRaisesTypeErrorWhenItemNotString(self) -> None:
         """Raise TypeError when a replace list item is not a string.
 
         Ensures `replaceArray` validates each item in the replacement
@@ -223,14 +228,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").replaceArray("l", [1, 2])
 
     # --------------------------------------------------------- replaceMatches
 
-    def testReplaceMatchesWithStringReplacement(self):
+    def testReplaceMatchesWithStringReplacement(self) -> None:
         """Replace regex matches using a string replacement.
 
         Validates that `replaceMatches` substitutes all occurrences
@@ -239,12 +244,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello123world").replaceMatches(r"\d+", "NUM")
         self.assertEqual(result, Stringable("helloNUMworld"))
 
-    def testReplaceMatchesWithCallableReplacement(self):
+    def testReplaceMatchesWithCallableReplacement(self) -> None:
         """Replace regex matches using a callable replacement.
 
         Validates that `replaceMatches` invokes the callable with each
@@ -253,14 +258,15 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").replaceMatches(
-            r"[aeiou]", lambda m: m.group(0).upper(),
+            r"[aeiou]",
+            lambda m: m.group(0).upper(),
         )
         self.assertEqual(result, Stringable("hEllO"))
 
-    def testReplaceMatchesWithMultiplePatterns(self):
+    def testReplaceMatchesWithMultiplePatterns(self) -> None:
         """Apply multiple patterns in a single replaceMatches call.
 
         Validates that `replaceMatches` accepts a list of patterns and
@@ -269,14 +275,15 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").replaceMatches(
-            [r"hello", r"world"], "x",
+            [r"hello", r"world"],
+            "x",
         )
         self.assertEqual(result, Stringable("x x"))
 
-    def testReplaceMatchesRaisesTypeErrorOnInvalidPattern(self):
+    def testReplaceMatchesRaisesTypeErrorOnInvalidPattern(self) -> None:
         """Raise TypeError when pattern is neither a string nor a list.
 
         Ensures `replaceMatches` enforces type validation on the
@@ -285,14 +292,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").replaceMatches(123, "x")
 
     # ------------------------------------------------------------- remove
 
-    def testRemoveDeletesSubstring(self):
+    def testRemoveDeletesSubstring(self) -> None:
         """Remove all occurrences of a substring from the string.
 
         Validates that `remove` deletes every instance of the search
@@ -301,12 +308,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").remove("l")
         self.assertEqual(result, Stringable("heo word"))
 
-    def testRemoveCaseInsensitive(self):
+    def testRemoveCaseInsensitive(self) -> None:
         """Remove substrings case-insensitively when specified.
 
         Validates that `remove` with case_sensitive=False deletes all
@@ -315,12 +322,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("Hello World").remove("hello", case_sensitive=False)
         self.assertEqual(result, Stringable(" World"))
 
-    def testRemoveMultipleSubstrings(self):
+    def testRemoveMultipleSubstrings(self) -> None:
         """Remove multiple substrings in one call using a list.
 
         Validates that `remove` accepts a list of search strings and
@@ -329,12 +336,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").remove(["hello", " "])
         self.assertEqual(result, Stringable("world"))
 
-    def testRemoveRaisesTypeErrorOnInvalidSearch(self):
+    def testRemoveRaisesTypeErrorOnInvalidSearch(self) -> None:
         """Raise TypeError when search is neither a string nor a list.
 
         Ensures `remove` validates the search argument type before
@@ -343,14 +350,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").remove(42)
 
     # -------------------------------------------------------------- chopStart
 
-    def testChopStartRemovesPrefixWhenPresent(self):
+    def testChopStartRemovesPrefixWhenPresent(self) -> None:
         """Remove the specified prefix from the start of the string.
 
         Validates that `chopStart` strips the given prefix when it
@@ -359,12 +366,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("https://example.com").chopStart("https://")
         self.assertEqual(result, Stringable("example.com"))
 
-    def testChopStartNoChangeWhenPrefixAbsent(self):
+    def testChopStartNoChangeWhenPrefixAbsent(self) -> None:
         """Return unchanged string when prefix is absent.
 
         Ensures `chopStart` is a no-op when none of the provided needles
@@ -373,12 +380,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("example.com").chopStart("https://")
         self.assertEqual(result, Stringable("example.com"))
 
-    def testChopStartWithList(self):
+    def testChopStartWithList(self) -> None:
         """Remove the first matching prefix from a list of needles.
 
         Validates that `chopStart` accepts a list and removes the first
@@ -387,7 +394,7 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("http://example.com").chopStart(
             ["https://", "http://"],
@@ -396,7 +403,7 @@ class TestStringableManipulation(TestCase):
 
     # --------------------------------------------------------------- chopEnd
 
-    def testChopEndRemovesSuffixWhenPresent(self):
+    def testChopEndRemovesSuffixWhenPresent(self) -> None:
         """Remove the specified suffix from the end of the string.
 
         Validates that `chopEnd` strips the given suffix when it appears
@@ -405,12 +412,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("example.com/").chopEnd("/")
         self.assertEqual(result, Stringable("example.com"))
 
-    def testChopEndNoChangeWhenSuffixAbsent(self):
+    def testChopEndNoChangeWhenSuffixAbsent(self) -> None:
         """Return unchanged string when suffix is absent.
 
         Ensures `chopEnd` is a no-op when none of the provided needles
@@ -419,14 +426,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("example.com").chopEnd("/")
         self.assertEqual(result, Stringable("example.com"))
 
     # ----------------------------------------------------------- deduplicate
 
-    def testDeduplicateCollapsesSpaces(self):
+    def testDeduplicateCollapsesSpaces(self) -> None:
         """Collapse consecutive spaces into a single space.
 
         Validates that `deduplicate` replaces runs of the default space
@@ -435,12 +442,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello   world").deduplicate()
         self.assertEqual(result, Stringable("hello world"))
 
-    def testDeduplicateWithCustomCharacter(self):
+    def testDeduplicateWithCustomCharacter(self) -> None:
         """Collapse consecutive occurrences of a custom character.
 
         Validates that `deduplicate` accepts a character argument and
@@ -450,12 +457,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("aabbcc").deduplicate("b")
         self.assertEqual(result, Stringable("aabcc"))
 
-    def testDeduplicateRaisesValueErrorOnMultiCharInput(self):
+    def testDeduplicateRaisesValueErrorOnMultiCharInput(self) -> None:
         """Raise ValueError when character is not a single character.
 
         Ensures `deduplicate` enforces the single-character constraint
@@ -464,14 +471,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("hello").deduplicate("ab")
 
     # ------------------------------------------------------------------ mask
 
-    def testMaskReplacesMiddleSection(self):
+    def testMaskReplacesMiddleSection(self) -> None:
         """Mask a section of the string with the specified character.
 
         Validates that `mask` replaces the specified character range with
@@ -480,12 +487,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("password").mask("*", 2, 4)
         self.assertEqual(result, Stringable("pa****rd"))
 
-    def testMaskToEndOfStringWhenLengthOmitted(self):
+    def testMaskToEndOfStringWhenLengthOmitted(self) -> None:
         """Mask from the index to end of string when length is omitted.
 
         Validates that `mask` without a length argument masks every
@@ -494,12 +501,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").mask("*", 2)
         self.assertEqual(result, Stringable("he***"))
 
-    def testMaskWithNegativeIndex(self):
+    def testMaskWithNegativeIndex(self) -> None:
         """Mask characters relative to the end of the string.
 
         Validates that a negative index causes `mask` to compute the
@@ -508,12 +515,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").mask("*", -3)
         self.assertEqual(result, Stringable("he***"))
 
-    def testMaskRaisesValueErrorOnMultiCharCharacter(self):
+    def testMaskRaisesValueErrorOnMultiCharCharacter(self) -> None:
         """Raise ValueError when masking character is not a single char.
 
         Ensures `mask` enforces the single-character constraint on its
@@ -522,12 +529,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("hello").mask("**", 0)
 
-    def testMaskRaisesTypeErrorOnNonIntegerIndex(self):
+    def testMaskRaisesTypeErrorOnNonIntegerIndex(self) -> None:
         """Raise TypeError when index is not an integer.
 
         Ensures `mask` validates the index type before computing the
@@ -536,14 +543,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").mask("*", "a")
 
     # ----------------------------------------------------------------- limit
 
-    def testLimitTruncatesString(self):
+    def testLimitTruncatesString(self) -> None:
         """Limit the string to a maximum number of characters.
 
         Validates that `limit` returns a truncated string followed by
@@ -552,12 +559,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").limit(5)
         self.assertEqual(result, Stringable("hello..."))
 
-    def testLimitReturnsOriginalWhenWithinLimit(self):
+    def testLimitReturnsOriginalWhenWithinLimit(self) -> None:
         """Return the original string when it is within the limit.
 
         Ensures `limit` is a no-op when the string length does not
@@ -566,12 +573,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hi").limit(100)
         self.assertEqual(result, Stringable("hi"))
 
-    def testLimitWithCustomEnd(self):
+    def testLimitWithCustomEnd(self) -> None:
         """Use a custom end string when truncation occurs.
 
         Validates that `limit` appends the provided end string instead
@@ -580,12 +587,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").limit(5, " [more]")
         self.assertEqual(result, Stringable("hello [more]"))
 
-    def testLimitWithPreserveWords(self):
+    def testLimitWithPreserveWords(self) -> None:
         """Avoid cutting words in the middle when preserve_words is True.
 
         Validates that `limit` with preserve_words=True truncates at a
@@ -594,12 +601,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world foo").limit(8, "...", preserve_words=True)
         self.assertNotIn("wor", str(result)[5:])
 
-    def testLimitRaisesValueErrorOnNegativeLimit(self):
+    def testLimitRaisesValueErrorOnNegativeLimit(self) -> None:
         """Raise ValueError when limit is negative.
 
         Ensures `limit` validates that the limit parameter is a
@@ -608,14 +615,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("hello").limit(-1)
 
     # -------------------------------------------------------------- padBoth
 
-    def testPadBothCentresString(self):
+    def testPadBothCentresString(self) -> None:
         """Centre the string within the specified total length.
 
         Validates that `padBoth` adds equal padding to both sides of the
@@ -624,14 +631,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hi").padBoth(6)
         self.assertEqual(len(result), 6)
         self.assertTrue(str(result).startswith(" "))
         self.assertTrue(str(result).endswith(" "))
 
-    def testPadBothNoOpWhenAlreadyLongEnough(self):
+    def testPadBothNoOpWhenAlreadyLongEnough(self) -> None:
         """Return the original string when already at or above the length.
 
         Ensures `padBoth` is a no-op when the string length meets or
@@ -640,12 +647,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").padBoth(5)
         self.assertEqual(result, Stringable("hello world"))
 
-    def testPadBothRaisesValueErrorOnEmptyPad(self):
+    def testPadBothRaisesValueErrorOnEmptyPad(self) -> None:
         """Raise ValueError when pad is an empty string.
 
         Ensures `padBoth` validates that the pad string is non-empty
@@ -654,14 +661,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("hi").padBoth(10, "")
 
     # --------------------------------------------------------------- padLeft
 
-    def testPadLeftAddsLeadingPadding(self):
+    def testPadLeftAddsLeadingPadding(self) -> None:
         """Pad the left side of the string to reach the desired length.
 
         Validates that `padLeft` adds the correct number of padding
@@ -670,12 +677,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hi").padLeft(5)
         self.assertEqual(result, Stringable("   hi"))
 
-    def testPadLeftWithCustomPad(self):
+    def testPadLeftWithCustomPad(self) -> None:
         """Use a custom pad string for left-padding.
 
         Validates that `padLeft` honours the provided pad string instead
@@ -684,14 +691,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("5").padLeft(3, "0")
         self.assertEqual(result, Stringable("005"))
 
     # -------------------------------------------------------------- padRight
 
-    def testPadRightAddsTrailingPadding(self):
+    def testPadRightAddsTrailingPadding(self) -> None:
         """Pad the right side of the string to reach the desired length.
 
         Validates that `padRight` adds the correct number of padding
@@ -700,14 +707,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hi").padRight(5)
         self.assertEqual(result, Stringable("hi   "))
 
     # ------------------------------------------------------------------ trim
 
-    def testTrimRemovesWhitespace(self):
+    def testTrimRemovesWhitespace(self) -> None:
         """Remove leading and trailing whitespace by default.
 
         Validates that `trim` strips whitespace from both ends when no
@@ -716,12 +723,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("  hello  ").trim()
         self.assertEqual(result, Stringable("hello"))
 
-    def testTrimRemovesSpecifiedCharacters(self):
+    def testTrimRemovesSpecifiedCharacters(self) -> None:
         """Remove specified characters from both ends.
 
         Validates that `trim` strips any combination of the provided
@@ -730,12 +737,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("--hello--").trim("-")
         self.assertEqual(result, Stringable("hello"))
 
-    def testTrimRaisesTypeErrorOnNonString(self):
+    def testTrimRaisesTypeErrorOnNonString(self) -> None:
         """Raise TypeError when characters argument is not a string.
 
         Ensures `trim` validates its characters parameter type before
@@ -744,14 +751,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").trim(42)
 
     # ------------------------------------------------------------------ ltrim
 
-    def testLtrimRemovesLeadingWhitespace(self):
+    def testLtrimRemovesLeadingWhitespace(self) -> None:
         """Remove leading whitespace while preserving trailing whitespace.
 
         Validates that `ltrim` only strips characters from the left
@@ -760,14 +767,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("  hello  ").ltrim()
         self.assertEqual(result, Stringable("hello  "))
 
     # ------------------------------------------------------------------ rtrim
 
-    def testRtrimRemovesTrailingWhitespace(self):
+    def testRtrimRemovesTrailingWhitespace(self) -> None:
         """Remove trailing whitespace while preserving leading whitespace.
 
         Validates that `rtrim` only strips characters from the right
@@ -776,14 +783,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("  hello  ").rtrim()
         self.assertEqual(result, Stringable("  hello"))
 
     # ------------------------------------------------------------- lStrip
 
-    def testLStripRemovesLeadingCharacters(self):
+    def testLStripRemovesLeadingCharacters(self) -> None:
         """Remove specified leading characters using lStrip.
 
         Validates that `lStrip` removes any combination of the specified
@@ -792,12 +799,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("xxhello").lStrip("x")
         self.assertEqual(result, Stringable("hello"))
 
-    def testLStripRaisesTypeErrorOnNonString(self):
+    def testLStripRaisesTypeErrorOnNonString(self) -> None:
         """Raise TypeError when chars is not a string or None.
 
         Ensures `lStrip` validates the chars parameter type before
@@ -806,14 +813,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").lStrip(42)
 
     # ------------------------------------------------------------- rStrip
 
-    def testRStripRemovesTrailingCharacters(self):
+    def testRStripRemovesTrailingCharacters(self) -> None:
         """Remove specified trailing characters using rStrip.
 
         Validates that `rStrip` removes any combination of the specified
@@ -822,12 +829,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("helloxx").rStrip("x")
         self.assertEqual(result, Stringable("hello"))
 
-    def testRStripRaisesTypeErrorOnNonString(self):
+    def testRStripRaisesTypeErrorOnNonString(self) -> None:
         """Raise TypeError when chars is not a string or None.
 
         Ensures `rStrip` validates the chars parameter type before
@@ -836,14 +843,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").rStrip(42)
 
     # ----------------------------------------------------------------- zFill
 
-    def testZFillPadsWithLeadingZeros(self):
+    def testZFillPadsWithLeadingZeros(self) -> None:
         """Pad the string with leading zeros to reach the given width.
 
         Validates that `zFill` produces a string of exactly the
@@ -852,12 +859,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("42").zFill(5)
         self.assertEqual(result, Stringable("00042"))
 
-    def testZFillNoOpWhenAlreadyWideEnough(self):
+    def testZFillNoOpWhenAlreadyWideEnough(self) -> None:
         """Return the original string when it is already wide enough.
 
         Ensures `zFill` is a no-op when the string length meets or
@@ -866,12 +873,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").zFill(3)
         self.assertEqual(result, Stringable("hello"))
 
-    def testZFillRaisesValueErrorOnNegativeWidth(self):
+    def testZFillRaisesValueErrorOnNegativeWidth(self) -> None:
         """Raise ValueError when width is negative.
 
         Ensures `zFill` validates that the width parameter is a
@@ -880,14 +887,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("5").zFill(-1)
 
     # --------------------------------------------------------------- repeat
 
-    def testRepeatReturnsRepeatedString(self):
+    def testRepeatReturnsRepeatedString(self) -> None:
         """Repeat the string the specified number of times.
 
         Validates that `repeat` produces a string composed of the
@@ -896,11 +903,11 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("ab").repeat(3), Stringable("ababab"))
 
-    def testRepeatZeroTimesReturnsEmpty(self):
+    def testRepeatZeroTimesReturnsEmpty(self) -> None:
         """Return an empty Stringable when repeating zero times.
 
         Validates that `repeat(0)` produces an empty string without
@@ -909,11 +916,11 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").repeat(0), Stringable(""))
 
-    def testRepeatRaisesValueErrorOnNegativeTimes(self):
+    def testRepeatRaisesValueErrorOnNegativeTimes(self) -> None:
         """Raise ValueError when times is negative.
 
         Ensures `repeat` validates that the times parameter is a
@@ -922,14 +929,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("ab").repeat(-1)
 
     # ----------------------------------------------------------------- words
 
-    def testWordsLimitsWordCount(self):
+    def testWordsLimitsWordCount(self) -> None:
         """Limit the string to the specified number of words.
 
         Validates that `words` returns only the first N words of the
@@ -938,12 +945,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("one two three four").words(2)
         self.assertEqual(result, Stringable("one two..."))
 
-    def testWordsNoTruncationWhenWithinLimit(self):
+    def testWordsNoTruncationWhenWithinLimit(self) -> None:
         """Return the full string when word count is within the limit.
 
         Ensures `words` is a no-op when the string contains fewer or
@@ -952,12 +959,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").words(10)
         self.assertEqual(result, Stringable("hello world"))
 
-    def testWordsRaisesValueErrorOnNegativeCount(self):
+    def testWordsRaisesValueErrorOnNegativeCount(self) -> None:
         """Raise ValueError when word count is negative.
 
         Ensures `words` validates that the words parameter is a
@@ -966,14 +973,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("hello").words(-1)
 
     # --------------------------------------------------------------- wordCount
 
-    def testWordCountReturnsCorrectCount(self):
+    def testWordCountReturnsCorrectCount(self) -> None:
         """Count the number of words in the string.
 
         Validates that `wordCount` returns the correct integer word
@@ -982,11 +989,11 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world foo").wordCount(), 3)
 
-    def testWordCountReturnsZeroForEmptyString(self):
+    def testWordCountReturnsZeroForEmptyString(self) -> None:
         """Return zero for an empty string.
 
         Ensures `wordCount` returns 0 when the string contains no
@@ -995,11 +1002,11 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("").wordCount(), 0)
 
-    def testWordCountWithCustomSeparatorCharacters(self):
+    def testWordCountWithCustomSeparatorCharacters(self) -> None:
         """Count words using additional separator characters.
 
         Validates that `wordCount` treats the specified characters as
@@ -1008,14 +1015,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello,world").wordCount(",")
         self.assertEqual(result, 2)
 
     # -------------------------------------------------------------- wordWrap
 
-    def testWordWrapBreaksLongLines(self):
+    def testWordWrapBreaksLongLines(self) -> None:
         """Wrap text to the specified line width.
 
         Validates that `wordWrap` inserts line breaks so that no line
@@ -1024,16 +1031,16 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         long_text = "The quick brown fox jumped over the lazy dog"
         result = Stringable(long_text).wordWrap(15)
         for line in str(result).split("\n"):
-            self.assertLessEqual(len(line), 25)
+            self.assertLessEqual(len(line), 15)
 
     # ------------------------------------------------------------------ wrap
 
-    def testWrapAddsBeforeAndAfter(self):
+    def testWrapAddsBeforeAndAfter(self) -> None:
         """Wrap the string with a prefix and suffix.
 
         Validates that `wrap` prepends the before string and appends the
@@ -1042,12 +1049,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").wrap("[", "]")
         self.assertEqual(result, Stringable("[hello]"))
 
-    def testWrapUsesSameStringWhenAfterOmitted(self):
+    def testWrapUsesSameStringWhenAfterOmitted(self) -> None:
         """Use the before string as suffix when after is not provided.
 
         Validates that `wrap` applies the before argument to both sides
@@ -1056,12 +1063,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").wrap("*")
         self.assertEqual(result, Stringable("*hello*"))
 
-    def testWrapRaisesTypeErrorOnNonStringBefore(self):
+    def testWrapRaisesTypeErrorOnNonStringBefore(self) -> None:
         """Raise TypeError when before argument is not a string.
 
         Ensures `wrap` validates the before parameter type before
@@ -1070,14 +1077,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").wrap(1)
 
     # ---------------------------------------------------------------- unwrap
 
-    def testUnwrapRemovesPrefixAndSuffix(self):
+    def testUnwrapRemovesPrefixAndSuffix(self) -> None:
         """Remove the specified prefix and suffix from the string.
 
         Validates that `unwrap` strips both the before prefix and the
@@ -1086,12 +1093,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("[hello]").unwrap("[", "]")
         self.assertEqual(result, Stringable("hello"))
 
-    def testUnwrapUsesSameStringWhenAfterOmitted(self):
+    def testUnwrapUsesSameStringWhenAfterOmitted(self) -> None:
         """Remove the same string from both ends when after is omitted.
 
         Validates that `unwrap` applies the before argument to both sides
@@ -1100,14 +1107,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("*hello*").unwrap("*")
         self.assertEqual(result, Stringable("hello"))
 
     # ------------------------------------------------------------------ squish
 
-    def testSquishNormalisesWhitespace(self):
+    def testSquishNormalisesWhitespace(self) -> None:
         """Normalise consecutive whitespace to a single space.
 
         Validates that `squish` replaces any run of whitespace characters
@@ -1116,12 +1123,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("  hello   world  ").squish()
         self.assertEqual(result, Stringable("hello world"))
 
-    def testSquishWithTabsAndNewlines(self):
+    def testSquishWithTabsAndNewlines(self) -> None:
         """Normalise tabs and newlines as well as spaces.
 
         Ensures `squish` treats all whitespace character types uniformly
@@ -1130,14 +1137,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello\t\nworld").squish()
         self.assertEqual(result, Stringable("hello world"))
 
     # --------------------------------------------------------------- numbers
 
-    def testNumbersRemovesNonDigitChars(self):
+    def testNumbersRemovesNonDigitChars(self) -> None:
         """Remove all non-numeric characters from the string.
 
         Validates that `numbers` returns only the digit characters
@@ -1146,12 +1153,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("abc123def456").numbers()
         self.assertEqual(result, Stringable("123456"))
 
-    def testNumbersOnPureDigitString(self):
+    def testNumbersOnPureDigitString(self) -> None:
         """Return unchanged string when input contains only digits.
 
         Ensures `numbers` is a no-op when the string already consists
@@ -1160,12 +1167,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("12345").numbers()
         self.assertEqual(result, Stringable("12345"))
 
-    def testNumbersOnStringWithNoDigits(self):
+    def testNumbersOnStringWithNoDigits(self) -> None:
         """Return empty Stringable when input has no digit characters.
 
         Ensures `numbers` returns an empty Stringable when none of the
@@ -1174,14 +1181,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("abc").numbers()
         self.assertEqual(result, Stringable(""))
 
     # ------------------------------------------------------------------ pipe
 
-    def testPipeAppliesCallbackAndReturns(self):
+    def testPipeAppliesCallbackAndReturns(self) -> None:
         """Apply a callback and return the result as a Stringable.
 
         Validates that `pipe` passes the current Stringable to the
@@ -1190,12 +1197,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello").pipe(lambda s: str(s).upper())
         self.assertEqual(result, Stringable("HELLO"))
 
-    def testPipeRaisesTypeErrorOnNonCallable(self):
+    def testPipeRaisesTypeErrorOnNonCallable(self) -> None:
         """Raise TypeError when callback is not callable.
 
         Ensures `pipe` validates that its argument is callable before
@@ -1204,14 +1211,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").pipe("not_callable")
 
     # ------------------------------------------------------------------- tap
 
-    def testTapCallsCallbackAndReturnsSelf(self):
+    def testTapCallsCallbackAndReturnsSelf(self) -> None:
         """Call the callback but return the unchanged Stringable.
 
         Validates that `tap` invokes the callback as a side-effect and
@@ -1220,7 +1227,7 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         called_with = []
         result = Stringable("hello").tap(lambda s: called_with.append(str(s)))
@@ -1229,7 +1236,7 @@ class TestStringableManipulation(TestCase):
 
     # ----------------------------------------------------------------- swap
 
-    def testSwapReplacesMultipleKeywords(self):
+    def testSwapReplacesMultipleKeywords(self) -> None:
         """Swap multiple keywords simultaneously using a dictionary.
 
         Validates that `swap` replaces every key occurrence with its
@@ -1238,12 +1245,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").swap({"hello": "hi", "world": "earth"})
         self.assertEqual(result, Stringable("hi earth"))
 
-    def testSwapRaisesTypeErrorOnNonDict(self):
+    def testSwapRaisesTypeErrorOnNonDict(self) -> None:
         """Raise TypeError when map_dict is not a dictionary.
 
         Ensures `swap` validates that its argument is a dict before
@@ -1252,12 +1259,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").swap("not-a-dict")
 
-    def testSwapRaisesTypeErrorOnNonStringValues(self):
+    def testSwapRaisesTypeErrorOnNonStringValues(self) -> None:
         """Raise TypeError when dictionary values are not strings.
 
         Ensures `swap` validates that all keys and values in the mapping
@@ -1266,14 +1273,14 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").swap({"hello": 42})
 
     # ------------------------------------------------------------- substrCount
 
-    def testSubstrCountCountsOccurrences(self):
+    def testSubstrCountCountsOccurrences(self) -> None:
         """Count the non-overlapping occurrences of a needle.
 
         Validates that `substrCount` returns the correct count of
@@ -1282,12 +1289,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world hello").substrCount("hello")
         self.assertEqual(result, 2)
 
-    def testSubstrCountWithOffset(self):
+    def testSubstrCountWithOffset(self) -> None:
         """Count occurrences after a given starting offset.
 
         Validates that `substrCount` begins counting from the specified
@@ -1296,12 +1303,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello hello hello").substrCount("hello", 6)
         self.assertEqual(result, 2)
 
-    def testSubstrCountRaisesTypeErrorOnNonStringNeedle(self):
+    def testSubstrCountRaisesTypeErrorOnNonStringNeedle(self) -> None:
         """Raise TypeError when needle is not a string.
 
         Ensures `substrCount` validates the needle type before performing
@@ -1310,28 +1317,27 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").substrCount(42)
 
     # ----------------------------------------------------------- substrReplace
 
-    def testSubstrReplaceBasicReplacement(self):
-        """Replace a portion of the string at the given offset.
+    def testSubstrReplaceInsertsWhenLengthIsOmitted(self) -> None:
+        """Insert text at the offset when no replacement length is supplied.
 
-        Validates that `substrReplace` substitutes the substring starting
-        at offset with the provided replacement.
+        Preserve the original suffix after the inserted text.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").substrReplace("Python", 6)
-        self.assertIn("Python", str(result))
+        self.assertEqual(result, "hello Pythonworld")
 
-    def testSubstrReplaceWithLength(self):
+    def testSubstrReplaceWithLength(self) -> None:
         """Replace exactly the specified number of characters.
 
         Validates that `substrReplace` with a length argument replaces
@@ -1340,12 +1346,12 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("hello world").substrReplace("X", 0, 5)
-        self.assertTrue(str(result).startswith("X"))
+        self.assertEqual(result, "X world")
 
-    def testSubstrReplaceRaisesValueErrorOnNegativeLength(self):
+    def testSubstrReplaceRaisesValueErrorOnNegativeLength(self) -> None:
         """Raise ValueError when length is negative.
 
         Ensures `substrReplace` validates that the length parameter is
@@ -1354,7 +1360,7 @@ class TestStringableManipulation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Stringable("hello").substrReplace("x", 0, -1)

@@ -3,8 +3,13 @@
 from orionis.failure.runtime import capture, current_operation, handoff
 from orionis.http.exceptions.websocket import WebSocketDisconnected
 
+
 async def disconnected(
-    error: Exception, *, transport: str, phase: str, expected: bool = False,
+    error: Exception,
+    *,
+    transport: str,
+    phase: str,
+    expected: bool = False,
 ) -> WebSocketDisconnected:
     """
     Observe a transport error and associate its public disconnect wrapper.

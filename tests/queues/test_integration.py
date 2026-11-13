@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import json
 import os
@@ -24,10 +26,12 @@ if TYPE_CHECKING:
 _JOB_PACKAGE = "queue_probe_jobs"
 _REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 
+
 class TransactionRollback(RuntimeError):
     """Trigger rollback of an application-owned test transaction."""
 
     __slots__ = ()
+
 
 def verify_equal(actual: object, expected: object, message: str) -> None:
     """Verify a probe result without relying on interpreter assert settings.
@@ -44,6 +48,7 @@ def verify_equal(actual: object, expected: object, message: str) -> None:
     if actual != expected:
         error = f"{message}: expected {expected!r}, received {actual!r}."
         raise AssertionError(error)
+
 
 def create_application(directory: str, driver: str) -> Application:
     """Configure an actual application with isolated durable queue storage.
@@ -83,19 +88,25 @@ def create_application(directory: str, driver: str) -> Application:
     app.withRouting(console=[])
     app.withConfigDatabase(
         default="sqlite",
-        connections={"sqlite": {
-            "driver": "sqlite", "database": str(base_path / "queue.sqlite"),
-            "journal_mode": "WAL", "busy_timeout": 30000,
-        }},
+        connections={
+            "sqlite": {
+                "driver": "sqlite",
+                "database": str(base_path / "queue.sqlite"),
+                "journal_mode": "WAL",
+                "busy_timeout": 30000,
+            },
+        },
     )
     app.withConfigQueue(
         default=driver,
         connections={
             "database": {"driver": "database", "retry_after": 2.0},
             "redis": {
-                "driver": "redis", "retry_after": 2.0,
+                "driver": "redis",
+                "retry_after": 2.0,
                 "endpoint": os.environ.get(
-                    "ORIONIS_QUEUE_REDIS_HOST", "127.0.0.1",
+                    "ORIONIS_QUEUE_REDIS_HOST",
+                    "127.0.0.1",
                 ),
                 "port": int(os.environ.get("ORIONIS_QUEUE_REDIS_PORT", "6379")),
                 "db": int(os.environ.get("ORIONIS_QUEUE_REDIS_DB", "0")),
@@ -109,6 +120,7 @@ def create_application(directory: str, driver: str) -> Application:
     app.create()
     verify_equal(app.path("app_jobs"), jobs_path.resolve(), "Custom jobs path")
     return app
+
 
 def create_job(value: int, *, fail: bool = False) -> BaseJob:
     """Create a job declared in the temporary application's resolved directory.
@@ -129,6 +141,7 @@ def create_job(value: int, *, fail: bool = False) -> BaseJob:
     job_type = module.FailJob if fail else module.RecordJob
     return job_type(value)
 
+
 async def call_command(app: Application, *arguments: str) -> None:
     """Invoke Reactor through the application's actual CLI lifecycle.
 
@@ -141,6 +154,7 @@ async def call_command(app: Application, *arguments: str) -> None:
     """
     result = await app.handleCommand(["reactor", *arguments])
     verify_equal(result, 0, f"Reactor command {' '.join(arguments)}")
+
 
 async def verify_transactions(app: Application, manager: IQueueManager) -> None:
     """Verify inline pending dispatch joins cold and warm SQLite transactions.
@@ -159,7 +173,8 @@ async def verify_transactions(app: Application, manager: IQueueManager) -> None:
         async with connection.transaction():
             await (
                 Queue.dispatch(create_job(201))
-                .onConnection("database").onQueue("transactions")
+                .onConnection("database")
+                .onQueue("transactions")
             )
             message = "Roll back the cold queue schema and its dispatch."
             raise TransactionRollback(message)
@@ -168,26 +183,36 @@ async def verify_transactions(app: Application, manager: IQueueManager) -> None:
     async with connection.transaction():
         await (
             Queue.dispatch(create_job(202))
-            .onConnection("database").onQueue("transactions")
+            .onConnection("database")
+            .onQueue("transactions")
         )
     verify_equal(await driver.size("transactions"), 1, "Committed dispatch")
     await call_command(
-        app, "queue:work", "database", "--queue=transactions", "--stop-when-empty",
+        app,
+        "queue:work",
+        "database",
+        "--queue=transactions",
+        "--stop-when-empty",
     )
     verify_equal(await driver.size("transactions"), 0, "Committed job acknowledgement")
     try:
         async with connection.transaction():
             await (
                 Queue.dispatch(create_job(203))
-                .onConnection("database").onQueue("transactions")
+                .onConnection("database")
+                .onQueue("transactions")
             )
             message = "Roll back a dispatch after durable schema bootstrap."
             raise TransactionRollback(message)
     except TransactionRollback:
         verify_equal(await driver.size("transactions"), 0, "Warm dispatch rollback")
 
+
 async def verify_success(
-    app: Application, driver_name: str, driver: IQueueDriver, state: State,
+    app: Application,
+    driver_name: str,
+    driver: IQueueDriver,
+    state: State,
 ) -> None:
     """Verify facade chaining, prioritized consumption, and real scoped DI.
 
@@ -202,13 +227,13 @@ async def verify_success(
     state : State
         Shared application observation service.
     """
-    await (
-        Queue.dispatch(create_job(1)).onConnection(driver_name).onQueue("high")
-    )
+    await Queue.dispatch(create_job(1)).onConnection(driver_name).onQueue("high")
     await Queue.dispatch(create_job(2))
     delayed = (
         Queue.dispatch(create_job(3))
-        .onConnection(driver_name).onQueue("emails").delay(seconds=0.03)
+        .onConnection(driver_name)
+        .onQueue("emails")
+        .delay(seconds=0.03)
     )
     verify_equal(await driver.size("emails"), 0, "Pending dispatch performs no push")
     driver_module = import_module(f"orionis.queues.drivers.{driver_name}")
@@ -219,35 +244,47 @@ async def verify_success(
         await delayed
         await asyncio.sleep(0.04)
         verify_equal(
-            await driver.reserve(("emails",), 2.0), None,
+            await driver.reserve(("emails",), 2.0),
+            None,
             "Delayed job not ready early",
         )
     finally:
         driver_module.current_time = original_time
     state.events.clear()
     await call_command(
-        app, "queue:work", driver_name, "--queue=high,default,emails",
-        "--concurrency=3", "--stop-when-empty",
+        app,
+        "queue:work",
+        driver_name,
+        "--queue=high,default,emails",
+        "--concurrency=3",
+        "--stop-when-empty",
     )
     verify_equal(
-        sorted(event[0] for event in state.events), [1, 2, 3],
+        sorted(event[0] for event in state.events),
+        [1, 2, 3],
         "Deserialized jobs receive application dependencies",
     )
     verify_equal(
-        {event[1] for event in state.events}, {"high", "default", "emails"},
+        {event[1] for event in state.events},
+        {"high", "default", "emails"},
         "Logical queue selections preserved",
     )
     verify_equal(
-        len({id(event[3]) for event in state.events}), 3,
+        len({id(event[3]) for event in state.events}),
+        3,
         "Every job receives a distinct scoped service",
     )
     verify_equal([event[2] for event in state.events], [1, 1, 1], "Initial attempts")
     for queue in ("high", "default", "emails"):
         verify_equal(await driver.size(queue), 0, f"Successful {queue} acknowledgement")
 
+
 async def verify_failures(
-    app: Application, manager: IQueueManager, driver_name: str,
-    driver: IQueueDriver, state: State,
+    app: Application,
+    manager: IQueueManager,
+    driver_name: str,
+    driver: IQueueDriver,
+    state: State,
 ) -> None:
     """Verify persistent retries and failure administration through Reactor.
 
@@ -269,7 +306,9 @@ async def verify_failures(
     state.events.clear()
     await call_command(app, "queue:work", driver_name, "--max-jobs=3")
     verify_equal(
-        [event[2] for event in state.events], [1, 2, 3], "Retry attempt budget",
+        [event[2] for event in state.events],
+        [1, 2, 3],
+        "Retry attempt budget",
     )
     failures = await repository.all()
     verify_equal(len(failures), 1, "One terminal failure event")
@@ -278,7 +317,9 @@ async def verify_failures(
     verify_equal(failed.job_id, original_job_id, "Failure retains dispatch identity")
     verify_equal(failed.attempts, 3, "Terminal failure retains attempts")
     verify_equal(
-        failed.exception_message, "Application job failure", "Original exception",
+        failed.exception_message,
+        "Application job failure",
+        "Original exception",
     )
     verify_equal(await driver.size("default"), 0, "Failed job removed from queue")
     await call_command(app, "queue:failed")
@@ -296,6 +337,7 @@ async def verify_failures(
     verify_equal(await repository.all(), (), "Forget removes only failure records")
     result = await app.handleCommand(["reactor", "queue:forget", "missing"])
     verify_equal(result, 1, "Missing failure returns a failure exit code")
+
 
 async def run_probe(driver_name: str = "database") -> dict[str, object]:
     """Execute public queue workflows in an isolated real application process.
@@ -324,7 +366,8 @@ async def run_probe(driver_name: str = "database") -> dict[str, object]:
             identity, payload = source.encode(job)
             worker_codec = await app.make(IJobSerializer)
             verify_equal(
-                worker_codec.decode(identity, payload).value, 77,
+                worker_codec.decode(identity, payload).value,
+                77,
                 "Worker discovers jobs before their first dispatch",
             )
             driver = await manager.connection(driver_name)
@@ -340,11 +383,15 @@ async def run_probe(driver_name: str = "database") -> dict[str, object]:
             logger = await app.make(ILogger)
             await asyncio.to_thread(logger.close)
     return {
-        "driver": driver_name, "success_jobs": 3, "scoped_services": 3,
+        "driver": driver_name,
+        "success_jobs": 3,
+        "scoped_services": 3,
         "job_discovery": "app_jobs",
-        "failure_attempts": 6, "transactions": "cold/warm rollback and commit",
+        "failure_attempts": 6,
+        "transactions": "cold/warm rollback and commit",
         "cli": "work/failed/retry/forget/clear/migrate",
     }
+
 
 async def main() -> None:
     """
@@ -359,6 +406,7 @@ async def main() -> None:
     async with asyncio.timeout(30):
         result = await run_probe(driver_name)
     sys.stdout.write("ORIONIS_QUEUE_E2E=" + json.dumps(result) + "\n")
+
 
 class TestQueueApplicationIntegration(TestCase):
     """Verify eager providers and public workflows in a real application."""
@@ -375,10 +423,15 @@ class TestQueueApplicationIntegration(TestCase):
             Assert the subprocess's persisted queue and CLI integration results.
         """
         process = await asyncio.create_subprocess_exec(
-            sys.executable, "-B", "-X", "utf8", "-m",
+            sys.executable,
+            "-B",
+            "-X",
+            "utf8",
+            "-m",
             "tests.queues.test_integration",
             cwd=_REPOSITORY_ROOT,
-            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
         try:
             output, errors = await asyncio.wait_for(process.communicate(), timeout=45)
@@ -388,8 +441,11 @@ class TestQueueApplicationIntegration(TestCase):
             raise
         self.assertEqual(process.returncode, 0, (output + errors).decode("utf-8"))
         result_line = next(
-            (line for line in output.decode("utf-8").splitlines()
-             if line.startswith("ORIONIS_QUEUE_E2E=")),
+            (
+                line
+                for line in output.decode("utf-8").splitlines()
+                if line.startswith("ORIONIS_QUEUE_E2E=")
+            ),
         )
         result = json.loads(result_line.partition("=")[2])
         self.assertEqual(result["driver"], "database")
@@ -398,6 +454,7 @@ class TestQueueApplicationIntegration(TestCase):
         self.assertEqual(result["scoped_services"], 3)
         self.assertEqual(result["failure_attempts"], 6)
         self.assertEqual(result["cli"], "work/failed/retry/forget/clear/migrate")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

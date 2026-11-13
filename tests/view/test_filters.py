@@ -1,209 +1,138 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify filter output, independent builders, and Jinja escaping."""
+
+from jinja2 import Environment
 from orionis.test import TestCase
 from orionis.view.filters import _filter_json, _filter_markdown
 
-_jsonify = _filter_json()
-_markdown = _filter_markdown()
 
 class TestJsonifyFilter(TestCase):
+    """Check compact, formatted, and fallback representations."""
 
-    def testSerializesDictToJson(self) -> None:
-        """
-        Serialise a dictionary to a JSON string.
+    def testSerializesSupportedValues(self) -> None:
+        """Serialise each supported fixture to its exact compact JSON text.
 
-        Validates that a plain dict is encoded as a valid JSON object
-        string with both key and value present in the output.
+        Returns
+        -------
+        None
+            No return value.
         """
-        result = _jsonify({"key": "value"})
-        self.assertIn('"key"', result)
-        self.assertIn('"value"', result)
-
-    def testSerializesListToJson(self) -> None:
-        """
-        Serialise a list to a compact JSON array string.
-
-        Validates that a list of integers is encoded compactly without
-        extra whitespace in the default mode.
-        """
-        result = _jsonify([1, 2, 3])
-        self.assertEqual(result, "[1,2,3]")
-
-    def testSerializesNoneToNull(self) -> None:
-        """
-        Serialise None to the JSON null literal.
-
-        Validates that Python's None maps to the JSON null keyword.
-        """
-        result = _jsonify(None)
-        self.assertEqual(result, "null")
-
-    def testSerializesIntegerToNumericString(self) -> None:
-        """
-        Serialise an integer to its JSON numeric representation.
-
-        Validates that numeric types are encoded without surrounding
-        quotes in the output.
-        """
-        result = _jsonify(42)
-        self.assertEqual(result, "42")
+        cases = (
+            ({"key": "value"}, '{"key":"value"}'),
+            ([1, 2, 3], "[1,2,3]"),
+            (None, "null"),
+            (42, "42"),
+            ({"a": 1}, '{"a":1}'),
+            ("hello", '"hello"'),
+            (0, "0"),
+            ([], "[]"),
+            (True, "true"),
+            (False, "false"),
+        )
+        for value, expected in cases:
+            with self.subTest(value=value):
+                result = _filter_json()(value)
+                self.assertEqual(result, expected)
+                self.assertIs(type(result), str)
 
     def testIndentProducesPrettyOutput(self) -> None:
-        """
-        Pretty-print JSON when an indent value is supplied.
+        """Format JSON with the requested two-space indentation.
 
-        Validates that the indent parameter triggers formatted output
-        containing newlines and indentation characters.
+        Returns
+        -------
+        None
+            No return value.
         """
-        result = _jsonify({"a": 1}, indent=2)
-        self.assertIn("\n", result)
-
-    def testDefaultModeIsCompact(self) -> None:
-        """
-        Produce compact JSON output when no indent is specified.
-
-        Validates that the default output contains no unnecessary
-        whitespace between tokens.
-        """
-        result = _jsonify({"a": 1})
-        self.assertNotIn("\n", result)
+        self.assertEqual(_filter_json()({"a": 1}, indent=2), '{\n  "a": 1\n}')
 
     def testFallsBackToStrForNonSerializable(self) -> None:
-        """
-        Fall back to str() for values that cannot be JSON-serialised.
+        """Return the object's text when JSON encoding rejects its type.
 
-        Validates that non-serialisable objects produce a string
-        representation instead of raising an exception.
+        Returns
+        -------
+        None
+            No return value.
         """
 
         class _Unserializable:
-            pass
+            """Provide an unsupported object with a deterministic representation."""
 
-        result = _jsonify(_Unserializable())
-        self.assertIsInstance(result, str)
+            __slots__ = ()
 
-    def testAlwaysReturnsString(self) -> None:
-        """
-        Confirm _jsonify always returns a str regardless of input type.
+            def __str__(self) -> str:
+                """Return the fallback text used by this fixture.
 
-        Validates that the output type is str for common Python values
-        so Jinja2 templates receive a printable result.
-        """
-        self.assertIsInstance(_jsonify("hello"), str)
-        self.assertIsInstance(_jsonify(0), str)
-        self.assertIsInstance(_jsonify([]), str)
+                Returns
+                -------
+                str
+                    Deterministic text for an unsupported JSON object.
+                """
+                return "fixture value"
 
-    def testSerializesBooleanTrue(self) -> None:
-        """
-        Serialise boolean True to the JSON true literal.
+        self.assertEqual(_filter_json()(_Unserializable()), "fixture value")
 
-        Validates that Python's True maps to the lowercase JSON boolean.
-        """
-        result = _jsonify(True)
-        self.assertEqual(result, "true")
-
-    def testSerializesBooleanFalse(self) -> None:
-        """
-        Serialise boolean False to the JSON false literal.
-
-        Validates that Python's False maps to the lowercase JSON boolean.
-        """
-        result = _jsonify(False)
-        self.assertEqual(result, "false")
 
 class TestMarkdownFilter(TestCase):
+    """Check the Markdown syntax supported by the registered extensions."""
 
-    def testConvertsH1HeadingToHtml(self) -> None:
-        """
-        Render a Markdown H1 heading to an HTML h1 element.
+    def testRendersMarkdownAsPlainStrings(self) -> None:
+        """Render all syntax fixtures without marking their HTML as trusted.
 
-        Validates that ATX-style headings are converted to the
-        corresponding HTML heading tag (with or without attributes).
+        Returns
+        -------
+        None
+            No return value.
         """
-        result = _markdown("# Title")
-        self.assertIn("<h1", result)
+        cases = (
+            ("# Title", '<h1 id="title">Title</h1>'),
+            ("**bold**", "<p><strong>bold</strong></p>"),
+            ("", ""),
+            ("simple paragraph text", "<p>simple paragraph text</p>"),
+            ("*italic*", "<p><em>italic</em></p>"),
+        )
+        for value, expected in cases:
+            with self.subTest(value=value):
+                result = _filter_markdown()(value)
+                self.assertEqual(result, expected)
+                self.assertIs(type(result), str)
 
-    def testConvertsBoldToStrong(self) -> None:
-        """
-        Render Markdown bold syntax to an HTML strong element.
-
-        Validates that double-asterisk emphasis is converted to the
-        HTML <strong> tag.
-        """
-        result = _markdown("**bold**")
-        self.assertIn("<strong>", result)
-
-    def testHandlesEmptyString(self) -> None:
-        """
-        Render an empty Markdown string without raising an exception.
-
-        Validates that an empty input is handled gracefully and always
-        returns a string value.
-        """
-        result = _markdown("")
-        self.assertIsInstance(result, str)
-
-    def testAlwaysReturnsString(self) -> None:
-        """
-        Confirm _markdown always returns a str type.
-
-        Validates that the output type is str regardless of the input
-        content or Markdown syntax used.
-        """
-        result = _markdown("simple paragraph text")
-        self.assertIsInstance(result, str)
-
-    def testConvertsItalicToEm(self) -> None:
-        """
-        Render Markdown italic syntax to an HTML em element.
-
-        Validates that single-asterisk emphasis is converted to the
-        HTML <em> tag.
-        """
-        result = _markdown("*italic*")
-        self.assertIn("<em>", result)
 
 class TestFilterBuilders(TestCase):
+    """Check callable ownership and escaping in an actual Jinja environment."""
 
-    def testJsonBuilderReturnsCallable(self) -> None:
-        """
-        Verify _filter_json returns a callable filter.
+    def testBuildersProduceIndependentCallables(self) -> None:
+        """Build a fresh callable for every registration of either filter.
 
-        Validates that Jinja2 can invoke the built filter with a
-        template value at render time without a TypeError.
+        Returns
+        -------
+        None
+            No return value.
         """
-        self.assertTrue(callable(_filter_json()))
+        for builder in (_filter_json, _filter_markdown):
+            with self.subTest(builder=builder.__name__):
+                first = builder()
+                second = builder()
+                self.assertTrue(callable(first))
+                self.assertTrue(callable(second))
+                self.assertIsNot(first, second)
 
-    def testMarkdownBuilderReturnsCallable(self) -> None:
-        """
-        Verify _filter_markdown returns a callable filter.
+    async def testFilterOutputRemainsSubjectToAutoescaping(self) -> None:
+        """Escape script-like input after applying either presentation filter.
 
-        Validates that Jinja2 can invoke the built filter with a
-        template value at render time without a TypeError.
+        Returns
+        -------
+        None
+            No return value.
         """
-        self.assertTrue(callable(_filter_markdown()))
-
-    def testBuilderProducesIndependentCallables(self) -> None:
-        """
-        Confirm each call to _filter_json builds a new callable.
-
-        Validates that the builder does not share a cached closure
-        between registrations.
-        """
-        self.assertIsNot(_filter_json(), _filter_json())
-
-    def testJsonFilterProducesSameOutputAsJsonify(self) -> None:
-        """
-        Confirm a freshly built json filter matches the module callable.
-
-        Validates that the filter produces the same output as the
-        callable built at import time with the same argument.
-        """
-        self.assertEqual(_filter_json()(42), _jsonify(42))
-
-    def testMarkdownFilterProducesSameOutputAsMarkdown(self) -> None:
-        """
-        Confirm a freshly built markdown filter matches the module callable.
-
-        Validates that the filter produces the same output as the
-        callable built at import time with the same argument.
-        """
-        self.assertEqual(_filter_markdown()("# Title"), _markdown("# Title"))
+        environment = Environment(autoescape=True, enable_async=True)
+        environment.filters.update(
+            json=_filter_json(),
+            markdown=_filter_markdown(),
+        )
+        for name in ("json", "markdown"):
+            with self.subTest(filter=name):
+                template = environment.from_string("{{ value | " + name + " }}")
+                result = await template.render_async(value="<script>alert(1)</script>")
+                self.assertNotIn("<script>", result)
+                self.assertIn("&lt;script&gt;", result)

@@ -2,6 +2,7 @@
 
 from enum import IntEnum
 
+
 class TaskEvent(IntEnum):
     """
     Define task-related event types for the scheduler.
@@ -39,6 +40,7 @@ class TaskEvent(IntEnum):
     MISSED = 2**14
     SUBMITTED = 2**15
     MAX_INSTANCES = 2**16
+
 
 class SchedulerEvent(IntEnum):
     """

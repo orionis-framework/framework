@@ -26,17 +26,27 @@ __all__ = [
     "Translator",
 ]
 
+_EXCEPTION_MODULE = "orionis.localization.exceptions"
+"""Module defining the public localization exception types."""
+
 _EXPORTS = {
-    "InvalidLocaleException": ("orionis.localization.exceptions", "InvalidLocaleException"),
+    "InvalidLocaleException": (_EXCEPTION_MODULE, "InvalidLocaleException"),
     "LocalizationManager": ("orionis.localization.manager", "LocalizationManager"),
-    "TranslationException": ("orionis.localization.exceptions", "TranslationException"),
-    "TranslationFileNotFoundException": ("orionis.localization.exceptions", "TranslationFileNotFoundException"),
+    "TranslationException": (_EXCEPTION_MODULE, "TranslationException"),
+    "TranslationFileNotFoundException": (
+        _EXCEPTION_MODULE,
+        "TranslationFileNotFoundException",
+    ),
     "TranslationLoader": ("orionis.localization.loader", "TranslationLoader"),
-    "TranslationRepository": ("orionis.localization.repository", "TranslationRepository"),
-    "TranslationSyntaxException": ("orionis.localization.exceptions", "TranslationSyntaxException"),
+    "TranslationRepository": (
+        "orionis.localization.repository",
+        "TranslationRepository",
+    ),
+    "TranslationSyntaxException": (_EXCEPTION_MODULE, "TranslationSyntaxException"),
     "Translator": ("orionis.localization.translator", "Translator"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -58,6 +68,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
@@ -12,12 +14,18 @@ from orionis.test import TestCase
 from tests.http.routes.test_nested_routing import UserController, route_handler
 from tests.http.test_kernel import boot_kernel, dispatch
 
+
 class _LoaderApp:
     """Configure real route persistence and record route-import requests."""
 
     __slots__ = (
-        "cache_only", "compiled", "compiledInvalidationPathsDirs",
-        "compiledInvalidationPathsFiles", "compiledPath", "imports", "route_files",
+        "cache_only",
+        "compiled",
+        "compiledInvalidationPathsDirs",
+        "compiledInvalidationPathsFiles",
+        "compiledPath",
+        "imports",
+        "route_files",
     )
 
     @property
@@ -32,7 +40,11 @@ class _LoaderApp:
         return "/up"
 
     def __init__(
-        self, path: Path, *, compiled: bool = True, cache_only: bool = False,
+        self,
+        path: Path,
+        *,
+        compiled: bool = True,
+        cache_only: bool = False,
     ) -> None:
         """Configure an isolated directory and optional cache-hit guards.
 
@@ -107,6 +119,7 @@ class _LoaderApp:
         self.imports.append(kind)
         return self.route_files.get(kind)
 
+
 class _CacheOnlyRouter(Router):
     """Use a real router while rejecting exports during a cache hit."""
 
@@ -127,6 +140,7 @@ class _CacheOnlyRouter(Router):
         """
         error_msg = "A cache hit must not export registered routes"
         raise AssertionError(error_msg)
+
 
 class _IdentityOnlyMeta(type):
     """Reject equality checks against controller classes."""
@@ -154,10 +168,12 @@ class _IdentityOnlyMeta(type):
         error_msg = "Fallback normalization must not compare controller classes"
         raise AssertionError(error_msg)
 
+
 class _IdentityOnlyController(UserController, metaclass=_IdentityOnlyMeta):
     """Provide a valid invokable action with guarded metaclass equality."""
 
     __slots__ = ()
+
 
 class TestLoaderFallbackPersistence(TestCase):
     """Keep fallback state consistent across real persistence boundaries."""
@@ -187,10 +203,14 @@ class TestLoaderFallbackPersistence(TestCase):
                     saved = FileBasedCache(path, "routes").get()
                     self.assertIsNone(saved["fallback"])
                     warm_app = _LoaderApp(path, cache_only=True)
-                    loaders.append(RouteLoader(
-                        warm_app, _CacheOnlyRouter(warm_app),
-                        RouteCompiler(), RouteCache(),
-                    ))
+                    loaders.append(
+                        RouteLoader(
+                            warm_app,
+                            _CacheOnlyRouter(warm_app),
+                            RouteCompiler(),
+                            RouteCache(),
+                        ),
+                    )
                 else:
                     self.assertFalse((path / "routes").exists())
                 for current in loaders:
@@ -203,7 +223,8 @@ class TestLoaderFallbackPersistence(TestCase):
                         routes["GET"]["static"].keys(),
                     )
                     kernel, _, _, catch = await boot_kernel(
-                        routes=loaded, fallback=current.fallback,
+                        routes=loaded,
+                        fallback=current.fallback,
                     )
                     await dispatch(kernel, "/missing")
                     self.assertIsInstance(catch.handled[0], RouteNotFound)
@@ -216,7 +237,10 @@ class TestLoaderFallbackPersistence(TestCase):
                     guarded_router.fallback(_IdentityOnlyController)
                     expected = guarded_router.export()["fallback"]
                     guarded = RouteLoader(
-                        guarded_app, guarded_router, RouteCompiler(), RouteCache(),
+                        guarded_app,
+                        guarded_router,
+                        RouteCompiler(),
+                        RouteCache(),
                     )
                     self.assertIs(guarded.fallback, expected)
                     self.assertIs(guarded.fallback[0], _IdentityOnlyController)
@@ -247,7 +271,10 @@ class TestLoaderFallbackPersistence(TestCase):
                 self.assertEqual(cold.fallback, expected)
                 warm_app = _LoaderApp(path, cache_only=True)
                 warm = RouteLoader(
-                    warm_app, _CacheOnlyRouter(warm_app), RouteCompiler(), RouteCache(),
+                    warm_app,
+                    _CacheOnlyRouter(warm_app),
+                    RouteCompiler(),
+                    RouteCache(),
                 )
                 for loader in (cold, warm):
                     self.assertEqual(loader.fallback, expected)
@@ -255,7 +282,8 @@ class TestLoaderFallbackPersistence(TestCase):
                     self.assertIs(loader.load(), routes)
                     self.assertEqual(loader.fallback, expected)
                     kernel, _, _, catch = await boot_kernel(
-                        routes=routes, fallback=loader.fallback,
+                        routes=routes,
+                        fallback=loader.fallback,
                     )
                     response = await dispatch(kernel, "/missing")
                     self.assertEqual(response.getStatusCode(), 200)
@@ -275,9 +303,13 @@ class TestLoaderFallbackPersistence(TestCase):
         with TemporaryDirectory() as directory:
             path = Path(directory)
             persistence = FileBasedCache(path, "routes")
-            persistence.save({
-                "version": RouteCache.VERSION - 1, "routes": {}, "fallback": None,
-            })
+            persistence.save(
+                {
+                    "version": RouteCache.VERSION - 1,
+                    "routes": {},
+                    "fallback": None,
+                },
+            )
             app = _LoaderApp(path)
             loader = RouteLoader(app, Router(app), RouteCompiler(), RouteCache())
             self.assertIsNone(loader.fallback)
@@ -290,11 +322,15 @@ class TestLoaderFallbackPersistence(TestCase):
             self.assertIsNone(saved["fallback"])
             warm_app = _LoaderApp(path, cache_only=True)
             warm = RouteLoader(
-                warm_app, _CacheOnlyRouter(warm_app), RouteCompiler(), RouteCache(),
+                warm_app,
+                _CacheOnlyRouter(warm_app),
+                RouteCompiler(),
+                RouteCache(),
             )
             self.assertIsNone(warm.fallback)
             self.assertIn("/up", warm.load()["GET"]["static"])
             self.assertEqual(warm_app.imports, [])
+
 
 class TestDedicatedRouteFiles(TestCase):
     """Load protocol-specific route files through the real import path."""
@@ -354,9 +390,7 @@ class TestDedicatedRouteFiles(TestCase):
         loaded = loader.load()
         self.assertIs(loader.load(), loaded)
         self.assertEqual(self._app.imports, ["web", "api", "websocket"])
-        routes = {
-            item["path"]: item for item in self._router.export()["routes"]
-        }
+        routes = {item["path"]: item for item in self._router.export()["routes"]}
         self.assertEqual(routes["/web"]["kind"], "web")
         self.assertEqual(routes["/api"]["kind"], "api")
         self.assertEqual(routes["/websocket"]["kind"], "web")

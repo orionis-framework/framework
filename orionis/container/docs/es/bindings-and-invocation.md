@@ -56,9 +56,13 @@ Un binding relaciona contrato con clase compatible y `Lifetime`. El contrato usa
 - `SCOPED`: construye una vez en el scope activo y descarta al cerrar.
 - `instance`: publica objeto preparado globalmente o en el scope activo.
 
+Una instancia explícita en el scope activo tiene prioridad sobre un singleton global del mismo contrato, incluso al resolver mediante su alias global o al inyectar parámetros. Al salir del scope vuelve a usarse el registro global. Las instancias scoped de tipos primitivos también pueden suministrar parámetros anotados sin un binding global equivalente.
+
 ### Resolución e invocación automática
 
-El contenedor almacena planes de reflexión, combina valores aportados con dependencias/defaults, construye parámetros recursivamente y espera awaitables. Esquemas Orionis y requests HTTP reciben tratamiento especializado.
+El contenedor almacena planes de reflexión, combina valores aportados con dependencias/defaults, construye parámetros recursivamente y espera funciones declaradas con `async def`. Un callable síncrono devuelve su resultado sin modificarlo, incluido un awaitable; espera ese resultado explícitamente cuando corresponda. Esquemas Orionis y requests HTTP reciben tratamiento especializado.
+
+Los argumentos explícitos tienen prioridad sobre la inyección. Los parámetros exclusivamente posicionales conservan las reglas de Python: una palabra clave con el mismo nombre entra en `**kwargs` si existe o se rechaza; no reemplaza el parámetro posicional.
 
 ### Propagación de scopes
 
@@ -149,10 +153,6 @@ class First:
 class Second:
     def __init__(self, first: First) -> None:
         self.first = first
-
-
-# Resolve the one forward reference after both classes exist.
-First.__init__.__annotations__["second"] = Second
 
 
 class CycleContainer(Container):

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import argparse
 from unittest.mock import AsyncMock, Mock, patch
 from orionis.console.commands.migrate.migrate import MigrateCommand
@@ -5,6 +7,7 @@ from orionis.console.commands.seed.seed import SeedCommand
 from orionis.console.core.commands import CORE_COMMANDS
 from orionis.database.migrations.events import MigrationEvents
 from orionis.test import TestCase
+
 
 class TestSeederCommands(TestCase):
     """Verify seeding is exposed through the existing console conventions."""

@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Validate application Python sources without writing bytecode."""
 
 import sys
@@ -30,10 +32,9 @@ _SKIP_DIRS: frozenset[str] = _VENV_DIR_NAMES | frozenset(
 if _ACTIVE_VENV_BASENAME:
     _SKIP_DIRS |= frozenset({_ACTIVE_VENV_BASENAME})
 
+
 class OptimizeCommand(BaseCommand):
     """Validate application Python sources without writing bytecode."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = True
     """Timestamps flag used by ``OptimizeCommand``."""
@@ -45,7 +46,7 @@ class OptimizeCommand(BaseCommand):
     bytecode.``.
     """
 
-    def handle(self, app: IApplication, console: Console) -> int: # NOSONAR
+    def handle(self, app: IApplication, console: Console) -> int:  # NOSONAR
         """
         Validate Python modules below the application root in memory.
 

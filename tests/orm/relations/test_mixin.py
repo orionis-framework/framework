@@ -1,5 +1,9 @@
+# ruff: noqa: ARG002, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Implement the fixed application-config fixture signature.
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
+from unittest.mock import patch
 from orionis.database.connection_manager import ConnectionManager
 from orionis.orm import (
     Boolean,
@@ -23,12 +27,13 @@ if TYPE_CHECKING:
         HasOneRelation,
     )
 
+
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
     __slots__ = ()
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Run the config helper.
 
         Parameters
@@ -51,6 +56,7 @@ class _StubApp:
                 },
             },
         }
+
 
 def _pivot_table(name: str, first: str, second: str, *extra: str) -> TableDefinition:
     """Build a bare pivot table with two integer keys and optional extras.
@@ -78,13 +84,14 @@ def _pivot_table(name: str, first: str, second: str, *extra: str) -> TableDefini
         column.name = key
     return TableDefinition(name=name, columns=columns)
 
+
 class Author(Model):
     id = Integer().primary().autoIncrement()
     name = String()
     timestamps = False
 
     def books(self) -> HasManyRelation[Book]:
-        """Every book written by this author.
+        """Return every book written by this author.
 
         Returns
         -------
@@ -102,6 +109,7 @@ class Author(Model):
             Value produced by the helper.
         """
         return self.hasOne(AuthorProfile)
+
 
 class Book(Model):
     id = Integer().primary().autoIncrement()
@@ -123,7 +131,7 @@ class Book(Model):
         return self.belongsTo(Author)
 
     def tags(self) -> BelongsToManyRelation[Tag]:
-        """Every tag linked to this book through the pivot table.
+        """Return every tag linked to this book through the pivot table.
 
         Returns
         -------
@@ -131,6 +139,7 @@ class Book(Model):
             Value produced by the helper.
         """
         return self.belongsToMany(Tag)
+
 
 class AuthorProfile(Model):
     id = Integer().primary().autoIncrement()
@@ -140,13 +149,14 @@ class AuthorProfile(Model):
 
     fillable: ClassVar[list[str]] = ["bio", "author_id"]
 
+
 class Tag(Model):
     id = Integer().primary().autoIncrement()
     name = String()
     timestamps = False
 
     def books(self) -> BelongsToManyRelation[Book]:
-        """Every book linked to this tag through the pivot table.
+        """Return every book linked to this tag through the pivot table.
 
         Returns
         -------
@@ -155,13 +165,14 @@ class Tag(Model):
         """
         return self.belongsToMany(Book)
 
+
 class Writer(Model):
     writer_id = Integer().primary().autoIncrement()
     name = String()
     timestamps = False
 
     def articles(self) -> HasManyRelation[Article]:
-        """Every article written by this writer, using custom keys.
+        """Return every article written by this writer, using custom keys.
 
         Returns
         -------
@@ -169,6 +180,7 @@ class Writer(Model):
             Value produced by the helper.
         """
         return self.hasMany(Article, foreign_key="writer_ref", local_key="writer_id")
+
 
 class Article(Model):
     id = Integer().primary().autoIncrement()
@@ -186,13 +198,14 @@ class Article(Model):
         """
         return self.belongsTo(Writer, foreign_key="writer_ref", owner_key="writer_id")
 
+
 class Student(Model):
     student_id = Integer().primary().autoIncrement()
     name = String()
     timestamps = False
 
     def courses(self) -> BelongsToManyRelation[Course]:
-        """Every course this student is enrolled in, via a custom pivot.
+        """Return every course this student is enrolled in, via a custom pivot.
 
         Returns
         -------
@@ -208,13 +221,14 @@ class Student(Model):
             related_key="course_id",
         )
 
+
 class Course(Model):
     course_id = Integer().primary().autoIncrement()
     name = String()
     timestamps = False
 
     def students(self) -> BelongsToManyRelation[Student]:
-        """Every student enrolled in this course, via a custom pivot.
+        """Return every student enrolled in this course, via a custom pivot.
 
         Returns
         -------
@@ -230,6 +244,7 @@ class Course(Model):
             related_key="student_id",
         )
 
+
 class _RelationsTestCase(TestCase):
     """Base test case wiring an isolated in-memory sqlite connection."""
 
@@ -239,14 +254,14 @@ class _RelationsTestCase(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        previous_manager = ConnectionResolver._manager
-        self.addCleanup(ConnectionResolver.setManager, previous_manager)
-        self.addCleanup(setattr, DB, "_pinned_instance", DB._pinned_instance)
         self._manager = ConnectionManager(_StubApp())
-        ConnectionResolver.setManager(self._manager)
-        DB._pinned_instance = QueryBuilder(self._manager)
+        self.enterContext(patch.object(ConnectionResolver, "_manager", self._manager))
+        self.enterContext(
+            patch.object(DB, "_pinned_instance", QueryBuilder(self._manager)),
+        )
+        self.addAsyncCleanup(self._manager.disconnect)
         connection = self._manager.connection()
         await connection.createTable(Author.__meta__.table)
         await connection.createTable(Book.__meta__.table)
@@ -263,16 +278,6 @@ class _RelationsTestCase(TestCase):
             _pivot_table("enrollments", "student_ref", "course_ref"),
         )
 
-    async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
 
 class TestRelationConfigurationErrors(_RelationsTestCase):
     async def testUnknownRelationNameRaises(self) -> None:
@@ -283,7 +288,7 @@ class TestRelationConfigurationErrors(_RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Author.create({"name": "Ana"})
         with self.assertRaises(RelationNotFoundException):
@@ -297,7 +302,7 @@ class TestRelationConfigurationErrors(_RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await Book.create({"title": "One"})
         with self.assertRaises(RelationNotFoundException):
@@ -312,7 +317,7 @@ class TestRelationConfigurationErrors(_RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await Author.create({"name": "Ana"})
         with self.assertRaises(MassAssignmentException):
@@ -324,7 +329,7 @@ class TestRelationConfigurationErrors(_RelationsTestCase):
         Returns
         -------
         None
-            Verify has-one, has-many, inverse, and pivot relations are slotted.
+            No return value.
         """
         author = Author({"id": 1, "name": "author"})
         book = Book._newFromDatabase({"id": 1, "title": "book", "author_id": 1})

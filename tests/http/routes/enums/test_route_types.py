@@ -1,5 +1,8 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.test import TestCase
+
 
 class TestRouteType(TestCase):
     """Unit tests for the RouteType string enumeration."""

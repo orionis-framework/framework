@@ -1,3 +1,6 @@
+# ruff: noqa: ANN201, ANN202, FBT003, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import asyncio
 from orionis.container.container import Container
 from orionis.container.context.scope import ScopedContext
@@ -8,6 +11,7 @@ from orionis.mcp.streams import OwnedStream
 from orionis.schemas import Schema
 from orionis.test import TestCase
 from tests.mcp.test_streams import _Source
+
 
 class _RequestSnapshot:
     """A nested native dependency resolved while authorizing a subscription URI."""
@@ -26,6 +30,7 @@ class _RequestSnapshot:
             Complete the documented checks or setup without a return value.
         """
         self.request = request
+
 
 class _AuthorizedResource(Resource):
     """Authorize only when direct and constructor-injected contexts agree."""
@@ -77,6 +82,7 @@ class _AuthorizedResource(Resource):
         """
         return McpResponse.text("allowed")
 
+
 class _FailingStream(Tool):
     """Raise an application error after delivering one legitimate progress update."""
 
@@ -94,10 +100,12 @@ class _FailingStream(Tool):
         message = "secret-database-password-and-private-path"
         raise RuntimeError(message)
 
+
 class _ProgressInput(Schema):
     """Select a malformed direct dataclass construction for the wire regression."""
 
     variant: int
+
 
 class _RawProgress(Tool[_ProgressInput]):
     """Bypass response factories to verify the last protocol boundary."""
@@ -125,6 +133,7 @@ class _RawProgress(Tool[_ProgressInput]):
         yield McpResponse(progress_update=values[payload.variant])
         yield McpResponse.text("must not be reached")
 
+
 class _AuditServer(Server):
     """Compile all audit fixtures through the same public declaration API."""
 
@@ -132,6 +141,7 @@ class _AuditServer(Server):
     tools = (_FailingStream, _RawProgress)
     resources = (_AuthorizedResource,)
     resource_subscriptions = True
+
 
 class TestAuditEdges(TestCase):
     """Run actual wire dispatch in native request scopes without socket fixtures."""

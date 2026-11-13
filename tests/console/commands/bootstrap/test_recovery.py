@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, PT027, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use explicit process arguments or locally constructed execution fixtures.
 import os
 import subprocess
 import sys
@@ -15,6 +18,7 @@ from orionis.foundation.application import Application
 
 _ROOT = Path(__file__).resolve().parents[4]
 _CONTEXTS = ("api", "ai", "console", "web", "websocket")
+
 
 class TestBootstrapRecovery(unittest.TestCase):
     """Keep recovery limited to one explicitly selected native routing context."""
@@ -53,7 +57,8 @@ class TestBootstrapRecovery(unittest.TestCase):
             + (
                 f"app.withRouting({context}='endpoints/{context}.py', "
                 "health='/ready')\n"
-                if context else ""
+                if context
+                else ""
             )
             + "app.create()\n",
             encoding="utf-8",
@@ -81,7 +86,7 @@ class TestBootstrapRecovery(unittest.TestCase):
             Completed CLI process with captured text output.
         """
         # Keep the application subprocess independent of local imports and caches.
-        return subprocess.run(  # noqa: S603
+        return subprocess.run(
             [sys.executable, "-B", str(root / "reactor"), *arguments],
             cwd=root,
             env={
@@ -119,7 +124,9 @@ class TestBootstrapRecovery(unittest.TestCase):
                 restored = self._run(root, f"bootstrap:{context}")
 
                 self.assertEqual(
-                    restored.returncode, 0, restored.stdout + restored.stderr,
+                    restored.returncode,
+                    0,
+                    restored.stdout + restored.stderr,
                 )
                 self.assertTrue((root / "endpoints" / f"{context}.py").is_file())
                 self.assertEqual(bootstrap.read_bytes(), original)
@@ -131,10 +138,13 @@ class TestBootstrapRecovery(unittest.TestCase):
                 }
                 repeated = self._run(root, f"bootstrap:{context}")
                 self.assertEqual(repeated.returncode, 0, repeated.stderr)
-                self.assertEqual(before, {
-                    path: (path.read_bytes(), path.stat().st_mtime_ns)
-                    for path in root.rglob("*.py")
-                })
+                self.assertEqual(
+                    before,
+                    {
+                        path: (path.read_bytes(), path.stat().st_mtime_ns)
+                        for path in root.rglob("*.py")
+                    },
+                )
 
     def testUnrelatedMissingContextRemainsStrict(self) -> None:
         """Preserve missing API validation during console recovery.
@@ -251,11 +261,15 @@ class TestBootstrapRecovery(unittest.TestCase):
             recovered = self._run(root, "bootstrap:api")
 
             self.assertEqual(
-                recovered.returncode, 0, recovered.stdout + recovered.stderr,
+                recovered.returncode,
+                0,
+                recovered.stdout + recovered.stderr,
             )
             inspected = subprocess.run(
                 [
-                    sys.executable, "-B", "-c",
+                    sys.executable,
+                    "-B",
+                    "-c",
                     (
                         "from bootstrap.app import app; "
                         "print([path.name for path in app.routingPaths('api')])"
@@ -280,16 +294,21 @@ class TestBootstrapRecovery(unittest.TestCase):
             self.assertEqual(warmed_again.returncode, 0, warmed_again.stderr)
             cached = {
                 path.name: (path.read_bytes(), path.stat().st_mtime_ns)
-                for path in cache_path.iterdir() if path.is_file()
+                for path in cache_path.iterdir()
+                if path.is_file()
             }
 
             repeated = self._run(root, "bootstrap:api")
 
             self.assertEqual(repeated.returncode, 0, repeated.stdout + repeated.stderr)
-            self.assertEqual(cached, {
-                path.name: (path.read_bytes(), path.stat().st_mtime_ns)
-                for path in cache_path.iterdir() if path.is_file()
-            })
+            self.assertEqual(
+                cached,
+                {
+                    path.name: (path.read_bytes(), path.stat().st_mtime_ns)
+                    for path in cache_path.iterdir()
+                    if path.is_file()
+                },
+            )
 
     def testOnlyExactCommandsActivateRecovery(self) -> None:
         """Parse optional executable prefixes and exclude help or unknown commands.
@@ -301,17 +320,22 @@ class TestBootstrapRecovery(unittest.TestCase):
         """
         # Accept only exact native command names and supported executable prefixes.
         for arguments in (
-            None, [], ["list"],
-            ["bootstrap:unknown"], ["bootstrap:api:extra"],
-            ["reactor", "bootstrap:api", "--help"], ["bootstrap:api", "-h"],
+            None,
+            [],
+            ["list"],
+            ["bootstrap:unknown"],
+            ["bootstrap:api:extra"],
+            ["reactor", "bootstrap:api", "--help"],
+            ["bootstrap:api", "-h"],
         ):
             with self.subTest(arguments=arguments), bootstrap_recovery(arguments):
                 self.assertFalse(bootstrap_recovery_active())
-                self.assertFalse(any(
-                    recovering_route(context) for context in _CONTEXTS
-                ))
+                self.assertFalse(
+                    any(recovering_route(context) for context in _CONTEXTS),
+                )
         for arguments in (
-            ["bootstrap:api"], ["reactor", "bootstrap:api"],
+            ["bootstrap:api"],
+            ["reactor", "bootstrap:api"],
             ["C:\\project\\reactor.py", "bootstrap:api"],
         ):
             with self.subTest(arguments=arguments), bootstrap_recovery(arguments):
@@ -322,9 +346,7 @@ class TestBootstrapRecovery(unittest.TestCase):
         for context in ("config", "lifespan"):
             with bootstrap_recovery(["reactor", f"bootstrap:{context}"]):
                 self.assertTrue(bootstrap_recovery_active())
-                self.assertFalse(any(
-                    recovering_route(route) for route in _CONTEXTS
-                ))
+                self.assertFalse(any(recovering_route(route) for route in _CONTEXTS))
 
     def testContextResetsAfterErrorsAndNestedStartup(self) -> None:
         """Keep scoped recovery active for CLI startup and restore it afterward.
@@ -335,7 +357,7 @@ class TestBootstrapRecovery(unittest.TestCase):
             Complete the assertions without returning a value.
         """
         # Nest recovery contexts and raise an error to verify state restoration.
-        with ( # NOSONAR
+        with (  # NOSONAR
             self.assertRaisesRegex(RuntimeError, "interrupted"),
             startup_feedback(["reactor", "bootstrap:api"]),
         ):
@@ -347,6 +369,7 @@ class TestBootstrapRecovery(unittest.TestCase):
             error_msg = "interrupted"
             raise RuntimeError(error_msg)
         self.assertFalse(bootstrap_recovery_active())
+
 
 if __name__ == "__main__":
     # Run this module directly with the standard unittest runner.

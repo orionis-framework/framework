@@ -1,3 +1,5 @@
+# ruff: noqa: N815
+# Protocol fields retain the official MCP property names.
 """Provide mcp protocol operations.
 
 Includes ``Annotations``, ``Content``, ``TextContent``, ``ImageContent``.
@@ -6,8 +8,6 @@ Includes ``Annotations``, ``Content``, ``TextContent``, ``ImageContent``.
 from typing import Literal
 import msgspec
 
-# Protocol fields retain the official MCP property names.
-# ruff: noqa: N815
 
 class Annotations(msgspec.Struct, frozen=True, kw_only=True):
     """Optional audience, priority and modification hints."""
@@ -17,6 +17,7 @@ class Annotations(msgspec.Struct, frozen=True, kw_only=True):
     )
     priority: float | msgspec.UnsetType = msgspec.UNSET
     lastModified: str | msgspec.UnsetType = msgspec.UNSET
+
 
 class Content(msgspec.Struct, frozen=True, kw_only=True):
     """Common content metadata."""
@@ -28,11 +29,13 @@ class Content(msgspec.Struct, frozen=True, kw_only=True):
     """Meta produced by ``msgspec.field``."""
     annotations: Annotations | msgspec.UnsetType = msgspec.UNSET
 
+
 class TextContent(Content, tag="text", kw_only=True, frozen=True):
     """UTF-8 text content."""
 
     text: str
     """Text content carried by this protocol value."""
+
 
 class ImageContent(Content, tag="image", kw_only=True, frozen=True):
     """Base64-encoded image content."""
@@ -42,6 +45,7 @@ class ImageContent(Content, tag="image", kw_only=True, frozen=True):
     mimeType: str
     """Media type of the encoded image content."""
 
+
 class AudioContent(Content, tag="audio", kw_only=True, frozen=True):
     """Base64-encoded audio content."""
 
@@ -49,6 +53,7 @@ class AudioContent(Content, tag="audio", kw_only=True, frozen=True):
     """Decoded content carried by this message or request."""
     mimeType: str
     """Media type of the encoded audio content."""
+
 
 class TextResourceContents(msgspec.Struct, frozen=True, kw_only=True):
     """Text at an explicit resource URI."""
@@ -64,6 +69,7 @@ class TextResourceContents(msgspec.Struct, frozen=True, kw_only=True):
     )
     """Meta produced by ``msgspec.field``."""
 
+
 class BlobResourceContents(msgspec.Struct, frozen=True, kw_only=True):
     """Binary resource encoded once as base64."""
 
@@ -78,11 +84,13 @@ class BlobResourceContents(msgspec.Struct, frozen=True, kw_only=True):
     )
     """Meta produced by ``msgspec.field``."""
 
+
 class EmbeddedResource(Content, tag="resource", kw_only=True, frozen=True):
     """A resource embedded in tool or prompt content."""
 
     resource: TextResourceContents | BlobResourceContents
     """Embedded resource contents included in the response."""
+
 
 class ResourceLink(Content, tag="resource_link", kw_only=True, frozen=True):
     """A discoverable resource reference, without reading its bytes."""
@@ -97,6 +105,7 @@ class ResourceLink(Content, tag="resource_link", kw_only=True, frozen=True):
     size: int | msgspec.UnsetType = msgspec.UNSET
     icons: tuple[dict[str, object], ...] | msgspec.UnsetType = msgspec.UNSET
 
+
 type ContentBlock = (
     TextContent | ImageContent | AudioContent | EmbeddedResource | ResourceLink
 )
@@ -104,6 +113,7 @@ type ContentBlock = (
 Type alias for ``TextContent | ImageContent | AudioContent | EmbeddedResource |
 ResourceLink``.
 """
+
 
 class PromptMessage(msgspec.Struct, frozen=True):
     """One prompt message with a protocol-defined role."""

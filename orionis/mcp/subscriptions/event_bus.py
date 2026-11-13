@@ -1,18 +1,18 @@
+# ruff: noqa: TC001, TC003
+# Resolve service annotations without artificial dependency namespaces.
 """Coalesce duplicate changes and close overloaded listeners gracefully."""
 
 import asyncio
 from collections import OrderedDict
-from typing import TYPE_CHECKING
+from collections.abc import AsyncIterator
 from orionis.mcp.contracts.event_bus import IMcpEventBus
 from orionis.mcp.exceptions import McpProtocolException
 from orionis.mcp.streams import AsyncClosable
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from orionis.mcp.protocol.requests import SubscriptionFilter
+from orionis.mcp.protocol.requests import SubscriptionFilter
 
 type Change = tuple[str, str | None]
 """Type alias for ``tuple[str, str | None]``."""
+
 
 class _Listener:
     """Retain only a server key, accepted filter and bounded pending changes."""
@@ -74,6 +74,7 @@ class _Listener:
                 return uri in self.filters.resourceSubscriptions
             case _:
                 return False
+
 
 class InMemoryMcpEventBus(IMcpEventBus):
     """Coalesce duplicate changes and close overloaded listeners gracefully."""
@@ -146,7 +147,9 @@ class InMemoryMcpEventBus(IMcpEventBus):
         """
         if self._closed or len(self._listeners) >= self._max_listeners:
             raise McpProtocolException(
-                -32603, "Subscription capacity unavailable", status=503,
+                -32603,
+                "Subscription capacity unavailable",
+                status=503,
             )
         listener = _Listener(server, filters)
         self._listeners.add(listener)
@@ -220,6 +223,7 @@ class InMemoryMcpEventBus(IMcpEventBus):
             listener.closed = True
             listener.pending.clear()
             listener.ready.set()
+
 
 class _Subscription(AsyncClosable):
     """An explicitly closable iterator, including before first iteration."""

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from dataclasses import FrozenInstanceError, asdict
 from config.mail import BootstrapMail
 from orionis.foundation.config.mail.entities.file import File
@@ -6,6 +8,7 @@ from orionis.foundation.config.mail.entities.mail import Mail
 from orionis.foundation.config.mail.entities.mailers import Mailers
 from orionis.foundation.config.mail.entities.smtp import Smtp
 from orionis.test import TestCase
+
 
 class TestMailConfiguration(TestCase):
     def testNamedMailerSurvivesSerialization(self) -> None:

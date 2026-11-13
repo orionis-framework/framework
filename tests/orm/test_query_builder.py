@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import TYPE_CHECKING
 from orionis.database.exceptions import ConnectionNotFoundException
 from orionis.database.migrations.context import migration_connection_scope
@@ -7,6 +9,7 @@ from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from orionis.database.contracts.transaction import ITransaction
+
 
 class _RecordingConnection:
     """Record gateway calls without replacing framework methods."""
@@ -24,7 +27,7 @@ class _RecordingConnection:
         Returns
         -------
         None
-            Initialize an independent call log.
+            No return value.
         """
         self.name = name
         self.calls: list[tuple[object, ...]] = []
@@ -101,7 +104,7 @@ class _RecordingConnection:
         Returns
         -------
         None
-            Append a transaction-start observation.
+            No return value.
         """
         self.calls.append(("begin",))
 
@@ -111,7 +114,7 @@ class _RecordingConnection:
         Returns
         -------
         None
-            Append a transaction-commit observation.
+            No return value.
         """
         self.calls.append(("commit",))
 
@@ -121,7 +124,7 @@ class _RecordingConnection:
         Returns
         -------
         None
-            Append a transaction-rollback observation.
+            No return value.
         """
         self.calls.append(("rollback",))
 
@@ -135,6 +138,7 @@ class _RecordingConnection:
         """
         return Transaction(self)  # type: ignore[arg-type]
 
+
 class _RecordingManager:
     """Resolve named connections and record the requested connection names."""
 
@@ -146,7 +150,7 @@ class _RecordingManager:
         Returns
         -------
         None
-            Initialize named connection state and resolution observations.
+            No return value.
         """
         self.default_name = "sqlite"
         self.connections = {
@@ -200,7 +204,7 @@ class _RecordingManager:
         Returns
         -------
         None
-            Update the manager's default connection.
+            No return value.
 
         Raises
         ------
@@ -209,6 +213,7 @@ class _RecordingManager:
         """
         self.connection(name)
         self.default_name = name
+
 
 class TestQueryBuilder(TestCase):
     """Verify gateway isolation, delegation, and connection precedence."""
@@ -219,7 +224,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Initialize state owned exclusively by the current test.
+            No return value.
         """
         self.manager = _RecordingManager()
         self.gateway = QueryBuilder(self.manager)  # type: ignore[arg-type]
@@ -230,7 +235,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Verify building a second query never retargets the first.
+            No return value.
         """
         first = self.gateway.table("users", alias="u").where("id", 1)
         second = self.gateway.table("posts")
@@ -246,7 +251,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Verify default, scoped, and explicit table connection precedence.
+            No return value.
         """
         scoped = self.gateway.connection("reporting")
         self.assertIsNot(scoped, self.gateway)
@@ -269,7 +274,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Verify the gateway exposes manager state and preserves its errors.
+            No return value.
         """
         self.assertEqual(self.gateway.getDefaultName(), "sqlite")
         self.gateway.setDefaultName("reporting")
@@ -284,7 +289,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Verify all three SQL entry points preserve results and arguments.
+            No return value.
         """
         sql = "SELECT :value"
         bindings = {"value": 7}
@@ -310,7 +315,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Verify explicit names reach the manager and unknown names propagate.
+            No return value.
         """
         scoped = self.gateway.connection("reporting")
         self.assertEqual(
@@ -326,7 +331,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Verify ambient migration state never overrides explicit scopes.
+            No return value.
         """
         migration = self.manager.connections["reporting"]
         with migration_connection_scope(migration):  # type: ignore[arg-type]
@@ -349,7 +354,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Verify begin, commit, and rollback preserve connection precedence.
+            No return value.
         """
         scoped = self.gateway.connection("reporting")
         await scoped.beginTransaction()
@@ -367,7 +372,7 @@ class TestQueryBuilder(TestCase):
         Returns
         -------
         None
-            Verify the gateway uses the framework transaction implementation.
+            No return value.
         """
         async with self.gateway.transaction("reporting"):
             await self.gateway.select("SELECT 1", name="reporting")

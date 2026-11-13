@@ -19,5 +19,3 @@ The public package exports `Reflection`, the specialized reflection classes, `Re
 - [Inspecting classes, functions, and instances](reflection.md)
 
 Continue with: [container](../../../container/docs/en/README.md) · [console](../../../console/docs/en/README.md).
-
-Examples that require bootstrap, a request, or external services state that context. Verification for this reconstruction is distinct from historical notes; a production integration is not assumed to have been executed.

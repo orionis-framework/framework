@@ -1,3 +1,5 @@
+# ruff: noqa: DTZ001, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from orionis.schemas.rules.after import After
@@ -16,8 +18,8 @@ _MOMENT = datetime(2024, 6, 15, 12, 0, 0)
 _EARLIER = datetime(2024, 1, 1, 0, 0, 0)
 _LATER = datetime(2024, 12, 31, 0, 0, 0)
 
-class TestAfter(TestCase):
 
+class TestAfter(TestCase):
     async def testValueAfterLiteralReferencePasses(self) -> None:
         """Return True when the value comes after the referenced date.
 
@@ -26,7 +28,7 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = After("2024-01-01")
         self.assertTrue(await rule.enforce("born", _MOMENT, _OWNER))
@@ -40,7 +42,7 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await After(_MOMENT).enforce("born", _MOMENT, _OWNER))
 
@@ -52,7 +54,7 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = After("start")
         instance = SimpleNamespace(start=_MOMENT)
@@ -67,7 +69,7 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = After()
         self.assertTrue(await rule.enforce("when", DateTime.now().add(days=1), _OWNER))
@@ -83,7 +85,7 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = After("yesterday")
         self.assertTrue(await rule.enforce("when", DateTime.now(), _OWNER))
@@ -96,7 +98,7 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = After("2024-01-01")
         self.assertTrue(await rule.enforce("born", "2024-06-15", _OWNER))
@@ -110,7 +112,7 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = After("2024-01-01")
         self.assertTrue(await rule.enforce("born", date(2024, 6, 15), _OWNER))
@@ -123,7 +125,7 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await After("missing").enforce("born", _MOMENT, _OWNER))
 
@@ -135,14 +137,14 @@ class TestAfter(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = After("2024-01-01")
         self.assertTrue(await rule.enforce("born", None, _OWNER))
         self.assertTrue(await rule.enforce("born", 123, _OWNER))
 
-class TestAfterOrEqual(TestCase):
 
+class TestAfterOrEqual(TestCase):
     async def testEqualMomentPasses(self) -> None:
         """Return True when the value equals the referenced moment.
 
@@ -151,7 +153,7 @@ class TestAfterOrEqual(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await AfterOrEqual(_MOMENT).enforce("born", _MOMENT, _OWNER))
 
@@ -163,7 +165,7 @@ class TestAfterOrEqual(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await AfterOrEqual(_MOMENT).enforce("born", _LATER, _OWNER))
 
@@ -175,7 +177,7 @@ class TestAfterOrEqual(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await AfterOrEqual(_MOMENT).enforce("born", _EARLIER, _OWNER))
 
@@ -187,12 +189,12 @@ class TestAfterOrEqual(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await AfterOrEqual("missing").enforce("born", _MOMENT, _OWNER))
 
-class TestBefore(TestCase):
 
+class TestBefore(TestCase):
     async def testEarlierMomentPasses(self) -> None:
         """Return True when the value comes before the referenced moment.
 
@@ -201,7 +203,7 @@ class TestBefore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Before(_MOMENT).enforce("born", _EARLIER, _OWNER))
 
@@ -213,7 +215,7 @@ class TestBefore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await Before(_MOMENT).enforce("born", _MOMENT, _OWNER))
 
@@ -225,7 +227,7 @@ class TestBefore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Before("end")
         instance = SimpleNamespace(end=_MOMENT)
@@ -240,7 +242,7 @@ class TestBefore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = Before()
         self.assertTrue(
@@ -256,12 +258,12 @@ class TestBefore(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await Before(_MOMENT).enforce("born", None, _OWNER))
 
-class TestBeforeOrEqual(TestCase):
 
+class TestBeforeOrEqual(TestCase):
     async def testEqualMomentPasses(self) -> None:
         """Return True when the value equals the referenced moment.
 
@@ -270,7 +272,7 @@ class TestBeforeOrEqual(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await BeforeOrEqual(_MOMENT).enforce("born", _MOMENT, _OWNER))
 
@@ -282,7 +284,7 @@ class TestBeforeOrEqual(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(await BeforeOrEqual(_MOMENT).enforce("born", _EARLIER, _OWNER))
 
@@ -294,7 +296,7 @@ class TestBeforeOrEqual(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await BeforeOrEqual(_MOMENT).enforce("born", _LATER, _OWNER))
 
@@ -306,14 +308,14 @@ class TestBeforeOrEqual(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(
             await BeforeOrEqual("missing").enforce("born", _MOMENT, _OWNER),
         )
 
-class TestDateFormat(TestCase):
 
+class TestDateFormat(TestCase):
     async def testMatchingFormatPasses(self) -> None:
         """Return True when the value matches the configured format.
 
@@ -322,7 +324,7 @@ class TestDateFormat(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(
             await DateFormat("YYYY-MM-DD").enforce("born", "2024-01-31", _OWNER),
@@ -336,7 +338,7 @@ class TestDateFormat(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DateFormat("YYYY-MM-DD", "DD/MM/YYYY")
         self.assertTrue(await rule.enforce("born", "2024-01-31", _OWNER))
@@ -350,7 +352,7 @@ class TestDateFormat(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DateFormat("YYYY-MM-DD")
         self.assertFalse(await rule.enforce("born", "31/01/2024", _OWNER))
@@ -364,7 +366,7 @@ class TestDateFormat(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = DateFormat("YYYY-MM-DD")
         self.assertTrue(await rule.enforce("born", _MOMENT + timedelta(days=1), _OWNER))
@@ -377,7 +379,7 @@ class TestDateFormat(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             DateFormat()

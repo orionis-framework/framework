@@ -1,7 +1,9 @@
+# ruff: noqa: SLF001, TC001
+# Resolve runtime types and preserve the identity of generated structured-response text.
 """Describe MCP response cache lifetime and visibility options."""
 
 import math
-from typing import TYPE_CHECKING, TypedDict, Literal, cast
+from typing import TypedDict, Literal, cast
 import msgspec
 from orionis.mcp.protocol.content import (
     EmbeddedResource,
@@ -13,12 +15,10 @@ from orionis.mcp.protocol.results import (
     GetPromptResult,
     ReadResourceResult,
 )
-from orionis.mcp.responses import McpResponse, Progress, mime_format
-from orionis.mcp.server.compiler import validate_output
+from orionis.mcp.responses import McpResponse, Progress, _encode_payload, mime_format
+from orionis.mcp.context import McpRequest
+from orionis.mcp.server.compiler import CompiledPrimitive, validate_output
 
-if TYPE_CHECKING:
-    from orionis.mcp.context import McpRequest
-    from orionis.mcp.server.compiler import CompiledPrimitive
 
 class CacheOptions(TypedDict):
     """Describe MCP response cache lifetime and visibility options."""
@@ -27,6 +27,31 @@ class CacheOptions(TypedDict):
     """Cache lifetime in milliseconds."""
     cacheScope: Literal["private", "public"]
     """Visibility of the cached response: private or public."""
+
+
+def buffered_size(value: object) -> int:
+    """Measure buffered JSON data without counting builder-only ownership state.
+
+    Parameters
+    ----------
+    value : object
+        Yielded response or typed protocol result.
+
+    Returns
+    -------
+    int
+        Serialized data size for early buffer admission. Final wire encoding
+        separately enforces the complete response budget.
+    """
+    if not isinstance(value, McpResponse):
+        return len(msgspec.json.encode(value))
+    size = len(msgspec.json.encode(value.content)) + len(
+        msgspec.json.encode(value.meta),
+    )
+    if value.structured_content is not msgspec.UNSET:
+        size += len(msgspec.json.encode(value.structured_content))
+    return size
+
 
 def response_items(result: object) -> tuple[McpResponse, ...]:
     """
@@ -57,6 +82,7 @@ def response_items(result: object) -> tuple[McpResponse, ...]:
         raise TypeError(message)
     return responses
 
+
 async def tool_result(
     primitive: CompiledPrimitive,
     responses: tuple[McpResponse, ...],
@@ -86,14 +112,49 @@ async def tool_result(
         raise ValueError(message)
     value = values[0] if values else msgspec.UNSET
     is_error = any(item.is_error for item in responses)
+    generated_text = None
     if not is_error:
-        await validate_output(primitive, value)
+        value, generated_text = await validated_output(primitive, value)
     return CallToolResult(
-        content=tuple(part for item in responses for part in item.content),
+        content=tuple(
+            msgspec.structs.replace(part, text=generated_text)
+            if generated_text is not None
+            and isinstance(part, TextContent)
+            and part is item._structured_text
+            else part
+            for item in responses
+            for part in item.content
+        ),
         structuredContent=value,
         isError=is_error,
         meta=_metadata(responses),
     )
+
+
+async def validated_output(
+    primitive: CompiledPrimitive,
+    value: object,
+) -> tuple[object, str | None]:
+    """Normalize declared structured output before publishing its wire value.
+
+    Parameters
+    ----------
+    primitive : orionis.mcp.server.compiler.CompiledPrimitive
+        Tool declaration supplying its output schema.
+    value : object
+        Handler-provided structured content.
+
+    Returns
+    -------
+    tuple[object, str | None]
+        Validated JSON value and its generated text, or unchanged undeclared output.
+    """
+    converted = await validate_output(primitive, value)
+    if primitive.output_type is msgspec.UNSET or value is msgspec.UNSET:
+        return value, None
+    encoded = _encode_payload(converted, "json")
+    return msgspec.json.decode(encoded), encoded.decode("utf-8")
+
 
 def prompt_result(
     description: str,
@@ -123,6 +184,7 @@ def prompt_result(
         description=description or msgspec.UNSET,
         meta=_metadata(responses),
     )
+
 
 def resource_result(
     primitive: CompiledPrimitive,
@@ -162,7 +224,9 @@ def resource_result(
                     else part.text
                 )
                 response = McpResponse.resource(
-                    cast("str", request.uri), value, primitive.mime_type,
+                    cast("str", request.uri),
+                    value,
+                    primitive.mime_type,
                 )
                 contents.append(
                     cast("EmbeddedResource", response.content[0]).resource,
@@ -171,8 +235,11 @@ def resource_result(
                 message = "resources/read requires text or blob contents"
                 raise TypeError(message)
     return ReadResourceResult(
-        contents=tuple(contents), meta=_metadata(responses), **cache,
+        contents=tuple(contents),
+        meta=_metadata(responses),
+        **cache,
     )
+
 
 def _metadata(responses: tuple[McpResponse, ...]) -> dict[str, object]:
     """
@@ -196,6 +263,7 @@ def _metadata(responses: tuple[McpResponse, ...]) -> dict[str, object]:
                 raise ValueError(message)
             metadata[key] = value
     return metadata
+
 
 def progress_params(
     update: Progress,

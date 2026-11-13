@@ -1,14 +1,14 @@
+# ruff: noqa: TC001
+# Keep storage protocol annotations available for runtime reflection.
 """Represent a directory on a storage disk."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from orionis.storage.contracts.directory import IDirectory
 from orionis.storage.file import File
-from orionis.storage.paths import normalizePath
+from orionis.storage.paths import normalize_path
+from orionis.storage.contracts.driver import IStorageDriver
+from orionis.storage.contracts.file import IFile
 
-if TYPE_CHECKING:
-    from orionis.storage.contracts.driver import IStorageDriver
-    from orionis.storage.contracts.file import IFile
 
 class Directory(IDirectory):
     """
@@ -38,7 +38,7 @@ class Directory(IDirectory):
         Returns
         -------
         None
-            Initialize the directory with its driver and canonical path.
+            No return value.
 
         Raises
         ------
@@ -47,7 +47,7 @@ class Directory(IDirectory):
         """
         self._driver = driver
         """Driver of the disk that owns the directory."""
-        self._path = normalizePath(path)
+        self._path = normalize_path(path)
         """
         Root-relative directory path; normalized on ingestion. The empty string
         denotes the disk root.

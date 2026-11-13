@@ -1,9 +1,12 @@
+# ruff: noqa: ANN202, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Exercise scheduler failure delivery without external scheduler services."""
 
 import asyncio
 import threading
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
+from apscheduler.jobstores.memory import MemoryJobStore
 from orionis.console.enums.events import TaskEvent
 from orionis.console.tasks.schedule import Schedule
 from orionis.failure.runtime import capture, operation
@@ -32,13 +35,51 @@ class TestSchedulerFailureObservation(TestCase):
         """Verify job error is observed without any user listener."""
         error = ValueError("scheduler backend")
         event = SimpleNamespace(
-            code=TaskEvent.ERROR, job_id="test:job", exception=error,
+            code=TaskEvent.ERROR,
+            job_id="test:job",
+            exception=error,
         )
         self.schedule._dispatchTaskEventListener(event)
         await self._drain()
         self.assertEqual(len(self.handler.failures), 1)
         self.assertIs(self.handler.failures[0][0], error)
         self.assertEqual(self.handler.failures[0][1].phase, "job")
+
+    async def testNativeShutdownFailureReachesTheWaiter(self) -> None:
+        """
+        Observe errors raised by APScheduler's deferred shutdown callback.
+
+        Returns
+        -------
+        None
+            Propagate the original native-store failure instead of reporting success.
+        """
+        error = OSError("native scheduler store failed")
+
+        class FailingStore(MemoryJobStore):
+            """Fail while closing an owned in-memory store."""
+
+            def shutdown(self) -> None:
+                """Raise the controlled store failure."""
+                raise error
+
+        self.schedule._Schedule__reactor.info = AsyncMock(return_value=[])
+        with (
+            operation(self.app, flow="scheduler"),
+            patch.object(self.schedule, "_Schedule__suppressApschedulerLogging"),
+        ):
+            await self.schedule.boot()
+            scheduler = self.schedule._Schedule__scheduler
+            scheduler.add_jobstore(FailingStore(), alias="failing-test")
+            try:
+                self.schedule.shutdown(wait=0)
+                with self.assertRaises(OSError) as caught:
+                    await asyncio.wait_for(self.schedule.wait(), 1)
+                self.assertIs(caught.exception, error)
+            finally:
+                scheduler.remove_jobstore("failing-test", shutdown=False)
+                await self._drain()
+        self.assertEqual(self.handler.reports, [error])
 
     async def testJobAndListenerFailuresRemainDistinct(self) -> None:
         """Verify job and listener failures remain distinct."""
@@ -48,12 +89,15 @@ class TestSchedulerFailureObservation(TestCase):
             TaskEvent.ERROR: AsyncMock(side_effect=listener),
         }
         event = SimpleNamespace(
-            code=TaskEvent.ERROR, job_id="test:job", exception=original,
+            code=TaskEvent.ERROR,
+            job_id="test:job",
+            exception=original,
         )
         self.schedule._dispatchTaskEventListener(event)
         await self._drain()
         self.assertCountEqual(
-            [error for error, _ in self.handler.failures], [original, listener],
+            [error for error, _ in self.handler.failures],
+            [original, listener],
         )
 
     async def testManagedTaskFailureIsCollectedBeforeItIsDiscarded(self) -> None:
@@ -73,6 +117,7 @@ class TestSchedulerFailureObservation(TestCase):
         error = RuntimeError("shutdown backend")
         self.schedule._Schedule__scheduler = SimpleNamespace(
             shutdown=MagicMock(side_effect=error),
+            takePending=lambda: (),
         )
         with operation(self.app, flow="scheduler"):
             self.schedule.shutdown(wait=0)
@@ -97,6 +142,33 @@ class TestSchedulerFailureObservation(TestCase):
         self.assertIsNone(coroutine.cr_frame)
         self.assertEqual(self.handler.failures, [])
 
+    async def testRejectedAdmissionClosesBothUnscheduledCoroutines(self) -> None:
+        """
+        Release the listener and supervisor when task creation fails.
+
+        Returns
+        -------
+        None
+            Preserve the admission error without retaining either coroutine.
+        """
+        coroutine = asyncio.sleep(0)
+        error = RuntimeError("scheduler admission rejected")
+        with patch(
+            "orionis.console.tasks.schedule.asyncio.create_task",
+            side_effect=error,
+        ) as create_task:
+            try:
+                with self.assertRaises(RuntimeError) as caught:
+                    self.schedule._Schedule__createManagedTask(coroutine)
+                self.assertIs(caught.exception, error)
+                self.assertIsNone(coroutine.cr_frame)
+                self.assertIsNone(create_task.call_args.args[0].cr_frame)
+                self.assertEqual(self.schedule._Schedule__pending_listener_tasks, set())
+            finally:
+                coroutine.close()
+                if create_task.call_args is not None:
+                    create_task.call_args.args[0].close()
+
     async def testShutdownCancellationBeforeStartingReleasesWaiters(self) -> None:
         """Expose cancellation even if shutdown never reaches its finally block."""
         self.schedule.shutdown(wait=0)
@@ -110,7 +182,10 @@ class TestSchedulerFailureObservation(TestCase):
     async def testRepeatedShutdownDrainsAndStopsTheSchedulerOnce(self) -> None:
         """Avoid sibling shutdown tasks waiting on one another during draining."""
         shutdown = MagicMock()
-        self.schedule._Schedule__scheduler = SimpleNamespace(shutdown=shutdown)
+        self.schedule._Schedule__scheduler = SimpleNamespace(
+            shutdown=shutdown,
+            takePending=lambda: (),
+        )
         self.schedule.shutdown(wait=0)
         self.schedule.shutdown(wait=0)
         await asyncio.wait_for(self.schedule.wait(), 1)
@@ -181,7 +256,10 @@ class TestSchedulerFailureObservation(TestCase):
             release.wait()
             raise error
 
-        self.schedule._Schedule__scheduler = SimpleNamespace(shutdown=shutdown)
+        self.schedule._Schedule__scheduler = SimpleNamespace(
+            shutdown=shutdown,
+            takePending=lambda: (),
+        )
         self.schedule.shutdown(wait=0)
         await started.wait()
         task = next(iter(self.schedule._Schedule__pending_listener_tasks))

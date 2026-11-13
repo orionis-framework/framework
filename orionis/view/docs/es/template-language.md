@@ -55,15 +55,19 @@ Los siguientes nombres se registran durante `ViewServiceProvider.boot()`. Los he
 | Fecha/versiones | `now()`, `today()`, `framework_version()`, `python_version()` |
 | Cifrado | `encrypt(plaintext)`, `decrypt(payload)` |
 
-Los parámetros de `route` usados en el path se codifican; los restantes forman query string. Una ruta inexistente o un argumento obligatorio ausente produce `ViewRouteException`. Las URLs usan el origen de la solicitud cuando existe y pueden ser relativas fuera de scope. `secure_url` cambia el esquema a HTTPS si hay host; no descubre uno para una ruta relativa. `asset` pide `file.url()` al disco: no comprueba existencia ni publica el archivo.
+Los parámetros de `route` usados en el path se codifican; los restantes forman query string. `url` y `secure_url` insertan los parámetros de consulta antes de un `#fragment` existente y conservan literalmente ese fragmento. Una ruta inexistente o un argumento obligatorio ausente produce `ViewRouteException`. Las URLs usan el origen de la solicitud cuando existe y pueden ser relativas fuera de scope. `secure_url` cambia el esquema a HTTPS si hay host; no descubre uno para una ruta relativa. `asset` pide `file.url()` al disco: no comprueba existencia ni publica el archivo.
 
-`cache(key, default)` considera `None` como ausencia. `errors` es una bolsa con métodos, no un dict. `old` devuelve texto vacío para un valor `None`. `auth()` no cachea identidad: conserva el scope de la solicitud; comprueba `auth().check()` antes de acceder a atributos del usuario. Para locales concurrentes pasa `locale=` explícitamente, porque `locale()` refleja el valor global compartido.
+`cache(key, default)` considera `None` como ausencia. `errors` es una bolsa con métodos, no un dict. `errors.any()` requiere al menos una lista de mensajes no vacía; las claves asociadas a listas vacías no cuentan. Fuera del scope de sesión, cada resultado vacío es independiente; con sesión, `errors.all()` devuelve el mapping de errores existente. `old` devuelve texto vacío para un valor `None`. `auth()` no cachea identidad: conserva el scope de la solicitud; comprueba `auth().check()` antes de acceder a atributos del usuario. Para locales concurrentes pasa `locale=` explícitamente, porque `locale()` refleja el valor global compartido.
+
+`today()` devuelve un `pendulum.DateTime` a medianoche. `encrypt` y `decrypt` utilizan el encrypter configurado.
 
 ## Escape y contenido confiable
 
-El autoescape está habilitado para la aplicación por defecto. Conserva `{{ user.name }}` con escape; `|safe` y `Markup` solo deben utilizarse con HTML que controles. El filtro `markdown` devuelve un `str` HTML sin sanitización de contenido arbitrario. Marcarlo como seguro puede permitir HTML introducido por usuarios; incorpora una política de sanitización si tu producto acepta Markdown externo.
+El autoescape está habilitado para la aplicación por defecto. Conserva `{{ user.name }}` con escape; `|safe` y `Markup` solo deben utilizarse con HTML que controles. Tanto `json` como `markdown` devuelven valores `str` normales sujetos al autoescape de Jinja. El filtro `markdown` produce HTML sin sanitización de contenido arbitrario. Marcarlo como seguro puede permitir HTML introducido por usuarios; incorpora una política de sanitización si tu producto acepta Markdown externo.
 
-`json` serializa con msgspec, opcionalmente `|json(indent=2)`, pero devuelve `str(value)` si no puede serializar. Es un filtro de presentación, no una garantía de JSON válido para todos los objetos ni un escape específico para `<script>`. Evita interpolarlo como código ejecutable. `dump()` expone datos como HTML y debe reservarse para diagnóstico controlado; no vuelques secretos. Los helpers de cifrado no reemplazan la autorización.
+`json` serializa con msgspec, opcionalmente `|json(indent=2)`, pero devuelve `str(value)` si falla la serialización o el formato. Es un filtro de presentación, no una garantía de JSON válido para todos los objetos ni un escape específico para `<script>`. Evita interpolarlo como código ejecutable. La etiqueta `{% csrf %}` acepta builders `csrf_field` síncronos o asíncronos, escapa las cadenas normales y conserva los valores `Markup`. La ausencia del builder produce `ViewRenderException`.
+
+`dump()` expone datos como HTML y debe reservarse para diagnóstico controlado; no vuelques secretos. Los helpers de cifrado no reemplazan la autorización.
 
 ---
 

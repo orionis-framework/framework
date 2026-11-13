@@ -1,9 +1,16 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
+from typing import get_type_hints
 from orionis.cache.cache_manager import CacheManager
+from orionis.cache.contracts.cache_manager import ICacheManager
+from orionis.cache.contracts.file_based_cache import IFileBasedCache
+from orionis.cache.contracts.repository import ICacheRepository
 from orionis.cache.exceptions import CacheStoreException
 from orionis.test import TestCase
+
 
 class _CacheApplication:
     """Supply a fixed cache configuration to the manager."""
@@ -42,8 +49,18 @@ class _CacheApplication:
             stores=SimpleNamespace(),
         )
 
+
 class TestCacheManager(TestCase):
     """Verify named cache backend selection."""
+
+    def testPublicContractAnnotationsResolveAtRuntime(self) -> None:
+        """Resolve public cache contract annotations for runtime consumers."""
+        for contract in (ICacheManager, ICacheRepository, IFileBasedCache):
+            for name, method in vars(contract).items():
+                if name.startswith("_") or not callable(method):
+                    continue
+                with self.subTest(contract=contract.__name__, method=name):
+                    self.assertIn("return", get_type_hints(method))
 
     def testUnknownStoreDoesNotBecomeAFileStore(self) -> None:
         """Reject an unknown driver before creating a backend.
@@ -51,7 +68,7 @@ class TestCacheManager(TestCase):
         Returns
         -------
         None
-            Assertions verify explicit backend selection.
+            No return value.
         """
         with TemporaryDirectory() as directory:
             manager = CacheManager(_CacheApplication(Path(directory)))
@@ -64,7 +81,7 @@ class TestCacheManager(TestCase):
         Returns
         -------
         None
-            Assertions verify repository identity.
+            No return value.
         """
         with TemporaryDirectory() as directory:
             manager = CacheManager(_CacheApplication(Path(directory)))

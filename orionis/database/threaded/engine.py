@@ -1,16 +1,21 @@
+# ruff: noqa: TC002, TC003
+# Keep native engine and iterator annotations available to runtime reflection.
 """Expose asynchronous checkouts without claiming a blocking driver is async."""
 
 from __future__ import annotations
 from contextlib import asynccontextmanager
-from typing import TYPE_CHECKING
 from sqlalchemy.exc import SQLAlchemyError
 from orionis.database.exceptions import QueryException
 from orionis.database.threaded.connection import ThreadedConnection
-from orionis.database.threaded.worker import ThreadedWorker
+from orionis.database.threaded.worker import (
+    ThreadedWorker,
+    _complete_cleanup,
+    _rollback_or_invalidate,
+)
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from sqlalchemy.engine import Engine
+from collections.abc import AsyncIterator
+from sqlalchemy.engine import Engine
+
 
 class ThreadedEngine:
     """Expose asynchronous checkouts without claiming a blocking driver is async."""
@@ -32,7 +37,7 @@ class ThreadedEngine:
         Returns
         -------
         None
-            Initialize the adapter without starting worker threads.
+            No return value.
         """
         self.sync_engine = engine
         """Blocking Core engine backed by the official connector dialect."""
@@ -56,9 +61,8 @@ class ThreadedEngine:
         try:
             return await ThreadedConnection.open(self.sync_engine)
         except SQLAlchemyError as error:
-            message = (
-                f"Unable to open connection '{self._name}' "
-                f"({type(error).__name__})."
+            message = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                f"Unable to open connection '{self._name}' ({type(error).__name__})."
             )
             raise QueryException(message) from None
 
@@ -73,23 +77,32 @@ class ThreadedEngine:
             Checkout with an active root transaction.
         """
         connection = await self.connect()
+        primary: BaseException | None = None
         try:
             try:
                 transaction = await connection.begin()
                 try:
                     yield connection
-                except BaseException:
-                    await transaction.rollback()
+                except BaseException as error:
+                    await _complete_cleanup(
+                        _rollback_or_invalidate(
+                            transaction.rollback(),
+                            connection.invalidate,
+                        ),
+                        error,
+                    )
                     raise
                 else:
                     await transaction.commit()
-            except SQLAlchemyError:
-                await connection.invalidate()
+            except BaseException as error:
+                primary = error
+                if isinstance(error, SQLAlchemyError):
+                    await _complete_cleanup(connection.invalidate(), error)
                 raise
             finally:
-                await connection.close()
+                await _complete_cleanup(connection.close(), primary)
         except SQLAlchemyError as error:
-            message = (
+            message = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Unable to complete transaction on connection '{self._name}' "
                 f"({type(error).__name__})."
             )
@@ -102,17 +115,20 @@ class ThreadedEngine:
         Returns
         -------
         None
-            Dispose the blocking pool and join the temporary cleanup worker.
+            No return value.
         """
         worker = ThreadedWorker()
+        primary: BaseException | None = None
         try:
             try:
                 await worker.run(self.sync_engine.dispose)
+            except BaseException as error:
+                primary = error
+                raise
             finally:
-                await worker.close()
+                await _complete_cleanup(worker.close(), primary)
         except SQLAlchemyError as error:
-            message = (
-                f"Unable to dispose connection '{self._name}' "
-                f"({type(error).__name__})."
+            message = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                f"Unable to dispose connection '{self._name}' ({type(error).__name__})."
             )
             raise QueryException(message) from None

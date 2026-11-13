@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IInspire(ABC):
     """Define the contract for inspire implementations."""
 

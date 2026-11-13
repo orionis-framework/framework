@@ -6,6 +6,7 @@ import importlib
 import os
 from pathlib import Path
 import sys
+import tokenize
 from types import MappingProxyType
 from typing import Any
 
@@ -14,15 +15,30 @@ _EXCLUDED_DIRECTORIES = frozenset({"__pycache__", "site-packages"})
 _VENV_DIRECTORIES = frozenset({".env", ".venv", "env", "venv"})
 """Venv directories used by ``inspector``."""
 
+
+def _raise_discovery_error(error: OSError) -> None:
+    """Propagate a failed directory traversal instead of reporting partial results.
+
+    Parameters
+    ----------
+    error : OSError
+        Filesystem error reported by the directory walker.
+
+    Returns
+    -------
+    None
+        This function does not return normally.
+
+    Raises
+    ------
+    OSError
+        The original directory traversal error.
+    """
+    raise error
+
+
 class ModuleInspector:
-
-    # ruff: noqa: RUF012
-
-    # Cache for resolved class objects keyed by fully-qualified name
     """Load modules and inspect their exported definitions."""
-
-    __cache_resolved_classes: dict[str, type] = {}
-    """Cache for resolved class objects keyed by fully-qualified name."""
 
     @staticmethod
     def discoverModules(
@@ -47,12 +63,14 @@ class ModuleInspector:
         Returns
         -------
         set of str
-            Set of discovered module names in dot notation.
+            Module names in dot notation, or an empty set for an absent directory.
 
         Raises
         ------
         ValueError
             If the target directory is outside the base directory.
+        OSError
+            If a present directory cannot be traversed completely.
         """
         base = base_path.resolve()
         target = target_path.resolve()
@@ -67,11 +85,20 @@ class ModuleInspector:
             ):
                 return set()
 
+        try:
+            target.stat()
+        except FileNotFoundError:
+            return set()
+
         modules: set[str] = set()
-        for directory, subdirectories, files in os.walk(target):
+        for directory, subdirectories, files in os.walk(
+            target,
+            onerror=_raise_discovery_error,
+        ):
             # Prevent traversal into virtual environments and import caches.
             subdirectories[:] = [
-                name for name in subdirectories
+                name
+                for name in subdirectories
                 if name.casefold() not in _EXCLUDED_DIRECTORIES
                 and (
                     name.casefold() not in _VENV_DIRECTORIES
@@ -103,7 +130,7 @@ class ModuleInspector:
         Returns
         -------
         None
-            Add modules in place, omitting a root-level package initializer.
+            This method does not return a value.
         """
         for filename in files:
             if not filename.endswith(".py"):
@@ -125,9 +152,9 @@ class ModuleInspector:
         """
         Load and return a class object from a specified module.
 
-        Import the given module and retrieve the class by name, using internal
-        caches for efficiency. If not provided directly, module and class names
-        can be extracted from the metadata dictionary.
+        Reuse Python's module cache and retrieve the current class attribute.
+        If not provided directly, module and class names can be extracted from
+        the metadata dictionary.
 
         Parameters
         ----------
@@ -167,14 +194,6 @@ class ModuleInspector:
             module_path = metadata.get("module")
             class_name = metadata.get("class")
 
-        # Use the fully qualified class name as the cache key
-        class_key: str = f"{module_path}.{class_name}"
-
-        # Return the class previously resolved for this path.
-        _resolved = cls.__cache_resolved_classes.get(class_key)
-        if _resolved is not None:
-            return _resolved
-
         # Retrieve from sys.modules if already imported, otherwise import now
         module = sys.modules.get(module_path)
         if module is None:
@@ -188,22 +207,17 @@ class ModuleInspector:
         try:
             klass = getattr(module, class_name)
         except AttributeError as e:
-            error_msg = (
-                f"Module '{module_path}' does not have a class "
-                f"'{class_name}': {e}"
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                f"Module '{module_path}' does not have a class '{class_name}': {e}"
             )
             raise AttributeError(error_msg) from e
 
         # Ensure the resolved attribute is a class
         if not isinstance(klass, type):
             error_msg = (
-                f"Attribute '{class_name}' in module '{module_path}' is not a "
-                "class."
+                f"Attribute '{class_name}' in module '{module_path}' is not a class."
             )
             raise TypeError(error_msg)
-
-        # Cache the resolved class for future calls
-        cls.__cache_resolved_classes[class_key] = klass
 
         # Return the resolved class
         return klass
@@ -237,11 +251,12 @@ class ModuleInspector:
             return False
 
         try:
-            source = file_path.read_text(encoding="utf-8")
+            with tokenize.open(file_path) as source_file:
+                source = source_file.read()
             if allow_empty and not source.strip():
                 return True
             tree = ast.parse(source)
-        except (SyntaxError, UnicodeDecodeError):
+        except SyntaxError, UnicodeDecodeError:
             return False
 
         # Walk the AST and match import nodes directly without a nested helper

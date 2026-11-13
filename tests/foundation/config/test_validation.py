@@ -1,6 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from enum import Enum
 from orionis.foundation.config.validation import normalize_enum
 from orionis.test import TestCase
+
 
 class _Mode(Enum):
     PRIMARY = "fast-mode"
@@ -8,6 +11,7 @@ class _Mode(Enum):
     FAST_MODE = "other"
     NUMBER = 0
     EMPTY = ""
+
 
 class TestEnumNormalization(TestCase):
     """Validate indexed enum lookups without changing accepted inputs."""
@@ -105,7 +109,8 @@ class TestEnumNormalization(TestCase):
         self.assertIs(normalize_enum("[1]", choices, "choice"), choices.VALUES.value)
         choices.VALUES.value.append(2)
         self.assertIs(
-            normalize_enum("[1, 2]", choices, "choice"), choices.VALUES.value,
+            normalize_enum("[1, 2]", choices, "choice"),
+            choices.VALUES.value,
         )
         with self.assertRaises(ValueError):
             normalize_enum("[1]", choices, "choice")

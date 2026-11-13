@@ -1,3 +1,5 @@
+# ruff: noqa: SIM115
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Hold an uploaded file in memory or spill it to a temporary file on disk."""
 
 from __future__ import annotations
@@ -23,6 +25,7 @@ _DOTFILE_RE = re.compile(r"^\.+")
 # Maximum chunk size for streaming file saves to disk (64 KiB)
 _CHUNK_SIZE = 64 * 1024
 """Maximum chunk size for streaming file saves to disk (64 KiB)."""
+
 
 # Uploaded file container with automatic memory-to-disk spill support
 class UploadedFile(IUploadedFile):
@@ -90,7 +93,7 @@ class UploadedFile(IUploadedFile):
         self._rolled = False
         """Rolled flag used by ``UploadedFile``."""
         # SpooledTemporaryFile spills to disk once memory_threshold is exceeded
-        self._file = tempfile.SpooledTemporaryFile(  # noqa: SIM115
+        self._file = tempfile.SpooledTemporaryFile(
             max_size=memory_threshold,
         )
         """SpooledTemporaryFile spills to disk once memory_threshold is exceeded."""
@@ -143,8 +146,7 @@ class UploadedFile(IUploadedFile):
             would exceed the in-memory threshold.
         """
         return self._rolled or bool(
-            self._memory_threshold
-            and self._size + size > self._memory_threshold,
+            self._memory_threshold and self._size + size > self._memory_threshold,
         )
 
     def write(self, chunk: bytes | bytearray | memoryview) -> None:

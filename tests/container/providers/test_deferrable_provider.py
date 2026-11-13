@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.container.contracts.deferrable_provider import IDeferrableProvider
 from orionis.container.providers.deferrable_provider import DeferrableProvider
@@ -8,6 +10,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 
 _ALIAS = "x-orionis-probe"
+
 
 class _ConcreteDeferred(DeferrableProvider):
     """Concrete provider declaring both a type and an alias."""
@@ -23,6 +26,7 @@ class _ConcreteDeferred(DeferrableProvider):
         """
         return [str, _ALIAS]
 
+
 class _EmptyDeferred(DeferrableProvider):
     """Concrete provider that publishes no service at all."""
 
@@ -37,12 +41,13 @@ class _EmptyDeferred(DeferrableProvider):
         """
         return []
 
+
 # ===========================================================================
 # Contract compliance
 # ===========================================================================
 
-class TestDeferrableProviderContract(TestCase):
 
+class TestDeferrableProviderContract(TestCase):
     def testConcreteProviderSatisfiesTheDeferrableContract(self) -> None:
         """
         Satisfy the IDeferrableProvider contract with a concrete provider.
@@ -50,18 +55,19 @@ class TestDeferrableProviderContract(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         provider = _ConcreteDeferred()
         self.assertIsInstance(provider, DeferrableProvider)
         self.assertIsInstance(provider, IDeferrableProvider)
 
+
 # ===========================================================================
-# provides()
+# Declared services
 # ===========================================================================
+
 
 class TestDeferrableProviderProvides(TestCase):
-
     def testBaseProvidesRaisesNotImplementedError(self) -> None:
         """
         Raise NotImplementedError when provides() is not overridden.
@@ -72,7 +78,7 @@ class TestDeferrableProviderProvides(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(NotImplementedError) as ctx:
             DeferrableProvider.provides()
@@ -85,7 +91,7 @@ class TestDeferrableProviderProvides(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(_ConcreteDeferred.provides(), [str, _ALIAS])
 
@@ -96,6 +102,6 @@ class TestDeferrableProviderProvides(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(_EmptyDeferred.provides(), [])

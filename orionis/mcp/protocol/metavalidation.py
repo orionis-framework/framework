@@ -31,6 +31,7 @@ _MAX_TRACE_MEMBERS = 32
 _MAX_TRACE_VALUE = 256
 """Max trace value value used by ``metavalidation``."""
 
+
 def validate_meta_key(key: str, *, extension: bool = False) -> None:
     """
     Check the specification's prefix and name grammar.
@@ -47,11 +48,14 @@ def validate_meta_key(key: str, *, extension: bool = False) -> None:
     None
         Complete the documented operation without returning a value.
     """
-    if not isinstance(key, str) or not _META_KEY.fullmatch(key) or (
-        extension and "/" not in key
+    if (
+        not isinstance(key, str)
+        or not _META_KEY.fullmatch(key)
+        or (extension and "/" not in key)
     ):
         message = "Invalid MCP metadata key"
         raise ValueError(message)
+
 
 def validate_metadata(metadata: object, *, allow_reserved: bool = True) -> None:
     """
@@ -75,8 +79,14 @@ def validate_metadata(metadata: object, *, allow_reserved: bool = True) -> None:
     for key in metadata:
         validate_meta_key(key)
         labels = key.partition("/")[0].split(".") if "/" in key else []
-        if not allow_reserved and len(labels) > 1 and labels[1] in (
-            "modelcontextprotocol", "mcp",
+        if (
+            not allow_reserved
+            and len(labels) > 1
+            and labels[1]
+            in (
+                "modelcontextprotocol",
+                "mcp",
+            )
         ):
             message = "Application metadata cannot override reserved MCP keys"
             raise ValueError(message)
@@ -90,6 +100,7 @@ def validate_metadata(metadata: object, *, allow_reserved: bool = True) -> None:
             if not isinstance(value, str) or not validator(value):
                 message = f"Invalid W3C {key} metadata"
                 raise ValueError(message)
+
 
 def validate_client_capabilities(capabilities: Mapping[str, object]) -> None:
     """
@@ -120,8 +131,11 @@ def validate_client_capabilities(capabilities: Mapping[str, object]) -> None:
             raise TypeError(message)
         _capability_settings(key, value, children)
 
+
 def _capability_settings(
-    key: str, value: Mapping[str, object], children: tuple[str, ...],
+    key: str,
+    value: Mapping[str, object],
+    children: tuple[str, ...],
 ) -> None:
     """
     Validate the nested settings of a known client capability.
@@ -145,12 +159,13 @@ def _capability_settings(
     ValueError
         If a setting is not a mapping or an extension name is invalid.
     """
-    for name in (value if key in ("experimental", "extensions") else children):
+    for name in value if key in ("experimental", "extensions") else children:
         if name in value and not isinstance(value[name], Mapping):
             message = "Client capability settings must be an object"
             raise ValueError(message)
         if key == "extensions":
             validate_meta_key(name, extension=True)
+
 
 def validate_implementation(value: object) -> None:
     """
@@ -167,6 +182,7 @@ def validate_implementation(value: object) -> None:
         Complete the documented operation without returning a value.
     """
     msgspec.convert(value, type=ServerInfo, strict=True)
+
 
 def _trace_parent(value: str) -> bool:
     """
@@ -193,6 +209,7 @@ def _trace_parent(value: str) -> bool:
         and (not suffix if version == "00" else not suffix or suffix.startswith("-"))
     )
 
+
 def _trace_state(value: str) -> bool:
     """
     Check ordered tracestate members, including unique vendor keys.
@@ -215,13 +232,20 @@ def _trace_state(value: str) -> bool:
         key, separator, item = member.strip(" \t").partition("=")
         if not separator:
             return False
-        if not _STATE_KEY.fullmatch(key) or key in seen or (
-            not item or len(item) > _MAX_TRACE_VALUE or item.endswith(" ")
-            or any(char in ",=" or not " " <= char <= "~" for char in item)
+        if (
+            not _STATE_KEY.fullmatch(key)
+            or key in seen
+            or (
+                not item
+                or len(item) > _MAX_TRACE_VALUE
+                or item.endswith(" ")
+                or any(char in ",=" or not " " <= char <= "~" for char in item)
+            )
         ):
             return False
         seen.add(key)
     return True
+
 
 def _baggage(value: str) -> bool:
     """
@@ -246,8 +270,7 @@ def _baggage(value: str) -> bool:
             if not _TOKEN.fullmatch(key) or (index == 0 and not separator):
                 return False
             if separator and any(
-                char in '\\";, ' or not "!" <= char <= "~"
-                for char in item.strip(" \t")
+                char in '\\";, ' or not "!" <= char <= "~" for char in item.strip(" \t")
             ):
                 return False
     return True

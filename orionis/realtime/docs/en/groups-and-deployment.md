@@ -5,11 +5,13 @@ Groups select connections belonging to a Hub, such as room participants. They ar
 ```python
 from orionis.realtime import Hub, remote
 
+
 class RoomHub(Hub):
     @remote
     async def join(self, room: str) -> None:
         if self.context.user is None:
             from orionis.realtime.errors import RPCError
+
             raise RPCError("unauthenticated", "Sign in first")
         await self.groups.join(room)
         await self.clients.group(room).send("joined", self.context.connection_id)
@@ -27,13 +29,16 @@ from orionis.realtime import ConnectionManager
 from orionis.realtime.config import RealtimeConfig
 from orionis.realtime import Hub
 
+
 class EmptyHub(Hub):
     pass
+
 
 async def example():
     manager = ConnectionManager(RealtimeConfig())
     result = await manager.hub(EmptyHub).all.send("refresh", {"version": 1})
     assert (result.sent, result.failed) == (0, 0)
+
 
 asyncio.run(example())
 ```
@@ -54,11 +59,15 @@ asyncio.run(example())
 
 Budgets are positive integers and timeouts are finite positive values. `config/realtime.py` constructs `RealtimeConfig`; the provider registers immutable configuration. Combine them with HTTP WebSocket message/connection limits. Raising a Realtime limit does not automatically raise the transport limit.
 
+Only an absent configuration (`None`) selects defaults. Invalid falsy values such as `False`, `0` or an empty list fail explicitly before services are registered.
+
 ## Workers, ordering and extension
 
 `ConnectionManager` and groups are worker-local. Processes do not see each other's connections; restart loses registrations/membership. Cross-worker delivery needs an application backplane and compatible `IConnectionManager` implementation. Configuring Redis elsewhere does not automatically add pub/sub or offline storage.
 
 Connections serialize writes under a lock and apply backpressure; a failed write closes the connection and cancels its owner to prevent later writes overtaking it. Broadcasts bound fan-out and encode once per codec. Access the manager on the application's event loop; it is not a globally thread-safe registry.
+
+If the event loop rejects task creation, the unscheduled coroutine is closed and write admission releases its lock. Rejection does not leave a phantom active invocation or permanently block later writes.
 
 Remote reflection caches up to 1024 Hub classes. Instances/scopes remain invocation-specific. Do not retain scoped resources in tasks that outlive connections; manage cancellation, joining and closure of your own tasks.
 

@@ -1,6 +1,7 @@
 """Group the view globals components and public imports."""
 
 from typing import TYPE_CHECKING as _TYPE_CHECKING
+
 from orionis._exports import resolve_export as _resolve_export
 
 if _TYPE_CHECKING:
@@ -65,12 +66,15 @@ __all__ = [
     "_global_url",
 ]
 
+_LANG_MODULE = "orionis.view.globals.lang"
+"""Locate the shared translation global builders."""
+
 _EXPORTS = {
     "_global_app": ("orionis.view.globals.app", "_global_app"),
     "_global_asset": ("orionis.view.globals.asset", "_global_asset"),
     "_global_auth": ("orionis.view.globals.auth", "_global_auth"),
     "_global_cache": ("orionis.view.globals.cache", "_global_cache"),
-    "_global_choice": ("orionis.view.globals.lang", "_global_choice"),
+    "_global_choice": (_LANG_MODULE, "_global_choice"),
     "_global_collect": ("orionis.view.globals.collection", "_global_collect"),
     "_global_config": ("orionis.view.globals.config", "_global_config"),
     "_global_csrf_field": ("orionis.view.globals.csrf", "_global_csrf_field"),
@@ -80,12 +84,18 @@ _EXPORTS = {
     "_global_encrypt": ("orionis.view.globals.bcrypt", "_global_encrypt"),
     "_global_errors": ("orionis.view.globals.errors", "_global_errors"),
     "_global_flash": ("orionis.view.globals.flash", "_global_flash"),
-    "_global_framework_version": ("orionis.view.globals.version", "_global_framework_version"),
-    "_global_locale": ("orionis.view.globals.lang", "_global_locale"),
-    "_global_locales": ("orionis.view.globals.lang", "_global_locales"),
+    "_global_framework_version": (
+        "orionis.view.globals.version",
+        "_global_framework_version",
+    ),
+    "_global_locale": (_LANG_MODULE, "_global_locale"),
+    "_global_locales": (_LANG_MODULE, "_global_locales"),
     "_global_now": ("orionis.view.globals.datetime", "_global_now"),
     "_global_old": ("orionis.view.globals.old", "_global_old"),
-    "_global_python_version": ("orionis.view.globals.version", "_global_python_version"),
+    "_global_python_version": (
+        "orionis.view.globals.version",
+        "_global_python_version",
+    ),
     "_global_request": ("orionis.view.globals.request", "_global_request"),
     "_global_route": ("orionis.view.globals.route", "_global_route"),
     "_global_secure_asset": ("orionis.view.globals.asset", "_global_secure_asset"),
@@ -93,10 +103,11 @@ _EXPORTS = {
     "_global_session": ("orionis.view.globals.session", "_global_session"),
     "_global_stringable": ("orionis.view.globals.stringable", "_global_stringable"),
     "_global_today": ("orionis.view.globals.datetime", "_global_today"),
-    "_global_trans": ("orionis.view.globals.lang", "_global_trans"),
+    "_global_trans": (_LANG_MODULE, "_global_trans"),
     "_global_url": ("orionis.view.globals.url", "_global_url"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -118,6 +129,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

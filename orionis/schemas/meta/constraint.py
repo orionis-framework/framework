@@ -2,6 +2,7 @@
 
 from orionis.schemas.meta.validation import ValidationMetadata
 
+
 class ConstraintMetadata(ValidationMetadata):
     """
     Intermediate marker for validation constraints.

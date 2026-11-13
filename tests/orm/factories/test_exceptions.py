@@ -1,6 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.orm.factories import exceptions as exceptions_module
 from orionis.orm.factories.exceptions import FactoryException
 from orionis.test import TestCase
+
 
 class TestFactoryExceptions(TestCase):
     """Verify factory failures retain exception metadata and their hierarchy."""
@@ -11,7 +14,7 @@ class TestFactoryExceptions(TestCase):
         Returns
         -------
         None
-            Verify the complete hierarchy and ordinary Python exception chaining.
+            No return value.
         """
         names = {
             "FactoryConcurrencyException",

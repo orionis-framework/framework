@@ -54,7 +54,9 @@ from orionis.console import Argument
 parser = argparse.ArgumentParser(add_help=False)
 Argument(
     name_or_flags=("-f", "--format"),
-    choices=["json", "csv"], default="json", dest="format_name",
+    choices=["json", "csv"],
+    default="json",
+    dest="format_name",
 ).addToParser(parser)
 assert vars(parser.parse_args(["--format", "csv"])) == {"format_name": "csv"}
 ```
@@ -62,6 +64,8 @@ assert vars(parser.parse_args(["--format", "csv"])) == {"format_name": "csv"}
 Orionis reserves `-h`/`--help`. `required` does not make a positional argument optional: use `nargs="?"` and a default. Boolean/const actions reject `type_`; `choices` must be a collection rather than a string; the `version` action requires version text. Invalid definitions fail during `Argument` construction, before work begins.
 
 `getArgument("missing", default)` applies the default only when the key is absent: explicitly supplied `None` is preserved. `getArguments()` returns a shallow copy. Do not use `bool("false")` for boolean parsing; use actions such as `store_true`/`store_false`.
+
+Command metadata preserves literal defaults and constants, including `"__MISSING__"`, when cached. A restored `type_` must resolve to a callable: missing converters, missing converter dependencies, and non-callable references fail explicitly instead of silently disabling conversion.
 
 ## Register a fluent operation
 
@@ -87,3 +91,7 @@ Call `register_reports()` while loading the route, before metadata is cached; th
 ## Results and diagnostics
 
 Return an integer to control the exit code; other successful results become 0. Normal Reactor failures are logged, delegated to the failure catcher, and return 1. Help and parsing errors use `SystemExit` internally. Test invalid arguments and business results: a process ending without a traceback does not imply exit code 0.
+
+Nonzero results retain their exit code and produce failure feedback, not a successful completion message. They are reported through the active failure runtime, with a fallback error log when no runtime is active.
+
+The kernel recognizes a launcher by its basename, such as `reactor` or `reactor.py`. Command names merely containing that word, such as `app:reactor-status`, remain command names.

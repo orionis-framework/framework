@@ -1,6 +1,9 @@
+# ruff: noqa: PLR0913, TC001, TC003
+# Retain the injected collaborators and concrete public runtime annotations.
 """Expose authentication and authorization to application code."""
 
-from typing import TYPE_CHECKING
+from collections.abc import Iterable, Mapping
+from datetime import datetime
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import (
     authentication_lock,
@@ -8,11 +11,17 @@ from orionis.auth.context.functions import (
     current_auth_context,
 )
 from orionis.auth.contracts.authorizable import IAuthorizable
+from orionis.auth.contracts.authenticatable import IAuthenticatable
 from orionis.auth.contracts.authorizer import IAuthorizer
+from orionis.auth.contracts.context import IAuthenticationContext
+from orionis.auth.contracts.guard import IGuard
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.auth.contracts.permission_repository import IPermissionRepository
+from orionis.auth.contracts.policy import IPolicy
 from orionis.auth.contracts.session_guard import ISessionGuard
+from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
 from orionis.auth.contracts.token_repository import IAccessTokenRepository
+from orionis.auth.entities.new_access_token import NewAccessToken
 from orionis.auth.exceptions import (
     AuthException,
     AuthenticationException,
@@ -25,15 +34,9 @@ from orionis.container.context.scope import ScopedContext
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.request import Request
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
-    from datetime import datetime
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
-    from orionis.auth.contracts.context import IAuthenticationContext
-    from orionis.auth.contracts.guard import IGuard
-    from orionis.auth.contracts.policy import IPolicy
-    from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
-    from orionis.auth.entities.new_access_token import NewAccessToken
+_UNAUTHENTICATED = "Unauthenticated."
+"""Describe the absence of a current authenticated identity."""
+
 
 class AuthManager(IAuthManager):
     """
@@ -52,8 +55,6 @@ class AuthManager(IAuthManager):
     another one.
     """
 
-    # ruff: noqa: TC001 (Dependency Injection)
-
     __slots__ = (
         "__authorizer",
         "__default_guard",
@@ -64,7 +65,7 @@ class AuthManager(IAuthManager):
     )
     """Declare the instance attribute slots reserved by this class."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         app: IApplication,
         authorizer: IAuthorizer,
@@ -94,7 +95,7 @@ class AuthManager(IAuthManager):
         Returns
         -------
         None
-            The guard registry is built once, at boot time.
+            No return value.
         """
         self.__authorizer = authorizer
         """Component answering permission, role and policy questions."""
@@ -111,9 +112,7 @@ class AuthManager(IAuthManager):
             token_guard.name: token_guard,
         }
         """Register the configured guard classes by name."""
-        self.__default_guard: str = (
-            app.config("auth.default") or session_guard.name
-        )
+        self.__default_guard: str = app.config("auth.default") or session_guard.name
         """Name of the authentication guard selected when none is specified."""
 
     # ── Authentication state ──────────────────────────────────────────
@@ -206,7 +205,10 @@ class AuthManager(IAuthManager):
     # ── Session lifecycle ─────────────────────────────────────────────
 
     async def attempt(
-        self, credentials: Mapping[str, object], *, remember: bool = False,
+        self,
+        credentials: Mapping[str, object],
+        *,
+        remember: bool = False,
     ) -> bool:
         """
         Authenticate the current request from submitted credentials.
@@ -226,10 +228,12 @@ class AuthManager(IAuthManager):
         bool
             True when the credentials matched and the session started.
         """
-        request = self.__request()
         async with authentication_lock():
+            request = self.__request()
             identity = await self.__session_guard.attempt(
-                request, credentials, remember=remember,
+                request,
+                credentials,
+                remember=remember,
             )
             if identity is None:
                 return False
@@ -249,10 +253,10 @@ class AuthManager(IAuthManager):
         Returns
         -------
         None
-            The session and the request context are updated.
+            No return value.
         """
-        request = self.__request()
         async with authentication_lock():
+            request = self.__request()
             self.__session_guard.login(request, identity)
             self.__rebind(identity, self.__session_guard.name)
 
@@ -263,10 +267,10 @@ class AuthManager(IAuthManager):
         Returns
         -------
         None
-            The session is invalidated and the context becomes a guest.
+            No return value.
         """
-        request = self.__request()
         async with authentication_lock():
+            request = self.__request()
             await self.__session_guard.logout(request)
             bind_auth_context(AuthenticationContext(guard=self.__session_guard.name))
 
@@ -331,7 +335,8 @@ class AuthManager(IAuthManager):
             True when at least one permission is granted.
         """
         return await self.__authorizer.canAny(
-            current_auth_context(), permissions,
+            current_auth_context(),
+            permissions,
         )
 
     async def canAll(self, permissions: Iterable[str]) -> bool:
@@ -349,7 +354,8 @@ class AuthManager(IAuthManager):
             True when every permission is granted.
         """
         return await self.__authorizer.canAll(
-            current_auth_context(), permissions,
+            current_auth_context(),
+            permissions,
         )
 
     async def hasRole(self, role: str) -> bool:
@@ -380,7 +386,7 @@ class AuthManager(IAuthManager):
         Returns
         -------
         None
-            Nothing is returned when the permission is granted.
+            No return value.
 
         Raises
         ------
@@ -391,7 +397,7 @@ class AuthManager(IAuthManager):
         """
         context = current_auth_context()
         if context.isGuest:
-            error_msg = "Unauthenticated." # NOSONAR
+            error_msg = _UNAUTHENTICATED
             raise AuthenticationException(error_msg)
 
         granted = await self.__authorizer.can(context, permission)
@@ -416,7 +422,9 @@ class AuthManager(IAuthManager):
             True when the policy allows the operation.
         """
         return await self.__authorizer.allows(
-            current_auth_context(), ability, resource,
+            current_auth_context(),
+            ability,
+            resource,
         )
 
     async def denies(self, ability: str, resource: object) -> bool:
@@ -452,7 +460,7 @@ class AuthManager(IAuthManager):
         Returns
         -------
         None
-            Nothing is returned when the policy allows the operation.
+            No return value.
 
         Raises
         ------
@@ -463,7 +471,7 @@ class AuthManager(IAuthManager):
         """
         context = current_auth_context()
         if context.isGuest:
-            error_msg = "Unauthenticated."
+            error_msg = _UNAUTHENTICATED
             raise AuthenticationException(error_msg)
 
         allowed = await self.__authorizer.allows(context, ability, resource)
@@ -485,7 +493,7 @@ class AuthManager(IAuthManager):
         Returns
         -------
         None
-            The policy registry is updated as a side effect.
+            No return value.
         """
         self.__authorizer.registerPolicy(resource, policy)
 
@@ -536,13 +544,12 @@ class AuthManager(IAuthManager):
             raise AuthorizationException(error_msg)
         owner = tokenable if tokenable is not None else context.identity
         if owner is None:
-            error_msg = "Unauthenticated."
+            error_msg = _UNAUTHENTICATED
             raise AuthenticationException(error_msg)
 
         if not isinstance(owner, IAuthorizable):
             error_msg = (
-                "Personal access tokens require an identity implementing "
-                "IAuthorizable."
+                "Personal access tokens require an identity implementing IAuthorizable."
             )
             raise AuthException(error_msg)
 
@@ -591,7 +598,7 @@ class AuthManager(IAuthManager):
         Returns
         -------
         None
-            The scope is updated as a side effect.
+            No return value.
         """
         bind_auth_context(
             AuthenticationContext(

@@ -1,12 +1,13 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string holds a syntactically valid JSON document."""
 
 import msgspec
 from orionis.schemas.rule import Rule
 
+
 class Json(Rule):
     """Ensure a string holds a syntactically valid JSON document."""
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -46,7 +47,7 @@ class Json(Rule):
 
         try:
             msgspec.json.decode(value)
-        except msgspec.DecodeError:
+        except msgspec.DecodeError, UnicodeEncodeError:
             return False
 
         return True

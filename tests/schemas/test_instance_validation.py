@@ -1,5 +1,6 @@
+# ruff: noqa: PT009, PT027, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 # Schema metadata is evaluated at runtime.
-# ruff: noqa: TC001
 from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import UUID
@@ -10,8 +11,10 @@ from orionis.schemas.fields import Field
 from orionis.schemas.validator import Schema as Validator
 from orionis.test import TestCase
 
+
 class _Output(Schema, rename="camel"):
     item_count: Field[int, GreaterThanOrEqual(1)]
+
 
 class TestInstanceValidation(TestCase):
     async def testMutatedNestedInstancesAreRevalidated(self) -> None:
@@ -21,8 +24,9 @@ class TestInstanceValidation(TestCase):
         Returns
         -------
         None
-            Assert the invalid child reports its fully qualified field path.
+            No return value.
         """
+
         class Batch(Schema):
             children: dict[str, list[_Output]]
 
@@ -39,8 +43,9 @@ class TestInstanceValidation(TestCase):
         Returns
         -------
         None
-            Assert an invalid default raises a validation exception.
+            No return value.
         """
+
         class InvalidDefault(Schema, omit_defaults=True):
             count: Field[int, GreaterThanOrEqual(1)] = 0
 
@@ -54,8 +59,9 @@ class TestInstanceValidation(TestCase):
         Returns
         -------
         None
-            Assert dates, decimals, UUIDs and bytes retain their values.
+            No return value.
         """
+
         class Native(Schema):
             timestamp: datetime
             amount: Decimal
@@ -73,8 +79,9 @@ class TestInstanceValidation(TestCase):
         Returns
         -------
         None
-            Assert revalidation reports type errors without string coercion.
+            No return value.
         """
+
         class Text(Schema):
             value: str
 
@@ -89,8 +96,9 @@ class TestInstanceValidation(TestCase):
         Returns
         -------
         None
-            Assert valid rows pass and invalid quantities are rejected.
+            No return value.
         """
+
         class Row(Schema, array_like=True, tag="row"):
             count: Field[int, GreaterThanOrEqual(1)]
 
@@ -105,8 +113,9 @@ class TestInstanceValidation(TestCase):
         Returns
         -------
         None
-            Assert both numeric constraints and the sibling type error are reported.
+            No return value.
         """
+
         class Row(Schema, array_like=True, tag="row"):
             count: Field[int, GreaterThanOrEqual(2), MultipleOf(2)]
             other: int
@@ -120,9 +129,13 @@ class TestInstanceValidation(TestCase):
         ):
             with self.assertRaises(ValidationException) as caught:
                 await Validator.validate(payload, target)
-            self.assertEqual(set(caught.exception.errors), {
-                prefix + "count", prefix + "other",
-            })
+            self.assertEqual(
+                set(caught.exception.errors),
+                {
+                    prefix + "count",
+                    prefix + "other",
+                },
+            )
             self.assertEqual(
                 [error["rule"] for error in caught.exception.errors[prefix + "count"]],
                 ["ge", "multiple_of"],

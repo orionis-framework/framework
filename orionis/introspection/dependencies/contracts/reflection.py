@@ -1,13 +1,14 @@
+# ruff: noqa: TC001
+# Public annotations remain available to runtime inspection.
 """Define the contract for dependency-reflection implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from orionis.introspection.dependencies.entities.signature import (
-        Signature,
-    )
+from orionis.introspection.dependencies.entities.signature import (
+    Signature,
+)
+
 
 class IReflectDependencies(ABC):
     """

@@ -1,19 +1,22 @@
+# ruff: noqa: TC001
+# Keep upload and storage protocol annotations available for runtime reflection.
 """Represent a file received through HTTP, ready to be stored."""
 
 from __future__ import annotations
 import asyncio
+from contextlib import aclosing
 import secrets
-from typing import TYPE_CHECKING
+from orionis.storage.buffering import iterate_chunks
 from orionis.storage.contracts.uploaded_file import IUploadedFile
 from orionis.storage.exceptions import StoragePathException
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from orionis.http.payload.contracts.uploaded_file import (
-        IUploadedFile as IHttpUploadedFile,
-    )
-    from orionis.storage.contracts.file import IFile
-    from orionis.storage.contracts.manager import IStorageManager
+from orionis.http.payload.contracts.uploaded_file import (
+    IUploadedFile as IHttpUploadedFile,
+)
+from orionis.storage.contracts.file import IFile
+from orionis.storage.contracts.manager import IStorageManager
+from orionis.support.concurrency import complete_on_cancel
+
 
 class UploadedFile(IUploadedFile):
     """
@@ -47,7 +50,7 @@ class UploadedFile(IUploadedFile):
         Returns
         -------
         None
-            Initialize the uploaded file with its payload and manager.
+            No return value.
         """
         self._source = source
         """Buffered multipart payload produced by the HTTP layer."""
@@ -125,31 +128,15 @@ class UploadedFile(IUploadedFile):
         """
         Read the full uploaded payload.
 
+        Cancellation waits for the active worker before returning control.
+
         Returns
         -------
         bytes
             Complete payload contents.
         """
         # The payload may be spooled to disk, so read on a worker thread.
-        return await asyncio.to_thread(self._source.read)
-
-    async def __stream(self) -> AsyncIterator[bytes]:
-        """
-        Stream the payload in chunks without loading it in memory.
-
-        Yields
-        ------
-        bytes
-            Consecutive chunks of the buffered payload.
-        """
-        iterator = self._source.chunks()
-
-        # Advance the blocking iterator on a worker thread per chunk.
-        while True:
-            chunk = await asyncio.to_thread(next, iterator, b"")
-            if not chunk:
-                break
-            yield chunk
+        return await complete_on_cancel(asyncio.to_thread(self._source.read))
 
     # ── Persistence operations ───────────────────────────────────────────────
 
@@ -188,6 +175,10 @@ class UploadedFile(IUploadedFile):
         """
         Persist the payload under an explicit file name.
 
+        Own and close the chunk iterator even if the destination fails. Keep
+        the underlying upload buffer available for later reads or copies.
+        Cancellation drains the active iterator operation before closing it.
+
         Parameters
         ----------
         directory : str
@@ -207,16 +198,17 @@ class UploadedFile(IUploadedFile):
         Raises
         ------
         orionis.storage.exceptions.StoragePathException
-            If *name* is empty or contains a directory separator.
+            If *name* is empty, a dot segment, or contains a directory separator.
         """
         # The name must be a single path segment; directories go apart.
-        if not name or "/" in name or "\\" in name:
+        if not name or name in (".", "..") or "/" in name or "\\" in name:
             error_msg = f"Invalid upload file name [{name}]."
             raise StoragePathException(error_msg)
 
         target = f"{directory}/{name}" if directory else name
         file = self._manager.disk(disk).file(target)
-        return await file.writeStream(self.__stream(), visibility)
+        async with aclosing(iterate_chunks(self._source.chunks)) as stream:
+            return await file.writeStream(stream, visibility)
 
     async def move(
         self,
@@ -226,6 +218,8 @@ class UploadedFile(IUploadedFile):
     ) -> IFile:
         """
         Persist the payload and release the upload buffer.
+
+        Once closing starts, cancellation waits for the worker to finish.
 
         Parameters
         ----------
@@ -245,7 +239,7 @@ class UploadedFile(IUploadedFile):
         stored = await self.storeAs(directory, name or self.hashName(), disk)
 
         # Release the temporary upload buffer once persisted.
-        await asyncio.to_thread(self._source.close)
+        await complete_on_cancel(asyncio.to_thread(self._source.close))
         return stored
 
     async def copy(

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import threading
 from types import SimpleNamespace
@@ -10,6 +12,7 @@ from orionis.view.engine import Jinja2Engine
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+
 class TestTemplateWorkers(TestCase):
     """Verify that synchronous cold loaders run away from the application loop."""
 
@@ -20,7 +23,7 @@ class TestTemplateWorkers(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         caller = threading.get_ident()
         threads = []
@@ -28,7 +31,9 @@ class TestTemplateWorkers(TestCase):
 
         class Loader(jinja2.DictLoader):
             def getSource(
-                self: Self, environment: jinja2.Environment, template: str,
+                self: Self,
+                environment: jinja2.Environment,
+                template: str,
             ) -> tuple[str, None, Callable[[], bool]]:
                 """
                 Record the loading thread and delegate to the dictionary loader.

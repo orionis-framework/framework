@@ -1,11 +1,12 @@
+# ruff: noqa: TC001
+# Preserve runtime annotations for migration event arguments.
 """Contract for the database migration runner."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from orionis.database.migrations.events import MigrationEvents
 
-if TYPE_CHECKING:
-    from orionis.database.migrations.events import MigrationEvents
 
 class IMigrator(ABC):
     """

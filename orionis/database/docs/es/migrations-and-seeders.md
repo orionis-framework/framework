@@ -30,17 +30,24 @@ Cada archivo debe contener su subclase local de `Migration`; usa prefijos secuen
 
 ```python
 from orionis.database import Migration
+
 from orionis.support.facades import Schema
 
 
 class CreateFlags(Migration):
     async def up(self) -> None:
+        """Create the flags table and its unique name constraint."""
+
         async with Schema.create("flags") as table:
             table.id()
+
             table.string("name", 80)
+
             table.unique("name")
 
     async def down(self) -> None:
+        """Remove the flags table."""
+
         await Schema.drop("flags")
 ```
 
@@ -75,11 +82,14 @@ Los servicios equivalentes son `Migrator(app, manager).migrate(...)`, `.rollback
 
 ```python
 from orionis.database import Seeder
+
 from orionis.support.facades import DB
 
 
 class DefaultFlags(Seeder):
     async def run(self) -> None:
+        """Insert the initial enabled flag."""
+
         await DB.table("flags").insert({"name": "enabled"})
 ```
 
@@ -91,6 +101,10 @@ La identidad registrada es el nombre de archivo sin extensión, no el nombre de 
 
 ## Fallos y despliegue
 
+La conexión contextual deja de estar activa al terminar el ámbito de migración propietario, también en las copias heredadas por tareas hijas. La detección omite módulos inicializadores de paquetes y considera los alias de una misma clase como un único candidato. Los fallos de acceso al sistema de archivos se propagan; no se interpretan como una lista vacía. Si un callback de error falla al informar del fallo de una operación, se conserva el error original y el fallo del callback llega al sistema central de excepciones.
+
 La detección valida clases locales, duplicados y archivos; una migración registrada que falta puede producir `MigrationNotFoundException` al revertir. No renombres archivos ya aplicados. `MigrationEvents` y `SeederEvents` permiten informar inicio, éxito y fallo sin mezclar salida de consola con la lógica de datos.
+
+Si falla la reclamación de un seeder y también falla la lectura de recuperación, se conserva el error de reclamación con su causa original. El fallo de la lectura se comunica al sistema central.
 
 El registro transaccional no convierte un envío de correo o una llamada externa en reversible. Mantén esos efectos fuera de los seeders registrados o diséñalos idempotentes. Redshift rechaza `SeederRunner.seed()` antes del acceso porque no impone restricciones únicas. Las [factories](../../../orm/docs/es/factories-and-testing.md) generan modelos; no sustituyen el historial de seeders ni abren una transacción para un lote.

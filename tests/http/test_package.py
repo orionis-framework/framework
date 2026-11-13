@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import ModuleType
 import orionis.http as http_package
 from orionis.http import factory as factory_module
@@ -33,8 +35,8 @@ _EXPECTED_EXPORTS: tuple[str, ...] = (
     "response",
 )
 
-class TestHttpPackageExports(TestCase):
 
+class TestHttpPackageExports(TestCase):
     def testDeclaresTheDocumentedPublicSurface(self) -> None:
         """Expose exactly the documented set of public names.
 
@@ -60,9 +62,7 @@ class TestHttpPackageExports(TestCase):
             Assertions verify the behavior described above.
         """
         missing = [
-            name
-            for name in http_package.__all__
-            if not hasattr(http_package, name)
+            name for name in http_package.__all__ if not hasattr(http_package, name)
         ]
         self.assertEqual(missing, [])
 
@@ -149,8 +149,8 @@ class TestHttpPackageExports(TestCase):
         self.assertIs(http_package.response, factory_module.response)
         self.assertIsInstance(http_package.response, factory_module.ResponseFactory)
 
-class TestHttpResponseAlias(TestCase):
 
+class TestHttpResponseAlias(TestCase):
     def testAliasResolvesToTheResponseBaseClass(self) -> None:
         """Point the handler return alias at the response base class.
 

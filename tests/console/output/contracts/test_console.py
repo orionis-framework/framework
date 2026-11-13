@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.output.console import Console
 from orionis.console.output.contracts.console import IConsole
 from orionis.test import TestCase
+
 
 class TestIConsoleContract(TestCase):
     """Test suite for the IConsole abstract interface contract."""

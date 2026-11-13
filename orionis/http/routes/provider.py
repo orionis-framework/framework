@@ -6,6 +6,7 @@ from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.router import Router
 from orionis.support.facades.router import Route as RouteFacade
 
+
 class RouterProvider(ServiceProvider):
     """Register router services in the application container."""
 

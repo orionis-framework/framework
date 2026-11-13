@@ -22,4 +22,4 @@ Application code usually interacts through `Application`, which extends the cont
 
 Continue with: [foundation](../../../foundation/docs/en/README.md) · [schemas](../../../schemas/docs/en/README.md).
 
-Examples that require bootstrap, a request, or external services state that context. Verification for this reconstruction is distinct from historical notes; a production integration is not assumed to have been executed.
+Standalone examples use their own container subclasses. The provider example requires application registration and boot, as described alongside it.

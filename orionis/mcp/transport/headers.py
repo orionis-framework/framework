@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Runtime callers inspect the public header-validation signature.
 """One statically reachable argument mirrored into a lowercase HTTP header."""
 
 from __future__ import annotations
@@ -8,14 +10,12 @@ import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal, DecimalException
-from typing import TYPE_CHECKING, Literal, cast
+from typing import Literal, cast
 import msgspec
 from orionis.mcp.exceptions import McpInvalidParams, McpProtocolException
 from orionis.mcp.protocol.constants import PROTOCOL_VERSION
-
-if TYPE_CHECKING:
-    from orionis.http.payload.estructures.headers import Headers
-    from orionis.mcp.protocol.requests import JsonRpcRequest, RequestParams
+from orionis.http.payload.estructures.headers import Headers
+from orionis.mcp.protocol.requests import JsonRpcRequest, RequestParams
 
 type HeaderKind = Literal["string", "integer", "boolean"]
 """Type alias for ``Literal['string', 'integer', 'boolean']``."""
@@ -49,6 +49,7 @@ class HeaderBinding:
     kind: HeaderKind
     """Primitive value kind used when decoding the transport header."""
 
+
 def _contains_annotation(value: object) -> bool:
     """
     Locate annotations even inside unsupported schema constructs.
@@ -70,6 +71,7 @@ def _contains_annotation(value: object) -> bool:
     if isinstance(value, (list, tuple)):
         return any(_contains_annotation(child) for child in value)
     return False
+
 
 def _binding(schema: Mapping[str, object], path: tuple[str, ...]) -> HeaderBinding:
     """
@@ -96,6 +98,7 @@ def _binding(schema: Mapping[str, object], path: tuple[str, ...]) -> HeaderBindi
         message = "x-mcp-header requires a string, integer, or boolean property"
         raise ValueError(message)
     return HeaderBinding(path, "mcp-param-" + name.lower(), cast("HeaderKind", kind))
+
 
 def _walk_schema(
     schema: Mapping[str, object],
@@ -132,6 +135,7 @@ def _walk_schema(
             message = "x-mcp-header cannot occur outside a properties chain"
             raise ValueError(message)
 
+
 def _walk_properties(
     properties: Mapping[str, object],
     path: tuple[str, ...],
@@ -158,6 +162,7 @@ def _walk_properties(
         if isinstance(name, str) and isinstance(child, Mapping):
             _walk_schema(child, (*path, name), bindings)
 
+
 def compile_header_bindings(
     input_schema: Mapping[str, object],
 ) -> tuple[HeaderBinding, ...]:
@@ -182,6 +187,7 @@ def compile_header_bindings(
         raise ValueError(message)
     return tuple(bindings)
 
+
 def _mismatch(name: str) -> McpProtocolException:
     """
     Report the failing header without reflecting untrusted field values.
@@ -197,6 +203,7 @@ def _mismatch(name: str) -> McpProtocolException:
         Result of the operation described above.
     """
     return McpProtocolException(-32020, f"Header mismatch: {name}", status=400)
+
 
 def _decode_value(value: str, name: str, *, encoded: bool) -> str:
     """
@@ -228,6 +235,7 @@ def _decode_value(value: str, name: str, *, encoded: bool) -> str:
             raise _mismatch(name) from exc
     return value
 
+
 def _single_header(headers: Headers, name: str, *, encoded: bool = False) -> str:
     """
     Require one field occurrence, including case-insensitive duplicates.
@@ -253,6 +261,7 @@ def _single_header(headers: Headers, name: str, *, encoded: bool = False) -> str
         raise _mismatch(name)
     return _decode_value(value, name, encoded=encoded)
 
+
 def _parameter(params: RequestParams | Mapping[str, object], name: str) -> object:
     """
     Read either decoded protocol structs or an unknown method's raw mapping.
@@ -272,6 +281,7 @@ def _parameter(params: RequestParams | Mapping[str, object], name: str) -> objec
     if isinstance(params, Mapping):
         return params.get(name)
     return getattr(params, "meta" if name == "_meta" else name, None)
+
 
 def _argument(arguments: object, path: tuple[str, ...]) -> object:
     """
@@ -295,6 +305,7 @@ def _argument(arguments: object, path: tuple[str, ...]) -> object:
             return None
         value = value.get(name)
     return value
+
 
 def _matches_integer(header: str, value: object) -> bool:
     """
@@ -325,6 +336,7 @@ def _matches_integer(header: str, value: object) -> bool:
     except DecimalException:
         return False
 
+
 def _matches_value(binding: HeaderBinding, header: str, value: object) -> bool:
     """
     Compare mirrored parameters without coercing booleans into integers.
@@ -348,6 +360,7 @@ def _matches_value(binding: HeaderBinding, header: str, value: object) -> bool:
     if binding.kind == "boolean":
         return isinstance(value, bool) and header == ("true" if value else "false")
     return isinstance(value, str) and header == value
+
 
 def _validate_binding(
     headers: Headers,
@@ -380,6 +393,7 @@ def _validate_binding(
     if not _matches_value(binding, header, value):
         raise _mismatch(binding.name)
 
+
 def _validate_standard(
     headers: Headers,
     name: str,
@@ -409,6 +423,7 @@ def _validate_standard(
     if _single_header(headers, name, encoded=encoded) != expected:
         raise _mismatch(name)
 
+
 def _validate_version(headers: Headers, metadata: object) -> None:
     """
     Distinguish invalid body metadata from a missing or disagreeing header.
@@ -432,6 +447,7 @@ def _validate_version(headers: Headers, metadata: object) -> None:
         raise McpInvalidParams
     if header != version:
         raise _mismatch(name)
+
 
 def validate_headers(
     headers: Headers,

@@ -34,6 +34,8 @@ Conexiones durables con nombre deben usar tablas o prefijos Redis distintos. La 
 
 El repositorio de fallos incluido es database. Se resuelve de manera perezosa cuando se necesita; utilizar Redis o sync no elimina ese requisito para fallos terminales. Prepara su conexión y permisos antes de producción. Redshift se rechaza como backend database y como repositorio de fallos porque no impone las claves únicas requeridas.
 
+Si falla la creación concurrente del esquema o la inserción de un fallo, la recuperación comprueba si otra operación ya la completó. Si esa consulta también genera un error de base de datos, se conservan el error original de creación o inserción y su causa; el error de recuperación se observa mediante el runtime central de fallos. Una tabla no confirmada no se marca lista y un registro no confirmado no se informa como persistido.
+
 ## Preparar las tablas de colas
 
 Crea el almacenamiento antes de enviar jobs o iniciar workers:
@@ -62,5 +64,9 @@ assert failed.hasColumn("traceback")
 Una inserción en cola database utiliza la conexión SQL administrada y participa en la [transacción](../../../database/docs/es/transactions.md) propiedad de la tarea si usa esa misma conexión. Al revertir, el mensaje tampoco queda enviado. Otra conexión o Redis no forman parte de esa unidad SQL. No hay API general de dispatch `afterCommit` ni protocolo distribuido que coordine esos sistemas.
 
 El provider registra serializer y manager como singletons, descubre jobs y fija la facade `Queue`; durante shutdown cierra recursos propios. `await Queue.connection(name)` obtiene el driver cacheado; `await Queue.close()` cierra clientes de cola sin desconectar servicios database compartidos. Normalmente el ciclo de aplicación debe encargarse del cierre.
+
+El cierre espera inicializaciones admitidas, desacopla los recursos cacheados e intenta cerrarlos todos aunque alguno falle. Conserva el primer error y observa los secundarios centralmente; la cancelación del llamador espera la limpieza propia. Una inicialización no puede cerrar su propio manager. Detén trabajo nuevo antes del shutdown: resolver después de desacoplar una snapshot puede crear otro cliente y un uso posterior puede reabrir servicios.
+
+Las duraciones y los deadlines absolutos deben tener una representación de punto flotante finita. Los enteros demasiado grandes generan errores de configuración o payload de colas, no un desbordamiento numérico sin traducir; un deadline finito pasado sigue siendo una declaración válida que el worker rechazará como vencida.
 
 Para extensiones, `IQueueDriver` define `push`, `reserve`, `release`, `delete`, `size`, `clear` y `close`, todos async. Un driver debe respetar fencing, vencimiento y los contratos de envelope/reserva. La configuración stock solo reconoce los tres drivers incluidos; implementar el contrato no registra automáticamente un nuevo nombre en el manager.

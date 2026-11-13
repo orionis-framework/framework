@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Remove saved test-run result files."""
 
 from orionis.console.base.command import BaseCommand
@@ -5,10 +7,9 @@ from orionis.console.commands.support._clear import clear_files
 from orionis.console.output.console import Console
 from orionis.foundation.contracts.application import IApplication
 
+
 class ClearTestingCommand(BaseCommand):
     """Remove saved test-run result files."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = False
     """Timestamps flag used by ``ClearTestingCommand``."""

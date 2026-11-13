@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.database.exceptions import (
     ConnectionNotFoundException,
@@ -20,8 +22,8 @@ _SPECIFIC_EXCEPTIONS = (
     UnsupportedDriverException,
 )
 
-class TestDatabaseExceptions(TestCase):
 
+class TestDatabaseExceptions(TestCase):
     def testDatabaseExceptionExtendsException(self) -> None:
         """Extend the built-in Exception type.
 
@@ -30,7 +32,7 @@ class TestDatabaseExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(DatabaseException, Exception))
 
@@ -43,7 +45,7 @@ class TestDatabaseExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for exception_type in _SPECIFIC_EXCEPTIONS:
             self.assertTrue(issubclass(exception_type, DatabaseException))
@@ -57,12 +59,8 @@ class TestDatabaseExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        exception_type
-            Raised by this helper to exercise the failure path.
         """
         for exception_type in _SPECIFIC_EXCEPTIONS:
             error_msg = f"{exception_type.__name__} failure."
@@ -79,12 +77,8 @@ class TestDatabaseExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        QueryException
-            Raised by this helper to exercise the failure path.
         """
         error_msg = "Query failed."
         with self.assertRaises(DatabaseException):
@@ -99,7 +93,7 @@ class TestDatabaseExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(issubclass(ValueError, DatabaseException))
 
@@ -112,14 +106,8 @@ class TestDatabaseExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        cause
-            Raised by this helper to exercise the failure path.
-        QueryException
-            Raised by this helper to exercise the failure path.
         """
         cause = ValueError("root cause")
         try:

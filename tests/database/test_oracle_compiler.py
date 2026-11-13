@@ -1,4 +1,8 @@
-"""Oracle compilation regressions reproduced against the native thin driver."""
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify Oracle SQLAlchemy compilation without contacting a database server."""
+
+from __future__ import annotations
 
 from sqlalchemy.dialects import oracle, postgresql
 from orionis.database.compiler import SQLCompiler
@@ -7,9 +11,19 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Float, Integer, Text
 from orionis.test import TestCase
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from orionis.orm.schema.column.definition import ColumnDefinition
+
 
 class TestOracleCompiler(TestCase):
-    def definition(self, value=None, *, incrementing=False) -> TableDefinition:
+    def definition(
+        self,
+        value: ColumnDefinition | None = None,
+        *,
+        incrementing: bool = False,
+    ) -> TableDefinition:
         """
         Build a table definition with explicit key generation.
 
@@ -40,7 +54,7 @@ class TestOracleCompiler(TestCase):
         Returns
         -------
         None
-            Assert DDL generation for automatic and client-managed primary keys.
+            No return value.
         """
         for incrementing in (False, True):
             with self.subTest(incrementing=incrementing):
@@ -60,7 +74,7 @@ class TestOracleCompiler(TestCase):
         Returns
         -------
         None
-            Assert Oracle binary precision, result options, and PostgreSQL DDL.
+            No return value.
         """
         definition = self.definition(Float(25, asdecimal=True, decimal_return_scale=3))
         ddl = SQLCompiler(driver="oracle").compileCreateTable(definition)
@@ -86,7 +100,7 @@ class TestOracleCompiler(TestCase):
         Returns
         -------
         None
-            Assert LOB comparison SQL, hidden payloads, and CLOB-typed bindings.
+            No return value.
         """
         value = "private-bound-probe-" * 600
         for operator in ("=", "!="):
@@ -116,7 +130,7 @@ class TestOracleCompiler(TestCase):
         Returns
         -------
         None
-            Assert ``IS NULL`` and ``IS NOT NULL`` without LOB comparisons.
+            No return value.
         """
         for operator, expected in (("=", "IS NULL"), ("!=", "IS NOT NULL")):
             with self.subTest(operator=operator):

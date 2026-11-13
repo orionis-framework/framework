@@ -1,5 +1,6 @@
 """Require identities to verify their email address before activation."""
 
+
 class MustVerifyEmail:
     """
     Require identities to verify their email address before activation.

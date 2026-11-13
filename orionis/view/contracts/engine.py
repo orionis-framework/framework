@@ -1,12 +1,13 @@
-"""Contract for view engine implementations."""
+"""Define the contract for view engine implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Self
 
+
 class IViewEngine(ABC):
     """
-    Contract for view engine implementations.
+    Define the operations provided by a view engine.
 
     All rendering engines registered with the view system must implement
     this interface so that the rest of the framework remains decoupled from
@@ -16,7 +17,10 @@ class IViewEngine(ABC):
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    async def warmup(self: Self, *templates: str) -> None: # NOSONAR
+    async def warmup(  # NOSONAR(S7503) - Optional async protocol hook.
+        self: Self,
+        *templates: str,
+    ) -> None:
         """
         Prepare known templates without evaluating render context when supported.
 
@@ -28,7 +32,7 @@ class IViewEngine(ABC):
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         del templates
 

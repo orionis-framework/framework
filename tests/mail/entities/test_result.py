@@ -1,10 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from pathlib import Path
 from orionis.mail.entities.result import MailResult
 from orionis.mail.enums.status import MailStatus
 from orionis.test import TestCase
 
-class TestMailResult(TestCase):
 
+class TestMailResult(TestCase):
     def testOwnsItsRecipientCollectionsAndRejections(self) -> None:
         """Detach every collection supplied by a transport.
 

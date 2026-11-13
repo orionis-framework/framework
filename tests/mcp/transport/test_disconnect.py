@@ -1,8 +1,11 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from types import SimpleNamespace
 from orionis.foundation.application import Application
 from orionis.http.contracts.kernel import IKernelHTTP
 from orionis.test import TestCase
+
 
 class _PolicyKernel(IKernelHTTP):
     """Simulate a long buffered response before any response bytes are available."""
@@ -83,6 +86,7 @@ class _PolicyKernel(IKernelHTTP):
             await asyncio.Event().wait()
         finally:
             self.cleaned.set()
+
 
 class TestProtocolDisconnect(TestCase):
     """Select actual Application watchers without enabling global monitoring."""

@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class Lifespan(StrEnum):
     """
     Define the possible lifespan events for the application.

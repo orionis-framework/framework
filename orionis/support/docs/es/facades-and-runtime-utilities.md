@@ -56,10 +56,10 @@ Salvo `DateTime`, estas clases obtienen su destino del contenedor. Consulta la d
 ### Tipos y auxiliares
 
 - `Collection(items=None)`: selección, mapeo, agrupación, agregación, paginación, serialización y protocolos de lista fluidos.
-- `DotDict(mapping)`: acceso por clave y atributo; `export()` restaura diccionarios recursivamente y `copy()` copia mapeos anidados.
+- `DotDict(mapping)`: acceso por clave y atributo; `export()` restaura diccionarios recursivamente y `copy()` copia profundamente el contenido mutable.
 - `StdClass(**kwargs)`: atributos dinámicos que rechazan nombres reservados o dunder; admite `fromDict`, `toDict`, `update` y `remove`.
 - `Stringable(value)`: envoltorio inmutable y fluido de texto con utilidades de formato, coincidencia, reemplazo, codificación, hash, análisis, truncado y validación.
-- `MISSING`: centinela falso cuya representación es `MISSING`.
+- `MISSING`: centinela falso cuya representación es `<MISSING>`.
 - `BaseEntity`: `toDict()` y `getFields()` para entidades dataclass.
 - `FreezeThaw.freeze()` / `thaw()`: conversiones recursivas inmutables/mutables.
 - `PerformanceCounter`: `start`/`stop`, `astart`/`astop`, gestores de contexto y conversiones de duración.
@@ -101,6 +101,7 @@ assert DateTime.diffInDays(instant, later) == 2
 ```python
 from orionis.support.facades import Cache, Log, Storage
 
+
 # Run after the Orionis application has booted and bound these services.
 async def completed_import() -> None:
     Log.info("Import completed")
@@ -114,6 +115,10 @@ Los destinos de las fachadas se configuran en sus módulos propietarios y se res
 
 `Workers` usa por defecto 0,5 GiB por worker. `setRamPerWorker()` cambia un presupuesto de clase para todo el proceso. `Inspire` admite una lista personalizada de mapeos con las claves obligatorias `quote` y `author`. Los demás tipos auxiliares no requieren configuración global.
 
+`DateTime.formatLocal()` convierte las fechas proporcionadas, incluidos valores Pendulum, a la zona configurada y las formatea con el locale configurado. `today()`, `tomorrow()` y `yesterday()` devuelven valores `DateTime` de Pendulum a medianoche. `isToday()` compara las fechas en la zona configurada, también cuando la entrada usa otro desplazamiento horario.
+
+`Inspire` conserva por referencia la lista no vacía de citas proporcionada. Sus modificaciones posteriores afectan a la selección; si queda vacía, `random()` devuelve la cita de respaldo. El llamador debe mantener válidas las entradas añadidas después de construir el servicio.
+
 ## Integración con Orionis
 
 Usa fachadas en límites de aplicación —controladores, comandos, trabajos, listeners y proveedores— donde resulte útil acceder concisamente a un servicio configurado. Prefiere inyección por constructor dentro de servicios de dominio reutilizables cuando importen las dependencias explícitas y las pruebas aisladas.
@@ -126,17 +131,17 @@ El paquete diferido de fachadas evita importar todos los subsistemas al arrancar
 - `DotDict.missing` devuelve `None`; usa comprobación de pertenencia cuando `None` sea un valor almacenado significativo.
 - `StdClass` rechaza nombres dunder y nombres que colisionan con su API de clase.
 - `Collection.chunk()` y `forPage()` rechazan tamaños no positivos; las operaciones con callbacks exigen objetos invocables.
-- `FreezeThaw` solo transforma diccionarios, listas, tuplas y proxies de mapeo. Los objetos almacenados dentro no se copian profundamente.
+- `FreezeThaw` transforma diccionarios, listas y tuplas; conserva los proxies de mapeo existentes. Los demás objetos contenidos no se copian profundamente. Los ciclos formados solo por secuencias producen `ValueError`.
 - `PerformanceCounter` impide leer antes de completar una medición y mezclar métodos de inicio/parada síncronos y asíncronos.
 - `Final` rechaza la herencia al crear la clase. `Singleton` ignora argumentos del constructor después de existir la primera instancia.
-- Zonas horarias inválidas y entradas de fecha incompatibles producen errores de validación de `DateTime`/`pendulum`.
+- Las zonas horarias configuradas inválidas producen `ValueError`. Rechazar un locale conserva el locale configurado anterior. Las entradas de fecha incompatibles producen errores de validación de `DateTime`/`pendulum`.
 - `Workers.setRamPerWorker()` exige un valor finito, positivo y suficiente para representar al menos un byte.
 
 ## Rendimiento y concurrencia
 
 Las importaciones de fachadas y sus exportaciones raíz son diferidas y cacheadas. `BaseEntity` cachea metadatos normalizados de campos por clase de entidad. `ExceptionParser` analiza una vez y devuelve su diccionario cacheado en llamadas posteriores. `DateTime` cachea instancias de `ZoneInfo` hasta que cambia su zona horaria.
 
-`Singleton` protege la primera construcción con un `threading.Lock` por clase; su método asíncrono usa la misma sección crítica breve y no realiza E/S bloqueante. `FreezeThaw` usa recorrido iterativo para evitar límites de recursión. `Workers` cachea CPU y RAM total al importar el módulo, por lo que los cálculos posteriores usan aritmética entera de tiempo constante.
+`Singleton` protege la primera construcción con un `threading.Lock` por clase; su método asíncrono usa la misma ruta de construcción. Los constructores se ejecutan síncronamente, por lo que deben realizar trabajo breve. La construcción recursiva del mismo singleton produce `RuntimeError`; un constructor que falla puede reintentarse. `FreezeThaw` usa recorrido iterativo para evitar límites de recursión. `Workers` cachea CPU y RAM total al importar el módulo, por lo que los cálculos posteriores usan aritmética entera de tiempo constante.
 
 `Collection` y los auxiliares mutables no están sincronizados. No mutues una misma instancia de forma concurrente sin coordinación en la aplicación.
 

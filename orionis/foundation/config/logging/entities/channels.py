@@ -20,6 +20,7 @@ _CHANNEL_ENTITIES: tuple[tuple[str, type], ...] = (
 )
 """Channel entities definitions used by ``channels``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Channels(BaseEntity):
     """

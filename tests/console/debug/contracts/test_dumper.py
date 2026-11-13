@@ -1,10 +1,12 @@
+# ruff: noqa: ANN002, ANN003, ANN205, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.debug.contracts.dumper import IDumper
 from orionis.test import TestCase
 
-class TestIDumper(TestCase):
 
+class TestIDumper(TestCase):
     def testIsAbstractClass(self) -> None:
         """Verify that IDumper is an abstract class.
 
@@ -121,7 +123,9 @@ class TestIDumper(TestCase):
             sig = inspect.signature(getattr(IDumper, method_name))
             for param_name, expected in defaults.items():
                 actual = sig.parameters[param_name].default
-                msg=f"{method_name}.{param_name}: expected {expected!r}, got {actual!r}"
+                msg = (
+                    f"{method_name}.{param_name}: expected {expected!r}, got {actual!r}"
+                )
                 self.assertEqual(
                     actual,
                     expected,
@@ -142,7 +146,7 @@ class TestIDumper(TestCase):
 
         class PartialDumper(IDumper):
             @staticmethod
-            def dd(*args, **kwargs): # noqa: ANN002, ANN003, ANN205
+            def dd(*args, **kwargs):
                 """Accept the dump request in the test double.
 
                 Parameters
@@ -175,7 +179,7 @@ class TestIDumper(TestCase):
 
         class ConcreteDumper(IDumper):
             @staticmethod
-            def dd(*args, **kwargs): # noqa: ANN002, ANN003, ANN205
+            def dd(*args, **kwargs):
                 """Accept the dump request in the test double.
 
                 Parameters
@@ -192,7 +196,7 @@ class TestIDumper(TestCase):
                 """
 
             @staticmethod
-            def dump(*args, **kwargs): # noqa: ANN002, ANN003, ANN205
+            def dump(*args, **kwargs):
                 """Accept the dump request in the test double.
 
                 Parameters

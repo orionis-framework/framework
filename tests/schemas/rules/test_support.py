@@ -1,19 +1,26 @@
+# ruff: noqa: DTZ001, FBT003, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from datetime import date, datetime
 from decimal import Decimal
 from threading import get_ident
 from types import SimpleNamespace
+from typing import get_type_hints
 from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.schemas.rules.measure import KILOBYTE, is_file, measure, read_content
 from orionis.schemas.rules.temporal import parse_moment, resolve_moment, to_datetime
 from orionis.support.facades.datetime import DateTime
 from orionis.test import TestCase
 
-def _upload(data: bytes) -> UploadedFile:
+
+def _upload(test: TestCase, data: bytes) -> UploadedFile:
     """
     Build an uploaded file holding the given content.
 
     Parameters
     ----------
+    test : TestCase
+        Test that owns and closes the uploaded file.
     data : bytes
         Content written into the upload buffer.
 
@@ -23,11 +30,12 @@ def _upload(data: bytes) -> UploadedFile:
         Upload ready to be handed to a helper.
     """
     upload = UploadedFile("a.txt", "text/plain")
+    test.addCleanup(upload.close)
     upload.write(data)
     return upload
 
-class TestIsFile(TestCase):
 
+class TestIsFile(TestCase):
     def testUploadedFileIsDetected(self) -> None:
         """Return True for an object implementing the upload protocol.
 
@@ -37,9 +45,9 @@ class TestIsFile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertTrue(is_file(_upload(b"a")))
+        self.assertTrue(is_file(_upload(self, b"a")))
 
     def testForeignObjectsAreRejected(self) -> None:
         """Return False for objects missing part of the upload protocol.
@@ -49,13 +57,13 @@ class TestIsFile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for value in ("text", b"bytes", None, SimpleNamespace(read=print)):
             self.assertFalse(is_file(value))
 
-class TestReadContent(TestCase):
 
+class TestReadContent(TestCase):
     async def testFileReadsDoNotBlockTheEventLoopThread(self) -> None:
         """
         Offload the synchronous upload protocol, including disk-backed files.
@@ -63,7 +71,7 @@ class TestReadContent(TestCase):
         Returns
         -------
         None
-            Assert off-loop reads for synchronous upload implementations.
+            No return value.
         """
         threads: list[int] = []
 
@@ -92,9 +100,9 @@ class TestReadContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(await read_content(_upload(b"payload")), b"payload")
+        self.assertEqual(await read_content(_upload(self, b"payload")), b"payload")
 
     async def testForeignValueReturnsNone(self) -> None:
         """Return None when the value is not a readable upload.
@@ -104,13 +112,13 @@ class TestReadContent(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(await read_content("text"))
         self.assertIsNone(await read_content(None))
 
-class TestMeasure(TestCase):
 
+class TestMeasure(TestCase):
     def testNumbersReturnTheirMagnitude(self) -> None:
         """Return the number itself for every numeric type.
 
@@ -119,7 +127,7 @@ class TestMeasure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(measure(42), 42)
         self.assertEqual(measure(2.5), 2.5)
@@ -133,7 +141,7 @@ class TestMeasure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(measure("abc"), 3)
         self.assertEqual(measure([1, 2]), 2)
@@ -148,9 +156,9 @@ class TestMeasure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(measure(_upload(b"x" * KILOBYTE)), 1)
+        self.assertEqual(measure(_upload(self, b"x" * KILOBYTE)), 1)
 
     def testBooleansAndForeignObjectsReturnNone(self) -> None:
         """Return None for values that carry no comparable size.
@@ -160,14 +168,20 @@ class TestMeasure(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(measure(True))
         self.assertIsNone(measure(False))
         self.assertIsNone(measure(None))
         self.assertIsNone(measure(object()))
 
+
 class TestToDatetime(TestCase):
+    def testTemporalAnnotationsResolveAtRuntime(self) -> None:
+        """Resolve the public temporal helper types for runtime inspection."""
+        for helper in (to_datetime, parse_moment, resolve_moment):
+            with self.subTest(helper=helper.__name__):
+                self.assertIn("return", get_type_hints(helper))
 
     def testDatetimeIsConvertedToTheConfiguredTimezone(self) -> None:
         """Return a timezone-aware moment for a naive datetime.
@@ -177,7 +191,7 @@ class TestToDatetime(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = to_datetime(datetime(2024, 6, 15, 12))
         self.assertIsNotNone(moment)
@@ -192,7 +206,7 @@ class TestToDatetime(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = to_datetime(date(2024, 6, 15))
         self.assertIsNotNone(moment)
@@ -207,7 +221,7 @@ class TestToDatetime(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = to_datetime("2024-06-15")
         self.assertIsNotNone(moment)
@@ -221,14 +235,14 @@ class TestToDatetime(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(to_datetime(None))
         self.assertIsNone(to_datetime(123))
         self.assertIsNone(to_datetime("not-a-date"))
 
-class TestParseMoment(TestCase):
 
+class TestParseMoment(TestCase):
     def testRelativeKeywordsAreResolved(self) -> None:
         """Resolve every supported relative keyword into a concrete moment.
 
@@ -237,7 +251,7 @@ class TestParseMoment(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         yesterday = parse_moment("yesterday")
         today = parse_moment("TODAY")
@@ -255,7 +269,7 @@ class TestParseMoment(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         today = parse_moment("today")
         self.assertEqual(today.hour, 0)
@@ -269,13 +283,13 @@ class TestParseMoment(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(parse_moment("not-a-date"))
         self.assertIsNone(parse_moment(""))
 
-class TestResolveMoment(TestCase):
 
+class TestResolveMoment(TestCase):
     def testNoneResolvesToTheCurrentMoment(self) -> None:
         """Resolve a missing reference into the current moment.
 
@@ -284,7 +298,7 @@ class TestResolveMoment(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         resolved = resolve_moment(None, SimpleNamespace())
         self.assertIsNotNone(resolved)
@@ -298,7 +312,7 @@ class TestResolveMoment(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = SimpleNamespace(start=datetime(2024, 6, 15))
         resolved = resolve_moment("start", instance)
@@ -313,7 +327,7 @@ class TestResolveMoment(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         resolved = resolve_moment("2024-06-15", SimpleNamespace())
         self.assertIsNotNone(resolved)
@@ -327,6 +341,6 @@ class TestResolveMoment(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(resolve_moment("missing", SimpleNamespace()))

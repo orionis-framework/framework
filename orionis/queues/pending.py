@@ -1,20 +1,25 @@
+# ruff: noqa: TC001, TC003
+# Keep awaitable protocol and dispatch annotations resolvable at runtime.
 """Defer a single dispatch until awaited and allow options before submission."""
 
 import asyncio
-from typing import TYPE_CHECKING
+from collections.abc import Generator
 from orionis.queues.exceptions import QueueDispatchError
 from orionis.queues.functions import validate_name, validate_seconds
+from orionis.queues.job import BaseJob
+from orionis.queues.types import DispatchCallback
 
-if TYPE_CHECKING:
-    from collections.abc import Generator
-    from orionis.queues.job import BaseJob
-    from orionis.queues.types import DispatchCallback
 
 class PendingDispatch:
     """Defer a single dispatch until awaited and allow options before submission."""
 
     __slots__ = (
-        "_completion", "_connection", "_delay", "_job", "_queue", "_submit",
+        "_completion",
+        "_connection",
+        "_delay",
+        "_job",
+        "_queue",
+        "_submit",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -133,7 +138,10 @@ class PendingDispatch:
         self._job = None
         try:
             result = await self._submit(
-                job, self._connection, self._queue, self._delay,
+                job,
+                self._connection,
+                self._queue,
+                self._delay,
             )
         except asyncio.CancelledError:
             completion.cancel()

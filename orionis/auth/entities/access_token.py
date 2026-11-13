@@ -1,10 +1,11 @@
+# ruff: noqa: TC003
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Describe a stored personal access token."""
 
 from dataclasses import asdict, dataclass
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from datetime import datetime
+from datetime import datetime
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class AccessToken:

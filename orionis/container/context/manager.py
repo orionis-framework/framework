@@ -1,18 +1,35 @@
+# ruff: noqa: ANN401
+# Preserve heterogeneous service values and runtime context-manager annotations.
 """Own scoped service instances and their creation and cleanup lifecycle."""
 
 import asyncio
-from typing import Any, TypeVar, Self, TYPE_CHECKING
+import types
+from inspect import CORO_CREATED, getcoroutinestate
+from typing import Any, Self
 from orionis.container.context.scope import ScopedContext
 
-if TYPE_CHECKING:
-    import types
 
-T = TypeVar("T")
-"""Type parameter preserving the value type across manager operations."""
+def _close_unstarted_coroutine(value: object) -> None:
+    """Release a stored native coroutine which the scope never started.
+
+    Parameters
+    ----------
+    value : object
+        Discarded value, possibly an unstarted native coroutine.
+
+    Returns
+    -------
+    None
+        This function does not return a value.
+    """
+    if (
+        isinstance(value, types.CoroutineType)
+        and getcoroutinestate(value) == CORO_CREATED
+    ):
+        value.close()
+
 
 class ScopeManager:
-
-    # ruff: noqa: ANN401
     """Own scoped service instances and their creation and cleanup lifecycle."""
 
     __slots__ = ("__active", "__closed", "__creation_locks", "_instances", "_token")
@@ -124,7 +141,10 @@ class ScopeManager:
         if self.__closed:
             error_msg = "Cannot publish a service to a closed container scope."
             raise RuntimeError(error_msg)
+        previous = self._instances.get(key)
         self._instances[key] = value
+        if previous is not value:
+            _close_unstarted_coroutine(previous)
 
     def __contains__(self, key: object) -> bool:
         """
@@ -146,15 +166,19 @@ class ScopeManager:
         """
         Remove all instances from the current scope.
 
-        Clears the internal dictionary of all stored instances.
+        Release unstarted native coroutines. Existing services, running
+        coroutines, and externally supplied tasks retain their caller-owned
+        lifecycles.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        # Clear all stored instances in the current scope
+        values = tuple(self._instances.values())
         self._instances.clear()
+        for value in values:
+            _close_unstarted_coroutine(value)
 
     async def __aenter__(self) -> Self:
         """
@@ -223,6 +247,11 @@ class ScopeManager:
         -------
         typing.Any or None
             The resolved instance associated with the key, or None if not found.
+
+        Notes
+        -----
+        Awaiting a stored task does not overwrite a replacement or repopulate
+        the scope after ``clear()``. Completion after scope exit is rejected.
         """
         # Attempt to get the instance from the internal dictionary
         instance = self._instances.get(key)
@@ -237,8 +266,13 @@ class ScopeManager:
 
         # Await the Task if necessary and store the result
         if isinstance(instance, asyncio.Task):
-            instance = await instance
-            self[key] = instance
+            task = instance
+            instance = await task
+            if self.__closed:
+                error_msg = "Cannot publish a service to a closed container scope."
+                raise RuntimeError(error_msg)
+            if self._instances.get(key) is task:
+                self._instances[key] = instance
 
         # Return the resolved instance
         return instance
@@ -286,8 +320,6 @@ class ScopeManager:
         """
         instance = await self.get(key)
         if instance is None:
-            error_msg = (
-                f"Instance for key {key!r} not found in scope"
-            )
+            error_msg = f"Instance for key {key!r} not found in scope"
             raise KeyError(error_msg)
         return instance

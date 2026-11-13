@@ -1,10 +1,13 @@
+# ruff: noqa: ANN401, PLC0415, SLF001, TC001
 """Fluent query builder bound to a model class."""
 
-from __future__ import annotations
 import asyncio
 import inspect
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
+import orionis.orm as _orm
+from orionis.database.contracts.connection import IConnection
 from orionis.orm.attributes import serialize_for_storage
+from orionis.orm.collections.paginator import Paginator
 from orionis.orm.contracts.builder import IModelQueryBuilder
 from orionis.orm.exceptions import (
     ModelNotFoundException,
@@ -15,11 +18,6 @@ from orionis.orm.query.base_builder import QueryBuilderBase
 from orionis.orm.query.expressions import AggregateFunction, DeletePlan
 from orionis.orm.resolver import ConnectionResolver
 from orionis.support.types.collection import Collection
-
-if TYPE_CHECKING:
-    from orionis.database.contracts.connection import IConnection
-    from orionis.orm.collections.paginator import Paginator
-    from orionis.orm.model import Model
 
 # Default page size used by pagination.
 _DEFAULT_PER_PAGE: int = 15
@@ -33,7 +31,8 @@ _TRASHED_INCLUDE: str = "with"
 _TRASHED_ONLY: str = "only"
 """Trashed only identifier: ``only``."""
 
-class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
+
+class ModelQueryBuilder[TModel: _orm.Model](QueryBuilderBase, IModelQueryBuilder):
     """
     Fluent query builder bound to a model class.
 
@@ -55,8 +54,6 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
     )
     """Declare the instance attribute slots reserved by this class."""
 
-    # ruff: noqa: ANN401
-
     def __init__(self, model: type[TModel]) -> None:
         """
         Initialize the builder for a model class.
@@ -69,7 +66,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         meta = model.__meta__
         super().__init__(meta.table)
@@ -245,9 +242,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         """
         method = self._meta.scopes.get(name)
         if method is None:
-            error_msg = (
-                f"Model [{self._model.__name__}] declares no scope '{name}'."
-            )
+            error_msg = f"Model [{self._model.__name__}] declares no scope '{name}'."
             raise ScopeNotFoundException(error_msg)
         getattr(self._model, method)(self, *args, **kwargs)
         return self
@@ -352,9 +347,14 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
             If an eager-loaded relationship name does not resolve to one.
         """
         self._beforeExecute()
-        rows = await self._connection().select(self._plan)
-        hydrate = self._model._newFromDatabase  # noqa: SLF001
-        models = [hydrate(row) for row in rows]
+        connection = self._connection()
+        rows = await connection.select(self._plan)
+        hydrate = self._model._newFromDatabase
+        models = []
+        for row in rows:
+            model = hydrate(row)
+            object.__setattr__(model, "_read_connection", connection)
+            models.append(model)
         await self._fireRetrieved(models)
         if self._eager_loads and models:
             await self._eagerLoad(models)
@@ -379,10 +379,12 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         self._beforeExecute()
         probe = self._plan.clone()
         probe.limit_value = 1
-        rows = await self._connection().select(probe)
+        connection = self._connection()
+        rows = await connection.select(probe)
         if not rows:
             return None
-        instance = self._model._newFromDatabase(rows[0])  # noqa: SLF001
+        instance = self._model._newFromDatabase(rows[0])
+        object.__setattr__(instance, "_read_connection", connection)
         models = [instance]
         await self._fireRetrieved(models)
         if self._eager_loads:
@@ -447,8 +449,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         instance = await self.find(key)
         if instance is None:
             error_msg = (
-                f"No records found for model [{self._model.__name__}] "
-                f"with key [{key}]."
+                f"No records found for model [{self._model.__name__}] with key [{key}]."
             )
             raise ModelNotFoundException(error_msg)
         return instance
@@ -544,8 +545,8 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
             Detached copy carrying its own plan and eager-load list.
         """
         duplicate = super().clone()
-        duplicate._eager_loads = self._eager_loads.copy()  # noqa: SLF001
-        duplicate._without_scopes = set(self._without_scopes)  # noqa: SLF001
+        duplicate._eager_loads = self._eager_loads.copy()
+        duplicate._without_scopes = set(self._without_scopes)
         return duplicate
 
     def _beforeExecute(self) -> None:
@@ -559,12 +560,33 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         if self._scopes_applied:
             return
+        if not self._meta.global_scopes and (
+            self._meta.deleted_column is None or self._trashed_mode == _TRASHED_INCLUDE
+        ):
+            self._scopes_applied = True
+            return
+        previous = self._plan
+        self._plan = previous.clone()
         self._scopes_applied = True
+        try:
+            self._applyModelFilters()
+        except BaseException:
+            self._plan = previous
+            self._scopes_applied = False
+            raise
 
+    def _applyModelFilters(self) -> None:
+        """Apply registered scopes and deletion visibility to the staged plan.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
         for name, scope in self._meta.global_scopes.items():
             if name not in self._without_scopes:
                 scope(self)
@@ -589,7 +611,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         # Skip the whole loop when no listener is registered, which is
         # the common case on a hot hydration path.
@@ -607,6 +629,12 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         orionis.database.contracts.IConnection
             Connection declared by the model, or the default one.
         """
+        if self._resolved_connection is not None:
+            return self._resolved_connection
+        if self._connection_manager is not None:
+            return self._connection_manager.connection(self._connection_name)
+        if self._connection_name == self._meta.connection:
+            return self._model.getConnection()
         return ConnectionResolver.connection(self._connection_name)
 
     def _serializeValues(self, values: dict[str, Any]) -> dict[str, Any]:
@@ -687,7 +715,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -697,7 +725,7 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
         # Imported locally: Relation subclasses ModelQueryBuilder, so
         # importing it at module level here would cycle back through
         # orionis.orm.relations.relation.
-        from orionis.orm.relations.relation import Relation  # noqa: PLC0415
+        from orionis.orm.relations.relation import Relation
 
         sample = models[0]
         for name in self._eager_loads:
@@ -733,6 +761,5 @@ class ModelQueryBuilder[TModel: "Model"](QueryBuilderBase, IModelQueryBuilder):
             Human readable error message.
         """
         return (
-            f"'{name}' is not a relationship method on model "
-            f"[{self._model.__name__}]."
+            f"'{name}' is not a relationship method on model [{self._model.__name__}]."
         )

@@ -1,3 +1,5 @@
+# ruff: noqa: PLR2004, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import json
 import os
@@ -38,6 +40,7 @@ if TYPE_CHECKING:
     from orionis.mail.entities.prepared import PreparedMail
 
 _PDF = b"%PDF-1.4\nMail integration fixture\n%%EOF\n"
+
 
 class WelcomeMail(Mailable):
     __slots__ = ("name",)
@@ -101,6 +104,7 @@ class WelcomeMail(Mailable):
             ),
         ]
 
+
 class CompleteWelcomeMail(WelcomeMail):
     __slots__ = ()
 
@@ -118,6 +122,7 @@ class CompleteWelcomeMail(WelcomeMail):
             to="ana@example.com",
         )
 
+
 async def send_welcome() -> MailResult:
     """Execute the reusable Mailable acceptance example.
 
@@ -133,6 +138,7 @@ async def send_welcome() -> MailResult:
             WelcomeMail("Ana"),
         )
     )
+
 
 def configure_welcome(message: Message) -> None:
     """Configure the direct controller example with every envelope field.
@@ -162,6 +168,7 @@ def configure_welcome(message: Message) -> None:
         ),
     )
 
+
 class WelcomeController(BaseController):
     __slots__ = ()
 
@@ -175,6 +182,7 @@ class WelcomeController(BaseController):
         """
         result = await Mail.send("emails.welcome", {"name": "Ana"}, configure_welcome)
         return response.json({"message_id": result.message_id, "status": result.status})
+
 
 class InvoiceDeliveryService:
     __slots__ = ()
@@ -223,6 +231,7 @@ class InvoiceDeliveryService:
             )
         )
 
+
 async def send_notifications() -> None:
     """Execute both literal-body examples without a callback or Mailable.
 
@@ -243,6 +252,7 @@ async def send_notifications() -> None:
         .subject("Report ready")
         .html("<h1>Your report is ready.</h1>")
     )
+
 
 class NotificationService:
     __slots__ = ()
@@ -277,6 +287,7 @@ class NotificationService:
             self.configureMessage,
         )
 
+
 async def send_independent_messages() -> None:
     """Execute concurrent derivations of the same immutable fluent chain.
 
@@ -293,6 +304,7 @@ async def send_independent_messages() -> None:
     first = base.to("ana@example.com")
     second = base.to("luis@example.com")
     await asyncio.gather(first.raw("Hello, Ana."), second.raw("Hello, Luis."))
+
 
 class AlertService:
     __slots__ = ("__mail",)
@@ -332,6 +344,7 @@ class AlertService:
             .raw("A service alert requires your attention.")
         )
 
+
 class RecordingSink:
     __slots__ = ("messages",)
 
@@ -344,6 +357,7 @@ class RecordingSink:
             Completes the operation described above.
         """
         self.messages: list[PreparedMail] = []
+
 
 class RecordingTransport(IMailTransport):
     __slots__ = ("sink",)
@@ -395,6 +409,7 @@ class RecordingTransport(IMailTransport):
             recipients=message.recipients,
         )
 
+
 async def recording_factory(
     app: IApplication,
     config: Mapping[str, object],
@@ -423,6 +438,7 @@ async def recording_factory(
         raise AssertionError(error_msg)
     return await app.make(RecordingTransport)
 
+
 class RecordingProvider(ServiceProvider):
     __slots__ = ()
 
@@ -448,6 +464,7 @@ class RecordingProvider(ServiceProvider):
         manager = await self.app.make(IMailManager)
         manager.extend("recording", recording_factory)
 
+
 def forbid_smtp(*_args: object, **_kwargs: object) -> None:
     """Fail if a file-only example attempts any SMTP connection.
 
@@ -470,6 +487,7 @@ def forbid_smtp(*_args: object, **_kwargs: object) -> None:
     """
     error_msg = "File-only examples must not construct an SMTP connection."
     raise AssertionError(error_msg)
+
 
 def semantic_content(path: Path) -> list[tuple[object, ...]]:
     """Compare MIME structure and payloads without operation-specific boundaries.
@@ -495,6 +513,7 @@ def semantic_content(path: Path) -> list[tuple[object, ...]]:
         for part in parsed.walk()
     ]
 
+
 def require(condition: object, detail: str) -> None:
     """Fail an isolated acceptance check even when Python optimization is enabled.
 
@@ -517,6 +536,7 @@ def require(condition: object, detail: str) -> None:
     """
     if not condition:
         raise AssertionError(detail)
+
 
 async def run_examples(app: Application) -> dict[str, object]:
     """Execute all required styles against the real facade, engine, and local disk.
@@ -633,6 +653,7 @@ async def run_examples(app: Application) -> dict[str, object]:
         "facade_pinned": isinstance(Mail.fromAddress("a@b"), PendingMail),
     }
 
+
 async def main(runtime: str) -> None:
     """Boot a real isolated application through its public HTTP or CLI entry point.
 
@@ -742,7 +763,9 @@ async def main(runtime: str) -> None:
         )
     sys.stdout.write(json.dumps({"runtime": runtime, **result}) + "\n")
 
+
 _ROOT = Path(__file__).resolve().parents[2]
+
 
 class TestMailApplicationIntegration(TestCase):
     async def _runApplication(self, runtime: str) -> dict[str, object]:
@@ -809,6 +832,7 @@ class TestMailApplicationIntegration(TestCase):
         self.assertEqual(result["files"], 18)
         self.assertEqual(result["extension"], "recording")
         self.assertTrue(result["facade_pinned"])
+
 
 if __name__ == "__main__":
     asyncio.run(main(sys.argv[1]))

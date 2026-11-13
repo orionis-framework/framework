@@ -17,12 +17,22 @@ __all__ = [
 ]
 
 _EXPORTS = {
-    "CompositeForeignKey": ("orionis.orm.schema.constraints.composite_foreign_key", "CompositeForeignKey"),
-    "ForeignReference": ("orionis.orm.schema.constraints.foreign_reference", "ForeignReference"),
+    "CompositeForeignKey": (
+        "orionis.orm.schema.constraints.composite_foreign_key",
+        "CompositeForeignKey",
+    ),
+    "ForeignReference": (
+        "orionis.orm.schema.constraints.foreign_reference",
+        "ForeignReference",
+    ),
     "TableIndex": ("orionis.orm.schema.constraints.table_index", "TableIndex"),
-    "UniqueConstraint": ("orionis.orm.schema.constraints.unique_constraint", "UniqueConstraint"),
+    "UniqueConstraint": (
+        "orionis.orm.schema.constraints.unique_constraint",
+        "UniqueConstraint",
+    ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -44,6 +54,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

@@ -1,20 +1,43 @@
+# ruff: noqa: ANN401, SLF001, TC003
+# Retain parent connection ownership, dynamic results, and runtime annotations.
 """Base class for every query builder bound to a parent model instance."""
 
-from __future__ import annotations
+import orionis.orm as _orm
 from contextvars import ContextVar
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from orionis.orm.contracts.relation import IRelation
 from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from collections.abc import Callable, Generator
-    from orionis.orm.model import Model
+from collections.abc import Callable, Generator
 
-_CONSTRAINTS: ContextVar[bool] = ContextVar("orm_relation_constraints", default=True)
-"""Context-local constraints isolated between asynchronous tasks."""
 
-class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
+class _ConstraintScope:
+    """Limit inherited constraint suppression to its owner's active callback."""
+
+    __slots__ = ("active",)
+    """Reserve the active lifetime flag without a per-instance dictionary."""
+
+    def __init__(self) -> None:
+        """Start an active suppression scope.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self.active = True
+        """Indicate whether the owning callback is still executing."""
+
+
+_CONSTRAINTS: ContextVar[_ConstraintScope | None] = ContextVar(
+    "orm_relation_constraints",
+    default=None,
+)
+"""Context-local scope whose lifetime also applies to inherited contexts."""
+
+
+class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
     """
     Base class for every query builder bound to a parent model instance.
 
@@ -30,7 +53,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
     __slots__ = ("_eager_keys_empty", "_parent")
     """Declare the instance attribute slots reserved by this class."""
 
-    def __init__(self, parent: Model, related: type[TRelated]) -> None:
+    def __init__(self, parent: _orm.Model, related: type[TRelated]) -> None:
         """
         Bind a relationship query builder to its parent instance.
 
@@ -44,14 +67,20 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         super().__init__(related)
+        if related.__meta__.connection is None:
+            self._resolved_connection = parent._read_connection
+            """Retain the connection that owns the parent model's loaded state."""
+            self._connection_name = type(parent).__meta__.connection
+            """Use the parent's configured connection for an unbound related model."""
         self._parent = parent
         """Model instance the relationship is accessed from."""
         self._eager_keys_empty = False
         """Eager keys empty flag used by ``Relation``."""
-        if _CONSTRAINTS.get():
+        scope = _CONSTRAINTS.get()
+        if scope is None or not scope.active:
             self.addConstraints()
 
     # ── Template methods (overridden per relationship kind) ─────────────────
@@ -63,12 +92,12 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         error_msg = f"{type(self).__name__} must implement addConstraints()."
         raise NotImplementedError(error_msg)
 
-    def addEagerConstraints(self, models: list[Model]) -> None:
+    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
         """
         Constrain the query to every parent instance of an eager batch.
 
@@ -80,12 +109,12 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         error_msg = f"{type(self).__name__} must implement addEagerConstraints()."
         raise NotImplementedError(error_msg)
 
-    async def getResults(self) -> Any:  # noqa: ANN401
+    async def getResults(self) -> Any:
         """
         Execute the relationship query for its bound parent instance.
 
@@ -108,7 +137,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
         Returns
         -------
-        collections.abc.Collection
+        orionis.support.types.Collection
             Every related row across the whole eager-loaded batch.
         """
         if self._eager_keys_empty:
@@ -117,7 +146,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
 
     def match(
         self,
-        models: list[Model],
+        models: list[_orm.Model],
         results: Collection,
         name: str,
     ) -> None:
@@ -128,7 +157,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         ----------
         models : list of orionis.orm.Model
             Parent instances being eager loaded together.
-        results : collections.abc.Collection
+        results : orionis.support.types.Collection
             Rows produced by :meth:`orionis.orm.relations.Relation.getEager`.
         name : str
             Relationship name the results are stored under.
@@ -136,7 +165,7 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         error_msg = f"{type(self).__name__} must implement match()."
         raise NotImplementedError(error_msg)
@@ -170,6 +199,8 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         model, foreign key, ...) from a sample instance without binding
         the query to that specific instance. The setting is isolated to
         the current execution context, including across worker threads.
+        Inherited child contexts stop suppressing constraints when the owning
+        callback returns or raises.
 
         Parameters
         ----------
@@ -183,8 +214,10 @@ class Relation[TRelated: "Model"](ModelQueryBuilder[TRelated], IRelation):
         orionis.orm.relations.Relation
             The relationship built by ``callback``, unconstrained.
         """
-        token = _CONSTRAINTS.set(False)
+        scope = _ConstraintScope()
+        token = _CONSTRAINTS.set(scope)
         try:
             return callback()
         finally:
+            scope.active = False
             _CONSTRAINTS.reset(token)

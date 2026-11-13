@@ -8,6 +8,7 @@ Use sessions for small preferences or temporary browser state. Data outlives one
 from orionis.http import response
 from orionis.session.contracts.session import ISession
 
+
 async def choose_theme(session: ISession):
     session.put("theme", "dark")
     return response.redirect("/settings", 303).withFlash("notice", "Theme saved")
@@ -26,24 +27,26 @@ assert session.started and session.dirty
 assert session.get("theme") == "dark"
 ```
 
-Writing an equal value does not dirty the session. However, mutating a retrieved collection may change data without `put`; renewal conservatively treats mutable payloads. Do not expose `all()` as a public response: it includes internal bags.
+Writing an equal value does not dirty the session. However, mutating a retrieved collection may change data without `put`; renewal conservatively treats mutable payloads. `all()` returns a shallow copy: nested values remain shared. A dictionary passed to `Session(data=...)` is retained by reference. Do not expose `all()` as a public response: it includes internal bags.
 
 ## POST, redirect, GET
 
-`flash(key, value)` makes data readable in the current request and the next. At the next start, the manager removes the old bag and promotes the new one. This is neither a message queue nor indefinite persistence.
+`flash(key, value)` makes data readable in the current request and the next. At the next start, the manager removes the old bag and promotes the new one. Changes from this aging step are persisted even when the handler makes no further writes. This is neither a message queue nor indefinite persistence.
 
 ```python
 from orionis.session.session import Session
 
 session = Session()
-session.flashInput({"email": "ada@example.test", "password": "secret", "_csrf": "secret"})
+session.flashInput(
+    {"email": "ada@example.test", "password": "secret", "_csrf": "secret"}
+)
 session.flashErrors({"email": "Already registered"})
 assert session.getOldInput("email") == "ada@example.test"
 assert session.getOldInput("password") is None
 assert session.getErrors() == {"email": ["Already registered"]}
 ```
 
-`flashInput` filters known credential and CSRF field names. Exclude application-specific secrets yourself. `flashErrors` accepts mappings or validation exceptions and normalizes values into message lists. Repeated writes to reserved bags merge.
+`flashInput` filters known credential and CSRF field names. Exclude application-specific secrets yourself. `flashErrors` accepts mappings or validation exceptions and normalizes values into lists of strings, preserving scalar messages such as `0` and `False`. A missing or `None` message in a single validation failure becomes an empty string. Repeated writes to reserved bags merge.
 
 Response `withInput`, `withErrors` and `withFlash` queue the same data for middleware to apply; do not write it twice. Sessions expose `setPreviousUrl`/`getPreviousUrl`; the web layer updates navigation only for eligible requests/responses. Redirect-back flows must check safe destinations through HTTP helpers rather than trust arbitrary `Referer` input.
 

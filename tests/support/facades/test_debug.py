@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import ast
 import asyncio
 import inspect
@@ -16,8 +18,8 @@ from orionis.support.facades import Debug as ExportedDebug
 from orionis.support.facades.debug import Debug
 from orionis.test import TestCase
 
-class TestDebugFacade(TestCase):
 
+class TestDebugFacade(TestCase):
     def setUp(self) -> None:
         """
         Pin an isolated dumper service for each test.
@@ -60,7 +62,8 @@ class TestDebugFacade(TestCase):
         stub_path = Path(inspect.getfile(Debug)).with_suffix(".pyi")
         stub = ast.parse(stub_path.read_text(encoding="utf-8"))
         definition = next(
-            node for node in stub.body
+            node
+            for node in stub.body
             if isinstance(node, ast.ClassDef) and node.name == Debug.__name__
         )
         self.assertEqual(
@@ -113,7 +116,8 @@ class TestDebugFacade(TestCase):
         method = type(self).testHttpDdPreservesTheCallerLocationAndOptions
         source_lines, first_line = inspect.getsourcelines(method)
         call_line = first_line + next(
-            index for index, line in enumerate(source_lines)
+            index
+            for index, line in enumerate(source_lines)
             if line.lstrip().startswith("Debug.dd(")
         )
         html = captured.exception.dumper.toHtml(
@@ -136,6 +140,7 @@ class TestDebugFacade(TestCase):
         None
             This test does not return a value.
         """
+
         async def capture(value: str) -> HttpDump:
             """
             Capture an HTTP dump snapshot before mutating its input.

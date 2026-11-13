@@ -1,12 +1,15 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.support.types.stringable import Stringable
 from orionis.test import TestCase
+
 
 class TestStringableBasics(TestCase):
     """Unit tests for basic Stringable string operations."""
 
     # ------------------------------------------------------------------ after
 
-    def testAfterReturnsSubstringAfterFirstOccurrence(self):
+    def testAfterReturnsSubstringAfterFirstOccurrence(self) -> None:
         """Return the substring after the first occurrence.
 
         Validates that `after` correctly locates the search string and
@@ -15,12 +18,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello world hello")
         self.assertEqual(s.after("hello"), Stringable(" world hello"))
 
-    def testAfterReturnsOriginalWhenNotFound(self):
+    def testAfterReturnsOriginalWhenNotFound(self) -> None:
         """Return the original string when search value is absent.
 
         Ensures `after` falls back to the original string when the
@@ -29,12 +32,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello world")
         self.assertEqual(s.after("xyz"), Stringable("hello world"))
 
-    def testAfterEmptySearchString(self):
+    def testAfterEmptySearchString(self) -> None:
         """Return the full string when search is an empty string.
 
         Verifies that an empty search string returns the original value
@@ -43,14 +46,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(s.after(""), Stringable("hello"))
 
     # -------------------------------------------------------------- afterLast
 
-    def testAfterLastReturnsSubstringAfterLastOccurrence(self):
+    def testAfterLastReturnsSubstringAfterLastOccurrence(self) -> None:
         """Return the substring after the last occurrence.
 
         Validates that `afterLast` locates the *last* match and returns
@@ -59,12 +62,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("foo/bar/baz")
         self.assertEqual(s.afterLast("/"), Stringable("baz"))
 
-    def testAfterLastReturnsOriginalWhenNotFound(self):
+    def testAfterLastReturnsOriginalWhenNotFound(self) -> None:
         """Return the original string when search value is absent.
 
         Ensures `afterLast` falls back to the original string when the
@@ -73,14 +76,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(s.afterLast("x"), Stringable("hello"))
 
     # ----------------------------------------------------------------- before
 
-    def testBeforeReturnsSubstringBeforeFirstOccurrence(self):
+    def testBeforeReturnsSubstringBeforeFirstOccurrence(self) -> None:
         """Return the substring before the first occurrence.
 
         Validates that `before` correctly extracts everything preceding
@@ -89,12 +92,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello world hello")
         self.assertEqual(s.before("world"), Stringable("hello "))
 
-    def testBeforeReturnsOriginalWhenNotFound(self):
+    def testBeforeReturnsOriginalWhenNotFound(self) -> None:
         """Return the original string when search value is absent.
 
         Ensures `before` falls back to the original string when the
@@ -103,14 +106,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello world")
         self.assertEqual(s.before("xyz"), Stringable("hello world"))
 
     # ------------------------------------------------------------- beforeLast
 
-    def testBeforeLastReturnsSubstringBeforeLastOccurrence(self):
+    def testBeforeLastReturnsSubstringBeforeLastOccurrence(self) -> None:
         """Return the substring before the last occurrence.
 
         Validates that `beforeLast` extracts everything preceding the
@@ -119,12 +122,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("foo/bar/baz")
         self.assertEqual(s.beforeLast("/"), Stringable("foo/bar"))
 
-    def testBeforeLastReturnsOriginalWhenNotFound(self):
+    def testBeforeLastReturnsOriginalWhenNotFound(self) -> None:
         """Return the original string when search value is absent.
 
         Ensures `beforeLast` falls back to the original string when the
@@ -133,14 +136,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(s.beforeLast("x"), Stringable("hello"))
 
     # --------------------------------------------------------------- between
 
-    def testBetweenExtractsSubstringBetweenDelimiters(self):
+    def testBetweenExtractsSubstringBetweenDelimiters(self) -> None:
         """Extract the substring between two delimiters.
 
         Validates that `between` correctly isolates the content located
@@ -149,12 +152,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("[hello]")
         self.assertEqual(s.between("[", "]"), Stringable("hello"))
 
-    def testBetweenReturnsEmptyWhenStartDelimiterMissing(self):
+    def testBetweenReturnsEmptyWhenStartDelimiterMissing(self) -> None:
         """Return empty string when starting delimiter is absent.
 
         Ensures `between` returns an empty Stringable when the opening
@@ -163,12 +166,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello]")
         self.assertEqual(s.between("[", "]"), Stringable(""))
 
-    def testBetweenReturnsEmptyWhenEndDelimiterMissing(self):
+    def testBetweenReturnsEmptyWhenEndDelimiterMissing(self) -> None:
         """Return empty string when ending delimiter is absent.
 
         Ensures `between` returns an empty Stringable when the closing
@@ -177,12 +180,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("[hello")
         self.assertEqual(s.between("[", "]"), Stringable(""))
 
-    def testBetweenRaisesTypeErrorOnInvalidDelimiters(self):
+    def testBetweenRaisesTypeErrorOnInvalidDelimiters(self) -> None:
         """Raise TypeError when delimiters are not strings.
 
         Verifies that passing non-string delimiters to `between` raises
@@ -191,7 +194,7 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("text")
         with self.assertRaises(TypeError):
@@ -199,7 +202,7 @@ class TestStringableBasics(TestCase):
 
     # ----------------------------------------------------------- betweenFirst
 
-    def testBetweenFirstExtractsFirstPairContent(self):
+    def testBetweenFirstExtractsFirstPairContent(self) -> None:
         """Extract content between the first pair of delimiters.
 
         Validates that `betweenFirst` isolates content between the very
@@ -208,14 +211,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("[a][b]")
         self.assertEqual(s.betweenFirst("[", "]"), Stringable("a"))
 
     # --------------------------------------------------------------- append
 
-    def testAppendJoinsStrings(self):
+    def testAppendJoinsStrings(self) -> None:
         """Append one or more strings to the end.
 
         Validates that `append` concatenates all provided values to the
@@ -224,12 +227,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(s.append(" world", "!"), Stringable("hello world!"))
 
-    def testAppendRaisesTypeErrorOnNonString(self):
+    def testAppendRaisesTypeErrorOnNonString(self) -> None:
         """Raise TypeError when a non-string value is appended.
 
         Ensures `append` enforces type validation on all provided
@@ -238,7 +241,7 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         with self.assertRaises(TypeError):
@@ -246,7 +249,7 @@ class TestStringableBasics(TestCase):
 
     # --------------------------------------------------------------- prepend
 
-    def testPrependJoinsStrings(self):
+    def testPrependJoinsStrings(self) -> None:
         """Prepend one or more strings to the beginning.
 
         Validates that `prepend` inserts all provided values before the
@@ -255,12 +258,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("world")
         self.assertEqual(s.prepend("hello ", "dear "), Stringable("hello dear world"))
 
-    def testPrependRaisesTypeErrorOnNonString(self):
+    def testPrependRaisesTypeErrorOnNonString(self) -> None:
         """Raise TypeError when a non-string value is prepended.
 
         Ensures `prepend` enforces type validation on all arguments
@@ -269,7 +272,7 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("world")
         with self.assertRaises(TypeError):
@@ -277,7 +280,7 @@ class TestStringableBasics(TestCase):
 
     # --------------------------------------------------------------- newLine
 
-    def testNewLineAppendsDefaultSingleNewline(self):
+    def testNewLineAppendsDefaultSingleNewline(self) -> None:
         """Append a single newline by default.
 
         Validates that calling `newLine` without a count argument appends
@@ -286,12 +289,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(s.newLine(), Stringable("hello\n"))
 
-    def testNewLineAppendsMultipleNewlines(self):
+    def testNewLineAppendsMultipleNewlines(self) -> None:
         """Append multiple newlines when count is specified.
 
         Ensures that passing a count value causes `newLine` to append the
@@ -300,14 +303,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(s.newLine(3), Stringable("hello\n\n\n"))
 
     # ----------------------------------------------------------------- value
 
-    def testValueReturnsPlainString(self):
+    def testValueReturnsPlainString(self) -> None:
         """Return the underlying plain string value.
 
         Validates that `value` returns a regular Python `str` equal to
@@ -316,7 +319,7 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(s.value(), "hello")
@@ -324,7 +327,7 @@ class TestStringableBasics(TestCase):
 
     # ---------------------------------------------------------------- length
 
-    def testLengthReturnsCharacterCount(self):
+    def testLengthReturnsCharacterCount(self) -> None:
         """Return the number of characters in the string.
 
         Validates that `length` returns an integer matching the expected
@@ -333,14 +336,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").length(), 5)
         self.assertEqual(Stringable("").length(), 0)
 
     # --------------------------------------------------------------- reverse
 
-    def testReverseReturnsReversedString(self):
+    def testReverseReturnsReversedString(self) -> None:
         """Return the string with characters in reverse order.
 
         Validates that `reverse` correctly mirrors the full sequence of
@@ -349,11 +352,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").reverse(), Stringable("olleh"))
 
-    def testReverseOnEmptyString(self):
+    def testReverseOnEmptyString(self) -> None:
         """Return an empty Stringable when reversing an empty string.
 
         Ensures that reversing an empty string returns an empty Stringable
@@ -362,13 +365,13 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("").reverse(), Stringable(""))
 
     # ------------------------------------------------------------------ take
 
-    def testTakePositiveCharactersFromStart(self):
+    def testTakePositiveCharactersFromStart(self) -> None:
         """Take a specified number of characters from the start.
 
         Validates that `take` with a positive limit returns the first N
@@ -377,11 +380,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").take(5), Stringable("hello"))
 
-    def testTakeNegativeCharactersFromEnd(self):
+    def testTakeNegativeCharactersFromEnd(self) -> None:
         """Take a specified number of characters from the end.
 
         Validates that `take` with a negative limit returns the last N
@@ -390,11 +393,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").take(-5), Stringable("world"))
 
-    def testTakeRaisesTypeErrorOnNonInteger(self):
+    def testTakeRaisesTypeErrorOnNonInteger(self) -> None:
         """Raise TypeError when limit is not an integer.
 
         Ensures `take` validates its argument type before processing,
@@ -403,14 +406,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").take("3")
 
     # ---------------------------------------------------------------- substr
 
-    def testSubstrExtractsFromStart(self):
+    def testSubstrExtractsFromStart(self) -> None:
         """Extract a substring from a given start position.
 
         Validates that `substr` with a start index and no length returns
@@ -419,11 +422,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").substr(6), Stringable("world"))
 
-    def testSubstrExtractsWithLength(self):
+    def testSubstrExtractsWithLength(self) -> None:
         """Extract a substring of a specified length from a start position.
 
         Ensures `substr` correctly slices the string when both start and
@@ -432,11 +435,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").substr(0, 5), Stringable("hello"))
 
-    def testSubstrRaisesTypeErrorOnInvalidStart(self):
+    def testSubstrRaisesTypeErrorOnInvalidStart(self) -> None:
         """Raise TypeError when start is not an integer.
 
         Verifies `substr` enforces the integer type constraint on its
@@ -445,14 +448,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").substr("a")
 
     # --------------------------------------------------------------- charAt
 
-    def testCharAtReturnsCorrectCharacter(self):
+    def testCharAtReturnsCorrectCharacter(self) -> None:
         """Return the character at a given index.
 
         Validates that `charAt` returns the correct character for a valid
@@ -461,11 +464,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").charAt(1), "e")
 
-    def testCharAtReturnsFalseForOutOfBoundsIndex(self):
+    def testCharAtReturnsFalseForOutOfBoundsIndex(self) -> None:
         """Return False when index is out of bounds.
 
         Ensures `charAt` returns `False` rather than raising an exception
@@ -474,11 +477,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(Stringable("hi").charAt(99))
 
-    def testCharAtNegativeIndex(self):
+    def testCharAtNegativeIndex(self) -> None:
         """Return the character at a negative index.
 
         Validates that negative indices work correctly, accessing
@@ -487,11 +490,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").charAt(-1), "o")
 
-    def testCharAtRaisesTypeErrorOnNonInteger(self):
+    def testCharAtRaisesTypeErrorOnNonInteger(self) -> None:
         """Raise TypeError when index is not an integer.
 
         Ensures `charAt` enforces the integer type constraint before
@@ -500,14 +503,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").charAt("a")
 
     # -------------------------------------------------------------- position
 
-    def testPositionReturnsIndexOfFirstOccurrence(self):
+    def testPositionReturnsIndexOfFirstOccurrence(self) -> None:
         """Return the index of the first occurrence of a substring.
 
         Validates that `position` correctly identifies the zero-based
@@ -516,11 +519,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello world").position("world"), 6)
 
-    def testPositionReturnsFalseWhenNotFound(self):
+    def testPositionReturnsFalseWhenNotFound(self) -> None:
         """Return False when the needle is not found.
 
         Ensures `position` returns `False` rather than raising an
@@ -529,11 +532,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(Stringable("hello").position("xyz"))
 
-    def testPositionWithOffset(self):
+    def testPositionWithOffset(self) -> None:
         """Respect the offset parameter when searching.
 
         Validates that `position` begins its search at the specified
@@ -542,12 +545,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Stringable("aabbaa").position("a", 4)
         self.assertEqual(result, 4)
 
-    def testPositionRaisesTypeErrorOnNonStringNeedle(self):
+    def testPositionRaisesTypeErrorOnNonStringNeedle(self) -> None:
         """Raise TypeError when needle is not a string.
 
         Ensures `position` validates needle type before performing the
@@ -556,14 +559,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").position(42)
 
     # ---------------------------------------------------------------- finish
 
-    def testFinishAppendsCapIfAbsent(self):
+    def testFinishAppendsCapIfAbsent(self) -> None:
         """Append the cap string when it is missing at the end.
 
         Validates that `finish` ensures the string ends with the specified
@@ -572,11 +575,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello").finish("/"), Stringable("hello/"))
 
-    def testFinishDoesNotDuplicateCapIfPresent(self):
+    def testFinishDoesNotDuplicateCapIfPresent(self) -> None:
         """Preserve the cap when the string already ends with it.
 
         Ensures `finish` does not append a duplicate cap when the string
@@ -585,11 +588,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("hello/").finish("/"), Stringable("hello/"))
 
-    def testFinishRaisesTypeErrorOnNonString(self):
+    def testFinishRaisesTypeErrorOnNonString(self) -> None:
         """Raise TypeError when cap is not a string.
 
         Verifies that `finish` enforces type validation on the cap
@@ -598,14 +601,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").finish(1)
 
     # ----------------------------------------------------------------- start
 
-    def testStartPrependsPrefix(self):
+    def testStartPrependsPrefix(self) -> None:
         """Prepend the prefix when the string does not start with it.
 
         Validates that `start` ensures the string begins with the
@@ -614,11 +617,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("world").start("/"), Stringable("/world"))
 
-    def testStartDoesNotDuplicatePrefixIfPresent(self):
+    def testStartDoesNotDuplicatePrefixIfPresent(self) -> None:
         """Preserve the prefix when the string already starts with it.
 
         Ensures `start` does not prepend a duplicate prefix when the
@@ -627,11 +630,11 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Stringable("/world").start("/"), Stringable("/world"))
 
-    def testStartRaisesTypeErrorOnNonString(self):
+    def testStartRaisesTypeErrorOnNonString(self) -> None:
         """Raise TypeError when prefix is not a string.
 
         Verifies that `start` enforces type validation on the prefix
@@ -640,14 +643,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("world").start(1)
 
     # --------------------------------------------------------------- excerpt
 
-    def testExcerptExtractsAroundPhrase(self):
+    def testExcerptExtractsAroundPhrase(self) -> None:
         """Extract text surrounding the given phrase.
 
         Validates that `excerpt` returns a snippet centered around the
@@ -656,13 +659,13 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("The quick brown fox")
         result = s.excerpt("brown", {"radius": 5})
         self.assertIn("brown", result)
 
-    def testExcerptReturnsNoneWhenPhraseNotFound(self):
+    def testExcerptReturnsNoneWhenPhraseNotFound(self) -> None:
         """Return None when the phrase is not found.
 
         Ensures `excerpt` returns `None` when the searched phrase does
@@ -671,12 +674,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello world")
         self.assertIsNone(s.excerpt("xyz"))
 
-    def testExcerptWithEmptyPhrase(self):
+    def testExcerptWithEmptyPhrase(self) -> None:
         """Return the beginning of the string when phrase is empty.
 
         Validates that `excerpt` with an empty phrase returns the first
@@ -685,13 +688,13 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello world")
         result = s.excerpt("", {"radius": 5})
         self.assertIsNotNone(result)
 
-    def testExcerptRaisesTypeErrorOnNonStringPhrase(self):
+    def testExcerptRaisesTypeErrorOnNonStringPhrase(self) -> None:
         """Raise TypeError when phrase is not a string.
 
         Ensures `excerpt` validates the phrase type before attempting
@@ -700,14 +703,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").excerpt(42)
 
     # -------------------------------------------------------------- basename
 
-    def testBasenameExtractsFilename(self):
+    def testBasenameExtractsFilename(self) -> None:
         """Extract the trailing filename component from a path.
 
         Validates that `basename` correctly isolates the final segment
@@ -716,12 +719,12 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("/var/www/html/index.html")
         self.assertEqual(s.basename(), Stringable("index.html"))
 
-    def testBasenameRemovesSuffix(self):
+    def testBasenameRemovesSuffix(self) -> None:
         """Remove the specified suffix from the basename.
 
         Ensures that `basename` with a suffix argument strips the suffix
@@ -730,14 +733,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("/var/www/html/index.html")
         self.assertEqual(s.basename(".html"), Stringable("index"))
 
     # --------------------------------------------------------------- dirname
 
-    def testDirnameReturnsParentDirectory(self):
+    def testDirnameReturnsParentDirectory(self) -> None:
         """Return the parent directory path.
 
         Validates that `dirname` correctly extracts the immediate parent
@@ -746,13 +749,13 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("/var/www/html/index.html")
         result = s.dirname()
         self.assertIn("html", str(result))
 
-    def testDirnameWithMultipleLevels(self):
+    def testDirnameWithMultipleLevels(self) -> None:
         """Ascend multiple directory levels.
 
         Ensures `dirname` with a level count greater than one navigates
@@ -761,7 +764,7 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("/var/www/html/index.html")
         result = s.dirname(2)
@@ -769,7 +772,7 @@ class TestStringableBasics(TestCase):
 
     # ----------------------------------------------------------- __getitem__
 
-    def testGetItemByIndex(self):
+    def testGetItemByIndex(self) -> None:
         """Return the character at a given index via subscript.
 
         Validates that index-based subscript access returns a Stringable
@@ -778,13 +781,13 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(s[0], Stringable("h"))
         self.assertIsInstance(s[0], Stringable)
 
-    def testGetItemBySlice(self):
+    def testGetItemBySlice(self) -> None:
         """Return a substring via slice subscript.
 
         Validates that slice-based subscript access returns a Stringable
@@ -793,7 +796,7 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello world")
         self.assertEqual(s[0:5], Stringable("hello"))
@@ -801,7 +804,7 @@ class TestStringableBasics(TestCase):
 
     # ----------------------------------------------------------------- __str__
 
-    def testStrReturnsPlainStringRepresentation(self):
+    def testStrReturnsPlainStringRepresentation(self) -> None:
         """Return the plain string representation.
 
         Validates that Python's built-in `str()` applied to a Stringable
@@ -810,7 +813,7 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("hello")
         self.assertEqual(str(s), "hello")
@@ -818,7 +821,7 @@ class TestStringableBasics(TestCase):
 
     # --------------------------------------------------------------- scan
 
-    def testScanParsesFormatString(self):
+    def testScanParsesFormatString(self) -> None:
         """Parse values from a string according to a format pattern.
 
         Validates that `scan` correctly extracts typed tokens from the
@@ -827,14 +830,14 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("name=John age=30")
         result = s.scan("name=%s age=%d")
         self.assertIsInstance(result, list)
         self.assertIn("John", result)
 
-    def testScanReturnsEmptyListWhenNoMatch(self):
+    def testScanReturnsEmptyListWhenNoMatch(self) -> None:
         """Return an empty list when no pattern matches.
 
         Ensures `scan` returns an empty list rather than raising an
@@ -843,13 +846,13 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         s = Stringable("no match here")
         result = s.scan("%d-%d-%d")
         self.assertEqual(result, [])
 
-    def testScanRaisesTypeErrorOnNonStringFormat(self):
+    def testScanRaisesTypeErrorOnNonStringFormat(self) -> None:
         """Raise TypeError when format string is not a string.
 
         Verifies that `scan` enforces the string type constraint on the
@@ -858,7 +861,7 @@ class TestStringableBasics(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Stringable("hello").scan(123)

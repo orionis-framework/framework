@@ -1,3 +1,5 @@
+# ruff: noqa: PLR0913
+# Keep established public and external protocol names and signatures.
 """Define the contract for task implementations."""
 
 from __future__ import annotations
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
     from orionis.console.base.contracts.listener import IBaseTaskListener
     from orionis.console.entities.task import Task as TaskEntity
     from orionis.console.enums.events import TaskEvent as TaskEventListener
+
 
 class ITask(ABC):
     """Define the contract for task implementations."""
@@ -2363,7 +2366,6 @@ class ITask(ABC):
             If any parameter is not a non-negative integer or if all are zero.
         """
 
-    # ruff: noqa: PLR0913
     @abstractmethod
     def cron(
         self,

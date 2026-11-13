@@ -1,16 +1,17 @@
+# ruff: noqa: TC001
+# Keep model and collection annotations available to runtime introspection.
 """Shared machinery for the ``hasOne``/``hasMany`` relationship kinds."""
 
-from __future__ import annotations
+import orionis.orm as _orm
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from orionis.orm.metaclass import snake_case
 from orionis.orm.relations.relation import Relation
 
-if TYPE_CHECKING:
-    from orionis.orm.model import Model
-    from orionis.support.types.collection import Collection
+from orionis.support.types.collection import Collection
 
-class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
+
+class HasOneOrManyRelation[TRelated: _orm.Model](Relation[TRelated]):
     """
     Shared machinery for the ``hasOne``/``hasMany`` relationship kinds.
 
@@ -26,7 +27,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
 
     def __init__(
         self,
-        parent: Model,
+        parent: _orm.Model,
         related: type[TRelated],
         foreign_key: str | None,
         local_key: str | None,
@@ -50,7 +51,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self._foreign_key = foreign_key or f"{snake_case(type(parent).__name__)}_id"
         """
@@ -71,7 +72,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         value = getattr(self._parent, self._local_key)
         if value is None:
@@ -81,7 +82,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
         else:
             self.where(self._foreign_key, value)
 
-    def addEagerConstraints(self, models: list[Model]) -> None:
+    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
         """
         Constrain the query to the rows owned by every parent instance.
 
@@ -93,7 +94,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         keys = {
             value
@@ -113,7 +114,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
 
         Parameters
         ----------
-        results : collections.abc.Collection
+        results : orionis.support.types.Collection
             Related rows produced by an eager query.
 
         Returns
@@ -141,7 +142,8 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
         Returns
         -------
         orionis.orm.Model
-            Persisted related model, already linked to the parent.
+            Related model linked to the parent and saved on this relationship's
+            connection, unless a model event vetoes persistence.
 
         Raises
         ------
@@ -151,4 +153,7 @@ class HasOneOrManyRelation[TRelated: "Model"](Relation[TRelated]):
         """
         payload = dict(attributes)
         payload[self._foreign_key] = getattr(self._parent, self._local_key)
-        return await self._model.create(payload)
+        model = self._model(payload)
+        object.__setattr__(model, "_read_connection", self._connection())
+        await model.save()
+        return model

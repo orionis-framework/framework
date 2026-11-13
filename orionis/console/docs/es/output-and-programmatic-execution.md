@@ -23,6 +23,10 @@ Los métodos de salida son síncronos. Llamarlos desde `async handle()` no los c
 
 `exitSuccess()` y `exitError()` lanzan `SystemExit`; si tu intención es devolver un código al reactor, devuelve un entero desde `handle`. `exception(error)` muestra diagnósticos; `dump(...)` y `Dumper` sirven para desarrollo. `dd` termina después del volcado, por lo que no debe quedar en código operativo.
 
+Los helpers de salida conservan los bloques `finally` y el vaciado normal de buffers. `VarDumper.redirectOutput()` usa temporalmente los streams originales del intérprete y restaura los streams del llamador actual después de imprimir, también ante fallos y llamadas repetidas.
+
+El printer de depuración HTTP mantiene temporizadores por contexto de petición. Las llamadas repetidas a `start()` reutilizan su worker; `stop()` drena las líneas admitidas o propaga un fallo de escritura sin bloquearse. Su cola acotada sigue descartando líneas de depuración excedentes cuando está llena; no es un backend de logging durable.
+
 ## Mostrar progreso
 
 ```python

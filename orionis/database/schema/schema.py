@@ -1,6 +1,8 @@
+# ruff: noqa: TC001
+# Preserve runtime schema and connection annotations for reflection.
 """Apply database schema operations to the selected connection."""
 
-from typing import TYPE_CHECKING, Self
+from typing import Self
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.contracts.schema import ISchema
@@ -17,18 +19,17 @@ from orionis.database.schema.unique import Unique
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.column import ColumnDefinition
 from orionis.orm.metaclass import ModelMeta
+from orionis.database.schema.definitions import SchemaDefinition
+from orionis.orm.model import Model
 
-if TYPE_CHECKING:
-    from orionis.database.schema.definitions import SchemaDefinition
-    from orionis.orm.model import Model
 
 class Schema(ISchema):
-
-    # ruff: noqa: TC001
     """Apply database schema operations to the selected connection."""
 
     __slots__ = (
-        "__conn_manager", "__connection_name", "__connection_selected",
+        "__conn_manager",
+        "__connection_name",
+        "__connection_selected",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -44,7 +45,7 @@ class Schema(ISchema):
         Returns
         -------
         None
-            Initialize the Schema instance.
+            No return value.
         """
         # Initialize connection manager and state attributes
         self.__conn_manager: IConnectionManager = conn_manager
@@ -148,14 +149,14 @@ class Schema(ISchema):
             If the argument is not a concrete model class.
         """
         metadata = (
-            model.__dict__.get("__meta__")
-            if isinstance(model, ModelMeta) else None
+            model.__dict__.get("__meta__") if isinstance(model, ModelMeta) else None
         )
         if metadata is None:
             error_msg = "Expected a concrete model class with table metadata."
             raise TypeError(error_msg)
         connection_name = (
-            self.__connection_name if self.__connection_selected
+            self.__connection_name
+            if self.__connection_selected
             else metadata.connection
         )
         connection = (
@@ -291,12 +292,7 @@ class Schema(ISchema):
     def __classifyDefinition(
         self,
         definition: (
-            ColumnDefinition
-            | Comment
-            | ForeignKey
-            | Index
-            | PrimaryKey
-            | Unique
+            ColumnDefinition | Comment | ForeignKey | Index | PrimaryKey | Unique
         ),
         bucket: DefinitionBucket,
     ) -> None:
@@ -314,10 +310,13 @@ class Schema(ISchema):
         Returns
         -------
         None
-            The ``bucket`` accumulator is mutated in place.
+            No return value.
         """
         # Register columns and collect their primary key declarations.
         if isinstance(definition, ColumnDefinition):
+            if definition.name in bucket.columns:
+                message = f"Column '{definition.name}' has already been defined."
+                raise ValueError(message)
             bucket.columns[definition.name] = definition
             # Column-level .primary() also defines the primary key.
             if definition.is_primary:
@@ -358,12 +357,12 @@ class Schema(ISchema):
         Returns
         -------
         None
-            The ``bucket`` accumulator is mutated in place.
+            No return value.
         """
         for column_name in ("created_at", "updated_at"):
             column = Column.dateTime(column_name, timezone=definition.timezone)
             column.nullable()
-            bucket.columns[column_name] = column
+            self.__classifyDefinition(column, bucket)
 
     def __setPrimaryKey(
         self,
@@ -384,7 +383,7 @@ class Schema(ISchema):
         Returns
         -------
         None
-            The ``kwargs`` mapping is mutated in place.
+            No return value.
 
         Raises
         ------

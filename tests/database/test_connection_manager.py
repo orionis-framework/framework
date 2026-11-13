@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.contracts.connection import IConnection
 from orionis.database.exceptions import ConnectionNotFoundException
 from orionis.test import TestCase
+
 
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
@@ -18,11 +21,11 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._config = config
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Return the requested database configuration.
 
         Parameters
@@ -35,7 +38,10 @@ class _StubApp:
         dict
             Value produced by the helper.
         """
+        if key != "database":
+            raise KeyError(key)
         return self._config
+
 
 def _make_manager() -> ConnectionManager:
     """Build a manager with two in-memory sqlite connections.
@@ -45,16 +51,28 @@ def _make_manager() -> ConnectionManager:
     ConnectionManager
         Value produced by the helper.
     """
-    return ConnectionManager(_StubApp({
-        "default": "sqlite",
-        "connections": {
-            "sqlite": {"driver": "sqlite", "database": ":memory:", "prefix": ""},
-            "replica": {"driver": "sqlite", "database": ":memory:", "prefix": ""},
-        },
-    }))
+    return ConnectionManager(
+        _StubApp(
+            {
+                "default": "sqlite",
+                "connections": {
+                    "sqlite": {
+                        "driver": "sqlite",
+                        "database": ":memory:",
+                        "prefix": "",
+                    },
+                    "replica": {
+                        "driver": "sqlite",
+                        "database": ":memory:",
+                        "prefix": "",
+                    },
+                },
+            },
+        ),
+    )
+
 
 class TestConnectionManager(TestCase):
-
     def setUp(self) -> None:
         """Create a fresh manager before each test.
 
@@ -63,21 +81,10 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._manager = _make_manager()
-
-    async def asyncTearDown(self) -> None:
-        """Dispose every cached connection after each test.
-
-        Releases pooled resources between tests.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._manager.disconnect()
+        self.addAsyncCleanup(self._manager.disconnect)
 
     # ── Resolution ────────────────────────────────────────────────────────────
 
@@ -89,7 +96,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = self._manager.connection()
         self.assertIsInstance(connection, IConnection)
@@ -103,7 +110,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = self._manager.connection("replica")
         self.assertEqual(connection.getName(), "replica")
@@ -116,7 +123,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         first = self._manager.connection()
         second = self._manager.connection("sqlite")
@@ -130,7 +137,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ConnectionNotFoundException):
             self._manager.connection("missing")
@@ -145,7 +152,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._manager.addConnection(
             "runtime",
@@ -165,7 +172,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             self._manager.addConnection("", {})
@@ -182,7 +189,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._manager.getDefaultName(), "sqlite")
         self._manager.setDefaultName("replica")
@@ -200,7 +207,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         config = self._manager.configFor("replica")
         self.assertEqual(config["driver"], "sqlite")
@@ -213,7 +220,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             self._manager.configFor(),
@@ -228,7 +235,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ConnectionNotFoundException):
             self._manager.configFor("missing")
@@ -243,7 +250,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         first = self._manager.connection()
         await self._manager.disconnect("sqlite")
@@ -258,7 +265,7 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         first_default = self._manager.connection()
         first_replica = self._manager.connection("replica")
@@ -276,6 +283,6 @@ class TestConnectionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._manager.disconnect("never-touched")

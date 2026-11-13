@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from typing import TYPE_CHECKING, Annotated
 from orionis.container.container import Container
@@ -17,26 +19,31 @@ from orionis.test import TestCase
 if TYPE_CHECKING:
     from orionis.orm.query.expressions import SelectPlan
 
+
 class _UniquePayload(Schema):
     """Combine a database rule with an independently converted field."""
 
     code: Annotated[str, Unique("unique_values", "code")]
     quantity: int = 1
 
+
 class _NestedPayload(Schema):
     """Allow a nested schema or a scalar union member."""
 
     child: _UniquePayload | int
+
 
 class _CollectionPayload(Schema):
     values: list[_UniquePayload]
     mapping: dict[str, _UniquePayload]
     quantity: int = 1
 
+
 class _SchemaContainer(Container):
     """Keep validation bindings independent of the application's container."""
 
     __slots__ = ()
+
 
 class _SchemaRequest(Request):
     """Supply a request body without constructing a transport."""
@@ -54,7 +61,7 @@ class _SchemaRequest(Request):
         Returns
         -------
         None
-            The request body is ready for validation.
+            No return value.
         """
         self._data = data
 
@@ -67,6 +74,7 @@ class _SchemaRequest(Request):
             Payload supplied when constructing the request.
         """
         return self._data
+
 
 def _receive_payload(payload: _UniquePayload) -> _UniquePayload:
     """Return the typed payload injected by the container.
@@ -83,6 +91,7 @@ def _receive_payload(payload: _UniquePayload) -> _UniquePayload:
     """
     return payload
 
+
 class _WaitingConnection:
     """Hold a database probe until its caller releases it."""
 
@@ -94,7 +103,7 @@ class _WaitingConnection:
         Returns
         -------
         None
-            The connection is ready to suspend its first query.
+            No return value.
         """
         self.entered = asyncio.Event()
         self.release = asyncio.Event()
@@ -116,6 +125,7 @@ class _WaitingConnection:
         await self.release.wait()
         return []
 
+
 class _ConnectionManager:
     """Resolve only the test-owned connection, without constructing engines."""
 
@@ -132,7 +142,7 @@ class _ConnectionManager:
         Returns
         -------
         None
-            Connection resolution is ready.
+            No return value.
         """
         self.current: Connection | _WaitingConnection = connection
 
@@ -151,6 +161,7 @@ class _ConnectionManager:
         """
         return self.current
 
+
 class TestUniqueAsync(TestCase):
     """Verify transaction visibility and nonblocking uniqueness checks."""
 
@@ -160,39 +171,43 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            A fresh table and connection are available to the rule.
+            No return value.
         """
         try:
             self._previous = ConnectionResolver.manager()
         except OrmConfigurationException:
             self._previous = None
         self._connection = Connection(
-            "sqlite", {"driver": "sqlite", "database": ":memory:", "prefix": ""},
+            "sqlite",
+            {"driver": "sqlite", "database": ":memory:", "prefix": ""},
         )
+        self.addAsyncCleanup(self._connection.disconnect)
+        self.addCleanup(self._restoreResolver)
         columns = {"id": Integer().primary().autoIncrement(), "code": String()}
         for name, column in columns.items():
             column.name = name
         self._table = TableDefinition(
-            name="unique_values", columns=columns, primary_key="id",
+            name="unique_values",
+            columns=columns,
+            primary_key="id",
         )
         await self._connection.createTable(self._table)
         self._manager = _ConnectionManager(self._connection)
         ConnectionResolver.setManager(self._manager)
 
-    async def asyncTearDown(self) -> None:
-        """Restore the application resolver and release the test database.
+    def _restoreResolver(self) -> None:
+        """Restore the application resolver and isolated container registration.
 
         Returns
         -------
         None
-            No connection or resolver state remains owned by the test.
+            No return value.
         """
         if self._previous is None:
             ConnectionResolver.clear()
         else:
             ConnectionResolver.setManager(self._previous)
         Container._instances.pop(_SchemaContainer, None)
-        await self._connection.disconnect()
 
     async def testSeesUncommittedRowsAndHonorsTheExcludedRow(self) -> None:
         """Check the current transaction without opening an isolated connection.
@@ -200,12 +215,15 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Uncommitted duplicates fail while the excluded row remains valid.
+            No return value.
         """
         async with self._connection.transaction():
-            inserted = await self._connection.insert(InsertPlan(
-                table=self._table, values=[{"code": "taken"}],
-            ))
+            inserted = await self._connection.insert(
+                InsertPlan(
+                    table=self._table,
+                    values=[{"code": "taken"}],
+                ),
+            )
             rule = Unique("unique_values", "code")
             self.assertFalse(await rule.enforce("code", "taken", None))
             self.assertTrue(await rule.enforce("code", "available", None))
@@ -218,7 +236,7 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            The query and its release event execute in the same event loop.
+            No return value.
         """
         connection = _WaitingConnection()
         self._manager.current = connection
@@ -238,13 +256,17 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            The rule accepts None without starting a database query.
+            No return value.
         """
         connection = _WaitingConnection()
         self._manager.current = connection
-        self.assertTrue(await Unique("unique_values", "code").enforce(
-            "code", None, None,
-        ))
+        self.assertTrue(
+            await Unique("unique_values", "code").enforce(
+                "code",
+                None,
+                None,
+            ),
+        )
         self.assertFalse(connection.entered.is_set())
 
     async def testValidatorReportsTypeAndDatabaseFailuresTogether(self) -> None:
@@ -253,15 +275,19 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Both field errors are reported inside the current transaction.
+            No return value.
         """
         async with self._connection.transaction():
-            await self._connection.insert(InsertPlan(
-                table=self._table, values=[{"code": "taken"}],
-            ))
+            await self._connection.insert(
+                InsertPlan(
+                    table=self._table,
+                    values=[{"code": "taken"}],
+                ),
+            )
             with self.assertRaises(ValidationException) as caught:
                 await Validator.validate(
-                    {"code": "taken", "quantity": "invalid"}, _UniquePayload,
+                    {"code": "taken", "quantity": "invalid"},
+                    _UniquePayload,
                 )
             self.assertEqual(set(caught.exception.errors), {"code", "quantity"})
 
@@ -271,11 +297,14 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Nested database failures retain their fully qualified field names.
+            No return value.
         """
-        await self._connection.insert(InsertPlan(
-            table=self._table, values=[{"code": "taken"}],
-        ))
+        await self._connection.insert(
+            InsertPlan(
+                table=self._table,
+                values=[{"code": "taken"}],
+            ),
+        )
         for quantity in (1, "invalid"):
             with self.assertRaises(ValidationException) as caught:
                 await Validator.validate(
@@ -291,10 +320,11 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Validation preserves the scalar union member.
+            No return value.
         """
         self.assertEqual(
-            (await Validator.validate({"child": 3}, _NestedPayload)).child, 3,
+            (await Validator.validate({"child": 3}, _NestedPayload)).child,
+            3,
         )
 
     async def testCollectionsPreserveTheActiveTransactionOnBothPaths(self) -> None:
@@ -304,25 +334,32 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Assert database probes within the active collection transaction.
+            No return value.
         """
         async with self._connection.transaction():
-            await self._connection.insert(InsertPlan(
-                table=self._table, values=[{"code": "taken"}],
-            ))
+            await self._connection.insert(
+                InsertPlan(
+                    table=self._table,
+                    values=[{"code": "taken"}],
+                ),
+            )
             for quantity in (1, "invalid"):
                 with self.assertRaises(ValidationException) as caught:
-                    await Validator.validate({
-                        "values": [{"code": "taken"}],
-                        "mapping": {"main": {"code": "taken"}},
-                        "quantity": quantity,
-                    }, _CollectionPayload)
+                    await Validator.validate(
+                        {
+                            "values": [{"code": "taken"}],
+                            "mapping": {"main": {"code": "taken"}},
+                            "quantity": quantity,
+                        },
+                        _CollectionPayload,
+                    )
                 self.assertEqual(
                     set(caught.exception.errors) - {"quantity"},
                     {"values[0].code", "mapping['main'].code"},
                 )
                 self.assertEqual(
-                    "quantity" in caught.exception.errors, quantity != 1,
+                    "quantity" in caught.exception.errors,
+                    quantity != 1,
                 )
 
     async def testFailedCollectionItemsStillAwaitTheirValidDatabaseFields(self) -> None:
@@ -332,23 +369,35 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Assert valid database probes despite sibling conversion failures.
+            No return value.
         """
-        await self._connection.insert(InsertPlan(
-            table=self._table, values=[{"code": "taken"}],
-        ))
+        await self._connection.insert(
+            InsertPlan(
+                table=self._table,
+                values=[{"code": "taken"}],
+            ),
+        )
         with self.assertRaises(ValidationException) as caught:
-            await Validator.validate({
-                "values": [
-                    {"code": "taken", "quantity": "bad"},
-                    {"code": "taken"},
-                ],
-                "mapping": {"main": {"code": "taken", "quantity": "bad"}},
-            }, _CollectionPayload)
-        self.assertEqual(set(caught.exception.errors), {
-            "values[0].code", "values[0].quantity", "values[1].code",
-            "mapping['main'].code", "mapping['main'].quantity",
-        })
+            await Validator.validate(
+                {
+                    "values": [
+                        {"code": "taken", "quantity": "bad"},
+                        {"code": "taken"},
+                    ],
+                    "mapping": {"main": {"code": "taken", "quantity": "bad"}},
+                },
+                _CollectionPayload,
+            )
+        self.assertEqual(
+            set(caught.exception.errors),
+            {
+                "values[0].code",
+                "values[0].quantity",
+                "values[1].code",
+                "mapping['main'].code",
+                "mapping['main'].quantity",
+            },
+        )
 
     async def testCollectionValidationPropagatesCancellation(self) -> None:
         """
@@ -357,17 +406,24 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Assert propagation of cancellation from a suspended child probe.
+            No return value.
         """
         connection = _WaitingConnection()
         self._manager.current = connection
-        pending = asyncio.create_task(Validator.validate({
-            "values": [{"code": "available"}], "mapping": {},
-        }, _CollectionPayload))
+        pending = asyncio.create_task(
+            Validator.validate(
+                {
+                    "values": [{"code": "available"}],
+                    "mapping": {},
+                },
+                _CollectionPayload,
+            ),
+        )
         try:
             await asyncio.wait_for(connection.entered.wait(), timeout=1)
         finally:
             pending.cancel()
+            await asyncio.gather(pending, return_exceptions=True)
         with self.assertRaises(asyncio.CancelledError):
             await pending
 
@@ -377,17 +433,21 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Cancellation propagates without being converted to validation errors.
+            No return value.
         """
         connection = _WaitingConnection()
         self._manager.current = connection
-        pending = asyncio.create_task(Validator.validate(
-            {"code": "available"}, _UniquePayload,
-        ))
+        pending = asyncio.create_task(
+            Validator.validate(
+                {"code": "available"},
+                _UniquePayload,
+            ),
+        )
         try:
             await asyncio.wait_for(connection.entered.wait(), timeout=1)
         finally:
             pending.cancel()
+            await asyncio.gather(pending, return_exceptions=True)
         with self.assertRaises(asyncio.CancelledError):
             await pending
 
@@ -397,7 +457,7 @@ class TestUniqueAsync(TestCase):
         Returns
         -------
         None
-            Injection completes only after the nonblocking query finishes.
+            No return value.
         """
         connection = _WaitingConnection()
         self._manager.current = connection

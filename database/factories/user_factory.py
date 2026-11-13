@@ -2,6 +2,7 @@ from typing import Any, Self
 from app.models.user import User
 from orionis.orm.factories import Factory
 
+
 class UserFactory(Factory[User]):
     """
     Generate user attributes, accepting a password hash at creation time.

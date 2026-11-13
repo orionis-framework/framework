@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string is a valid RFC 9562 universally unique identifier."""
 
 import re
@@ -23,6 +25,7 @@ _VERSION_INDEX = 14
 _VARIANT_INDEX = 19
 """Variant index value used by ``uuid_string``."""
 
+
 class Uuid(Rule):
     """
     Ensure a string is a valid RFC 9562 universally unique identifier.
@@ -30,8 +33,6 @@ class Uuid(Rule):
     Any version is accepted by default; pass ``version`` to require one
     specific layout.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_version",)
     """Declare the instance attribute slots reserved by this class."""
@@ -61,7 +62,7 @@ class Uuid(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------
@@ -109,7 +110,7 @@ class Uuid(Rule):
         if not isinstance(value, str):
             return True
 
-        if _UUID_PATTERN.match(value) is None:
+        if _UUID_PATTERN.fullmatch(value) is None:
             return False
 
         if self._version is None:

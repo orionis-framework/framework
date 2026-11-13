@@ -13,6 +13,10 @@ python reactor make:factory ProductFactory --help
 
 Generating a model does not migrate its table; generating a job does not start workers. Review generated imports, dependencies, and configuration before use.
 
+Generation errors, including invalid names, duplicate signatures, and existing destination files, print a diagnostic and return exit code 1. An error message must not be interpreted as successful generation.
+
+Generated class and module names must be valid Python identifiers, not keywords. Validation considers the final prefixed/suffixed name and rejects invalid components before creating their directories or files.
+
 ### Realtime sockets and hubs
 
 ```shell
@@ -37,6 +41,8 @@ orionis bootstrap:config app
 
 Omit `file` to restore all missing files, or pass a configuration name without `.py` to restore only that file. Available names come from the remote `master` tree; an unknown name produces an error listing those options. Existing files are preserved without being overwritten.
 
+Routing bootstrap commands refuse edits when a later local helper can replace the selected application's routing, including through assigned aliases. Register the new context in that helper explicitly rather than inserting a declaration it would overwrite.
+
 ## Evolve data
 
 `migrate`, `migrate:status`, `migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh`, `seed`, and `db:seed` are covered in [migrations and seeders](../../../database/docs/en/migrations-and-seeders.md). They share `--database`/`-d` connection selection. Rollback `--step` counts batches. `db:show` displays database information; `db:table` inspects tables; `db:wipe` removes schema data through its workflow and requires operational care.
@@ -54,6 +60,8 @@ Do not schedule `migrate:fresh`, `db:wipe`, or `queue:clear` as routine producti
 ## Serve, inspect, and test
 
 `serve` starts the development server with its supported options; see [HTTP](../../../http/docs/en/README.md) for the web lifecycle. `route:list` inspects registered routes. `test` runs Orionis testing; selection and modes belong to [Testing](../../../test/docs/en/README.md). Development servers and workers are long-running processes and need supervision in operational environments.
+
+The test command returns 1 when no tests match, with a diagnostic about discovery and filters. It must not be used as evidence of validation when no results were produced.
 
 `schedule:list` and `schedule:work` belong to the [scheduler](task-scheduling.md). `queue:migrate` prepares all configured SQL queue tables and failed-job storage without removing data. `queue:work`, `queue:failed`, `queue:retry`, `queue:forget`, and `queue:clear` operate [queues](../../../queues/docs/en/workers-and-failures.md). MCP commands are covered under [MCP](../../../mcp/docs/en/README.md).
 

@@ -1,3 +1,5 @@
+# ruff: noqa: TRY004
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Provide http routes operations.
 
 Includes ``normalize_path``, ``normalize_request_path``, ``strip_regex_anchors``,
@@ -24,6 +26,7 @@ _ACTION_LIST_LENGTH: int = 2
 # Matches one or more consecutive forward slashes anywhere in a path.
 _MULTI_SLASH_RE: re.Pattern = re.compile(r"/{2,}")
 """Matches one or more consecutive forward slashes anywhere in a path."""
+
 
 def normalize_path(path: str) -> str:
     """
@@ -54,6 +57,7 @@ def normalize_path(path: str) -> str:
         path = path.rstrip("/")
     return path
 
+
 def normalize_request_path(path: str) -> str:
     """
     Normalise a request path for route resolution.
@@ -77,6 +81,7 @@ def normalize_request_path(path: str) -> str:
         path = path.rstrip("/") or "/"
     return path
 
+
 def strip_regex_anchors(pattern: str) -> str:
     """
     Remove start and end anchors from a regex pattern.
@@ -96,6 +101,7 @@ def strip_regex_anchors(pattern: str) -> str:
     if pattern and pattern[-1] == "$":
         pattern = pattern[:-1]
     return pattern
+
 
 def flatten_middleware(
     *middleware: MiddlewareInput,
@@ -129,19 +135,15 @@ def flatten_middleware(
     """
     flat: list[type[BaseMiddleware | WebSocketMiddleware]] = []
     for entry in middleware:
-        items = (
-            entry
-            if isinstance(entry, (Sequence, AbstractSet))
-            else (entry,)
-        )
+        items = entry if isinstance(entry, (Sequence, AbstractSet)) else (entry,)
         validated = []
         for m in items:
             if not isinstance(m, type) or not issubclass(
-                m, (BaseMiddleware, WebSocketMiddleware),
+                m,
+                (BaseMiddleware, WebSocketMiddleware),
             ):
                 error_msg = (
-                    "All middleware must subclass BaseMiddleware "
-                    "or WebSocketMiddleware"
+                    "All middleware must subclass BaseMiddleware or WebSocketMiddleware"
                 )
                 raise TypeError(error_msg)
             validated.append(m)
@@ -170,6 +172,7 @@ def _middleware_key(
     """
     return middleware.__module__, middleware.__qualname__
 
+
 def is_valid_handler(action: object) -> bool:
     """
     Check whether the route action parser accepts a candidate.
@@ -195,11 +198,12 @@ def is_valid_handler(action: object) -> bool:
     """
     try:
         parse_action(action)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return False
     return True
 
-def parse_action( # NOSONAR
+
+def parse_action(  # NOSONAR
     action: object,
 ) -> tuple[Callable, None] | tuple[type, str]:
     """
@@ -239,10 +243,14 @@ def parse_action( # NOSONAR
     """
     # 1. Invokable controller: bare class passed directly
     if inspect.isclass(action):
-        handler = next((
-            base.__dict__["__call__"] for base in action.__mro__
-            if "__call__" in base.__dict__
-        ), None)
+        handler = next(
+            (
+                base.__dict__["__call__"]
+                for base in action.__mro__
+                if "__call__" in base.__dict__
+            ),
+            None,
+        )
         if isinstance(handler, (staticmethod, classmethod)):
             handler = handler.__func__
         if not callable(handler) or inspect.isabstract(action):
@@ -277,9 +285,7 @@ def parse_action( # NOSONAR
         _callable, _handle = action
 
         if not isinstance(_callable, type) or inspect.isabstract(_callable):
-            error_msg = (
-                "First element of action list must be a concrete class"
-            )
+            error_msg = "First element of action list must be a concrete class"
             raise TypeError(error_msg)
 
         if not isinstance(_handle, str):
@@ -290,11 +296,9 @@ def parse_action( # NOSONAR
         # and is callable before accepting the action.
         handler_attr = getattr(_callable, _handle, None)
         if not callable(handler_attr):
-            error_msg = (
-                f"Class {_callable} does not have method {_handle}"
-            )
+            error_msg = f"Class {_callable} does not have method {_handle}"
             # ValueError is part of the documented public contract.
-            raise ValueError(error_msg)  # noqa: TRY004
+            raise ValueError(error_msg)
 
         return _callable, _handle
 

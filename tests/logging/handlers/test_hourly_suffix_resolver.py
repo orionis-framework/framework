@@ -1,9 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import UTC, datetime, timedelta, timezone
 from orionis.logging.handlers.hourly_suffix_resolver import HourlySuffixResolver
 from orionis.test import TestCase
 
 # Fixed offset used to prove the resolver normalises the timezone.
 _AHEAD = timezone(timedelta(hours=5))
+
 
 def _make_resolver() -> HourlySuffixResolver:
     """Return an hourly resolver pinned to UTC.
@@ -17,8 +20,8 @@ def _make_resolver() -> HourlySuffixResolver:
     resolver.tz = UTC
     return resolver
 
-class TestHourlySuffixResolverSuffix(TestCase):
 
+class TestHourlySuffixResolverSuffix(TestCase):
     def testSuffixUsesTheHourlyPattern(self) -> None:
         """Build the suffix from the date and the hour of the given datetime.
 
@@ -27,7 +30,7 @@ class TestHourlySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = datetime(2025, 4, 9, 14, 30, 45, tzinfo=UTC)
         self.assertEqual(_make_resolver().getSuffix(dt=moment), "2025-04-09_14")
@@ -41,15 +44,15 @@ class TestHourlySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertRegex(
             _make_resolver().getSuffix(),
             r"^\d{4}-\d{2}-\d{2}_\d{2}$",
         )
 
-class TestHourlySuffixResolverRotation(TestCase):
 
+class TestHourlySuffixResolverRotation(TestCase):
     def testNextRotationIsTheStartOfTheFollowingHour(self) -> None:
         """Schedule the next rotation at the top of the next hour.
 
@@ -58,7 +61,7 @@ class TestHourlySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 14, 30, 45, tzinfo=UTC)
         self.assertEqual(
@@ -74,7 +77,7 @@ class TestHourlySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 23, 59, 59, tzinfo=UTC)
         self.assertEqual(
@@ -82,19 +85,18 @@ class TestHourlySuffixResolverRotation(TestCase):
             datetime(2025, 4, 10, 0, 0, 0, tzinfo=UTC),
         )
 
-    def testNextRotationAdoptsTheResolverTimezone(self) -> None:
+    def testNextRotationPreservesTheInstantInTheResolverTimezone(self) -> None:
         """Express the next rotation in the timezone of the resolver.
 
-        Validates that a datetime built in another timezone is relabelled
-        instead of being converted.
+        Convert the supplied instant before rounding to the next local hour.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 14, 30, 0, tzinfo=_AHEAD)
         self.assertEqual(
             _make_resolver().getNextRotationTime(current),
-            datetime(2025, 4, 9, 15, 0, 0, tzinfo=UTC),
+            datetime(2025, 4, 9, 10, 0, 0, tzinfo=UTC),
         )

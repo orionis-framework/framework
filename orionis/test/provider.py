@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415
+# Import the testing engine only when its deferred service is requested.
 """Register testing services in the application container."""
 
 from __future__ import annotations
@@ -6,9 +8,8 @@ from orionis.container.providers.service_provider import ServiceProvider
 from orionis.support.facades.testing import Test as TestFacade
 from orionis.test.contracts.engine import ITestingEngine
 
-class TestingProvider(ServiceProvider, DeferrableProvider):
 
-    # ruff: noqa: PLC0415
+class TestingProvider(ServiceProvider, DeferrableProvider):
     """Register testing services in the application container."""
 
     @classmethod
@@ -31,9 +32,10 @@ class TestingProvider(ServiceProvider, DeferrableProvider):
         Returns
         -------
         None
-            Register the engine implementation under its contract.
+            No return value.
         """
         from orionis.test.core.engine import TestingEngine
+
         self.app.singleton(ITestingEngine, TestingEngine)
 
     async def boot(self) -> None:

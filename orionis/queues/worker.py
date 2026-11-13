@@ -1,32 +1,34 @@
+# ruff: noqa: BLE001, TC001
+# Keep worker annotations resolvable and observe secondary recovery failures.
 """Provide queues operations through ``WorkerOptions``, ``Worker``."""
 
 import asyncio
 import logging
 from contextlib import suppress
 from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING
 from dataclasses import dataclass
 from orionis.failure.runtime import capture, capture_result, operation
+from orionis.foundation.contracts.application import IApplication
 from orionis.queues.context import JobContext
+from orionis.queues.contracts.driver import IQueueDriver
+from orionis.queues.contracts.failed_repository import IFailedJobRepository
+from orionis.queues.contracts.serializer import IJobSerializer
 from orionis.queues.contracts.worker import IWorker
+from orionis.queues.entities.envelope import JobEnvelope
+from orionis.queues.entities.reserved_job import ReservedJob
 from orionis.queues.exceptions import (
-    QueueConfigurationError, QueuePayloadError, QueueRetryError,
+    QueueConfigurationError,
+    QueuePayloadError,
+    QueueRetryError,
 )
 from orionis.queues.functions import current_time, validate_name, validate_seconds
 from orionis.support.concurrency import complete_on_cancel
-
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
-    from orionis.queues.contracts.driver import IQueueDriver
-    from orionis.queues.contracts.failed_repository import IFailedJobRepository
-    from orionis.queues.contracts.serializer import IJobSerializer
-    from orionis.queues.entities.envelope import JobEnvelope
-    from orionis.queues.entities.reserved_job import ReservedJob
 
 _LOGGER = logging.getLogger(__name__)
 """Logger used by ``worker``."""
 type FailedResolver = Callable[[], Awaitable[IFailedJobRepository]]
 """Type alias for ``Callable[[], Awaitable[IFailedJobRepository]]``."""
+
 
 @dataclass(frozen=True, slots=True)
 class WorkerOptions:
@@ -57,10 +59,13 @@ class WorkerOptions:
         orionis.queues.exceptions.QueueConfigurationError
             If concurrency, queue selection, routing names, or durations are invalid.
         """
-        if (isinstance(self.concurrency, bool)
-                or not isinstance(self.concurrency, int)
-                or self.concurrency < 1 or not isinstance(self.queues, tuple)
-                or not self.queues):
+        if (
+            isinstance(self.concurrency, bool)
+            or not isinstance(self.concurrency, int)
+            or self.concurrency < 1
+            or not isinstance(self.queues, tuple)
+            or not self.queues
+        ):
             message = "Worker concurrency and queues are invalid."
             raise QueueConfigurationError(message)
         validate_name(self.connection, "Connection")
@@ -92,8 +97,11 @@ class Worker(IWorker):
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, app: IApplication, driver: IQueueDriver,
-        serializer: IJobSerializer, options: WorkerOptions,
+        self,
+        app: IApplication,
+        driver: IQueueDriver,
+        serializer: IJobSerializer,
+        options: WorkerOptions,
         failed: IFailedJobRepository | FailedResolver | None = None,
     ) -> None:
         """
@@ -193,18 +201,28 @@ class Worker(IWorker):
         Exception
             If a consumer fails, after requesting a stop and joining its peers.
         """
-        if self._running or (max_jobs is not None and (
-                isinstance(max_jobs, bool) or not isinstance(max_jobs, int)
-                or max_jobs < 1)):
+        if self._running or (
+            max_jobs is not None
+            and (
+                isinstance(max_jobs, bool)
+                or not isinstance(max_jobs, int)
+                or max_jobs < 1
+            )
+        ):
             message = "The worker is already running or max_jobs is invalid."
             raise QueueConfigurationError(message)
         self._running = True
         self._started = self._processed = 0
         self._stop.clear()
-        consumers = tuple(asyncio.create_task(self._consume(
-            stop_when_empty=stop_when_empty,
-            max_jobs=max_jobs,
-        )) for _ in range(self._concurrency))
+        consumers = tuple(
+            asyncio.create_task(
+                self._consume(
+                    stop_when_empty=stop_when_empty,
+                    max_jobs=max_jobs,
+                ),
+            )
+            for _ in range(self._concurrency)
+        )
         group = asyncio.gather(*consumers)
         try:
             await complete_on_cancel(group, on_cancel=self.stop)
@@ -218,7 +236,10 @@ class Worker(IWorker):
         return self._processed
 
     async def _consume(
-        self, *, stop_when_empty: bool, max_jobs: int | None,
+        self,
+        *,
+        stop_when_empty: bool,
+        max_jobs: int | None,
     ) -> None:
         """
         Run one consumer in an isolated queue-failure observation context.
@@ -340,11 +361,14 @@ class Worker(IWorker):
         orionis.queues.exceptions.QueueRetryError
             If attempts exceed ``max_tries`` or ``retry_until`` has been reached.
         """
-        if (reserved.id != envelope.id or reserved.queue != envelope.queue
-                or envelope.connection != self._connection
-                or isinstance(reserved.attempts, bool)
-                or not isinstance(reserved.attempts, int)
-                or reserved.attempts < 1):
+        if (
+            reserved.id != envelope.id
+            or reserved.queue != envelope.queue
+            or envelope.connection != self._connection
+            or isinstance(reserved.attempts, bool)
+            or not isinstance(reserved.attempts, int)
+            or reserved.attempts < 1
+        ):
             message = "The reserved job does not match its envelope routing."
             raise QueuePayloadError(message)
         if envelope.timeout is None or envelope.timeout >= self._retry_after:
@@ -353,8 +377,7 @@ class Worker(IWorker):
         if reserved.attempts > envelope.max_tries:
             message = "The job exhausted its attempts before this reservation."
             raise QueueRetryError(message)
-        if (envelope.retry_until is not None
-                and current_time() >= envelope.retry_until):
+        if envelope.retry_until is not None and current_time() >= envelope.retry_until:
             message = "The job retry deadline expired before execution."
             raise QueueRetryError(message)
 
@@ -405,8 +428,13 @@ class Worker(IWorker):
                 )
                 raise
             return
-        with operation(self._app, flow="queue", operation="execute",
-                       correlation_id=reserved.id, isolated=True):
+        with operation(
+            self._app,
+            flow="queue",
+            operation="execute",
+            correlation_id=reserved.id,
+            isolated=True,
+        ):
             envelope = None
             context = JobContext(self._driver, reserved, self._connection, self._fail)
             try:
@@ -437,9 +465,13 @@ class Worker(IWorker):
                     )
                     if not context.finished:
                         try:
-                            await self._handleFailure(reserved, envelope, exception,
-                                                      raise_errors=raise_errors)
-                        except Exception as recovery_error:  # noqa: BLE001
+                            await self._handleFailure(
+                                reserved,
+                                envelope,
+                                exception,
+                                raise_errors=raise_errors,
+                            )
+                        except Exception as recovery_error:
                             # Retain an unacknowledged lease for crash recovery.
                             await self._observe(
                                 recovery_error,
@@ -472,7 +504,7 @@ class Worker(IWorker):
         """
         try:
             await self._driver.release(reserved)
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:
             # Preserve cancellation while leaving an unacknowledged lease.
             await self._observe(
                 error,
@@ -483,8 +515,12 @@ class Worker(IWorker):
             )
 
     async def _observe(
-        self, error: Exception, reserved: ReservedJob, phase: str,
-        message: str, *args: object,
+        self,
+        error: Exception,
+        reserved: ReservedJob,
+        phase: str,
+        message: str,
+        *args: object,
     ) -> None:
         """
         Observe a job failure without letting fallback logging replace it.
@@ -592,11 +628,15 @@ class Worker(IWorker):
         if envelope is not None and envelope.backoff:
             index = min(reserved.attempts - 1, len(envelope.backoff) - 1)
             delay = envelope.backoff[index]
-        retry = (not raise_errors and envelope is not None
-                 and reserved.attempts < envelope.max_tries
-                 and not isinstance(exception, (QueuePayloadError,
-                                                QueueConfigurationError,
-                                                QueueRetryError)))
+        retry = (
+            not raise_errors
+            and envelope is not None
+            and reserved.attempts < envelope.max_tries
+            and not isinstance(
+                exception,
+                (QueuePayloadError, QueueConfigurationError, QueueRetryError),
+            )
+        )
         if retry and envelope.retry_until is not None:
             retry = current_time() + delay < envelope.retry_until
         if retry:

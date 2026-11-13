@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import tests.orm.query.test_base_builder as language_fixtures
@@ -18,6 +21,7 @@ if TYPE_CHECKING:
     from sqlalchemy.sql.selectable import CompoundSelect, Select
     from orionis.orm.query.expressions import SelectPlan
 
+
 class _RecordingCompiler(SQLCompiler):
     """Count SELECT plans passed through the real SQL compiler."""
 
@@ -29,7 +33,7 @@ class _RecordingCompiler(SQLCompiler):
         Returns
         -------
         None
-            Prepare an independent compiler for the current test connection.
+            No return value.
         """
         super().__init__()
         self.select_count = 0
@@ -50,7 +54,10 @@ class _RecordingCompiler(SQLCompiler):
         self.select_count += 1
         return super().compileSelect(plan)
 
+
 class TestEagerLoading(relation_fixtures._RelationsTestCase):
+    """Verify relation loading across hydrated result collections."""
+
     async def testWithLoadsHasManyForEveryModel(self) -> None:
         """Eager load a hasMany relationship across an entire result set.
 
@@ -59,7 +66,7 @@ class TestEagerLoading(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ana = await relation_fixtures.Author.create({"name": "Ana"})
         bob = await relation_fixtures.Author.create({"name": "Bob"})
@@ -89,7 +96,7 @@ class TestEagerLoading(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.Book.create({"title": "One", "author_id": author.id})
@@ -105,7 +112,7 @@ class TestEagerLoading(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.AuthorProfile.create(
@@ -126,7 +133,7 @@ class TestEagerLoading(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.Book.create({"title": "One", "author_id": author.id})
@@ -150,7 +157,7 @@ class TestEagerLoading(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.Book.create({"title": "One", "author_id": author.id})
@@ -166,7 +173,7 @@ class TestEagerLoading(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.Book.create({"title": "One", "author_id": author.id})
@@ -184,7 +191,7 @@ class TestEagerLoading(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         book = await relation_fixtures.Book.create({"title": "One"})
         fiction = await relation_fixtures.Tag.create({"name": "fiction"})
@@ -202,11 +209,12 @@ class TestEagerLoading(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         self.assertFalse(author.relationLoaded("books"))
         self.assertIsNone(author.getRelation("books"))
+
 
 class TestScopes(feature_fixtures._ModelFeatureTestCase):
     """Local and global query scopes."""
@@ -219,7 +227,7 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         models = await feature_fixtures.Account.query().active().get()
@@ -233,7 +241,7 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         models = await feature_fixtures.Account.active().get()
@@ -247,7 +255,7 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         models = await feature_fixtures.Account.query().ofRole("guest").get()
@@ -261,7 +269,7 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ScopeNotFoundException):
             feature_fixtures.Account.query().scope("ghost")
@@ -274,10 +282,10 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(AttributeError):
-            feature_fixtures.Account.query().ghost  # noqa: B018
+            _ = feature_fixtures.Account.query().ghost
 
     async def testGlobalScopeAppliesToEveryQuery(self) -> None:
         """Constrain every query of the model.
@@ -287,7 +295,7 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         feature_fixtures.Account.addGlobalScope(
@@ -304,7 +312,7 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         feature_fixtures.Account.addGlobalScope(
@@ -328,7 +336,7 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seed()
         feature_fixtures.Account.addGlobalScope(
@@ -344,11 +352,12 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Verify SQL parity, detached scopes, and subsequent unscoped reads.
+            No return value.
         """
         await self.seed()
         feature_fixtures.Account.addGlobalScope(
-            "active", lambda query: query.where("active", True),
+            "active",
+            lambda query: query.where("active", True),
         )
         query = feature_fixtures.Account.query()
         original_plan = query.toPlan()
@@ -377,7 +386,7 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
         Returns
         -------
         None
-            Verify filter selection without modifying the original plans.
+            No return value.
         """
         cases = (
             (feature_fixtures.Account.query(), "IS NULL"),
@@ -399,7 +408,10 @@ class TestScopes(feature_fixtures._ModelFeatureTestCase):
             feature_fixtures.Account.active().toSql(literal_binds=True),
         )
 
+
 class TestModelBuilderContract(TestCase):
+    """Verify model factories return the declared query interface."""
+
     def testBuilderImplementsContract(self) -> None:
         """Implement the IModelQueryBuilder contract.
 
@@ -408,9 +420,10 @@ class TestModelBuilderContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(plan_fixtures._Item.query(), IModelQueryBuilder)
+
 
 class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
     """The model builder and the model-less builder are one engine."""
@@ -423,7 +436,7 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         models = await (
@@ -443,7 +456,7 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -465,7 +478,7 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -489,7 +502,7 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         model_plan = (
             language_fixtures._User.query()
@@ -525,7 +538,7 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(ModelQueryBuilder, QueryBuilderBase))
         self.assertTrue(issubclass(RawQueryBuilder, QueryBuilderBase))
@@ -536,15 +549,20 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Verify class forwarding, parameter privacy, and repeatable rendering.
+            No return value.
         """
         model_query = (
             language_fixtures._User.where("name", "O'Reilly")
-            .select("name").orderBy("id").limit(3)
+            .select("name")
+            .orderBy("id")
+            .limit(3)
         )
         raw_query = (
-            DB.table("users").where("name", "O'Reilly")
-            .select("name").orderBy("id").limit(3)
+            DB.table("users")
+            .where("name", "O'Reilly")
+            .select("name")
+            .orderBy("id")
+            .limit(3)
         )
         for literal_binds in (False, True):
             with self.subTest(literal_binds=literal_binds):
@@ -568,14 +586,16 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Verify named connection routing without creating its database engine.
+            No return value.
         """
         self._manager.addConnection(
-            "debug", {"driver": "mysql", "database": "debug", "prefix": "app_"},
+            "debug",
+            {"driver": "mysql", "database": "debug", "prefix": "app_"},
         )
         queries = (
             DB.table("users", connection="debug").where("name", "marker"),
-            language_fixtures._User.query().adoptConnection("debug")
+            language_fixtures._User.query()
+            .adoptConnection("debug")
             .where("name", "marker"),
         )
         for query in queries:
@@ -591,7 +611,7 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Verify the same target guard used by ordinary raw retrieval.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             RawQueryBuilder().toSql()
@@ -602,36 +622,60 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
         Returns
         -------
         None
-            Verify groups, IN, joins, raw bindings, subqueries, unions, and paging.
+            No return value.
         """
         await self.seedUsers()
-        await DB.table("posts").insert([
-            {"user_id": 1, "title": "first", "views": 3},
-            {"user_id": 2, "title": "second", "views": 7},
-        ])
+        await DB.table("posts").insert(
+            [
+                {"user_id": 1, "title": "first", "views": 3},
+                {"user_id": 2, "title": "second", "views": 7},
+            ],
+        )
         queries = (
-            DB.table("users").select("name")
+            DB.table("users")
+            .select("name")
             .where("active", True)
-            .where(lambda query: query.where("role", "admin").orWhere(
-                "role", "manager",
-            ))
-            .whereIn("country", ["CO", "MX"]).orderBy("name").limit(2),
-            DB.table("users", alias="u").select("u.name", "p.title")
+            .where(
+                lambda query: query.where("role", "admin").orWhere(
+                    "role",
+                    "manager",
+                ),
+            )
+            .whereIn("country", ["CO", "MX"])
+            .orderBy("name")
+            .limit(2),
+            DB.table("users", alias="u")
+            .select("u.name", "p.title")
             .join("posts", "p.user_id", "=", "u.id", alias="p")
             .whereRaw("p.views > :floor", {"floor": 3})
-            .whereExists(lambda query: query.table("posts").select("id")
-                         .whereColumn("posts.user_id", "=", "u.id"))
+            .whereExists(
+                lambda query: (
+                    query.table("posts")
+                    .select("id")
+                    .whereColumn("posts.user_id", "=", "u.id")
+                ),
+            )
             .orderBy("u.id"),
-            DB.table("posts").select("user_id")
-            .selectRaw("count(*)", alias="total").groupBy("user_id")
+            DB.table("posts")
+            .select("user_id")
+            .selectRaw("count(*)", alias="total")
+            .groupBy("user_id")
             .havingRaw("count(*) >= :minimum", {"minimum": 1})
             .orderBy("user_id"),
-            DB.table("users").select("name")
+            DB.table("users")
+            .select("name")
             .whereRaw("role = :role", {"role": "admin"})
-            .unionAll(DB.table("users").select("name").whereRaw(
-                "role = :role", {"role": "manager"},
-            ))
-            .orderBy("name").limit(2).offset(1),
+            .unionAll(
+                DB.table("users")
+                .select("name")
+                .whereRaw(
+                    "role = :role",
+                    {"role": "manager"},
+                ),
+            )
+            .orderBy("name")
+            .limit(2)
+            .offset(1),
         )
         for index, query in enumerate(queries):
             with self.subTest(query=index):
@@ -642,6 +686,7 @@ class TestModelSharesTheEngine(language_fixtures._QueryLanguageTestCase):
                 rendered_rows = await self._manager.connection().select(sql)
                 self.assertEqual(rendered_rows, list(await query.get()))
 
+
 class TestEagerLoadCloning(TestCase):
     """Check terminal guards and execution-context isolation."""
 
@@ -651,12 +696,13 @@ class TestEagerLoadCloning(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         query = fixtures.Author.query().withRelations("books", "books")
         clone = query.clone().withRelations("profile", "books")
         self.assertEqual(list(query._eager_loads), ["books"])
         self.assertEqual(list(clone._eager_loads), ["books", "profile"])
+
 
 class TestModelTerminalIsolation(fixtures._RelationsTestCase):
     """Exercise repeated terminals and relation writes against SQLite."""
@@ -667,7 +713,7 @@ class TestModelTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await fixtures.Book.create({"title": "first"})
         await fixtures.Book.create({"title": "second"})
@@ -682,7 +728,7 @@ class TestModelTerminalIsolation(fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await fixtures.Author.create({"name": "author"})
         connection = self._manager.connection()

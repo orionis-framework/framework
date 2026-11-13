@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from abc import ABC
@@ -5,9 +7,15 @@ from orionis.container.contracts.facade import IFacade
 from orionis.container.facades.facade import Facade
 from orionis.test import TestCase
 
-_ABSTRACT_METHODS = frozenset({
-    "getFacadeAccessor", "resolve", "pin", "unpin",
-})
+_ABSTRACT_METHODS = frozenset(
+    {
+        "getFacadeAccessor",
+        "resolve",
+        "pin",
+        "unpin",
+    },
+)
+
 
 class _StubFacade(IFacade):
     """Minimal IFacade implementation used only for structural tests."""
@@ -48,7 +56,7 @@ class _StubFacade(IFacade):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     @classmethod
@@ -58,11 +66,11 @@ class _StubFacade(IFacade):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
-class TestIFacade(TestCase):
 
+class TestIFacade(TestCase):
     def testContractIsAnAbstractBaseClass(self) -> None:
         """
         Declare IFacade as an ABC that cannot be instantiated directly.
@@ -70,7 +78,7 @@ class TestIFacade(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertTrue(issubclass(IFacade, ABC))
         with self.assertRaises(TypeError):
@@ -83,7 +91,7 @@ class TestIFacade(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(IFacade.__abstractmethods__, _ABSTRACT_METHODS)
 
@@ -94,24 +102,22 @@ class TestIFacade(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsInstance(_StubFacade(), IFacade)
 
     def testFacadeImplementationMatchesTheContractSignatures(self) -> None:
-        """
-        Keep the Facade parameter names aligned with the contract.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
+        """Match runtime parameter kinds, defaults, annotations, and return types."""
         for name in sorted(_ABSTRACT_METHODS):
-            expected = list(
-                inspect.signature(getattr(IFacade, name)).parameters,
-            )
-            actual = list(
-                inspect.signature(getattr(Facade, name)).parameters,
-            )
-            self.assertEqual(actual, expected, f"signature drift on {name!r}")
+            with self.subTest(method=name):
+                expected = inspect.signature(getattr(IFacade, name), eval_str=True)
+                actual = inspect.signature(getattr(Facade, name), eval_str=True)
+                self.assertEqual(
+                    [item for key, item in actual.parameters.items() if key != "self"],
+                    [
+                        item
+                        for key, item in expected.parameters.items()
+                        if key != "self"
+                    ],
+                )
+                self.assertEqual(actual.return_annotation, expected.return_annotation)

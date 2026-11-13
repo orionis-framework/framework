@@ -30,6 +30,7 @@ EXPECTED_EXPORTS = {
     "UniqueFake": ("orionis.orm.factories.fake", "UniqueFake"),
 }
 
+
 class TestFactoriesPackage(TestCase):
     """Verify the orionis.orm.factories public export surface."""
 
@@ -39,6 +40,6 @@ class TestFactoriesPackage(TestCase):
         Returns
         -------
         None
-            Verify exact exported names and identities without shadowing modules.
+            No return value.
         """
         assert_package_exports(self, "orionis.orm.factories", EXPECTED_EXPORTS)

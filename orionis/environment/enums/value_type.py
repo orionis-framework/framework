@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class EnvironmentValueType(Enum):
     """
     Define supported types for casting environment variable values.

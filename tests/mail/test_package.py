@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import ModuleType
 import orionis.mail as mail_package
 from orionis.mail import (
@@ -16,8 +18,8 @@ from orionis.mail.contracts.transport import IMailTransport
 from orionis.test import TestCase
 from tests.mail.test_composer import RecordingDelivery
 
-class TestMailPackage(TestCase):
 
+class TestMailPackage(TestCase):
     def testDeclaresTheConsumerFacingSurface(self) -> None:
         """Export the values and base classes consumers compose mail with.
 

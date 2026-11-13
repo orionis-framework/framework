@@ -10,6 +10,7 @@ from orionis.support.entities.base import BaseEntity
 _DEFAULT_PATH: str = "storage/logs/monthly_{suffix}.log"
 """Default path identifier: ``storage/logs/monthly_{suffix}.log``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Monthly(BaseEntity):
     """
@@ -50,7 +51,8 @@ class Monthly(BaseEntity):
     retention_months: int = field(
         default_factory=lambda: (
             Env.get("LOG_RETENTION", 4)
-            if Env.get("LOG_CHANNEL", "stack") == "monthly" else 4
+            if Env.get("LOG_CHANNEL", "stack") == "monthly"
+            else 4
         ),
         metadata={
             "description": (

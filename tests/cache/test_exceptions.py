@@ -1,9 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.cache.exceptions import CacheException, CacheStoreException
 from orionis.test import TestCase
 
-class TestCacheExceptions(TestCase):
 
+class TestCacheExceptions(TestCase):
     def testCacheExceptionInheritsFromException(self) -> None:
         """Verify CacheException is a subclass of Exception.
 
@@ -13,7 +15,7 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(CacheException, Exception))
 
@@ -26,22 +28,9 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(CacheStoreException, CacheException))
-
-    def testCacheStoreExceptionInheritsFromException(self) -> None:
-        """Verify CacheStoreException is also a subclass of Exception.
-
-        Validates the full chain: CacheStoreException → CacheException
-        → Exception.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertTrue(issubclass(CacheStoreException, Exception))
 
     def testRaiseCacheExceptionWithMessage(self) -> None:
         """Raise CacheException and confirm the message is preserved.
@@ -52,12 +41,8 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        CacheException
-            Raised by this helper to exercise the failure path.
         """
         msg = "base cache error"
         with self.assertRaises(CacheException) as ctx:
@@ -73,12 +58,8 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        CacheStoreException
-            Raised by this helper to exercise the failure path.
         """
         msg = "unknown store: foobar"
         with self.assertRaises(CacheStoreException) as ctx:
@@ -94,12 +75,8 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        CacheStoreException
-            Raised by this helper to exercise the failure path.
         """
         msg = "store not configured"
         with self.assertRaises(CacheException):
@@ -114,12 +91,8 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        CacheException
-            Raised by this helper to exercise the failure path.
         """
         with self.assertRaises(CacheException):
             raise CacheException
@@ -133,12 +106,8 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        CacheStoreException
-            Raised by this helper to exercise the failure path.
         """
         with self.assertRaises(CacheStoreException):
             raise CacheStoreException
@@ -152,7 +121,7 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(issubclass(CacheException, CacheStoreException))
 
@@ -165,7 +134,7 @@ class TestCacheExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = CacheException("code", 404)
         self.assertEqual(exc.args, ("code", 404))

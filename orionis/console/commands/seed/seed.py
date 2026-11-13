@@ -1,12 +1,13 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Apply every database seeder that has not been run yet."""
 
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.seeders.runner import SeederRunner
 
+
 class SeedCommand(MigrationCommand):
     """Apply every database seeder that has not been run yet."""
-
-    # ruff: noqa: TC001
 
     signature: str = "seed"
     """Signature identifier: ``seed``."""

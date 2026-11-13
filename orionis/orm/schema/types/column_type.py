@@ -3,6 +3,7 @@
 from __future__ import annotations
 from enum import StrEnum
 
+
 class ColumnType(StrEnum):
     """
     Logical column types understood by the Orionis SQL compiler.

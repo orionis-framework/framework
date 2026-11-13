@@ -1,3 +1,5 @@
+# ruff: noqa: C901
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Translate HTTP responses into ASGI protocol messages."""
 
 from __future__ import annotations
@@ -15,6 +17,7 @@ if TYPE_CHECKING:
     from pathlib import Path
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
+
 class ASGIResponseAdapter(ResponseAdapter):
     """Translate HTTP responses into ASGI protocol messages."""
 
@@ -26,7 +29,7 @@ class ASGIResponseAdapter(ResponseAdapter):
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    async def send(  # noqa: C901  # NOSONAR
+    async def send(  # NOSONAR
         self,
         adapter: TransportAdapter,
         response: Response,
@@ -86,27 +89,31 @@ class ASGIResponseAdapter(ResponseAdapter):
             if range_values is not None:
                 start, end = range_values
                 headers = [
-                    pair for pair in headers
-                    if pair[0] not in {
+                    pair
+                    for pair in headers
+                    if pair[0]
+                    not in {
                         b"content-length",
                         b"content-range",
                         b"accept-ranges",
                     }
                 ]
-                headers.extend((
+                headers.extend(
                     (
-                        b"content-length",
-                        str(end - start).encode("ascii"),
+                        (
+                            b"content-length",
+                            str(end - start).encode("ascii"),
+                        ),
+                        (
+                            b"content-range",
+                            f"bytes {start}-{end - 1}/{file_size}".encode("ascii"),
+                        ),
+                        (
+                            b"accept-ranges",
+                            b"bytes",
+                        ),
                     ),
-                    (
-                        b"content-range",
-                        f"bytes {start}-{end - 1}/{file_size}".encode("ascii"),
-                    ),
-                    (
-                        b"accept-ranges",
-                        b"bytes",
-                    ),
-                ))
+                )
                 status = 206
                 stream = self.__fileRangeIterator(response.getPath(), start, end)
 
@@ -139,9 +146,13 @@ class ASGIResponseAdapter(ResponseAdapter):
 
         started = False
         try:
-            await send({
-                "type": self.RESPONSE_START, "status": status, "headers": headers,
-            })
+            await send(
+                {
+                    "type": self.RESPONSE_START,
+                    "status": status,
+                    "headers": headers,
+                },
+            )
             started = True
             await send({"type": self.RESPONSE_BODY, "body": body, "more_body": False})
         except Exception as error:
@@ -186,29 +197,35 @@ class ASGIResponseAdapter(ResponseAdapter):
         """
         self.__ensureContentLength(headers, response)
         started = False
+        failure = None
         try:
-            await send({
-                "type": self.RESPONSE_START,
-                "status": status,
-                "headers": headers,
-            })
-            started = True
-            await send({
-                "type": self.RESPONSE_BODY,
-                "body": b"",
-                "more_body": False,
-            })
-        except Exception as error:
-            await capture(
-                error,
-                flow="http",
-                phase="send",
-                metadata={"transport": "asgi", "response_started": started},
+            await send(
+                {
+                    "type": self.RESPONSE_START,
+                    "status": status,
+                    "headers": headers,
+                },
             )
+            started = True
+            await send(
+                {
+                    "type": self.RESPONSE_BODY,
+                    "body": b"",
+                    "more_body": False,
+                },
+            )
+        except BaseException as error:
+            failure = error
+            if isinstance(error, Exception):
+                await capture(
+                    error,
+                    flow="http",
+                    phase="send",
+                    metadata={"transport": "asgi", "response_started": started},
+                )
             raise
         finally:
-            if isinstance(response, EventStreamResponse):
-                await response.getStream().aclose()
+            await close_stream(response.getStream(), failure)
         if (
             response.background is not None
             or type(response).runBackground is not Response.runBackground
@@ -216,7 +233,8 @@ class ASGIResponseAdapter(ResponseAdapter):
             await response.runBackground()
 
     async def __waitDisconnect(
-        self, receive: Callable[..., Awaitable[dict]],
+        self,
+        receive: Callable[..., Awaitable[dict]],
     ) -> None:
         """
         Wait for disconnect, draining unconsumed request messages.
@@ -273,14 +291,22 @@ class ASGIResponseAdapter(ResponseAdapter):
         failure = None
         started = False
         try:
-            await send({
-                "type": self.RESPONSE_START, "status": status, "headers": headers,
-            })
+            await send(
+                {
+                    "type": self.RESPONSE_START,
+                    "status": status,
+                    "headers": headers,
+                },
+            )
             started = True
             async for chunk in iterator:
-                await send({
-                    "type": self.RESPONSE_BODY, "body": chunk, "more_body": True,
-                })
+                await send(
+                    {
+                        "type": self.RESPONSE_BODY,
+                        "body": chunk,
+                        "more_body": True,
+                    },
+                )
         except BaseException as exc:
             failure = exc
             if isinstance(exc, Exception):
@@ -293,9 +319,13 @@ class ASGIResponseAdapter(ResponseAdapter):
             raise
         finally:
             await close_stream(iterator, failure)
-        await send({
-            "type": self.RESPONSE_BODY, "body": b"", "more_body": False,
-        })
+        await send(
+            {
+                "type": self.RESPONSE_BODY,
+                "body": b"",
+                "more_body": False,
+            },
+        )
 
     def __ensureContentLength(
         self,

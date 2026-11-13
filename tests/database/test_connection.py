@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import traceback
 from importlib.util import find_spec
@@ -24,6 +26,12 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer, String
 from orionis.test import TestCase
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from orionis.database.entities.result import InsertResult
+
+
 def _make_table() -> TableDefinition:
     """Build the table definition shared by the connection tests.
 
@@ -40,8 +48,8 @@ def _make_table() -> TableDefinition:
         column.name = key
     return TableDefinition(name="items", columns=columns, primary_key="id")
 
-class TestConnection(TestCase):
 
+class TestConnection(TestCase):
     async def asyncSetUp(self) -> None:
         """Create an in-memory connection with a fresh table per test.
 
@@ -50,28 +58,17 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._table = _make_table()
         self._connection = Connection(
             "sqlite",
             {"driver": "sqlite", "database": ":memory:", "prefix": ""},
         )
+        self.addAsyncCleanup(self._connection.disconnect)
         await self._connection.createTable(self._table)
 
-    async def asyncTearDown(self) -> None:
-        """Dispose the engine after each test.
-
-        Releases the pooled in-memory database.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._connection.disconnect()
-
-    async def _insert(self, name: str):
+    async def _insert(self, name: str) -> InsertResult:
         """Insert a row and return the insert result.
 
         Parameters
@@ -97,7 +94,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._insert("alpha")
         self.assertEqual(result.last_insert_id, 1)
@@ -111,7 +108,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = InsertPlan(
             table=self._table,
@@ -129,7 +126,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._insert("alpha")
         rows = await self._connection.select(SelectPlan(table=self._table))
@@ -144,7 +141,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._insert("alpha")
         plan = SelectPlan(table=self._table, columns=("name",))
@@ -159,7 +156,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._insert("alpha")
         await self._insert("beta")
@@ -178,7 +175,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._insert("alpha")
         await self._insert("beta")
@@ -193,7 +190,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._insert("alpha")
         plan = SelectPlan(table=self._table, columns=("name",))
@@ -207,7 +204,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plan = SelectPlan(table=self._table, columns=("name",))
         self.assertIsNone(await self._connection.scalar(plan))
@@ -222,7 +219,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._insert("alpha")
         rows = await self._connection.select(
@@ -239,7 +236,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._insert("alpha")
         affected = await self._connection.execute(
@@ -256,7 +253,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         done = await self._connection.statement(
             "CREATE TABLE extra (id INTEGER PRIMARY KEY)",
@@ -271,7 +268,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(QueryException):
             await self._connection.select("SELECT * FROM missing_table")
@@ -282,7 +279,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         credential = "private-value-that-must-not-be-logged"
         with self.assertRaises(QueryException) as caught:
@@ -306,7 +303,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         async with self._connection.transaction():
             await self._insert("kept")
@@ -321,12 +318,8 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised by this helper to exercise the failure path.
         """
         with self.assertRaises(RuntimeError):
             async with self._connection.transaction():
@@ -344,12 +337,8 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        RuntimeError
-            Raised by this helper to exercise the failure path.
         """
         async with self._connection.transaction():
             await self._insert("outer")
@@ -369,7 +358,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(self._connection.inTransaction())
         await self._connection.begin()
@@ -392,7 +381,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TransactionException):
             await self._connection.commit()
@@ -405,7 +394,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TransactionException):
             await self._connection.rollback()
@@ -420,7 +409,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._connection.dropTable("items")
         with self.assertRaises(QueryException):
@@ -434,7 +423,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(QueryException):
             await self._connection.createTable(self._table, if_not_exists=False)
@@ -447,11 +436,12 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._connection.dropTable("items")
         with self.assertRaises(QueryException):
             await self._connection.dropTable("items", if_exists=False)
+
     # ── Configuration and lifecycle ────────────────────────────────────────────────
 
     async def testUnsupportedDriverFailsAtConstruction(self) -> None:
@@ -462,7 +452,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(UnsupportedDriverException):
             Connection("bad", {"driver": "mssql-legacy"})
@@ -475,7 +465,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._connection.getName(), "sqlite")
 
@@ -487,7 +477,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(self._connection.transaction(), ITransaction)
 
@@ -499,7 +489,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._connection.disconnect()
         await self._connection.disconnect()
@@ -512,7 +502,7 @@ class TestConnection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connection = Connection(
             "tuned",
@@ -533,15 +523,15 @@ class TestConnection(TestCase):
         finally:
             await connection.disconnect()
 
-class TestConnectionSqlCompilation(TestCase):
 
+class TestConnectionSqlCompilation(TestCase):
     def testToSqlKeepsValuesBoundAndDoesNotCreateAnEngine(self) -> None:
         """Render placeholders and prefixes without initializing the database.
 
         Returns
         -------
         None
-            Assertions verify offline compilation and parameter privacy.
+            No return value.
         """
         connection = Connection(
             "debug",
@@ -567,10 +557,11 @@ class TestConnectionSqlCompilation(TestCase):
         Returns
         -------
         None
-            Assertions verify string escaping and offline literal rendering.
+            No return value.
         """
         connection = Connection(
-            "debug", {"driver": "sqlite", "database": ":memory:"},
+            "debug",
+            {"driver": "sqlite", "database": ":memory:"},
         )
         plan = SelectPlan(
             table=_make_table(),
@@ -588,18 +579,23 @@ class TestConnectionSqlCompilation(TestCase):
         Returns
         -------
         None
-            Assertions verify populated and empty expanding parameters.
+            No return value.
         """
         connection = Connection(
-            "debug", {"driver": "sqlite", "database": ":memory:"},
+            "debug",
+            {"driver": "sqlite", "database": ":memory:"},
         )
         for values in ([1, 2, 3], []):
             with self.subTest(values=values):
                 plan = SelectPlan(
                     table=_make_table(),
-                    wheres=[WhereClause(
-                        column="id", where_type=WhereType.IN, value=values,
-                    )],
+                    wheres=[
+                        WhereClause(
+                            column="id",
+                            where_type=WhereType.IN,
+                            value=values,
+                        ),
+                    ],
                 )
                 sql = connection.toSql(plan)
                 literal_sql = connection.toSql(plan, literal_binds=True)
@@ -617,10 +613,11 @@ class TestConnectionSqlCompilation(TestCase):
         Returns
         -------
         None
-            Assertions verify framework errors without sensitive values.
+            No return value.
         """
         connection = Connection(
-            "debug", {"driver": "sqlite", "database": ":memory:"},
+            "debug",
+            {"driver": "sqlite", "database": ":memory:"},
         )
         credential = "private-value-that-must-not-be-logged"
         plan = SelectPlan(
@@ -632,9 +629,12 @@ class TestConnectionSqlCompilation(TestCase):
             connection.toSql(plan, literal_binds=True)
 
         self.assertIn("CompileError", str(caught.exception))
-        self.assertNotIn(credential, "".join(
-            traceback.format_exception(caught.exception),
-        ))
+        self.assertNotIn(
+            credential,
+            "".join(
+                traceback.format_exception(caught.exception),
+            ),
+        )
         self.assertTrue(caught.exception.__suppress_context__)
         self.assertIsNone(connection._engine)
 
@@ -644,7 +644,7 @@ class TestConnectionSqlCompilation(TestCase):
         Returns
         -------
         None
-            Verify five SQL dialects without database engines or connections.
+            No return value.
         """
         table = TableDefinition(name="order", columns=_make_table().columns)
         plan = SelectPlan(
@@ -661,18 +661,25 @@ class TestConnectionSqlCompilation(TestCase):
         )
         for driver, quoted_table, placeholder in cases:
             with self.subTest(driver=driver):
-                connection = Connection("debug", {
-                    "driver": driver,
-                    "database": "debug",
-                    "dsn": "127.0.0.1:1521/debug",
-                })
+                connection = Connection(
+                    "debug",
+                    {
+                        "driver": driver,
+                        "database": "debug",
+                        "dsn": "127.0.0.1:1521/debug",
+                    },
+                )
                 sql = connection.toSql(plan)
                 self.assertIn("FROM " + quoted_table, sql)
                 self.assertIn(quoted_table + ".name = " + placeholder, sql)
                 self.assertNotIn("private-marker", sql)
-                self.assertIn("'private-marker'", connection.toSql(
-                    plan, literal_binds=True,
-                ))
+                self.assertIn(
+                    "'private-marker'",
+                    connection.toSql(
+                        plan,
+                        literal_binds=True,
+                    ),
+                )
                 self.assertIsNone(connection._engine)
 
     def testToSqlHandlesTheOptionalRedshiftDialect(self) -> None:
@@ -681,10 +688,11 @@ class TestConnectionSqlCompilation(TestCase):
         Returns
         -------
         None
-            Verify optional dependency handling without starting a SQL engine.
+            No return value.
         """
         connection = Connection(
-            "debug", {"driver": "redshift", "database": "debug"},
+            "debug",
+            {"driver": "redshift", "database": "debug"},
         )
         plan = SelectPlan(table=TableDefinition(name="items"), columns=("name",))
         if find_spec("sqlalchemy_redshift") is None:
@@ -700,7 +708,7 @@ class TestConnectionSqlCompilation(TestCase):
         Returns
         -------
         None
-            Verify cached dialect reuse without acquiring database connections.
+            No return value.
         """
         factories = (
             lambda: create_async_engine("sqlite+aiosqlite://", paramstyle="named"),
@@ -708,7 +716,8 @@ class TestConnectionSqlCompilation(TestCase):
         )
         for factory in factories:
             connection = Connection(
-                "debug", {"driver": "sqlite", "database": ":memory:"},
+                "debug",
+                {"driver": "sqlite", "database": ":memory:"},
             )
             engine = factory()
             connection._engine = engine

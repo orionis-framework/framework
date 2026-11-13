@@ -1,5 +1,8 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.base.controller import BaseController
 from orionis.test import TestCase
+
 
 class TestBaseController(TestCase):
     """Unit tests for the BaseController marker class."""
@@ -56,9 +59,7 @@ class TestBaseController(TestCase):
             Assertions verify the behavior described above.
         """
         public_methods = [
-            name
-            for name in dir(BaseController)
-            if not name.startswith("_")
+            name for name in dir(BaseController) if not name.startswith("_")
         ]
         self.assertEqual(public_methods, [])
 

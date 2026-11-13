@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, PT027, S608
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Interpolate only fixed fixture table names; bind every row value.
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
@@ -16,6 +19,7 @@ from orionis.orm.query_builder import QueryBuilder
 from orionis.orm.resolver import ConnectionResolver
 from orionis.test import TestCase
 
+
 class TestAdminSeeder(TestCase):
     """Exercise the real user model and authorization tables together."""
 
@@ -26,13 +30,16 @@ class TestAdminSeeder(TestCase):
         Returns
         -------
         None
-            Test dependencies are ready to use.
+            No return value.
         """
-        self.connection = Connection("admin_seeder", {
-            "driver": "sqlite",
-            "database": ":memory:",
-            "foreign_key_constraints": True,
-        })
+        self.connection = Connection(
+            "admin_seeder",
+            {
+                "driver": "sqlite",
+                "database": ":memory:",
+                "foreign_key_constraints": True,
+            },
+        )
         self.addAsyncCleanup(self.connection.disconnect)
         for definition in (USERS_V1, *build_authorization_tables()):
             await self.connection.createTable(definition)
@@ -44,11 +51,13 @@ class TestAdminSeeder(TestCase):
         self.registrar = PermissionRegistrar(QueryBuilder(manager))
         self.hasher = Argon2Hasher(memory=8, threads=1, time=1)
         self.hashMake = AsyncMock(side_effect=self.hasher.make)
-        self.enterContext(patch.object(
-            admin_seeder,
-            "Hash",
-            SimpleNamespace(make=self.hashMake),
-        ))
+        self.enterContext(
+            patch.object(
+                admin_seeder,
+                "Hash",
+                SimpleNamespace(make=self.hashMake),
+            ),
+        )
 
     async def _run(self) -> None:
         """
@@ -57,7 +66,7 @@ class TestAdminSeeder(TestCase):
         Returns
         -------
         None
-            Changes commit together or roll back together.
+            No return value.
         """
         with migration_connection_scope(self.connection):
             async with self.connection.transaction():
@@ -73,7 +82,7 @@ class TestAdminSeeder(TestCase):
         Returns
         -------
         None
-            Verify the admin password is hashed and associations are exact.
+            No return value.
         """
         await self._run()
 
@@ -96,21 +105,32 @@ class TestAdminSeeder(TestCase):
         )
         self.assertEqual([row["name"] for row in roles], ["admin"])
         self.assertEqual(
-            [row["name"] for row in permissions], ["full_access"],
+            [row["name"] for row in permissions],
+            ["full_access"],
         )
-        self.assertEqual(await self.connection.select(
-            "SELECT permission_id, role_id FROM role_has_permissions",
-        ), [{
-            "permission_id": permissions[0]["id"],
-            "role_id": roles[0]["id"],
-        }])
-        self.assertEqual(await self.connection.select(
-            "SELECT role_id, model_type, model_id FROM model_has_roles",
-        ), [{
-            "role_id": roles[0]["id"],
-            "model_type": "app.models.user.User",
-            "model_id": str(user["id"]),
-        }])
+        self.assertEqual(
+            await self.connection.select(
+                "SELECT permission_id, role_id FROM role_has_permissions",
+            ),
+            [
+                {
+                    "permission_id": permissions[0]["id"],
+                    "role_id": roles[0]["id"],
+                },
+            ],
+        )
+        self.assertEqual(
+            await self.connection.select(
+                "SELECT role_id, model_type, model_id FROM model_has_roles",
+            ),
+            [
+                {
+                    "role_id": roles[0]["id"],
+                    "model_type": "app.models.user.User",
+                    "model_id": str(user["id"]),
+                },
+            ],
+        )
 
     async def testHashingFailureLeavesEveryTableEmpty(self) -> None:
         """Roll back authorization records if password hashing fails.
@@ -118,19 +138,22 @@ class TestAdminSeeder(TestCase):
         Returns
         -------
         None
-            Verify the failed transaction leaves every table empty.
+            No return value.
         """
         self.hashMake.side_effect = RuntimeError("hash failed")
         with self.assertRaisesRegex(RuntimeError, "hash failed"):
             await self._run()
 
         for table in (
-            "users", "roles", "permissions", "model_has_roles",
+            "users",
+            "roles",
+            "permissions",
+            "model_has_roles",
             "role_has_permissions",
         ):
             with self.subTest(table=table):
                 rows = await self.connection.select(
-                    f"SELECT * FROM {table}",  # noqa: S608
+                    f"SELECT * FROM {table}",
                 )
                 self.assertEqual(rows, [])
 
@@ -140,24 +163,28 @@ class TestAdminSeeder(TestCase):
         Returns
         -------
         None
-            Verify the existing user remains unchanged and gains no role.
+            No return value.
         """
         with migration_connection_scope(self.connection):
-            existing = await User.create({
-                "name": "Existing",
-                "email": "admin@example.com",
-                "password": "existing digest",
-            })
+            existing = await User.create(
+                {
+                    "name": "Existing",
+                    "email": "admin@example.com",
+                    "password": "existing digest",
+                },
+            )
 
         with self.assertRaises(QueryException):
             await self._run()
 
         self.assertEqual(await self.connection.select("SELECT * FROM roles"), [])
         self.assertEqual(
-            await self.connection.select("SELECT * FROM permissions"), [],
+            await self.connection.select("SELECT * FROM permissions"),
+            [],
         )
         self.assertEqual(
-            await self.connection.select("SELECT * FROM model_has_roles"), [],
+            await self.connection.select("SELECT * FROM model_has_roles"),
+            [],
         )
         persisted = await User.find(existing.id)
         self.assertEqual(persisted.password, "existing digest")
@@ -168,7 +195,7 @@ class TestAdminSeeder(TestCase):
         Returns
         -------
         None
-            Verify discovery, tracking, and idempotent execution.
+            No return value.
         """
         app = SimpleNamespace(
             basePath=Path.cwd(),

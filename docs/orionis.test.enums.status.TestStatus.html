@@ -232,7 +232,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36861"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36961"> 
                     
                 </input>
 
@@ -384,15 +384,15 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TestStatus</span>(<a href="https://docs.python.org/3/library/enum.html#enum.StrEnum" class="intersphinx-link">StrEnum</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/enums/status.py#L5" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.test.enums.status.TestStatus">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">TestStatus</span>(<a href="https://docs.python.org/3/library/enum.html#enum.StrEnum" class="intersphinx-link">StrEnum</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/enums/status.py#L6" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.test.enums.status.TestStatus">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Represent possible statuses for a test during execution.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link">orionis.test.enums.status.TestStatus</a></code></td><td class="fieldArgDesc">Enumeration member representing the test status.</td></tr></table></div>
+          <div><p>Represent possible statuses for a test during execution.</p></div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2189">
+          <table class="children sortable" id="id2206">
   
   
   <tr class="constant">
@@ -414,7 +414,7 @@
     
     <td>Constant</td>
     <td><code><a href="#SKIPPED" class="internal-link" title="orionis.test.enums.status.TestStatus.SKIPPED">SKIPPED</a></code></td>
-    <td>Indicates the test was intentionally not executed.</td>
+    <td>Indicate an omitted test or a declared expected failure.</td>
   </tr>
 </table>
           
@@ -435,7 +435,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">ERRORED</span>: <code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link">orionis.test.enums.status.TestStatus</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/enums/status.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/enums/status.py#L24">
       
       (source)
     </a>
@@ -462,7 +462,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">FAILED</span>: <code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link">orionis.test.enums.status.TestStatus</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/enums/status.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/enums/status.py#L23">
       
       (source)
     </a>
@@ -489,7 +489,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">PASSED</span>: <code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link">orionis.test.enums.status.TestStatus</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/enums/status.py#L26">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/enums/status.py#L22">
       
       (source)
     </a>
@@ -516,7 +516,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">SKIPPED</span>: <code><a href="orionis.test.enums.status.TestStatus.html" class="internal-link">orionis.test.enums.status.TestStatus</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/test/enums/status.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/test/enums/status.py#L25">
       
       (source)
     </a>
@@ -528,7 +528,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p>Indicates the test was intentionally not executed.</p></div>
+    <div><p>Indicate an omitted test or a declared expected failure.</p></div>
     <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><span class="rst-variable-quote">'</span><span class="rst-variable-string">SKIPPED</span><span class="rst-variable-quote">'</span></code></pre></td></tr></table>
   </div>
 </div>
@@ -542,7 +542,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -29,15 +29,28 @@ __all__ = [
 _EXPORTS = {
     "HTTP": ("orionis.foundation.config.http.entitites.http", "HTTP"),
     "Cors": ("orionis.foundation.config.http.entitites.cors", "Cors"),
-    "HTTPBodyLimits": ("orionis.foundation.config.http.entitites.body", "HTTPBodyLimits"),
+    "HTTPBodyLimits": (
+        "orionis.foundation.config.http.entitites.body",
+        "HTTPBodyLimits",
+    ),
     "HTTPCsrf": ("orionis.foundation.config.http.entitites.csrf", "HTTPCsrf"),
     "HTTPProxies": ("orionis.foundation.config.http.entitites.proxies", "HTTPProxies"),
-    "HTTPRateLimit": ("orionis.foundation.config.http.entitites.rate_limit", "HTTPRateLimit"),
-    "HTTPSecurity": ("orionis.foundation.config.http.entitites.security", "HTTPSecurity"),
-    "HTTPWebSocket": ("orionis.foundation.config.http.entitites.websocket", "HTTPWebSocket"),
+    "HTTPRateLimit": (
+        "orionis.foundation.config.http.entitites.rate_limit",
+        "HTTPRateLimit",
+    ),
+    "HTTPSecurity": (
+        "orionis.foundation.config.http.entitites.security",
+        "HTTPSecurity",
+    ),
+    "HTTPWebSocket": (
+        "orionis.foundation.config.http.entitites.websocket",
+        "HTTPWebSocket",
+    ),
     "Redis": ("orionis.foundation.config.http.entitites.redis", "Redis"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -59,6 +72,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import csv
 import json
 import math
@@ -26,6 +29,7 @@ from benchmarks.http_compare.report import (
     write_reports,
 )
 
+
 def _measurement() -> dict[str, Any]:
     """
     Build an oha payload with HTTP errors and transport failures.
@@ -43,6 +47,7 @@ def _measurement() -> dict[str, Any]:
         "latencyPercentiles": {"p50": 0.008, "p95": 0.03, "p99": 0.05},
     }
 
+
 def _successful_runs() -> list[dict[str, int | float]]:
     """
     Build three normalized runs with unequal durations and latencies.
@@ -59,13 +64,18 @@ def _successful_runs() -> list[dict[str, int | float]]:
         (1000, 5, 0.09, 0.08, 0.095, 0.099),
         (100, 1, 0.01, 0.005, 0.02, 0.03),
     ):
-        samples.append(parse_measurement({
-            "statusCodeDistribution": {"200": requests},
-            "errorDistribution": {},
-            "summary": {"total": elapsed, "average": mean},
-            "latencyPercentiles": {"p50": p50, "p95": p95, "p99": p99},
-        }))
+        samples.append(
+            parse_measurement(
+                {
+                    "statusCodeDistribution": {"200": requests},
+                    "errorDistribution": {},
+                    "summary": {"total": elapsed, "average": mean},
+                    "latencyPercentiles": {"p50": p50, "p95": p95, "p99": p99},
+                },
+            ),
+        )
     return samples
+
 
 def _probe_connection() -> Mock:
     """
@@ -86,9 +96,13 @@ def _probe_connection() -> Mock:
     connection.getresponse.side_effect = responses
     return connection
 
+
 def _startup_log(
-    directory: Path, pids: list[int], *,
-    server: str = "granian", started: bool = True,
+    directory: Path,
+    pids: list[int],
+    *,
+    server: str = "granian",
+    started: bool = True,
 ) -> Path:
     """
     Write fixture startup events for the selected server.
@@ -123,6 +137,7 @@ def _startup_log(
     path.write_text("".join(events), encoding="utf-8")
     return path
 
+
 def _chart_report() -> dict[str, Any]:
     """
     Build a synthetic five-framework throughput comparison.
@@ -141,13 +156,17 @@ def _chart_report() -> dict[str, Any]:
     }
     return {
         "settings": {
-            "frameworks": list(rates), "workers": [3],
-            "connections": 100, "warmup_seconds": 2,
+            "frameworks": list(rates),
+            "workers": [3],
+            "connections": 100,
+            "warmup_seconds": 2,
             "warmup_frameworks": ["orionis-rsgi", "orionis-asgi"],
-            "repetitions": 3, "duration_seconds": 10,
+            "repetitions": 3,
+            "duration_seconds": 10,
         },
         "environment": {
-            "python": "3.14.8", "commit": "abc123456",
+            "python": "3.14.8",
+            "commit": "abc123456",
             "recorded_at": "2026-10-15T16:00:00+00:00",
             "versions": {"granian": "2.8.4", "uvicorn": "0.54.0"},
         },
@@ -163,6 +182,7 @@ def _chart_report() -> dict[str, Any]:
         ],
     }
 
+
 class TestMeasurements(unittest.TestCase):
     """Verify successful throughput, latency units, and independent samples."""
 
@@ -176,16 +196,19 @@ class TestMeasurements(unittest.TestCase):
             Check successful request counts, errors, throughput, and latency units.
         """
         # Compare the complete shape so missing or additional metrics are visible.
-        self.assertEqual(parse_measurement(_measurement()), {
-            "requests": 100,
-            "errors": 16,
-            "elapsed_seconds": 2.5,
-            "requests_per_second": 40,
-            "mean_latency_ms": 12,
-            "p50_latency_ms": 8,
-            "p95_latency_ms": 30,
-            "p99_latency_ms": 50,
-        })
+        self.assertEqual(
+            parse_measurement(_measurement()),
+            {
+                "requests": 100,
+                "errors": 16,
+                "elapsed_seconds": 2.5,
+                "requests_per_second": 40,
+                "mean_latency_ms": 12,
+                "p50_latency_ms": 8,
+                "p95_latency_ms": 30,
+                "p99_latency_ms": 50,
+            },
+        )
 
     def testMeasurementRejectsAbsentSuccessesOrZeroElapsed(self) -> None:
         """
@@ -302,6 +325,7 @@ class TestMeasurements(unittest.TestCase):
         with self.assertRaises(ValueError):
             aggregate_samples([])
 
+
 class TestOrionisApplication(unittest.TestCase):
     """Verify the Orionis factory contains only native app configuration."""
 
@@ -322,7 +346,9 @@ class TestOrionisApplication(unittest.TestCase):
             TemporaryDirectory() as temporary,
             chdir(temporary),
             patch.object(
-                orionis_benchmark, "Application", return_value=app,
+                orionis_benchmark,
+                "Application",
+                return_value=app,
             ) as application,
         ):
             result = orionis_benchmark.create_application()
@@ -332,11 +358,14 @@ class TestOrionisApplication(unittest.TestCase):
             application.assert_called_once_with(base_path=directory)
             app.withRouting.assert_called_once_with(api="_http_compare_routes.py")
             app.withConfigApp.assert_called_once_with(
-                env="production", debug=False, maintenance=False,
+                env="production",
+                debug=False,
+                maintenance=False,
             )
             app.on.assert_not_called()
             app.create.assert_called_once_with()
             self.assertIs(result, app)
+
 
 @unittest.skipUnless(
     all(
@@ -407,9 +436,12 @@ class TestMinimalApplications(unittest.TestCase):
             dict[str, int | float]
                 Successful fixture sample after validating HTTP responses.
             """
-            with closing(compare_run.http.client.HTTPConnection(
-                urlsplit(url).netloc, timeout=5,
-            )) as connection:
+            with closing(
+                compare_run.http.client.HTTPConnection(
+                    urlsplit(url).netloc,
+                    timeout=5,
+                ),
+            ) as connection:
                 for _ in range(2):
                     connection.request("GET", "/")
                     response = connection.getresponse()
@@ -433,9 +465,8 @@ class TestMinimalApplications(unittest.TestCase):
             (framework, workers)
             for framework in compare_run.FRAMEWORKS.values()
             for workers in (1, 2)
-            if workers == 1 or (
-                framework.server == "uvicorn" and compare_run.sys.platform != "win32"
-            )
+            if workers == 1
+            or (framework.server == "uvicorn" and compare_run.sys.platform != "win32")
         ]
         for framework, workers in cases:
             with (
@@ -449,17 +480,25 @@ class TestMinimalApplications(unittest.TestCase):
                 with (
                     patch.object(compare_run, "run_load", side_effect=load) as generate,
                     patch.object(
-                        compare_run, "stop_server", wraps=compare_run.stop_server,
+                        compare_run,
+                        "stop_server",
+                        wraps=compare_run.stop_server,
                     ) as stop,
                 ):
                     compare_run.benchmark_case(
-                        framework, workers, args, output / "unused-oha",
-                        output, [], row,
+                        framework,
+                        workers,
+                        args,
+                        output / "unused-oha",
+                        output,
+                        [],
+                        row,
                     )
                 self.assertEqual(row["status"], "ok")
                 self.assertEqual("warmup" in row, framework.requires_warmup)
                 self.assertEqual(generate.call_count, 1 + framework.requires_warmup)
                 self.assertIsNotNone(stop.call_args.args[0].poll())
+
 
 class _LoadOptions(TypedDict):
     """Describe the subprocess options used by the load runner."""
@@ -469,6 +508,7 @@ class _LoadOptions(TypedDict):
     timeout: float
     check: bool
     creationflags: int
+
 
 class TestLoadGenerator(unittest.TestCase):
     """Verify measurements and raw evidence survive subprocess failures."""
@@ -485,13 +525,13 @@ class TestLoadGenerator(unittest.TestCase):
         raw = json.dumps(_measurement())
         diagnostic = "load diagnostic\n"
         script = (
-            f"import sys; sys.stdout.write({raw!r}); "
-            f"sys.stderr.write({diagnostic!r})"
+            f"import sys; sys.stdout.write({raw!r}); sys.stderr.write({diagnostic!r})"
         )
         execute = compare_run.subprocess.run
 
         def run(
-            _command: list[str], **kwargs: Unpack[_LoadOptions],
+            _command: list[str],
+            **kwargs: Unpack[_LoadOptions],
         ) -> compare_run.subprocess.CompletedProcess[bytes]:
             """
             Run a Python stand-in with the original subprocess options.
@@ -515,7 +555,12 @@ class TestLoadGenerator(unittest.TestCase):
             commands = []
             with patch.object(compare_run.subprocess, "run", side_effect=run) as load:
                 measured = compare_run.run_load(
-                    Path("oha"), "http://127.0.0.1:8000/", 1, 10, output, commands,
+                    Path("oha"),
+                    "http://127.0.0.1:8000/",
+                    1,
+                    10,
+                    output,
+                    commands,
                 )
             self.assertEqual(measured, parse_measurement(json.loads(raw)))
             self.assertEqual(output.read_text(encoding="utf-8"), raw)
@@ -523,9 +568,16 @@ class TestLoadGenerator(unittest.TestCase):
                 output.with_suffix(".stderr.log").read_text(encoding="utf-8"),
                 diagnostic,
             )
-            self.assertEqual(commands, [{
-                "kind": "oha", "argv": load.call_args.args[0], "output": str(output),
-            }])
+            self.assertEqual(
+                commands,
+                [
+                    {
+                        "kind": "oha",
+                        "argv": load.call_args.args[0],
+                        "output": str(output),
+                    },
+                ],
+            )
             self.assertEqual(load.call_args.kwargs["timeout"], 31)
 
     def testLoadPreservesOutputOnProcessFailure(self) -> None:
@@ -540,7 +592,8 @@ class TestLoadGenerator(unittest.TestCase):
         execute = compare_run.subprocess.run
 
         def run(
-            _command: list[str], **kwargs: Unpack[_LoadOptions],
+            _command: list[str],
+            **kwargs: Unpack[_LoadOptions],
         ) -> compare_run.subprocess.CompletedProcess[bytes]:
             """
             Emit partial output and fail through a real subprocess.
@@ -562,13 +615,18 @@ class TestLoadGenerator(unittest.TestCase):
             CalledProcessError
                 If the forwarded options require a successful exit.
             """
-            return execute([
-                compare_run.sys.executable, "-B", "-c",
-                (
-                    "import sys; sys.stdout.write('{'); "
-                    "sys.stderr.write('load failed'); sys.exit(7)"
-                ),
-            ], **kwargs)
+            return execute(
+                [
+                    compare_run.sys.executable,
+                    "-B",
+                    "-c",
+                    (
+                        "import sys; sys.stdout.write('{'); "
+                        "sys.stderr.write('load failed'); sys.exit(7)"
+                    ),
+                ],
+                **kwargs,
+            )
 
         with TemporaryDirectory() as temporary:
             output = Path(temporary) / "load.json"
@@ -577,7 +635,12 @@ class TestLoadGenerator(unittest.TestCase):
                 self.assertRaises(compare_run.subprocess.CalledProcessError) as raised,
             ):
                 compare_run.run_load(
-                    Path("oha"), "http://127.0.0.1:8000/", 1, 10, output, [],
+                    Path("oha"),
+                    "http://127.0.0.1:8000/",
+                    1,
+                    10,
+                    output,
+                    [],
                 )
             self.assertEqual(raised.exception.returncode, 7)
             self.assertEqual(output.read_text(encoding="utf-8"), "{")
@@ -598,7 +661,8 @@ class TestLoadGenerator(unittest.TestCase):
         execute = compare_run.subprocess.run
 
         def run(
-            _command: list[str], **kwargs: Unpack[_LoadOptions],
+            _command: list[str],
+            **kwargs: Unpack[_LoadOptions],
         ) -> compare_run.subprocess.CompletedProcess[bytes]:
             """
             Run a Python subprocess with a short timeout.
@@ -621,13 +685,19 @@ class TestLoadGenerator(unittest.TestCase):
                 When the subprocess exceeds the shortened timeout.
             """
             kwargs["timeout"] = 1
-            return execute([
-                compare_run.sys.executable, "-B", "-c",
-                (
-                    "import sys, time; sys.stdout.write('{'); sys.stdout.flush(); "
-                    "sys.stderr.write('unfinished'); sys.stderr.flush(); time.sleep(10)"
-                ),
-            ], **kwargs)
+            return execute(
+                [
+                    compare_run.sys.executable,
+                    "-B",
+                    "-c",
+                    (
+                        "import sys, time; sys.stdout.write('{'); sys.stdout.flush(); "
+                        "sys.stderr.write('unfinished'); sys.stderr.flush(); "
+                        "time.sleep(10)"
+                    ),
+                ],
+                **kwargs,
+            )
 
         with TemporaryDirectory() as temporary:
             output = Path(temporary) / "load.json"
@@ -636,7 +706,12 @@ class TestLoadGenerator(unittest.TestCase):
                 self.assertRaises(compare_run.subprocess.TimeoutExpired),
             ):
                 compare_run.run_load(
-                    Path("oha"), "http://127.0.0.1:8000/", 1, 10, output, [],
+                    Path("oha"),
+                    "http://127.0.0.1:8000/",
+                    1,
+                    10,
+                    output,
+                    [],
                 )
             self.assertEqual(output.read_text(encoding="utf-8"), "{")
             self.assertEqual(
@@ -644,8 +719,46 @@ class TestLoadGenerator(unittest.TestCase):
                 "unfinished",
             )
 
+
 class TestBenchmarkRunner(unittest.TestCase):
     """Verify equal server settings, warmup isolation, and worker cleanup."""
+
+    def testAssignedPortUsesOnlyLiveOwnedListeners(self) -> None:
+        """
+        Resolve one owned listener without guessing among unrelated connections.
+
+        Returns
+        -------
+        None
+            Ignore retired processes and non-listening endpoints; reject ambiguity.
+        """
+        process = Mock(pid=10)
+        listener = Mock(
+            status=compare_run.psutil.CONN_LISTEN,
+            laddr=Mock(ip="127.0.0.1", port=12345),
+        )
+        connected = Mock(
+            status=compare_run.psutil.CONN_ESTABLISHED,
+            laddr=Mock(ip="127.0.0.1", port=12346),
+        )
+        owned = Mock()
+        owned.is_running.return_value = True
+        owned.net_connections.return_value = [listener, connected]
+        retired = Mock()
+        retired.is_running.return_value = False
+        known = {10: owned, 20: retired}
+        with patch.object(compare_run, "track_children"):
+            self.assertEqual(compare_run._listening_port(process, known), 12345)
+            retired.net_connections.assert_not_called()
+            owned.net_connections.return_value = []
+            self.assertIsNone(compare_run._listening_port(process, known))
+            second = Mock(
+                status=compare_run.psutil.CONN_LISTEN,
+                laddr=Mock(ip="127.0.0.1", port=12347),
+            )
+            owned.net_connections.return_value = [listener, second]
+            with self.assertRaisesRegex(RuntimeError, "multiple loopback listeners"):
+                compare_run._listening_port(process, known)
 
     def testHelpOmitsInternalOptions(self) -> None:
         """
@@ -671,8 +784,11 @@ class TestBenchmarkRunner(unittest.TestCase):
             Check server assignments, launcher modules, and native CLI arguments.
         """
         servers = {
-            "orionis-rsgi": "granian", "orionis-asgi": "granian",
-            "fastapi": "uvicorn", "litestar": "uvicorn", "starlette": "uvicorn",
+            "orionis-rsgi": "granian",
+            "orionis-asgi": "granian",
+            "fastapi": "uvicorn",
+            "litestar": "uvicorn",
+            "starlette": "uvicorn",
         }
         for framework in compare_run.FRAMEWORKS.values():
             with self.subTest(framework=framework.name):
@@ -681,27 +797,59 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertEqual(framework.server, server)
                 server_module = (
                     "benchmarks.http_compare.uvicorn_server"
-                    if server == "uvicorn" else server
+                    if server == "uvicorn"
+                    else server
                 )
-                native_options = [
-                    "--interface", framework.interface,
-                    "--http", "1",
-                    "--runtime-threads", "1",
-                    "--task-impl", "asyncio",
-                    "--http1-keep-alive", "--no-ws", "--no-reload",
-                    "--no-respawn-failed-workers", "--no-metrics",
-                ] if server == "granian" else [
-                    "--http", "h11", "--ws", "none",
-                    "--lifespan", "on", "--no-use-colors",
-                ]
-                self.assertEqual(command, [
-                    compare_run.sys.executable, "-B", "-m", server_module,
-                    framework.target, "--factory",
-                    "--host", "127.0.0.1", "--port", "8000",
-                    "--workers", "2", "--loop", "asyncio",
-                    "--no-access-log", "--log-level", "info",
-                    *native_options,
-                ])
+                native_options = (
+                    [
+                        "--interface",
+                        framework.interface,
+                        "--http",
+                        "1",
+                        "--runtime-threads",
+                        "1",
+                        "--task-impl",
+                        "asyncio",
+                        "--http1-keep-alive",
+                        "--no-ws",
+                        "--no-reload",
+                        "--no-respawn-failed-workers",
+                        "--no-metrics",
+                    ]
+                    if server == "granian"
+                    else [
+                        "--http",
+                        "h11",
+                        "--ws",
+                        "none",
+                        "--lifespan",
+                        "on",
+                        "--no-use-colors",
+                    ]
+                )
+                self.assertEqual(
+                    command,
+                    [
+                        compare_run.sys.executable,
+                        "-B",
+                        "-m",
+                        server_module,
+                        framework.target,
+                        "--factory",
+                        "--host",
+                        "127.0.0.1",
+                        "--port",
+                        "8000",
+                        "--workers",
+                        "2",
+                        "--loop",
+                        "asyncio",
+                        "--no-access-log",
+                        "--log-level",
+                        "info",
+                        *native_options,
+                    ],
+                )
 
     def testOrionisPreparationUsesOnlyTwoRootRequests(self) -> None:
         """
@@ -723,21 +871,30 @@ class TestBenchmarkRunner(unittest.TestCase):
                     patch.object(compare_run, "track_children"),
                     patch.object(compare_run, "check_workers"),
                     patch.object(
-                        compare_run.http.client, "HTTPConnection",
+                        compare_run.http.client,
+                        "HTTPConnection",
                         return_value=connection,
                     ) as connect,
                     patch.object(compare_run.time, "sleep"),
                 ):
                     result = compare_run.wait_until_ready(
-                        process, 8000, log_path, workers, {},
+                        process,
+                        8000,
+                        log_path,
+                        workers,
+                        {},
                         framework=compare_run.FRAMEWORKS["orionis-rsgi"],
                     )
 
                 self.assertEqual(result, set(pids))
                 connect.assert_called_once_with("127.0.0.1", 8000, timeout=1)
-                self.assertEqual(connection.request.call_args_list, [
-                    call("GET", "/"), call("GET", "/"),
-                ])
+                self.assertEqual(
+                    connection.request.call_args_list,
+                    [
+                        call("GET", "/"),
+                        call("GET", "/"),
+                    ],
+                )
                 self.assertEqual(connection.getresponse.call_count, 2)
                 connection.close.assert_called_once_with()
 
@@ -760,21 +917,31 @@ class TestBenchmarkRunner(unittest.TestCase):
                     patch.object(compare_run, "track_children"),
                     patch.object(compare_run, "check_workers") as check,
                     patch.object(
-                        compare_run.http.client, "HTTPConnection",
+                        compare_run.http.client,
+                        "HTTPConnection",
                     ) as connect,
                     patch.object(
-                        compare_run.socket, "create_connection",
+                        compare_run.socket,
+                        "create_connection",
                     ) as tcp,
                 ):
                     result = compare_run.wait_until_ready(
-                        process, 8000, log_path, workers, {},
+                        process,
+                        8000,
+                        log_path,
+                        workers,
+                        {},
                         framework=compare_run.FRAMEWORKS["fastapi"],
                     )
 
                 self.assertEqual(result, set(pids))
-                self.assertEqual(check.call_args_list, [
-                    call(process, set(pids), {}), call(process, set(pids), {}),
-                ])
+                self.assertEqual(
+                    check.call_args_list,
+                    [
+                        call(process, set(pids), {}),
+                        call(process, set(pids), {}),
+                    ],
+                )
                 tcp.assert_called_once_with(("127.0.0.1", 8000), timeout=1)
                 tcp.return_value.close.assert_called_once_with()
                 connect.assert_not_called()
@@ -799,12 +966,18 @@ class TestBenchmarkRunner(unittest.TestCase):
                 patch.object(compare_run.socket, "create_connection") as tcp,
                 patch.object(compare_run.time, "sleep") as pause,
                 patch.object(
-                    compare_run.time, "monotonic", side_effect=[0, 0, 61],
+                    compare_run.time,
+                    "monotonic",
+                    side_effect=[0, 0, 61],
                 ),
                 self.assertRaisesRegex(TimeoutError, "2 ready workers"),
             ):
                 compare_run.wait_until_ready(
-                    process, 8000, log_path, 2, {},
+                    process,
+                    8000,
+                    log_path,
+                    2,
+                    {},
                     framework=compare_run.FRAMEWORKS["fastapi"],
                 )
 
@@ -826,22 +999,31 @@ class TestBenchmarkRunner(unittest.TestCase):
         process.poll.return_value = None
         with TemporaryDirectory() as temporary:
             log_path = _startup_log(
-                Path(temporary), [5678, 5679], started=False,
+                Path(temporary),
+                [5678, 5679],
+                started=False,
             )
             with (
                 patch.object(compare_run, "track_children"),
                 patch.object(compare_run, "check_workers"),
                 patch.object(
-                    compare_run.http.client, "HTTPConnection",
+                    compare_run.http.client,
+                    "HTTPConnection",
                 ) as connect,
                 patch.object(compare_run.time, "sleep"),
                 patch.object(
-                    compare_run.time, "monotonic", side_effect=[0, 0, 61],
+                    compare_run.time,
+                    "monotonic",
+                    side_effect=[0, 0, 61],
                 ),
                 self.assertRaisesRegex(TimeoutError, "2 ready workers"),
             ):
                 compare_run.wait_until_ready(
-                    process, 8000, log_path, 2, {},
+                    process,
+                    8000,
+                    log_path,
+                    2,
+                    {},
                     framework=compare_run.FRAMEWORKS["orionis-rsgi"],
                 )
 
@@ -861,7 +1043,10 @@ class TestBenchmarkRunner(unittest.TestCase):
         for completed in (0, 1):
             with self.subTest(completed=completed), TemporaryDirectory() as temporary:
                 log_path = _startup_log(
-                    Path(temporary), [5678, 5679], server="uvicorn", started=False,
+                    Path(temporary),
+                    [5678, 5679],
+                    server="uvicorn",
+                    started=False,
                 )
                 with log_path.open("a", encoding="utf-8") as log:
                     log.write("INFO:     Application startup complete.\n" * completed)
@@ -871,12 +1056,18 @@ class TestBenchmarkRunner(unittest.TestCase):
                     patch.object(compare_run.socket, "create_connection") as tcp,
                     patch.object(compare_run.time, "sleep"),
                     patch.object(
-                        compare_run.time, "monotonic", side_effect=[0, 0, 61],
+                        compare_run.time,
+                        "monotonic",
+                        side_effect=[0, 0, 61],
                     ),
                     self.assertRaisesRegex(TimeoutError, "Uvicorn.*2 ready workers"),
                 ):
                     compare_run.wait_until_ready(
-                        process, 8000, log_path, 2, {},
+                        process,
+                        8000,
+                        log_path,
+                        2,
+                        {},
                         framework=compare_run.FRAMEWORKS["fastapi"],
                     )
                 check.assert_not_called()
@@ -898,12 +1089,17 @@ class TestBenchmarkRunner(unittest.TestCase):
             with (
                 patch.object(compare_run, "track_children"),
                 patch.object(
-                    compare_run.http.client, "HTTPConnection",
+                    compare_run.http.client,
+                    "HTTPConnection",
                 ) as connect,
                 self.assertRaisesRegex(RuntimeError, "9999"),
             ):
                 compare_run.wait_until_ready(
-                    process, 8000, log_path, 1, {},
+                    process,
+                    8000,
+                    log_path,
+                    1,
+                    {},
                     framework=compare_run.FRAMEWORKS["orionis-rsgi"],
                 )
 
@@ -926,11 +1122,16 @@ class TestBenchmarkRunner(unittest.TestCase):
             (200, b"Hello World", "text/plain", 11, True),
         ):
             with self.subTest(
-                status=status, body=body, content_type=content_type,
-                version=version, will_close=will_close,
+                status=status,
+                body=body,
+                content_type=content_type,
+                version=version,
+                will_close=will_close,
             ):
                 response = Mock(
-                    status=status, version=version, will_close=will_close,
+                    status=status,
+                    version=version,
+                    will_close=will_close,
                 )
                 response.read.return_value = body
                 response.getheader.return_value = content_type
@@ -958,7 +1159,8 @@ class TestBenchmarkRunner(unittest.TestCase):
             with (
                 patch.object(compare_run.subprocess, "Popen", return_value=process),
                 patch.object(
-                    compare_run, "wait_until_ready",
+                    compare_run,
+                    "wait_until_ready",
                     side_effect=TimeoutError("server not ready"),
                 ),
                 patch.object(compare_run, "run_load") as load,
@@ -966,8 +1168,13 @@ class TestBenchmarkRunner(unittest.TestCase):
                 self.assertRaisesRegex(TimeoutError, "server not ready"),
             ):
                 compare_run.benchmark_case(
-                    compare_run.FRAMEWORKS["orionis-rsgi"], 2, args,
-                    output / "oha", output, [], row,
+                    compare_run.FRAMEWORKS["orionis-rsgi"],
+                    2,
+                    args,
+                    output / "oha",
+                    output,
+                    [],
+                    row,
                 )
 
         load.assert_not_called()
@@ -994,22 +1201,36 @@ class TestBenchmarkRunner(unittest.TestCase):
                 (output / "logs").mkdir()
                 (output / "raw").mkdir()
                 with (
-                    patch.dict(os.environ, {
-                        "GRANIAN_PORT": "9000", "UVICORN_PORT": "9001",
-                    }),
+                    patch.dict(
+                        os.environ,
+                        {
+                            "GRANIAN_PORT": "9000",
+                            "UVICORN_PORT": "9001",
+                        },
+                    ),
                     patch.object(
-                        compare_run.subprocess, "Popen", return_value=process,
+                        compare_run.subprocess,
+                        "Popen",
+                        return_value=process,
                     ) as start,
                     patch.object(compare_run, "wait_until_ready") as prepare,
+                    patch.object(compare_run, "_listening_port", return_value=8000),
                     patch.object(compare_run, "check_workers") as check,
                     patch.object(compare_run, "stop_server") as stop,
                     patch.object(
-                        compare_run, "run_load", return_value=sample,
+                        compare_run,
+                        "run_load",
+                        return_value=sample,
                     ) as load,
                 ):
                     compare_run.benchmark_case(
-                        compare_run.FRAMEWORKS[name], 1, args,
-                        output / "oha", output, [], row,
+                        compare_run.FRAMEWORKS[name],
+                        1,
+                        args,
+                        output / "oha",
+                        output,
+                        [],
+                        row,
                     )
 
                 self.assertEqual(
@@ -1017,12 +1238,15 @@ class TestBenchmarkRunner(unittest.TestCase):
                     [10, 10, 10],
                 )
                 self.assertEqual(
-                    prepare.call_args.kwargs["framework"], compare_run.FRAMEWORKS[name],
+                    prepare.call_args.kwargs["framework"],
+                    compare_run.FRAMEWORKS[name],
                 )
-                self.assertFalse(any(
-                    key.startswith(("GRANIAN_", "UVICORN_"))
-                    for key in start.call_args.kwargs["env"]
-                ))
+                self.assertFalse(
+                    any(
+                        key.startswith(("GRANIAN_", "UVICORN_"))
+                        for key in start.call_args.kwargs["env"]
+                    ),
+                )
                 self.assertNotIn("warmup", row)
                 self.assertEqual(row["status"], "ok")
                 self.assertEqual(row["samples"], [sample] * args.repetitions)
@@ -1058,24 +1282,35 @@ class TestBenchmarkRunner(unittest.TestCase):
                 (output / "raw").mkdir()
                 with (
                     patch.object(
-                        compare_run.subprocess, "Popen", return_value=process,
+                        compare_run.subprocess,
+                        "Popen",
+                        return_value=process,
                     ),
                     patch.object(compare_run, "wait_until_ready") as prepare,
+                    patch.object(compare_run, "_listening_port", return_value=8000),
                     patch.object(compare_run, "check_workers") as check,
                     patch.object(compare_run, "stop_server") as stop,
                     patch.object(
-                        compare_run, "run_load", side_effect=[warmup, *measured],
+                        compare_run,
+                        "run_load",
+                        side_effect=[warmup, *measured],
                     ) as load,
                 ):
                     order.attach_mock(prepare, "prepare")
                     order.attach_mock(load, "load")
                     compare_run.benchmark_case(
-                        compare_run.FRAMEWORKS[name], 1, args,
-                        output / "oha", output, [], row,
+                        compare_run.FRAMEWORKS[name],
+                        1,
+                        args,
+                        output / "oha",
+                        output,
+                        [],
+                        row,
                     )
 
                 self.assertEqual(
-                    prepare.call_args.kwargs["framework"], compare_run.FRAMEWORKS[name],
+                    prepare.call_args.kwargs["framework"],
+                    compare_run.FRAMEWORKS[name],
                 )
                 self.assertEqual(row["status"], "ok")
                 self.assertEqual(row["warmup"]["requests"], 1000000)
@@ -1109,11 +1344,13 @@ class TestBenchmarkRunner(unittest.TestCase):
         with (
             patch.object(compare_run.sys, "platform", "win32"),
             patch.object(
-                compare_run.psutil, "Process",
+                compare_run.psutil,
+                "Process",
                 side_effect=compare_run.psutil.NoSuchProcess(process.pid),
             ),
             patch.object(
-                compare_run.psutil, "wait_procs",
+                compare_run.psutil,
+                "wait_procs",
                 side_effect=[([], [worker]), ([worker], [])],
             ) as wait,
         ):
@@ -1161,7 +1398,9 @@ class TestBenchmarkRunner(unittest.TestCase):
             Confirm only living owned workers satisfy native readiness checks.
         """
         for scenario, pid in (
-            ("dead", 5678), ("foreign", 9999), ("zombie", 5678),
+            ("dead", 5678),
+            ("foreign", 9999),
+            ("zombie", 5678),
         ):
             with self.subTest(scenario=scenario):
                 process = Mock(pid=1234)
@@ -1169,7 +1408,8 @@ class TestBenchmarkRunner(unittest.TestCase):
                 worker = Mock(pid=5678)
                 worker.is_running.return_value = scenario != "dead"
                 worker.status.return_value = (
-                    compare_run.psutil.STATUS_ZOMBIE if scenario == "zombie"
+                    compare_run.psutil.STATUS_ZOMBIE
+                    if scenario == "zombie"
                     else compare_run.psutil.STATUS_RUNNING
                 )
                 parent = Mock()
@@ -1197,11 +1437,14 @@ class TestBenchmarkRunner(unittest.TestCase):
                 owner.children.return_value = []
                 owner.is_running.return_value = status != "dead"
                 owner.status.return_value = (
-                    compare_run.psutil.STATUS_ZOMBIE if status == "zombie"
+                    compare_run.psutil.STATUS_ZOMBIE
+                    if status == "zombie"
                     else compare_run.psutil.STATUS_RUNNING
                 )
                 with patch.object(
-                    compare_run.psutil, "Process", return_value=owner,
+                    compare_run.psutil,
+                    "Process",
+                    return_value=owner,
                 ):
                     if status == "running":
                         compare_run.check_workers(process, {1234}, {})
@@ -1221,7 +1464,8 @@ class TestBenchmarkRunner(unittest.TestCase):
         # Keep actual CLI orchestration and artifact persistence under test.
         samples = _successful_runs()
         environment = {
-            "os": "CI test host", "python": "3.14.8",
+            "os": "CI test host",
+            "python": "3.14.8",
             "versions": {"granian": "2.8.4", "uvicorn": "0.54.0"},
         }
 
@@ -1276,23 +1520,37 @@ class TestBenchmarkRunner(unittest.TestCase):
             output = Path(temporary) / "results"
             with (
                 patch.object(
-                    compare_run, "collect_environment", return_value=environment,
+                    compare_run,
+                    "collect_environment",
+                    return_value=environment,
                 ),
                 patch.object(
-                    compare_run, "resolve_oha", return_value=Path(temporary) / "oha",
+                    compare_run,
+                    "resolve_oha",
+                    return_value=Path(temporary) / "oha",
                 ),
                 patch.object(compare_run.random.Random, "shuffle"),
                 patch.object(
-                    compare_run, "benchmark_case", side_effect=benchmark, autospec=True,
+                    compare_run,
+                    "benchmark_case",
+                    side_effect=benchmark,
+                    autospec=True,
                 ) as run,
                 patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
                 redirect_stdout(StringIO()),
                 redirect_stderr(StringIO()),
             ):
-                exit_code = compare_run.main([
-                    "--workers", "1", "--frameworks", "fastapi", "starlette",
-                    "--output-dir", str(output),
-                ])
+                exit_code = compare_run.main(
+                    [
+                        "--workers",
+                        "1",
+                        "--frameworks",
+                        "fastapi",
+                        "starlette",
+                        "--output-dir",
+                        str(output),
+                    ],
+                )
             saved = json.loads((output / "summary.json").read_text(encoding="utf-8"))
             diagnostics = json.loads(
                 (output / "diagnostics.json").read_text(encoding="utf-8"),
@@ -1341,28 +1599,35 @@ class TestBenchmarkRunner(unittest.TestCase):
                 with (
                     patch.object(compare_run.sys, "platform", "win32"),
                     patch.object(
-                        compare_run, "collect_environment",
+                        compare_run,
+                        "collect_environment",
                         return_value=_chart_report()["environment"],
                     ),
                     patch.object(
-                        compare_run, "resolve_oha",
+                        compare_run,
+                        "resolve_oha",
                         return_value=Path(temporary) / "oha",
                         side_effect=setup_error,
                     ),
                     patch.object(
-                        compare_run, "benchmark_case",
+                        compare_run,
+                        "benchmark_case",
                         side_effect=benchmark_error,
                     ) as benchmark,
                     patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
                     redirect_stdout(StringIO()) as stdout,
                     redirect_stderr(StringIO()) as stderr,
                 ):
-                    exit_code = compare_run.main([
-                        "--workers", "2" if scenario == "unsupported" else "1",
-                        "--frameworks",
-                        "orionis-asgi" if scenario == "unsupported" else "fastapi",
-                        "--output-dir", str(output),
-                    ])
+                    exit_code = compare_run.main(
+                        [
+                            "--workers",
+                            "2" if scenario == "unsupported" else "1",
+                            "--frameworks",
+                            "orionis-asgi" if scenario == "unsupported" else "fastapi",
+                            "--output-dir",
+                            str(output),
+                        ],
+                    )
                 report = json.loads(
                     (output / "summary.json").read_text(encoding="utf-8"),
                 )
@@ -1393,7 +1658,8 @@ class TestBenchmarkRunner(unittest.TestCase):
                     else:
                         self.assertEqual(
                             diagnostics["results"][0]["reason"],
-                            failure_message if scenario == "case"
+                            failure_message
+                            if scenario == "case"
                             else "Interrupted by user",
                         )
 
@@ -1411,30 +1677,41 @@ class TestBenchmarkRunner(unittest.TestCase):
             with (
                 patch.object(compare_run.sys, "platform", "win32"),
                 patch.object(
-                    compare_run, "collect_environment",
+                    compare_run,
+                    "collect_environment",
                     return_value=_chart_report()["environment"],
                 ),
                 patch.object(
-                    compare_run, "resolve_oha", return_value=Path(temporary) / "oha",
+                    compare_run,
+                    "resolve_oha",
+                    return_value=Path(temporary) / "oha",
                 ),
                 patch.object(
-                    compare_run, "benchmark_case",
+                    compare_run,
+                    "benchmark_case",
                 ) as benchmark,
                 patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
                 redirect_stdout(StringIO()),
             ):
-                exit_code = compare_run.main([
-                    "--workers", "2", "3", "4",
-                    "--frameworks", *compare_run.FRAMEWORKS,
-                    "--output-dir", str(output),
-                ])
+                exit_code = compare_run.main(
+                    [
+                        "--workers",
+                        "2",
+                        "3",
+                        "4",
+                        "--frameworks",
+                        *compare_run.FRAMEWORKS,
+                        "--output-dir",
+                        str(output),
+                    ],
+                )
             report = json.loads((output / "summary.json").read_text(encoding="utf-8"))
         self.assertEqual(exit_code, 1)
         benchmark.assert_not_called()
         self.assertEqual(len(report["results"]), 15)
-        self.assertTrue(all(
-            row["status"] == "unsupported" for row in report["results"]
-        ))
+        self.assertTrue(
+            all(row["status"] == "unsupported" for row in report["results"]),
+        )
 
     def testMainValidatesOnlySelectedServerVersions(self) -> None:
         """
@@ -1459,15 +1736,18 @@ class TestBenchmarkRunner(unittest.TestCase):
                     environment["versions"][missing] = "not installed"
                     with (
                         patch.object(
-                            compare_run, "collect_environment",
+                            compare_run,
+                            "collect_environment",
                             return_value=environment,
                         ),
                         patch.object(
-                            compare_run, "resolve_oha",
+                            compare_run,
+                            "resolve_oha",
                             return_value=Path(temporary) / "oha",
                         ),
                         patch.object(
-                            compare_run, "benchmark_case",
+                            compare_run,
+                            "benchmark_case",
                             side_effect=lambda *args: args[-1].update(
                                 aggregate_samples(_successful_runs()),
                             ),
@@ -1476,10 +1756,16 @@ class TestBenchmarkRunner(unittest.TestCase):
                         redirect_stdout(StringIO()),
                         redirect_stderr(StringIO()),
                     ):
-                        exit_code = compare_run.main([
-                            "--workers", "1", "--frameworks", name,
-                            "--output-dir", str(output),
-                        ])
+                        exit_code = compare_run.main(
+                            [
+                                "--workers",
+                                "1",
+                                "--frameworks",
+                                name,
+                                "--output-dir",
+                                str(output),
+                            ],
+                        )
                     diagnostics = json.loads(
                         (output / "diagnostics.json").read_text(encoding="utf-8"),
                     )
@@ -1508,14 +1794,18 @@ class TestBenchmarkRunner(unittest.TestCase):
             with (
                 patch.object(compare_run.sys, "platform", "linux"),
                 patch.object(
-                    compare_run, "collect_environment",
+                    compare_run,
+                    "collect_environment",
                     return_value=_chart_report()["environment"],
                 ),
                 patch.object(
-                    compare_run, "resolve_oha", return_value=Path(temporary) / "oha",
+                    compare_run,
+                    "resolve_oha",
+                    return_value=Path(temporary) / "oha",
                 ),
                 patch.object(
-                    compare_run, "benchmark_case",
+                    compare_run,
+                    "benchmark_case",
                     side_effect=lambda *args: args[-1].update(
                         aggregate_samples(_successful_runs()),
                     ),
@@ -1523,12 +1813,23 @@ class TestBenchmarkRunner(unittest.TestCase):
                 patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": ""}),
                 redirect_stdout(StringIO()),
             ):
-                exit_code = compare_run.main([
-                    "--workers", "1", "2", "3", "4",
-                    "--frameworks", "orionis-rsgi", "orionis-asgi",
-                    "fastapi", "litestar", "starlette",
-                    "--output-dir", str(output),
-                ])
+                exit_code = compare_run.main(
+                    [
+                        "--workers",
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "--frameworks",
+                        "orionis-rsgi",
+                        "orionis-asgi",
+                        "fastapi",
+                        "litestar",
+                        "starlette",
+                        "--output-dir",
+                        str(output),
+                    ],
+                )
             saved = json.loads((output / "summary.json").read_text(encoding="utf-8"))
             diagnostics = json.loads(
                 (output / "diagnostics.json").read_text(encoding="utf-8"),
@@ -1543,14 +1844,18 @@ class TestBenchmarkRunner(unittest.TestCase):
         self.assertEqual(set(saved["settings"]), {"frameworks", "workers"})
         self.assertEqual(diagnostics["settings"]["warmup_seconds"], 2)
         self.assertEqual(
-            diagnostics["settings"]["readiness"], "native-server-workers-and-tcp",
+            diagnostics["settings"]["readiness"],
+            "native-server-workers-and-tcp",
         )
         self.assertTrue(diagnostics["settings"]["uvicorn_multi_worker_tcp_nodelay"])
         self.assertEqual(
             diagnostics["settings"]["servers"],
             {
-                "orionis-rsgi": "granian", "orionis-asgi": "granian",
-                "fastapi": "uvicorn", "litestar": "uvicorn", "starlette": "uvicorn",
+                "orionis-rsgi": "granian",
+                "orionis-asgi": "granian",
+                "fastapi": "uvicorn",
+                "litestar": "uvicorn",
+                "starlette": "uvicorn",
             },
         )
         self.assertEqual(
@@ -1567,11 +1872,14 @@ class TestBenchmarkRunner(unittest.TestCase):
                 render_throughput_svg(saved, workers),
             )
         self.assertIn(
-            "Throughput with 1 worker</title>", charts["throughput-1-workers.svg"],
+            "Throughput with 1 worker</title>",
+            charts["throughput-1-workers.svg"],
         )
         self.assertIn(
-            "Throughput with 3 workers</title>", charts["throughput-3-workers.svg"],
+            "Throughput with 3 workers</title>",
+            charts["throughput-3-workers.svg"],
         )
+
 
 class TestThroughputCharts(unittest.TestCase):
     """Verify comparable, ranked, accessible SVG charts without invented data."""
@@ -1586,16 +1894,23 @@ class TestThroughputCharts(unittest.TestCase):
             Check ranking, bar dimensions, labels, accessibility, and worker filters.
         """
         report = _chart_report()
-        report["results"].append({
-            **report["results"][0], "workers": 1, "requests_per_second": 999999,
-        })
+        report["results"].append(
+            {
+                **report["results"][0],
+                "workers": 1,
+                "requests_per_second": 999999,
+            },
+        )
         svg = render_throughput_svg(report, 3)
         root = ElementTree.fromstring(svg)
         namespace = {"svg": "http://www.w3.org/2000/svg"}
         groups = root.findall("svg:g", namespace)
         expected = [
-            ("starlette", 29800), ("orionis-asgi", 21100),
-            ("orionis-rsgi", 21050), ("litestar", 20900), ("fastapi", 17200),
+            ("starlette", 29800),
+            ("orionis-asgi", 21100),
+            ("orionis-rsgi", 21050),
+            ("litestar", 20900),
+            ("fastapi", 17200),
         ]
         self.assertEqual(
             [group.attrib["data-framework"] for group in groups],
@@ -1605,7 +1920,9 @@ class TestThroughputCharts(unittest.TestCase):
             bars = group.findall("svg:rect", namespace)
             self.assertEqual(len(bars), 1)
             self.assertAlmostEqual(
-                float(bars[0].attrib["width"]), rate / 32000 * 620, places=2,
+                float(bars[0].attrib["width"]),
+                rate / 32000 * 620,
+                places=2,
             )
             self.assertIn(f"{rate:,.2f}", "".join(group.itertext()))
         self.assertEqual(root.attrib["role"], "img")
@@ -1641,7 +1958,12 @@ class TestThroughputCharts(unittest.TestCase):
             Confirm incomplete, duplicated, or failed comparisons cannot form charts.
         """
         for scenario in (
-            "missing", "duplicate", "failed", "errors", "setup", "empty-setup",
+            "missing",
+            "duplicate",
+            "failed",
+            "errors",
+            "setup",
+            "empty-setup",
         ):
             with self.subTest(scenario=scenario):
                 report = _chart_report()
@@ -1659,8 +1981,9 @@ class TestThroughputCharts(unittest.TestCase):
                     )
                 with self.assertRaisesRegex(ValueError, "complete, error-free"):
                     render_throughput_svg(report, 3)
-        with self.assertRaisesRegex(ValueError, "complete, error-free"): # NOSONAR
-            render_throughput_svg(_chart_report(), 4)
+        report = _chart_report()
+        with self.assertRaisesRegex(ValueError, "complete, error-free"):
+            render_throughput_svg(report, 4)
 
     def testChartRejectsInvalidRates(self) -> None:
         """
@@ -1697,6 +2020,7 @@ class TestThroughputCharts(unittest.TestCase):
         self.assertIn(label, text)
         self.assertNotIn("Python 3.14.8 <preview> & build", text)
         self.assertEqual(root.findall(".//preview"), [])
+
 
 class TestComparisonReports(unittest.TestCase):
     """Verify that every artifact publishes the same comparative results."""
@@ -1741,24 +2065,35 @@ class TestComparisonReports(unittest.TestCase):
         """
         # Pair a valid row with an errored row to expose invented failure metrics.
         good = {
-            "framework": "orionis-asgi", "interface": "asgi", "workers": 1,
+            "framework": "orionis-asgi",
+            "interface": "asgi",
+            "workers": 1,
             "warmup": {**_successful_runs()[0], "requests": 1000000},
             **aggregate_samples(_successful_runs()),
         }
         failed = {
-            "framework": "fastapi", "interface": "asgi", "workers": 2,
+            "framework": "fastapi",
+            "interface": "asgi",
+            "workers": 2,
             **aggregate_samples([parse_measurement(_measurement())]),
         }
         report = {
             "settings": {
-                "frameworks": ["orionis-asgi", "fastapi"], "workers": [1, 2],
-                "connections": 100, "warmup_seconds": 2,
+                "frameworks": ["orionis-asgi", "fastapi"],
+                "workers": [1, 2],
+                "connections": 100,
+                "warmup_seconds": 2,
                 "warmup_frameworks": ["orionis-asgi"],
-                "repetitions": 3, "duration_seconds": 10,
+                "repetitions": 3,
+                "duration_seconds": 10,
             },
             "environment": {
-                "os": "Ubuntu CI", "cpu": "CI CPU", "logical_cpus": 4,
-                "python": "3.14.8", "commit": "abc123", "dirty": False,
+                "os": "Ubuntu CI",
+                "cpu": "CI CPU",
+                "logical_cpus": 4,
+                "python": "3.14.8",
+                "commit": "abc123",
+                "dirty": False,
                 "run_url": "https://example.org/runs/123",
                 "versions": {"granian": "2.8.4", "oha": "1.16.0"},
             },
@@ -1782,24 +2117,39 @@ class TestComparisonReports(unittest.TestCase):
             with (output / "summary.csv").open(encoding="utf-8", newline="") as stream:
                 rows = list(csv.DictReader(stream))
 
-        self.assertEqual(saved_report, {
-            "schema_version": 2,
-            "settings": {
-                "frameworks": ["orionis-asgi", "fastapi"], "workers": [1, 2],
+        self.assertEqual(
+            saved_report,
+            {
+                "schema_version": 2,
+                "settings": {
+                    "frameworks": ["orionis-asgi", "fastapi"],
+                    "workers": [1, 2],
+                },
+                "results": [
+                    {
+                        "framework": "orionis-asgi",
+                        "interface": "asgi",
+                        "workers": 1,
+                        "status": "ok",
+                        "requests": 1110,
+                        "errors": 0,
+                        "requests_per_second": 100,
+                        "mean_latency_ms": 10,
+                        "p50_latency_ms": 5,
+                        "p95_latency_ms": 20,
+                        "p99_latency_ms": 30,
+                    },
+                    {
+                        "framework": "fastapi",
+                        "interface": "asgi",
+                        "workers": 2,
+                        "status": "failed",
+                        "requests": 100,
+                        "errors": 16,
+                    },
+                ],
             },
-            "results": [
-                {
-                    "framework": "orionis-asgi", "interface": "asgi", "workers": 1,
-                    "status": "ok", "requests": 1110, "errors": 0,
-                    "requests_per_second": 100, "mean_latency_ms": 10,
-                    "p50_latency_ms": 5, "p95_latency_ms": 20, "p99_latency_ms": 30,
-                },
-                {
-                    "framework": "fastapi", "interface": "asgi", "workers": 2,
-                    "status": "failed", "requests": 100, "errors": 16,
-                },
-            ],
-        })
+        )
         self.assertEqual(diagnostics, report)
         self.assertEqual(saved_environment, report["environment"])
         self.assertEqual(markdown, rendered)
@@ -1850,6 +2200,7 @@ class TestComparisonReports(unittest.TestCase):
         self.assertIn("diagnostics.json", json.loads(public)["error"])
         self.assertEqual(diagnostics["error"], report["error"])
 
+
 @unittest.skipUnless(find_spec("uvicorn") is not None, "Install benchmark dependencies")
 class TestUvicornTransport(unittest.TestCase):
     """Verify native Uvicorn launching with the multi-worker TCP correction."""
@@ -1866,12 +2217,17 @@ class TestUvicornTransport(unittest.TestCase):
         from benchmarks.http_compare.uvicorn_server import TcpNoDelayConfig
 
         config = TcpNoDelayConfig(
-            "unused", host="127.0.0.1", port=0, workers=2, log_config=None,
+            "unused",
+            host="127.0.0.1",
+            port=0,
+            workers=2,
+            log_config=None,
         )
         with closing(config.bind_socket()) as listener:
             self.assertEqual(listener.proto, 0)
             self.assertEqual(
-                listener.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY), 1,
+                listener.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY),
+                1,
             )
             self.assertEqual(listener.getsockname()[0], "127.0.0.1")
             self.assertTrue(listener.get_inheritable())
@@ -1881,7 +2237,8 @@ class TestUvicornTransport(unittest.TestCase):
                 closing(listener.accept()[0]) as accepted,
             ):
                 self.assertEqual(
-                    accepted.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY), 1,
+                    accepted.getsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY),
+                    1,
                 )
 
     def testTcpOptionFailureClosesTheBoundListener(self) -> None:
@@ -1904,7 +2261,9 @@ class TestUvicornTransport(unittest.TestCase):
         ):
             config.bind_socket()
         listener.setsockopt.assert_called_once_with(
-            socket.IPPROTO_TCP, socket.TCP_NODELAY, 1,
+            socket.IPPROTO_TCP,
+            socket.TCP_NODELAY,
+            1,
         )
         listener.close.assert_called_once_with()
 

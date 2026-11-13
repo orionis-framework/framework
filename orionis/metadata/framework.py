@@ -1,4 +1,4 @@
-"""Define framework for metadata."""
+"""Expose runtime identity and release metadata without importing services."""
 
 # Full name of the author or maintainer of the project
 AUTHOR = "Raul Mauricio Uñate Castro"

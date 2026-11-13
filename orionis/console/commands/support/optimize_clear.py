@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Remove generated optimization artifacts from the application."""
 
 import shutil
@@ -36,10 +38,9 @@ _COMPILED_CACHE_FILES: tuple[str, ...] = ("config", "commands", "routes")
 _BYTECODE_SUFFIXES: frozenset[str] = frozenset({".pyc", ".pyo"})
 """Bytecode suffixes used by ``optimize_clear``."""
 
+
 class OptimizeClearCommand(BaseCommand):
     """Remove generated optimization artifacts from the application."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = True
     """Timestamps flag used by ``OptimizeClearCommand``."""

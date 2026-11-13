@@ -45,6 +45,8 @@ El conector es síncrono; Orionis ejecuta conexión, queries, resultados y contr
 
 Los engines son perezosos y reutilizables. Cierra una conexión directa cuando termines; deja que el ciclo de aplicación cierre las conexiones administradas. `disconnect(name=None)` del gestor cierra todas las cacheadas; con nombre, solamente la seleccionada. No desconectes un servicio compartido mientras otras tareas lo usan.
 
+Al cerrar todas las conexiones administradas, el gestor intenta cerrar cada conexión cacheada aunque una falle. Conserva la cancelación si existe o, en su ausencia, el primer fallo de cierre, y comunica los adicionales al sistema central. Los cierres concurrentes de una conexión bloqueante adquirida o de su worker comparten la finalización y esperan la limpieza por cancelación antes de volver.
+
 Las lecturas materializan resultados completos. Aplica filtros, selección de columnas y paginación; no diseñes un exportador masivo suponiendo streaming de cursores. Divide escrituras grandes y considera que cada lote ocupa memoria. Para errores, diferencia configuración/driver de SQL fallido; conserva métricas de latencia, número de filas y operación de negocio sin exponer datos enlazados. No hay en esta capa garantía general de reintento automático de transacciones.
 
 Las operaciones independientes usan contextos `engine.begin()` y liberan su conexión después de cada llamada; una transacción conserva la conexión hasta terminar sus niveles. El SQL crudo parseado se reutiliza con una caché LRU de 256 textos, sin convertir valores variables en SQL interpolado. En PostgreSQL, los inserts por lotes cuentan filas devueltas por `RETURNING`, incluidas las diferencias cuando un trigger omite una fila de entrada.

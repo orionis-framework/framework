@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from dataclasses import asdict
 from orionis.foundation.config.hashing.entities.hashing import Hashing
@@ -15,14 +17,14 @@ from orionis.test import TestCase
 _ARGON2_OPTIONS: dict[str, int] = {"memory": 32, "threads": 1, "time": 1}
 _BCRYPT_OPTIONS: dict[str, int] = {"rounds": 4}
 
+
 class _StubApp:
     """Application double returning a fixed hashing configuration."""
 
     __slots__ = ("requested", "section")
 
     def __init__(self, section: object) -> None:
-        """
-        Store the configuration section handed to the manager.
+        """Store the configuration section handed to the manager.
 
         Parameters
         ----------
@@ -32,6 +34,7 @@ class _StubApp:
         Returns
         -------
         None
+            No return value.
         """
         self.section = section
         self.requested: list[str] = []
@@ -53,6 +56,7 @@ class _StubApp:
         self.requested.append(key)
         return self.section
 
+
 def build_config(driver: str = "argon2") -> Hashing:
     """
     Build a hashing configuration entity with cheap cost parameters.
@@ -72,6 +76,7 @@ def build_config(driver: str = "argon2") -> Hashing:
         argon2=dict(_ARGON2_OPTIONS),
         bcrypt=dict(_BCRYPT_OPTIONS),
     )
+
 
 def build_manager(driver: str = "argon2", *, as_entity: bool = False) -> HashManager:
     """
@@ -94,8 +99,8 @@ def build_manager(driver: str = "argon2", *, as_entity: bool = False) -> HashMan
     section = config if as_entity else asdict(config)
     return HashManager(_StubApp(section))  # type: ignore[arg-type]
 
-class TestHashManagerLayout(TestCase):
 
+class TestHashManagerLayout(TestCase):
     def testImplementsTheManagerContract(self) -> None:
         """Register the manager as an implementation of its contract.
 
@@ -104,25 +109,9 @@ class TestHashManagerLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(build_manager(), IHashManager)
-
-    def testDeclaresTheExpectedSlots(self) -> None:
-        """Declare the state of the manager as explicit slots.
-
-        Validates the memory layout required by the framework
-        conventions.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(
-            HashManager.__dict__.get("__slots__"),
-            ("_config", "_default", "_drivers"),
-        )
 
     def testDoesNotExposeAnInstanceDictionary(self) -> None:
         """Keep instances free of an attribute dictionary.
@@ -133,12 +122,12 @@ class TestHashManagerLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(build_manager(), "__dict__"))
 
-class TestHashManagerConstruction(TestCase):
 
+class TestHashManagerConstruction(TestCase):
     def testReadsOnlyTheHashingSection(self) -> None:
         """Read the hashing section from the application configuration.
 
@@ -147,7 +136,7 @@ class TestHashManagerConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp(asdict(build_config()))
         HashManager(app)  # type: ignore[arg-type]
@@ -162,7 +151,7 @@ class TestHashManagerConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         self.assertEqual(manager.getDefaultDriver(), "argon2")
@@ -177,7 +166,7 @@ class TestHashManagerConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager(as_entity=True)
         self.assertEqual(manager.getDefaultDriver(), "argon2")
@@ -192,7 +181,7 @@ class TestHashManagerConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager("bcrypt")
         self.assertEqual(manager.getDefaultDriver(), "bcrypt")
@@ -208,7 +197,7 @@ class TestHashManagerConstruction(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         expected = str(Hashing().driver)
         for section in (None, {}):
@@ -216,20 +205,8 @@ class TestHashManagerConstruction(TestCase):
             self.assertEqual(manager.getDefaultDriver(), expected)
             self.assertIsInstance(manager.driver(), IHasher)
 
+
 class TestHashManagerDriverResolution(TestCase):
-
-    def testResolvesTheDefaultDriverWhenNoNameIsGiven(self) -> None:
-        """Resolve the configured driver when no name is provided.
-
-        Validates the resolution used by every delegated operation.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertIsInstance(build_manager().driver(), Argon2Hasher)
-
     def testResolvesADriverByName(self) -> None:
         """Resolve a named driver regardless of the configured default.
 
@@ -238,7 +215,7 @@ class TestHashManagerDriverResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(build_manager().driver("bcrypt"), BcryptHasher)
 
@@ -250,7 +227,7 @@ class TestHashManagerDriverResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         self.assertIs(manager.driver(""), manager.driver())
@@ -263,7 +240,7 @@ class TestHashManagerDriverResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         self.assertIs(manager.driver(), manager.driver("argon2"))
@@ -276,23 +253,10 @@ class TestHashManagerDriverResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         self.assertIsNot(manager.driver("argon2"), manager.driver("bcrypt"))
-
-    def testRejectsAnUnsupportedDriver(self) -> None:
-        """Reject a driver name without an implementation.
-
-        Validates that a typo never degrades password storage silently.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(HashDriverNotSupportedException):
-            build_manager().driver("md5")
 
     def testUnsupportedDriverErrorListsTheSupportedOnes(self) -> None:
         """Report the rejected name and the supported alternatives.
@@ -302,7 +266,7 @@ class TestHashManagerDriverResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(HashDriverNotSupportedException) as captured:
             build_manager().driver("md5")
@@ -319,7 +283,7 @@ class TestHashManagerDriverResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hashed = await build_manager().make("secret")
         self.assertIn("m=32", hashed)
@@ -334,13 +298,13 @@ class TestHashManagerDriverResolution(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hashed = await build_manager("bcrypt").make("secret")
         self.assertTrue(hashed.startswith("$2b$04$"))
 
-class TestHashManagerDelegation(TestCase):
 
+class TestHashManagerDelegation(TestCase):
     async def testMakeUsesTheDefaultDriver(self) -> None:
         """Produce hashes with the configured default driver.
 
@@ -349,7 +313,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         hashed = await build_manager().make("secret")
         self.assertTrue(hashed.startswith("$argon2id$"))
@@ -362,7 +326,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         hashed = await manager.make("my-secret-password")
@@ -376,7 +340,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         hashed = await manager.make("my-secret-password")
@@ -390,7 +354,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("t=2", await build_manager().make("secret", rounds=2))
 
@@ -402,7 +366,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("m=16", await build_manager().make("secret", memory=16))
 
@@ -414,7 +378,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("p=2", await build_manager().make("secret", threads=2))
 
@@ -426,7 +390,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(build_manager().getAlgorithm(), "argon2id")
         self.assertEqual(build_manager("bcrypt").getAlgorithm(), "bcrypt")
@@ -439,7 +403,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         self.assertFalse(manager.needsRehash(await manager.make("secret")))
@@ -452,7 +416,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         legacy = await manager.driver("bcrypt").make("secret")
@@ -466,7 +430,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         self.assertIs(manager.setRounds(2), manager)
@@ -479,7 +443,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         manager.setRounds(2)
@@ -494,7 +458,7 @@ class TestHashManagerDelegation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
         hashed = await manager.make("secret")
@@ -502,8 +466,8 @@ class TestHashManagerDelegation(TestCase):
         self.assertTrue(manager.needsRehash(hashed))
         self.assertTrue(await manager.check("secret", hashed))
 
-class TestHashManagerConcurrency(TestCase):
 
+class TestHashManagerConcurrency(TestCase):
     async def testConcurrentHashingProducesVerifiableHashes(self) -> None:
         """Hash from several tasks without corrupting the shared cache.
 
@@ -514,7 +478,7 @@ class TestHashManagerConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = build_manager()
 

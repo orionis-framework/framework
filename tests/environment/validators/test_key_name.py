@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.environment.validators import ValidateKeyName as PackageValidateKeyName
 from orionis.environment.validators.key_name import ValidateKeyName
 from orionis.test import TestCase
@@ -6,8 +8,8 @@ from orionis.test import TestCase
 # TestValidateKeyNameAcceptedNames
 # ---------------------------------------------------------------------------
 
-class TestValidateKeyNameAcceptedNames(TestCase):
 
+class TestValidateKeyNameAcceptedNames(TestCase):
     def testAcceptsEveryValidNamingShape(self) -> None:
         """Accept every documented shape of a valid variable name.
 
@@ -18,7 +20,7 @@ class TestValidateKeyNameAcceptedNames(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for key in (
             "A",
@@ -40,7 +42,7 @@ class TestValidateKeyNameAcceptedNames(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         key = "MY_KEY"
         self.assertIs(ValidateKeyName(key), key)
@@ -54,16 +56,17 @@ class TestValidateKeyNameAcceptedNames(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(ValidateKeyName, PackageValidateKeyName)
+
 
 # ---------------------------------------------------------------------------
 # TestValidateKeyNameRejectedTypes
 # ---------------------------------------------------------------------------
 
-class TestValidateKeyNameRejectedTypes(TestCase):
 
+class TestValidateKeyNameRejectedTypes(TestCase):
     def testRejectsEveryNonStringInput(self) -> None:
         """Raise TypeError for every non-string input.
 
@@ -73,7 +76,7 @@ class TestValidateKeyNameRejectedTypes(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for key in (42, 3.14, True, None, ["KEY"], {"KEY": 1}, ("KEY",)):
             with self.assertRaises(TypeError):
@@ -88,18 +91,19 @@ class TestValidateKeyNameRejectedTypes(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError) as ctx:
             ValidateKeyName(42)
         self.assertIn("int", str(ctx.exception))
 
+
 # ---------------------------------------------------------------------------
 # TestValidateKeyNameRejectedNames
 # ---------------------------------------------------------------------------
 
-class TestValidateKeyNameRejectedNames(TestCase):
 
+class TestValidateKeyNameRejectedNames(TestCase):
     def testRejectsEveryNameOutsideThePattern(self) -> None:
         """Raise ValueError for every name outside the allowed pattern.
 
@@ -110,7 +114,7 @@ class TestValidateKeyNameRejectedNames(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for key in (
             "",
@@ -136,7 +140,7 @@ class TestValidateKeyNameRejectedNames(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError) as ctx:
             ValidateKeyName("lower")
@@ -144,12 +148,13 @@ class TestValidateKeyNameRejectedNames(TestCase):
         self.assertIn("lower", message)
         self.assertIn("MY_ENV_VAR", message)
 
+
 # ---------------------------------------------------------------------------
 # TestValidateKeyNameCaching
 # ---------------------------------------------------------------------------
 
-class TestValidateKeyNameCaching(TestCase):
 
+class TestValidateKeyNameCaching(TestCase):
     def testReusesTheCachedResultForRepeatedNames(self) -> None:
         """Serve repeated validations from the memoisation cache.
 
@@ -159,7 +164,7 @@ class TestValidateKeyNameCaching(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         info_before = ValidateKeyName.cache_info()
         ValidateKeyName("CACHED_KEY")

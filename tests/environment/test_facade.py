@@ -1,7 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import os
-import shutil
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 from typing import ClassVar
 from orionis.environment import Env
 from orionis.environment import facade as facade_module
@@ -17,6 +19,7 @@ _UNAVAILABLE: str = "environment file is unavailable"
 # Test doubles
 # ---------------------------------------------------------------------------
 
+
 class _UnavailableDotEnv:
     """Reader double whose construction always fails."""
 
@@ -30,7 +33,7 @@ class _UnavailableDotEnv:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
 
         Raises
         ------
@@ -39,12 +42,14 @@ class _UnavailableDotEnv:
         """
         raise self.failure(_UNAVAILABLE)
 
+
 class _OsErrorDotEnv(_UnavailableDotEnv):
     """Reader double failing with a filesystem error."""
 
     __slots__ = ()
 
     failure: ClassVar[type[Exception]] = OSError
+
 
 class _ValueErrorDotEnv(_UnavailableDotEnv):
     """Reader double failing with a decoding error."""
@@ -53,6 +58,7 @@ class _ValueErrorDotEnv(_UnavailableDotEnv):
 
     failure: ClassVar[type[Exception]] = ValueError
 
+
 class _RuntimeErrorDotEnv(_UnavailableDotEnv):
     """Reader double failing with an error the facade must not swallow."""
 
@@ -60,74 +66,42 @@ class _RuntimeErrorDotEnv(_UnavailableDotEnv):
 
     failure: ClassVar[type[Exception]] = RuntimeError
 
+
 # ---------------------------------------------------------------------------
 # Shared fixture
 # ---------------------------------------------------------------------------
 
+
 class _EnvTestCase(TestCase):
-
     def setUp(self) -> None:
-        """Install a throwaway `.env` file behind the facade.
-
-        Isolates every test from the repository `.env` file and from the
-        process environment shared with the rest of the suite.
+        """Isolate the file, singleton, and process variables for this test.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._previous_singleton = vars(DotEnv)["_singleton_instance"]
-        type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
-        self._directory = Path(tempfile.mkdtemp())
-        self._env_path = self._directory / ".env"
-        DotEnv(path=str(self._env_path))
-        self._tracked_keys: list[str] = []
-
-    def tearDown(self) -> None:
-        """Restore the previous singleton and clean every side effect.
-
-        Removes the tracked process variables and the temporary directory
-        so no state survives the test case.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        for key in self._tracked_keys:
-            os.environ.pop(key, None)
-        shutil.rmtree(self._directory, ignore_errors=True)
-        type.__setattr__(
+        super().setUp()
+        self.addCleanup(
+            type.__setattr__,
             DotEnv,
             "_singleton_instance",
-            self._previous_singleton,
+            vars(DotEnv)["_singleton_instance"],
         )
+        type.__setattr__(DotEnv, "_singleton_instance", _MISSING)
+        self.enterContext(patch.dict(os.environ))
+        os.environ.pop("UNDEFINED_KEY", None)
+        self._directory = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        self._env_path = self._directory / ".env"
+        DotEnv(path=str(self._env_path))
 
-    def _trackKey(self, key: str) -> str:
-        """
-        Register a variable for automatic cleanup after the test.
-
-        Parameters
-        ----------
-        key : str
-            Environment variable name to remove during teardown.
-
-        Returns
-        -------
-        str
-            The same key, so it can be used inline at the call site.
-        """
-        if key not in self._tracked_keys:
-            self._tracked_keys.append(key)
-        return key
 
 # ---------------------------------------------------------------------------
 # TestEnvGet
 # ---------------------------------------------------------------------------
 
-class TestEnvGet(_EnvTestCase):
 
+class TestEnvGet(_EnvTestCase):
     def testReturnsTheStoredValue(self) -> None:
         """Return the value stored for an existing variable.
 
@@ -137,9 +111,9 @@ class TestEnvGet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        Env.set(self._trackKey("FACADE_KEY"), "value")
+        Env.set("FACADE_KEY", "value")
         self.assertEqual(Env.get("FACADE_KEY"), "value")
 
     def testReturnsNoneForAnUnknownVariable(self) -> None:
@@ -150,7 +124,7 @@ class TestEnvGet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(Env.get("UNDEFINED_KEY"))
 
@@ -163,7 +137,7 @@ class TestEnvGet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Env.get("UNDEFINED_KEY", "fallback"), "fallback")
         self.assertEqual(Env.get("UNDEFINED_KEY", 7), 7)
@@ -177,9 +151,9 @@ class TestEnvGet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        Env.set(self._trackKey("TYPED_KEY"), 42, "int")
+        Env.set("TYPED_KEY", 42, "int")
         self.assertEqual(Env.get("TYPED_KEY"), 42)
 
     def testRejectsAnInvalidVariableName(self) -> None:
@@ -191,17 +165,18 @@ class TestEnvGet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Env.get("lower_case")
+
 
 # ---------------------------------------------------------------------------
 # TestEnvSet
 # ---------------------------------------------------------------------------
 
-class TestEnvSet(_EnvTestCase):
 
+class TestEnvSet(_EnvTestCase):
     def testReportsASuccessfulAssignment(self) -> None:
         """Report success after storing a variable.
 
@@ -210,9 +185,9 @@ class TestEnvSet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertTrue(Env.set(self._trackKey("FACADE_KEY"), "value"))
+        self.assertTrue(Env.set("FACADE_KEY", "value"))
 
     def testRestoresEverySupportedValueType(self) -> None:
         """Restore every supported value type through the facade.
@@ -223,12 +198,12 @@ class TestEnvSet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for index, value in enumerate(
             ("text", 42, 2.5, True, False, [1, 2], {"a": 1}, (1, 2), {1, 2}),
         ):
-            key = self._trackKey(f"FACADE_VALUE_{index}")
+            key = f"FACADE_VALUE_{index}"
             Env.set(key, value, only_os=True)
             self.assertEqual(Env.get(key), value)
 
@@ -241,9 +216,9 @@ class TestEnvSet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("FACADE_SECRET")
+        key = "FACADE_SECRET"
         Env.set(key, "secret", EnvironmentValueType.BASE64, only_os=True)
         self.assertEqual(Env.get(key), "secret")
 
@@ -256,9 +231,9 @@ class TestEnvSet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("FACADE_KEY")
+        key = "FACADE_KEY"
         Env.set(key, "first")
         Env.set(key, "second")
         self.assertEqual(Env.get(key), "second")
@@ -272,19 +247,20 @@ class TestEnvSet(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("FACADE_EPHEMERAL")
+        key = "FACADE_EPHEMERAL"
         Env.set(key, "value", only_os=True)
         self.assertNotIn(key, self._env_path.read_text(encoding="utf-8"))
         self.assertEqual(Env.get(key), "value")
+
 
 # ---------------------------------------------------------------------------
 # TestEnvUnset
 # ---------------------------------------------------------------------------
 
-class TestEnvUnset(_EnvTestCase):
 
+class TestEnvUnset(_EnvTestCase):
     def testReportsASuccessfulRemoval(self) -> None:
         """Report success after removing a variable.
 
@@ -293,9 +269,9 @@ class TestEnvUnset(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("FACADE_KEY")
+        key = "FACADE_KEY"
         Env.set(key, "value")
         self.assertTrue(Env.unset(key))
 
@@ -308,9 +284,9 @@ class TestEnvUnset(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("FACADE_KEY")
+        key = "FACADE_KEY"
         Env.set(key, "value")
         Env.unset(key)
         self.assertIsNone(Env.get(key))
@@ -325,9 +301,9 @@ class TestEnvUnset(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("FACADE_KEY")
+        key = "FACADE_KEY"
         Env.set(key, "value")
         Env.unset(key, only_os=True)
         self.assertIn(key, Env.all())
@@ -342,16 +318,17 @@ class TestEnvUnset(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(Env.unset("UNDEFINED_KEY"))
+
 
 # ---------------------------------------------------------------------------
 # TestEnvAll
 # ---------------------------------------------------------------------------
 
-class TestEnvAll(_EnvTestCase):
 
+class TestEnvAll(_EnvTestCase):
     def testReturnsAnEmptyMappingForAnEmptyFile(self) -> None:
         """Return an empty mapping when the file holds no variables.
 
@@ -360,7 +337,7 @@ class TestEnvAll(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Env.all(), {})
 
@@ -373,20 +350,34 @@ class TestEnvAll(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        Env.set(self._trackKey("FACADE_NUMBER"), 42)
-        Env.set(self._trackKey("FACADE_TEXT"), "text")
+        Env.set("FACADE_NUMBER", 42)
+        Env.set("FACADE_TEXT", "text")
         self.assertEqual(
             Env.all(),
             {"FACADE_NUMBER": 42, "FACADE_TEXT": "text"},
         )
 
+
 # ---------------------------------------------------------------------------
 # TestEnvReload
 # ---------------------------------------------------------------------------
 
+
 class TestEnvReload(_EnvTestCase):
+    def testPropagatesDecodingFailureFromTheRealFile(self) -> None:
+        """Preserve the real reload failure when the selected file is not UTF-8.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self._env_path.write_bytes(b"ORIONIS_BAD_ENCODING=\xff\xfe\n")
+        with self.assertRaises(RuntimeError) as caught:
+            Env.reload()
+        self.assertIsInstance(caught.exception.__cause__, UnicodeDecodeError)
 
     def testReportsASuccessfulReload(self) -> None:
         """Report success after reloading the file.
@@ -396,7 +387,7 @@ class TestEnvReload(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(Env.reload())
 
@@ -409,9 +400,9 @@ class TestEnvReload(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        key = self._trackKey("FACADE_EXTERNAL")
+        key = "FACADE_EXTERNAL"
         self._env_path.write_text(f"{key}=external\n", encoding="utf-8")
         Env.reload()
         self.assertEqual(Env.get(key), "external")
@@ -425,18 +416,19 @@ class TestEnvReload(_EnvTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         before = DotEnv()
         Env.reload()
         self.assertIs(DotEnv(), before)
 
+
 # ---------------------------------------------------------------------------
 # TestEnvReloadFailures
 # ---------------------------------------------------------------------------
 
-class _EnvReloadFailureTestCase(TestCase):
 
+class _EnvReloadFailureTestCase(TestCase):
     dot_env_double: ClassVar[type] = _OsErrorDotEnv
 
     def setUp(self) -> None:
@@ -448,26 +440,13 @@ class _EnvReloadFailureTestCase(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_dot_env = facade_module.DotEnv
-        facade_module.DotEnv = self.dot_env_double
+        super().setUp()
+        self.enterContext(patch.object(facade_module, "DotEnv", self.dot_env_double))
 
-    def tearDown(self) -> None:
-        """Restore the original reader after each test.
-
-        Guarantees that module-level state is never leaked to other test
-        cases running in the same process.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        facade_module.DotEnv = self._original_dot_env
 
 class TestEnvReloadFilesystemFailure(_EnvReloadFailureTestCase):
-
     dot_env_double: ClassVar[type] = _OsErrorDotEnv
 
     def testReportsFailureInsteadOfRaising(self) -> None:
@@ -479,12 +458,12 @@ class TestEnvReloadFilesystemFailure(_EnvReloadFailureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(Env.reload())
 
-class TestEnvReloadDecodingFailure(_EnvReloadFailureTestCase):
 
+class TestEnvReloadDecodingFailure(_EnvReloadFailureTestCase):
     dot_env_double: ClassVar[type] = _ValueErrorDotEnv
 
     def testReportsFailureInsteadOfRaising(self) -> None:
@@ -496,12 +475,12 @@ class TestEnvReloadDecodingFailure(_EnvReloadFailureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(Env.reload())
 
-class TestEnvReloadUnexpectedFailure(_EnvReloadFailureTestCase):
 
+class TestEnvReloadUnexpectedFailure(_EnvReloadFailureTestCase):
     dot_env_double: ClassVar[type] = _RuntimeErrorDotEnv
 
     def testPropagatesUnexpectedFailures(self) -> None:
@@ -513,17 +492,18 @@ class TestEnvReloadUnexpectedFailure(_EnvReloadFailureTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(RuntimeError):
             Env.reload()
+
 
 # ---------------------------------------------------------------------------
 # TestEnvLayout
 # ---------------------------------------------------------------------------
 
-class TestEnvLayout(TestCase):
 
+class TestEnvLayout(TestCase):
     def testDeclaresEmptySlots(self) -> None:
         """Declare empty slots for a facade that holds no state.
 
@@ -533,7 +513,7 @@ class TestEnvLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Env.__slots__, ())
 
@@ -546,6 +526,6 @@ class TestEnvLayout(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(Env(), "__dict__"))

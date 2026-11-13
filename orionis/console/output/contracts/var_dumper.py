@@ -7,6 +7,7 @@ from typing import TypeVar
 T = TypeVar("T")
 """Type parameter preserving the value type across var dumper operations."""
 
+
 class IVarDumper(ABC):
     """Define the contract for var dumper implementations."""
 

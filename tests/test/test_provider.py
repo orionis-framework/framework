@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.test import TestCase
@@ -5,6 +7,7 @@ from orionis.test import provider as provider_module
 from orionis.test.contracts.engine import ITestingEngine
 from orionis.test.core.engine import TestingEngine
 from orionis.test.provider import TestingProvider
+
 
 class _StubApp:
     """Application double recording every binding it receives."""
@@ -40,6 +43,7 @@ class _StubApp:
         """
         self.singletons.append((abstract, concrete))
 
+
 class _StubFacade:
     """Testing facade double counting how many times it was pinned."""
 
@@ -67,8 +71,8 @@ class _StubFacade:
         """
         self.pinned += 1
 
-class TestTestingProviderDefinition(TestCase):
 
+class TestTestingProviderDefinition(TestCase):
     def testExtendsServiceProvider(self) -> None:
         """
         Extend the base service provider.
@@ -106,8 +110,8 @@ class TestTestingProviderDefinition(TestCase):
         app = _StubApp()
         self.assertIs(TestingProvider(app).app, app)  # type: ignore[arg-type]
 
-class TestTestingProviderRegistration(TestCase):
 
+class TestTestingProviderRegistration(TestCase):
     def testRegisterBindsTheEngineAsSingleton(self) -> None:
         """
         Bind the concrete engine to its contract as a singleton.
@@ -135,8 +139,8 @@ class TestTestingProviderRegistration(TestCase):
             [(ITestingEngine, TestingEngine)] * 2,
         )
 
-class TestTestingProviderBoot(TestCase):
 
+class TestTestingProviderBoot(TestCase):
     def setUp(self) -> None:
         """
         Replace the testing facade with a double before each scenario.

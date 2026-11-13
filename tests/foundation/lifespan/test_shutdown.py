@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from io import StringIO
 from orionis.foundation.lifespan import shutdown
 from orionis.test import TestCase
@@ -5,6 +7,7 @@ from tests.foundation.lifespan.test_startup import (
     _ImmediateConsole,
     _LifespanApplication,
 )
+
 
 class TestShutdownDisplay(TestCase):
     def setUp(self) -> None:

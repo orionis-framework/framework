@@ -27,7 +27,7 @@ plan = Document.published().toPlan()
 assert len(plan.wheres) == 1
 ```
 
-Inside an application, `await Document.published().get()` applies the scope. `query.scope("published")` is an explicit alternative; an absent name raises `ScopeNotFoundException`. Register global scopes through `Document.addGlobalScope("policy", callback)`; they apply before execution. `withoutGlobalScope("policy")`, `withoutGlobalScopes(...)`, and `removeGlobalScope("policy")` omit or remove them at their respective scope. Do not change the global registry for one concurrent request: modify that request's builder.
+Inside an application, `await Document.published().get()` applies the scope. `query.scope("published")` is an explicit alternative; an absent name raises `ScopeNotFoundException`. Register global scopes through `Document.addGlobalScope("policy", callback)`; they apply before execution. `withoutGlobalScope("policy")`, `withoutGlobalScopes(...)`, and `removeGlobalScope("policy")` omit or remove them at their respective scope. Do not change the global registry for one concurrent request: modify that request's builder. If a global scope raises, its query-plan changes are discarded and a later execution retries scope preparation; external effects performed by that callback are not rolled back.
 
 ## Listen to and veto persistence
 
@@ -45,7 +45,7 @@ Only `saving`, `creating`, `updating`, `deleting`, and `restoring` allow veto by
 
 Observers expose methods named after events and register through `Document.observe(observer)`. Passing a class instantiates it without arguments: build the object first when it requires dependencies. `flushEvents(event=None)` removes listeners and helps test isolation. Registrations are class-level and inherited when subclasses are created; do not repeatedly register listeners on every request.
 
-After-events run after the statement, rather than after an outer transaction commits. A `created` listener sending email may run before a later rollback. Design external effects with deliberate identities and retry behavior. Bulk builder writes do not run every instance lifecycle.
+Successful after-events run only when the instance operation succeeds; an update, delete, or restore that finds no affected row returns `False` without those events. Local attributes may still reflect the attempted change, so inspect the result. After-events run after the statement, rather than after an outer transaction commits. A `created` listener sending email may run before a later rollback. Design external effects with deliberate identities and retry behavior. Bulk builder writes do not run every instance lifecycle.
 
 ## Logical deletion
 

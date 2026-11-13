@@ -1,7 +1,10 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from collections.abc import ItemsView, KeysView, ValuesView
 from typing import get_args, get_origin, get_type_hints
 from orionis.http.payload.estructures.cookies import Cookies
 from orionis.test import TestCase
+
 
 class TestCookieViewAnnotations(TestCase):
     """Keep cookie view annotations resolvable and consistent with their results."""
@@ -38,7 +41,8 @@ class TestCookieViewAnnotations(TestCase):
         keys = cookies.keys()
         values = cookies.values()
         self.assertEqual(
-            list(items), [("color", "blue"), ("empty", ""), ("name", "A B")],
+            list(items),
+            [("color", "blue"), ("empty", ""), ("name", "A B")],
         )
         self.assertEqual(list(keys), ["color", "empty", "name"])
         self.assertEqual(list(values), ["blue", "", "A B"])

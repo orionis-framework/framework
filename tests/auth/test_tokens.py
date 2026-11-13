@@ -1,9 +1,12 @@
+# ruff: noqa: ANN401, ARG002, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Preserve dynamic application configuration and provider override signatures.
 import asyncio
 import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, ClassVar
 from orionis.auth.exceptions import TokenException
 from orionis.auth.guards.token_guard import TokenGuard
 from orionis.auth.tokens import repository as token_module
@@ -16,6 +19,7 @@ from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, DateTime, String, Text
 from orionis.test import TestCase
+
 
 class _StubApp:
     """Application stub exposing the database and token configuration."""
@@ -35,12 +39,12 @@ class _StubApp:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self._database = database
         self._tokens = tokens or {}
 
-    def config(self, key: str | None = None) -> Any:  # noqa: ANN401
+    def config(self, key: str | None = None) -> Any:
         """Resolve a dot-notated configuration key.
 
         Parameters
@@ -77,6 +81,7 @@ class _StubApp:
                 return None
         return node
 
+
 class _Identity:
     """Authorizable double owning personal access tokens."""
 
@@ -95,7 +100,7 @@ class _Identity:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.identifier = identifier
         self.kind = kind
@@ -150,6 +155,7 @@ class _Identity:
         """
         return self.identifier
 
+
 class _DirectoryProvider:
     """Identity provider double backed by an in-memory mapping."""
 
@@ -166,7 +172,7 @@ class _DirectoryProvider:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.identities = identities
         self.entered: asyncio.Event | None = None
@@ -190,7 +196,7 @@ class _DirectoryProvider:
             await self.released.wait()
         return self.identities.get(int(identifier))
 
-    async def retrieveByCredentials(self, credentials: object) -> _Identity | None:  # noqa: ARG002
+    async def retrieveByCredentials(self, credentials: object) -> _Identity | None:
         """Credential lookup is never used by the token guard.
 
         Parameters
@@ -205,7 +211,7 @@ class _DirectoryProvider:
         """
         return None
 
-    async def validateCredentials(self, identity: object, credentials: object) -> bool:  # noqa: ARG002
+    async def validateCredentials(self, identity: object, credentials: object) -> bool:
         """Credential verification is never used by the token guard.
 
         Parameters
@@ -221,6 +227,7 @@ class _DirectoryProvider:
             Value produced by the helper.
         """
         return False
+
 
 def tokens_table() -> TableDefinition:
     """Build the ``personal_access_tokens`` table used by the tests.
@@ -251,6 +258,7 @@ def tokens_table() -> TableDefinition:
         primary_key="id",
     )
 
+
 def bearer_request(token: str | None) -> SimpleNamespace:
     """Build a request double exposing only the bearer token.
 
@@ -266,41 +274,41 @@ def bearer_request(token: str | None) -> SimpleNamespace:
     """
     return SimpleNamespace(bearerToken=token)
 
+
 class TestTokenFunctions(TestCase):
     """Validate the primitives backing personal access tokens."""
 
     def testSecretsAreUniqueAndUrlSafe(self) -> None:
-        """Validates that generated secrets never repeat.
+        """Validate that generated secrets never repeat.
 
         Reusing a secret would let one client impersonate another.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         secrets_seen = {generate_token_secret(40) for _ in range(200)}
         self.assertEqual(len(secrets_seen), 200)
         for secret in secrets_seen:
-            self.assertNotIn("|", secret)
-            self.assertNotIn(" ", secret)
+            self.assertRegex(secret, r"\A[A-Za-z0-9_-]+\Z")
 
     def testSecretLengthFollowsTheRequestedEntropy(self) -> None:
-        """Validates that the configured entropy reaches the generator.
+        """Validate that the configured entropy reaches the generator.
 
         More random bytes must produce a longer token.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         short = generate_token_secret(32)
         long = generate_token_secret(64)
         self.assertLess(len(short), len(long))
 
     def testDigestIsStableAndFixedWidth(self) -> None:
-        """Validates the value persisted in the database.
+        """Validate the value persisted in the database.
 
         The digest must be deterministic so lookups are a single index
         hit, and always 64 hexadecimal characters wide.
@@ -308,17 +316,18 @@ class TestTokenFunctions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         digest = hash_token_secret("a-secret")
         self.assertEqual(digest, hash_token_secret("a-secret"))
-        self.assertEqual(len(digest), 64)
+        self.assertRegex(digest, r"\A[0-9a-f]{64}\Z")
         self.assertNotEqual(digest, hash_token_secret("another-secret"))
+
 
 class _TokenCase(TestCase):
     """Base case creating the token table on a temporary SQLite file."""
 
-    tokens_config: dict[str, Any] = {}  # noqa: RUF012
+    tokens_config: ClassVar[dict[str, Any]] = {}
 
     async def asyncSetUp(self) -> None:
         """Create the schema and build the repository.
@@ -326,46 +335,38 @@ class _TokenCase(TestCase):
         Returns
         -------
         None
-            Prepares isolated state for the test.
+            No return value.
         """
         self._tmp = tempfile.TemporaryDirectory()
+        self.enterContext(self._tmp)
         database = str(Path(self._tmp.name) / "tokens.sqlite")
 
         self.app = _StubApp(database, self.tokens_config)
         self.manager = ConnectionManager(self.app)
         self._previous_manager = ConnectionResolver._manager
+        self.addCleanup(ConnectionResolver.setManager, self._previous_manager)
         ConnectionResolver.setManager(self.manager)
         self.connection = self.manager.connection("sqlite")
+        self.addAsyncCleanup(self.manager.disconnect)
         await self.connection.createTable(tokens_table())
 
         self.db = QueryBuilder(self.manager)
         self.repository = AccessTokenRepository(self.app, self.db)
         self.identity = _Identity(1)
 
-    async def asyncTearDown(self) -> None:
-        """Release the connection and drop the temporary database.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        ConnectionResolver.setManager(self._previous_manager)
-        await self.connection.disconnect()
-        self._tmp.cleanup()
 
 class TestAccessTokenRepository(_TokenCase):
     """Validate the persistence of personal access tokens."""
 
     async def testIssuesATokenAndStoresOnlyItsDigest(self) -> None:
-        """Validates the core security property of opaque tokens.
+        """Validate the core security property of opaque tokens.
 
         A leaked database row must never expose a usable credential.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "ci")
 
@@ -377,14 +378,14 @@ class TestAccessTokenRepository(_TokenCase):
         self.assertEqual(issued.access_token.name, "ci")
 
     async def testTheseSecretNeverAppearsInTheRepresentation(self) -> None:
-        """Validates that the plain text stays out of debugging output.
+        """Validate that the plain text stays out of debugging output.
 
         A token printed in a log would be a credential leak.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "ci")
         self.assertNotIn(issued.plain_text, repr(issued))
@@ -394,27 +395,27 @@ class TestAccessTokenRepository(_TokenCase):
         self.assertFalse(hasattr(issued.access_token, "__dict__"))
 
     async def testRejectsAnEmptyName(self) -> None:
-        """Validates the only input guard of token creation.
+        """Reject a name that cannot identify an issued credential.
 
         A nameless token cannot be audited nor revoked with confidence.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TokenException):
             await self.repository.create(self.identity, "   ")
 
     async def testResolvesAValidToken(self) -> None:
-        """Validates the lookup performed on every API request.
+        """Validate the lookup performed on every API request.
 
         The presented value is hashed and matched against the index.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "ci")
 
@@ -426,50 +427,55 @@ class TestAccessTokenRepository(_TokenCase):
         self.assertIsNone(found.abilities)
 
     async def testRejectsAnUnknownToken(self) -> None:
-        """Validates that a forged value resolves to nothing.
+        """Validate that a forged value resolves to nothing.
 
         Every failure mode answers exactly the same way.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(await self.repository.findByPlainText("forged"))
         self.assertIsNone(await self.repository.findByPlainText(""))
 
     async def testStoresAndRestoresTheAbilities(self) -> None:
-        """Validates the round trip of the token restrictions.
+        """Validate the round trip of the token restrictions.
 
         Abilities must survive the JSON encoding used for storage.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(
-            self.identity, "reader", abilities=["users.view", "users.list"],
+            self.identity,
+            "reader",
+            abilities=["users.view", "users.list"],
         )
 
         found = await self.repository.findByPlainText(issued.plain_text)
 
         self.assertEqual(
-            found.abilities, frozenset({"users.view", "users.list"}),
+            found.abilities,
+            frozenset({"users.view", "users.list"}),
         )
 
     async def testAnEmptyAbilitySetIsPreserved(self) -> None:
-        """Validates that "no ability" differs from "unrestricted".
+        """Validate that "no ability" differs from "unrestricted".
 
         Collapsing both would silently widen the token.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(
-            self.identity, "powerless", abilities=[],
+            self.identity,
+            "powerless",
+            abilities=[],
         )
 
         found = await self.repository.findByPlainText(issued.plain_text)
@@ -477,20 +483,19 @@ class TestAccessTokenRepository(_TokenCase):
         self.assertEqual(found.abilities, frozenset())
 
     async def testRejectsAnExpiredToken(self) -> None:
-        """Validates that expiration is honoured on lookup.
+        """Validate that expiration is honoured on lookup.
 
         An expired token is indistinguishable from an unknown one.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(
             self.identity,
             "stale",
-            expires_at=datetime.now(UTC).replace(tzinfo=None)
-            - timedelta(minutes=1),
+            expires_at=datetime.now(UTC).replace(tzinfo=None) - timedelta(minutes=1),
         )
 
         self.assertIsNone(
@@ -498,20 +503,19 @@ class TestAccessTokenRepository(_TokenCase):
         )
 
     async def testAcceptsATokenThatHasNotExpiredYet(self) -> None:
-        """Validates the boundary of the expiration check.
+        """Validate the boundary of the expiration check.
 
         A token valid for another hour must keep working.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(
             self.identity,
             "fresh",
-            expires_at=datetime.now(UTC).replace(tzinfo=None)
-            + timedelta(hours=1),
+            expires_at=datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=1),
         )
 
         self.assertIsNotNone(
@@ -519,14 +523,14 @@ class TestAccessTokenRepository(_TokenCase):
         )
 
     async def testRevokedTokensStopBeingAccepted(self) -> None:
-        """Validates immediate revocation.
+        """Validate immediate revocation.
 
         Opaque tokens are chosen precisely so revocation is instant.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "ci")
 
@@ -538,14 +542,14 @@ class TestAccessTokenRepository(_TokenCase):
         )
 
     async def testRevokingTwiceReportsNoFurtherChange(self) -> None:
-        """Validates that revocation is idempotent.
+        """Validate that revocation is idempotent.
 
         Only the call that actually revoked reports success.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "ci")
 
@@ -554,14 +558,14 @@ class TestAccessTokenRepository(_TokenCase):
         self.assertFalse(await self.repository.revoke(None))
 
     async def testRevokesEveryTokenOfAnIdentity(self) -> None:
-        """Validates the bulk revocation used on password changes.
+        """Validate the bulk revocation used on password changes.
 
         Only the tokens of that identity may be affected.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         other = _Identity(2)
         await self.repository.create(self.identity, "one")
@@ -576,14 +580,14 @@ class TestAccessTokenRepository(_TokenCase):
         )
 
     async def testSupportsSeveralTokensPerIdentity(self) -> None:
-        """Validates that an identity may hold many credentials.
+        """Validate that an identity may hold many credentials.
 
         Each device or integration gets its own revocable token.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         first = await self.repository.create(self.identity, "laptop")
         second = await self.repository.create(self.identity, "phone")
@@ -597,51 +601,50 @@ class TestAccessTokenRepository(_TokenCase):
         )
 
     async def testRecordsTheLastUsage(self) -> None:
-        """Validates the audit trail of a token.
+        """Validate the audit trail of a token.
 
         The column starts empty and is filled by a single statement.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "ci")
         self.assertIsNone(issued.access_token.last_used_at)
 
-        await self.repository.touch(issued.access_token.id)
+        self.assertTrue(await self.repository.touch(issued.access_token.id))
 
         row = await self.db.table("personal_access_tokens").first()
         self.assertIsNotNone(row["last_used_at"])
 
     async def testTouchingAnUnknownTokenIsSafe(self) -> None:
-        """Validates the no-op path of the usage update.
+        """Validate the no-op path of the usage update.
 
         A missing identifier must not raise.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self.repository.touch(None)
+        self.assertFalse(await self.repository.touch(None))
 
     async def testPurgesExpiredAndRevokedTokens(self) -> None:
-        """Validates the maintenance operation.
+        """Validate the maintenance operation.
 
         Only unusable rows may be deleted.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         alive = await self.repository.create(self.identity, "alive")
         expired = await self.repository.create(
             self.identity,
             "expired",
-            expires_at=datetime.now(UTC).replace(tzinfo=None)
-            - timedelta(minutes=1),
+            expires_at=datetime.now(UTC).replace(tzinfo=None) - timedelta(minutes=1),
         )
         revoked = await self.repository.create(self.identity, "revoked")
         await self.repository.revoke(revoked.access_token.id)
@@ -664,7 +667,7 @@ class TestAccessTokenRepository(_TokenCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for field, value in (
             ("abilities", "invalid-json"),
@@ -688,7 +691,7 @@ class TestAccessTokenRepository(_TokenCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TokenException):
             token_module._as_datetime("not-a-date")
@@ -699,12 +702,14 @@ class TestAccessTokenRepository(_TokenCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for abilities in ("users.view", [1], [""], [{}]):
             with self.assertRaises(TokenException):
                 await self.repository.create(
-                    self.identity, "invalid", abilities=abilities,
+                    self.identity,
+                    "invalid",
+                    abilities=abilities,
                 )
 
     async def testConcurrentCreationKeepsEveryCredentialIndependent(self) -> None:
@@ -713,12 +718,14 @@ class TestAccessTokenRepository(_TokenCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        issued = await asyncio.gather(*(
-            self.repository.create(self.identity, f"client-{index}")
-            for index in range(12)
-        ))
+        issued = await asyncio.gather(
+            *(
+                self.repository.create(self.identity, f"client-{index}")
+                for index in range(12)
+            ),
+        )
         self.assertEqual(len({item.plain_text for item in issued}), 12)
         self.assertEqual(len({item.access_token.id for item in issued}), 12)
         self.assertEqual(await self.db.table("personal_access_tokens").count(), 12)
@@ -729,12 +736,12 @@ class TestAccessTokenRepository(_TokenCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "shared")
-        results = await asyncio.gather(*(
-            self.repository.revoke(issued.access_token.id) for _ in range(8)
-        ))
+        results = await asyncio.gather(
+            *(self.repository.revoke(issued.access_token.id) for _ in range(8)),
+        )
         self.assertEqual(results.count(True), 1)
         self.assertFalse(await self.repository.touch(issued.access_token.id))
 
@@ -744,51 +751,56 @@ class TestAccessTokenRepository(_TokenCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.connection._compiler = SQLCompiler()
         issued = await self.repository.create(self.identity, "cold")
         self.assertIsNotNone(issued.access_token.id)
         self.assertTrue(await self.repository.revoke(issued.access_token.id))
 
+
 class TestConfiguredTokenExpiration(_TokenCase):
     """Validate the default lifetime configured for new tokens."""
 
-    tokens_config = {"expiration": 60}  # noqa: RUF012
+    tokens_config: ClassVar[dict[str, Any]] = {"expiration": 60}
 
     async def testAppliesTheConfiguredLifetime(self) -> None:
-        """Validates that tokens expire without an explicit deadline.
+        """Validate that tokens expire without an explicit deadline.
 
         The configuration is the single source of truth for the default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "ci")
 
-        self.assertIsNotNone(issued.access_token.expires_at)
+        expected = issued.access_token.created_at + timedelta(minutes=60)
+        self.assertEqual(issued.access_token.expires_at, expected)
         row = await self.db.table("personal_access_tokens").first()
-        self.assertIsNotNone(row["expires_at"])
+        self.assertEqual(token_module._as_datetime(row["expires_at"]), expected)
 
     async def testAnExplicitDeadlineWinsOverTheConfiguration(self) -> None:
-        """Validates that a caller may shorten or extend the lifetime.
+        """Validate that a caller may shorten or extend the lifetime.
 
         The explicit value must not be overwritten by the default.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         deadline = datetime.now(UTC).replace(tzinfo=None) + timedelta(days=7)
 
         issued = await self.repository.create(
-            self.identity, "long", expires_at=deadline,
+            self.identity,
+            "long",
+            expires_at=deadline,
         )
 
         self.assertEqual(issued.access_token.expires_at, deadline)
+
 
 class TestTokenGuard(_TokenCase):
     """Validate how API requests are authenticated."""
@@ -799,36 +811,38 @@ class TestTokenGuard(_TokenCase):
         Returns
         -------
         None
-            Prepares isolated state for the test.
+            No return value.
         """
         await super().asyncSetUp()
         self.provider = _DirectoryProvider({1: self.identity})
         self.guard = TokenGuard(self.repository, self.provider)
 
     def testExposesItsConfigurationName(self) -> None:
-        """Validates the name used to select the guard.
+        """Validate the name used to select the guard.
 
         The manager resolves guards by this exact string.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self.guard.name, "token")
 
     async def testResolvesTheIdentityOwningTheToken(self) -> None:
-        """Validates the happy path of API authentication.
+        """Validate the happy path of API authentication.
 
         The abilities of the token travel with the result.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(
-            self.identity, "ci", abilities=["users.view"],
+            self.identity,
+            "ci",
+            abilities=["users.view"],
         )
 
         result = await self.guard.resolve(bearer_request(issued.plain_text))
@@ -840,14 +854,14 @@ class TestTokenGuard(_TokenCase):
         self.assertEqual(result.credential_id, issued.access_token.id)
 
     async def testMarksTheTokenAsUsed(self) -> None:
-        """Validates that a successful request updates the audit column.
+        """Validate that a successful request updates the audit column.
 
         This is the only write a read-only API request performs.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "ci")
 
@@ -857,35 +871,34 @@ class TestTokenGuard(_TokenCase):
         self.assertIsNotNone(row["last_used_at"])
 
     async def testRequestsWithoutATokenStayAnonymous(self) -> None:
-        """Validates that a missing header is not an error.
+        """Validate that a missing header is not an error.
 
         Public API routes must keep working.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(await self.guard.resolve(bearer_request(None)))
         self.assertIsNone(await self.guard.resolve(bearer_request("")))
 
     async def testUnknownRevokedAndExpiredTokensAreRefused(self) -> None:
-        """Validates that every unusable token answers the same way.
+        """Validate that every unusable token answers the same way.
 
         The client cannot tell why the credential was rejected.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         revoked = await self.repository.create(self.identity, "revoked")
         await self.repository.revoke(revoked.access_token.id)
         expired = await self.repository.create(
             self.identity,
             "expired",
-            expires_at=datetime.now(UTC).replace(tzinfo=None)
-            - timedelta(minutes=1),
+            expires_at=datetime.now(UTC).replace(tzinfo=None) - timedelta(minutes=1),
         )
 
         self.assertIsNone(await self.guard.resolve(bearer_request("forged")))
@@ -897,14 +910,14 @@ class TestTokenGuard(_TokenCase):
         )
 
     async def testRefusesATokenWhoseOwnerDisappeared(self) -> None:
-        """Validates that deleting an account invalidates its tokens.
+        """Validate that deleting an account invalidates its tokens.
 
         The identity provider is the source of truth.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ghost = _Identity(99)
         issued = await self.repository.create(ghost, "ghost")
@@ -919,7 +932,7 @@ class TestTokenGuard(_TokenCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "racing")
         self.provider.entered = asyncio.Event()
@@ -927,12 +940,13 @@ class TestTokenGuard(_TokenCase):
         pending = asyncio.create_task(
             self.guard.resolve(bearer_request(issued.plain_text)),
         )
-        await self.provider.entered.wait()
         try:
+            await asyncio.wait_for(self.provider.entered.wait(), 5)
             await self.repository.revoke(issued.access_token.id)
         finally:
             self.provider.released.set()
-        self.assertIsNone(await pending)
+            await asyncio.wait_for(asyncio.gather(pending, return_exceptions=True), 5)
+        self.assertIsNone(pending.result())
 
     async def testMismatchedIdentityIdentifierIsRefused(self) -> None:
         """Refuse a provider response that belongs to a different owner.
@@ -940,7 +954,7 @@ class TestTokenGuard(_TokenCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(self.identity, "account")
         self.provider.identities[1] = _Identity(2)
@@ -949,17 +963,18 @@ class TestTokenGuard(_TokenCase):
         )
 
     async def testRefusesATokenIssuedForAnotherKindOfOwner(self) -> None:
-        """Validates the polymorphic guard on the token row.
+        """Validate the polymorphic guard on the token row.
 
         A token minted for a team must not authenticate an account.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = await self.repository.create(
-            _Identity(1, "tests.Team"), "team",
+            _Identity(1, "tests.Team"),
+            "team",
         )
 
         self.assertIsNone(

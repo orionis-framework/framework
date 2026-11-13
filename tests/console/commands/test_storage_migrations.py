@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from tempfile import TemporaryDirectory
 from threading import get_ident
 from typing import TYPE_CHECKING
@@ -37,6 +39,7 @@ if TYPE_CHECKING:
     from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
     from orionis.console.base.command import BaseCommand
 
+
 class _ObservedScheduleStore(ScheduleStore):
     """Record where the scheduler's native database store is constructed."""
 
@@ -53,6 +56,7 @@ class _ObservedScheduleStore(ScheduleStore):
         """
         self.database_thread = get_ident()
         return super().database()
+
 
 class _Application(CommandApplication):
     """Expose isolated storage configuration and database services."""
@@ -93,7 +97,9 @@ class _Application(CommandApplication):
             },
             "auth": {
                 "tokens": {
-                    "table": "api_tokens", "expiration": None, "secret_bytes": 40,
+                    "table": "api_tokens",
+                    "expiration": None,
+                    "secret_bytes": 40,
                 },
                 "passwords": {"table": "reset_links"},
             },
@@ -183,7 +189,9 @@ class _Application(CommandApplication):
             raise TypeError(message)
         return self.manager
 
+
 IApplication.register(_Application)
+
 
 class TestStorageMigrations(TestCase):
     """Verify framework-owned schema commands against isolated SQL databases."""
@@ -222,9 +230,10 @@ class TestStorageMigrations(TestCase):
             (_record(AuthMigrateCommand), shared),
             (_record(CacheMigrateCommand), shared),
             (_record(SessionMigrateCommand), shared),
-            (_record(ScheduleMigrateCommand), (
-                ScheduleStore(self.app, self.app.manager),
-            )),
+            (
+                _record(ScheduleMigrateCommand),
+                (ScheduleStore(self.app, self.app.manager),),
+            ),
             (_record(QueueMigrateCommand), (QueueManager(self.app, JobSerializer()),)),
         )
 
@@ -249,10 +258,12 @@ class TestStorageMigrations(TestCase):
             ("app_failed_jobs", build_failed_jobs_table("failed_jobs")),
         ):
             columns = await connection.select(
-                "SELECT name FROM pragma_table_info(:table)", {"table": table},
+                "SELECT name FROM pragma_table_info(:table)",
+                {"table": table},
             )
             self.assertEqual(
-                {column["name"] for column in columns}, set(definition.columns),
+                {column["name"] for column in columns},
+                set(definition.columns),
             )
         self.assertEqual(manager._drivers, {})
         self.assertIsNone(manager._failed)
@@ -279,11 +290,24 @@ class TestStorageMigrations(TestCase):
             "app_model_has_roles": ("role_id", "model_type", "model_id"),
             "app_role_has_permissions": ("permission_id", "role_id"),
             "app_api_tokens": (
-                "id", "tokenable_type", "tokenable_id", "name", "token", "abilities",
-                "last_used_at", "expires_at", "revoked_at", "created_at", "updated_at",
+                "id",
+                "tokenable_type",
+                "tokenable_id",
+                "name",
+                "token",
+                "abilities",
+                "last_used_at",
+                "expires_at",
+                "revoked_at",
+                "created_at",
+                "updated_at",
             ),
             "app_reset_links": (
-                "email", "token", "user_id", "password_fingerprint", "created_at",
+                "email",
+                "token",
+                "user_id",
+                "password_fingerprint",
+                "created_at",
             ),
         }
         tables = await connection.select(
@@ -294,7 +318,8 @@ class TestStorageMigrations(TestCase):
         for table, names in expected.items():
             with self.subTest(table=table):
                 columns = await connection.select(
-                    "SELECT name FROM pragma_table_info(:table)", {"table": table},
+                    "SELECT name FROM pragma_table_info(:table)",
+                    {"table": table},
                 )
                 self.assertEqual(tuple(column["name"] for column in columns), names)
         db = QueryBuilder(self.app.manager)
@@ -319,9 +344,13 @@ class TestStorageMigrations(TestCase):
             "SELECT name FROM sqlite_master WHERE type = 'table'",
         )
         names = {row["name"] for row in tables}
-        self.assertTrue({
-            "app_personal_access_tokens", "app_password_reset_tokens",
-        } <= names)
+        self.assertTrue(
+            {
+                "app_personal_access_tokens",
+                "app_password_reset_tokens",
+            }
+            <= names,
+        )
         self.assertTrue({"app_api_tokens", "app_reset_links"}.isdisjoint(names))
 
     async def testAuthMigratePreservesExistingAuthorizationAndRecoveryRecords(
@@ -337,7 +366,8 @@ class TestStorageMigrations(TestCase):
         """
         connection = self.app.manager.connection()
         for definition in (
-            *build_authorization_tables(), build_password_reset_table("reset_links"),
+            *build_authorization_tables(),
+            build_password_reset_table("reset_links"),
         ):
             await connection.createTable(definition)
         db = QueryBuilder(self.app.manager)
@@ -346,18 +376,24 @@ class TestStorageMigrations(TestCase):
         await registrar.assignRole(identity, "editor")
         await registrar.grantToRole("editor", "posts.update")
         await registrar.givePermissionTo(identity, "posts.view")
-        await db.table("reset_links").insert({
-            "email": "editor@example.test",
-            "token": "a" * 64,
-            "user_id": "123",
-            "password_fingerprint": "b" * 64,
-            "created_at": 123,
-        })
+        await db.table("reset_links").insert(
+            {
+                "email": "editor@example.test",
+                "token": "a" * 64,
+                "user_id": "123",
+                "password_fingerprint": "b" * 64,
+                "created_at": 123,
+            },
+        )
         expected = {
             table: await db.table(table).get()
             for table in (
-                "permissions", "roles", "model_has_permissions", "model_has_roles",
-                "role_has_permissions", "reset_links",
+                "permissions",
+                "roles",
+                "model_has_permissions",
+                "model_has_roles",
+                "role_has_permissions",
+                "reset_links",
             )
         }
         command = _record(AuthMigrateCommand)
@@ -483,7 +519,8 @@ class TestStorageMigrations(TestCase):
         )
         indexes = await connection.select("PRAGMA index_list(cron_tasks)")
         self.assertIn(
-            "ix_cron_tasks_next_run_time", [index["name"] for index in indexes],
+            "ix_cron_tasks_next_run_time",
+            [index["name"] for index in indexes],
         )
         record = {"id": "preserved", "next_run_time": 1.5, "job_state": b"job-state"}
         await connection.execute(
@@ -492,7 +529,8 @@ class TestStorageMigrations(TestCase):
             record,
         )
         self.assertEqual(
-            await command.handle(ScheduleStore(self.app, self.app.manager)), 0,
+            await command.handle(ScheduleStore(self.app, self.app.manager)),
+            0,
         )
         self.assertEqual(await connection.select("SELECT * FROM cron_tasks"), [record])
         self.assertIsNone(self.app.manager.connection()._engine)
@@ -509,7 +547,8 @@ class TestStorageMigrations(TestCase):
         self.app.settings["scheduler"]["stores"]["database"] = None
         command = _record(ScheduleMigrateCommand)
         self.assertEqual(
-            await command.handle(ScheduleStore(self.app, self.app.manager)), 1,
+            await command.handle(ScheduleStore(self.app, self.app.manager)),
+            1,
         )
         self.assertEqual(command.messages[0][0], "error")
         self.assertIsNone(self.app.manager.connection()._engine)
@@ -528,18 +567,23 @@ class TestStorageMigrations(TestCase):
         connection = self.app.manager.connection("storage")
         columns = await connection.select("PRAGMA table_info(app_http_sessions)")
         self.assertEqual(
-            [column["name"] for column in columns], ["id", "payload", "expires_at"],
+            [column["name"] for column in columns],
+            ["id", "payload", "expires_at"],
         )
         definition = TableDefinition(name="http_sessions")
         record = {"id": "preserved", "payload": "{}", "expires_at": 1}
         await connection.insert(InsertPlan(table=definition, values=[record]))
         self.assertEqual(await command.handle(self.app, self.app.manager), 0)
         self.assertEqual(
-            await connection.select(SelectPlan(table=definition)), [record],
+            await connection.select(SelectPlan(table=definition)),
+            [record],
         )
-        self.assertEqual(await self.app.manager.connection().select(
-            "SELECT name FROM sqlite_master WHERE type = 'table'",
-        ), [])
+        self.assertEqual(
+            await self.app.manager.connection().select(
+                "SELECT name FROM sqlite_master WHERE type = 'table'",
+            ),
+            [],
+        )
 
     async def testSessionMigrateReportsMissingConnection(self) -> None:
         """
@@ -581,18 +625,32 @@ class TestStorageMigrations(TestCase):
         tables = await self.app.manager.connection("storage").select(
             "SELECT name FROM sqlite_master WHERE type = 'table'",
         )
-        self.assertEqual({row["name"] for row in tables}, {
-            "app_cached_values", "app_held_locks", "app_http_sessions", "cron_tasks",
-            "app_pending_jobs", "app_failed_jobs",
-        })
+        self.assertEqual(
+            {row["name"] for row in tables},
+            {
+                "app_cached_values",
+                "app_held_locks",
+                "app_http_sessions",
+                "cron_tasks",
+                "app_pending_jobs",
+                "app_failed_jobs",
+            },
+        )
         default_tables = await self.app.manager.connection().select(
             "SELECT name FROM sqlite_master WHERE type = 'table'",
         )
-        self.assertEqual({row["name"] for row in default_tables}, {
-            "app_permissions", "app_roles", "app_model_has_permissions",
-            "app_model_has_roles", "app_role_has_permissions", "app_api_tokens",
-            "app_reset_links",
-        })
+        self.assertEqual(
+            {row["name"] for row in default_tables},
+            {
+                "app_permissions",
+                "app_roles",
+                "app_model_has_permissions",
+                "app_model_has_roles",
+                "app_role_has_permissions",
+                "app_api_tokens",
+                "app_reset_links",
+            },
+        )
 
     async def testStorageCommandsReportDatabaseFailures(self) -> None:
         """
@@ -603,10 +661,13 @@ class TestStorageMigrations(TestCase):
         None
             Verify every command returns one when its configured database cannot open.
         """
-        self.app.manager.addConnection("broken", {
-            "driver": "sqlite",
-            "database": str(self.app.basePath / "missing" / "broken.sqlite"),
-        })
+        self.app.manager.addConnection(
+            "broken",
+            {
+                "driver": "sqlite",
+                "database": str(self.app.basePath / "missing" / "broken.sqlite"),
+            },
+        )
         self.app.manager.setDefaultName("broken")
         self.app.settings["session"]["connection"] = "broken"
         self.app.settings["cache"]["stores"]["database"]["connection"] = "broken"
@@ -625,9 +686,13 @@ class TestStorageMigrations(TestCase):
         None
             Verify all five commands reject a backend without key enforcement.
         """
-        self.app.manager.addConnection("analytics", {
-            "driver": "redshift", "database": "unused",
-        })
+        self.app.manager.addConnection(
+            "analytics",
+            {
+                "driver": "redshift",
+                "database": "unused",
+            },
+        )
         self.app.manager.setDefaultName("analytics")
         self.app.settings["session"]["connection"] = "analytics"
         self.app.settings["cache"]["stores"]["database"]["connection"] = "analytics"
@@ -649,8 +714,11 @@ class TestStorageMigrations(TestCase):
             Verify canonical signatures are registered and loadable.
         """
         expected = {
-            "auth:migrate", "cache:migrate", "queue:migrate",
-            "schedule:migrate", "session:migrate",
+            "auth:migrate",
+            "cache:migrate",
+            "queue:migrate",
+            "schedule:migrate",
+            "session:migrate",
         }
         self.assertTrue(expected <= {command.signature for command in CORE_COMMANDS})
         loader = Loader(self.app)
@@ -673,7 +741,8 @@ class TestStorageMigrations(TestCase):
             container.instance(IApplication, self.app)
             container.instance(IConnectionManager, self.app.manager)
             container.instance(
-                IScheduleStore, ScheduleStore(self.app, self.app.manager),
+                IScheduleStore,
+                ScheduleStore(self.app, self.app.manager),
             )
             container.instance(IQueueManager, QueueManager(self.app, JobSerializer()))
             for command, _arguments in self._commands():

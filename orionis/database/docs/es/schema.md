@@ -11,13 +11,21 @@ from orionis.support.facades import Schema
 
 
 async def create_projects() -> None:
+    """Create the project table and its declared constraints."""
+
     async with Schema.create("projects") as table:
         table.id()
+
         table.string("name", 120)
+
         table.string("slug", 160)
+
         table.boolean("active").default(True)
+
         table.timestamps()
+
         table.unique("slug")
+
         table.index("active")
 ```
 
@@ -31,12 +39,18 @@ Los modelos aceptan `table_definition`. Una definición es útil para mantener c
 
 ```python
 from orionis.orm import Integer, String
+
 from orionis.orm.schema.table import TableDefinition
 
+
 project_id = Integer().primary().autoIncrement()
+
 project_id.name = "id"
+
 project_name = String(120)
+
 project_name.name = "name"
+
 
 PROJECTS_V1 = TableDefinition(
     name="projects",

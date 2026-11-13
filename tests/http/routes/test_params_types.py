@@ -1,6 +1,10 @@
+# ruff: noqa: PLC0415, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import uuid
 from orionis.http.routes.params_types import PARAM_TYPES
 from orionis.test import TestCase
+
 
 class TestParamTypes(TestCase):
     """Unit tests for the PARAM_TYPES route parameter type registry."""

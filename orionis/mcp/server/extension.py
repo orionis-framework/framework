@@ -1,14 +1,14 @@
+# ruff: noqa: TC002, TC003
+# Resolve extension dataclass fields and its generated constructor at runtime.
 """Declare negotiated capabilities and extension-owned method/schema hooks."""
 
 from dataclasses import dataclass, field
+from collections.abc import Callable, Mapping
 from types import MappingProxyType
+import msgspec
 from orionis.mcp.context import freeze_json
 from orionis.mcp.protocol.metavalidation import validate_meta_key
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    import msgspec
-    from collections.abc import Callable, Mapping
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class McpExtension:

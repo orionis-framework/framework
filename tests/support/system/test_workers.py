@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import math
 from unittest.mock import patch
@@ -20,6 +22,7 @@ _CPU_COUNT = 4
 _RAM_GB = 8.0
 _RAM_BYTES = int(_RAM_GB * (1 << 30))
 
+
 class TestCpuCountDetection(TestCase):
     def testUsesProcessCpuCountWhenAvailable(self) -> None:
         """Prefer the CPU count available to the current process.
@@ -27,7 +30,7 @@ class TestCpuCountDetection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with (
             patch.object(workers_module.os, "process_cpu_count", return_value=2),
@@ -42,7 +45,7 @@ class TestCpuCountDetection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with (
             patch.object(workers_module.os, "process_cpu_count", return_value=None),
@@ -56,7 +59,7 @@ class TestCpuCountDetection(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with (
             patch.object(workers_module.os, "process_cpu_count", return_value=None),
@@ -64,9 +67,11 @@ class TestCpuCountDetection(TestCase):
         ):
             self.assertEqual(workers_module._get_cpu_count(), 1)
 
+
 # ---------------------------------------------------------------------------
 # TestWorkersInterface
 # ---------------------------------------------------------------------------
+
 
 class TestWorkersInterface(TestCase):
     def testImplementsIWorkers(self) -> None:
@@ -78,7 +83,7 @@ class TestWorkersInterface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(Workers, IWorkers))
 
@@ -91,7 +96,7 @@ class TestWorkersInterface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = Workers()
         self.assertIsNotNone(instance)
@@ -105,7 +110,7 @@ class TestWorkersInterface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Workers(), IWorkers)
 
@@ -118,7 +123,7 @@ class TestWorkersInterface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(callable(getattr(Workers, "calculate", None)))
 
@@ -131,13 +136,15 @@ class TestWorkersInterface(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(callable(getattr(Workers, "setRamPerWorker", None)))
+
 
 # ---------------------------------------------------------------------------
 # TestWorkersDefaultState
 # ---------------------------------------------------------------------------
+
 
 class TestWorkersDefaultState(TestCase):
     def setUp(self) -> None:
@@ -146,19 +153,14 @@ class TestWorkersDefaultState(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_ram = Workers._ram_per_worker_bytes
-
-    def tearDown(self) -> None:
-        """Restore the class-level RAM allocation after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        Workers._ram_per_worker_bytes = self._original_ram
+        self.addCleanup(
+            setattr,
+            Workers,
+            "_ram_per_worker_bytes",
+            Workers._ram_per_worker_bytes,
+        )
 
     def testDefaultRamPerWorkerIsHalfGb(self) -> None:
         """Confirm the default RAM budget is stored in bytes.
@@ -169,7 +171,7 @@ class TestWorkersDefaultState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Workers._ram_per_worker_bytes, 1 << 29)
 
@@ -181,13 +183,15 @@ class TestWorkersDefaultState(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Workers._ram_per_worker_bytes, int)
+
 
 # ---------------------------------------------------------------------------
 # TestWorkersSetRamPerWorker
 # ---------------------------------------------------------------------------
+
 
 class TestWorkersSetRamPerWorker(TestCase):
     def setUp(self) -> None:
@@ -196,19 +200,14 @@ class TestWorkersSetRamPerWorker(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_ram = Workers._ram_per_worker_bytes
-
-    def tearDown(self) -> None:
-        """Restore the class-level RAM allocation after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        Workers._ram_per_worker_bytes = self._original_ram
+        self.addCleanup(
+            setattr,
+            Workers,
+            "_ram_per_worker_bytes",
+            Workers._ram_per_worker_bytes,
+        )
 
     def testSetRamPerWorkerUpdatesClassVariable(self) -> None:
         """Update the class-level RAM-per-worker via setRamPerWorker.
@@ -219,7 +218,7 @@ class TestWorkersSetRamPerWorker(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(2.0)
         self.assertEqual(Workers._ram_per_worker_bytes, 2 << 30)
@@ -233,7 +232,7 @@ class TestWorkersSetRamPerWorker(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(1.0)
         Workers.setRamPerWorker(3.5)
@@ -248,7 +247,7 @@ class TestWorkersSetRamPerWorker(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = Workers.setRamPerWorker(1.0)
         self.assertIsNone(result)
@@ -261,7 +260,7 @@ class TestWorkersSetRamPerWorker(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(512.0)
         self.assertEqual(Workers._ram_per_worker_bytes, 512 << 30)
@@ -274,7 +273,7 @@ class TestWorkersSetRamPerWorker(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(0.001)
         self.assertEqual(
@@ -288,7 +287,7 @@ class TestWorkersSetRamPerWorker(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for invalid_budget in (0.0, -1.0, math.nan, math.inf, -math.inf):
             with self.assertRaises(ValueError):
@@ -300,14 +299,16 @@ class TestWorkersSetRamPerWorker(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Workers.setRamPerWorker(1e-12)
 
+
 # ---------------------------------------------------------------------------
 # TestWorkersCalculate
 # ---------------------------------------------------------------------------
+
 
 class TestWorkersCalculate(TestCase):
     def setUp(self) -> None:
@@ -316,19 +317,14 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_ram = Workers._ram_per_worker_bytes
-
-    def tearDown(self) -> None:
-        """Restore the class-level RAM allocation after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        Workers._ram_per_worker_bytes = self._original_ram
+        self.addCleanup(
+            setattr,
+            Workers,
+            "_ram_per_worker_bytes",
+            Workers._ram_per_worker_bytes,
+        )
 
     def testCalculateReturnsCpuBoundResult(self) -> None:
         """Return the CPU count when RAM capacity exceeds CPU capacity.
@@ -341,7 +337,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(0.5)
         with (
@@ -362,7 +358,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(4.0)
         with (
@@ -383,7 +379,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(2.0)
         with (
@@ -402,7 +398,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(3.0)
         with (
@@ -422,7 +418,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(0.5)
         with (
@@ -441,7 +437,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with (
             patch(f"{_MOD}._CPU_COUNT", _CPU_COUNT),
@@ -463,7 +459,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(0.5)
         with (
@@ -482,7 +478,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(0.1)
         with (
@@ -502,7 +498,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(1.0)
         with (
@@ -523,7 +519,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(0.5)
         with (
@@ -543,7 +539,7 @@ class TestWorkersCalculate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(100.0)
         with (
@@ -554,9 +550,11 @@ class TestWorkersCalculate(TestCase):
         # floor(8G / 100G) = 0 → min(4, 0) = 0 → 0 or 1 = 1
         self.assertEqual(result, 1)
 
+
 # ---------------------------------------------------------------------------
 # TestWorkersEdgeCases
 # ---------------------------------------------------------------------------
+
 
 class TestWorkersEdgeCases(TestCase):
     def setUp(self) -> None:
@@ -565,47 +563,14 @@ class TestWorkersEdgeCases(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_ram = Workers._ram_per_worker_bytes
-
-    def tearDown(self) -> None:
-        """Restore the class-level RAM allocation after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        Workers._ram_per_worker_bytes = self._original_ram
-
-    def testSetRamPerWorkerRejectsZero(self) -> None:
-        """Raise ValueError when ram_per_worker is zero.
-
-        Validates invalid budgets are rejected before calculate() uses
-        them.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(ValueError):
-            Workers.setRamPerWorker(0.0)
-
-    def testSetRamPerWorkerRejectsNegative(self) -> None:
-        """Raise ValueError when ram_per_worker is negative.
-
-        Validates that calculate() cannot return a negative worker
-        count from an invalid memory budget.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(ValueError):
-            Workers.setRamPerWorker(-1.0)
+        self.addCleanup(
+            setattr,
+            Workers,
+            "_ram_per_worker_bytes",
+            Workers._ram_per_worker_bytes,
+        )
 
     def testSetRamPerWorkerRejectsInvalidValueWithoutChangingBudget(self) -> None:
         """Preserve the active budget when a new value is invalid.
@@ -616,7 +581,7 @@ class TestWorkersEdgeCases(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         Workers.setRamPerWorker(2.0)
         active_budget = Workers._ram_per_worker_bytes
@@ -633,7 +598,7 @@ class TestWorkersEdgeCases(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         per_worker_bytes = int(0.5 * (1 << 30))
         Workers.setRamPerWorker(0.5)

@@ -32,6 +32,8 @@ Este programa solo construye un job. En una aplicación real reemplaza la salida
 
 El serializer recoge slots públicos y anotaciones que no sean `ClassVar` a lo largo de la jerarquía. `tries`, `timeout` y `backoff` son política de clase, no estado. Se admiten strings, bytes, enteros, floats finitos, booleanos, `None` y listas/tuplas/diccionarios anidados con claves string. Objetos arbitrarios, atributos privados o estado de instancia no declarado son rechazados.
 
+Las anotaciones pospuestas, incluido `from __future__ import annotations`, se evalúan en el módulo que define la clase registrada. Las declaraciones `ClassVar` siguen siendo política de clase y no campos del payload; las anotaciones persistentes resueltas conservan la validación estricta de tipos. Se evalúan declaraciones confiables de la aplicación, no nombres de tipos suministrados por un mensaje.
+
 La carga tiene límite de 1 MiB y profundidad de estado de 32. Guarda documentos grandes en almacenamiento y envía una clave. El estado utiliza MessagePack y preserva tuplas mediante una extensión; no carga pickle ni importa clases a partir de una identidad no confiable. Solo decodifica clases registradas. El envelope exterior se codifica como JSON, tiene versión 1 y contiene identidad, routing y política de ejecución.
 
 Puedes verificar el round trip sin ejecutar trabajo:

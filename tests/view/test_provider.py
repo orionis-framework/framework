@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.test import TestCase
@@ -12,41 +14,44 @@ from orionis.view.factory import ViewFactory
 from orionis.view.provider import ViewServiceProvider
 
 # Full contract of template globals published by the provider.
-_EXPECTED_GLOBALS: frozenset[str] = frozenset({
-    "__",
-    "app",
-    "asset",
-    "auth",
-    "cache",
-    "choice",
-    "collect",
-    "config",
-    "csrf_field",
-    "csrf_token",
-    "decrypt",
-    "dump",
-    "encrypt",
-    "errors",
-    "flash",
-    "framework_version",
-    "locale",
-    "locales",
-    "now",
-    "old",
-    "python_version",
-    "request",
-    "route",
-    "secure_asset",
-    "secure_url",
-    "session",
-    "stringable",
-    "today",
-    "trans",
-    "url",
-})
+_EXPECTED_GLOBALS: frozenset[str] = frozenset(
+    {
+        "__",
+        "app",
+        "asset",
+        "auth",
+        "cache",
+        "choice",
+        "collect",
+        "config",
+        "csrf_field",
+        "csrf_token",
+        "decrypt",
+        "dump",
+        "encrypt",
+        "errors",
+        "flash",
+        "framework_version",
+        "locale",
+        "locales",
+        "now",
+        "old",
+        "python_version",
+        "request",
+        "route",
+        "secure_asset",
+        "secure_url",
+        "session",
+        "stringable",
+        "today",
+        "trans",
+        "url",
+    },
+)
 
 # Full contract of template filters published by the provider.
 _EXPECTED_FILTERS: frozenset[str] = frozenset({"json", "markdown"})
+
 
 class _StubEnvironment:
     """View environment double recording every registration it receives."""
@@ -60,7 +65,7 @@ class _StubEnvironment:
         Returns
         -------
         None
-            Prepare independent global, filter, and extension records.
+            No return value.
         """
         self.globals: dict[str, object] = {}
         self.filters: dict[str, object] = {}
@@ -80,7 +85,7 @@ class _StubEnvironment:
         Returns
         -------
         None
-            Store the captured global registration.
+            No return value.
         """
         self.globals[name] = value
 
@@ -98,7 +103,7 @@ class _StubEnvironment:
         Returns
         -------
         None
-            Store the captured filter registration.
+            No return value.
         """
         self.filters[name] = callback
 
@@ -114,9 +119,10 @@ class _StubEnvironment:
         Returns
         -------
         None
-            Append the extension to the captured registrations.
+            No return value.
         """
         self.extensions.append(extension)
+
 
 class _StubApp:
     """Application double capturing bindings and resolving the environment."""
@@ -130,6 +136,11 @@ class _StubApp:
         ----------
         environment : _StubEnvironment | None, optional
             Environment returned from dependency resolution.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.environment: _StubEnvironment | None = environment
         self.singletons: list[tuple[object, object]] = []
@@ -149,7 +160,7 @@ class _StubApp:
         Returns
         -------
         None
-            Append the requested binding to the captured singleton list.
+            No return value.
         """
         self.singletons.append((abstract, concrete))
 
@@ -186,6 +197,7 @@ class _StubApp:
         self.resolved.append(abstract)
         return self.environment
 
+
 class _StubViewFacade:
     """View facade double counting how many times it was pinned."""
 
@@ -198,7 +210,7 @@ class _StubViewFacade:
         Returns
         -------
         None
-            Set the facade pin counter to zero.
+            No return value.
         """
         self.pinned: int = 0
 
@@ -209,18 +221,23 @@ class _StubViewFacade:
         Returns
         -------
         None
-            Increment the facade pin counter.
+            No return value.
         """
         self.pinned += 1
 
-class TestViewServiceProviderDefinition(TestCase):
 
+class TestViewServiceProviderDefinition(TestCase):
     def testInheritsServiceProvider(self) -> None:
         """
         Verify ViewServiceProvider extends the base service provider.
 
         Validates that the provider participates in the standard
         register/boot lifecycle of the container.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.assertTrue(issubclass(ViewServiceProvider, ServiceProvider))
 
@@ -230,6 +247,11 @@ class TestViewServiceProviderDefinition(TestCase):
 
         Validates that the provider keeps the container it must bind
         services into.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         app = _StubApp()
         self.assertIs(ViewServiceProvider(app).app, app)
@@ -240,94 +262,60 @@ class TestViewServiceProviderDefinition(TestCase):
 
         Validates that the boot phase can await container resolutions
         and facade pinning.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.assertTrue(
             inspect.iscoroutinefunction(ViewServiceProvider.boot),
         )
 
-class TestViewServiceProviderRegister(TestCase):
 
-    def testRegisterBindsThreeSingletons(self) -> None:
+class TestViewServiceProviderRegister(TestCase):
+    def testRegisterBindsTheRequiredSingletonsInOrder(self) -> None:
         """
-        Bind exactly three view services during registration.
+        Bind exactly the three required view services in dependency order.
 
         Validates that no extra binding leaks into the container.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         app = _StubApp()
         ViewServiceProvider(app).register()
-        self.assertEqual(len(app.singletons), 3)
-
-    def testRegisterBindsEnvironmentContract(self) -> None:
-        """
-        Bind IViewEnvironment to the concrete ViewEnvironment.
-
-        Validates that the sole owner of the Jinja2 environment is
-        resolvable through its contract.
-        """
-        app = _StubApp()
-        ViewServiceProvider(app).register()
-        self.assertIn((IViewEnvironment, ViewEnvironment), app.singletons)
-
-    def testRegisterBindsEngineContract(self) -> None:
-        """
-        Bind IViewEngine to the concrete Jinja2Engine.
-
-        Validates that the rendering engine is resolvable through its
-        contract.
-        """
-        app = _StubApp()
-        ViewServiceProvider(app).register()
-        self.assertIn((IViewEngine, Jinja2Engine), app.singletons)
-
-    def testRegisterBindsFactoryContract(self) -> None:
-        """
-        Bind IViewFactory to the concrete ViewFactory.
-
-        Validates that the public entry-point used by controllers is
-        resolvable through its contract.
-        """
-        app = _StubApp()
-        ViewServiceProvider(app).register()
-        self.assertIn((IViewFactory, ViewFactory), app.singletons)
-
-    def testRegisterBindsEnvironmentBeforeEngine(self) -> None:
-        """
-        Bind the environment before the engine that consumes it.
-
-        Validates the registration order required for the engine to
-        resolve its dependency.
-        """
-        app = _StubApp()
-        ViewServiceProvider(app).register()
-        abstracts = [abstract for abstract, _ in app.singletons]
-        self.assertLess(
-            abstracts.index(IViewEnvironment),
-            abstracts.index(IViewEngine),
+        self.assertEqual(
+            app.singletons,
+            [
+                (IViewEnvironment, ViewEnvironment),
+                (IViewEngine, Jinja2Engine),
+                (IViewFactory, ViewFactory),
+            ],
         )
 
-class TestViewServiceProviderBoot(TestCase):
 
+class TestViewServiceProviderBoot(TestCase):
     def setUp(self) -> None:
         """
         Replace the view facade with a double before each test.
 
         Prevents the boot phase from pinning the real facade, which
         would require a fully booted application.
+
+        Returns
+        -------
+        None
+            No return value.
         """
-        self._original_facade = provider_module.ViewFacade
+        original_facade = provider_module.ViewFacade
+        self.addCleanup(setattr, provider_module, "ViewFacade", original_facade)
         self._facade = _StubViewFacade()
         provider_module.ViewFacade = self._facade
         self._environment = _StubEnvironment()
         self._app = _StubApp(self._environment)
-
-    def tearDown(self) -> None:
-        """
-        Restore the original view facade after each test.
-
-        Guarantees that module-level state is never leaked to other
-        test cases.
-        """
-        provider_module.ViewFacade = self._original_facade
 
     async def _boot(self) -> None:
         """
@@ -336,7 +324,7 @@ class TestViewServiceProviderBoot(TestCase):
         Returns
         -------
         None
-            Boot the provider with the configured application double.
+            No return value.
         """
         await ViewServiceProvider(self._app).boot()
 
@@ -346,6 +334,11 @@ class TestViewServiceProviderBoot(TestCase):
 
         Validates that every registration targets the same shared
         environment instance.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._boot()
         self.assertEqual(self._app.resolved, [IViewEnvironment])
@@ -356,6 +349,11 @@ class TestViewServiceProviderBoot(TestCase):
 
         Validates the public contract of names available inside every
         rendered template.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._boot()
         self.assertEqual(set(self._environment.globals), _EXPECTED_GLOBALS)
@@ -366,17 +364,27 @@ class TestViewServiceProviderBoot(TestCase):
 
         Validates that the conventional alias points at the very same
         callable rather than a second closure.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._boot()
         globals_ = self._environment.globals
         self.assertIs(globals_["__"], globals_["trans"])
 
-    async def testBootRegistersCallableGlobals(self) -> None:
+    async def testBootRegistersNonEmptyGlobals(self) -> None:
         """
         Register callable or object-based globals only.
 
         Validates that no builder leaks a plain None into the template
         namespace.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._boot()
         self.assertTrue(
@@ -389,6 +397,11 @@ class TestViewServiceProviderBoot(TestCase):
 
         Validates the public contract of filters usable with the pipe
         operator inside templates.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._boot()
         self.assertEqual(set(self._environment.filters), _EXPECTED_FILTERS)
@@ -398,6 +411,11 @@ class TestViewServiceProviderBoot(TestCase):
         Register every filter as a callable object.
 
         Validates that Jinja2 receives usable filter implementations.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._boot()
         self.assertTrue(
@@ -410,6 +428,11 @@ class TestViewServiceProviderBoot(TestCase):
 
         Validates that the ``{% csrf %}`` tag is available in templates
         after boot.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._boot()
         self.assertEqual(self._environment.extensions, [CsrfExtension])
@@ -420,6 +443,11 @@ class TestViewServiceProviderBoot(TestCase):
 
         Validates that controllers get zero-resolution access to the
         view factory on the hot path.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         await self._boot()
         self.assertEqual(self._facade.pinned, 1)

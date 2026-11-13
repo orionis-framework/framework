@@ -1,12 +1,13 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value is a successfully uploaded file."""
 
 from orionis.schemas.rules.measure import is_file
 from orionis.schemas.rule import Rule
 
+
 class File(Rule):
     """Ensure a value is a successfully uploaded file."""
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

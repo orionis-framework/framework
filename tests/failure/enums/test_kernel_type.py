@@ -1,9 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
+
 from orionis.failure.enums.kernel_type import KernelContext
 from orionis.test import TestCase
 
-class TestKernelContextMembers(TestCase):
 
+class TestKernelContextMembers(TestCase):
     def testConsoleMemberExists(self) -> None:
         """Confirm that CONSOLE is a member of KernelContext.
 
@@ -13,7 +16,7 @@ class TestKernelContextMembers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("CONSOLE", KernelContext.__members__)
 
@@ -26,12 +29,14 @@ class TestKernelContextMembers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("HTTP", KernelContext.__members__)
 
     def testExactlyTwoMembers(self) -> None:
-        """Verify that KernelContext defines exactly two members.
+        """Verify exactly two members.
+
+        KernelContext defines exactly two members.
 
         Validates that no variants have been silently added or removed,
         keeping the enumeration surface stable.
@@ -39,7 +44,7 @@ class TestKernelContextMembers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(len(KernelContext), 2)
 
@@ -52,7 +57,7 @@ class TestKernelContextMembers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertNotEqual(KernelContext.CONSOLE, KernelContext.HTTP)
 
@@ -65,13 +70,13 @@ class TestKernelContextMembers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(KernelContext.CONSOLE, KernelContext)
         self.assertIsInstance(KernelContext.HTTP, KernelContext)
 
-class TestKernelContextLookup(TestCase):
 
+class TestKernelContextLookup(TestCase):
     def testLookupConsoleByName(self) -> None:
         """Retrieve CONSOLE via name-based enum lookup.
 
@@ -81,7 +86,7 @@ class TestKernelContextLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         member = KernelContext["CONSOLE"]
         self.assertIs(member, KernelContext.CONSOLE)
@@ -95,7 +100,7 @@ class TestKernelContextLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         member = KernelContext["HTTP"]
         self.assertIs(member, KernelContext.HTTP)
@@ -109,7 +114,7 @@ class TestKernelContextLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(KeyError):
             _ = KernelContext["UNKNOWN"]
@@ -123,7 +128,7 @@ class TestKernelContextLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(KernelContext.CONSOLE.name, "CONSOLE")
         self.assertEqual(KernelContext.HTTP.name, "HTTP")
@@ -137,51 +142,7 @@ class TestKernelContextLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(KernelContext.CONSOLE.value, int)
         self.assertIsInstance(KernelContext.HTTP.value, int)
-
-class TestKernelContextComparison(TestCase):
-
-    def testEqualityWithSelf(self) -> None:
-        """Compare a KernelContext member with itself for equality.
-
-        Validates that identity equality is preserved and the same
-        member is always equal to itself.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(KernelContext.CONSOLE, KernelContext.CONSOLE)
-        self.assertEqual(KernelContext.HTTP, KernelContext.HTTP)
-
-    def testInequalityBetweenMembers(self) -> None:
-        """Confirm inequality between distinct KernelContext members.
-
-        Validates that different enum members are not considered equal
-        by the standard equality operator.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertNotEqual(KernelContext.CONSOLE, KernelContext.HTTP)
-
-    def testIsComparison(self) -> None:
-        """Confirm identity equality for same-member references.
-
-        Validates that two references to the same member share the exact
-        same object, satisfying the ``is`` identity check.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        a = KernelContext.CONSOLE
-        b = KernelContext.CONSOLE
-        self.assertIs(a, b)

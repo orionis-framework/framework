@@ -4,6 +4,7 @@ from typing import ClassVar
 from orionis.auth.concerns.functions import model_primary_key
 from orionis.auth.contracts.authorizable import IAuthorizable
 
+
 class Authorizable:
     """
     Let any Orionis model own permissions and roles.
@@ -57,6 +58,7 @@ class Authorizable:
             persisted.
         """
         return getattr(self, model_primary_key(self), None)
+
 
 # Registered as a virtual subclass so ``isinstance`` and ``issubclass``
 # work without forcing ``ABCMeta`` onto every model.

@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import base64
 from dataclasses import replace
 import msgspec
@@ -10,6 +12,7 @@ from orionis.mcp.context import McpRequest
 from orionis.mcp.exceptions import McpInvalidParams
 from orionis.mcp.state import McpState
 from orionis.test import TestCase
+
 
 class _App(Container):
     """Provide real container lifetimes and deterministic test encryption config."""
@@ -30,6 +33,7 @@ class _App(Container):
             Return the result produced by ``config``.
         """
         return {"app.key": b"1" * 32, "app.cipher": "AES-256-GCM"}.get(key, default)
+
 
 class _Identity(IAuthenticatable):
     """An application identity using Orionis' actual authentication contract."""
@@ -78,6 +82,7 @@ class _Identity(IAuthenticatable):
             Return the result produced by ``getAuthPassword``.
         """
         return ""
+
 
 class TestMcpState(TestCase):
     """State must authenticate across workers without ambient session storage."""
@@ -176,7 +181,10 @@ class TestMcpState(TestCase):
             },
         )
         for changes in variants:
-            with self.subTest(changes=changes), self.assertRaises(McpInvalidParams): # NOSONAR # noqa: E501
+            with (
+                self.subTest(changes=changes),
+                self.assertRaises(McpInvalidParams),
+            ):  # NOSONAR
                 self.worker.open(replace(retry, **changes))
 
     def testExpiryAndWrongPurpose(self):
@@ -193,7 +201,10 @@ class TestMcpState(TestCase):
             altered = self.encrypter.encrypt(
                 msgspec.json.encode({**payload, **changes}).decode(),
             )
-            with self.subTest(changes=changes), self.assertRaises(McpInvalidParams): # NOSONAR # noqa: E501
+            with (
+                self.subTest(changes=changes),
+                self.assertRaises(McpInvalidParams),
+            ):  # NOSONAR
                 self.worker.open(replace(self.request, request_state=altered))
 
     def testTamperAndCipherDowngrade(self):
@@ -216,7 +227,10 @@ class TestMcpState(TestCase):
             altered = base64.b64encode(
                 msgspec.json.encode({**envelope, **changes}),
             ).decode()
-            with self.subTest(changes=changes), self.assertRaises(McpInvalidParams): # NOSONAR # noqa: E501
+            with (
+                self.subTest(changes=changes),
+                self.assertRaises(McpInvalidParams),
+            ):  # NOSONAR
                 self.worker.open(replace(self.request, request_state=altered))
 
     def testInvalidTtlAndMissingServerContext(self):
@@ -230,11 +244,11 @@ class TestMcpState(TestCase):
         for ttl in (0, -1, True):
             with self.subTest(ttl=ttl), self.assertRaises(ValueError):
                 self.state.seal(self.request, {}, ttl=ttl)
-        with self.assertRaises(ValueError): # NOSONAR
+        with self.assertRaises(ValueError):  # NOSONAR
             self.state.seal(replace(self.request, server_id=""), {})
 
     def testCbcIsNotAcceptedForMrtrState(self):
-        """The native framework may support CBC while MCP state requires integrity.
+        """Reject legacy CBC even when a custom configuration bypasses validation.
 
         Returns
         -------
@@ -244,7 +258,7 @@ class TestMcpState(TestCase):
 
         class _CbcApp(_App):
             def config(self, key, default=None):
-                """Select the framework's unauthenticated cipher for this regression.
+                """Select a rejected legacy cipher through a custom configuration.
 
                 Parameters
                 ----------
@@ -265,5 +279,5 @@ class TestMcpState(TestCase):
                 )
 
         app = _CbcApp()
-        with self.assertRaises(ValueError): # NOSONAR
-            McpState(app, Encrypter(app))
+        with self.assertRaisesRegex(ValueError, "MCP requestState"):
+            McpState(app, self.encrypter)

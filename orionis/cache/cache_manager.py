@@ -1,7 +1,11 @@
+# ruff: noqa: ANN401, PLC0415, TC001, TC003
+# Keep reflected annotations available and load optional backend dependencies lazily.
 """Resolve configured cache stores and reuse their repositories."""
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Self
+from threading import Lock
+from typing import Any, Self
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.cache.exceptions import CacheStoreException
 from orionis.cache.repository import CacheRepository
@@ -9,11 +13,8 @@ from orionis.foundation.config.cache.entities.cache import Cache as _CacheConfig
 from orionis.foundation.config.cache.enums.drivers import Drivers
 from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 class CacheManager(ICacheManager):
-    # ruff: noqa: ANN401, PLC0415, TC001
     """Resolve configured cache stores and reuse their repositories."""
 
     __slots__ = (
@@ -23,6 +24,7 @@ class CacheManager(ICacheManager):
         "_default",
         "_prefix",
         "_repositories",
+        "_repositories_lock",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -38,7 +40,7 @@ class CacheManager(ICacheManager):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         self._app = app
         """Application container used to read config and the base path."""
@@ -59,6 +61,8 @@ class CacheManager(ICacheManager):
         """Prefix applied when constructing names or storage keys."""
         self._repositories: dict[str, CacheRepository] = {}
         """Cache repositories already resolved, indexed by store name."""
+        self._repositories_lock = Lock()
+        """Serialize initial repository construction across calling threads."""
 
     # ── Store resolution ────────────────────────────────────────────────────
 
@@ -66,12 +70,13 @@ class CacheManager(ICacheManager):
         """
         Return the named or default cache repository.
 
-        The repository is created on first access and cached for reuse.
+        The repository is created once on first access, including concurrent
+        callers from different threads, and cached for reuse.
 
         Parameters
         ----------
         name : str | None
-            Store name (``'file'``, ``'memory'``, ``'redis'``, ``'memcached'``).
+            Store name: file, memory, Redis, Memcached or database.
             Defaults to the configured default store.
 
         Returns
@@ -89,10 +94,13 @@ class CacheManager(ICacheManager):
         if repository is not None:
             return repository
 
-        backend = self._buildBackend(resolved)
-        repo = CacheRepository(backend=backend, prefix=self._prefix)
-        self._repositories[resolved] = repo
-        return repo
+        with self._repositories_lock:
+            repository = self._repositories.get(resolved)
+            if repository is None:
+                backend = self._buildBackend(resolved)
+                repository = CacheRepository(backend=backend, prefix=self._prefix)
+                self._repositories[resolved] = repository
+        return repository
 
     def _buildBackend(self: Self, name: str) -> Any:
         """
@@ -483,7 +491,9 @@ class CacheManager(ICacheManager):
         key : str
             Resource key to lock.
         timeout : float | None
-            Maximum lock duration in seconds.
+            Store-specific acquisition deadline or lease duration in seconds.
+            None leaves file/database acquisition unbounded and uses the
+            default lease for database and aiocache backends.
 
         Returns
         -------

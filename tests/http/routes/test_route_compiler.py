@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.route_compiler import RouteCompiler
 from orionis.test import TestCase
@@ -5,6 +7,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 def _handler_a() -> None:
     """Provide the first importable route action fixture.
@@ -15,6 +18,7 @@ def _handler_a() -> None:
         Completes the operation described above.
     """
 
+
 def _handler_b() -> None:
     """Provide the second importable route action fixture.
 
@@ -24,6 +28,7 @@ def _handler_b() -> None:
         Completes the operation described above.
     """
 
+
 def _handler_c() -> None:
     """Provide the third importable route action fixture.
 
@@ -32,6 +37,7 @@ def _handler_c() -> None:
     None
         Completes the operation described above.
     """
+
 
 def _make_route_dict(
     method: str = "GET",
@@ -75,9 +81,11 @@ def _make_route_dict(
         "kind": kind,
     }
 
+
 # ---------------------------------------------------------------------------
 # RouteCompiler.compilePath
 # ---------------------------------------------------------------------------
+
 
 class TestRouteCompilerCompilePath(TestCase):
     """Unit tests for RouteCompiler.compilePath static method."""
@@ -192,9 +200,11 @@ class TestRouteCompilerCompilePath(TestCase):
         self.assertIn("post_id", converters)
         self.assertIn("comment_id", converters)
 
+
 # ---------------------------------------------------------------------------
 # RouteCompiler.compile
 # ---------------------------------------------------------------------------
+
 
 class TestRouteCompilerCompile(TestCase):
     """Unit tests for RouteCompiler.compile."""
@@ -317,7 +327,10 @@ class TestRouteCompilerCompile(TestCase):
         compiler = RouteCompiler()
         get_route = _make_route_dict("GET", "/resource", _handler_a)
         post_route = _make_route_dict(
-            "POST", "/resource", _handler_b, kind="api",
+            "POST",
+            "/resource",
+            _handler_b,
+            kind="api",
         )
         compiled, _ = compiler.compile([get_route, post_route], None)
         self.assertIn("GET", compiled)
@@ -352,7 +365,10 @@ class TestRouteCompilerCompile(TestCase):
         """
         compiler = RouteCompiler()
         route = _make_route_dict(
-            "GET", "/named", _handler_a, name="route.named",
+            "GET",
+            "/named",
+            _handler_a,
+            name="route.named",
         )
         compiled, _ = compiler.compile([route], None)
         cr = compiled["GET"]["static"]["/named"]

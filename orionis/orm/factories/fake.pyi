@@ -515,7 +515,9 @@ class _ProviderMethods:
 
     @overload
     def randomChoices(
-        self, elements: Collection[T] | OrderedDict[T, float], length: int | None = ...,
+        self,
+        elements: Collection[T] | OrderedDict[T, float],
+        length: int | None = ...,
     ) -> Sequence[T]:
         """Select random elements with replacement from a population.
 
@@ -980,7 +982,9 @@ class _ProviderMethods:
 
     @overload
     def randomSample(
-        self, elements: Collection[T] | OrderedDict[T, float], length: int | None = ...,
+        self,
+        elements: Collection[T] | OrderedDict[T, float],
+        length: int | None = ...,
     ) -> Sequence[T]:
         """Select random elements without replacement from a population.
 
@@ -1405,7 +1409,10 @@ class _ProviderMethods:
         """
 
     def swift(
-        self, length: int | None = ..., primary: bool = ..., use_dataset: bool = ...,
+        self,
+        length: int | None = ...,
+        primary: bool = ...,
+        use_dataset: bool = ...,
     ) -> str:
         """Generate swift using Faker.
 
@@ -1596,7 +1603,8 @@ class _ProviderMethods:
         """
 
     def ean8(
-        self, prefixes: tuple[int | str | tuple[int | str, ...], ...] = ...,
+        self,
+        prefixes: tuple[int | str | tuple[int | str, ...], ...] = ...,
     ) -> str:
         """Generate ean8 using Faker.
 
@@ -2157,11 +2165,7 @@ class _ProviderMethods:
 
     def creditCardExpire(
         self,
-        start: datetime.date
-        | datetime.datetime
-        | datetime.timedelta
-        | str
-        | int = ...,
+        start: datetime.date | datetime.datetime | datetime.timedelta | str | int = ...,
         end: datetime.date | datetime.datetime | datetime.timedelta | str | int = ...,
         date_format: str = ...,
     ) -> str:
@@ -2565,7 +2569,8 @@ class _ProviderMethods:
         """
 
     def dateObject(
-        self, end_datetime: datetime.datetime | None = ...,
+        self,
+        end_datetime: datetime.datetime | None = ...,
     ) -> datetime.date:
         """Generate date object using Faker.
 
@@ -2623,7 +2628,9 @@ class _ProviderMethods:
         """
 
     def dateThisCentury(
-        self, before_today: bool = ..., after_today: bool = ...,
+        self,
+        before_today: bool = ...,
+        after_today: bool = ...,
     ) -> datetime.date:
         """Generate date this century using Faker.
 
@@ -2650,7 +2657,9 @@ class _ProviderMethods:
         """
 
     def dateThisDecade(
-        self, before_today: bool = ..., after_today: bool = ...,
+        self,
+        before_today: bool = ...,
+        after_today: bool = ...,
     ) -> datetime.date:
         """Generate date this decade using Faker.
 
@@ -2677,7 +2686,9 @@ class _ProviderMethods:
         """
 
     def dateThisMonth(
-        self, before_today: bool = ..., after_today: bool = ...,
+        self,
+        before_today: bool = ...,
+        after_today: bool = ...,
     ) -> datetime.date:
         """Generate date this month using Faker.
 
@@ -2704,7 +2715,9 @@ class _ProviderMethods:
         """
 
     def dateThisYear(
-        self, before_today: bool = ..., after_today: bool = ...,
+        self,
+        before_today: bool = ...,
+        after_today: bool = ...,
     ) -> datetime.date:
         """Generate date this year using Faker.
 
@@ -3568,7 +3581,9 @@ class _ProviderMethods:
         """
 
     def fileName(
-        self, category: str | None = ..., extension: str | None = ...,
+        self,
+        category: str | None = ...,
+        extension: str | None = ...,
     ) -> str:
         """Generate file name using Faker.
 
@@ -3742,7 +3757,9 @@ class _ProviderMethods:
         """
 
     def coordinate(
-        self, center: float | None = ..., radius: float | int = ...,
+        self,
+        center: float | None = ...,
+        radius: float | int = ...,
     ) -> Decimal:
         """Generate coordinate using Faker.
 
@@ -3801,7 +3818,9 @@ class _ProviderMethods:
         """
 
     def localLatlng(
-        self, country_code: str = ..., coords_only: bool = ...,
+        self,
+        country_code: str = ...,
+        coords_only: bool = ...,
     ) -> tuple[str, ...] | None:
         """Generate local latlng using Faker.
 
@@ -4261,7 +4280,9 @@ class _ProviderMethods:
         """
 
     def ipv4Private(
-        self, network: bool = ..., address_class: str | None = ...,
+        self,
+        network: bool = ...,
+        address_class: str | None = ...,
     ) -> str:
         """Generate ipv4 private using Faker.
 
@@ -4288,7 +4309,9 @@ class _ProviderMethods:
         """
 
     def ipv4Public(
-        self, network: bool = ..., address_class: str | None = ...,
+        self,
+        network: bool = ...,
+        address_class: str | None = ...,
     ) -> str:
         """Generate ipv4 public using Faker.
 
@@ -4410,7 +4433,10 @@ class _ProviderMethods:
         """
 
     def portNumber(
-        self, is_system: bool = ..., is_user: bool = ..., is_dynamic: bool = ...,
+        self,
+        is_system: bool = ...,
+        is_user: bool = ...,
+        is_dynamic: bool = ...,
     ) -> int:
         """Generate port number using Faker.
 
@@ -4821,7 +4847,9 @@ class _ProviderMethods:
         """
 
     def paragraphs(
-        self, nb: int = ..., ext_word_list: Sequence[str] | None = ...,
+        self,
+        nb: int = ...,
+        ext_word_list: Sequence[str] | None = ...,
     ) -> list[str]:
         """Generate paragraphs using Faker.
 
@@ -4892,7 +4920,9 @@ class _ProviderMethods:
         """
 
     def sentences(
-        self, nb: int = ..., ext_word_list: Sequence[str] | None = ...,
+        self,
+        nb: int = ...,
+        ext_word_list: Sequence[str] | None = ...,
     ) -> list[str]:
         """Generate sentences using Faker.
 
@@ -4923,7 +4953,9 @@ class _ProviderMethods:
         """
 
     def text(
-        self, max_nb_chars: int = ..., ext_word_list: Sequence[str] | None = ...,
+        self,
+        max_nb_chars: int = ...,
+        ext_word_list: Sequence[str] | None = ...,
     ) -> str:
         """Generate localized text within the requested character limit.
 
@@ -6439,7 +6471,8 @@ class _ProviderMethods:
         """
 
     def passportOwner(
-        self, gender: Literal["M", "F", "X"] = ...,
+        self,
+        gender: Literal["M", "F", "X"] = ...,
     ) -> tuple[str, str]:
         """Generate passport owner using Faker.
 
@@ -6854,7 +6887,9 @@ class _ProviderMethods:
         """
 
     def profile(
-        self, fields: list[str] | None = ..., sex: Literal["M", "F", "X"] | None = ...,
+        self,
+        fields: list[str] | None = ...,
+        sex: Literal["M", "F", "X"] | None = ...,
     ) -> dict[str, str | tuple[Decimal, Decimal] | list[str] | datetime.date]:
         """Generate profile using Faker.
 
@@ -6882,7 +6917,8 @@ class _ProviderMethods:
         """
 
     def simpleProfile(
-        self, sex: Literal["M", "F", "X"] | None = ...,
+        self,
+        sex: Literal["M", "F", "X"] | None = ...,
     ) -> dict[str, str | datetime.date | Literal["M", "F", "X"]]:
         """Generate simple profile using Faker.
 
@@ -7066,7 +7102,10 @@ class _ProviderMethods:
         """
 
     def pyint(
-        self, min_value: int = ..., max_value: int = ..., step: int = ...,
+        self,
+        min_value: int = ...,
+        max_value: int = ...,
+        step: int = ...,
     ) -> int:
         """Generate an integer within the requested interval and step.
 
@@ -9154,7 +9193,9 @@ class _ProviderMethods:
         """
 
     def pincodeInState(
-        self, state_abbr: str | None = ..., include_union_territories: bool = ...,
+        self,
+        state_abbr: str | None = ...,
+        include_union_territories: bool = ...,
     ) -> int:
         """Generate pincode in state using Faker.
 
@@ -10003,7 +10044,9 @@ class _ProviderMethods:
         """
 
     def englishParagraph(
-        self, nb_sentences: int = ..., variable_nb_sentences: bool = ...,
+        self,
+        nb_sentences: int = ...,
+        variable_nb_sentences: bool = ...,
     ) -> str:
         """Generate english paragraph using Faker.
 
@@ -10053,7 +10096,9 @@ class _ProviderMethods:
         """
 
     def englishSentence(
-        self, nb_words: int = ..., variable_nb_words: bool = ...,
+        self,
+        nb_words: int = ...,
+        variable_nb_words: bool = ...,
     ) -> str:
         """Generate english sentence using Faker.
 
@@ -10126,7 +10171,9 @@ class _ProviderMethods:
         """
 
     def englishTexts(
-        self, nb_texts: int = ..., max_nb_chars: int = ...,
+        self,
+        nb_texts: int = ...,
+        max_nb_chars: int = ...,
     ) -> list[str]:
         """Generate english texts using Faker.
 
@@ -12018,7 +12065,10 @@ class _ProviderMethods:
         """
 
     def rcsNumber(
-        self, city: str = ..., letter: str = ..., siren: str = ...,
+        self,
+        city: str = ...,
+        letter: str = ...,
+        siren: str = ...,
     ) -> str:
         """Generate rcs number using Faker.
 
@@ -13107,9 +13157,8 @@ class _ProviderMethods:
         Provider reference:
         https://faker.readthedocs.io/en/master/providers.html
         """
-    # Keep Faker's postal_code distinct from its postalcode formatter.
 
-    def postalCode(self) -> str:  # NOSONAR
+    def postalCode(self) -> str:  # NOSONAR(S1845) - Distinct Faker formatter names.
         """Generate postal code using Faker.
 
         Returns
@@ -13120,6 +13169,7 @@ class _ProviderMethods:
         Notes
         -----
         Faker formatter: ``postal_code``.
+        Keep this formatter distinct from Faker's ``postalcode`` formatter.
         Localized formatters require a supporting locale.
         Provider reference:
         https://faker.readthedocs.io/en/master/providers.html
@@ -13508,7 +13558,9 @@ class _ProviderMethods:
         """
 
     def pesel(
-        self, date_of_birth: datetime.datetime | None = ..., sex: str | None = ...,
+        self,
+        date_of_birth: datetime.datetime | None = ...,
+        sex: str | None = ...,
     ) -> str:
         """Generate pesel using Faker.
 
@@ -13735,10 +13787,6 @@ class _ProviderMethods:
 
     def cnpj(self, use_alphanumeric: bool = ...) -> str:
         """Generate cnpj using Faker.
-
-        source: https://www.gov.br/receitafederal/pt-br/centrais-de-
-        conteudo/publicacoes/documentos-tecnicos/cnpj/manual-dv-cnpj.pdf/view  #
-        noqa: E501
 
         Parameters
         ----------
@@ -14448,7 +14496,9 @@ class _ProviderMethods:
         """
 
     def fullName(
-        self, gender: Literal["M", "F", "X"] | None = ..., short: bool | None = ...,
+        self,
+        gender: Literal["M", "F", "X"] | None = ...,
+        short: bool | None = ...,
     ) -> str:
         """Generate full name using Faker.
 
@@ -14741,7 +14791,11 @@ class _OptionalProviderMethods:
         """
 
     def bothify(
-        self, text: str = ..., letters: str = ..., *, prob: float = ...,
+        self,
+        text: str = ...,
+        letters: str = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Replace numeric and alphabetic placeholders with random characters.
 
@@ -14927,7 +14981,10 @@ class _OptionalProviderMethods:
         """
 
     def countryCode(
-        self, representation: str = ..., *, prob: float = ...,
+        self,
+        representation: str = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate country code using Faker.
 
@@ -15012,7 +15069,11 @@ class _OptionalProviderMethods:
         """
 
     def hexify(
-        self, text: str = ..., upper: bool = ..., *, prob: float = ...,
+        self,
+        text: str = ...,
+        upper: bool = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate hexify using Faker.
 
@@ -15080,7 +15141,11 @@ class _OptionalProviderMethods:
         """
 
     def lexify(
-        self, text: str = ..., letters: str = ..., *, prob: float = ...,
+        self,
+        text: str = ...,
+        letters: str = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate lexify using Faker.
 
@@ -15325,7 +15390,10 @@ class _OptionalProviderMethods:
         """
 
     def postalcodeInState(
-        self, state_abbr: str | None = ..., *, prob: float = ...,
+        self,
+        state_abbr: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate postalcode in state using Faker.
 
@@ -15410,7 +15478,10 @@ class _OptionalProviderMethods:
         """
 
     def postcodeInState(
-        self, state_abbr: str | None = ..., *, prob: float = ...,
+        self,
+        state_abbr: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate postcode in state using Faker.
 
@@ -15487,7 +15558,10 @@ class _OptionalProviderMethods:
 
     @overload
     def randomChoices(
-        self, *, length: int | None = ..., prob: float = ...,
+        self,
+        *,
+        length: int | None = ...,
+        prob: float = ...,
     ) -> Sequence[str] | None:
         """Select random elements with replacement from a population.
 
@@ -15678,7 +15752,10 @@ class _OptionalProviderMethods:
 
     @overload
     def randomElement(
-        self, elements: Collection[T] | OrderedDict[T, float], *, prob: float = ...,
+        self,
+        elements: Collection[T] | OrderedDict[T, float],
+        *,
+        prob: float = ...,
     ) -> T | None:
         """Select one random element from a population.
 
@@ -15900,7 +15977,12 @@ class _OptionalProviderMethods:
         """
 
     def randomInt(
-        self, min: int = ..., max: int = ..., step: int = ..., *, prob: float = ...,
+        self,
+        min: int = ...,
+        max: int = ...,
+        step: int = ...,
+        *,
+        prob: float = ...,
     ) -> int | None:
         """Generate an integer between inclusive bounds using a step.
 
@@ -15970,7 +16052,10 @@ class _OptionalProviderMethods:
         """
 
     def randomLetters(
-        self, length: int = ..., *, prob: float = ...,
+        self,
+        length: int = ...,
+        *,
+        prob: float = ...,
     ) -> Sequence[str] | None:
         """Generate random letters using Faker.
 
@@ -16033,7 +16118,11 @@ class _OptionalProviderMethods:
         """
 
     def randomNumber(
-        self, digits: int | None = ..., fix_len: bool = ..., *, prob: float = ...,
+        self,
+        digits: int | None = ...,
+        fix_len: bool = ...,
+        *,
+        prob: float = ...,
     ) -> int | None:
         """Generate an integer with the requested number of digits.
 
@@ -16121,7 +16210,10 @@ class _OptionalProviderMethods:
 
     @overload
     def randomSample(
-        self, *, length: int | None = ..., prob: float = ...,
+        self,
+        *,
+        length: int | None = ...,
+        prob: float = ...,
     ) -> Sequence[str] | None:
         """Select random elements without replacement from a population.
 
@@ -16457,7 +16549,10 @@ class _OptionalProviderMethods:
         """
 
     def zipcodeInState(
-        self, state_abbr: str | None = ..., *, prob: float = ...,
+        self,
+        state_abbr: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate zipcode in state using Faker.
 
@@ -16780,7 +16875,11 @@ class _OptionalProviderMethods:
         """
 
     def swift11(
-        self, primary: bool = ..., use_dataset: bool = ..., *, prob: float = ...,
+        self,
+        primary: bool = ...,
+        use_dataset: bool = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate swift11 using Faker.
 
@@ -17742,11 +17841,7 @@ class _OptionalProviderMethods:
 
     def creditCardExpire(
         self,
-        start: datetime.date
-        | datetime.datetime
-        | datetime.timedelta
-        | str
-        | int = ...,
+        start: datetime.date | datetime.datetime | datetime.timedelta | str | int = ...,
         end: datetime.date | datetime.datetime | datetime.timedelta | str | int = ...,
         date_format: str = ...,
         *,
@@ -17792,7 +17887,10 @@ class _OptionalProviderMethods:
         """
 
     def creditCardFull(
-        self, card_type: CardType | None = ..., *, prob: float = ...,
+        self,
+        card_type: CardType | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate credit card full using Faker.
 
@@ -17825,7 +17923,10 @@ class _OptionalProviderMethods:
         """
 
     def creditCardNumber(
-        self, card_type: CardType | None = ..., *, prob: float = ...,
+        self,
+        card_type: CardType | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate credit card number using Faker.
 
@@ -17858,7 +17959,10 @@ class _OptionalProviderMethods:
         """
 
     def creditCardProvider(
-        self, card_type: CardType | None = ..., *, prob: float = ...,
+        self,
+        card_type: CardType | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate credit card provider using Faker.
 
@@ -17891,7 +17995,10 @@ class _OptionalProviderMethods:
         """
 
     def creditCardSecurityCode(
-        self, card_type: CardType | None = ..., *, prob: float = ...,
+        self,
+        card_type: CardType | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate credit card security code using Faker.
 
@@ -18086,7 +18193,10 @@ class _OptionalProviderMethods:
         """
 
     def currencySymbol(
-        self, code: str | None = ..., *, prob: float = ...,
+        self,
+        code: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate currency symbol using Faker.
 
@@ -18339,7 +18449,10 @@ class _OptionalProviderMethods:
         """
 
     def dateObject(
-        self, end_datetime: datetime.datetime | None = ..., *, prob: float = ...,
+        self,
+        end_datetime: datetime.datetime | None = ...,
+        *,
+        prob: float = ...,
     ) -> datetime.date | None:
         """Generate date object using Faker.
 
@@ -18415,7 +18528,11 @@ class _OptionalProviderMethods:
         """
 
     def dateThisCentury(
-        self, before_today: bool = ..., after_today: bool = ..., *, prob: float = ...,
+        self,
+        before_today: bool = ...,
+        after_today: bool = ...,
+        *,
+        prob: float = ...,
     ) -> datetime.date | None:
         """Generate date this century using Faker.
 
@@ -18450,7 +18567,11 @@ class _OptionalProviderMethods:
         """
 
     def dateThisDecade(
-        self, before_today: bool = ..., after_today: bool = ..., *, prob: float = ...,
+        self,
+        before_today: bool = ...,
+        after_today: bool = ...,
+        *,
+        prob: float = ...,
     ) -> datetime.date | None:
         """Generate date this decade using Faker.
 
@@ -18485,7 +18606,11 @@ class _OptionalProviderMethods:
         """
 
     def dateThisMonth(
-        self, before_today: bool = ..., after_today: bool = ..., *, prob: float = ...,
+        self,
+        before_today: bool = ...,
+        after_today: bool = ...,
+        *,
+        prob: float = ...,
     ) -> datetime.date | None:
         """Generate date this month using Faker.
 
@@ -18520,7 +18645,11 @@ class _OptionalProviderMethods:
         """
 
     def dateThisYear(
-        self, before_today: bool = ..., after_today: bool = ..., *, prob: float = ...,
+        self,
+        before_today: bool = ...,
+        after_today: bool = ...,
+        *,
+        prob: float = ...,
     ) -> datetime.date | None:
         """Generate date this year using Faker.
 
@@ -19256,7 +19385,10 @@ class _OptionalProviderMethods:
         """
 
     def pytimezone(
-        self, *args: Any, prob: float = ..., **kwargs: Any,
+        self,
+        *args: Any,
+        prob: float = ...,
+        **kwargs: Any,
     ) -> datetime.tzinfo | None:
         """Generate pytimezone using Faker.
 
@@ -19643,7 +19775,10 @@ class _OptionalProviderMethods:
         """
 
     def fileExtension(
-        self, category: str | None = ..., *, prob: float = ...,
+        self,
+        category: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate file extension using Faker.
 
@@ -19797,7 +19932,10 @@ class _OptionalProviderMethods:
         """
 
     def mimeType(
-        self, category: str | None = ..., *, prob: float = ...,
+        self,
+        category: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate mime type using Faker.
 
@@ -19834,7 +19972,10 @@ class _OptionalProviderMethods:
         """
 
     def unixDevice(
-        self, prefix: str | None = ..., *, prob: float = ...,
+        self,
+        prefix: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate unix device using Faker.
 
@@ -19870,7 +20011,10 @@ class _OptionalProviderMethods:
         """
 
     def unixPartition(
-        self, prefix: str | None = ..., *, prob: float = ...,
+        self,
+        prefix: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate unix partition using Faker.
 
@@ -19999,7 +20143,11 @@ class _OptionalProviderMethods:
         """
 
     def localLatlng(
-        self, country_code: str = ..., coords_only: bool = ..., *, prob: float = ...,
+        self,
+        country_code: str = ...,
+        coords_only: bool = ...,
+        *,
+        prob: float = ...,
     ) -> tuple[str, ...] | None:
         """Generate local latlng using Faker.
 
@@ -20036,7 +20184,10 @@ class _OptionalProviderMethods:
         """
 
     def locationOnLand(
-        self, coords_only: bool = ..., *, prob: float = ...,
+        self,
+        coords_only: bool = ...,
+        *,
+        prob: float = ...,
     ) -> tuple[str, ...] | None:
         """Generate location on land using Faker.
 
@@ -20344,7 +20495,11 @@ class _OptionalProviderMethods:
         """
 
     def email(
-        self, safe: bool = ..., domain: str | None = ..., *, prob: float = ...,
+        self,
+        safe: bool = ...,
+        domain: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate an email address using the configured locale.
 
@@ -20495,7 +20650,10 @@ class _OptionalProviderMethods:
         """
 
     def httpStatusCode(
-        self, include_unassigned: bool = ..., *, prob: float = ...,
+        self,
+        include_unassigned: bool = ...,
+        *,
+        prob: float = ...,
     ) -> int | None:
         """Generate http status code using Faker.
 
@@ -20781,7 +20939,10 @@ class _OptionalProviderMethods:
         """
 
     def macAddress(
-        self, multicast: bool = ..., *, prob: float = ...,
+        self,
+        multicast: bool = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate mac address using Faker.
 
@@ -20845,7 +21006,11 @@ class _OptionalProviderMethods:
         """
 
     def nicHandles(
-        self, count: int = ..., suffix: str = ..., *, prob: float = ...,
+        self,
+        count: int = ...,
+        suffix: str = ...,
+        *,
+        prob: float = ...,
     ) -> list[str] | None:
         """Generate nic handles using Faker.
 
@@ -21186,7 +21351,10 @@ class _OptionalProviderMethods:
         """
 
     def url(
-        self, schemes: list[str] | None = ..., *, prob: float = ...,
+        self,
+        schemes: list[str] | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate url using Faker.
 
@@ -21857,7 +22025,10 @@ class _OptionalProviderMethods:
         """
 
     def boolean(
-        self, chance_of_getting_true: int = ..., *, prob: float = ...,
+        self,
+        chance_of_getting_true: int = ...,
+        *,
+        prob: float = ...,
     ) -> bool | None:
         """Generate a boolean with the requested probability of being true.
 
@@ -22522,7 +22693,10 @@ class _OptionalProviderMethods:
 
     @overload
     def sha1(
-        self, raw_output: Literal[True], *, prob: float = ...,
+        self,
+        raw_output: Literal[True],
+        *,
+        prob: float = ...,
     ) -> bytes | None:
         """Generate sha1 using Faker.
 
@@ -22630,7 +22804,10 @@ class _OptionalProviderMethods:
 
     @overload
     def sha256(
-        self, raw_output: Literal[True], *, prob: float = ...,
+        self,
+        raw_output: Literal[True],
+        *,
+        prob: float = ...,
     ) -> bytes | None:
         """Generate sha256 using Faker.
 
@@ -22668,7 +22845,10 @@ class _OptionalProviderMethods:
 
     @overload
     def sha256(
-        self, raw_output: Literal[False], *, prob: float = ...,
+        self,
+        raw_output: Literal[False],
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate sha256 using Faker.
 
@@ -22896,7 +23076,10 @@ class _OptionalProviderMethods:
 
     @overload
     def uuid1(
-        self, cast_to: Callable[[UUID], str], *, prob: float = ...,
+        self,
+        cast_to: Callable[[UUID], str],
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate a version 1 UUID in the requested representation.
 
@@ -22939,7 +23122,10 @@ class _OptionalProviderMethods:
 
     @overload
     def uuid1(
-        self, cast_to: Callable[[UUID], bytes], *, prob: float = ...,
+        self,
+        cast_to: Callable[[UUID], bytes],
+        *,
+        prob: float = ...,
     ) -> bytes | None:
         """Generate a version 1 UUID in the requested representation.
 
@@ -23054,7 +23240,10 @@ class _OptionalProviderMethods:
 
     @overload
     def uuid4(
-        self, cast_to: Callable[[UUID], str], *, prob: float = ...,
+        self,
+        cast_to: Callable[[UUID], str],
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate a version 4 UUID in the requested representation.
 
@@ -23093,7 +23282,10 @@ class _OptionalProviderMethods:
 
     @overload
     def uuid4(
-        self, cast_to: Callable[[UUID], bytes], *, prob: float = ...,
+        self,
+        cast_to: Callable[[UUID], bytes],
+        *,
+        prob: float = ...,
     ) -> bytes | None:
         """Generate a version 4 UUID in the requested representation.
 
@@ -23220,7 +23412,10 @@ class _OptionalProviderMethods:
 
     @overload
     def uuid7(
-        self, cast_to: Callable[[UUID], str], *, prob: float = ...,
+        self,
+        cast_to: Callable[[UUID], str],
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate a version 7 UUID in the requested representation.
 
@@ -23267,7 +23462,10 @@ class _OptionalProviderMethods:
 
     @overload
     def uuid7(
-        self, cast_to: Callable[[UUID], bytes], *, prob: float = ...,
+        self,
+        cast_to: Callable[[UUID], bytes],
+        *,
+        prob: float = ...,
     ) -> bytes | None:
         """Generate a version 7 UUID in the requested representation.
 
@@ -23422,7 +23620,10 @@ class _OptionalProviderMethods:
         """
 
     def passportDates(
-        self, birthday: datetime.date = ..., *, prob: float = ...,
+        self,
+        birthday: datetime.date = ...,
+        *,
+        prob: float = ...,
     ) -> tuple[str, str, str] | None:
         """Generate passport dates using Faker.
 
@@ -23523,7 +23724,10 @@ class _OptionalProviderMethods:
         """
 
     def passportGender(
-        self, seed: int = ..., *, prob: float = ...,
+        self,
+        seed: int = ...,
+        *,
+        prob: float = ...,
     ) -> Literal["M", "F", "X"] | None:
         """Generate passport gender using Faker.
 
@@ -23590,7 +23794,10 @@ class _OptionalProviderMethods:
         """
 
     def passportOwner(
-        self, gender: Literal["M", "F", "X"] = ..., *, prob: float = ...,
+        self,
+        gender: Literal["M", "F", "X"] = ...,
+        *,
+        prob: float = ...,
     ) -> tuple[str, str] | None:
         """Generate passport owner using Faker.
 
@@ -24282,9 +24489,7 @@ class _OptionalProviderMethods:
         sex: Literal["M", "F", "X"] | None = ...,
         *,
         prob: float = ...,
-    ) -> (
-        dict[str, str | tuple[Decimal, Decimal] | list[str] | datetime.date] | None
-    ):
+    ) -> dict[str, str | tuple[Decimal, Decimal] | list[str] | datetime.date] | None:
         """Generate profile using Faker.
 
         Generates a complete profile. If "fields" is not empty, only the fields in
@@ -24319,7 +24524,10 @@ class _OptionalProviderMethods:
         """
 
     def simpleProfile(
-        self, sex: Literal["M", "F", "X"] | None = ..., *, prob: float = ...,
+        self,
+        sex: Literal["M", "F", "X"] | None = ...,
+        *,
+        prob: float = ...,
     ) -> dict[str, str | datetime.date | Literal["M", "F", "X"]] | None:
         """Generate simple profile using Faker.
 
@@ -24383,7 +24591,10 @@ class _OptionalProviderMethods:
         """
 
     def pybool(
-        self, truth_probability: int = ..., *, prob: float = ...,
+        self,
+        truth_probability: int = ...,
+        *,
+        prob: float = ...,
     ) -> bool | None:
         """Generate a boolean with the requested probability of being true.
 
@@ -24807,7 +25018,11 @@ class _OptionalProviderMethods:
         """
 
     def pystrFormat(
-        self, string_format: str = ..., letters: str = ..., *, prob: float = ...,
+        self,
+        string_format: str = ...,
+        letters: str = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate pystr format using Faker.
 
@@ -25068,7 +25283,10 @@ class _OptionalProviderMethods:
         """
 
     def ssn(
-        self, taxpayer_identification_number_type: str = ..., *, prob: float = ...,
+        self,
+        taxpayer_identification_number_type: str = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate ssn using Faker.
 
@@ -27411,7 +27629,10 @@ class _OptionalProviderMethods:
         """
 
     def rvnr(
-        self, birthdate: datetime.date | None = ..., *, prob: float = ...,
+        self,
+        birthdate: datetime.date | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate rvnr using Faker.
 
@@ -27643,7 +27864,10 @@ class _OptionalProviderMethods:
         """
 
     def postalcodeInProvince(
-        self, province_abbr: str | None = ..., *, prob: float = ...,
+        self,
+        province_abbr: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate postalcode in province using Faker.
 
@@ -27674,7 +27898,10 @@ class _OptionalProviderMethods:
         """
 
     def postcodeInProvince(
-        self, province_abbr: str | None = ..., *, prob: float = ...,
+        self,
+        province_abbr: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate postcode in province using Faker.
 
@@ -29277,7 +29504,10 @@ class _OptionalProviderMethods:
         """
 
     def englishParagraphs(
-        self, nb: int = ..., *, prob: float = ...,
+        self,
+        nb: int = ...,
+        *,
+        prob: float = ...,
     ) -> list[str] | None:
         """Generate english paragraphs using Faker.
 
@@ -29310,7 +29540,11 @@ class _OptionalProviderMethods:
         """
 
     def englishSentence(
-        self, nb_words: int = ..., variable_nb_words: bool = ..., *, prob: float = ...,
+        self,
+        nb_words: int = ...,
+        variable_nb_words: bool = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate english sentence using Faker.
 
@@ -29345,7 +29579,10 @@ class _OptionalProviderMethods:
         """
 
     def englishSentences(
-        self, nb: int = ..., *, prob: float = ...,
+        self,
+        nb: int = ...,
+        *,
+        prob: float = ...,
     ) -> list[str] | None:
         """Generate english sentences using Faker.
 
@@ -29378,7 +29615,10 @@ class _OptionalProviderMethods:
         """
 
     def englishText(
-        self, max_nb_chars: int = ..., *, prob: float = ...,
+        self,
+        max_nb_chars: int = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate english text using Faker.
 
@@ -29411,7 +29651,11 @@ class _OptionalProviderMethods:
         """
 
     def englishTexts(
-        self, nb_texts: int = ..., max_nb_chars: int = ..., *, prob: float = ...,
+        self,
+        nb_texts: int = ...,
+        max_nb_chars: int = ...,
+        *,
+        prob: float = ...,
     ) -> list[str] | None:
         """Generate english texts using Faker.
 
@@ -29475,7 +29719,11 @@ class _OptionalProviderMethods:
         """
 
     def englishWords(
-        self, nb: int = ..., unique: bool = ..., *, prob: float = ...,
+        self,
+        nb: int = ...,
+        unique: bool = ...,
+        *,
+        prob: float = ...,
     ) -> list[str] | None:
         """Generate english words using Faker.
 
@@ -31147,7 +31395,11 @@ class _OptionalProviderMethods:
         """
 
     def rut(
-        self, min: int = ..., max: int = ..., *, prob: float = ...,
+        self,
+        min: int = ...,
+        max: int = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate rut using Faker.
 
@@ -31431,7 +31683,10 @@ class _OptionalProviderMethods:
         """
 
     def licensePlateByProvince(
-        self, province_prefix: str | None = ..., *, prob: float = ...,
+        self,
+        province_prefix: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate license plate by province using Faker.
 
@@ -31551,7 +31806,10 @@ class _OptionalProviderMethods:
         """
 
     def licensePlateByState(
-        self, state_abbr: str | None = ..., *, prob: float = ...,
+        self,
+        state_abbr: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate license plate by state using Faker.
 
@@ -31765,7 +32023,9 @@ class _OptionalProviderMethods:
         """
 
     def publicTransportLicensePlateLettered(
-        self, *, prob: float = ...,
+        self,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate public transport license plate lettered using Faker.
 
@@ -31796,7 +32056,9 @@ class _OptionalProviderMethods:
         """
 
     def publicTransportLicensePlateNumbered(
-        self, *, prob: float = ...,
+        self,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate public transport license plate numbered using Faker.
 
@@ -31827,7 +32089,10 @@ class _OptionalProviderMethods:
         """
 
     def clabe(
-        self, bank_code: int | None = ..., *, prob: float = ...,
+        self,
+        bank_code: int | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate clabe using Faker.
 
@@ -31894,7 +32159,10 @@ class _OptionalProviderMethods:
         """
 
     def electorCode(
-        self, gender: Literal["H", "M"] | None = ..., *, prob: float = ...,
+        self,
+        gender: Literal["H", "M"] | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate elector code using Faker.
 
@@ -32374,7 +32642,10 @@ class _OptionalProviderMethods:
         """
 
     def apeCode(
-        self, version: str | None = ..., *, prob: float = ...,
+        self,
+        version: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate ape code using Faker.
 
@@ -32549,7 +32820,10 @@ class _OptionalProviderMethods:
         """
 
     def siret(
-        self, max_sequential_digits: int = ..., *, prob: float = ...,
+        self,
+        max_sequential_digits: int = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate siret using Faker.
 
@@ -33580,7 +33854,9 @@ class _OptionalProviderMethods:
         """
 
     def firstNameFemalePair(
-        self, *, prob: float = ...,
+        self,
+        *,
+        prob: float = ...,
     ) -> tuple[str, str, str] | None:
         """Generate first name female pair using Faker.
 
@@ -33609,7 +33885,9 @@ class _OptionalProviderMethods:
         """
 
     def firstNameMalePair(
-        self, *, prob: float = ...,
+        self,
+        *,
+        prob: float = ...,
     ) -> tuple[str, str, str] | None:
         """Generate first name male pair using Faker.
 
@@ -34257,9 +34535,12 @@ class _OptionalProviderMethods:
         Provider reference:
         https://faker.readthedocs.io/en/master/providers.html
         """
-    # Keep Faker's postal_code distinct from its postalcode formatter.
 
-    def postalCode(self, *, prob: float = ...) -> str | None:  # NOSONAR
+    def postalCode(  # NOSONAR(S1845) - Distinct Faker formatter names.
+        self,
+        *,
+        prob: float = ...,
+    ) -> str | None:
         """Generate postal code using Faker.
 
         Parameters
@@ -34281,6 +34562,7 @@ class _OptionalProviderMethods:
         Notes
         -----
         Faker formatter: ``postal_code``.
+        Keep this formatter distinct from Faker's ``postalcode`` formatter.
         Localized formatters require a supporting locale.
         Provider reference:
         https://faker.readthedocs.io/en/master/providers.html
@@ -34954,7 +35236,10 @@ class _OptionalProviderMethods:
         """
 
     def peselComputeCheckDigit(
-        self, pesel: str, *, prob: float = ...,
+        self,
+        pesel: str,
+        *,
+        prob: float = ...,
     ) -> int | None:
         """Calculate the check digit of a PESEL identifier.
 
@@ -35018,7 +35303,10 @@ class _OptionalProviderMethods:
         """
 
     def pwzDoctorComputeCheckDigit(
-        self, x: Sequence[int], *, prob: float = ...,
+        self,
+        x: Sequence[int],
+        *,
+        prob: float = ...,
     ) -> int | None:
         """Calculate the check digit of a doctor identifier.
 
@@ -35232,13 +35520,12 @@ class _OptionalProviderMethods:
         """
 
     def cnpj(
-        self, use_alphanumeric: bool = ..., *, prob: float = ...,
+        self,
+        use_alphanumeric: bool = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate cnpj using Faker.
-
-        source: https://www.gov.br/receitafederal/pt-br/centrais-de-
-        conteudo/publicacoes/documentos-tecnicos/cnpj/manual-dv-cnpj.pdf/view  #
-        noqa: E501
 
         Parameters
         ----------
@@ -35267,7 +35554,10 @@ class _OptionalProviderMethods:
         """
 
     def companyId(
-        self, use_alphanumeric: bool = ..., *, prob: float = ...,
+        self,
+        use_alphanumeric: bool = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate company id using Faker.
 
@@ -36022,7 +36312,11 @@ class _OptionalProviderMethods:
         """
 
     def orgAndVatId(
-        self, long: bool = ..., dash: bool = ..., *, prob: float = ...,
+        self,
+        long: bool = ...,
+        dash: bool = ...,
+        *,
+        prob: float = ...,
     ) -> tuple[str, str] | None:
         """Generate org and vat id using Faker.
 
@@ -36057,7 +36351,11 @@ class _OptionalProviderMethods:
         """
 
     def orgId(
-        self, long: bool = ..., dash: bool = ..., *, prob: float = ...,
+        self,
+        long: bool = ...,
+        dash: bool = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate org id using Faker.
 
@@ -36263,7 +36561,10 @@ class _OptionalProviderMethods:
         """
 
     def plateLetterPrefix(
-        self, region_name: str | None = ..., *, prob: float = ...,
+        self,
+        region_name: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate plate letter prefix using Faker.
 
@@ -36325,7 +36626,10 @@ class _OptionalProviderMethods:
         """
 
     def plateRegionCode(
-        self, region_name: str | None = ..., *, prob: float = ...,
+        self,
+        region_name: str | None = ...,
+        *,
+        prob: float = ...,
     ) -> str | None:
         """Generate plate region code using Faker.
 
@@ -36762,7 +37066,7 @@ class Fake(_ProviderMethods):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
 
     @property
@@ -36816,7 +37120,7 @@ class Fake(_ProviderMethods):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
 
     def seedInstance(self, seed: int | None = ...) -> None:
@@ -36830,7 +37134,7 @@ class Fake(_ProviderMethods):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
 
     def seedLocale(self, locale: str, seed: int | None = ...) -> None:
@@ -36846,7 +37150,7 @@ class Fake(_ProviderMethods):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
 
     def format(self, formatter: str, *args: Any, **kwargs: Any) -> Any:
@@ -36901,7 +37205,7 @@ class Fake(_ProviderMethods):
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
 
     def __getitem__(self, locale: str) -> Fake:
@@ -36953,7 +37257,7 @@ class UniqueFake(_ProviderMethods):
         Returns
         -------
         None
-            Previously generated values become eligible for reuse.
+            No return value.
         """
 
     def excludeTypes(self, types: list[type]) -> UniqueFake:
@@ -36967,7 +37271,8 @@ class UniqueFake(_ProviderMethods):
         Returns
         -------
         UniqueFake
-            View sharing the backend's unique pool and dispatch lifecycle.
+            View initially sharing the backend's uniqueness history. Clearing a
+            view starts an independent history for that view, matching Faker.
         """
 
     def __getitem__(self, locale: str) -> UniqueFake:

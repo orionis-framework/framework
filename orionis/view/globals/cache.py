@@ -1,15 +1,18 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
+# Preserve heterogeneous template payload values.
 """Provide view globals operations through ``_global_cache``."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 from orionis.cache.contracts.cache_manager import ICacheManager
+from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
 
-# ruff: noqa: ANN401
-
-def _global_cache(app: IApplication) -> Any:
+def _global_cache(app: IApplication) -> Callable[..., Awaitable[Any]]:
     """
     Build the ``cache`` template global.
 
@@ -20,8 +23,8 @@ def _global_cache(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
-        Callable returning the application instance.
+    collections.abc.Callable
+        Async callable reading the configured cache store.
     """
 
     async def cache(key: str, default: Any | None = None) -> Any:

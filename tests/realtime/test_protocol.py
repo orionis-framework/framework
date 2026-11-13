@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import dataclasses
 import math
 import msgspec
@@ -5,9 +7,16 @@ from orionis.http.websocket_message import WebSocketMessage, WebSocketMessageTyp
 from orionis.realtime.config import RealtimeConfig
 from orionis.realtime.errors import ProtocolError
 from orionis.realtime.protocol import (
-    Cancel, Completion, HubProtocol, Invoke, Ping, Pong, RPCErrorPayload,
+    Cancel,
+    Completion,
+    HubProtocol,
+    Invoke,
+    Ping,
+    Pong,
+    RPCErrorPayload,
 )
 from orionis.test import TestCase
+
 
 def _frame(payload: object, protocol: str = "json") -> WebSocketMessage:
     """
@@ -31,8 +40,10 @@ def _frame(payload: object, protocol: str = "json") -> WebSocketMessage:
             data=msgspec.json.encode(payload).decode("utf-8"),
         )
     return WebSocketMessage(
-        type=WebSocketMessageType.BYTES, data=msgspec.msgpack.encode(payload),
+        type=WebSocketMessageType.BYTES,
+        data=msgspec.msgpack.encode(payload),
     )
+
 
 class TestHubProtocol(TestCase):
     """Validate version-one envelopes independently of networking and RPC."""
@@ -49,18 +60,33 @@ class TestHubProtocol(TestCase):
         for name in ("json", "msgpack"):
             with self.subTest(name=name):
                 protocol = HubProtocol(name)
-                message = protocol.decode(_frame({
-                    "type": "invoke", "id": "req-1", "target": "saludar",
-                    "args": ["Hola 👋"], "timeout": 5,
-                }, name))
+                message = protocol.decode(
+                    _frame(
+                        {
+                            "type": "invoke",
+                            "id": "req-1",
+                            "target": "saludar",
+                            "args": ["Hola 👋"],
+                            "timeout": 5,
+                        },
+                        name,
+                    ),
+                )
                 if not isinstance(message, Invoke):
                     self.fail("Expected a typed invoke envelope")
                 self.assertEqual(message.args, ["Hola 👋"])
                 self.assertEqual(message.kwargs, {})
                 self.assertEqual(message.timeout, 5)
-                empty = protocol.decode(_frame({
-                    "type": "invoke", "id": "req-2", "target": "ping",
-                }, name))
+                empty = protocol.decode(
+                    _frame(
+                        {
+                            "type": "invoke",
+                            "id": "req-2",
+                            "target": "ping",
+                        },
+                        name,
+                    ),
+                )
                 if not isinstance(empty, Invoke):
                     self.fail("Expected a typed invoke envelope")
                 self.assertEqual(empty.args, [])
@@ -77,17 +103,30 @@ class TestHubProtocol(TestCase):
         """
         for name in ("json", "msgpack"):
             protocol = HubProtocol(name)
-            null = protocol.decode(_frame({
-                "type": "completion", "id": "s-1", "result": None,
-            }, name))
+            null = protocol.decode(
+                _frame(
+                    {
+                        "type": "completion",
+                        "id": "s-1",
+                        "result": None,
+                    },
+                    name,
+                ),
+            )
             if not isinstance(null, Completion):
                 self.fail("Expected a typed completion envelope")
             self.assertIsNone(null.result)
             self.assertIs(null.error, msgspec.UNSET)
-            error = protocol.decode(_frame({
-                "type": "completion", "id": "s-2",
-                "error": {"code": "unavailable", "message": "Please retry"},
-            }, name))
+            error = protocol.decode(
+                _frame(
+                    {
+                        "type": "completion",
+                        "id": "s-2",
+                        "error": {"code": "unavailable", "message": "Please retry"},
+                    },
+                    name,
+                ),
+            )
             if not isinstance(error, Completion):
                 self.fail("Expected a typed completion envelope")
             self.assertIs(error.result, msgspec.UNSET)
@@ -106,7 +145,8 @@ class TestHubProtocol(TestCase):
         """
         protocol = HubProtocol()
         for payload, expected in (
-            ({"type": "ping"}, Ping), ({"type": "pong"}, Pong),
+            ({"type": "ping"}, Ping),
+            ({"type": "pong"}, Pong),
             ({"type": "cancel", "id": "req-1"}, Cancel),
         ):
             self.assertIsInstance(protocol.decode(_frame(payload)), expected)
@@ -122,7 +162,11 @@ class TestHubProtocol(TestCase):
         """
         protocol = HubProtocol()
         for message_type in (
-            "send", "ready", "stream_item", "stream_complete", "other",
+            "send",
+            "ready",
+            "stream_item",
+            "stream_complete",
+            "other",
         ):
             with (
                 self.subTest(message_type=message_type),
@@ -140,7 +184,10 @@ class TestHubProtocol(TestCase):
             The strict msgspec tagged union validates every envelope shape.
         """
         cases = [
-            [], None, {"id": "x"}, {"type": 1},
+            [],
+            None,
+            {"id": "x"},
+            {"type": 1},
             {"type": "ping", "extra": True},
             {"type": "cancel", "id": 1},
             {"type": "invoke", "id": "x", "target": "ping", "args": {}},
@@ -162,12 +209,20 @@ class TestHubProtocol(TestCase):
             Invalid bytes produce a stable public error.
         """
         for protocol, frame in (
-            (HubProtocol(), WebSocketMessage(
-                type=WebSocketMessageType.TEXT, data="{secret-token:",
-            )),
-            (HubProtocol("msgpack"), WebSocketMessage(
-                type=WebSocketMessageType.BYTES, data=b"\xc1",
-            )),
+            (
+                HubProtocol(),
+                WebSocketMessage(
+                    type=WebSocketMessageType.TEXT,
+                    data="{secret-token:",
+                ),
+            ),
+            (
+                HubProtocol("msgpack"),
+                WebSocketMessage(
+                    type=WebSocketMessageType.BYTES,
+                    data=b"\xc1",
+                ),
+            ),
         ):
             with self.assertRaises(ProtocolError) as exc:
                 protocol.decode(frame)
@@ -183,13 +238,20 @@ class TestHubProtocol(TestCase):
             A client cannot provide an ambiguous future result.
         """
         for outcome in (
-            {}, {"result": None, "error": {"code": "error", "message": "error"}},
+            {},
+            {"result": None, "error": {"code": "error", "message": "error"}},
             {"error": None},
         ):
             with self.subTest(outcome=outcome), self.assertRaises(ProtocolError):
-                HubProtocol().decode(_frame({
-                    "type": "completion", "id": "x", **outcome,
-                }))
+                HubProtocol().decode(
+                    _frame(
+                        {
+                            "type": "completion",
+                            "id": "x",
+                            **outcome,
+                        },
+                    ),
+                )
 
     def testBoundedIdsNamesArgumentsAndErrors(self) -> None:
         """
@@ -202,19 +264,32 @@ class TestHubProtocol(TestCase):
         """
         base = {"type": "invoke", "id": "x", "target": "ping"}
         cases = [
-            {**base, "id": ""}, {**base, "id": "x" * 129},
-            {**base, "id": "contains space"}, {**base, "id": "control\n"},
-            {**base, "target": ""}, {**base, "target": "x" * 129},
+            {**base, "id": ""},
+            {**base, "id": "x" * 129},
+            {**base, "id": "contains space"},
+            {**base, "id": "control\n"},
+            {**base, "target": ""},
+            {**base, "target": "x" * 129},
             {**base, "args": [0] * 65},
             {**base, "kwargs": {str(index): index for index in range(65)}},
             {**base, "kwargs": {"x" * 129: 1}},
             {"type": "completion", "id": "x", "error": {"code": "", "message": ""}},
-            {"type": "completion", "id": "x", "error": {
-                "code": "x" * 65, "message": "",
-            }},
-            {"type": "completion", "id": "x", "error": {
-                "code": "error", "message": "x" * 1025,
-            }},
+            {
+                "type": "completion",
+                "id": "x",
+                "error": {
+                    "code": "x" * 65,
+                    "message": "",
+                },
+            },
+            {
+                "type": "completion",
+                "id": "x",
+                "error": {
+                    "code": "error",
+                    "message": "x" * 1025,
+                },
+            },
         ]
         for case in cases:
             with self.subTest(case=case), self.assertRaises(ProtocolError):
@@ -231,9 +306,17 @@ class TestHubProtocol(TestCase):
         """
         for timeout in (0, -1, math.inf, -math.inf, math.nan):
             with self.subTest(timeout=timeout), self.assertRaises(ProtocolError):
-                HubProtocol("msgpack").decode(_frame({
-                    "type": "invoke", "id": "x", "target": "ping", "timeout": timeout,
-                }, "msgpack"))
+                HubProtocol("msgpack").decode(
+                    _frame(
+                        {
+                            "type": "invoke",
+                            "id": "x",
+                            "target": "ping",
+                            "timeout": timeout,
+                        },
+                        "msgpack",
+                    ),
+                )
 
     def testMessageLimitCountsUtf8Bytes(self) -> None:
         """
@@ -299,6 +382,7 @@ class TestHubProtocol(TestCase):
         for limit in (0, -1, True):
             with self.subTest(limit=limit), self.assertRaises(ValueError):
                 HubProtocol(max_message_size=limit)
+
 
 class TestRealtimeConfiguration(TestCase):
     """Validate immutable positive and finite realtime limits."""

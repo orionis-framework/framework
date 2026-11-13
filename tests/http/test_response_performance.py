@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from functools import partial
 from pathlib import Path
@@ -23,8 +25,10 @@ if TYPE_CHECKING:
     from os import stat_result
     from orionis.background.task import BackgroundTask
 
+
 class _BodyBytes(bytes):
     __slots__ = ()
+
 
 class _HookTextResponse(PlainTextResponse):
     """Record the header extension points used during subclass construction."""
@@ -75,6 +79,7 @@ class _HookTextResponse(PlainTextResponse):
         """
         self.events.append(("set", key))
         super().setHeader(key, value)
+
 
 class _HeaderHookResponse(Response):
     """Provide a hook recorder without adding conflicting response slots."""
@@ -160,23 +165,30 @@ class _HeaderHookResponse(Response):
         self.events.append(("remove", key))
         super().removeHeader(key)
 
+
 class _HookHTMLResponse(HTMLResponse, _HeaderHookResponse):
     __slots__ = ()
+
 
 class _HookJSONResponse(JSONResponse, _HeaderHookResponse):
     __slots__ = ()
 
+
 class _HookRedirectResponse(RedirectResponse, _HeaderHookResponse):
     __slots__ = ()
+
 
 class _HookStreamingResponse(StreamingResponse, _HeaderHookResponse):
     __slots__ = ()
 
+
 class _HookEventStreamResponse(EventStreamResponse, _HeaderHookResponse):
     __slots__ = ()
 
+
 class _HookFileResponse(FileResponse, _HeaderHookResponse):
     __slots__ = ()
+
 
 class _ObservedHeaders(dict[str, str]):
     __slots__ = ("truth_checks",)
@@ -203,8 +215,10 @@ class _ObservedHeaders(dict[str, str]):
         self.truth_checks += 1
         return len(self) > 0
 
+
 class _MediaType(str):
     __slots__ = ()
+
 
 def _response_factories(path: Path) -> dict[str, Callable[..., Response]]:
     """Bind representative constructors to their required inputs.
@@ -224,16 +238,21 @@ def _response_factories(path: Path) -> dict[str, Callable[..., Response]]:
         "json": partial(JSONResponse, {"id": 7}),
         "redirect": partial(RedirectResponse, "/next"),
         "stream": partial(
-            StreamingResponse, (b"body",), media_type="text/plain",
+            StreamingResponse,
+            (b"body",),
+            media_type="text/plain",
         ),
         "sse": partial(EventStreamResponse, ("body",)),
         "file": partial(
-            FileResponse, path, media_type="text/plain", filename="data.txt",
+            FileResponse,
+            path,
+            media_type="text/plain",
+            filename="data.txt",
         ),
     }
 
-class TestResponseResources(TestCase):
 
+class TestResponseResources(TestCase):
     def testBuiltInMetadataKeepsHeaderOrderAndOwnership(self) -> None:
         """Keep default metadata ordered and isolated for every response type.
 
@@ -252,7 +271,8 @@ class TestResponseResources(TestCase):
             "stream": [("content-type", "text/plain; charset=utf-8")],
             "sse": [
                 ("content-type", "text/event-stream; charset=utf-8"),
-                ("cache-control", "no-cache"), ("x-accel-buffering", "no"),
+                ("cache-control", "no-cache"),
+                ("x-accel-buffering", "no"),
             ],
             "file": [
                 ("content-type", "text/plain; charset=utf-8"),
@@ -291,10 +311,14 @@ class TestResponseResources(TestCase):
             Assert exact header ordering and type-specific metadata precedence.
         """
         original = {
-            "X-First": "keep", "CONTENT-TYPE": "custom/one",
-            "content-type": "custom/two", "Location": "/old",
-            "Content-Length": "999", "Content-Disposition": "inline",
-            "Cache-Control": "private", "X-Accel-Buffering": "yes",
+            "X-First": "keep",
+            "CONTENT-TYPE": "custom/one",
+            "content-type": "custom/two",
+            "Location": "/old",
+            "Content-Length": "999",
+            "Content-Disposition": "inline",
+            "Cache-Control": "private",
+            "X-Accel-Buffering": "yes",
         }
         with TemporaryDirectory() as directory:
             path = Path(directory) / "data.txt"
@@ -304,16 +328,19 @@ class TestResponseResources(TestCase):
                     headers = dict(original)
                     result = factory(headers=MappingProxyType(headers))
                     expected = [
-                        ("x-first", "keep"), ("content-type", "custom/one"),
+                        ("x-first", "keep"),
+                        ("content-type", "custom/one"),
                         ("content-type", "custom/two"),
                         ("location", "/next" if name == "redirect" else "/old"),
                         ("content-length", "4" if name == "file" else "999"),
                         (
                             "content-disposition",
-                            'attachment; filename="data.txt"' if name == "file"
+                            'attachment; filename="data.txt"'
+                            if name == "file"
                             else "inline",
                         ),
-                        ("cache-control", "private"), ("x-accel-buffering", "yes"),
+                        ("cache-control", "private"),
+                        ("x-accel-buffering", "yes"),
                     ]
                     if name == "sse":
                         expected = [
@@ -339,26 +366,34 @@ class TestResponseResources(TestCase):
                 "json": partial(_HookJSONResponse, {"id": 7}),
                 "redirect": partial(_HookRedirectResponse, "/next"),
                 "stream": partial(
-                    _HookStreamingResponse, (b"body",), media_type="text/plain",
+                    _HookStreamingResponse,
+                    (b"body",),
+                    media_type="text/plain",
                 ),
                 "sse": partial(_HookEventStreamResponse, ("body",)),
                 "file": partial(
-                    _HookFileResponse, path, media_type="text/plain",
+                    _HookFileResponse,
+                    path,
+                    media_type="text/plain",
                     filename="data.txt",
                 ),
             }
             expected = {
-                "html": content_type, "json": content_type,
+                "html": content_type,
+                "json": content_type,
                 "redirect": [("set", "location"), *content_type],
                 "stream": content_type,
                 "sse": [
                     *content_type,
-                    ("has", "cache-control"), ("set", "cache-control"),
-                    ("has", "x-accel-buffering"), ("set", "x-accel-buffering"),
+                    ("has", "cache-control"),
+                    ("set", "cache-control"),
+                    ("has", "x-accel-buffering"),
+                    ("set", "x-accel-buffering"),
                     ("remove", "content-length"),
                 ],
                 "file": [
-                    *content_type, ("set", "content-length"),
+                    *content_type,
+                    ("set", "content-length"),
                     ("set", "content-disposition"),
                 ],
             }
@@ -398,6 +433,7 @@ class TestResponseResources(TestCase):
         None
             Streams and files retain the lazy formatting boundary.
         """
+
         def unexpected_format(*_args: object) -> bool:
             """Reject a formatting call that should have been skipped.
 
@@ -424,11 +460,13 @@ class TestResponseResources(TestCase):
             path.write_bytes(b"data")
             with replace_attribute(_MediaType, "startswith", unexpected_format):
                 stream = StreamingResponse(
-                    (), media_type=_MediaType("text/custom"),
+                    (),
+                    media_type=_MediaType("text/custom"),
                     headers={"Content-Type": "custom/type"},
                 )
                 file = FileResponse(
-                    path, media_type=_MediaType("text/custom"),
+                    path,
+                    media_type=_MediaType("text/custom"),
                     headers={"Content-Type": "custom/type"},
                 )
             self.assertEqual(stream.getHeader("content-type"), ["custom/type"])
@@ -487,7 +525,9 @@ class TestResponseResources(TestCase):
             factories = (
                 (_HookStreamingResponse, (b"body",), {}, ["lookup", "format"]),
                 (
-                    _HookFileResponse, path, {"filename": "data.txt"},
+                    _HookFileResponse,
+                    path,
+                    {"filename": "data.txt"},
                     ["lookup", "format", "lookup", "lookup"],
                 ),
             )
@@ -495,13 +535,17 @@ class TestResponseResources(TestCase):
                 with (
                     self.subTest(response=response_type),
                     replace_attribute(
-                        response_type, "__getattribute__", read_attribute,
+                        response_type,
+                        "__getattribute__",
+                        read_attribute,
                     ),
                     replace_attribute(_MediaType, "startswith", check_prefix),
                 ):
                     events.clear()
                     response_type(
-                        content, media_type=_MediaType("text/custom"), **options,
+                        content,
+                        media_type=_MediaType("text/custom"),
+                        **options,
                     )
                     self.assertEqual(events, expected)
 
@@ -514,9 +558,13 @@ class TestResponseResources(TestCase):
             Assert that subclasses still observe both header operations.
         """
         result = _HookTextResponse()
-        self.assertEqual(result.events, [
-            ("has", "content-type"), ("set", "content-type"),
-        ])
+        self.assertEqual(
+            result.events,
+            [
+                ("has", "content-type"),
+                ("set", "content-type"),
+            ],
+        )
         self.assertEqual(result.getBody(), b"body")
 
     def testTextHeadersRemainIndependentForEmptyMappings(self) -> None:
@@ -533,13 +581,19 @@ class TestResponseResources(TestCase):
                 second = response.text("second", headers=headers)
                 self.assertIsNot(first, second)
                 first.getHeader("content-type").append("changed")
-                self.assertEqual(second.getHeader("content-type"), [
-                    "text/plain; charset=utf-8",
-                ])
+                self.assertEqual(
+                    second.getHeader("content-type"),
+                    [
+                        "text/plain; charset=utf-8",
+                    ],
+                )
                 second.getRawHeaders().clear()
-                self.assertEqual(second.getRawHeaders(), [
-                    (b"content-type", b"text/plain; charset=utf-8"),
-                ])
+                self.assertEqual(
+                    second.getRawHeaders(),
+                    [
+                        (b"content-type", b"text/plain; charset=utf-8"),
+                    ],
+                )
                 self.assertEqual(first.getBody(), b"first")
                 self.assertEqual(second.getBody(), b"second")
 
@@ -572,7 +626,9 @@ class TestResponseResources(TestCase):
             calls = []
 
             def record_stat(
-                file_path: Path, *, follow_symlinks: bool = True,
+                file_path: Path,
+                *,
+                follow_symlinks: bool = True,
             ) -> stat_result:
                 """
                 Record the metadata lookup and return the actual file status.

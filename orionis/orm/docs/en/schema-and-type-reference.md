@@ -45,7 +45,7 @@ Text variants accept `length` and `collation`; `StrictVarChar` defaults to 255 w
 
 ## Common modifiers
 
-All column types provide `.primary()`, `.nullable()`, `.default(value)`, `.unique()`, `.index()`, `.foreign("table.column")`, `.autoIncrement()`, and `.comment(text)`. These return the same definition; do not share mutable definitions between distinct columns.
+All column types provide `.primary()`, `.nullable()`, `.default(value)`, `.unique()`, `.index()`, `.foreign("table.column")`, `.autoIncrement()`, and `.comment(text)`. These return the same definition. Inline model declarations copy each column definition when binding it to a model and attribute, so reusing a declaration does not rename another model's column. Explicit `TableDefinition` objects still contain mutable column definitions; keep a compiled definition stable and create a new version for changes.
 
 `default` accepts a static value or zero-argument callable evaluated during compatible insert workflows. It is not an arbitrary SQL default expression. `hasDefault()` distinguishes explicitly supplied defaults, including `None`, from absence. `.foreign()` accepts exactly `table.column`; use appropriate structures for schemas or composite keys rather than inventing longer reference strings.
 

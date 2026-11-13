@@ -1,10 +1,11 @@
+# ruff: noqa: TC001
+# Keep runtime annotations, guarded exits, and framework integration explicit.
 """Carry what a guard learned about the incoming request."""
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class GuardResult:

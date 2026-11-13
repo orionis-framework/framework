@@ -6,6 +6,7 @@ from orionis.environment import Env
 from orionis.foundation.config.database.enums import OracleEncoding, OracleNencoding
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class Oracle(BaseEntity):
     """

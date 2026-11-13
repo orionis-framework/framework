@@ -1,11 +1,12 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string ends with one of the given suffixes."""
 
 from orionis.schemas.rule import Rule
 
+
 class EndsWith(Rule):
     """Ensure a string ends with one of the given suffixes."""
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_suffixes",)
     """Declare the instance attribute slots reserved by this class."""
@@ -29,7 +30,7 @@ class EndsWith(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------

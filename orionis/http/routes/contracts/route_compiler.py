@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     import re
     from collections.abc import Callable
 
+
 class IRouteCompiler(ABC):
     """Define the contract for route compiler implementations."""
 

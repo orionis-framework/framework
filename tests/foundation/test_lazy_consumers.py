@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use explicit process arguments or locally constructed execution fixtures.
 from __future__ import annotations
 import subprocess
 import sys
@@ -7,10 +10,9 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[2]
 
+
 class TestLazyConsumers(unittest.TestCase):
     """Keep unused implementations out of real registration and runtime paths."""
-
-    # ruff: noqa: S603
 
     def _probe(self, source: str) -> None:
         """Run isolated assertions and report child-process diagnostics.

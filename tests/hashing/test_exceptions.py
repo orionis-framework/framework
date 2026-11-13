@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.hashing.exceptions import (
     HashConfigurationException,
     HashDriverNotSupportedException,
@@ -13,8 +15,8 @@ _SPECIALISED_EXCEPTIONS: tuple[type[HashException], ...] = (
     MissingHashDependencyException,
 )
 
-class TestHashExceptionHierarchy(TestCase):
 
+class TestHashExceptionHierarchy(TestCase):
     def testBaseExceptionDerivesFromException(self) -> None:
         """Derive the module base failure from the builtin Exception.
 
@@ -24,7 +26,7 @@ class TestHashExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(HashException, Exception))
 
@@ -37,7 +39,7 @@ class TestHashExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for exception in _SPECIALISED_EXCEPTIONS:
             self.assertTrue(issubclass(exception, HashException))
@@ -50,7 +52,7 @@ class TestHashExceptionHierarchy(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(len(set(_SPECIALISED_EXCEPTIONS)), 3)
 
@@ -60,23 +62,24 @@ class TestHashExceptionHierarchy(TestCase):
         Validates the behaviour application code relies on when it guards
         a hashing operation.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
 
         Raises
         ------
         exception
             Raised by this helper to exercise the failure path.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         error_msg = "failure"
         for exception in _SPECIALISED_EXCEPTIONS:
             with self.assertRaises(HashException):
                 raise exception(error_msg)
 
-class TestHashExceptionInstances(TestCase):
 
+class TestHashExceptionInstances(TestCase):
     def testCarriesTheProvidedMessage(self) -> None:
         """Report the message handed to the constructor.
 
@@ -85,7 +88,7 @@ class TestHashExceptionInstances(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error_msg = "invalid cost factor"
         self.assertEqual(str(HashConfigurationException(error_msg)), error_msg)
@@ -96,15 +99,16 @@ class TestHashExceptionInstances(TestCase):
         Validates that chaining with ``raise ... from`` keeps the original
         traceback reachable for diagnostics.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
 
         Raises
         ------
         MissingHashDependencyException
             Raised by this helper to exercise the failure path.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         original = ImportError("pwdlib is missing")
         error_msg = "missing backend"

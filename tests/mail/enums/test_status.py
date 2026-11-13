@@ -1,9 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from enum import StrEnum
 from orionis.mail.enums.status import MailStatus
 from orionis.test import TestCase
 
-class TestMailStatus(TestCase):
 
+class TestMailStatus(TestCase):
     def testDeclaresTheThreeConfirmableOutcomes(self) -> None:
         """Expose exactly the outcomes a transport can confirm.
 

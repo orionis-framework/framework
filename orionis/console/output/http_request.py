@@ -1,3 +1,5 @@
+# ruff: noqa: ERA001
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Queue and display formatted HTTP request timing information."""
 
 from __future__ import annotations
@@ -6,6 +8,7 @@ import contextlib
 import shutil
 import sys
 import time
+from contextvars import ContextVar
 from typing import TYPE_CHECKING, ClassVar, Self
 from orionis.console.output.contracts.http_request import IHTTPRequestPrinter
 
@@ -55,9 +58,8 @@ _BG_GREY50 = "\033[48;5;244m"  # ≈ grey50
 _BG_GREY70 = "\033[48;5;250m"  # ≈ grey70
 """Bg grey70 identifier: ``\x1b[48;5;250m``."""
 
-class HTTPRequestPrinter(IHTTPRequestPrinter):
-    # ruff: noqa: ERA001
 
+class HTTPRequestPrinter(IHTTPRequestPrinter):
     # Minimum valid HTTP status code
     """Queue and display formatted HTTP request timing information."""
 
@@ -124,14 +126,20 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         """Enable HTTP request printing to console by default."""
 
         # Async queue and worker task (initialized by start())
-        self.__queue: asyncio.Queue | None = None
+        self.__queue: asyncio.Queue[str] | None = None
         """Async queue and worker task (initialized by start())."""
         self.__worker_task: asyncio.Task | None = None
         """Background task responsible for draining queued output."""
 
-        # Internal timer set by startTimer(); None until first call
-        self.__start_timer: float | None = None
-        """Internal timer set by startTimer(); None until first call."""
+        self.__lifecycle_lock = asyncio.Lock()
+        """Serialize worker startup and shutdown."""
+
+        # A shared printer must not combine timers from overlapping requests.
+        self.__start_timer: ContextVar[float | None] = ContextVar(
+            "orionis_http_request_timer",
+            default=None,
+        )
+        """Context-local timestamp set by ``startTimer`` for each request."""
 
         # Cache stdout bound methods: LOAD_FAST vs sys.stdout LOAD_GLOBAL+LOAD_ATTR
         self._write = sys.stdout.write
@@ -160,68 +168,93 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         """
         Start the background print worker.
 
-        Creates the internal async queue and spawns a background task
-        to drain queued output lines. Must be called once from an async
-        context before the first request is handled.
+        Create the internal async queue and a worker, or reuse the active worker.
+        Serialize startup with shutdown and close a rejected worker coroutine.
 
         Returns
         -------
         None
             This method does not return a value.
         """
-        # Initialize the async queue with a maximum size of 1000 items
-        self.__queue = asyncio.Queue(maxsize=1000)
-
-        # Spawn the background worker task
-        self.__worker_task = asyncio.ensure_future(self.__worker())
+        async with self.__lifecycle_lock:
+            worker = self.__worker_task
+            if worker is not None:
+                if not worker.done():
+                    return
+                worker.result()
+            queue: asyncio.Queue[str] = asyncio.Queue(maxsize=1000)
+            coroutine = self.__worker(queue)
+            try:
+                worker = asyncio.create_task(coroutine)
+            except BaseException:
+                coroutine.close()
+                raise
+            self.__queue = queue
+            self.__worker_task = worker
 
     async def stop(self: Self) -> None:
         """
         Drain remaining output and stop the background worker.
 
-        Waits for every queued line to be written before cancelling the
-        worker task. Safe to call even if start() was never invoked.
+        Close queue admission and await the worker directly, so a failed writer
+        cannot strand shutdown behind unfinished queue items. Release references
+        after success, failure, or cancellation. Safe before startup.
 
         Returns
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        OSError
+            If the output stream fails while writing or flushing.
+        asyncio.CancelledError
+            If shutdown or the worker is cancelled.
         """
-        # Wait for all queued lines to be processed
-        if self.__queue is not None:
-            await self.__queue.join()
+        async with self.__lifecycle_lock:
+            queue, worker = self.__queue, self.__worker_task
+            if queue is None or worker is None:
+                return
+            self.__queue = None
+            queue.shutdown()
+            try:
+                await worker
+            finally:
+                queue.shutdown(immediate=True)
+                self.__worker_task = None
 
-        # Cancel the worker task and suppress the CancelledError
-        if self.__worker_task is not None:
-            self.__worker_task.cancel()
-            with contextlib.suppress(asyncio.CancelledError):
-                await self.__worker_task
-
-        # Reset internal references
-        self.__queue = None
-        self.__worker_task = None
-
-    async def __worker(self: Self) -> None:
+    async def __worker(self: Self, queue: asyncio.Queue[str]) -> None:
         """
         Write queued lines to stdout in the background.
 
         Continuously reads lines from the internal async queue and writes
         them to stdout, flushing after each write to ensure immediate display.
 
+        Parameters
+        ----------
+        queue : asyncio.Queue[str]
+            Queue owned by this worker until shutdown.
+
         Returns
         -------
         None
             This method does not return a value.
         """
-        write = sys.stdout.write
-        flush = sys.stdout.flush
+        write = self._write
+        flush = self._flush
 
         # Retrieve the next line from the queue and write it
         while True:
-            line: str = await self.__queue.get()
-            write(line)
-            flush()
-            self.__queue.task_done()
+            try:
+                line = await queue.get()
+            except asyncio.QueueShutDown:
+                return
+            try:
+                write(line)
+                flush()
+            finally:
+                queue.task_done()
 
     def startTimer(self: Self) -> float | None:
         """
@@ -238,8 +271,9 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
         """
         if not self.__enabled:
             return None
-        self.__start_timer = time.perf_counter()
-        return self.__start_timer
+        started = time.perf_counter()
+        self.__start_timer.set(started)
+        return started
 
     def printRequest(
         self: Self,
@@ -267,7 +301,10 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
             This method does not return a value.
         """
         # If printing is disabled or no timer was captured, do nothing
-        if not self.__enabled or self.__start_timer is None:
+        if not self.__enabled:
+            return
+        started = self.__start_timer.get()
+        if started is None:
             return
 
         # Skip logging for well-known paths to reduce noise
@@ -276,7 +313,7 @@ class HTTPRequestPrinter(IHTTPRequestPrinter):
             return
 
         # Compute elapsed time from the captured start timestamp
-        elapsed = time.perf_counter() - self.__start_timer
+        elapsed = time.perf_counter() - started
 
         # Cache class dicts and attrs as locals: LOAD_FAST vs LOAD_ATTR chain per use
         _http_colors = self.HTTP_COLORS

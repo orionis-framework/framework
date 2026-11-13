@@ -1,9 +1,12 @@
+# ruff: noqa: PLC0415
+# Resolve the implementation only when its service is registered.
 """Service provider for the Orionis encryption system."""
 
 from __future__ import annotations
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.encrypter.contracts.encrypter import IEncrypter
 from orionis.support.facades.encrypter import Crypt as CryptFacade
+
 
 class EncrypterProvider(ServiceProvider):
     """
@@ -16,8 +19,6 @@ class EncrypterProvider(ServiceProvider):
     ``Crypt.decrypt(...)`` calls resolve without container overhead.
     """
 
-    # ruff: noqa: PLC0415
-
     def register(self) -> None:
         """
         Bind the encrypter contract to its singleton implementation.
@@ -25,9 +26,10 @@ class EncrypterProvider(ServiceProvider):
         Returns
         -------
         None
-            Register the encrypter binding.
+            No return value.
         """
         from orionis.encrypter import Encrypter
+
         self.app.singleton(IEncrypter, Encrypter)
 
     async def boot(self) -> None:
@@ -41,6 +43,6 @@ class EncrypterProvider(ServiceProvider):
         Returns
         -------
         None
-            This method does not return a value. It performs initialization only.
+            No return value.
         """
         await CryptFacade.pin()

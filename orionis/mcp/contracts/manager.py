@@ -1,14 +1,13 @@
+# ruff: noqa: TC001
+# Public service annotations must resolve without eagerly loading HTTP request parsing.
 """Share compiled servers, native routes, local transports, and change events."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+import orionis.http as http_module
+from orionis.http.routes.fluent import FluentRoute
+from orionis.mcp.server.compiler import CompiledMcpServer
+from orionis.mcp.server.primitives import Server
 
-if TYPE_CHECKING:
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
-    from orionis.http.routes.fluent import FluentRoute
-    from orionis.mcp.server.compiler import CompiledMcpServer
-    from orionis.mcp.server.primitives import Server
 
 class IMcpManager(ABC):
     """Share compiled servers, native routes, local transports, and change events."""
@@ -107,7 +106,10 @@ class IMcpManager(ABC):
         """
 
     @abstractmethod
-    async def dispatchHttp(self, request: Request) -> Response:
+    async def dispatchHttp(
+        self,
+        request: http_module.Request,
+    ) -> http_module.Response:
         """
         Handle a request through the shared compiled server's HTTP transport.
 

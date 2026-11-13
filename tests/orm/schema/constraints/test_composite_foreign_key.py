@@ -1,6 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema composite foreign key behavior."""
+
 from dataclasses import FrozenInstanceError, asdict
 from orionis.orm.schema.constraints.composite_foreign_key import CompositeForeignKey
 from orionis.test import TestCase
+
 
 class TestCompositeForeignKey(TestCase):
     """Verify composite-key column correspondence and immutable metadata."""
@@ -11,7 +16,7 @@ class TestCompositeForeignKey(TestCase):
         Returns
         -------
         None
-            Verify every field consumed by the database compiler.
+            No return value.
         """
         constraint = CompositeForeignKey(
             ("tenant_id", "account_id"),
@@ -39,7 +44,7 @@ class TestCompositeForeignKey(TestCase):
         Returns
         -------
         None
-            Verify unnamed constraints retain their column correspondence.
+            No return value.
         """
         constraint = CompositeForeignKey(("account_id",), "accounts", ("id",))
         self.assertIsNone(constraint.name)

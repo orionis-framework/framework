@@ -1,11 +1,13 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import orionis.mail.transports as transports_package
 from orionis.mail.contracts.transport import IMailTransport
 from orionis.mail.transports.file import FileTransport, create_file_transport
 from orionis.mail.transports.smtp import SmtpTransport, create_smtp_transport
 from orionis.test import TestCase
 
-class TestTransportsPackage(TestCase):
 
+class TestTransportsPackage(TestCase):
     def testExportsEveryBuiltInTransportAndFactory(self) -> None:
         """Publish each built-in transport next to its factory.
 

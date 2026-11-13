@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 import json
 from xml.etree.ElementTree import Element, ParseError
 import msgspec
@@ -11,6 +14,7 @@ from orionis.http.payload.parsers import (
     parse_xml,
 )
 from orionis.test import TestCase
+
 
 class TestParseContentType(TestCase):
     """Verify parse_content_type."""
@@ -103,6 +107,7 @@ class TestParseContentType(TestCase):
         self.assertEqual(media_type, "")
         self.assertEqual(params, {})
 
+
 class TestParseJson(TestCase):
     """Verify parse_json."""
 
@@ -187,6 +192,7 @@ class TestParseJson(TestCase):
         raw = json.dumps(payload).encode()
         self.assertEqual(parse_json(raw), payload)
 
+
 class TestParseUrlencoded(TestCase):
     """Verify parse_urlencoded."""
 
@@ -254,6 +260,7 @@ class TestParseUrlencoded(TestCase):
         """
         self.assertEqual(parse_urlencoded(b""), {})
 
+
 class TestParseUrlencodedMulti(TestCase):
     """Verify parse_urlencoded_multi."""
 
@@ -311,6 +318,7 @@ class TestParseUrlencodedMulti(TestCase):
         self.assertEqual(result["a"], "1")
         self.assertEqual(result["b"], ["x", "y"])
 
+
 class TestParseText(TestCase):
     """Verify parse_text."""
 
@@ -364,6 +372,7 @@ class TestParseText(TestCase):
         with self.assertRaises(UnicodeDecodeError):
             parse_text(b"\xff\xfe")
 
+
 class TestParseBinary(TestCase):
     """Verify parse_binary."""
 
@@ -391,6 +400,7 @@ class TestParseBinary(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertEqual(parse_binary(b""), b"")
+
 
 class TestParseXml(TestCase):
     """Verify parse_xml."""

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.orm.schema.column import ColumnDefinition
 
+
 class DefinitionBucket:
     """Mutable accumulator used while classifying schema definitions."""
 
@@ -25,7 +26,7 @@ class DefinitionBucket:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.columns: dict[str, ColumnDefinition] = {}
         """Column definitions included in the table schema."""

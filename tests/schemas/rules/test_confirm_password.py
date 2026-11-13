@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import SimpleNamespace
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.rules.confirm_password import ConfirmPassword
@@ -7,8 +9,8 @@ from orionis.test import TestCase
 _CREDENTIAL = "Secure1!"
 _OTHER = "Other1!"
 
-class TestConfirmPasswordEnforce(TestCase):
 
+class TestConfirmPasswordEnforce(TestCase):
     async def testMatchingConfirmationPasses(self) -> None:
         """Accept a confirmation equal to the compared field.
 
@@ -17,7 +19,7 @@ class TestConfirmPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = SimpleNamespace(password=_CREDENTIAL)
         rule = ConfirmPassword()
@@ -33,7 +35,7 @@ class TestConfirmPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = SimpleNamespace(password=_CREDENTIAL)
         rule = ConfirmPassword()
@@ -50,7 +52,7 @@ class TestConfirmPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = ConfirmPassword("new_password")
         instance = SimpleNamespace(new_password=_CREDENTIAL, password=_OTHER)
@@ -65,7 +67,7 @@ class TestConfirmPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         rule = ConfirmPassword()
         self.assertTrue(
@@ -80,7 +82,7 @@ class TestConfirmPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = SimpleNamespace(password=None)
         rule = ConfirmPassword()
@@ -97,13 +99,13 @@ class TestConfirmPasswordEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             ConfirmPassword("")
 
-class TestConfirmPasswordValidate(TestCase):
 
+class TestConfirmPasswordValidate(TestCase):
     async def testValidateReturnsNoneForMatchingValue(self) -> None:
         """Return None when both values match.
 
@@ -112,7 +114,7 @@ class TestConfirmPasswordValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = SimpleNamespace(password=_CREDENTIAL)
         rule = ConfirmPassword()
@@ -128,7 +130,7 @@ class TestConfirmPasswordValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         instance = SimpleNamespace(password=_CREDENTIAL)
         rule = ConfirmPassword(message="Passwords do not match.")
@@ -145,6 +147,6 @@ class TestConfirmPasswordValidate(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ConfirmPassword.__code__, "confirm_password")

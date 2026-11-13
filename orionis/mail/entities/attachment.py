@@ -7,6 +7,7 @@ from orionis.mail.functions import attachment_name, header_value, media_type
 from orionis.storage.exceptions import StoragePathException
 from orionis.storage.paths import normalizeFilePath
 
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class Attachment:
     """

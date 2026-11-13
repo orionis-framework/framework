@@ -1,6 +1,6 @@
 # Support types and utilities
 
-The official manual is organized into bilingual chapters. Technical material from the previous manual has been redistributed by topic; historical execution notes are not presented as current verification results.
+The bilingual manual covers support types, service facades, and runtime utilities.
 
 - [English manual](en/README.md)
 - [Manual en español](es/README.md)

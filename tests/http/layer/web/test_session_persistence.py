@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from http.cookies import SimpleCookie
 from pathlib import Path
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
 _COOKIE_NAME = "test_session"
 _PREVIOUS_URL = "http://orionis.test/last-good"
 _CSRF_KEY = "_csrf_token"
+
 
 class _SessionApplication:
     """Provide deterministic memory-session configuration and scoped binding."""
@@ -89,6 +92,7 @@ class _SessionApplication:
         """
         return True
 
+
 class _RecordingCatch:
     """Record downstream failures and render a concrete error response."""
 
@@ -120,11 +124,14 @@ class _RecordingCatch:
         self.handled.append(error)
         return Response(status_code=500)
 
+
 class _Terminal:
     """Supply a concrete response or a requested controller failure."""
 
     def __init__(
-        self, status_code: int = 200, error: Exception | None = None,
+        self,
+        status_code: int = 200,
+        error: Exception | None = None,
     ) -> None:
         """Store the response and optional exception for the awaited handler.
 
@@ -160,6 +167,7 @@ class _Terminal:
             raise self.error
         return self.response
 
+
 def _make_request(
     session_id: str | None = None,
     *,
@@ -187,13 +195,17 @@ def _make_request(
     """
     request_headers = list(headers or [])
     if session_id is not None:
-        request_headers.append((
-            b"cookie", f"{_COOKIE_NAME}={session_id}".encode(),
-        ))
+        request_headers.append(
+            (
+                b"cookie",
+                f"{_COOKIE_NAME}={session_id}".encode(),
+            ),
+        )
     return make_asgi_request(
         headers=request_headers,
         scope_overrides={"method": method, "path": path},
     )
+
 
 def _session_id(response: Response) -> str:
     """Extract the identifier emitted by the manager's real Set-Cookie header.
@@ -213,8 +225,13 @@ def _session_id(response: Response) -> str:
         cookies.load(value)
     return cookies[_COOKIE_NAME].value
 
-def _make_middleware(**overrides: object) -> tuple[
-    SessionManager, StartSessionMiddleware, _RecordingCatch,
+
+def _make_middleware(
+    **overrides: object,
+) -> tuple[
+    SessionManager,
+    StartSessionMiddleware,
+    _RecordingCatch,
 ]:
     """Wire a real manager and its memory store into the public middleware.
 
@@ -233,6 +250,7 @@ def _make_middleware(**overrides: object) -> tuple[
     catch = _RecordingCatch()
     return manager, StartSessionMiddleware(manager, catch), catch
 
+
 async def _seed_navigation(middleware: StartSessionMiddleware) -> str:
     """Persist the original successful navigation through the public pipeline.
 
@@ -247,9 +265,11 @@ async def _seed_navigation(middleware: StartSessionMiddleware) -> str:
         Value produced by the helper.
     """
     response = await middleware.handle(
-        _make_request(path="/last-good"), _Terminal(),
+        _make_request(path="/last-good"),
+        _Terminal(),
     )
     return _session_id(response)
+
 
 async def _run_csrf_pipeline(
     session_middleware: StartSessionMiddleware,
@@ -288,11 +308,15 @@ async def _run_csrf_pipeline(
 
     return await session_middleware.handle(request, next_middleware)
 
+
 class TestSessionPersistence(TestCase):
     """Verify previous-page and CSRF behavior across stored request cycles."""
 
     async def _assertPreviousUrl(
-        self, manager: SessionManager, response: Response, expected: str,
+        self,
+        manager: SessionManager,
+        response: Response,
+        expected: str,
     ) -> None:
         """Restore the saved session and inspect validation's redirect target.
 
@@ -328,7 +352,9 @@ class TestSessionPersistence(TestCase):
         for method in ("GET", "HEAD"):
             for status in (200, 204, 206, 299):
                 request = _make_request(
-                    session_id, method=method, path=f"/success/{method}/{status}",
+                    session_id,
+                    method=method,
+                    path=f"/success/{method}/{status}",
                 )
                 terminal = _Terminal(status)
                 response = await middleware.handle(request, terminal)
@@ -377,7 +403,10 @@ class TestSessionPersistence(TestCase):
         manager, middleware, _ = _make_middleware(track_previous_url=False)
         request = _make_request()
         response = await _run_csrf_pipeline(
-            middleware, CSRFTokenMiddleware({}), request, _Terminal(),
+            middleware,
+            CSRFTokenMiddleware({}),
+            request,
+            _Terminal(),
         )
         restored = await manager.start(_make_request(_session_id(response)))
         self.assertEqual(restored.get(_CSRF_KEY), request.state.csrf_token)
@@ -392,7 +421,8 @@ class TestSessionPersistence(TestCase):
             A public navigation can read an existing scalar session unchanged.
         """
         manager, middleware, _ = _make_middleware(
-            track_previous_url=False, renewal_interval=60,
+            track_previous_url=False,
+            renewal_interval=60,
         )
         session = await manager.start(_make_request())
         session.put("user_id", 42)
@@ -416,7 +446,9 @@ class TestSessionPersistence(TestCase):
         for method in ("GET", "HEAD"):
             for status in (100, 199, 300, 302, 399, 400, 404, 499, 500, 599):
                 request = _make_request(
-                    session_id, method=method, path=f"/excluded/{method}/{status}",
+                    session_id,
+                    method=method,
+                    path=f"/excluded/{method}/{status}",
                 )
                 response = await middleware.handle(request, _Terminal(status))
                 self.assertEqual(response.getStatusCode(), status)
@@ -447,7 +479,8 @@ class TestSessionPersistence(TestCase):
         )
         for method, headers in cases:
             response = await middleware.handle(
-                _make_request(session_id, method=method, headers=headers), _Terminal(),
+                _make_request(session_id, method=method, headers=headers),
+                _Terminal(),
             )
             await self._assertPreviousUrl(manager, response, _PREVIOUS_URL)
         self.assertEqual(catch.handled, [])
@@ -464,7 +497,8 @@ class TestSessionPersistence(TestCase):
         session_id = await _seed_navigation(middleware)
         failure = RuntimeError("Controller failed")
         response = await middleware.handle(
-            _make_request(session_id, path="/failed"), _Terminal(error=failure),
+            _make_request(session_id, path="/failed"),
+            _Terminal(error=failure),
         )
         self.assertEqual(response.getStatusCode(), 500)
         self.assertEqual(catch.handled, [failure])

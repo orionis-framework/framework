@@ -1,12 +1,13 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Revert every migration recorded on the connection."""
 
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
+
 class MigrateResetCommand(MigrationCommand):
     """Revert every migration recorded on the connection."""
-
-    # ruff: noqa: TC001
 
     signature: str = "migrate:reset"
     """Signature identifier: ``migrate:reset``."""

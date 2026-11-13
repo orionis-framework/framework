@@ -1,3 +1,9 @@
+# ruff: noqa: ARG002, PT009, PT027, SLF001, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Preserve fixture call signatures and runtime context dependency injection.
+
+"""Verify authentication authorizer contracts and behavior."""
+
 import asyncio
 from orionis.auth.authorization.authorizer import Authorizer
 from orionis.auth.authorization.policy import Policy
@@ -5,12 +11,14 @@ from orionis.auth.authorization.registry import PolicyRegistry
 from orionis.auth.authorization.snapshot import AuthorizationSnapshot
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import bind_auth_context
-from orionis.auth.contracts.context import IAuthenticationContext  # noqa: TC001
 from orionis.auth.contracts.policy import IPolicy
 from orionis.auth.exceptions import PolicyNotFoundException
 from orionis.container.container import Container
 from orionis.container.context.manager import ScopeManager
 from orionis.test import TestCase
+
+from orionis.auth.contracts.context import IAuthenticationContext
+
 
 class _Identity:
     """Identity double owning a fixed identifier."""
@@ -28,7 +36,7 @@ class _Identity:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.identifier = identifier
 
@@ -62,6 +70,7 @@ class _Identity:
         """
         return ""
 
+
 class _StaticRepository:
     """Permission repository double returning a fixed authorization."""
 
@@ -84,14 +93,14 @@ class _StaticRepository:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.permissions = permissions
         self.roles = roles
 
     async def loadFor(
         self,
-        authorizable: object,  # noqa: ARG002
+        authorizable: object,
     ) -> tuple[frozenset[str], frozenset[str]]:
         """Return the configured permissions and roles.
 
@@ -107,6 +116,7 @@ class _StaticRepository:
         """
         return frozenset(self.permissions), frozenset(self.roles)
 
+
 class _StubApp:
     """Application double building policies without a real container."""
 
@@ -118,7 +128,7 @@ class _StubApp:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.built: list[type] = []
 
@@ -138,6 +148,7 @@ class _StubApp:
         self.built.append(target)
         return target()
 
+
 class _Post:
     """Resource double owned by an identifier."""
 
@@ -154,14 +165,16 @@ class _Post:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.owner_id = owner_id
+
 
 class _Draft(_Post):
     """Resource subclass used to exercise inherited policies."""
 
     __slots__ = ()
+
 
 class _PostPolicy(Policy):
     """Policy granting write access only to the owner of a post."""
@@ -185,7 +198,7 @@ class _PostPolicy(Policy):
         """
         return post.owner_id == identity.getAuthIdentifier()
 
-    async def create(self, identity: object, resource: object) -> bool:  # noqa: ARG002
+    async def create(self, identity: object, resource: object) -> bool:
         """Allow creation for every authenticated identity.
 
         Parameters
@@ -202,7 +215,7 @@ class _PostPolicy(Policy):
         """
         return True
 
-    def archive(self, identity: object, post: _Post) -> bool:  # noqa: ARG002
+    def archive(self, identity: object, post: _Post) -> bool:
         """Allow archiving through a synchronous ability.
 
         Parameters
@@ -219,12 +232,13 @@ class _PostPolicy(Policy):
         """
         return True
 
+
 class _SuperPolicy(Policy):
     """Policy granting everything through the ``before`` hook."""
 
     __slots__ = ()
 
-    async def before(self, identity: object, ability: str) -> bool | None:  # noqa: ARG002
+    async def before(self, identity: object, ability: str) -> bool | None:
         """Grant every ability without running the ability method.
 
         Parameters
@@ -241,12 +255,13 @@ class _SuperPolicy(Policy):
         """
         return True
 
+
 class _DenyingPolicy(Policy):
     """Policy denying everything through the ``before`` hook."""
 
     __slots__ = ()
 
-    async def before(self, identity: object, ability: str) -> bool | None:  # noqa: ARG002
+    async def before(self, identity: object, ability: str) -> bool | None:
         """Deny every ability without running the ability method.
 
         Parameters
@@ -263,8 +278,8 @@ class _DenyingPolicy(Policy):
         """
         return False
 
-    async def update(self, identity: object, post: _Post) -> bool:  # noqa: ARG002
-        """Never reached because ``before`` short circuits first.
+    async def update(self, identity: object, post: _Post) -> bool:
+        """Return an unused grant behind the denying hook.
 
         Parameters
         ----------
@@ -280,12 +295,13 @@ class _DenyingPolicy(Policy):
         """
         return True
 
+
 class _UnclearPolicy(Policy):
     """Return a truthy non-boolean to exercise fail-closed evaluation."""
 
     __slots__ = ()
 
-    def update(self, identity: object, post: _Post) -> str:  # noqa: ARG002
+    def update(self, identity: object, post: _Post) -> str:
         """Return a value that must not grant authorization.
 
         Parameters
@@ -301,6 +317,7 @@ class _UnclearPolicy(Policy):
             Value produced by the helper.
         """
         return "denied"
+
 
 class _InjectedPolicy(Policy):
     """Verify that a policy's dependencies belong to its current request."""
@@ -318,7 +335,7 @@ class _InjectedPolicy(Policy):
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.context = context
 
@@ -341,6 +358,7 @@ class _InjectedPolicy(Policy):
             self.context.identifier() == post.owner_id
             and identity.getAuthIdentifier() == post.owner_id
         )
+
 
 def authenticated(
     permissions: tuple[str, ...] = (),
@@ -370,58 +388,59 @@ def authenticated(
         repository=_StaticRepository(permissions, roles),
     )
 
+
 class TestPolicyRegistry(TestCase):
     """Validate how policies are bound to resource classes."""
 
     def testReturnsNoneForAnUnknownResource(self) -> None:
-        """Validates the answer when nothing is registered.
+        """Validate the answer when nothing is registered.
 
         The authorizer turns this into an explicit error.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(PolicyRegistry().policyFor(_Post))
 
     def testResolvesTheRegisteredPolicy(self) -> None:
-        """Validates the direct binding of a resource class.
+        """Validate the direct binding of a resource class.
 
         This is the common case for a one-to-one mapping.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         registry = PolicyRegistry()
         registry.register(_Post, _PostPolicy)
         self.assertIs(registry.policyFor(_Post), _PostPolicy)
 
     def testResolvesAPolicyInheritedFromAnAncestor(self) -> None:
-        """Validates the method resolution order walk.
+        """Validate the method resolution order walk.
 
         A subclass without its own policy must reuse the parent one.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         registry = PolicyRegistry()
         registry.register(_Post, _PostPolicy)
         self.assertIs(registry.policyFor(_Draft), _PostPolicy)
 
     def testPrefersTheMostSpecificPolicy(self) -> None:
-        """Validates that a subclass may override the inherited policy.
+        """Validate that a subclass may override the inherited policy.
 
         The nearest ancestor in the resolution order wins.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         registry = PolicyRegistry()
         registry.register(_Post, _PostPolicy)
@@ -430,14 +449,14 @@ class TestPolicyRegistry(TestCase):
         self.assertIs(registry.policyFor(_Post), _PostPolicy)
 
     def testInvalidatesTheLookupCacheOnRegistration(self) -> None:
-        """Validates that a late registration is taken into account.
+        """Validate that a late registration is taken into account.
 
         A cached miss must not survive a new binding.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         registry = PolicyRegistry()
         self.assertIsNone(registry.policyFor(_Draft))
@@ -445,14 +464,14 @@ class TestPolicyRegistry(TestCase):
         self.assertIs(registry.policyFor(_Draft), _PostPolicy)
 
     def testRejectsNonClassArguments(self) -> None:
-        """Validates the input guards of the registry.
+        """Validate the input guards of the registry.
 
         Registering an instance would fail much later, at lookup time.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         registry = PolicyRegistry()
         with self.assertRaises(TypeError):
@@ -463,14 +482,14 @@ class TestPolicyRegistry(TestCase):
             registry.register(_Post, object)
 
     def testExposesACopyOfItsBindings(self) -> None:
-        """Validates that callers cannot mutate the registry.
+        """Validate that callers cannot mutate the registry.
 
         The returned mapping is a snapshot, not the live state.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         registry = PolicyRegistry()
         registry.register(_Post, _PostPolicy)
@@ -478,44 +497,47 @@ class TestPolicyRegistry(TestCase):
         bindings.clear()
         self.assertIs(registry.policyFor(_Post), _PostPolicy)
 
+
 class TestPolicyBase(TestCase):
     """Validate the base class shared by every policy."""
 
     def testImplementsTheContract(self) -> None:
-        """Validates that policies satisfy the declared interface.
+        """Validate that policies satisfy the declared interface.
 
         The authorizer only depends on the contract.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(_PostPolicy(), IPolicy)
 
     def testDoesNotExposeAnInstanceDictionary(self) -> None:
-        """Validates that policies stay dictionary free.
+        """Validate that policies stay dictionary free.
 
-        They are cached per class and must remain stateless.
+        Each evaluation builds a policy, so its slotted layout avoids
+        an instance dictionary.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(_PostPolicy(), "__dict__"))
 
     async def testTheDefaultHookNeverShortCircuits(self) -> None:
-        """Validates the neutral default of the ``before`` hook.
+        """Validate the neutral default of the ``before`` hook.
 
         Without an override the ability method decides the outcome.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(await _PostPolicy().before(_Identity(), "update"))
+
 
 class TestAuthorizer(TestCase):
     """Validate permission, role and policy evaluation."""
@@ -526,20 +548,20 @@ class TestAuthorizer(TestCase):
         Returns
         -------
         None
-            Prepares isolated state for the test.
+            No return value.
         """
         self.app = _StubApp()
         self.authorizer = Authorizer(self.app)
 
     async def testGuestsAreDeniedWithoutTouchingTheSnapshot(self) -> None:
-        """Validates the fast path for anonymous requests.
+        """Validate the fast path for anonymous requests.
 
         A guest owns nothing, so no query may be issued.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guest = AuthenticationContext()
         self.assertFalse(await self.authorizer.can(guest, "users.view"))
@@ -549,28 +571,28 @@ class TestAuthorizer(TestCase):
         self.assertFalse(await self.authorizer.allows(guest, "update", _Post(1)))
 
     async def testGrantsAPermissionOwnedByTheIdentity(self) -> None:
-        """Validates the direct permission path.
+        """Validate the direct permission path.
 
         The snapshot is the single source of truth.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = authenticated(permissions=("users.view",))
         self.assertTrue(await self.authorizer.can(context, "users.view"))
         self.assertFalse(await self.authorizer.can(context, "users.delete"))
 
     async def testEvaluatesAnyAndAllCombinations(self) -> None:
-        """Validates the combined permission checks.
+        """Validate the combined permission checks.
 
         ``canAny`` is a union test while ``canAll`` is an intersection.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = authenticated(permissions=("users.view",))
         wanted = ["users.view", "users.delete"]
@@ -581,28 +603,28 @@ class TestAuthorizer(TestCase):
         )
 
     async def testReportsTheRolesOfTheIdentity(self) -> None:
-        """Validates role membership through the authorizer.
+        """Validate role membership through the authorizer.
 
         Roles come from the same snapshot as the permissions.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = authenticated(roles=("admin",))
         self.assertTrue(await self.authorizer.hasRole(context, "admin"))
         self.assertFalse(await self.authorizer.hasRole(context, "editor"))
 
     async def testTokenAbilitiesNarrowThePermissions(self) -> None:
-        """Validates the intersection rule at the authorizer level.
+        """Validate the intersection rule at the authorizer level.
 
         A token must never widen the authorization of its owner.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = authenticated(
             permissions=("users.view", "users.delete"),
@@ -612,14 +634,14 @@ class TestAuthorizer(TestCase):
         self.assertFalse(await self.authorizer.can(context, "users.delete"))
 
     async def testRunsThePolicyAbilityForTheResource(self) -> None:
-        """Validates the resource aware authorization path.
+        """Validate the resource aware authorization path.
 
         The policy receives the identity and the resource instance.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _PostPolicy)
         context = authenticated()
@@ -632,14 +654,14 @@ class TestAuthorizer(TestCase):
         )
 
     async def testSupportsSynchronousAbilities(self) -> None:
-        """Validates that a policy may declare a synchronous ability.
+        """Validate that a policy may declare a synchronous ability.
 
         Not every rule needs to await something.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _PostPolicy)
         context = authenticated()
@@ -648,28 +670,28 @@ class TestAuthorizer(TestCase):
         )
 
     async def testEvaluatesAbilitiesAgainstTheResourceClass(self) -> None:
-        """Validates the gate used by the policy middleware.
+        """Validate the gate used by the policy middleware.
 
         Abilities such as ``create`` have no instance to inspect.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _PostPolicy)
         context = authenticated()
         self.assertTrue(await self.authorizer.allows(context, "create", _Post))
 
     async def testTheBeforeHookCanGrantEverything(self) -> None:
-        """Validates the super administrator escape hatch.
+        """Validate the super administrator escape hatch.
 
-        A truthy hook answer skips the ability method entirely.
+        An explicit True hook answer skips the ability method entirely.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _SuperPolicy)
         context = authenticated()
@@ -678,14 +700,14 @@ class TestAuthorizer(TestCase):
         )
 
     async def testTheBeforeHookCanDenyEverything(self) -> None:
-        """Validates that the hook also short circuits a denial.
+        """Validate that the hook also short circuits a denial.
 
         The ability method must not be able to override it.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _DenyingPolicy)
         context = authenticated()
@@ -694,28 +716,28 @@ class TestAuthorizer(TestCase):
         )
 
     async def testFailsWhenTheResourceHasNoPolicy(self) -> None:
-        """Validates the error raised for an unprotected resource.
+        """Validate the error raised for an unprotected resource.
 
         Answering ``False`` would hide a configuration mistake.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = authenticated()
         with self.assertRaises(PolicyNotFoundException):
             await self.authorizer.allows(context, "update", _Post(1))
 
     async def testFailsWhenThePolicyLacksTheAbility(self) -> None:
-        """Validates the error raised for a misspelled ability.
+        """Validate the error raised for a misspelled ability.
 
         A silent denial would be very hard to debug.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _PostPolicy)
         context = authenticated()
@@ -728,7 +750,7 @@ class TestAuthorizer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _PostPolicy)
         context = authenticated()
@@ -744,7 +766,7 @@ class TestAuthorizer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _PostPolicy)
         restricted = authenticated(abilities=("create",))
@@ -762,7 +784,7 @@ class TestAuthorizer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _SuperPolicy)
         context = authenticated(abilities=())
@@ -776,7 +798,7 @@ class TestAuthorizer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _UnclearPolicy)
         self.assertFalse(
@@ -789,7 +811,7 @@ class TestAuthorizer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _SuperPolicy)
         context = authenticated()
@@ -799,27 +821,27 @@ class TestAuthorizer(TestCase):
             )
 
     def testExposesItsRegistry(self) -> None:
-        """Validates that the registry is reachable for inspection.
+        """Validate that the registry is reachable for inspection.
 
         Applications may want to list every protected resource.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.authorizer.registerPolicy(_Post, _PostPolicy)
         self.assertIs(self.authorizer.registry().policyFor(_Post), _PostPolicy)
 
     async def testSnapshotStaysStableAcrossChecks(self) -> None:
-        """Validates that repeated checks reuse the same picture.
+        """Validate that repeated checks reuse the same picture.
 
         Authorization must not change halfway through a request.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         context = authenticated(permissions=("users.view",))
         await self.authorizer.can(context, "users.view")
@@ -833,7 +855,7 @@ class TestAuthorizer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         container = type("PolicyTestContainer", (Container,), {})()
         authorizer = Authorizer(container)
@@ -851,7 +873,7 @@ class TestAuthorizer(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             async with ScopeManager():
                 context = AuthenticationContext(identity=_Identity(identifier))

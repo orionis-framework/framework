@@ -1,32 +1,51 @@
-"""Store compiled Jinja templates through the framework cache."""
+# ruff: noqa: ARG002
+# Keep Jinja's optional filename parameter while identifying templates by name.
+"""Store compiled Jinja templates in the configured bytecode directory."""
 
 from __future__ import annotations
 from hashlib import sha1
+from ntpath import isreserved
 from pathlib import Path
 from jinja2.bccache import Bucket, FileSystemBytecodeCache
 
 # Extensions stripped before building the cache filename
 _TEMPLATE_EXTENSIONS: tuple[str, ...] = (
-    ".html", ".htm", ".jinja", ".jinja2", ".j2",
+    ".html",
+    ".htm",
+    ".jinja",
+    ".jinja2",
+    ".j2",
 )
 """Extensions stripped before building the cache filename."""
 
-# Digest characters appended to the readable stem to keep keys unique
+# Disambiguate readable stems without treating the digest as a security boundary.
 _DIGEST_LENGTH: int = 8
-"""Digest characters appended to the readable stem to keep keys unique."""
+"""Digest characters appended to distinguish flattened template names."""
+
+_CACHE_TRANSLATION = str.maketrans(
+    {
+        **dict.fromkeys('<>:"|?*' + "".join(map(chr, range(32))), "_"),
+        "/": ".",
+        "\\": ".",
+    },
+)
+"""Flatten separators and replace characters forbidden in Windows filenames."""
+
 
 class OrionisBytecodeCache(FileSystemBytecodeCache):
-    """Store compiled Jinja templates through the framework cache."""
+    """Store compiled Jinja templates in the configured bytecode directory."""
 
-    def getCacheKey(self, name: str, filename: str | None = None) -> str: # noqa: ARG002
+    def getCacheKey(self, name: str, filename: str | None = None) -> str:
         """
         Convert a template name into a human-readable cache key.
 
         Flattening separators and dropping the extension is a lossy
         transformation, so distinct templates such as ``mail/welcome.html``
         and ``mail/welcome.j2`` would share a single cache file.  A short
-        digest of the untouched name is appended to keep the mapping
-        injective while the stem stays readable.
+        digest of the untouched name distinguishes these names while the
+        stem stays readable. Replace Windows-reserved characters and
+        prefix device names so the result remains a portable basename.
+        The truncated digest does not guarantee collision freedom.
 
         Parameters
         ----------
@@ -40,13 +59,16 @@ class OrionisBytecodeCache(FileSystemBytecodeCache):
         str
             Sanitised key used as the cache filename stem.
         """
-        key: str = name.replace("/", ".").replace("\\", ".")
+        key: str = name.translate(_CACHE_TRANSLATION)
         for ext in _TEMPLATE_EXTENSIONS:
             if key.endswith(ext):
                 key = key[: -len(ext)]
                 break
+        if isreserved(key):
+            key = f"_{key}"
         digest: str = sha1(
-            name.encode("utf-8"), usedforsecurity=False,
+            name.encode("utf-8"),
+            usedforsecurity=False,
         ).hexdigest()[:_DIGEST_LENGTH]
         return f"{key}.{digest}"
 
@@ -55,7 +77,7 @@ class OrionisBytecodeCache(FileSystemBytecodeCache):
 
     def _getCacheFilename(self, bucket: Bucket) -> str:
         """
-        Return the absolute path to the cache file for *bucket*.
+        Join the configured cache directory with the filename for *bucket*.
 
         Parameters
         ----------
@@ -65,7 +87,7 @@ class OrionisBytecodeCache(FileSystemBytecodeCache):
         Returns
         -------
         str
-            Absolute path of the form
+            Configured path of the form
             ``<cache_dir>/<template_name>.<digest>.cache``.
         """
         return str(Path(self.directory) / f"{bucket.key}.cache")

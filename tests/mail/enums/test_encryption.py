@@ -1,9 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from enum import StrEnum
 from orionis.mail.enums.encryption import MailEncryption
 from orionis.test import TestCase
 
-class TestMailEncryption(TestCase):
 
+class TestMailEncryption(TestCase):
     def testDeclaresTheThreeSupportedModes(self) -> None:
         """Expose exactly the transport security modes of the SMTP driver.
 

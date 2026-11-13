@@ -1,3 +1,6 @@
+# ruff: noqa: BLE001, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Open request sessions and persist their response-side changes."""
 
 from typing import TYPE_CHECKING
@@ -24,9 +27,8 @@ _SUCCESS_MIN: int = 200
 _SUCCESS_MAX: int = 300
 """Success max value used by ``start_session``."""
 
-class StartSessionMiddleware(BaseMiddleware):
 
-    # ruff: noqa: TC001, BLE001
+class StartSessionMiddleware(BaseMiddleware):
     """Open request sessions and persist their response-side changes."""
 
     __slots__ = ("_catch", "_manager", "_track_previous_url")

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from functools import partial
@@ -32,6 +34,7 @@ if TYPE_CHECKING:
 # Helpers used across multiple tests
 # ---------------------------------------------------------------------------
 
+
 def _plain_handler() -> None:
     """Provide a synchronous route action fixture.
 
@@ -41,6 +44,7 @@ def _plain_handler() -> None:
         Completes the operation described above.
     """
 
+
 async def _async_handler() -> None:
     """Provide an asynchronous route action fixture.
 
@@ -49,6 +53,7 @@ async def _async_handler() -> None:
     None
         Completes the operation described above.
     """
+
 
 class _InvokableCtrl:
     def __call__(self) -> None:
@@ -60,6 +65,7 @@ class _InvokableCtrl:
             Completes the operation described above.
         """
 
+
 class _CtrlWithMethod:
     def index(self) -> None:
         """Handle index action.
@@ -70,14 +76,17 @@ class _CtrlWithMethod:
             Completes the operation described above.
         """
 
+
 class _CtrlNoCall:
     """Controller that does not define __call__."""
+
 
 class _NonCallableFunctionImpostor:
     """Appear function-like to inspection without supporting calls."""
 
     __class__ = FunctionType
     __name__ = "named"
+
 
 class _StaticInvokableCtrl:
     @staticmethod
@@ -90,6 +99,7 @@ class _StaticInvokableCtrl:
             Completes the operation described above.
         """
 
+
 class _ClassInvokableCtrl:
     @classmethod
     def __call__(cls) -> None:
@@ -101,6 +111,7 @@ class _ClassInvokableCtrl:
             Completes the operation described above.
         """
 
+
 class _AbstractInvokableCtrl(ABC):
     @abstractmethod
     def __call__(self) -> None:
@@ -111,6 +122,7 @@ class _AbstractInvokableCtrl(ABC):
         None
             Completes the operation described above.
         """
+
 
 class _UnconstructedInvokableCtrl:
     def __init__(self) -> None:
@@ -145,6 +157,7 @@ class _UnconstructedInvokableCtrl:
         error_msg = "Route validation must not execute handlers"
         raise AssertionError(error_msg)
 
+
 class _FailingHandlerDescriptor:
     def __get__(self, _instance: object, _owner: type | None = None) -> object:
         """Expose an unexpected failure while looking up the handler.
@@ -169,8 +182,10 @@ class _FailingHandlerDescriptor:
         error_msg = "Unexpected handler lookup failure"
         raise RuntimeError(error_msg)
 
+
 class _CtrlWithFailingDescriptor:
     index = _FailingHandlerDescriptor()
+
 
 def _guard_handler() -> None:
     """Fail if validation tries to execute a function handler.
@@ -187,6 +202,7 @@ def _guard_handler() -> None:
     """
     error_msg = "Route validation must not execute handlers"
     raise AssertionError(error_msg)
+
 
 class _ConcreteMiddleware(BaseMiddleware):
     async def handle(
@@ -210,9 +226,11 @@ class _ConcreteMiddleware(BaseMiddleware):
         """
         return await call_next()
 
+
 # ---------------------------------------------------------------------------
 # normalize_path
 # ---------------------------------------------------------------------------
+
 
 class TestNormalizePath(TestCase):
     """Unit tests for the normalize_path route utility."""
@@ -302,9 +320,11 @@ class TestNormalizePath(TestCase):
         """
         self.assertEqual(normalize_path("/a/b/c/d"), "/a/b/c/d")
 
+
 # ---------------------------------------------------------------------------
 # normalizeRequestPath
 # ---------------------------------------------------------------------------
+
 
 class TestNormalizeRequestPath(TestCase):
     """Unit tests for the normalizeRequestPath utility."""
@@ -369,9 +389,11 @@ class TestNormalizeRequestPath(TestCase):
         """
         self.assertEqual(normalize_request_path("/ping"), "/ping")
 
+
 # ---------------------------------------------------------------------------
 # stripRegexAnchors
 # ---------------------------------------------------------------------------
+
 
 class TestStripRegexAnchors(TestCase):
     """Unit tests for the stripRegexAnchors utility."""
@@ -436,9 +458,11 @@ class TestStripRegexAnchors(TestCase):
         """
         self.assertEqual(strip_regex_anchors(""), "")
 
+
 # ---------------------------------------------------------------------------
 # flattenMiddleware
 # ---------------------------------------------------------------------------
+
 
 class TestFlattenMiddleware(TestCase):
     """Unit tests for the flattenMiddleware utility."""
@@ -573,9 +597,11 @@ class TestFlattenMiddleware(TestCase):
         with self.assertRaises(TypeError):
             flatten_middleware(_plain_handler)  # type: ignore[arg-type]
 
+
 # ---------------------------------------------------------------------------
 # isValidHandler
 # ---------------------------------------------------------------------------
+
 
 class TestIsValidHandler(TestCase):
     """Unit tests for the isValidHandler utility."""
@@ -727,7 +753,8 @@ class TestIsValidHandler(TestCase):
                 self.assertEqual(router.export(), original)
                 router.fallback(route_handler)
                 self.assertEqual(
-                    router.export()["fallback"], (None, route_handler),
+                    router.export()["fallback"],
+                    (None, route_handler),
                 )
         finally:
             coroutine.close()
@@ -761,7 +788,8 @@ class TestIsValidHandler(TestCase):
             router.fallback(action)
             self.assertEqual(router.export()["fallback"], expected_fallback)
             resolved = RouteResolver(compile_router(router)).resolve(
-                "GET", "/accepted",
+                "GET",
+                "/accepted",
             )
             self.assertEqual(resolved.route.type, expected_type)
             self.assertEqual(resolved.route.name, "accepted")
@@ -778,9 +806,11 @@ class TestIsValidHandler(TestCase):
             with self.assertRaisesRegex(RuntimeError, "Unexpected handler lookup"):
                 validate([_CtrlWithFailingDescriptor, "index"])
 
+
 # ---------------------------------------------------------------------------
 # parseAction
 # ---------------------------------------------------------------------------
+
 
 class TestParseAction(TestCase):
     """Unit tests for the parseAction route-action parser."""

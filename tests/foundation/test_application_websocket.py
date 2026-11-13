@@ -1,6 +1,9 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import SimpleNamespace
 from orionis.test import TestCase
 from tests.foundation.test_application_async import _AsyncCall, _new_application
+
 
 class TestApplicationWebSocketDispatch(TestCase):
     """Exercise WebSocket dispatch without HTTP body-disconnect watchers."""

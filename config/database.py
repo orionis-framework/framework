@@ -2,15 +2,32 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.database import (
-    PGSQL, ConnectionName, Connections, Database, MySQL, MySQLCharset,
-    MySQLCollation, MySQLEngine, Oracle, OracleEncoding, OracleNencoding,
-    PGSQLCharset, PGSQLSSLMode, Redshift, RedshiftSSLMode, SQLite, SQLiteForeignKey,
-    SQLiteJournalMode, SQLiteSynchronous, SQLServer, SQLServerCharset,
+    PGSQL,
+    ConnectionName,
+    Connections,
+    Database,
+    MySQL,
+    MySQLCharset,
+    MySQLCollation,
+    MySQLEngine,
+    Oracle,
+    OracleEncoding,
+    OracleNencoding,
+    PGSQLCharset,
+    PGSQLSSLMode,
+    Redshift,
+    RedshiftSSLMode,
+    SQLite,
+    SQLiteForeignKey,
+    SQLiteJournalMode,
+    SQLiteSynchronous,
+    SQLServer,
+    SQLServerCharset,
 )
+
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapDatabase(Database):
-
     # ----------------------------------------------------------------------------------
     # default : ConnectionName | str, optional
     # --- The default database connection name. Uses the 'DB_CONNECTION' environment
@@ -27,7 +44,6 @@ class BootstrapDatabase(Database):
     # ----------------------------------------------------------------------------------
     connections: Connections | dict = field(
         default_factory=lambda: Connections(
-
             # --------------------------------------------------------------------------
             # sqlite : SQLite, optional
             # --- SQLite connection settings. A missing URL is derived from the database
@@ -37,12 +53,14 @@ class BootstrapDatabase(Database):
                 url=Env.get("DB_URL", None),
                 database=Env.get("DB_DATABASE", "database/database.sqlite"),
                 prefix=Env.get("DB_PREFIX", ""),
-                foreign_key_constraints=Env.get( "DB_FOREIGN_KEYS", SQLiteForeignKey.OFF),
+                foreign_key_constraints=Env.get(
+                    "DB_FOREIGN_KEYS",
+                    SQLiteForeignKey.OFF,
+                ),
                 busy_timeout=Env.get("DB_BUSY_TIMEOUT", 5000),
                 journal_mode=Env.get("DB_JOURNAL_MODE", SQLiteJournalMode.DELETE),
                 synchronous=Env.get("DB_SYNCHRONOUS", SQLiteSynchronous.NORMAL),
             ),
-
             # --------------------------------------------------------------------------
             # mysql : MySQL, optional
             # --- MySQL connection settings, including socket, charset, and storage
@@ -66,7 +84,6 @@ class BootstrapDatabase(Database):
                 strict=Env.get("DB_STRICT", True),
                 engine=Env.get("DB_ENGINE", MySQLEngine.INNODB),
             ),
-
             # --------------------------------------------------------------------------
             # pgsql : PGSQL, optional
             # --- PostgreSQL connection settings, including search path and SSL mode.
@@ -87,7 +104,6 @@ class BootstrapDatabase(Database):
                 search_path=Env.get("DB_SEARCH_PATH", "public"),
                 sslmode=Env.get("DB_SSLMODE", PGSQLSSLMode.PREFER),
             ),
-
             # --------------------------------------------------------------------------
             # oracle : Oracle, optional
             # --- Oracle connection settings with service name, SID, DSN, or TNS
@@ -105,7 +121,6 @@ class BootstrapDatabase(Database):
                 encoding=Env.get("DB_ENCODING", OracleEncoding.AL32UTF8),
                 nencoding=Env.get("DB_NENCODING", OracleNencoding.AL16UTF16),
             ),
-
             # --------------------------------------------------------------------------
             # sqlserver : SQLServer, optional
             # --- SQL Server connection settings, including ODBC and TLS options.
@@ -127,7 +142,6 @@ class BootstrapDatabase(Database):
                 trust_server_certificate=Env.get("DB_TRUST_SERVER_CERTIFICATE", True),
                 odbc_driver=Env.get("DB_ODBC_DRIVER", "ODBC Driver 18 for SQL Server"),
             ),
-
             # --------------------------------------------------------------------------
             # redshift : Redshift, optional
             # --- Amazon Redshift settings for the official AWS Python connector.
@@ -148,7 +162,10 @@ class BootstrapDatabase(Database):
                 db_user=Env.get("DB_REDSHIFT_DB_USER", None),
                 profile=Env.get("DB_REDSHIFT_PROFILE", None),
                 is_serverless=Env.get("DB_REDSHIFT_IS_SERVERLESS", False),
-                serverless_work_group=Env.get("DB_REDSHIFT_SERVERLESS_WORK_GROUP", None),
+                serverless_work_group=Env.get(
+                    "DB_REDSHIFT_SERVERLESS_WORK_GROUP",
+                    None,
+                ),
                 serverless_acct_id=Env.get("DB_REDSHIFT_SERVERLESS_ACCT_ID", None),
             ),
         ),

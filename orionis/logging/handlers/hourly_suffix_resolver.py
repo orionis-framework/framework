@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from orionis.logging.contracts.suffix_resolver import SuffixResolver
 from orionis.support.facades.datetime import DateTime
 
+
 class HourlySuffixResolver(SuffixResolver):
     """Resolve log suffixes for hourly rotation windows."""
 
@@ -50,7 +51,7 @@ class HourlySuffixResolver(SuffixResolver):
         Parameters
         ----------
         current_time : datetime.datetime
-            The current datetime to base the next rotation time on.
+            The current instant. Naive values use the resolver timezone.
 
         Returns
         -------
@@ -58,8 +59,11 @@ class HourlySuffixResolver(SuffixResolver):
             The datetime object representing the next rotation time at the
             start of the next hour.
         """
-        # Round down to the start of the current hour, then add one hour
-        return (
-            current_time.replace(minute=0, second=0, microsecond=0, tzinfo=self.tz)
-            + timedelta(hours=1)
+        local_time = (
+            current_time.replace(tzinfo=self.tz)
+            if current_time.tzinfo is None
+            else current_time.astimezone(self.tz)
+        )
+        return local_time.replace(minute=0, second=0, microsecond=0) + timedelta(
+            hours=1,
         )

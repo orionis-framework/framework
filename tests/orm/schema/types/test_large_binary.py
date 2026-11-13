@@ -1,7 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema large binary behavior."""
+
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.orm.schema.types.large_binary import LargeBinary
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestLargeBinaryOptions(TestCase):
     """Verify LargeBinary constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestLargeBinaryOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = LargeBinary()
         assert_column_options(
@@ -36,7 +41,7 @@ class TestLargeBinaryOptions(TestCase):
         Returns
         -------
         None
-            Verify the constructor's optional positive-integer length contract.
+            No return value.
         """
         self.assertIsNone(LargeBinary(None).length)
         for length in (0, -1, 1.5, "10"):

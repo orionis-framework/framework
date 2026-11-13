@@ -1,30 +1,34 @@
+# ruff: noqa: BLE001, PLC0415, TC001
+# Keep runtime contract annotations while deferring backend and failure imports.
+# Attempt every cleanup before propagating its primary failure.
 """Resolve lazy connections and expose the canonical deferred dispatch API."""
 
 import asyncio
 import inspect
 from importlib import import_module
 from pathlib import Path
-from typing import TYPE_CHECKING
 from uuid import uuid4
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.foundation.config.queue import Queue as QueueConfig, Redis as RedisConfig
 from orionis.foundation.contracts.application import IApplication
 from orionis.introspection.modules.inspector import ModuleInspector
+from orionis.queues.contracts.driver import IQueueDriver
+from orionis.queues.contracts.failed_repository import IFailedJobRepository
 from orionis.queues.contracts.manager import IQueueManager
 from orionis.queues.contracts.serializer import IJobSerializer
 from orionis.queues.entities.envelope import JobEnvelope
 from orionis.queues.exceptions import (
-    QueueConfigurationError, QueueRetryError, QueueStorageError,
+    QueueConfigurationError,
+    QueueRetryError,
+    QueueStorageError,
 )
 from orionis.queues.functions import current_time, validate_name, validate_seconds
 from orionis.queues.job import BaseJob
 from orionis.queues.pending import PendingDispatch
 from orionis.queues.schema import build_failed_jobs_table, build_jobs_table
 from orionis.queues.worker import Worker, WorkerOptions
+from orionis.support.concurrency import complete_on_cancel
 
-if TYPE_CHECKING:
-    from orionis.queues.contracts.driver import IQueueDriver
-    from orionis.queues.contracts.failed_repository import IFailedJobRepository
 
 def _discover_jobs(base_path: Path, jobs_path: Path) -> tuple[type[BaseJob], ...]:
     """
@@ -73,15 +77,15 @@ def _discover_jobs(base_path: Path, jobs_path: Path) -> tuple[type[BaseJob], ...
 class QueueManager(IQueueManager):
     """Resolve lazy connections and expose the canonical deferred dispatch API."""
 
-    # ruff: noqa: PLC0415, TC001
-
     __slots__ = (
         "_app",
         "_config",
         "_driver_lock",
+        "_driver_owner",
         "_drivers",
         "_failed",
         "_failed_lock",
+        "_failed_owner",
         "_serializer",
     )
     """Declare the instance attribute slots reserved by this class."""
@@ -120,10 +124,14 @@ class QueueManager(IQueueManager):
         """Configured backend drivers cached by their registered names."""
         self._driver_lock = asyncio.Lock()
         """Synchronization primitive controlling access to driver lock."""
+        self._driver_owner: asyncio.Task[object] | None = None
+        """Task currently initializing a driver under its publication lock."""
         self._failed: IFailedJobRepository | None = None
         """Backend retaining failed-job records."""
         self._failed_lock = asyncio.Lock()
         """Synchronization primitive controlling access to failed lock."""
+        self._failed_owner: asyncio.Task[object] | None = None
+        """Task currently initializing the failed-job repository."""
 
     async def boot(self) -> None:
         """
@@ -226,8 +234,11 @@ class QueueManager(IQueueManager):
             message = "Job timeout must be shorter than connection retry_after."
             raise QueueConfigurationError(message)
         envelope = JobEnvelope(
-            id=str(uuid4()), job=identity, payload=payload,
-            connection=selected, queue=channel,
+            id=str(uuid4()),
+            job=identity,
+            payload=payload,
+            connection=selected,
+            queue=channel,
             max_tries=defaults["tries"] if job.tries is None else job.tries,
             timeout=timeout,
             backoff=defaults["backoff"] if job.backoff is None else job.backoff,
@@ -257,8 +268,12 @@ class QueueManager(IQueueManager):
         async with self._driver_lock:
             cached = self._drivers.get(selected)
             if cached is None:
-                cached = await self._createDriver(selected)
-                self._drivers[selected] = cached
+                self._driver_owner = asyncio.current_task()
+                try:
+                    cached = await self._createDriver(selected)
+                    self._drivers[selected] = cached
+                finally:
+                    self._driver_owner = None
             return cached
 
     async def _createDriver(self, name: str) -> IQueueDriver:
@@ -277,16 +292,22 @@ class QueueManager(IQueueManager):
         """
         options = self._config["connections"][name]
         if options["driver"] == "sync":
-
             from orionis.queues.drivers.sync import SyncQueueDriver
-            return SyncQueueDriver(self._app, self._serializer, name, self.failed,
-                                   retry_after=options["retry_after"])
-        if options["driver"] == "redis":
 
+            return SyncQueueDriver(
+                self._app,
+                self._serializer,
+                name,
+                self.failed,
+                retry_after=options["retry_after"],
+            )
+        if options["driver"] == "redis":
             from orionis.queues.drivers.redis import RedisQueueDriver
+
             return RedisQueueDriver(RedisConfig(**options))
 
         from orionis.queues.drivers.database import DatabaseQueueDriver
+
         manager = await self._app.make(IConnectionManager)
 
         return DatabaseQueueDriver(
@@ -321,8 +342,7 @@ class QueueManager(IQueueManager):
         options = self._config["connections"][selected]
         if options["driver"] == "sync":
             message = (
-                "The sync connection executes during dispatch; "
-                "use a durable worker."
+                "The sync connection executes during dispatch; use a durable worker."
             )
             raise QueueConfigurationError(message)
         channels = (options["queue"],) if queues is None else queues
@@ -330,9 +350,13 @@ class QueueManager(IQueueManager):
             validate_name(channel, "Queue")
         driver = await self.connection(selected)
         settings = WorkerOptions(
-            selected, queues=channels,
-            concurrency=(self._config["worker"]["concurrency"]
-                         if concurrency is None else concurrency),
+            selected,
+            queues=channels,
+            concurrency=(
+                self._config["worker"]["concurrency"]
+                if concurrency is None
+                else concurrency
+            ),
             retry_after=options["retry_after"],
             sleep=self._config["worker"]["sleep"],
         )
@@ -351,13 +375,20 @@ class QueueManager(IQueueManager):
             return self._failed
         async with self._failed_lock:
             if self._failed is None:
+                self._failed_owner = asyncio.current_task()
+                try:
+                    from orionis.queues.failed.repository import (
+                        DatabaseFailedJobRepository,
+                    )
 
-                from orionis.queues.failed.repository import DatabaseFailedJobRepository
-                manager = await self._app.make(IConnectionManager)
-                options = self._config["failed"]
-                self._failed = DatabaseFailedJobRepository(
-                    manager.connection(options["connection"]), options["table"],
-                )
+                    manager = await self._app.make(IConnectionManager)
+                    options = self._config["failed"]
+                    self._failed = DatabaseFailedJobRepository(
+                        manager.connection(options["connection"]),
+                        options["table"],
+                    )
+                finally:
+                    self._failed_owner = None
             return self._failed
 
     async def migrate(self) -> None:
@@ -384,9 +415,12 @@ class QueueManager(IQueueManager):
             if options["driver"] == "database"
         ]
         failed = self._config["failed"]
-        definitions.append((
-            failed["connection"], build_failed_jobs_table(failed["table"]),
-        ))
+        definitions.append(
+            (
+                failed["connection"],
+                build_failed_jobs_table(failed["table"]),
+            ),
+        )
         for name, definition in definitions:
             connection = manager.connection(name)
             if not connection.supportsUniqueConstraints():
@@ -417,8 +451,7 @@ class QueueManager(IQueueManager):
             message = f"Failed queue job '{failed_id}' does not exist."
             raise QueueRetryError(message)
         envelope = self._serializer.decodeEnvelope(failed.payload)
-        if (envelope.retry_until is not None
-                and current_time() >= envelope.retry_until):
+        if envelope.retry_until is not None and current_time() >= envelope.retry_until:
             message = "The failed job retry deadline has expired."
             raise QueueRetryError(message)
         driver = await self.connection(envelope.connection)
@@ -433,12 +466,62 @@ class QueueManager(IQueueManager):
         Returns
         -------
         None
-            Close cached drivers and any initialized failed-job repository,
-            then clear their cached references.
+            No return value.
+
+        Raises
+        ------
+        orionis.queues.exceptions.QueueConfigurationError
+            If initialization requests a shutdown that would wait for itself.
+        asyncio.CancelledError
+            After owned cleanup finishes when the caller is cancelled.
+        Exception
+            The first ordinary cleanup error after every resource is attempted.
         """
-        for driver in self._drivers.values():
-            await driver.close()
-        self._drivers.clear()
-        if self._failed is not None:
-            await self._failed.close()
-            self._failed = None
+        current = asyncio.current_task()
+        if current is self._driver_owner or current is self._failed_owner:
+            message = "Queue services cannot close from their own initialization."
+            raise QueueConfigurationError(message)
+        await complete_on_cancel(self._closeOwned())
+
+    async def _closeOwned(self) -> None:
+        """Detach initialized resources and attempt every owned cleanup.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        BaseException
+            Cancellation in preference to ordinary errors, or the first failure.
+        """
+        resources: list[IQueueDriver | IFailedJobRepository]
+        async with self._driver_lock:
+            resources = list(self._drivers.values())
+            self._drivers.clear()
+        async with self._failed_lock:
+            if self._failed is not None:
+                resources.append(self._failed)
+                self._failed = None
+        errors: list[BaseException] = []
+        for resource in resources:
+            try:
+                await resource.close()
+            except (Exception, asyncio.CancelledError) as error:
+                errors.append(error)
+        if errors:
+            from orionis.failure.runtime import capture
+
+            primary = next(
+                (
+                    error
+                    for error in errors
+                    if isinstance(error, asyncio.CancelledError)
+                ),
+                errors[0],
+            )
+            for error in errors:
+                if error is not primary:
+                    await capture(error, app=self._app, flow="queue", phase="close")
+            raise primary

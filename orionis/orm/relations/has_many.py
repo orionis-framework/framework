@@ -1,14 +1,11 @@
 """One-to-many relationship: the related table owns the foreign key."""
 
-from __future__ import annotations
-from typing import TYPE_CHECKING
+import orionis.orm as _orm
 from orionis.orm.relations.has_one_or_many import HasOneOrManyRelation
 from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from orionis.orm.model import Model
 
-class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
+class HasManyRelation[TRelated: _orm.Model](HasOneOrManyRelation[TRelated]):
     """
     One-to-many relationship: the related table owns the foreign key.
 
@@ -26,7 +23,7 @@ class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
 
         Returns
         -------
-        collections.abc.Collection
+        orionis.support.types.Collection
             Related models; empty when the parent has no key or no row
             references it.
         """
@@ -36,7 +33,7 @@ class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
 
     def match(
         self,
-        models: list[Model],
+        models: list[_orm.Model],
         results: Collection,
         name: str,
     ) -> None:
@@ -47,7 +44,7 @@ class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
         ----------
         models : list of orionis.orm.Model
             Parent instances being eager loaded together.
-        results : collections.abc.Collection
+        results : orionis.support.types.Collection
             Related rows produced by ``getEager``.
         name : str
             Relationship name the results are stored under.
@@ -55,7 +52,7 @@ class HasManyRelation[TRelated: "Model"](HasOneOrManyRelation[TRelated]):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         groups = self._groupByForeignKey(results)
         for model in models:

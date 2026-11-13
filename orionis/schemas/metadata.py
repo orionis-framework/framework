@@ -1,12 +1,10 @@
-"""Provide schemas operations.
-
-Includes ``Coerce``, ``Title``, ``Description``, ``Examples``, ``ExtraJsonSchema``.
-"""
+"""Declare field conversion markers and documentation metadata."""
 
 from __future__ import annotations
 from dataclasses import dataclass
 from orionis.schemas.meta.document import DocumentMetadata
 from orionis.schemas.meta.validation import ValidationMetadata
+
 
 @dataclass(frozen=True, slots=True)
 class Coerce(ValidationMetadata):
@@ -21,6 +19,7 @@ class Coerce(ValidationMetadata):
     than replaced with a default. Direct construction does not run coercion.
     """
 
+
 @dataclass(frozen=True, slots=True)
 class Title(DocumentMetadata):
     """
@@ -33,6 +32,7 @@ class Title(DocumentMetadata):
     """
 
     value: str
+
 
 @dataclass(frozen=True, slots=True)
 class Description(DocumentMetadata):
@@ -47,6 +47,7 @@ class Description(DocumentMetadata):
 
     value: str
 
+
 @dataclass(frozen=True, slots=True)
 class Examples(DocumentMetadata):
     """
@@ -59,6 +60,7 @@ class Examples(DocumentMetadata):
     """
 
     values: list[object]
+
 
 @dataclass(frozen=True, slots=True)
 class ExtraJsonSchema(DocumentMetadata):
@@ -77,6 +79,7 @@ class ExtraJsonSchema(DocumentMetadata):
 
     data: dict[str, object]
 
+
 @dataclass(frozen=True, slots=True)
 class Extra(DocumentMetadata):
     """
@@ -93,6 +96,7 @@ class Extra(DocumentMetadata):
     """
 
     data: dict[str, object]
+
 
 @dataclass(frozen=True, slots=True)
 class Message(DocumentMetadata):
@@ -114,6 +118,7 @@ class Message(DocumentMetadata):
     """
 
     text: str
+
 
 # ---------------------------------------------------------------------------
 # Public API

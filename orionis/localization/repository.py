@@ -1,16 +1,17 @@
-"""In-memory cache of translation maps keyed by locale."""
+# ruff: noqa: TC001
+# Resolve loader and mapping annotations during runtime injection and inspection.
+"""Cache translation maps in memory by locale."""
 
 from __future__ import annotations
 import math
 from collections import OrderedDict
 from threading import RLock
 from time import monotonic
-from typing import TYPE_CHECKING, Self
+from typing import Self
+from orionis.localization.contracts.loader import ITranslationLoader
 from orionis.localization.contracts.repository import ITranslationRepository
+from orionis.localization.types import TranslationMap
 
-if TYPE_CHECKING:
-    from orionis.localization.contracts.loader import ITranslationLoader
-    from orionis.localization.types import TranslationMap
 
 class TranslationRepository(ITranslationRepository):
     """
@@ -51,7 +52,15 @@ class TranslationRepository(ITranslationRepository):
         Returns
         -------
         None
-            Initialize the repository with its translation loader.
+            No return value.
+
+        Raises
+        ------
+        ValueError
+            If the capacity is not a positive integer or the negative-cache
+            lifetime is nonfinite or negative.
+        TypeError
+            If the negative-cache lifetime is not numeric.
         """
         self._loader = loader
         """Loader used to read translation sources on cache misses."""
@@ -154,7 +163,7 @@ class TranslationRepository(ITranslationRepository):
         Returns
         -------
         None
-            Discard every cached translation map.
+            No return value.
         """
         with self._lock:
             self._cache.clear()
@@ -167,7 +176,7 @@ class TranslationRepository(ITranslationRepository):
         Returns
         -------
         tuple[str, ``...``]
-            Locale codes present in the in-memory cache.
+            Unexpired locale codes, ordered from least to most recently used.
         """
         with self._lock:
             return tuple(locale for locale in tuple(self._cache) if self.has(locale))

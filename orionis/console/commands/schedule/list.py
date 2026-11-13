@@ -1,3 +1,5 @@
+# ruff: noqa: TC001, TC002
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Display the application's registered scheduled tasks."""
 
 from rich import box
@@ -8,10 +10,9 @@ from orionis.console.base.command import BaseCommand
 from orionis.console.contracts.schedule import ISchedule
 from orionis.foundation.contracts.application import IApplication
 
+
 class ScheduleListCommand(BaseCommand):
     """Display the application's registered scheduled tasks."""
-
-    # ruff: noqa: TC001, TC002 (DI)
 
     # Indicates whether timestamps will be shown in the command output
     timestamps: bool = False

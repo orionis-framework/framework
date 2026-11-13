@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from types import FrameType
     from orionis.queues.contracts.worker import IWorker
 
+
 def _stop_worker(worker: IWorker, _signal: int, _frame: FrameType | None) -> None:
     """
     Request graceful draining after a process termination signal.
@@ -30,6 +31,7 @@ def _stop_worker(worker: IWorker, _signal: int, _frame: FrameType | None) -> Non
         Complete the documented operation without returning a value.
     """
     worker.stop()
+
 
 class WorkerSignals:
     """Install temporary worker shutdown handlers on the main thread."""

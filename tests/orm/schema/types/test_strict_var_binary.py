@@ -1,7 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema strict var binary behavior."""
+
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.orm.schema.types.strict_var_binary import StrictVarBinary
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestStrictVarBinaryOptions(TestCase):
     """Verify StrictVarBinary constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestStrictVarBinaryOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = StrictVarBinary()
         assert_column_options(

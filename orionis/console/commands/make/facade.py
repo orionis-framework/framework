@@ -1,9 +1,12 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Generate a facade and its typing interface."""
 
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.make._base import MakeStubCommand
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
+
 
 class MakeFacade(MakeStubCommand):
     """Generate a facade and its typing interface."""
@@ -88,4 +91,3 @@ class MakeFacade(MakeStubCommand):
             ("Facade", implementation),
             ("Facade interface", interface),
         )
-

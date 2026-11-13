@@ -1,3 +1,6 @@
+# ruff: noqa: ANN202, PLC0415, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Verify the documentation model against the syntax used by the framework."""
 
 import ast
@@ -7,6 +10,7 @@ import unittest
 from importlib.util import find_spec
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
 
 @unittest.skipUnless(find_spec("pydoctor"), "Install the docs dependency group")
 class TestDocumentationSystem(unittest.TestCase):
@@ -25,7 +29,7 @@ class TestDocumentationSystem(unittest.TestCase):
         tuple
             Built documentation system and captured diagnostic output.
         """
-        from pydoctor.options import Options # pyright: ignore[reportMissingImports]
+        from pydoctor.options import Options  # pyright: ignore[reportMissingImports]
         from resources.docs.pydoctor.system import DocumentationSystem
 
         with TemporaryDirectory() as directory:
@@ -104,7 +108,7 @@ type HttpResponse = Response
         None
             Keep NumPy Attributes visible to the undocumented-object index.
         """
-        from pydoctor.templatewriter.summary import hasdocstring # pyright: ignore[reportMissingImports]
+        from pydoctor.templatewriter.summary import hasdocstring  # pyright: ignore[reportMissingImports]
 
         system, diagnostics = self._buildSystem('''"""Example configuration."""
 class Config:
@@ -131,9 +135,9 @@ class Config:
         None
             Confirm constructor parameters and instance attributes stay typed.
         """
-        from pydoctor import epydoc2stan # pyright: ignore[reportMissingImports]
-        from pydoctor.stanutils import flatten # pyright: ignore[reportMissingImports]
-        from pydoctor.templatewriter.summary import hasdocstring # pyright: ignore[reportMissingImports]
+        from pydoctor import epydoc2stan  # pyright: ignore[reportMissingImports]
+        from pydoctor.stanutils import flatten  # pyright: ignore[reportMissingImports]
+        from pydoctor.templatewriter.summary import hasdocstring  # pyright: ignore[reportMissingImports]
 
         system, diagnostics = self._buildSystem('''"""Example configuration."""
 class Config:
@@ -163,9 +167,11 @@ class Config:
         field = system.allobjects["example.Config._limit"]
         self.assertTrue(hasdocstring(field))
         self.assertEqual(epydoc2stan.get_parsed_type(field).to_text(), "int")
-        rendered = flatten(epydoc2stan.format_docstring(
-            system.allobjects["example.Config.__init__"],
-        ))
+        rendered = flatten(
+            epydoc2stan.format_docstring(
+                system.allobjects["example.Config.__init__"],
+            ),
+        )
         self.assertIn('class="fieldArg">limit:</span><code>int</code>', rendered)
         self.assertIn("Maximum number of accepted items.", rendered)
         self.assertNotIn('class="undocumented"', rendered)
@@ -209,8 +215,8 @@ value: "not a valid type!"
         None
             Reject unsupported link targets when rendering schema preparation docs.
         """
-        from pydoctor import epydoc2stan, model # pyright: ignore[reportMissingImports]
-        from pydoctor.stanutils import flatten # pyright: ignore[reportMissingImports]
+        from pydoctor import epydoc2stan, model  # pyright: ignore[reportMissingImports]
+        from pydoctor.stanutils import flatten  # pyright: ignore[reportMissingImports]
 
         schemas = Path(__file__).resolve().parents[2] / "orionis" / "schemas"
         for filename in ("coercion.py", "instance_payload.py"):
@@ -226,7 +232,8 @@ value: "not a valid type!"
                 diagnostics += output.getvalue()
                 for target in ("...", "msgspec.Struct"):
                     self.assertNotIn(
-                        f'Cannot find link target for "{target}"', diagnostics,
+                        f'Cannot find link target for "{target}"',
+                        diagnostics,
                     )
 
     def testCaseInsensitivePageNamesRemainDistinct(self) -> None:
@@ -237,18 +244,20 @@ value: "not a valid type!"
         None
             Confirm that member links use the disambiguated module filename.
         """
-        system, diagnostics = self._buildSystem({
-            "__init__.py": '''"""Example package."""
+        system, diagnostics = self._buildSystem(
+            {
+                "__init__.py": '''"""Example package."""
 from .widget import Widget
 __all__ = ["Widget"]
 ''',
-            "widget.py": '''"""Widget utilities."""
+                "widget.py": '''"""Widget utilities."""
 LIMIT = 10
 """Maximum number of widgets."""
 class Widget:
     """Example widget."""
 ''',
-        })
+            },
+        )
         self.assertEqual(system.violations, 0, diagnostics)
         module = system.allobjects["example.widget"]
         widget = system.allobjects["example.Widget"]
@@ -267,8 +276,8 @@ class Widget:
         None
             Confirm stable navigation and unlinked section titles.
         """
-        from pydoctor import epydoc2stan # pyright: ignore[reportMissingImports]
-        from pydoctor.stanutils import flatten # pyright: ignore[reportMissingImports]
+        from pydoctor import epydoc2stan  # pyright: ignore[reportMissingImports]
+        from pydoctor.stanutils import flatten  # pyright: ignore[reportMissingImports]
 
         system, diagnostics = self._buildSystem('''"""Example module.
 
@@ -316,8 +325,8 @@ def ready() -> bool:
         None
             Confirm NumPy Yields is complete documentation for generator output.
         """
-        from pydoctor import epydoc2stan # pyright: ignore[reportMissingImports]
-        from pydoctor.stanutils import flatten # pyright: ignore[reportMissingImports]
+        from pydoctor import epydoc2stan  # pyright: ignore[reportMissingImports]
+        from pydoctor.stanutils import flatten  # pyright: ignore[reportMissingImports]
 
         system, diagnostics = self._buildSystem('''"""Example generator."""
 from collections.abc import Iterator
@@ -345,6 +354,7 @@ def values(limit: int) -> Iterator[int]:
         self.assertNotIn("Returns", rendered)
         self.assertNotIn('class="undocumented"', rendered)
         self.assertEqual(system.violations, 0)
+
 
 class TestDocumentationSite(unittest.TestCase):
     """Check generated HTML independently of pydoctor's diagnostic output."""
@@ -378,10 +388,12 @@ class TestDocumentationSite(unittest.TestCase):
         None
             Confirm that valid navigation produces no diagnostics.
         """
-        report = self._validateSite({
-            "index.html": '<a href="widget.module.html#LIMIT">limit</a>',
-            "widget.module.html": '<p id="LIMIT">Limit.</p><a href="https://example.com/">external</a>',
-        })
+        report = self._validateSite(
+            {
+                "index.html": '<a href="widget.module.html#LIMIT">limit</a>',
+                "widget.module.html": '<p id="LIMIT">Limit.</p><a href="https://example.com/">external</a>',
+            },
+        )
         self.assertEqual(report["errors"], [])
         self.assertEqual(report["html_pages"], 2)
 
@@ -393,10 +405,12 @@ class TestDocumentationSite(unittest.TestCase):
         None
             Ensure rendered documentation gaps block publication.
         """
-        report = self._validateSite({
-            "index.html": """<span class="undocumented">Undocumented</span>
+        report = self._validateSite(
+            {
+                "index.html": """<span class="undocumented">Undocumented</span>
 <a href="missing.html">missing file</a><a href="#missing">missing anchor</a>""",
-        })
+            },
+        )
         messages = "\n".join(report["errors"])
         self.assertIn("undocumented", messages)
         self.assertIn("missing local file", messages)
@@ -410,9 +424,11 @@ class TestDocumentationSite(unittest.TestCase):
         None
             Keep navigation portable between Windows and static web hosts.
         """
-        report = self._validateSite({
-            "index.html": '<a href="widget.html">widget</a>',
-            "Widget.html": "<p>Widget.</p>",
-        })
+        report = self._validateSite(
+            {
+                "index.html": '<a href="widget.html">widget</a>',
+                "Widget.html": "<p>Widget.</p>",
+            },
+        )
         self.assertTrue(report["errors"])
         self.assertIn("missing local file", report["errors"][0])

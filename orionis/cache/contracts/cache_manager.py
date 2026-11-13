@@ -1,16 +1,14 @@
+# ruff: noqa: ANN401, TC001, TC003
 """Define the contract for cache manager implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Self
+from collections.abc import Callable
+from typing import Any, Self
+from orionis.cache.contracts.repository import ICacheRepository
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.cache.contracts.repository import ICacheRepository
 
 class ICacheManager(ABC):
-
-    # ruff: noqa: ANN401
     """Define the contract for cache manager implementations."""
 
     async def rememberOnce(

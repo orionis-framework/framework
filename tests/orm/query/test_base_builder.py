@@ -1,3 +1,6 @@
+# ruff: noqa: FBT003, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 from orionis.database.compiler import SQLCompiler
 from orionis.database.connection_manager import ConnectionManager
@@ -16,18 +19,27 @@ from orionis.support.types.collection import Collection
 from orionis.test import TestCase
 from tests.orm.relations import test_mixin as fixtures
 
+
 class _Item(Model):
+    """Provide a timestamped model for query plan assertions."""
+
     id = Integer().primary().autoIncrement()
     name = String()
     created_at = StrictTimestamp().nullable()
     updated_at = StrictTimestamp().nullable()
 
+
 class _Plain(Model):
+    """Provide a model without timestamp conventions."""
+
     id = Integer().primary()
     name = String()
     timestamps = False
 
+
 class TestBuilderPlans(TestCase):
+    """Verify clause normalization before executing SQL."""
+
     def testSelectSetsProjection(self) -> None:
         """Store the projected columns on the plan.
 
@@ -36,7 +48,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().select("id", "name")
         self.assertEqual(builder._plan.columns, ("id", "name"))
@@ -49,7 +61,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().where({"name": "a", "id": 1})
         wheres = builder._plan.wheres
@@ -64,7 +76,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             _Item.query().where({"name": "a"}, "=")
@@ -77,7 +89,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().where("name", "a").orWhere("name", "b")
         self.assertEqual(builder._plan.wheres[1].boolean, "or")
@@ -90,7 +102,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().where("name", "LIKE", "a%")
         clause = builder._plan.wheres[0]
@@ -105,7 +117,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().whereNotIn("id", [1, 2])
         clause = builder._plan.wheres[0]
@@ -120,7 +132,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().whereIn("id", Collection([1, 2]))
         self.assertEqual(builder._plan.wheres[0].value, (1, 2))
@@ -133,7 +145,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             _Item.query().whereBetween("id", (1,))
@@ -146,7 +158,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cases = (
             ("whereLike", WhereType.LIKE),
@@ -168,7 +180,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cases = (
             ("whereStartsWith", WhereType.STARTS_WITH),
@@ -190,7 +202,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().distinct()
         self.assertTrue(builder._plan.distinct)
@@ -203,7 +215,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().groupBy("name").having("id", ">", 1)
         self.assertEqual(builder._plan.groups, ["name"])
@@ -217,7 +229,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().take(5).skip(10)
         self.assertEqual(builder._plan.limit_value, 5)
@@ -231,7 +243,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             _Item.query().limit(-1)
@@ -246,7 +258,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Item.query().latest()
         order = builder._plan.orders[0]
@@ -261,7 +273,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Plain.query().latest()
         self.assertEqual(builder._plan.orders[0].column, "id")
@@ -274,7 +286,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = _Plain.query().oldest("name")
         order = builder._plan.orders[0]
@@ -289,7 +301,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             await _Item.query().insert([])
@@ -302,7 +314,7 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             await _Item.query().update({})
@@ -315,25 +327,26 @@ class TestBuilderPlans(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             await _Item.query().paginate(page=0)
         with self.assertRaises(InvalidQueryException):
             await _Item.query().paginate(per_page=0)
 
+
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
     __slots__ = ()
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, _key: str) -> dict:
         """Run the config helper.
 
         Parameters
         ----------
-        key : str
-            Value supplied for ``key``.
+        _key : str
+            Unused configuration section requested by the manager.
 
         Returns
         -------
@@ -350,6 +363,7 @@ class _StubApp:
                 },
             },
         }
+
 
 def _table(name: str, columns: dict) -> TableDefinition:
     """
@@ -370,6 +384,7 @@ def _table(name: str, columns: dict) -> TableDefinition:
     for key, column in columns.items():
         column.name = key
     return TableDefinition(name=name, columns=columns, primary_key="id")
+
 
 def _users_table() -> TableDefinition:
     """
@@ -392,6 +407,7 @@ def _users_table() -> TableDefinition:
         },
     )
 
+
 def _posts_table() -> TableDefinition:
     """
     Build the physical "posts" table used by the join tests.
@@ -411,6 +427,7 @@ def _posts_table() -> TableDefinition:
         },
     )
 
+
 class _QueryLanguageTestCase(TestCase):
     """Shared fixture creating the users/posts schema on sqlite."""
 
@@ -420,28 +437,18 @@ class _QueryLanguageTestCase(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         previous_manager = ConnectionResolver._manager
         self.addCleanup(ConnectionResolver.setManager, previous_manager)
         self.addCleanup(setattr, DB, "_pinned_instance", DB._pinned_instance)
         self._manager = ConnectionManager(_StubApp())
+        self.addAsyncCleanup(self._manager.disconnect)
         ConnectionResolver.setManager(self._manager)
         DB._pinned_instance = QueryBuilder(self._manager)
         connection = self._manager.connection()
         await connection.createTable(_users_table())
         await connection.createTable(_posts_table())
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the manager and clear the resolver after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        await self._manager.disconnect()
-        ConnectionResolver.clear()
 
     async def seedUsers(self) -> None:
         """Insert the reference user rows shared by several tests.
@@ -449,7 +456,7 @@ class _QueryLanguageTestCase(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         await DB.table("users").insert(
             [
@@ -500,6 +507,7 @@ class _QueryLanguageTestCase(TestCase):
         """
         return sorted(row["name"] for row in rows)
 
+
 class _User(Model):
     """Model mapped onto the shared ``users`` fixture table."""
 
@@ -513,6 +521,7 @@ class _User(Model):
     age = Integer()
     active = Boolean()
 
+
 class TestNestedConditions(_QueryLanguageTestCase):
     """Condition grouping through callbacks, at any nesting depth."""
 
@@ -525,7 +534,7 @@ class TestNestedConditions(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await (
@@ -546,7 +555,7 @@ class TestNestedConditions(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await (
@@ -569,7 +578,7 @@ class TestNestedConditions(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await (
@@ -590,7 +599,7 @@ class TestNestedConditions(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await (
@@ -618,7 +627,7 @@ class TestNestedConditions(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = (
             RawQueryBuilder()
@@ -640,11 +649,12 @@ class TestNestedConditions(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await DB.table("users").where(lambda _query: None).get()
         self.assertEqual(len(rows), 4)
+
 
 class TestConditionSurface(_QueryLanguageTestCase):
     """Conditions beyond plain comparisons."""
@@ -657,7 +667,7 @@ class TestConditionSurface(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await DB.table("posts").insert(
             [
@@ -676,7 +686,7 @@ class TestConditionSurface(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await DB.table("users").whereNotBetween("age", (18, 60)).get()
@@ -690,7 +700,7 @@ class TestConditionSurface(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await DB.table("users").whereRaw("age > :floor", {"floor": 40}).get()
@@ -704,7 +714,7 @@ class TestConditionSurface(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await (
@@ -721,10 +731,11 @@ class TestConditionSurface(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             DB.table("users").where("name", "; DROP TABLE users; --", "x")
+
 
 class TestSubqueries(_QueryLanguageTestCase):
     """Subquery support across projections, conditions, and joins."""
@@ -737,7 +748,7 @@ class TestSubqueries(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -761,7 +772,7 @@ class TestSubqueries(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -788,7 +799,7 @@ class TestSubqueries(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -815,7 +826,7 @@ class TestSubqueries(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -848,7 +859,7 @@ class TestSubqueries(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -884,7 +895,7 @@ class TestSubqueries(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = (
             RawQueryBuilder()
@@ -900,6 +911,7 @@ class TestSubqueries(_QueryLanguageTestCase):
         with self.assertRaises(QueryException):
             SQLCompiler().compileSelect(builder.toPlan())
 
+
 class TestJoins(_QueryLanguageTestCase):
     """Every join flavour exposed by the shared engine."""
 
@@ -909,7 +921,7 @@ class TestJoins(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         await self.seedUsers()
         await DB.table("posts").insert(
@@ -927,7 +939,7 @@ class TestJoins(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedJoinable()
         rows = await (
@@ -947,7 +959,7 @@ class TestJoins(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedJoinable()
         rows = await (
@@ -966,7 +978,7 @@ class TestJoins(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedJoinable()
         rows = await (
@@ -992,7 +1004,7 @@ class TestJoins(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedJoinable()
         rows = await (
@@ -1012,7 +1024,7 @@ class TestJoins(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedJoinable()
         rows = await DB.table("users").select("users.id").crossJoin("posts").get()
@@ -1026,10 +1038,11 @@ class TestJoins(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             RawQueryBuilder().table("users").join("posts", "posts.user_id")
+
 
 class TestCompoundsAndLocks(_QueryLanguageTestCase):
     """Unions, locking, and builder reuse."""
@@ -1042,7 +1055,7 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         rows = await (
@@ -1064,7 +1077,7 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         base = DB.table("users").select("name").where("country", "CO")
@@ -1079,7 +1092,7 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         first = DB.table("users").select("name").where("name", "Ada")
@@ -1096,7 +1109,7 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         builder = RawQueryBuilder().table("users").lockForUpdate()
         sql = str(SQLCompiler().compileSelect(builder.toPlan()))
@@ -1110,7 +1123,7 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         base = RawQueryBuilder().table("users").where("active", True)
         branch = base.clone().where("role", "admin")
@@ -1125,7 +1138,7 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.seedUsers()
         query = DB.table("users")
@@ -1146,10 +1159,11 @@ class TestCompoundsAndLocks(_QueryLanguageTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(InvalidQueryException):
             await RawQueryBuilder().get()
+
 
 class TestPaginationGuards(TestCase):
     """Check terminal guards and execution-context isolation."""
@@ -1160,7 +1174,7 @@ class TestPaginationGuards(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for invalid in (0, -1, 1.5, True, "1", None):
             for builder in (RawQueryBuilder().table("books"), fixtures.Book.query()):

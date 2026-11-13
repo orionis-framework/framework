@@ -9,9 +9,13 @@ if _TYPE_CHECKING:
 __all__ = ["RealtimeConfig"]
 
 _EXPORTS = {
-    "RealtimeConfig": ("orionis.foundation.config.realtime.entities.realtime", "RealtimeConfig"),
+    "RealtimeConfig": (
+        "orionis.foundation.config.realtime.entities.realtime",
+        "RealtimeConfig",
+    ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -33,6 +37,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

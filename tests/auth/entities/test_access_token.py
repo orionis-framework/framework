@@ -1,6 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import UTC, datetime
 from orionis.auth.entities.access_token import AccessToken
 from orionis.test import TestCase
+
 
 class TestAccessToken(TestCase):
     """Validate the metadata exposed for a stored token."""
@@ -13,7 +16,7 @@ class TestAccessToken(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         token = AccessToken(
             id=1,
@@ -34,7 +37,7 @@ class TestAccessToken(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         token = AccessToken(
             id=1,
@@ -57,7 +60,7 @@ class TestAccessToken(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         issued = datetime(2026, 1, 1, tzinfo=UTC)
         token = AccessToken(

@@ -1,7 +1,10 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure an uploaded file declares one of the accepted MIME types."""
 
 from orionis.schemas.rules.measure import is_file
 from orionis.schemas.rule import Rule
+
 
 class MimeTypes(Rule):
     """
@@ -10,8 +13,6 @@ class MimeTypes(Rule):
     Wildcard subtypes such as ``"image/*"`` match every subtype of the given
     top-level type.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_exact", "_prefixes")
     """Declare the instance attribute slots reserved by this class."""
@@ -36,7 +37,7 @@ class MimeTypes(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------

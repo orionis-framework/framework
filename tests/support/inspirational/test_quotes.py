@@ -1,8 +1,10 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.support.inspirational.quotes import INSPIRATIONAL_QUOTES
 from orionis.test import TestCase
 
-class TestInspirationalQuotesType(TestCase):
 
+class TestInspirationalQuotesType(TestCase):
     def testIsATuple(self) -> None:
         """
         Test that INSPIRATIONAL_QUOTES is a tuple.
@@ -13,17 +15,6 @@ class TestInspirationalQuotesType(TestCase):
             This method does not return a value.
         """
         self.assertIsInstance(INSPIRATIONAL_QUOTES, tuple)
-
-    def testIsNotEmpty(self) -> None:
-        """
-        Test that INSPIRATIONAL_QUOTES contains at least one entry.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.assertGreater(len(INSPIRATIONAL_QUOTES), 0)
 
     def testAllItemsAreDicts(self) -> None:
         """
@@ -36,38 +27,6 @@ class TestInspirationalQuotesType(TestCase):
         """
         for idx, item in enumerate(INSPIRATIONAL_QUOTES):
             self.assertIsInstance(item, dict, msg=f"Item at index {idx} is not a dict")
-
-    def testAllDictsHaveQuoteKey(self) -> None:
-        """
-        Test that every dict in INSPIRATIONAL_QUOTES has a 'quote' key.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        for idx, item in enumerate(INSPIRATIONAL_QUOTES):
-            self.assertIn(
-                "quote",
-                item,
-                msg=f"Item at index {idx} is missing 'quote' key",
-            )
-
-    def testAllDictsHaveAuthorKey(self) -> None:
-        """
-        Test that every dict in INSPIRATIONAL_QUOTES has an 'author' key.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        for idx, item in enumerate(INSPIRATIONAL_QUOTES):
-            self.assertIn(
-                "author",
-                item,
-                msg=f"Item at index {idx} is missing 'author' key",
-            )
 
     def testAllQuoteValuesAreNonEmptyStrings(self) -> None:
         """

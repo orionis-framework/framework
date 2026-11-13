@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from types import MappingProxyType
 from typing import Any
@@ -13,6 +15,7 @@ from orionis.session.flash import (
 )
 from orionis.session.session import Session
 from orionis.test import TestCase
+
 
 class _FakeFailure:
     """Minimal stand-in for a single validation failure."""
@@ -30,10 +33,11 @@ class _FakeFailure:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.field = field
         self.message = message
+
 
 class _FakeValidationException(Exception):
     """Duck-typed validation exception exposing errors and/or failure."""
@@ -55,13 +59,14 @@ class _FakeValidationException(Exception):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         super().__init__("invalid")
         if errors is not None:
             self.errors = errors
         if failure is not None:
             self.failure = failure
+
 
 class TestFlashConstants(TestCase):
     """Unit tests for the reserved keys owned by the session layer."""
@@ -75,7 +80,7 @@ class TestFlashConstants(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         keys = {OLD_INPUT_KEY, ERRORS_KEY, PREVIOUS_URL_KEY}
         self.assertEqual(len(keys), 3)
@@ -89,10 +94,11 @@ class TestFlashConstants(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for field in ("password", "password_confirmation", "csrf_token"):
             self.assertIn(field, SENSITIVE_INPUT_FIELDS)
+
 
 class TestFilterInput(TestCase):
     """Unit tests for filter_input()."""
@@ -105,7 +111,7 @@ class TestFilterInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = filter_input({"email": "a@b.c", "password": "secret"})
         self.assertEqual(result, {"email": "a@b.c"})
@@ -118,7 +124,7 @@ class TestFilterInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"email": "a@b.c", "remember": True}
         self.assertEqual(filter_input(payload), payload)
@@ -132,12 +138,19 @@ class TestFilterInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        payload = {"email": "a@b.c"}
-        result = filter_input(payload)
-        result["email"] = "changed"
-        self.assertEqual(payload["email"], "a@b.c")
+        for credentials in ({}, {"password": "secret"}):
+            for read_only in (False, True):
+                with self.subTest(credentials=bool(credentials), read_only=read_only):
+                    payload = {"email": "a@b.c", **credentials}
+                    original = payload.copy()
+                    values = MappingProxyType(payload) if read_only else payload
+                    result = filter_input(values)
+                    self.assertIsInstance(result, dict)
+                    self.assertEqual(result, {"email": "a@b.c"})
+                    result["email"] = "changed"
+                    self.assertEqual(payload, original)
 
     def testDropsEverySensitiveField(self) -> None:
         """Remove all blacklisted fields at once.
@@ -148,7 +161,7 @@ class TestFilterInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = dict.fromkeys(SENSITIVE_INPUT_FIELDS, "x")
         self.assertEqual(filter_input(payload), {})
@@ -161,7 +174,7 @@ class TestFilterInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(filter_input({}), {})
 
@@ -174,7 +187,7 @@ class TestFilterInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = MappingProxyType({"email": "a@b.c"})
         result = filter_input(payload)
@@ -189,10 +202,11 @@ class TestFilterInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = MappingProxyType({"email": "a@b.c", "password": "x"})
         self.assertEqual(filter_input(payload), {"email": "a@b.c"})
+
 
 class TestNormalizeErrors(TestCase):
     """Unit tests for normalize_errors()."""
@@ -204,7 +218,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assert message lists for templates and preserve the source details.
+            No return value.
         """
         errors = {
             "email": [
@@ -213,10 +227,13 @@ class TestNormalizeErrors(TestCase):
             ],
             "name": {"rule": "required", "message": "Name is required."},
         }
-        self.assertEqual(normalize_errors(errors), {
-            "email": ["Too short.", "Invalid email."],
-            "name": ["Name is required."],
-        })
+        self.assertEqual(
+            normalize_errors(errors),
+            {
+                "email": ["Too short.", "Invalid email."],
+                "name": ["Name is required."],
+            },
+        )
         self.assertEqual(errors["email"][0]["rule"], "min_length")
 
     def testStructuredExceptionErrorsAreNormalized(self) -> None:
@@ -226,17 +243,22 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assert both messages from the same field's structured errors.
+            No return value.
         """
-        exc = _FakeValidationException(errors={
-            "quantity": [
-                {"rule": "ge", "message": "Quantity must be positive."},
-                {"rule": "multiple_of", "message": "Use multiples of five."},
-            ],
-        })
-        self.assertEqual(normalize_errors(exc), {
-            "quantity": ["Quantity must be positive.", "Use multiples of five."],
-        })
+        exc = _FakeValidationException(
+            errors={
+                "quantity": [
+                    {"rule": "ge", "message": "Quantity must be positive."},
+                    {"rule": "multiple_of", "message": "Use multiples of five."},
+                ],
+            },
+        )
+        self.assertEqual(
+            normalize_errors(exc),
+            {
+                "quantity": ["Quantity must be positive.", "Use multiples of five."],
+            },
+        )
 
     def testStringValueBecomesSingleItemList(self) -> None:
         """Wrap a single message into a list.
@@ -247,7 +269,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             normalize_errors({"email": "required"}),
@@ -262,7 +284,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             normalize_errors({"age": ["too small", 42]}),
@@ -277,7 +299,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             normalize_errors({"a": ("x", "y")}),
@@ -293,7 +315,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(normalize_errors({"a": frozenset({"x"})}), {"a": ["x"]})
 
@@ -305,7 +327,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(normalize_errors({"n": 10}), {"n": ["10"]})
 
@@ -318,7 +340,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = _FakeValidationException(errors={"a": ["x"], "b": ["y", "z"]})
         self.assertEqual(normalize_errors(exc), {"a": ["x"], "b": ["y", "z"]})
@@ -331,7 +353,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = _FakeValidationException(failure=_FakeFailure("email", "invalid"))
         self.assertEqual(normalize_errors(exc), {"email": ["invalid"]})
@@ -345,7 +367,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = _FakeValidationException(
             errors=["not", "a", "mapping"],
@@ -362,7 +384,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = _FakeValidationException(failure=_FakeFailure(None, None))
         self.assertEqual(normalize_errors(exc), {"": [""]})
@@ -376,7 +398,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             normalize_errors(_FakeValidationException())
@@ -389,7 +411,7 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             normalize_errors("boom")
@@ -402,12 +424,13 @@ class TestNormalizeErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             normalize_errors(MappingProxyType({"email": "required"})),
             {"email": ["required"]},
         )
+
 
 class TestQueueBag(TestCase):
     """Unit tests for queue_bag()."""
@@ -420,7 +443,7 @@ class TestQueueBag(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         pending: dict[str, Any] = {}
         values = {"email": "a@b.c"}
@@ -436,7 +459,7 @@ class TestQueueBag(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         pending: dict[str, Any] = {OLD_INPUT_KEY: {"a": 1}}
         queue_bag(pending, OLD_INPUT_KEY, {"b": 2})
@@ -450,11 +473,12 @@ class TestQueueBag(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         pending: dict[str, Any] = {ERRORS_KEY: "oops"}
         queue_bag(pending, ERRORS_KEY, {"a": ["x"]})
         self.assertEqual(pending[ERRORS_KEY], {"a": ["x"]})
+
 
 class TestApplyFlash(TestCase):
     """Unit tests for apply_flash()."""
@@ -468,7 +492,7 @@ class TestApplyFlash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         apply_flash(
@@ -486,7 +510,7 @@ class TestApplyFlash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         apply_flash(session, {ERRORS_KEY: {"email": "required"}})
@@ -500,7 +524,7 @@ class TestApplyFlash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         apply_flash(session, {"success": "Saved"})
@@ -515,7 +539,7 @@ class TestApplyFlash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashInput({"email": "a@b.c"})
@@ -531,7 +555,7 @@ class TestApplyFlash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         apply_flash(session, {})
@@ -546,7 +570,7 @@ class TestApplyFlash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         apply_flash(
@@ -564,7 +588,7 @@ class TestApplyFlash(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         apply_flash(session, {PREVIOUS_URL_KEY: "http://orionis.test/login"})

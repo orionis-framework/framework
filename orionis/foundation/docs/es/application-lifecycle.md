@@ -14,6 +14,10 @@ Antes de `create()`, métodos `with...` construyen metadata mutable. La creació
 
 Scopes ASGI `http`, `websocket` y `lifespan` se despachan por `Application.__call__`; RSGI usa sus hooks. `handleCommand()` posee startup CLI, comando y shutdown garantizado. Startup HTTP publica handlers ASGI y RSGI antes de readiness.
 
+Si una task factory rechaza el handler HTTP o su monitor de desconexión, Application cierra las coroutines no admitidas y cancela/espera el handler ya admitido antes de propagar el error de admisión.
+
+Construir de nuevo la misma clase Application reutiliza su singleton y raíz originales. `boot()` y `aclose()` no reinician declaraciones de rutas ni recargan módulos. Las fachadas ordinarias conservan bindings de aplicación por proceso; usa otro proceso para una raíz de aplicación independiente.
+
 ## Flujos de trabajo comunes
 
 ### Iniciar aplicación web
@@ -26,7 +30,7 @@ Usa `await app.boot()` para providers eager registrados e iniciados sin kernel. 
 
 ### Cambiar configuración runtime
 
-Lee con puntos (`app.config("http.cors.allowed_origins")`) y escribe con segundo argumento. Claves ausentes/inaccesibles retornan `None`; escrituras crean diccionarios intermedios. Reinicia para descartar overrides.
+Lee con puntos (`app.config("http.cors.allow_origins")`) y escribe con segundo argumento. Claves ausentes/inaccesibles retornan `None`; escrituras crean diccionarios intermedios. Reinicia para descartar overrides.
 
 ### Entrar en mantenimiento
 
@@ -34,7 +38,7 @@ Lee con puntos (`app.config("http.cors.allowed_origins")`) y escribe con segundo
 
 ## Integración con Orionis
 
-Foundation carga 20 providers core en orden determinista, descubre providers concretos en `app/providers`, registra eager y publica metadata deferred antes del registro eager. `boot` síncrono corre en creación; async durante `boot()` o startup runtime.
+Foundation carga los providers core en orden determinista, descubre providers concretos en `app/providers`, registra eager y publica metadata deferred antes del registro eager. `boot` síncrono corre en creación; async durante `boot()` o startup runtime.
 
 Resuelve kernels CLI/HTTP desde metadata, valida imports de fachadas en rutas, inyecta scheduler/handler y se expone como `IApplication` con alias `x-orionis-IApplication`. Todos los módulos consumen su config, contenedor, rutas, scopes o lifecycle.
 
@@ -70,6 +74,8 @@ app.on(Lifespan.SHUTDOWN, close_resources, runtime=Runtime.HTTP)
 
 Los hooks globales y los de runtime se guardan en conjuntos. No dependas del orden de registro para inicializar dos recursos dependientes: agrupa esa secuencia en un callback que haga ambos pasos. Un provider deferred se registra y arranca al resolver uno de sus servicios; `areProvidersBooted` solo describe los eager.
 
+Los selectores de runtime desconocidos lanzan `ValueError` en vez de registrar hooks globales; los valores que no sean texto ni `None` lanzan `TypeError`. Se conservan los valores `"http"` y `"cli"`. Solo `None` selecciona callbacks globales.
+
 ## Recursos en un proceso sin servidor
 
 Guarda este ejemplo como programa independiente. El provider registra una dependencia y su `boot` añade la inicialización que requiere un event loop. La aplicación temporal no descubre los providers del checkout. Al terminar, cierra tus propios recursos: `boot()` por sí solo no ejecuta shutdown de un kernel.
@@ -82,9 +88,11 @@ from orionis import Application
 from orionis.environment.core.dot_env import DotEnv
 from orionis.container.providers import ServiceProvider
 
+
 class Catalog:
     def __init__(self) -> None:
         self.ready = False
+
 
 class CatalogProvider(ServiceProvider):
     def register(self) -> None:
@@ -93,6 +101,7 @@ class CatalogProvider(ServiceProvider):
     async def boot(self) -> None:
         catalog = await self.app.make(Catalog)
         catalog.ready = True
+
 
 async def main() -> None:
     with TemporaryDirectory() as directory:
@@ -103,9 +112,13 @@ async def main() -> None:
         app.create()
         assert app.isCreated
         await app.boot()
-        assert app.areProvidersBooted
-        assert not app.isHttpReady
-        assert (await app.make(Catalog)).ready
+        try:
+            assert app.areProvidersBooted
+            assert not app.isHttpReady
+            assert (await app.make(Catalog)).ready
+        finally:
+            await app.aclose()
+
 
 asyncio.run(main())
 ```

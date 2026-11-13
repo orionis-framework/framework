@@ -18,13 +18,12 @@ Cada elemento de `errors[campo]` contiene `rule` y `message`; los códigos de re
 
 - [Constraints, metadatos y referencia](constraints-and-reference.md)
 - [Declarar schemas y convertir datos](declaring-schemas.md)
+- [Reglas de aplicación y validación con I/O](application-rules.md)
 - [Validación, errores e integración](validation-and-errors.md)
 
 Continúa por: [http](../../../http/docs/es/README.md) · [database](../../../database/docs/es/README.md) · [mcp](../../../mcp/docs/es/README.md).
 
-Los ejemplos que requieren bootstrap, una solicitud o servicios externos indican su contexto. Los resultados de comprobación de esta reconstrucción se distinguen de las notas históricas; no se presupone que se haya ejecutado una integración de producción.
-
-- [Reglas de aplicación y validación con I/O](application-rules.md)
+Los ejemplos que requieren bootstrap, una solicitud o servicios externos indican su contexto.
 
 ## Ejecución acotada y rendimiento
 

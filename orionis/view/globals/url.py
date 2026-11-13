@@ -1,30 +1,41 @@
+# ruff: noqa: ANN401, BLE001, TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
+# Preserve heterogeneous template payload values.
+# Observe optional service failures centrally before returning a fallback.
 """Provide view globals operations.
 
-Includes ``_request_base_url``, ``_absolute_url``, ``_to_secure_url``,
-``_global_url``.
+Includes ``_split_scheme``, ``_request_base_url``, ``_absolute_url``,
+``_to_secure_url``, and ``_global_url``.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from collections.abc import Awaitable, Callable
+from typing import Any
 from urllib.parse import urlencode
+
+from orionis.foundation.contracts.application import IApplication
 from orionis.http.contracts.request import IRequest
+from orionis.view._failures import capture_service_failure
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
 
-# ruff: noqa: ANN401, BLE001
+def _split_scheme(url: str) -> tuple[str, str]:
+    """Split an explicit URL scheme without normalizing its remaining content.
 
-# Prefixes identifying an already absolute URL.
-_ABSOLUTE_PREFIXES: tuple[str, ...] = ("http://", "https://", "//")  # NOSONAR
-"""Prefixes identifying an already absolute URL."""
+    Parameters
+    ----------
+    url : str
+        URL or path whose scheme may be followed by a colon and two slashes.
 
-# Scheme prefixes rewritten by the ``secure_*`` template globals.
-_INSECURE_PREFIX: str = "http://"  # NOSONAR
-"""Scheme prefixes rewritten by the ``secure_*`` template globals."""
-_SECURE_PREFIX: str = "https://"
-"""Secure prefix identifier: ``https://``."""
-_SCHEMELESS_PREFIX: str = "//"
-"""Schemeless prefix identifier: ``//``."""
+    Returns
+    -------
+    tuple[str, str]
+        Lowercase scheme and exact remainder, or two empty strings when the
+        separator is absent. This helper performs no URL validation.
+    """
+    scheme, separator, remainder = url.partition("://")
+    return (scheme.lower(), remainder) if separator else ("", "")
+
 
 async def _request_base_url(app: IApplication) -> str:
     """
@@ -44,10 +55,10 @@ async def _request_base_url(app: IApplication) -> str:
     try:
         request: IRequest = await app.make(IRequest)
     except Exception as error:
-        from orionis.view._failures import capture_service_failure  # noqa: PLC0415
         await capture_service_failure(error, IRequest, app=app)
         return ""
     return request.baseUrl.rstrip("/")
+
 
 async def _absolute_url(
     app: IApplication,
@@ -62,7 +73,7 @@ async def _absolute_url(
     app : orionis.IApplication
         Application container used for service resolution.
     path : str
-        Absolute URL or application-relative path.
+        HTTP(S), protocol-relative URL, or application-relative path.
     query : dict[str, typing.Any]
         Query string values appended to the resulting URL.
 
@@ -72,7 +83,7 @@ async def _absolute_url(
         Absolute URL when a request is in scope, otherwise the
         normalised path.
     """
-    if path.startswith(_ABSOLUTE_PREFIXES):
+    if path.startswith("//") or _split_scheme(path)[0] in ("http", "https"):
         base = ""
         target = path
     else:
@@ -80,10 +91,15 @@ async def _absolute_url(
         target = "/" + path.lstrip("/") if path else "/"
 
     if query:
+        target, fragment_separator, fragment = target.partition("#")
         separator = "&" if "?" in target else "?"
-        target = f"{target}{separator}{urlencode(query, doseq=True)}"
+        target = (
+            f"{target}{separator}{urlencode(query, doseq=True)}"
+            f"{fragment_separator}{fragment}"
+        )
 
     return f"{base}{target}"
+
 
 def _to_secure_url(url: str) -> str:
     """
@@ -92,21 +108,22 @@ def _to_secure_url(url: str) -> str:
     Parameters
     ----------
     url : str
-        URL to normalise. Relative paths and HTTPS URLs are returned
-        untouched, since no host can be inferred for the former.
+        URL to normalize. Recognize HTTP schemes without regard to case.
+        Preserve existing HTTPS URLs, other schemes, and relative paths.
 
     Returns
     -------
     str
-        URL served over HTTPS whenever a host is present.
+        HTTPS URL for HTTP or protocol-relative inputs, with the remaining
+        content unchanged. Return all other inputs without modification.
     """
-    if url.startswith(_INSECURE_PREFIX):
-        return url.replace(_INSECURE_PREFIX, _SECURE_PREFIX, 1)
-    if url.startswith(_SCHEMELESS_PREFIX):
-        return url.replace(_SCHEMELESS_PREFIX, _SECURE_PREFIX, 1)
-    return url
+    if url.startswith("//"):
+        return f"https:{url}"
+    scheme, remainder = _split_scheme(url)
+    return f"https://{remainder}" if scheme == "http" else url
 
-def _global_url(app: IApplication) -> Any:
+
+def _global_url(app: IApplication) -> Callable[..., Awaitable[str]]:
     """
     Build the async ``url`` template global bound to the application.
 
@@ -117,9 +134,10 @@ def _global_url(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that builds a URL from a path.
     """
+
     async def url(path: str = "/", **query: Any) -> str:
         """
         Build a URL for an application path.
@@ -127,8 +145,8 @@ def _global_url(app: IApplication) -> Any:
         Parameters
         ----------
         path : str, optional
-            Application-relative path, or an already absolute URL, which
-            is returned untouched apart from the query string.
+            Application-relative path, or an HTTP(S) or protocol-relative
+            URL returned untouched apart from added query arguments.
         **query : typing.Any
             Values encoded as the query string of the URL.
 
@@ -142,7 +160,8 @@ def _global_url(app: IApplication) -> Any:
 
     return url
 
-def _global_secure_url(app: IApplication) -> Any:
+
+def _global_secure_url(app: IApplication) -> Callable[..., Awaitable[str]]:
     """
     Build the async ``secure_url`` template global bound to the application.
 
@@ -153,9 +172,10 @@ def _global_secure_url(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that builds an HTTPS URL from a path.
     """
+
     async def secure_url(path: str = "/", **query: Any) -> str:
         """
         Build an HTTPS URL for an application path.
@@ -163,8 +183,8 @@ def _global_secure_url(app: IApplication) -> Any:
         Parameters
         ----------
         path : str, optional
-            Application-relative path, or an already absolute URL, whose
-            scheme is forced to HTTPS.
+            Application-relative path, or an HTTP(S) or protocol-relative
+            URL whose insecure HTTP scheme is upgraded to HTTPS.
         **query : typing.Any
             Values encoded as the query string of the URL.
 

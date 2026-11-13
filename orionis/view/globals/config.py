@@ -1,14 +1,17 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
+# Preserve heterogeneous template payload values.
 """Provide view globals operations through ``_global_config``."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
+from collections.abc import Callable
+from typing import Any
 
-# ruff: noqa: ANN401
+from orionis.foundation.contracts.application import IApplication
 
-def _global_config(app: IApplication) -> Any:
+
+def _global_config(app: IApplication) -> Callable[..., Any]:
     """
     Build the ``config`` template global bound to the application.
 
@@ -19,9 +22,10 @@ def _global_config(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable that retrieves a dot-separated configuration key.
     """
+
     def config(key: str, default: Any = None) -> Any:
         """
         Retrieve an application configuration value.

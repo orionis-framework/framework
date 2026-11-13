@@ -1,11 +1,13 @@
+# ruff: noqa: ANN001, ANN202, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from abc import ABC
 from orionis.console.base.contracts.scheduler import IBaseScheduler
 from orionis.test import TestCase
 
-class TestIBaseScheduler(TestCase):
 
+class TestIBaseScheduler(TestCase):
     def testIsAbstractClass(self) -> None:
         """Verify that IBaseScheduler is an abstract class.
 
@@ -116,6 +118,7 @@ class TestIBaseScheduler(TestCase):
         """
         # Test that partial implementation fails
         with self.assertRaises(TypeError):
+
             class PartialScheduler(IBaseScheduler):
                 async def tasks(self, schedule):
                     """Leave task access unimplemented in the partial scheduler.
@@ -130,7 +133,9 @@ class TestIBaseScheduler(TestCase):
                     None
                         Completes the operation described above.
                     """
+
                 # Missing other abstract methods
+
             PartialScheduler()
 
     def testInheritsFromABC(self) -> None:

@@ -2,6 +2,8 @@
 
 El cliente MCP envía JSON-RPC codificado al dispatcher real y abre un scope nuevo por llamada. Es una prueba de integración del protocolo y del contenedor, sin sockets. No sustituye una prueba de un proxy HTTP, origen autorizado o transporte stdio. La declaración del servidor siguiente pertenece al módulo de prueba y se ejecuta bajo el runner de Orionis.
 
+`assertOk()` exige un resultado de tipo objeto y rechaza resultados ausentes o malformados, errores JSON-RPC y resultados de herramientas con `isError=True`. `assertTextContains()` busca únicamente en bloques de contenido de tipo `text` cuyo texto sea una cadena; el contenido ajeno o malformado no puede satisfacer la aserción.
+
 ## Ejemplos
 
 ### Ejercitar una herramienta MCP real
@@ -11,8 +13,10 @@ from orionis.mcp import McpResponse, Server, Tool
 from orionis.schemas import Schema
 from orionis.test import TestCase
 
+
 class GreetingInput(Schema):
     name: str
+
 
 class HelloTool(Tool[GreetingInput]):
     name = "hello"
@@ -20,9 +24,11 @@ class HelloTool(Tool[GreetingInput]):
     def handle(self, payload: GreetingInput) -> McpResponse:
         return McpResponse.text(f"Hello, {payload.name}")
 
+
 class GreetingServer(Server):
     name = "greetings"
     tools = (HelloTool,)
+
 
 class TestGreetingServer(TestCase):
     async def testHello(self) -> None:

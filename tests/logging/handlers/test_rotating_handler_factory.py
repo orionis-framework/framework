@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import logging
 from datetime import time
 from logging import FileHandler, Handler
@@ -20,30 +22,19 @@ _MEGABYTE = 1024 * 1024
 # Path fallback applied when the channel declares none.
 _DEFAULT_PATH = "storage/logs/default.log"
 
-class TestRotatingHandlerFactory(TestCase):
 
+class TestRotatingHandlerFactory(TestCase):
     def setUp(self) -> None:
         """Create a temporary application root and the handler registry.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._tmp = TemporaryDirectory(ignore_cleanup_errors=True)
-        self._handlers: list[Handler] = []
-
-    def tearDown(self) -> None:
-        """Close every built handler and delete the temporary root.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        for handler in self._handlers:
-            handler.close()
-        self._tmp.cleanup()
+        super().setUp()
+        self._tmp = TemporaryDirectory()
+        self.enterContext(self._tmp)
 
     def _createHandler(self, channel: str, config: dict) -> Handler | None:
         """Build a handler through the factory and track it for teardown.
@@ -66,7 +57,7 @@ class TestRotatingHandlerFactory(TestCase):
             app_root=self._tmp.name,
         )
         if handler is not None:
-            self._handlers.append(handler)
+            self.addCleanup(handler.close)
         return handler
 
     def _createRotating(
@@ -119,7 +110,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createFile({"path": "storage/logs/stack.log"})
         self.assertNotIsInstance(handler, AdvancedRotatingFileHandler)
@@ -133,7 +124,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._createFile({"path": "storage/logs/nested/deep/stack.log"})
         expected = Path(self._tmp.name) / "storage" / "logs" / "nested" / "deep"
@@ -147,7 +138,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._createFile({"path": "storage/logs/stack.log"})
         self.assertFalse((Path(self._tmp.name) / "storage/logs/stack.log").exists())
@@ -160,7 +151,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createFile(
             {"path": "storage/logs/stack.log", "level": logging.WARNING},
@@ -175,7 +166,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._createFile({})
         self.assertTrue((Path(self._tmp.name) / _DEFAULT_PATH).parent.is_dir())
@@ -188,7 +179,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._createFile({}).level, logging.INFO)
 
@@ -200,7 +191,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "hourly",
@@ -216,7 +207,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "hourly",
@@ -232,7 +223,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "hourly",
@@ -248,7 +239,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "daily",
@@ -265,7 +256,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "daily",
@@ -284,7 +275,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "daily",
@@ -300,7 +291,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "weekly",
@@ -316,7 +307,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "weekly",
@@ -332,7 +323,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "monthly",
@@ -348,7 +339,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "monthly",
@@ -364,7 +355,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "chunked",
@@ -380,7 +371,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "chunked",
@@ -396,7 +387,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "chunked",
@@ -412,7 +403,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "chunked",
@@ -428,7 +419,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "chunked",
@@ -445,7 +436,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "daily",
@@ -461,7 +452,7 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = self._createRotating(
             "daily",
@@ -478,6 +469,6 @@ class TestRotatingHandlerFactory(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(self._createHandler("unknown", {}))

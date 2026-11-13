@@ -1,5 +1,6 @@
 """Root marker for all Orionis field-level annotations."""
 
+
 class ValidationMetadata:
     """
     Root marker for all Orionis field-level annotations.

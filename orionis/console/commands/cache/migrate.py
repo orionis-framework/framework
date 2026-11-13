@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Create the configured framework cache tables without removing data."""
 
 from orionis.cache.exceptions import CacheStoreException
@@ -7,10 +9,9 @@ from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.exceptions import DatabaseException
 from orionis.foundation.contracts.application import IApplication
 
+
 class CacheMigrateCommand(BaseCommand):
     """Create the configured framework cache tables without removing data."""
-
-    # ruff: noqa: TC001
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

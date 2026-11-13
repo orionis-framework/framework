@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import json
 from pathlib import Path
@@ -29,6 +31,7 @@ from tests.http.test_support import replace_attribute
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
+
 
 class LoaderApplicationDouble:
     """Supply route-loading configuration and optional import failures."""
@@ -90,6 +93,7 @@ class LoaderApplicationDouble:
         if self.import_error is not None:
             raise self.import_error
 
+
 class LoaderRouterDouble:
     """Record route exports and changes to the registration kind."""
 
@@ -135,6 +139,7 @@ class LoaderRouterDouble:
         """
         self.exports += 1
         return {"routes": [], "fallback": self.fallback}
+
 
 class RoutePersistenceDouble:
     """Record cache reads and saved compiled route snapshots."""
@@ -182,6 +187,7 @@ class RoutePersistenceDouble:
         """
         self.saved.append(value)
 
+
 class DoubleNextMiddleware(BaseMiddleware):
     """Exercise the continuation guard at the final middleware layer."""
 
@@ -207,6 +213,7 @@ class DoubleNextMiddleware(BaseMiddleware):
         await call_next()
         return await call_next()
 
+
 def item_handler(item: int) -> Response:
     """Expose the parameter ultimately passed to the handler.
 
@@ -221,6 +228,7 @@ def item_handler(item: int) -> Response:
         Value produced by the helper.
     """
     return Response(content=str(item))
+
 
 class RewriteParamMiddleware(BaseMiddleware):
     """Adjust one parameter using the mutable request API."""
@@ -246,6 +254,7 @@ class RewriteParamMiddleware(BaseMiddleware):
         """
         request.routeParams()["item"] += 1
         return await call_next()
+
 
 class TestRoutingRuntime(TestCase):
     """Check request isolation and middleware continuation correctness."""
@@ -348,6 +357,7 @@ class TestRoutingRuntime(TestCase):
             response = await dispatch(kernel, "/items/1")
             self.assertEqual(response.getBody(), b"2")
         self.assertEqual(catch.handled, [])
+
 
 class TestRoutingCache(TestCase):
     """Exercise the real cache serializer and loader bootstrap boundaries."""
@@ -484,11 +494,13 @@ class TestRoutingCache(TestCase):
             with self.subTest(version=version):
                 app = LoaderApplicationDouble(compiled=True)
                 router = LoaderRouterDouble()
-                persistence = RoutePersistenceDouble({
-                    "version": version,
-                    "routes": {},
-                    "fallback": None,
-                })
+                persistence = RoutePersistenceDouble(
+                    {
+                        "version": version,
+                        "routes": {},
+                        "fallback": None,
+                    },
+                )
 
                 def create_persistence(
                     backend: RoutePersistenceDouble = persistence,
@@ -511,7 +523,9 @@ class TestRoutingCache(TestCase):
                     return backend
 
                 with replace_attribute(
-                    loader_module, "FileBasedCache", create_persistence,
+                    loader_module,
+                    "FileBasedCache",
+                    create_persistence,
                 ):
                     loader = RouteLoader(app, router, RouteCompiler(), RouteCache())
                 self.assertEqual(loader.load(), {})
@@ -521,7 +535,8 @@ class TestRoutingCache(TestCase):
                     self.assertEqual(router.exports, 1)
                     self.assertEqual(len(persistence.saved), 1)
                     self.assertEqual(
-                        persistence.saved[0]["version"], RouteCache.VERSION,
+                        persistence.saved[0]["version"],
+                        RouteCache.VERSION,
                     )
                 else:
                     self.assertEqual(router.exports, 0)

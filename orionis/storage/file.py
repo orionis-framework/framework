@@ -1,18 +1,18 @@
+# ruff: noqa: TC001, TC003
+# Keep storage protocol and native annotations available for runtime reflection.
 """Represent a single file on a storage disk."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from collections.abc import AsyncIterable, AsyncIterator
+from datetime import datetime
+from pathlib import Path
 from orionis.storage.contracts.file import IFile
 from orionis.storage.exceptions import StoragePathException
-from orionis.storage.paths import normalizeFilePath
+from orionis.storage.paths import normalize_file_path
+from orionis.storage.contracts.driver import IStorageDriver
+from orionis.storage.contracts.stream import IStorageStream
+from orionis.storage.entities.file_info import FileInfo
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterable, AsyncIterator
-    from datetime import datetime
-    from pathlib import Path
-    from orionis.storage.contracts.driver import IStorageDriver
-    from orionis.storage.contracts.stream import IStorageStream
-    from orionis.storage.entities.file_info import FileInfo
 
 class File(IFile):
     """
@@ -40,7 +40,7 @@ class File(IFile):
         Returns
         -------
         None
-            Initialize the file with its driver and canonical path.
+            No return value.
 
         Raises
         ------
@@ -49,7 +49,7 @@ class File(IFile):
         """
         self._driver = driver
         """Driver of the disk that owns the file."""
-        self._path = normalizeFilePath(path)
+        self._path = normalize_file_path(path)
         """Root-relative file path; normalized on ingestion."""
 
     def path(self) -> str:
@@ -260,12 +260,12 @@ class File(IFile):
         Raises
         ------
         orionis.storage.exceptions.StoragePathException
-            If *name* is empty or contains a directory separator.
+            If *name* is empty, a dot segment, or contains a directory separator.
         orionis.storage.exceptions.StorageFileNotFoundException
             If the source file does not exist.
         """
         # A rename never relocates the file to another directory.
-        if not name or "/" in name or "\\" in name:
+        if not name or name in (".", "..") or "/" in name or "\\" in name:
             error_msg = f"Invalid file name [{name}] for rename."
             raise StoragePathException(error_msg)
 

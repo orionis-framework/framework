@@ -1,21 +1,25 @@
+# ruff: noqa: TC001, TC003
+# Keep callable and argument types available to runtime introspection.
 """Describe the immutable metadata needed to invoke one callable."""
 
 from __future__ import annotations
 import inspect
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import lru_cache
 from types import FunctionType, MethodDescriptorType, MethodType, WrapperDescriptorType
-from typing import TYPE_CHECKING, Self, get_type_hints
+from typing import Self, get_type_hints
 from orionis.introspection.callables.reflection import ReflectionCallable
 from orionis.introspection.concretes.reflection import ReflectionConcrete
+from orionis.introspection.dependencies.entities.argument import Argument
 from orionis.introspection.dependencies.reflection import (
     _build_dependencies,
     _cached_resolved_signature,
+    _get_signature,
+    _register_signature_invalidator,
+    ReflectDependencies,
 )
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.introspection.dependencies.entities.argument import Argument
 
 @dataclass(frozen=True, slots=True)
 class InvocationPlan:
@@ -28,15 +32,15 @@ class InvocationPlan:
         Parameters in declaration order, excluding a bound receiver.
     is_async : bool
         Whether invocation requires awaiting the callable's result.
-
-    Attributes
-    ----------
+    positional_only : frozenset[str]
+        Names whose matching keyword arguments belong to ``**kwargs`` instead.
     has_keyword_only : bool
         Whether resolution needs keyword arguments even for positional calls.
     """
 
     arguments: tuple[Argument, ...]
     is_async: bool
+    positional_only: frozenset[str] = frozenset()
     has_keyword_only: bool = field(init=False)
 
     def __post_init__(self: Self) -> None:
@@ -45,13 +49,35 @@ class InvocationPlan:
         Returns
         -------
         None
-            The keyword-only flag is computed once per cached plan.
+            This method does not return a value.
         """
         object.__setattr__(
             self,
             "has_keyword_only",
             any(argument.is_keyword_only for argument in self.arguments),
         )
+
+
+def _positional_only_names(target: object) -> frozenset[str]:
+    """Read positional-only names from the shared signature cache.
+
+    Parameters
+    ----------
+    target : object
+        Callable whose parameter kinds are being compiled into a plan.
+
+    Returns
+    -------
+    frozenset[str]
+        Parameter names which Python does not bind from keyword arguments.
+    """
+    signature = _get_signature(target)
+    return frozenset(
+        name
+        for name, parameter in signature.parameters.items()
+        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY
+    )
+
 
 @lru_cache(maxsize=1024)
 def _callable_plan(target: Callable, *, bound: bool = False) -> InvocationPlan:
@@ -75,7 +101,9 @@ def _callable_plan(target: Callable, *, bound: bool = False) -> InvocationPlan:
     return InvocationPlan(
         tuple(signature.ordered.values()),
         inspect.iscoroutinefunction(target),
+        positional_only=_positional_only_names(target),
     )
+
 
 def callable_plan(target: Callable) -> InvocationPlan:
     """
@@ -95,6 +123,35 @@ def callable_plan(target: Callable) -> InvocationPlan:
         return _callable_plan(target.__func__, bound=True)
     return _callable_plan(target)
 
+
+def _resolve_constructor_annotation(
+    annotation: str,
+    globalns: dict[str, object],
+    localns: dict[str, object],
+) -> object:
+    """Resolve one class-local constructor hint without rejecting other parameters.
+
+    Parameters
+    ----------
+    annotation : str
+        Deferred annotation from the constructor signature.
+    globalns : dict[str, object]
+        Defining module namespace.
+    localns : dict[str, object]
+        Class namespace including its own name.
+
+    Returns
+    -------
+    object
+        Resolved annotation, or None when its references remain unavailable.
+    """
+    probe = type("_ConstructorHint", (), {"__annotations__": {"value": annotation}})
+    try:
+        return get_type_hints(probe, globalns=globalns, localns=localns)["value"]
+    except AttributeError, NameError, SyntaxError, TypeError:
+        return None
+
+
 @lru_cache(maxsize=1024)
 def constructor_plan(target: type, constructor: object) -> InvocationPlan:
     """
@@ -113,22 +170,25 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
         Shared constructor parameters with resolvable class-local types restored.
     """
     ReflectionConcrete(target)
-    signature = _cached_resolved_signature(constructor)
-    annotations = getattr(constructor, "__annotations__", {})
+    signature = ReflectDependencies(target).constructorSignature()
+    positional_only = _positional_only_names(constructor)
+    raw_signature = _get_signature(constructor)
     unresolved_names = tuple(
         name
-        for name, value in annotations.items()
-        if name != "return"
-        and isinstance(value, str)
+        for name, parameter in raw_signature.parameters.items()
+        if isinstance(parameter.annotation, str)
         and (argument := signature.ordered.get(name)) is not None
         and argument.module_name == "typing"
         and argument.type is str
     )
     if not unresolved_names:
-        return InvocationPlan(tuple(signature.ordered.values()), is_async=False)
+        return InvocationPlan(
+            tuple(signature.ordered.values()),
+            is_async=False,
+            positional_only=positional_only,
+        )
 
     # Resolve remaining class-local references in the constructor namespace.
-    raw_signature = inspect.signature(constructor)
     module = inspect.getmodule(constructor)
     globalns = vars(module) if module is not None else {}
     localns = dict(vars(target))
@@ -136,6 +196,8 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
     parameters = []
     changed = False
     for parameter in raw_signature.parameters.values():
+        if parameter.name not in signature.ordered:
+            continue
         hint = parameter.annotation
         updated = parameter
         dependency = signature.ordered.get(parameter.name)
@@ -150,22 +212,7 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
         if parameter.name not in unresolved_names:
             parameters.append(updated)
             continue
-        probe = type(
-            "_ConstructorHint",
-            (),
-            {
-                "__annotations__": {"value": hint},
-            },
-        )
-        try:
-            resolved = get_type_hints(
-                probe,
-                globalns=globalns,
-                localns=localns,
-            )["value"]
-        except AttributeError, NameError, SyntaxError, TypeError:
-            parameters.append(updated)
-            continue
+        resolved = _resolve_constructor_annotation(hint, globalns, localns)
         if isinstance(resolved, type):
             updated = parameter.replace(annotation=resolved)
             changed = True
@@ -174,7 +221,27 @@ def constructor_plan(target: type, constructor: object) -> InvocationPlan:
     if changed:
         raw_signature = raw_signature.replace(parameters=parameters)
         signature = _build_dependencies(raw_signature)
-    return InvocationPlan(tuple(signature.ordered.values()), is_async=False)
+    return InvocationPlan(
+        tuple(signature.ordered.values()),
+        is_async=False,
+        positional_only=positional_only,
+    )
+
+
+def _clear_invocation_plans() -> None:
+    """Discard plans derived from explicitly invalidated reflection metadata.
+
+    Returns
+    -------
+    None
+        No return value.
+    """
+    _callable_plan.cache_clear()
+    constructor_plan.cache_clear()
+
+
+_register_signature_invalidator("orionis.container.invocation", _clear_invocation_plans)
+
 
 def warm_controller_plan(target: type, method_name: str) -> None:
     """
@@ -190,7 +257,7 @@ def warm_controller_plan(target: type, method_name: str) -> None:
     Returns
     -------
     None
-        Standard descriptor plans are cached; custom descriptors remain lazy.
+        This function does not return a value.
 
     Notes
     -----

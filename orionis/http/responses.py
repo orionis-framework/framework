@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401, C901, PLR0913, PLR2004
+# Keep established public and external protocol names and signatures.
 """Provide http operations.
 
 Includes ``Response``, ``ResponseTemplate``, ``HTMLResponse``,
@@ -23,15 +25,17 @@ from uuid import UUID
 import msgspec.json as _msgspec_json
 from orionis.background.task import BackgroundTask
 from orionis.http.adapters.response.files import complete_file_read, open_file
+from orionis.http.adapters.response.streams import _SyncStreamIterator
 from orionis.http.contracts.response import IResponse
+from orionis.http.payload.estructures.headers import _validate_header
 from orionis.http.sse import ServerSentEvent, _EventStreamIterator
 from orionis.session.flash import _FlashData
 
 if TYPE_CHECKING:
     from orionis.http.enums.status import HTTPStatus
 
+
 class Response(_FlashData, IResponse):
-    # ruff: noqa: ANN401, C901, PLR0913, PLR2004
     """Represent an HTTP response with status, headers, cookies and body."""
 
     __slots__ = (
@@ -214,6 +218,7 @@ class Response(_FlashData, IResponse):
         key_lower = key.lower()
         cached = self._raw_headers
         if cached is not None:
+            _validate_header(key_lower, value)
             self._raw_headers = (
                 None
                 if key_lower in self._headers
@@ -295,11 +300,12 @@ class Response(_FlashData, IResponse):
         for key, values in self._headers.items():
             encoded_key = key.encode("latin-1")
             if isinstance(values, str):
+                _validate_header(key, values)
                 result.append((encoded_key, values.encode("latin-1")))
             else:
-                result.extend(
-                    (encoded_key, value.encode("latin-1")) for value in values
-                )
+                for value in values:
+                    _validate_header(key, value)
+                    result.append((encoded_key, value.encode("latin-1")))
         return result
 
     def getStringHeaders(self: Self) -> list[tuple[str, str]]:
@@ -314,9 +320,12 @@ class Response(_FlashData, IResponse):
         result = []
         for key, values in self._headers.items():
             if isinstance(values, str):
+                _validate_header(key, values)
                 result.append((key, values))
             else:
-                result.extend((key, value) for value in values)
+                for value in values:
+                    _validate_header(key, value)
+                    result.append((key, value))
         return result
 
     def setCookie(  # NOSONAR
@@ -635,6 +644,7 @@ class Response(_FlashData, IResponse):
         """
         return self.media_type
 
+
 @dataclass(frozen=True, slots=True, init=False)
 class ResponseTemplate:
     """
@@ -737,6 +747,7 @@ class ResponseTemplate:
         response._raw_headers = self._raw_headers
         return response
 
+
 class HTMLResponse(Response):
     """Render an HTML response with the corresponding content type."""
 
@@ -786,6 +797,7 @@ class HTMLResponse(Response):
         elif not self.hasHeader("content-type"):
             self.setHeader("content-type", self._CONTENT_TYPE)
 
+
 class PlainTextResponse(Response):
     """Return a plain-text HTTP response."""
 
@@ -834,6 +846,7 @@ class PlainTextResponse(Response):
             self._headers["content-type"] = self._CONTENT_TYPE
         elif not self.hasHeader("content-type"):
             self.setHeader("content-type", self._CONTENT_TYPE)
+
 
 class JSONResponse(Response):
     """Encode a JSON response while preserving response metadata."""
@@ -999,6 +1012,7 @@ class JSONResponse(Response):
         error_msg = f"Object of type {type(obj).__name__} is not JSON serializable"
         raise TypeError(error_msg)
 
+
 class RedirectResponse(Response):
     """Return an HTTP redirect to the configured location."""
 
@@ -1060,6 +1074,7 @@ class RedirectResponse(Response):
             self.setHeader("location", url)
             if not self.hasHeader("content-type"):
                 self.setHeader("content-type", self._CONTENT_TYPE)
+
 
 class StreamingResponse(Response):
     """Stream response chunks without buffering the complete body."""
@@ -1140,7 +1155,7 @@ class StreamingResponse(Response):
                     else media_type,
                 )
 
-    async def _wrapSyncIterable(
+    def _wrapSyncIterable(
         self: Self,
         iterable: Iterable[bytes],
     ) -> AsyncIterable[bytes]:
@@ -1162,15 +1177,8 @@ class StreamingResponse(Response):
         TypeError
             If any chunk in the iterable is not bytes-like.
         """
-        for chunk in iterable:
-            # Yield immutable bytes and convert mutable buffers.
-            if isinstance(chunk, bytes):
-                yield chunk
-            elif isinstance(chunk, (bytearray, memoryview)):
-                yield bytes(chunk)
-            else:
-                error_msg = "StreamingResponse chunks must be bytes"
-                raise TypeError(error_msg)
+        return _SyncStreamIterator(iterable)
+
 
 class EventStreamResponse(StreamingResponse):
     """Stream typed server-sent events through the existing response transport."""
@@ -1265,6 +1273,7 @@ class EventStreamResponse(StreamingResponse):
         if "content-length" in self._headers:
             return [pair for pair in headers if pair[0] != "content-length"]
         return headers
+
 
 class FileResponse(StreamingResponse):
     """Serve a filesystem resource through an HTTP response."""

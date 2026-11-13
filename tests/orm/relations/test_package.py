@@ -17,6 +17,7 @@ EXPECTED_EXPORTS = {
     "RelationsMixin": ("orionis.orm.relations.mixin", "RelationsMixin"),
 }
 
+
 class TestRelationsPackage(TestCase):
     """Verify the orionis.orm.relations public export surface."""
 
@@ -26,6 +27,6 @@ class TestRelationsPackage(TestCase):
         Returns
         -------
         None
-            Verify exact exported names and identities without shadowing modules.
+            No return value.
         """
         assert_package_exports(self, "orionis.orm.relations", EXPECTED_EXPORTS)

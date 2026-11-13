@@ -1,9 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.mail.entities.address import Address, addresses, one_address
 from orionis.mail.exceptions import MailCompositionException
 from orionis.test import TestCase
 
-class TestAddress(TestCase):
 
+class TestAddress(TestCase):
     def testPreservesLocalCaseAndNormalizesDomains(self) -> None:
         """Deduplicate mailboxes by their normalized addr-spec.
 

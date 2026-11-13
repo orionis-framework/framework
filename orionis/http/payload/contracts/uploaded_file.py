@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from pathlib import Path
 
+
 class IUploadedFile(ABC):
     """
     Define the contract for an uploaded file held in memory or on disk.

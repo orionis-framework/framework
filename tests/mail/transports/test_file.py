@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import os
 import threading
@@ -25,6 +27,7 @@ _PREPARED = PreparedMail(
     mime=_PAYLOAD,
     smtp_utf8=False,
 )
+
 
 class PublicationBoundary:
     """Inject failures around publication while keeping real filesystem writes."""
@@ -121,6 +124,7 @@ class PublicationBoundary:
             raise OSError(error_msg)
         os.link(temporary, final)
 
+
 class ObservedFileTransport(FileTransport):
     """Expose completion of the worker, including its temporary cleanup."""
 
@@ -160,8 +164,8 @@ class ObservedFileTransport(FileTransport):
         finally:
             self.finished.set()
 
-class TestFileTransport(TestCase):
 
+class TestFileTransport(TestCase):
     def setUp(self) -> None:
         """Isolate the output and cwd, replacing publication primitives.
 

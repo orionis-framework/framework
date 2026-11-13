@@ -45,7 +45,7 @@ Las variantes de texto aceptan `length` y `collation`; `StrictVarChar` usa longi
 
 ## Modificadores comunes
 
-Todos los tipos de columna ofrecen `.primary()`, `.nullable()`, `.default(value)`, `.unique()`, `.index()`, `.foreign("table.column")`, `.autoIncrement()` y `.comment(text)`. Devuelven la misma definición; evita compartir una definición mutable entre columnas distintas.
+Todos los tipos de columna ofrecen `.primary()`, `.nullable()`, `.default(value)`, `.unique()`, `.index()`, `.foreign("table.column")`, `.autoIncrement()` y `.comment(text)`. Devuelven la misma definición. Las declaraciones inline copian cada definición de columna al vincularla con un modelo y atributo, de modo que reutilizarla no renombra una columna de otro modelo. Los objetos `TableDefinition` explícitos todavía contienen definiciones de columna mutables; conserva estable una definición compilada y crea otra versión para cambiarla.
 
 `default` admite un valor estático o callable sin argumentos evaluado al insertar por el flujo compatible. No equivale a una expresión SQL de default arbitraria. `hasDefault()` distingue un default explícito, incluso `None`, de ausencia de default. `.foreign()` acepta exactamente `table.column`; para esquemas o claves compuestas usa las estructuras adecuadas en vez de inventar una cadena con más segmentos.
 

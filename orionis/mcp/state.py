@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Runtime constructor annotations are consumed by Orionis' native DI container.
 """Seal state across workers sharing an application key and GCM cipher."""
 
 import hashlib
@@ -9,8 +11,6 @@ from orionis.foundation.contracts.application import IApplication
 from orionis.mcp.context import McpRequest, mutable_json
 from orionis.mcp.exceptions import McpInvalidParams
 
-# Runtime constructor annotations are consumed by Orionis' native DI container.
-# ruff: noqa: TC001
 
 class _State(msgspec.Struct, frozen=True):
     """Authenticate the complete structured envelope before exposing state."""
@@ -26,10 +26,12 @@ class _State(msgspec.Struct, frozen=True):
     value: object
     """Payload retained for subsequent resolution or restoration."""
 
+
 _STATE_DECODER = msgspec.json.Decoder(_State)
 """State decoder used by ``state``."""
 _INVALID_STATE = "Invalid request state"
 """Invalid state identifier: ``Invalid request state``."""
+
 
 class McpState:
     """Seal state across workers sharing an application key and GCM cipher."""
@@ -119,6 +121,7 @@ class McpState:
             raise McpInvalidParams(_INVALID_STATE) from exc
         raise McpInvalidParams(_INVALID_STATE)
 
+
 def _fingerprint(request: McpRequest) -> str:
     """
     Bind state to stable request parameters, excluding retry and trace fields.
@@ -146,6 +149,7 @@ def _fingerprint(request: McpRequest) -> str:
     encoded = msgspec.json.encode(data, order="deterministic")
     return hashlib.sha256(encoded).hexdigest()
 
+
 def _principal(request: McpRequest) -> str:
     """
     Bind native guard, identity type, identifier and credential without coercion.
@@ -164,13 +168,13 @@ def _principal(request: McpRequest) -> str:
     identity = authentication.identity
     data = {
         "guard": authentication.guard,
-        "type": None if identity is None else (
-            f"{type(identity).__module__}.{type(identity).__qualname__}"
-        ),
+        "type": None
+        if identity is None
+        else (f"{type(identity).__module__}.{type(identity).__qualname__}"),
         "identifier": authentication.identifier(),
         "credential": authentication.credentialId,
-        "abilities": None if authentication.abilities is None else (
-            sorted(authentication.abilities)
-        ),
+        "abilities": None
+        if authentication.abilities is None
+        else (sorted(authentication.abilities)),
     }
     return hashlib.sha256(msgspec.json.encode(data, order="deterministic")).hexdigest()

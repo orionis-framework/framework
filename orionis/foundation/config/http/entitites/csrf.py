@@ -10,6 +10,7 @@ from orionis.support.entities.base import BaseEntity
 _MIN_TOKEN_LENGTH = 32
 """Min token length value used by ``csrf``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class HTTPCsrf(BaseEntity):
     """

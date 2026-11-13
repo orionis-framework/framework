@@ -10,6 +10,7 @@ from orionis.foundation.core_paths import CORE_APP_PATHS
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
+
 def application_path(app: IApplication, key: str) -> Path:
     """
     Resolve an effective application path with the framework default.
@@ -39,6 +40,7 @@ def application_path(app: IApplication, key: str) -> Path:
         error_msg = f"Application path '{key}' is not a filesystem path."
         raise TypeError(error_msg)
     return (app.basePath / configured).absolute()
+
 
 def display_path(app: IApplication, path: Path) -> str:
     """

@@ -73,8 +73,9 @@ assert config.autoescape is True
 
 ## Errores y casos límite
 
-- Las plantillas ausentes conservan `ViewTemplateNotFoundException`; los demás fallos del render pendiente se envuelven en `ViewRenderException` preservando su causa.
-- El motor envuelve los errores de plantilla Jinja en `ViewRenderException`.
+- Las plantillas ausentes conservan `ViewTemplateNotFoundException`; una `ViewRenderException` existente se propaga intacta. Los demás fallos inesperados del render pendiente se envuelven en `ViewRenderException` preservando su causa.
+- Los errores de plantilla Jinja durante carga, compilación o renderizado se envuelven una vez en `ViewRenderException`, conservando su causa nativa.
+- Una cola de workers de plantillas llena lanza `WorkQueueFullError`; el llamador puede aplicar su política de saturación.
 - Atributos encadenados desconocidos de `PendingView` lanzan `AttributeError`; solo pueden ponerse en cola atributos invocables de `HTMLResponse`.
 - Las operaciones flash no hacen nada si no está disponible el servicio de sesión.
 - `errors.first()` devuelve el primer mensaje disponible y la bolsa normaliza mensajes escalares a listas.
@@ -88,9 +89,9 @@ assert config.autoescape is True
 
 ## Rendimiento y concurrencia
 
-El entorno, el motor y la fábrica son singletons. Jinja conserva hasta `cache_size` plantillas compiladas en memoria y opcionalmente persiste bytecode en disco. Los nombres de caché incluyen el nombre aplanado y legible más un digest SHA-1 de ocho caracteres para evitar colisiones de extensiones o rutas.
+El entorno, el motor y la fábrica son singletons. Jinja conserva hasta `cache_size` plantillas compiladas en memoria y opcionalmente persiste bytecode en disco. Los nombres de caché combinan el nombre aplanado y legible con un digest SHA-1 de ocho caracteres para distinguir nombres que producen el mismo prefijo. Se normalizan los caracteres y dispositivos reservados de Windows para mantener cada archivo generado dentro del directorio configurado. El digest truncado no garantiza ausencia de colisiones.
 
-La normalización de nombres usa una caché LRU protegida por bloqueo y limitada a 1.024 entradas. Los planes de interpolación de rutas con nombre se memoizan; hilos en carrera solo pueden calcular y almacenar el mismo valor determinista. El renderizado es asíncrono, mientras el entorno compartido solo se modifica durante el arranque. Registra globals, filtros, tests y extensiones personalizados al arrancar proveedores, no durante peticiones concurrentes.
+La normalización de nombres usa una caché limitada a 1.024 entradas, con inserción y expulsión protegidas por un bloqueo. Expulsa el nombre insertado más antiguo (FIFO); los aciertos no cambian ese orden. Los planes de interpolación de rutas con nombre usan una caché LRU independiente limitada a 1.024 entradas. Los hilos en carrera pueden compilar varias veces el mismo plan ausente mientras la caché se mantiene coherente; cada plan es una función pura de la plantilla de ruta. El renderizado es asíncrono, mientras el entorno compartido solo se modifica durante el arranque. Registra globals, filtros, tests y extensiones personalizados al arrancar proveedores, no durante peticiones concurrentes.
 
 
 
@@ -118,7 +119,7 @@ assert key != cache.getCacheKey("users/profile.j2")
 
 | Ruta | Responsabilidad |
 | --- | --- |
-| `cache.py` | Nombres legibles y resistentes a colisiones para bytecode Jinja2. |
+| `cache.py` | Nombres de bytecode Jinja2 portables y legibles con digest de desambiguación. |
 | `contracts/` | Interfaces de entorno, motor y fábrica. |
 | `engine.py` | Renderizado Jinja2 asíncrono y normalización de nombres. |
 | `environment.py` | Configuración de loaders, escape y cachés en memoria/disco. |

@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class DiskName(StrEnum):
     """
     Enumerate the built-in filesystem disk names supported by Orionis.

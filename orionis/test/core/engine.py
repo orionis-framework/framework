@@ -1,23 +1,27 @@
+# ruff: noqa: TC001
+# Keep the application contract available for runtime dependency injection.
 """Discover configured tests, execute them and persist optional result caches."""
 
 import asyncio
 import fnmatch
 import json
 import os
+import re
 import sys
 import time
 import unittest
-from typing import Self, TYPE_CHECKING
+from typing import NoReturn, Self, TYPE_CHECKING
+from uuid import uuid4
 from orionis.foundation.contracts.application import IApplication
-from orionis.test.cases.case import TestCase
+from orionis.test.cases.case import _METHOD_PATTERN
 from orionis.test.contracts.engine import ITestingEngine
 from orionis.test.executors.runner import TestRunner
-from orionis.test.executors.results import TestResultProcessor
 from pathlib import Path
 
 if TYPE_CHECKING:
     from collections.abc import Generator
     from orionis.test.entities.result import TestResult
+    from orionis.test.executors.results import TestResultProcessor
 
 # Fallbacks mirroring orionis.foundation.config.testing.Testing, applied when a
 # configuration key is absent (app.config returns None for unknown keys).
@@ -33,9 +37,71 @@ _DEFAULT_FILE_PATTERN: str = "test_*.py"
 _DEFAULT_METHOD_PATTERN: str = "test*"
 """Default method pattern identifier: ``test*``."""
 
-class TestingEngine(ITestingEngine):
 
-    # ruff: noqa: TC001
+def _raise_discovery_error(error: OSError) -> NoReturn:
+    """Propagate traversal errors instead of silently omitting test directories.
+
+    Parameters
+    ----------
+    error : OSError
+        Filesystem error reported while walking the discovery tree.
+
+    Returns
+    -------
+    typing.NoReturn
+        No value is returned because the supplied exception is always raised.
+
+    Raises
+    ------
+    OSError
+        Always propagate the original filesystem error.
+    """
+    raise error
+
+
+class _PatternTestLoader(unittest.TestLoader):
+    """Filter short method names before constructing test case instances."""
+
+    def __init__(self, matcher: re.Pattern[str]) -> None:
+        """Store the configured matcher and accept any method prefix.
+
+        Parameters
+        ----------
+        matcher : re.Pattern[str]
+            Compiled shell-style pattern for individual method names.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        super().__init__()
+        self.testMethodPrefix = ""
+        """Allow the configured matcher to select any method prefix."""
+        self.__matcher = matcher
+        """Compiled pattern selecting short test method names."""
+
+    def getTestCaseNames(self, test_case_class: type[unittest.TestCase]) -> list[str]:
+        """Return callable methods matching the configured short-name pattern.
+
+        Parameters
+        ----------
+        test_case_class : type[unittest.TestCase]
+            Class whose test method names are selected.
+
+        Returns
+        -------
+        list[str]
+            Matching names in the native loader's configured order.
+        """
+        return [
+            name
+            for name in super().getTestCaseNames(test_case_class)
+            if self.__matcher.match(name) is not None
+        ]
+
+
+class TestingEngine(ITestingEngine):
     """Discover configured tests, execute them and persist optional result caches."""
 
     def __init__(
@@ -66,17 +132,17 @@ class TestingEngine(ITestingEngine):
         # Retrieve configuration values from the application instance.
         self.__base_path: Path = app.basePath
         """Retrieve configuration values from the application instance."""
-        self.__verbosity: int = (
-            _DEFAULT_VERBOSITY if verbosity is None else verbosity
-        )
+        self.__verbosity: int = _DEFAULT_VERBOSITY if verbosity is None else verbosity
         """Configured detail level for test-runner output."""
         self.__fail_fast: bool = app.config("testing.fail_fast") in [
-            1, True, "1", "true", "True",
+            1,
+            True,
+            "1",
+            "true",
+            "True",
         ]
         """Whether the test run stops after the first failure."""
-        self.__start_dir: str = (
-            app.config("testing.start_dir") or _DEFAULT_START_DIR
-        )
+        self.__start_dir: str = app.config("testing.start_dir") or _DEFAULT_START_DIR
         """Directory from which test discovery begins."""
         self.__file_pattern: str = (
             app.config("testing.file_pattern") or _DEFAULT_FILE_PATTERN
@@ -88,9 +154,7 @@ class TestingEngine(ITestingEngine):
         """Method-name pattern selecting test cases."""
         self.__json_cache: bool = bool(app.config("testing.cache_results"))
         """Json cache produced by ``bool``."""
-        self.__cache_folder: Path = (
-            app.path("storage_framework") / "cache" / "testing"
-        )
+        self.__cache_folder: Path = app.path("storage_framework") / "cache" / "testing"
         """Directory used to persist structured test-run results."""
         self.__with_panel: bool = True  # Default to showing the start panel
         """With panel flag used by ``TestingEngine``."""
@@ -131,12 +195,13 @@ class TestingEngine(ITestingEngine):
 
     def setStartDir(self, start_dir: str) -> Self:
         """
-        Set the start directory for test discovery.
+        Set the directory or Python file used for test discovery.
 
         Parameters
         ----------
         start_dir : str
-            Directory to start test discovery from.
+            Directory or Python file, relative to the application root when
+            not absolute.
 
         Returns
         -------
@@ -177,11 +242,7 @@ class TestingEngine(ITestingEngine):
         typing.Self
             Returns self for method chaining.
         """
-        # Update the method pattern in TestCase to ensure
-        # test methods are correctly identified.
-        TestCase.setMethodPattern(method_pattern)
-
-        # Update the method pattern in the engine for internal use.
+        # Apply this pattern only while discovering this engine's own cases.
         self.__method_pattern = method_pattern
         return self
 
@@ -198,7 +259,8 @@ class TestingEngine(ITestingEngine):
         return self
 
     def __extractTests(
-        self, test_suite: unittest.TestSuite,
+        self,
+        test_suite: unittest.TestSuite,
     ) -> Generator[unittest.TestCase]:
         """
         Extract individual test cases from a test suite recursively.
@@ -208,10 +270,10 @@ class TestingEngine(ITestingEngine):
         test_suite : unittest.TestSuite
             Test suite to extract test cases from.
 
-        Returns
-        -------
-        collections.abc.Generator[unittest.TestCase, None, None]
-            Generator yielding individual test cases.
+        Yields
+        ------
+        unittest.TestCase
+            Individual test case contained in the suite.
         """
         # Recursively extract test cases from nested suites.
         for test in test_suite:
@@ -219,6 +281,42 @@ class TestingEngine(ITestingEngine):
                 yield from self.__extractTests(test)
             else:
                 yield test
+
+    def __testFiles(self, start_path: Path) -> Generator[Path]:
+        """Yield matching Python files without traversing an explicit file path.
+
+        Parameters
+        ----------
+        start_path : pathlib.Path
+            Existing directory or Python file selected for discovery.
+
+        Yields
+        ------
+        pathlib.Path
+            File to import as a test module.
+
+        Raises
+        ------
+        ValueError
+            If an explicitly selected file does not have a Python extension.
+        OSError
+            If the discovery tree cannot be read.
+        """
+        if start_path.is_file():
+            if start_path.suffix != ".py":
+                message = "Test discovery requires a directory or Python file."
+                raise ValueError(message)
+            yield start_path
+            return
+
+        for directory, directories, filenames in os.walk(
+            start_path,
+            onerror=_raise_discovery_error,
+        ):
+            directories.sort()
+            for filename in sorted(filenames):
+                if fnmatch.fnmatch(filename, self.__file_pattern):
+                    yield Path(directory) / filename
 
     def discover(self) -> unittest.TestSuite:
         """
@@ -231,47 +329,67 @@ class TestingEngine(ITestingEngine):
 
         Raises
         ------
+        OSError
+            If the selected path is absent or a directory cannot be read.
+        ValueError
+            If the selected path is outside the application or is not Python.
+        ImportError
+            If a matching module was imported from another project directory.
         Exception
             If a test module raises an exception outside loader error handling.
         """
         # Resolve the project root before deriving module names from test paths.
-        top_level_dir: str = self.__base_path.resolve().as_posix()
+        base_path = self.__base_path.resolve()
+        top_level_dir: str = base_path.as_posix()
         if top_level_dir not in sys.path:
             sys.path.insert(0, top_level_dir)
 
-        start_dir_abs: Path = Path(self.__start_dir).resolve()
+        start_path = (base_path / self.__start_dir).resolve(strict=True)
+        start_path.relative_to(base_path)
 
         # Use a fresh TestLoader to avoid shared state in defaultTestLoader.
-        loader: unittest.TestLoader = unittest.TestLoader()
+        matcher = re.compile(fnmatch.translate(self.__method_pattern))
+        loader = _PatternTestLoader(matcher)
         filtered_suite: unittest.TestSuite = unittest.TestSuite()
 
-        # Walk the entire directory tree so subdirectories without __init__.py
-        # are also traversed (unittest.discover() skips them by default).
-        for dirpath, _dirs, filenames in os.walk(start_dir_abs):
-            for filename in filenames:
-                if not fnmatch.fnmatch(filename, self.__file_pattern):
-                    continue
-                filepath = Path(dirpath) / filename
-                rel = os.path.relpath(filepath.with_suffix(""), top_level_dir)
-                module_name: str = rel.replace(os.sep, ".").replace("/", ".")
+        # Construct cases with this engine's matcher and restore the caller's
+        # context even if loading a module fails.
+        token = _METHOD_PATTERN.set(matcher)
+        try:
+            for filepath in self.__testFiles(start_path):
+                relative = filepath.with_suffix("").relative_to(base_path)
+                module_name = ".".join(relative.parts)
                 errors_before = len(loader.errors)
                 tests = loader.loadTestsFromName(module_name)
                 # Preserve loader failures regardless of the method filter.
                 if len(loader.errors) != errors_before:
                     filtered_suite.addTests(tests)
                     continue
+                module_file = getattr(sys.modules.get(module_name), "__file__", None)
+                if (
+                    module_file is None
+                    or Path(module_file).resolve() != filepath.resolve()
+                ):
+                    message = (
+                        f"Test module {module_name!r} was imported from "
+                        f"{module_file!r}, but discovery selected {str(filepath)!r}."
+                    )
+                    raise ImportError(message)
                 for test_case in self.__extractTests(tests):
                     method_name = getattr(test_case, "_testMethodName", None)
                     if method_name and fnmatch.fnmatch(
-                        method_name, self.__method_pattern,
+                        method_name,
+                        self.__method_pattern,
                     ):
                         filtered_suite.addTest(test_case)
+        finally:
+            _METHOD_PATTERN.reset(token)
 
         return filtered_suite
 
-    async def __saveCache(self, results: list[TestResult]) -> None:
+    def __saveCache(self, results: list[TestResult]) -> None:
         """
-        Save test results to a JSON cache file asynchronously.
+        Save test results to an independent JSON cache file.
 
         Parameters
         ----------
@@ -283,26 +401,14 @@ class TestingEngine(ITestingEngine):
         None
             This method does not return a value.
         """
-        # If JSON caching is disabled, skip saving.
-        if not self.__json_cache:
-            return
-
         # Ensure the cache folder exists
         self.__cache_folder.mkdir(parents=True, exist_ok=True)
 
         data = [result.toDict() for result in results]
         timestamp = int(time.time())
-        full_path = self.__cache_folder / f"{timestamp}.json"
-
-        # Offload blocking file-write to a thread pool to keep the event loop free.
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(
-            None,
-            lambda: full_path.write_text(
-                json.dumps(data, indent=4, default=str),
-                encoding="utf-8",
-            ),
-        )
+        full_path = self.__cache_folder / f"{timestamp}-{uuid4().hex}.json"
+        with full_path.open("x", encoding="utf-8") as stream:
+            json.dump(data, stream, indent=4, default=str)
 
     async def run(self) -> list[TestResult]:
         """
@@ -329,10 +435,8 @@ class TestingEngine(ITestingEngine):
         )
 
         # Offload the synchronous runner to a thread pool to avoid blocking the loop.
-        loop = asyncio.get_running_loop()
-        result: TestResultProcessor = await loop.run_in_executor(
-            None, runner.run, suite,
-        )
+        result: TestResultProcessor = await asyncio.to_thread(runner.run, suite)
         results = result.getTestResults()
-        await self.__saveCache(results)
+        if self.__json_cache:
+            await asyncio.to_thread(self.__saveCache, results)
         return results

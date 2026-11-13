@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from unittest.mock import AsyncMock, MagicMock
@@ -5,8 +7,8 @@ from orionis.console.contracts.schedule import ISchedule
 from orionis.console.tasks.schedule import Schedule
 from orionis.test import TestCase
 
-class TestIScheduleContract(TestCase):
 
+class TestIScheduleContract(TestCase):
     @staticmethod
     def _makeStores() -> MagicMock:
         """
@@ -545,8 +547,8 @@ class TestIScheduleContract(TestCase):
                 member,
                 msg=f"Schedule is missing implementation for '{name}'",
             )
-            is_concrete = (
-                inspect.isfunction(member) or inspect.iscoroutinefunction(member)
+            is_concrete = inspect.isfunction(member) or inspect.iscoroutinefunction(
+                member,
             )
             self.assertTrue(
                 is_concrete,

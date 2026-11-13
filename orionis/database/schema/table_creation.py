@@ -1,11 +1,11 @@
+# ruff: noqa: E402, SLF001, TC001, TC003
+# Share the schema creation boundary and expose traceback annotations at runtime.
+# Resolve the schema module after defining its context to preserve the cyclic API.
 """Async context manager returned by ``Schema.create``."""
 
-from typing import TYPE_CHECKING
+from types import TracebackType
 from orionis.database.schema.blueprint import Blueprint
 
-if TYPE_CHECKING:
-    from types import TracebackType
-    from orionis.database.schema.schema import Schema
 
 class TableCreation:
     """
@@ -22,7 +22,7 @@ class TableCreation:
 
     def __init__(
         self,
-        schema: Schema,
+        schema: schema_module.Schema,
         name: str,
     ) -> None:
         """
@@ -38,7 +38,7 @@ class TableCreation:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.__schema = schema
         """The schema instance that will perform the creation."""
@@ -55,7 +55,15 @@ class TableCreation:
         -------
         orionis.database.schema.Blueprint
             Collector used to declare columns via method calls.
+
+        Raises
+        ------
+        RuntimeError
+            If this context already owns an unfinished declaration.
         """
+        if self.__blueprint is not None:
+            message = "This table declaration is already active."
+            raise RuntimeError(message)
         self.__blueprint = Blueprint()
         return self.__blueprint
 
@@ -82,9 +90,14 @@ class TableCreation:
         bool
             ``False`` to always propagate exceptions raised in the block.
         """
-        if exc_type is None and self.__blueprint is not None:
-            await self.__schema._createTable(  # noqa: SLF001
+        blueprint = self.__blueprint
+        self.__blueprint = None
+        if exc_type is None and blueprint is not None:
+            await self.__schema._createTable(
                 self.__name,
-                self.__blueprint.definitions(),
+                blueprint.definitions(),
             )
         return False
+
+
+import orionis.database.schema.schema as schema_module

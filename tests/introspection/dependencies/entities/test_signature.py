@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import FrozenInstanceError
 from orionis.introspection.dependencies.entities.argument import Argument
 from orionis.introspection.dependencies.entities.signature import Signature
 from orionis.test import TestCase
+
 
 def _make_argument(name: str = "dep", *, resolved: bool = True) -> Argument:
     """Create a minimal resolved Argument.
@@ -27,6 +30,7 @@ def _make_argument(name: str = "dep", *, resolved: bool = True) -> Argument:
         type=object,
         full_class_path="orionis.services.cache.FileBasedCache",
     )
+
 
 def _make_signature(
     resolved: dict | None = None,
@@ -54,6 +58,7 @@ def _make_signature(
         unresolved=unresolved if unresolved is not None else {},
         ordered=ordered if ordered is not None else {},
     )
+
 
 def _make_typed_argument(
     name: str,
@@ -92,12 +97,13 @@ def _make_typed_argument(
         default=default,
     )
 
+
 # ===========================================================================
 # TestSignature
 # ===========================================================================
 
-class TestSignature(TestCase):
 
+class TestSignature(TestCase):
     def testCanBeInstantiatedWithEmptyDicts(self) -> None:
         """
         Assert that Signature can be created with empty dicts.
@@ -105,7 +111,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = _make_signature()
         self.assertIsInstance(sig, Signature)
@@ -117,7 +123,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument()
         sig = _make_signature(resolved={"dep": arg})
@@ -130,7 +136,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument("missing", resolved=False)
         sig = _make_signature(unresolved={"missing": arg})
@@ -143,7 +149,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument("a")
         sig = _make_signature(ordered={"a": arg})
@@ -156,7 +162,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = _make_signature()
         with self.assertRaises(FrozenInstanceError):
@@ -169,7 +175,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = _make_signature()
         self.assertTrue(sig.noArgumentsRequired())
@@ -181,7 +187,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument()
         sig = _make_signature(ordered={"dep": arg})
@@ -194,7 +200,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument("svc")
         sig = _make_signature(ordered={"svc": arg})
@@ -209,7 +215,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = _make_signature()
         self.assertFalse(sig.hasUnresolvedArguments())
@@ -221,7 +227,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument("x", resolved=False)
         sig = _make_signature(unresolved={"x": arg})
@@ -234,7 +240,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument("svc")
         sig = _make_signature(ordered={"svc": arg})
@@ -249,7 +255,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument("svc")
         ordered = {"svc": arg}
@@ -263,7 +269,7 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument("x")
         sig = _make_signature(ordered={"x": arg})
@@ -278,18 +284,19 @@ class TestSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig1 = _make_signature()
         sig2 = _make_signature()
         self.assertEqual(sig1, sig2)
 
+
 # ===========================================================================
 # TestSignatureAccessors
 # ===========================================================================
 
-class TestSignatureAccessors(TestCase):
 
+class TestSignatureAccessors(TestCase):
     def setUp(self) -> None:
         """
         Build a Signature holding resolved, unresolved and keyword arguments.
@@ -297,7 +304,7 @@ class TestSignatureAccessors(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.res_arg = _make_typed_argument("res", default=1)
         self.unres_arg = _make_typed_argument("unres", resolved=False, default=0)
@@ -319,7 +326,7 @@ class TestSignatureAccessors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         resolved = self.sig.getResolved()
         self.assertIn("res", resolved)
@@ -332,7 +339,7 @@ class TestSignatureAccessors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         unresolved = self.sig.getUnresolved()
         self.assertIn("unres", unresolved)
@@ -345,7 +352,7 @@ class TestSignatureAccessors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(len(self.sig.getAllOrdered()), 3)
 
@@ -356,7 +363,7 @@ class TestSignatureAccessors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.sig.resolvedToDict()
         self.assertIsInstance(result, dict)
@@ -369,7 +376,7 @@ class TestSignatureAccessors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         result = self.sig.unresolvedToDict()
         self.assertIsInstance(result, dict)
@@ -382,7 +389,7 @@ class TestSignatureAccessors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         positional = self.sig.getPositionalOnly()
         self.assertIn("res", positional)
@@ -395,18 +402,19 @@ class TestSignatureAccessors(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         keyword = self.sig.getKeywordOnly()
         self.assertIn("kw", keyword)
         self.assertNotIn("res", keyword)
 
+
 # ===========================================================================
 # TestSignatureValidation
 # ===========================================================================
 
-class TestSignatureValidation(TestCase):
 
+class TestSignatureValidation(TestCase):
     def testResolvedMustBeADict(self) -> None:
         """
         Assert that a non-dict resolved bucket raises TypeError.
@@ -414,7 +422,7 @@ class TestSignatureValidation(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Signature(
@@ -430,7 +438,7 @@ class TestSignatureValidation(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Signature(
@@ -446,7 +454,7 @@ class TestSignatureValidation(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Signature(

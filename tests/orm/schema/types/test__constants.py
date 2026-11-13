@@ -1,3 +1,7 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema constants behavior."""
+
 from orionis.orm.schema.types import StrictDecimal, StrictVarChar, String
 from orionis.orm.schema.types._constants import (
     DEFAULT_DECIMAL_PRECISION,
@@ -5,6 +9,7 @@ from orionis.orm.schema.types._constants import (
     DEFAULT_STRING_LENGTH,
 )
 from orionis.test import TestCase
+
 
 class TestColumnDefaults(TestCase):
     """Verify shared defaults remain valid and consistent across declarations."""
@@ -15,7 +20,7 @@ class TestColumnDefaults(TestCase):
         Returns
         -------
         None
-            Verify positive lengths and a valid shared decimal precision and scale.
+            No return value.
         """
         self.assertGreater(DEFAULT_STRING_LENGTH, 0)
         self.assertEqual(String().length, DEFAULT_STRING_LENGTH)

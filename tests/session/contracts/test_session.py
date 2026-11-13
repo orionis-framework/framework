@@ -1,8 +1,14 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify the public session contract and concrete runtime annotations."""
+
 from __future__ import annotations
-from abc import ABC
+from inspect import isabstract, isfunction
+from typing import get_type_hints
 from orionis.session.contracts.session import ISession
 from orionis.session.session import Session
 from orionis.test import TestCase
+
 
 class TestISessionContract(TestCase):
     """Unit tests for the ISession abstract contract."""
@@ -16,9 +22,9 @@ class TestISessionContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertIn(ABC.__name__, [base.__name__ for base in ISession.__mro__])
+        self.assertTrue(isabstract(ISession))
 
     def testContractCannotBeInstantiated(self) -> None:
         """Reject direct instantiation of the contract.
@@ -29,7 +35,7 @@ class TestISessionContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ISession()  # type: ignore[abstract]
@@ -43,7 +49,7 @@ class TestISessionContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ISession.__slots__, ())
 
@@ -56,7 +62,7 @@ class TestISessionContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(Session(), ISession)
 
@@ -69,7 +75,7 @@ class TestISessionContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Session.__abstractmethods__, frozenset())
 
@@ -82,7 +88,7 @@ class TestISessionContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(Session(), "__dict__"))
 
@@ -95,7 +101,7 @@ class TestISessionContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         expected = {
             "all",
@@ -122,3 +128,10 @@ class TestISessionContract(TestCase):
             "wantsRegenerate",
         }
         self.assertEqual(set(ISession.__abstractmethods__), expected)
+
+        for owner in (ISession, Session):
+            for name, member in vars(owner).items():
+                method = member.fget if isinstance(member, property) else member
+                if isfunction(method) and name != "__annotate_func__":
+                    with self.subTest(owner=owner.__name__, method=name):
+                        self.assertTrue(get_type_hints(method))

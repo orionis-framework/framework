@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeMail(MakeStubCommand):
     """Generate a reusable Mailable class."""
 
@@ -19,4 +20,3 @@ class MakeMail(MakeStubCommand):
     """Success label identifier: ``Mail``."""
     postfix: str | None = "Mail"
     """Postfix identifier: ``Mail``."""
-

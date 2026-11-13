@@ -1,3 +1,6 @@
+# ruff: noqa: BLE001, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Handle built-in profile and password-management endpoints."""
 
 from typing import cast
@@ -10,9 +13,8 @@ from orionis.http import HTMLResponse, RedirectResponse, response
 from orionis.http.base import BaseController
 from orionis.http.default.schemas.change_password import ChangePasswordSchema
 
-class ProfileController(BaseController):
 
-    # ruff: noqa: TC001, BLE001
+class ProfileController(BaseController):
     """Handle built-in profile and password-management endpoints."""
 
     async def index(self, auth: IAuthManager) -> HTMLResponse:
@@ -87,9 +89,11 @@ class ProfileController(BaseController):
 
         # Reject the change without disclosing anything about the stored hash.
         if not valid:
-            return response.redirect(redirect_to).withErrors({
-                "current_password": "The current password is incorrect.",
-            })
+            return response.redirect(redirect_to).withErrors(
+                {
+                    "current_password": "The current password is incorrect.",
+                },
+            )
 
         # Hash off the event loop and persist the new credential.
         try:
@@ -103,14 +107,17 @@ class ProfileController(BaseController):
 
         # Report a generic failure when the new hash could not be stored.
         if not saved:
-            return response.redirect(redirect_to).withErrors({
-                "password": "The password could not be updated. Please try again.",
-            })
+            return response.redirect(redirect_to).withErrors(
+                {
+                    "password": "The password could not be updated. Please try again.",
+                },
+            )
 
         # The session guard rotates both the session identifier and CSRF token.
         await auth.login(user)
 
         # Confirm the change with a flash message on the profile page.
         return response.redirect(redirect_to).withFlash(
-            "success", "Your password has been updated.",
+            "success",
+            "Your password has been updated.",
         )

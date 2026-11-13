@@ -3,7 +3,13 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
+from orionis.hashing.hashers.functions import (
+    ARGON2_MAX_COST,
+    ARGON2_MAX_THREADS,
+    ARGON2_MEMORY_PER_THREAD,
+)
 from orionis.support.entities.base import BaseEntity
+
 
 @dataclass(frozen=True, kw_only=True)
 class Argon2(BaseEntity):
@@ -61,7 +67,7 @@ class Argon2(BaseEntity):
         TypeError
             If any cost parameter is not an integer.
         ValueError
-            If any cost parameter is lower than one.
+            If a cost exceeds native bounds or memory is insufficient per lane.
         """
         # Delegate base-class field validation
         super().__post_init__()
@@ -72,11 +78,14 @@ class Argon2(BaseEntity):
             if not isinstance(value, int) or isinstance(value, bool):
                 error_msg = f"The Argon2 '{name}' option must be an integer."
                 raise TypeError(error_msg)
-            if value < 1:
-                error_msg = f"The Argon2 '{name}' option must be at least 1."
+            maximum = ARGON2_MAX_THREADS if name == "threads" else ARGON2_MAX_COST
+            if not 1 <= value <= maximum:
+                error_msg = (
+                    f"The Argon2 '{name}' option must be between 1 and {maximum}."
+                )
                 raise ValueError(error_msg)
 
-        minimum_memory = 8 * self.threads
+        minimum_memory = ARGON2_MEMORY_PER_THREAD * self.threads
         if self.memory < minimum_memory:
             message = "Argon2 memory must be at least 8 KiB per thread."
             raise ValueError(message)

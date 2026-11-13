@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeDatabaseSeeder(MakeStubCommand):
     """Generate an application database seeder."""
 

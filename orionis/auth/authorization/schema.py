@@ -9,6 +9,7 @@ _PERMISSION_ID_COMMENT: str = "Permission ID"
 _ROLE_ID_COMMENT: str = "Role ID"
 """SQL comment shared by role identifier columns."""
 
+
 def build_authorization_tables() -> tuple[TableDefinition, ...]:
     """
     Build role and permission storage in foreign-key dependency order.

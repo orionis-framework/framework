@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import ModuleType
 from orionis import console as console_package
 from orionis.console.args.argument import Argument
@@ -9,8 +11,8 @@ from orionis.test import TestCase
 # Names the package promises to its consumers.
 _PUBLIC_SURFACE: list[str] = ["Argument", "Console", "Dumper", "ProgressBar"]
 
-class TestConsolePackageSurface(TestCase):
 
+class TestConsolePackageSurface(TestCase):
     def testDeclaresTheDocumentedPublicSurface(self) -> None:
         """Declare exactly the documented public exports.
 

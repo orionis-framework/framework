@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.foundation.config.hashing.entities.argon2 import Argon2
 from orionis.foundation.config.hashing.entities.bcrypt import Bcrypt
 from orionis.foundation.config.hashing.entities.hashing import Hashing
@@ -11,8 +13,8 @@ from orionis.hashing.hashers.argon2_hasher import (
 from orionis.hashing.hashers.bcrypt_hasher import DEFAULT_ROUNDS
 from orionis.test import TestCase
 
-class TestHashingDrivers(TestCase):
 
+class TestHashingDrivers(TestCase):
     def testOnlyPasswordHashingAlgorithmsAreSupported(self) -> None:
         """Offer password hashing algorithms exclusively.
 
@@ -22,15 +24,15 @@ class TestHashingDrivers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             sorted(driver.value for driver in Drivers),
             ["argon2", "bcrypt"],
         )
 
-class TestHashingEntity(TestCase):
 
+class TestHashingEntity(TestCase):
     def testDefaultDriverIsArgon2(self) -> None:
         """Select Argon2id for new installations.
 
@@ -39,7 +41,7 @@ class TestHashingEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Hashing().driver, "argon2")
 
@@ -52,7 +54,7 @@ class TestHashingEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Hashing(driver=Drivers.BCRYPT).driver, "bcrypt")
 
@@ -64,7 +66,7 @@ class TestHashingEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         config = Hashing(argon2={"time": 2}, bcrypt={"rounds": 10})
         self.assertIsInstance(config.argon2, Argon2)
@@ -81,7 +83,7 @@ class TestHashingEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Hashing(driver="md5")
@@ -94,7 +96,7 @@ class TestHashingEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Hashing(driver=123)
@@ -107,13 +109,13 @@ class TestHashingEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIn("hashing", CORE_CONFIG)
         self.assertEqual(CORE_CONFIG["hashing"]["driver"], "argon2")
 
-class TestArgon2Entity(TestCase):
 
+class TestArgon2Entity(TestCase):
     def testDefaultsFollowRecommendedCosts(self) -> None:
         """Declare the cost parameters recommended for interactive logins.
 
@@ -122,7 +124,7 @@ class TestArgon2Entity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         options = Argon2()
         self.assertEqual(options.memory, 65536)
@@ -138,7 +140,7 @@ class TestArgon2Entity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         options = Argon2()
         self.assertEqual(options.memory, DEFAULT_MEMORY)
@@ -153,7 +155,7 @@ class TestArgon2Entity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Argon2(time=0)
@@ -166,13 +168,13 @@ class TestArgon2Entity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Argon2(memory="65536")
 
-class TestBcryptEntity(TestCase):
 
+class TestBcryptEntity(TestCase):
     def testDefaultRoundsMatchTheDriverConstant(self) -> None:
         """Declare twelve rounds as the default cost factor.
 
@@ -182,7 +184,7 @@ class TestBcryptEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Bcrypt().rounds, 12)
         self.assertEqual(Bcrypt().rounds, DEFAULT_ROUNDS)
@@ -195,7 +197,7 @@ class TestBcryptEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Bcrypt(rounds=3)
@@ -210,7 +212,7 @@ class TestBcryptEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Bcrypt(rounds="12")

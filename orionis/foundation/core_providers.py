@@ -31,6 +31,7 @@ CORE_PROVIDER_METADATA: tuple[tuple[str, str], ...] = (
 )
 """Core provider metadata definitions used by ``core_providers``."""
 
+
 def get_core_providers_mapping() -> tuple[type[IServiceProvider], ...]:
     """
     Load the built-in provider classes in registration order.
@@ -43,6 +44,7 @@ def get_core_providers_mapping() -> tuple[type[IServiceProvider], ...]:
     return tuple(
         getattr(import_module(module), name) for module, name in CORE_PROVIDER_METADATA
     )
+
 
 def __getattr__(name: str) -> object:
     """
@@ -75,6 +77,7 @@ def __getattr__(name: str) -> object:
             raise AttributeError(message)
     globals()[name] = value
     return value
+
 
 def __dir__() -> list[str]:
     """

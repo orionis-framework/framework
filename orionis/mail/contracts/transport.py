@@ -1,12 +1,12 @@
+# ruff: noqa: TC001
+# Preserve public transport annotations for runtime dependency inspection.
 """Send already prepared mail without knowing views or storage declarations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.mail.entities.prepared import PreparedMail
+from orionis.mail.entities.result import MailResult
 
-if TYPE_CHECKING:
-    from orionis.mail.entities.prepared import PreparedMail
-    from orionis.mail.entities.result import MailResult
 
 class IMailTransport(ABC):
     """

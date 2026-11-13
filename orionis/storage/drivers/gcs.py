@@ -1,18 +1,27 @@
+# ruff: noqa: ANN401, PLC0415, SIM115, TC003
+# Keep optional SDK payloads dynamic and defer failure-runtime imports.
+# Preserve temporary-buffer ownership and runtime reflection of public annotations.
 """Storage driver backed by Google Cloud Storage."""
 
 from __future__ import annotations
 import asyncio
+from collections.abc import AsyncIterable, AsyncIterator
+from pathlib import Path
 import base64
 import hashlib
 import mimetypes
 import tempfile
+from threading import Lock
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, BinaryIO, Self
 from urllib.parse import quote
-from orionis.storage.buffering import spool_stream
+from orionis.storage.buffering import _close_buffer, read_chunks, spool_stream
+from orionis.support.concurrency import complete_on_cancel
 from orionis.storage.contracts.driver import IStorageDriver
 from orionis.storage.drivers.functions import (
+    _ModeBuffer,
+    _close_failed_buffer,
     assertBinaryMode,
     deriveDirectories,
     filterFiles,
@@ -28,10 +37,6 @@ from orionis.storage.exceptions import (
 from orionis.storage.paths import normalizeFilePath, normalizePath
 from orionis.storage.stream import AsyncStream
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterable, AsyncIterator
-    from pathlib import Path
-    from typing import BinaryIO
 
 # Default chunk size for streaming operations (64 KiB).
 _CHUNK_SIZE: int = 64 * 1024
@@ -52,6 +57,7 @@ _ACL_MAP: dict[str, str] = {
 }
 """Predefined ACLs applied per visibility level."""
 
+
 class GoogleStorageDriver(IStorageDriver):
     """
     Storage driver backed by Google Cloud Storage.
@@ -63,6 +69,7 @@ class GoogleStorageDriver(IStorageDriver):
 
         uv add 'orionis[gcs]'
 
+    Cancellation waits for active SDK work before resources are released.
     The SDK is imported lazily on first operation, and every blocking
     call runs on a worker thread via :func:`asyncio.to_thread`.
     Directories are virtual: prefixes are inferred from object names
@@ -71,12 +78,11 @@ class GoogleStorageDriver(IStorageDriver):
     file or Application Default Credentials.
     """
 
-    # ruff: noqa: ANN401
-
     __slots__ = (
         "_base_url",
         "_bucket",
         "_bucket_name",
+        "_client_lock",
         "_cloud_error",
         "_key_file",
         "_not_found",
@@ -100,7 +106,7 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Initialize the driver from a GCS disk configuration entity.
+            No return value.
         """
         self._project: str = str(getattr(config, "project_id", "") or "")
         """Project produced by ``str``."""
@@ -113,6 +119,8 @@ class GoogleStorageDriver(IStorageDriver):
         self._base_url: str | None = base_url.rstrip("/") if base_url else None
         """Base URL used when constructing public resource URLs."""
 
+        self._client_lock = Lock()
+        """Serialize lazy SDK initialization across worker threads."""
         self._bucket: Any = None
         """Cloud-storage bucket containing the driver resources."""
         self._not_found: type[Exception] = Exception
@@ -139,29 +147,33 @@ class GoogleStorageDriver(IStorageDriver):
         if self._bucket is not None:
             return self._bucket
 
-        # Import the official SDK lazily; it is an optional dependency.
-        storage = importDriverDependency(
-            "google.cloud.storage",
-            "google-cloud-storage",
-            "gcs",
-        )
-        errors = importDriverDependency(
-            "google.cloud.exceptions",
-            "google-cloud-storage",
-            "gcs",
-        )
+        with self._client_lock:
+            if self._bucket is not None:
+                return self._bucket
 
-        # Prefer the service-account key file; fall back to ADC.
-        client = (
-            storage.Client.from_service_account_json(self._key_file)
-            if self._key_file
-            else storage.Client(project=self._project or None)
-        )
+            # Import the official SDK lazily; it is an optional dependency.
+            storage = importDriverDependency(
+                "google.cloud.storage",
+                "google-cloud-storage",
+                "gcs",
+            )
+            errors = importDriverDependency(
+                "google.cloud.exceptions",
+                "google-cloud-storage",
+                "gcs",
+            )
 
-        self._not_found = errors.NotFound
-        self._cloud_error = errors.GoogleCloudError
-        self._bucket = client.bucket(self._bucket_name)
-        return self._bucket
+            # Prefer the service-account key file; fall back to ADC.
+            client = (
+                storage.Client.from_service_account_json(self._key_file)
+                if self._key_file
+                else storage.Client(project=self._project or None)
+            )
+
+            self._not_found = errors.NotFound
+            self._cloud_error = errors.GoogleCloudError
+            self._bucket = client.bucket(self._bucket_name)
+            return self._bucket
 
     def __blob(self: Self, normalized: str) -> Any:
         """
@@ -301,7 +313,8 @@ class GoogleStorageDriver(IStorageDriver):
         try:
             entries = list(blob.acl)
         except self._cloud_error as error:
-            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            from orionis.failure.runtime import capture_nowait
+
             capture_nowait(
                 error,
                 flow="storage",
@@ -353,7 +366,7 @@ class GoogleStorageDriver(IStorageDriver):
             except self._not_found as exc:
                 raise self.__missing(normalized) from exc
 
-        return await asyncio.to_thread(_read)
+        return await complete_on_cancel(asyncio.to_thread(_read))
 
     async def readStream(
         self: Self,
@@ -394,8 +407,6 @@ class GoogleStorageDriver(IStorageDriver):
             blob = self.__blobOrFail(normalized)
             return blob.open("rb")
 
-        from orionis.storage.buffering import read_chunks  # noqa: PLC0415
-
         chunks = read_chunks(_open, chunk_size)
         try:
             async for chunk in chunks:
@@ -418,8 +429,10 @@ class GoogleStorageDriver(IStorageDriver):
             ``True`` if an object exists at the given name.
         """
         normalized = normalizeFilePath(path)
-        return await asyncio.to_thread(
-            lambda: bool(self.__blob(normalized).exists()),
+        return await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: bool(self.__blob(normalized).exists()),
+            ),
         )
 
     # ── Write operations ─────────────────────────────────────────────────────
@@ -447,7 +460,7 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Write *contents* to *path*, replacing any existing object.
+            No return value.
         """
         normalized = normalizeFilePath(path)
         data = (
@@ -462,7 +475,7 @@ class GoogleStorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after writing the object.
+                No return value.
             """
             blob = self.__blob(normalized)
             blob.upload_from_string(
@@ -473,7 +486,7 @@ class GoogleStorageDriver(IStorageDriver):
                 predefined_acl=acl,
             )
 
-        await asyncio.to_thread(_write)
+        await complete_on_cancel(asyncio.to_thread(_write))
 
     async def writeStream(
         self: Self,
@@ -501,7 +514,7 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Write the chunks produced by *stream* to *path*.
+            No return value.
         """
         normalized = normalizeFilePath(path)
         acl = self.__aclFor(visibility) if visibility is not None else None
@@ -514,7 +527,7 @@ class GoogleStorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after uploading the file.
+                No return value.
             """
             blob = self.__blob(normalized)
             blob.upload_from_file(
@@ -525,10 +538,14 @@ class GoogleStorageDriver(IStorageDriver):
                 predefined_acl=acl,
             )
 
+        primary: BaseException | None = None
         try:
-            await asyncio.to_thread(_upload)
+            await complete_on_cancel(asyncio.to_thread(_upload))
+        except BaseException as error:
+            primary = error
+            raise
         finally:
-            await asyncio.to_thread(buffer.close)
+            await _close_buffer(buffer.close, primary)
 
     async def delete(self: Self, path: str) -> bool:
         """
@@ -562,7 +579,7 @@ class GoogleStorageDriver(IStorageDriver):
                 return False
             return True
 
-        return await asyncio.to_thread(_delete)
+        return await complete_on_cancel(asyncio.to_thread(_delete))
 
     async def copy(self: Self, source: str, target: str) -> None:
         """
@@ -578,7 +595,7 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Copy the object at *source* to *target* server-side.
+            No return value.
 
         Raises
         ------
@@ -595,13 +612,13 @@ class GoogleStorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after copying the object.
+                No return value.
             """
             bucket = self.__bucket()
             blob = self.__blobOrFail(origin)
             bucket.copy_blob(blob, bucket, destination)
 
-        await asyncio.to_thread(_copy)
+        await complete_on_cancel(asyncio.to_thread(_copy))
 
     async def move(self: Self, source: str, target: str) -> None:
         """
@@ -620,15 +637,20 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Move the object at *source* to *target*.
+            No return value.
 
         Raises
         ------
         orionis.storage.exceptions.StorageFileNotFoundException
             If the source object does not exist.
         """
-        await self.copy(source, target)
         normalized = normalizeFilePath(source)
+        destination = normalizeFilePath(target)
+        if normalized == destination:
+            if not await self.exists(normalized):
+                raise self.__missing(normalized)
+            return
+        await self.copy(normalized, destination)
 
         def _cleanup() -> None:
             """
@@ -637,13 +659,13 @@ class GoogleStorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after cleanup.
+                No return value.
             """
             blob = self.__blob(normalized)
             with suppress(self._not_found):
                 blob.delete()
 
-        await asyncio.to_thread(_cleanup)
+        await complete_on_cancel(asyncio.to_thread(_cleanup))
 
     # ── Metadata operations ──────────────────────────────────────────────────
 
@@ -667,7 +689,9 @@ class GoogleStorageDriver(IStorageDriver):
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
-        blob = await asyncio.to_thread(self.__blobOrFail, normalized)
+        blob = await complete_on_cancel(
+            asyncio.to_thread(self.__blobOrFail, normalized),
+        )
         return int(blob.size or 0)
 
     async def mimeType(self: Self, path: str) -> str | None:
@@ -693,7 +717,9 @@ class GoogleStorageDriver(IStorageDriver):
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
-        blob = await asyncio.to_thread(self.__blobOrFail, normalized)
+        blob = await complete_on_cancel(
+            asyncio.to_thread(self.__blobOrFail, normalized),
+        )
         return blob.content_type or mimetypes.guess_type(normalized)[0]
 
     async def lastModified(self: Self, path: str) -> datetime:
@@ -716,7 +742,9 @@ class GoogleStorageDriver(IStorageDriver):
             If the object does not exist.
         """
         normalized = normalizeFilePath(path)
-        blob = await asyncio.to_thread(self.__blobOrFail, normalized)
+        blob = await complete_on_cancel(
+            asyncio.to_thread(self.__blobOrFail, normalized),
+        )
         return blob.updated or datetime.now(tz=UTC)
 
     async def visibility(self: Self, path: str) -> str:
@@ -757,7 +785,7 @@ class GoogleStorageDriver(IStorageDriver):
                 else Visibility.PRIVATE.value
             )
 
-        return await asyncio.to_thread(_visibility)
+        return await complete_on_cancel(asyncio.to_thread(_visibility))
 
     async def setVisibility(self: Self, path: str, visibility: str) -> None:
         """
@@ -776,7 +804,7 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Change the visibility of the object at *path*.
+            No return value.
 
         Raises
         ------
@@ -798,7 +826,7 @@ class GoogleStorageDriver(IStorageDriver):
             Returns
             -------
             None
-                Completes after updating visibility.
+                No return value.
             """
             blob = self.__blobOrFail(normalized)
             if make_public:
@@ -806,7 +834,7 @@ class GoogleStorageDriver(IStorageDriver):
             else:
                 blob.make_private()
 
-        await asyncio.to_thread(_apply)
+        await complete_on_cancel(asyncio.to_thread(_apply))
 
     async def hash(self: Self, path: str, algorithm: str = "sha256") -> str:
         """
@@ -820,7 +848,7 @@ class GoogleStorageDriver(IStorageDriver):
         path : str
             Root-relative file path.
         algorithm : str
-            Any algorithm name accepted by ``hashlib.new``.
+            Fixed-length digest algorithm accepted by ``hashlib.new``.
 
         Returns
         -------
@@ -832,7 +860,7 @@ class GoogleStorageDriver(IStorageDriver):
         orionis.storage.exceptions.StorageFileNotFoundException
             If the object does not exist.
         orionis.storage.exceptions.UnsupportedStorageOperationException
-            If *algorithm* is not available.
+            If *algorithm* is unavailable or requires an explicit digest length.
         """
         normalized = normalizeFilePath(path)
 
@@ -851,13 +879,17 @@ class GoogleStorageDriver(IStorageDriver):
                 error_msg = f"Unsupported hash algorithm [{algorithm}]."
                 raise UnsupportedStorageOperationException(error_msg) from exc
 
+            if hasher.digest_size == 0:
+                error_msg = f"Unsupported hash algorithm [{algorithm}]."
+                raise UnsupportedStorageOperationException(error_msg)
+
             blob = self.__blobOrFail(normalized)
             with blob.open("rb") as handle:
                 while chunk := handle.read(_CHUNK_SIZE):
                     hasher.update(chunk)
             return hasher.hexdigest()
 
-        return await asyncio.to_thread(_hash)
+        return await complete_on_cancel(asyncio.to_thread(_hash))
 
     async def info(self: Self, path: str) -> FileInfo:
         """
@@ -911,7 +943,7 @@ class GoogleStorageDriver(IStorageDriver):
                 url=self.__urlFor(normalized),
             )
 
-        return await asyncio.to_thread(_info)
+        return await complete_on_cancel(asyncio.to_thread(_info))
 
     # ── Directory operations ─────────────────────────────────────────────────
 
@@ -927,14 +959,16 @@ class GoogleStorageDriver(IStorageDriver):
         Returns
         -------
         None
-            Create a zero-byte directory marker at *path*.
+            No return value.
         """
         normalized = normalizePath(path)
         if not normalized:
             return
 
-        await asyncio.to_thread(
-            lambda: self.__blob(f"{normalized}/").upload_from_string(b""),
+        await complete_on_cancel(
+            asyncio.to_thread(
+                lambda: self.__blob(f"{normalized}/").upload_from_string(b""),
+            ),
         )
 
     async def deleteDirectory(self: Self, path: str) -> bool:
@@ -970,7 +1004,7 @@ class GoogleStorageDriver(IStorageDriver):
                 blob.delete()
             return bool(blobs)
 
-        return await asyncio.to_thread(_purge)
+        return await complete_on_cancel(asyncio.to_thread(_purge))
 
     async def directoryExists(self: Self, path: str) -> bool:
         """
@@ -1007,7 +1041,7 @@ class GoogleStorageDriver(IStorageDriver):
             )
             return next(iter(iterator), None) is not None
 
-        return await asyncio.to_thread(_exists)
+        return await complete_on_cancel(asyncio.to_thread(_exists))
 
     async def files(
         self: Self,
@@ -1032,7 +1066,7 @@ class GoogleStorageDriver(IStorageDriver):
         """
         normalized = normalizePath(path)
         prefix = f"{normalized}/" if normalized else ""
-        keys = await asyncio.to_thread(self.__listKeysSync, prefix)
+        keys = await complete_on_cancel(asyncio.to_thread(self.__listKeysSync, prefix))
         return filterFiles(keys, normalized, recursive=recursive)
 
     async def directories(
@@ -1058,7 +1092,7 @@ class GoogleStorageDriver(IStorageDriver):
         """
         normalized = normalizePath(path)
         prefix = f"{normalized}/" if normalized else ""
-        keys = await asyncio.to_thread(self.__listKeysSync, prefix)
+        keys = await complete_on_cancel(asyncio.to_thread(self.__listKeysSync, prefix))
         return deriveDirectories(keys, normalized, recursive=recursive)
 
     # ── URLs and transfers ───────────────────────────────────────────────────
@@ -1123,7 +1157,7 @@ class GoogleStorageDriver(IStorageDriver):
                 method="GET",
             )
 
-        return await asyncio.to_thread(_sign)
+        return await complete_on_cancel(asyncio.to_thread(_sign))
 
     async def download(self: Self, path: str, destination: str | Path) -> Path:
         """
@@ -1166,7 +1200,7 @@ class GoogleStorageDriver(IStorageDriver):
                 raise self.__missing(normalized) from exc
             return target.resolve()
 
-        return await asyncio.to_thread(_download)
+        return await complete_on_cancel(asyncio.to_thread(_download))
 
     def open(self: Self, path: str, mode: str = "rb") -> AsyncStream:
         """
@@ -1206,43 +1240,39 @@ class GoogleStorageDriver(IStorageDriver):
             typing.BinaryIO
                 Stream handle for reading or writing.
             """
-            buffer = tempfile.SpooledTemporaryFile(  # noqa: SIM115
+            buffer = tempfile.SpooledTemporaryFile(
                 max_size=_SPOOL_THRESHOLD,
             )
 
-            # Seed the buffer for modes that read existing content.
-            if mode in ("rb", "rb+", "ab", "ab+"):
-                blob = self.__blob(normalized)
-                try:
-                    blob.download_to_file(buffer)
-                except self._not_found as exc:
-                    if mode in ("rb", "rb+"):
-                        buffer.close()
-                        raise self.__missing(normalized) from exc
-                if mode.startswith("a"):
-                    buffer.seek(0, 2)
-                else:
-                    buffer.seek(0)
-            return buffer
+            try:
+                # Seed the buffer for modes that read existing content.
+                if mode in ("rb", "rb+", "ab", "ab+"):
+                    self.__seedStream(buffer, normalized, mode)
+                return _ModeBuffer(buffer, mode)
+            except BaseException as error:
+                _close_failed_buffer(buffer, error)
+                raise
 
-        def flush(handle: BinaryIO) -> None:
+        def flush(handle: _ModeBuffer) -> None:
             """
             Persist the writable stream content to storage.
 
             Parameters
             ----------
-            handle : typing.BinaryIO
-                Buffered stream being closed.
+            handle : _ModeBuffer
+                Owned stream wrapper being closed.
 
             Returns
             -------
             None
-                Completes after writing the content.
+                No return value.
             """
             # Persist the buffered content back to GCS on close.
-            handle.seek(0)
+            handle.flush()
+            buffer = handle.raw
+            buffer.seek(0)
             self.__blob(normalized).upload_from_file(
-                handle,
+                buffer,
                 content_type=(
                     mimetypes.guess_type(normalized)[0] or _DEFAULT_CONTENT_TYPE
                 ),
@@ -1250,3 +1280,41 @@ class GoogleStorageDriver(IStorageDriver):
 
         on_close = None if mode == "rb" else flush
         return AsyncStream(opener, on_close)
+
+    def __seedStream(
+        self: Self,
+        buffer: BinaryIO,
+        normalized: str,
+        mode: str,
+    ) -> None:
+        """Seed a stream buffer and position it for the requested mode.
+
+        Missing objects are tolerated for append modes and rejected for read
+        modes. The caller retains ownership of the buffer during failures.
+
+        Parameters
+        ----------
+        buffer : typing.BinaryIO
+            Owned temporary buffer receiving existing content.
+        normalized : str
+            Canonical root-relative object path.
+        mode : str
+            Validated binary read or append mode.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        orionis.storage.exceptions.StorageFileNotFoundException
+            If the object does not exist and the mode requires it.
+        """
+        blob = self.__blob(normalized)
+        try:
+            blob.download_to_file(buffer)
+        except self._not_found as exc:
+            if mode in ("rb", "rb+"):
+                raise self.__missing(normalized) from exc
+        buffer.seek(0, 2 if mode.startswith("a") else 0)

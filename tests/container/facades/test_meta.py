@@ -1,5 +1,9 @@
+# ruff: noqa: N815, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# The application double exposes the isBooted protocol attribute.
 from __future__ import annotations
 import inspect
+from unittest.mock import patch
 from orionis.container.facades.facade import Facade
 from orionis.container.facades.meta import FacadeMeta
 from orionis.test import TestCase
@@ -10,6 +14,7 @@ from orionis.test import TestCase
 
 _CONTEXT_VALUE = "ctx-value"
 _SERVICE_VERSION = "1.0.0"
+
 
 class _DummyAsyncContext:
     """Minimal async context manager returned by a proxied method."""
@@ -25,7 +30,7 @@ class _DummyAsyncContext:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.value = value
         self.exited = False
@@ -64,6 +69,7 @@ class _DummyAsyncContext:
         """
         self.exited = True
         return False
+
 
 class _DummyService:
     """Lightweight service used as a stand-in for metaclass tests."""
@@ -117,6 +123,7 @@ class _DummyService:
         """
         return _DummyAsyncContext(_CONTEXT_VALUE)
 
+
 class _MetaFacade(Facade):
     """Facade subclass used to exercise the metaclass attribute routing."""
 
@@ -131,10 +138,11 @@ class _MetaFacade(Facade):
         """
         return "dummy_service"
 
+
 class _BootedApp:
     """Fake booted application whose make() always returns a _DummyService."""
 
-    isBooted: bool = True  # noqa: N815
+    isBooted: bool = True
 
     async def make(
         self,
@@ -160,6 +168,7 @@ class _BootedApp:
         """
         return _DummyService()
 
+
 class _FacadeStateTestCase(TestCase):
     """
     Base case installing the facade class state around each test.
@@ -172,36 +181,31 @@ class _FacadeStateTestCase(TestCase):
     pin_service: bool = False
 
     def setUp(self) -> None:
-        """Install the declared facade class state before each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
+        """Install isolated facade state and restore the previous class attributes."""
+        super().setUp()
         double = self.application_double
-        _MetaFacade._application = None if double is None else double()
-        _MetaFacade._pinned_instance = (
-            _DummyService() if self.pin_service else None
+        self.enterContext(
+            patch.object(
+                _MetaFacade,
+                "_application",
+                None if double is None else double(),
+            ),
+        )
+        self.enterContext(
+            patch.object(
+                _MetaFacade,
+                "_pinned_instance",
+                _DummyService() if self.pin_service else None,
+            ),
         )
 
-    def tearDown(self) -> None:
-        """Clear the facade class state after each test.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        _MetaFacade._application = None
-        _MetaFacade._pinned_instance = None
 
 # ===========================================================================
 # Metaclass wiring
 # ===========================================================================
 
-class TestFacadeMetaWiring(_FacadeStateTestCase):
 
+class TestFacadeMetaWiring(_FacadeStateTestCase):
     def testFacadeUsesFacadeMetaAsMetaclass(self) -> None:
         """
         Use FacadeMeta as the metaclass of Facade and of its subclasses.
@@ -212,17 +216,18 @@ class TestFacadeMetaWiring(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsInstance(Facade, FacadeMeta)
         self.assertIsInstance(_MetaFacade, FacadeMeta)
+
 
 # ===========================================================================
 # Pinned attribute routing
 # ===========================================================================
 
-class TestFacadeMetaPinnedAccess(_FacadeStateTestCase):
 
+class TestFacadeMetaPinnedAccess(_FacadeStateTestCase):
     pin_service = True
 
     def testAttributeAccessRoutesToThePinnedInstance(self) -> None:
@@ -235,7 +240,7 @@ class TestFacadeMetaPinnedAccess(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(_MetaFacade.greet(), "hello")
         self.assertEqual(_MetaFacade.add(3, 4), 7)
@@ -248,17 +253,18 @@ class TestFacadeMetaPinnedAccess(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             _ = _MetaFacade.does_not_exist
+
 
 # ===========================================================================
 # Deferred dispatcher construction
 # ===========================================================================
 
-class TestFacadeMetaDispatcherConstruction(_FacadeStateTestCase):
 
+class TestFacadeMetaDispatcherConstruction(_FacadeStateTestCase):
     def testUnpinnedAccessReturnsADeferredDispatcher(self) -> None:
         """
         Return a synchronous dispatcher when no instance is pinned.
@@ -269,7 +275,7 @@ class TestFacadeMetaDispatcherConstruction(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         dispatcher = _MetaFacade.greet
 
@@ -288,17 +294,18 @@ class TestFacadeMetaDispatcherConstruction(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIs(_MetaFacade.greet, _MetaFacade.greet)
         self.assertIsNot(_MetaFacade.greet, _MetaFacade.add)
+
 
 # ===========================================================================
 # Deferred dispatcher resolution
 # ===========================================================================
 
-class TestFacadeMetaDispatcherResolution(_FacadeStateTestCase):
 
+class TestFacadeMetaDispatcherResolution(_FacadeStateTestCase):
     application_double = _BootedApp
 
     async def testAwaitingTheDispatcherCallsTheResolvedMethod(self) -> None:
@@ -308,7 +315,7 @@ class TestFacadeMetaDispatcherResolution(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(await _MetaFacade.greet(), "hello")
 
@@ -319,7 +326,7 @@ class TestFacadeMetaDispatcherResolution(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(await _MetaFacade.add(2, 5), 7)
 
@@ -330,7 +337,7 @@ class TestFacadeMetaDispatcherResolution(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(await _MetaFacade.fetch(), "awaited")
 
@@ -343,7 +350,7 @@ class TestFacadeMetaDispatcherResolution(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertEqual(await _MetaFacade.version(), _SERVICE_VERSION)
 
@@ -354,7 +361,11 @@ class TestFacadeMetaDispatcherResolution(_FacadeStateTestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
-        async with _MetaFacade.openContext() as value:
-            self.assertEqual(value, _CONTEXT_VALUE)
+        context = _DummyAsyncContext(_CONTEXT_VALUE)
+        with patch.object(_DummyService, "openContext", return_value=context):
+            async with _MetaFacade.openContext() as value:
+                self.assertEqual(value, _CONTEXT_VALUE)
+                self.assertFalse(context.exited)
+        self.assertTrue(context.exited)

@@ -46,7 +46,7 @@ Un URL `smtps://` fija SSL; un URL `smtp://` conserva encryption configurado. El
 
 `TLS` significa STARTTLS obligatorio; `SSL` utiliza TLS implícito; `none` o cadena vacía desactiva TLS. No hay fallback silencioso de STARTTLS a plaintext. La conexión TLS verifica hostname y certificado con contexto del sistema y mínimo TLS 1.2. El backend no expone opciones para saltarse esa verificación.
 
-Un `smtps://` URL fija SSL y puerto 465 salvo puerto explícito. Un URL `smtp://` sustituye host y puerto si lo incluye, pero conserva encryption y puerto configurados si no los sobrescribe: no fuerza plaintext. Credenciales presentes en el URL sustituyen username/password como par. Los caracteres reservados deben codificarse en el URL. Se rechazan path, query y fragment; el host debe ser válido y el puerto entero entre 1 y 65535.
+Un `smtps://` URL fija SSL y puerto 465 salvo puerto explícito. Un URL `smtp://` sustituye host y puerto si lo incluye, pero conserva encryption y puerto configurados si no los sobrescribe: no fuerza plaintext. Credenciales presentes en el URL sustituyen username/password como par. Los caracteres reservados deben codificarse en el URL. Se rechazan path, query y fragment; el host debe ser válido y el puerto entero entre 1 y 65535. Los espacios y caracteres no imprimibles en hosts o URLs se rechazan antes de abrir un transporte, incluidos DEL, caracteres de formato invisibles y sustitutos Unicode aislados.
 
 Username y password deben estar ambos presentes o ambos vacíos. `timeout` acepta entero positivo o `None`; configura un tiempo acotado para operación real porque `None` deja la decisión de timeout al socket. Los buzones internacionales con local part Unicode requieren SMTPUTF8 y 8BITMIME; no basta un dominio que pueda normalizarse a IDNA. Los errores no publican credenciales; aun así evita registrar objetos de configuración o URLs completos.
 
@@ -63,15 +63,17 @@ Los `.eml` contienen cuerpo, adjuntos y direcciones visibles; protégelos como d
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from orionis.mail.enums.encryption import MailEncryption
 
-settings = SmtpSettings.fromConfig({
-    "url": "smtps://user:secret@mail.example.com",
-    "host": "ignored.example.com",
-    "port": 587,
-    "encryption": "TLS",
-    "username": "",
-    "password": "",
-    "timeout": 10,
-})
+settings = SmtpSettings.fromConfig(
+    {
+        "url": "smtps://user:secret@mail.example.com",
+        "host": "ignored.example.com",
+        "port": 587,
+        "encryption": "TLS",
+        "username": "",
+        "password": "",
+        "timeout": 10,
+    }
+)
 assert settings.host == "mail.example.com"
 assert settings.port == 465
 assert settings.encryption is MailEncryption.SSL
@@ -98,7 +100,9 @@ async def main() -> None:
         smtp_utf8=False,
     )
     with TemporaryDirectory() as root:
-        result = await FileTransport(Path(root)).send(prepared, mailer="file", driver="file")
+        result = await FileTransport(Path(root)).send(
+            prepared, mailer="file", driver="file"
+        )
         assert result.file_path is not None
         assert result.file_path.read_bytes() == prepared.mime
         print(result.status)
@@ -109,7 +113,7 @@ asyncio.run(main())
 
 ## Implementar y registrar un transporte
 
-Cumple `IMailTransport.send(prepared, *, mailer, driver) -> MailResult` como método async. Recibe `PreparedMail` con MIME completo, remitente y receptores separados: usa ese envelope de transporte para conservar Bcc y evita reanalizar los encabezados visibles para decidir a quién enviar. El pipeline valida composición antes de crear el transporte.
+Cumple `IMailTransport.send(prepared, *, mailer, driver) -> MailResult` como método async. Recibe `PreparedMail` con MIME completo, remitente y receptores separados: usa ese envelope de transporte para conservar Bcc y evita reanalizar los encabezados visibles para decidir a quién enviar. El pipeline valida composición antes de crear el transporte. Las anotaciones públicas de Mail se resuelven mediante `typing.get_type_hints` sin namespaces suministrados por el consumidor; `orionis.mail.types.Recipients` conserva el alias compartido de destinatarios.
 
 La factory recibe `(app, normalized_config)` y puede ser sync o async. Debe devolver una instancia de `IMailTransport`; el manager no acepta simplemente un objeto con un método de nombre parecido. `extend(name, factory)` rechaza nombres vacíos, duplicados y los drivers integrados `smtp`/`file`. El registro es compartido; complétalo durante boot. El resultado debe describir una evidencia real y no declarar aceptación SMTP antes de confirmarla.
 

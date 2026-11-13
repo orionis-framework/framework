@@ -1,12 +1,13 @@
-"""Register service services in the application container."""
+# ruff: noqa: TC001
+# Resolve the provider's application annotation during dependency injection.
+"""Define optional registration and startup hooks for service providers."""
 
 from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.foundation.contracts.application import IApplication
 
-class ServiceProvider(IServiceProvider):
 
-    # ruff: noqa: TC001
-    """Register service services in the application container."""
+class ServiceProvider(IServiceProvider):
+    """Define optional registration and startup hooks for service providers."""
 
     def __init__(
         self,
@@ -36,7 +37,7 @@ class ServiceProvider(IServiceProvider):
         """
         Register services and components into the application container.
 
-        This synchronous method must be implemented by subclasses to bind services,
+        Subclasses may override this synchronous hook to bind services,
         configurations, or other components to the application container. It is called
         during the application's service registration phase.
 
@@ -50,10 +51,6 @@ class ServiceProvider(IServiceProvider):
         None
             This method does not return a value.
 
-        Raises
-        ------
-        NotImplementedError
-            If the method is not overridden in a subclass.
         """
 
     async def boot(self) -> None:

@@ -7,6 +7,7 @@ from urllib.parse import urlsplit
 from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class HTTPSecurity(BaseEntity):
     """

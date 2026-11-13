@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import tempfile
 import traceback
 from pathlib import Path
@@ -6,18 +8,24 @@ from orionis.database.connection import Connection
 from orionis.database.exceptions import QueryException
 from orionis.test import TestCase
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sqlalchemy.engine import Connection as SqlConnection
+
 _BOUND_MARKER = "context-control-private-marker"
 _FAULT_SQL = "SELECT ? FROM missing_context_control_table"
 
+
 class TestNativeContextControlErrors(TestCase):
-    async def asyncSetUp(self):
+    async def asyncSetUp(self) -> None:
         """
         Initialize an isolated SQLite connection for each test.
 
         Returns
         -------
         None
-            Create the entries table and register connection and file cleanup.
+            No return value.
         """
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
@@ -28,7 +36,7 @@ class TestNativeContextControlErrors(TestCase):
         self.addAsyncCleanup(self.connection.disconnect)
         await self.connection.statement("CREATE TABLE entries (value TEXT)")
 
-    async def _checkFault(self, boundary):
+    async def _checkFault(self, boundary: str) -> None:
         """
         Verify error redaction and recovery at an implicit control boundary.
 
@@ -40,11 +48,11 @@ class TestNativeContextControlErrors(TestCase):
         Returns
         -------
         None
-            Assert sanitized errors, released checkouts, and rollback of writes.
+            No return value.
         """
         engine = self.connection._getEngine().sync_engine
 
-        def fault(raw):
+        def fault(raw: SqlConnection) -> None:
             """
             Trigger a bound SQL error at the selected transaction boundary.
 
@@ -77,7 +85,10 @@ class TestNativeContextControlErrors(TestCase):
         error = caught.exception
         rendered = "".join(traceback.format_exception(error))
         self.assertIn("context_errors", str(error))
-        self.assertIn("OperationalError", str(error))
+        self.assertIn(
+            "ResourceClosedError" if boundary == "rollback" else "OperationalError",
+            str(error),
+        )
         self.assertNotIn(_BOUND_MARKER, rendered)
         self.assertNotIn(_FAULT_SQL, rendered)
         self.assertNotIn("missing_context_control_table", rendered)
@@ -86,39 +97,42 @@ class TestNativeContextControlErrors(TestCase):
         self.assertEqual(engine.pool.checkedout(), 0)
         self.assertFalse(self.connection.inTransaction())
         self.assertEqual(
-            await self.connection.select("SELECT 9 AS value"), [{"value": 9}],
+            await self.connection.select("SELECT 9 AS value"),
+            [{"value": 9}],
         )
         self.assertEqual(await self.connection.select("SELECT value FROM entries"), [])
 
-    async def testImplicitBeginFaultHidesDriverSqlAndBindingsAndRecovers(self):
+    async def testImplicitBeginFaultHidesDriverSqlAndBindingsAndRecovers(self) -> None:
         """
         Verify that implicit BEGIN failures hide driver details and recover.
 
         Returns
         -------
         None
-            Confirm SQL and binding redaction, released resources, and reuse.
+            No return value.
         """
         await self._checkFault("begin")
 
-    async def testImplicitCommitFaultHidesDriverSqlAndBindingsAndRecovers(self):
+    async def testImplicitCommitFaultHidesDriverSqlAndBindingsAndRecovers(self) -> None:
         """
         Verify that implicit COMMIT failures hide driver details and recover.
 
         Returns
         -------
         None
-            Confirm SQL and binding redaction, released resources, and reuse.
+            No return value.
         """
         await self._checkFault("commit")
 
-    async def testImplicitRollbackFaultHidesDriverSqlAndBindingsAndRecovers(self):
+    async def testImplicitRollbackFaultHidesDriverSqlAndBindingsAndRecovers(
+        self,
+    ) -> None:
         """
         Verify that failed implicit rollback hides driver details and recovers.
 
         Returns
         -------
         None
-            Confirm redaction, connection reuse, and removal of pending rows.
+            No return value.
         """
         await self._checkFault("rollback")

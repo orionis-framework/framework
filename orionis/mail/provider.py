@@ -6,6 +6,7 @@ from orionis.mail.contracts.manager import IMailManager
 from orionis.mail.manager import MailManager
 from orionis.support.facades.mail import Mail
 
+
 class MailProvider(ServiceProvider):
     """
     Register mail eagerly so synchronous fluent facade entries work immediately.

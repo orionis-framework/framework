@@ -1,11 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import FrozenInstanceError
 from orionis.container.entities.binding import Binding
 from orionis.container.enums.lifetimes import Lifetime
 from orionis.test import TestCase
 
-class TestBinding(TestCase):
 
+class TestBinding(TestCase):
     # ------------------------------------------------------------------
     # Instantiation — default values
     # ------------------------------------------------------------------
@@ -20,7 +22,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding()
 
@@ -41,7 +43,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
         class IService:
@@ -57,7 +59,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
         class ServiceImpl:
@@ -73,7 +75,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         obj = object()
         binding = Binding(instance=obj)
@@ -86,7 +88,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding(alias="my_service")
         self.assertEqual(binding.alias, "my_service")
@@ -101,7 +103,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         for lt in Lifetime:
             binding = Binding(lifetime=lt)
@@ -114,7 +116,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
         class IFoo:
@@ -151,7 +153,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding(alias="original")
 
@@ -165,7 +167,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding()
         with self.assertRaises(FrozenInstanceError):
@@ -185,7 +187,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Binding(lifetime="singleton")  # type: ignore[arg-type]
@@ -197,25 +199,10 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Binding(lifetime=1)  # type: ignore[arg-type]
-
-    def testValidLifetimeEnumDoesNotRaise(self) -> None:
-        """
-        Test that each valid Lifetime enum member passes __post_init__ validation.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        for lt in Lifetime:
-            try:
-                Binding(lifetime=lt)
-            except TypeError:
-                self.fail(f"Binding raised TypeError for valid lifetime {lt!r}")
 
     # ------------------------------------------------------------------
     # Equality and hashing (frozen dataclass behaviour)
@@ -230,7 +217,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
         class Svc:
@@ -247,7 +234,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         b1 = Binding(alias="a")
         b2 = Binding(alias="b")
@@ -260,7 +247,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding(alias="hashable")
         result = {binding: "value"}
@@ -280,7 +267,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding()
         result = binding.toDict()
@@ -296,7 +283,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding(lifetime=Lifetime.SINGLETON)
         result = binding.toDict()
@@ -309,7 +296,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding()
         result = binding.toDict()
@@ -325,7 +312,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding(alias="my_alias")
         self.assertEqual(binding.toDict()["alias"], "my_alias")
@@ -341,7 +328,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding()
         result = binding.getFields()
@@ -356,7 +343,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding()
         self.assertEqual(len(binding.getFields()), 5)
@@ -368,7 +355,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding()
         names = [f["name"] for f in binding.getFields()]
@@ -386,7 +373,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         binding = Binding(alias="")
         self.assertEqual(binding.alias, "")
@@ -398,7 +385,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         for builtin in (str, int, list, dict):
             binding = Binding(contract=builtin)
@@ -413,7 +400,7 @@ class TestBinding(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         for obj in ("a string", 42, [1, 2], {"k": "v"}):
             binding = Binding(instance=obj)

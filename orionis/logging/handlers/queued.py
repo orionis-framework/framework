@@ -1,19 +1,20 @@
+# ruff: noqa: BLE001, SLF001, TC003
+# Drain after arbitrary sink failures; retain reporting metadata and runtime types.
 """Queue log records and observe sink delivery or cleanup failures."""
 
 import logging
 import sys
+from collections.abc import Callable
 from copy import copy
 from logging.handlers import QueueListener
 from queue import Queue
-from typing import TYPE_CHECKING, Self
-from orionis.failure.runtime import reporting_from, reporting_runtime
+from typing import Self
+from orionis.failure import runtime as failure_runtime
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.failure.runtime import FailureRuntime
 
 class LoggingDeliveryError(Exception):
     """Signal a synchronous or background log-delivery failure."""
+
 
 def observe_sink_error(
     record: logging.LogRecord,
@@ -36,23 +37,21 @@ def observe_sink_error(
     Returns
     -------
     None
-        Invoke the original callback unless failure reporting would recurse.
+        This function does not return a value.
 
     Raises
     ------
     LoggingDeliveryError
         If a sink error occurs while reporting another application failure.
     """
-    from orionis.failure.runtime import (  # noqa: PLC0415
-        capture_nowait, is_reporting,
-    )
     error = sys.exc_info()[1]
     if error is not None:
-        if is_reporting():
+        if failure_runtime.is_reporting():
             message = "The logging sink failed while reporting an application error."
             raise LoggingDeliveryError(message) from error
-        capture_nowait(error, app=app, flow="logging", phase="delivery")
+        failure_runtime.capture_nowait(error, app=app, flow="logging", phase="delivery")
     original(record)
+
 
 def _raise_sink_error(_record: logging.LogRecord) -> None:
     """
@@ -76,6 +75,7 @@ def _raise_sink_error(_record: logging.LogRecord) -> None:
     error_msg = "The background logging sink could not emit a record."
     raise LoggingDeliveryError(error_msg) from sys.exc_info()[1]
 
+
 class _Listener(QueueListener):
     """Drain queued records while retaining and observing delivery failures."""
 
@@ -83,7 +83,7 @@ class _Listener(QueueListener):
     """First error retained while background work continues to drain."""
     app: object | None = None
     """Application owning the sink and its failure policy."""
-    runtime: FailureRuntime | None = None
+    runtime: failure_runtime.FailureRuntime | None = None
     """Prepared coordinator retained for deliveries outside a request context."""
 
     def handle(self: Self, record: logging.LogRecord) -> None:
@@ -98,11 +98,11 @@ class _Listener(QueueListener):
         Returns
         -------
         None
-            Restore available reporter identity while dispatching the record.
+            This method does not return a value.
         """
         reporter = getattr(record, "_orionis_failure_reporting", None)
         if reporter is not None:
-            with reporting_from(reporter):
+            with failure_runtime.reporting_from(reporter):
                 self._deliver(record)
         else:
             self._deliver(record)
@@ -122,22 +122,23 @@ class _Listener(QueueListener):
         Returns
         -------
         None
-            Report delivery errors without interrupting the listener's queue drain.
+            This method does not return a value.
         """
         try:
             super().handle(record)
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:
             if self.error is None:
                 self.error = error
             # The sink thread has no request context. Its owner is retained at
             # construction; reporting is activated only after app startup.
-            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
             if isinstance(error, LoggingDeliveryError) and error.__cause__ is not None:
                 error = error.__cause__
-            capture_nowait(
+            failure_runtime.capture_nowait(
                 error,
-                app=self.app, runtime=self.runtime,
-                flow="logging", phase="delivery",
+                app=self.app,
+                runtime=self.runtime,
+                flow="logging",
+                phase="delivery",
             )
 
     def enqueueSentinel(self: Self) -> None:
@@ -147,12 +148,13 @@ class _Listener(QueueListener):
         Returns
         -------
         None
-            Block until the sentinel can be added after pending records.
+            This method does not return a value.
         """
         self.queue.put(self._sentinel)
 
     # Preserve the logging.handlers.QueueListener protocol name.
     enqueue_sentinel = enqueueSentinel
+
 
 class BoundedQueueHandler(logging.Handler):
     """
@@ -164,8 +166,13 @@ class BoundedQueueHandler(logging.Handler):
     records on close and surface background delivery failures to the caller.
     """
 
-    def __init__(self: Self, target: logging.Handler, capacity: int, *,
-                 app: object | None = None) -> None:
+    def __init__(
+        self: Self,
+        target: logging.Handler,
+        capacity: int,
+        *,
+        app: object | None = None,
+    ) -> None:
         """
         Start a bounded background listener for an owned logging sink.
 
@@ -181,7 +188,7 @@ class BoundedQueueHandler(logging.Handler):
         Returns
         -------
         None
-            Initialize at the target's log level and start the listener thread.
+            This method does not return a value.
 
         Raises
         ------
@@ -199,9 +206,8 @@ class BoundedQueueHandler(logging.Handler):
         """Name of the queue receiving or storing the job."""
         self._listener = _Listener(self._queue, target)
         """Listener produced by ``_Listener``."""
-        from orionis.failure.runtime import get_runtime  # noqa: PLC0415
         self._listener.app = app
-        self._listener.runtime = get_runtime(app)
+        self._listener.runtime = failure_runtime.get_runtime(app)
         self._stopped = False
         """Stopped flag used by ``BoundedQueueHandler``."""
         self._listener.start()
@@ -218,7 +224,7 @@ class BoundedQueueHandler(logging.Handler):
         Returns
         -------
         None
-            Accept the snapshot for background delivery without mutating the source.
+            This method does not return a value.
 
         Raises
         ------
@@ -236,7 +242,7 @@ class BoundedQueueHandler(logging.Handler):
         snapshot = copy(record)
         snapshot.msg = record.getMessage()
         snapshot.args = None
-        snapshot._orionis_failure_reporting = reporting_runtime()  # noqa: SLF001
+        snapshot._orionis_failure_reporting = failure_runtime.reporting_runtime()
         self._queue.put_nowait(snapshot)
 
     def flush(self: Self) -> None:
@@ -246,7 +252,7 @@ class BoundedQueueHandler(logging.Handler):
         Returns
         -------
         None
-            Finish accepted deliveries and flush the sink.
+            This method does not return a value.
 
         Raises
         ------
@@ -271,7 +277,7 @@ class BoundedQueueHandler(logging.Handler):
         Returns
         -------
         None
-            Release resources, or return immediately if shutdown already started.
+            This method does not return a value.
 
         Raises
         ------
@@ -290,14 +296,14 @@ class BoundedQueueHandler(logging.Handler):
         try:
             self._listener.stop()
             self.flush()
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:
             failure = error
             if not isinstance(error, LoggingDeliveryError):
                 self._observeFailure(error, phase="cleanup")
         finally:
             try:
                 self._target.close()
-            except Exception as error:  # noqa: BLE001
+            except Exception as error:
                 self._observeFailure(error, phase="cleanup")
                 failure = failure or error
             finally:
@@ -321,10 +327,12 @@ class BoundedQueueHandler(logging.Handler):
         Returns
         -------
         None
-            Submit the error using the listener's retained application and runtime.
+            This method does not return a value.
         """
-        from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
-        capture_nowait(
-            error, app=self._listener.app, runtime=self._listener.runtime,
-            flow="logging", phase=phase,
+        failure_runtime.capture_nowait(
+            error,
+            app=self._listener.app,
+            runtime=self._listener.runtime,
+            flow="logging",
+            phase=phase,
         )

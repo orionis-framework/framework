@@ -3,6 +3,7 @@
 Includes ``RPCError``, ``ProtocolError``, ``ClientInvocationError``.
 """
 
+
 class RPCError(Exception):
     """Report a deliberate, client-safe remote invocation failure."""
 
@@ -39,7 +40,9 @@ class ProtocolError(ValueError):
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, message: str = "Invalid realtime message", close_code: int = 1002,
+        self,
+        message: str = "Invalid realtime message",
+        close_code: int = 1002,
     ) -> None:
         """
         Retain a sanitized explanation and the appropriate close code.

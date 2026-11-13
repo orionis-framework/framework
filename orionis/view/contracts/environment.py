@@ -1,23 +1,22 @@
-"""Contract for the view-environment wrapper."""
+# ruff: noqa: ANN401, TC003
+# Retain unrestricted template values and runtime-resolvable callable annotations.
+"""Define the contract for the view-environment wrapper."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, TYPE_CHECKING
+from collections.abc import Callable
+from typing import Any
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 class IViewEnvironment(ABC):
     """
-    Contract for the view-environment wrapper.
+    Define the operations provided by the view-environment wrapper.
 
     The implementation is the sole authority for configuring the underlying
     template engine's environment (loaders, caches, globals, filters, tests,
     and extensions).  No other class should access the engine environment
     directly.
     """
-
-    # ruff: noqa: ANN401
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -37,7 +36,7 @@ class IViewEnvironment(ABC):
         Returns
         -------
         None
-            Register a global variable or callable available in all templates.
+            No return value.
         """
 
     @abstractmethod
@@ -56,7 +55,7 @@ class IViewEnvironment(ABC):
         Returns
         -------
         None
-            Register a filter callable that templates can apply with ``|``.
+            No return value.
         """
 
     @abstractmethod
@@ -74,7 +73,7 @@ class IViewEnvironment(ABC):
         Returns
         -------
         None
-            Register a test callable used in Jinja2 ``is`` expressions.
+            No return value.
         """
 
     @abstractmethod
@@ -90,7 +89,7 @@ class IViewEnvironment(ABC):
         Returns
         -------
         None
-            Register a Jinja2 extension class with the environment.
+            No return value.
 
         Raises
         ------

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import json
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.exceptions.fallback_route_already_registered import (
@@ -20,6 +22,7 @@ from tests.http.routes.test_nested_routing import (
 from tests.http.test_kernel import boot_kernel, dispatch
 
 _VERBS = ("get", "post", "put", "patch", "delete", "query")
+
 
 class TestDeferredRouteActions(TestCase):
     """Verify route completion before export, cache restoration and dispatch."""
@@ -77,19 +80,24 @@ class TestDeferredRouteActions(TestCase):
             for verb in _VERBS:
                 for label in ("omitted", "explicit"):
                     resolved = resolver.resolve(
-                        verb.upper(), f"/{label}/items/42",
+                        verb.upper(),
+                        f"/{label}/items/42",
                     )
                     self.assertEqual(resolved.params, {"id": 42})
                     self.assertEqual(resolved.route.method, verb.upper())
                     self.assertEqual(
-                        resolved.route.name, f"items.{verb}.{label}",
+                        resolved.route.name,
+                        f"items.{verb}.{label}",
                     )
                     self.assertEqual(resolved.route.type, RouteType.CONTROLLER)
-                    self.assertEqual(resolved.route.action, {
-                        "module": Namespace.Controller.__module__,
-                        "class": Namespace.Controller.__qualname__,
-                        "method": "index",
-                    })
+                    self.assertEqual(
+                        resolved.route.action,
+                        {
+                            "module": Namespace.Controller.__module__,
+                            "class": Namespace.Controller.__qualname__,
+                            "method": "index",
+                        },
+                    )
 
     def testRouterExportRejectsAnIncompleteRouteAndCanRecover(self) -> None:
         """Block a pending route from the compiled table without losing it.
@@ -238,6 +246,7 @@ class TestDeferredRouteActions(TestCase):
         )
         self.assertEqual(catch.handled, [])
 
+
 class TestRequiredFallbackAction(TestCase):
     """Verify rejected fallbacks leave room for one valid registration."""
 
@@ -284,13 +293,19 @@ class TestRequiredFallbackAction(TestCase):
             exported = router.export()
             self.assertEqual(exported["fallback"], expected)
             cache = RouteCache()
-            snapshot = json.loads(json.dumps(cache.toCache(
-                compile_router(router), exported["fallback"],
-            )))
+            snapshot = json.loads(
+                json.dumps(
+                    cache.toCache(
+                        compile_router(router),
+                        exported["fallback"],
+                    ),
+                ),
+            )
             restored, fallback = cache.fromCache(snapshot)
             self.assertEqual(fallback, expected)
             kernel, _, _, catch = await boot_kernel(
-                routes=restored, fallback=fallback,
+                routes=restored,
+                fallback=fallback,
             )
             response = await dispatch(kernel, "/missing")
             self.assertEqual(response.getStatusCode(), 200)

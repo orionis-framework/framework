@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use explicit process arguments or locally constructed execution fixtures.
 import json
 import os
 import subprocess
@@ -63,8 +66,8 @@ class Application:
 app = Application()
 """
 
-class TestCliEntryPoint(TestCase):
 
+class TestCliEntryPoint(TestCase):
     def setUp(self) -> None:
         """Create an isolated project with a bootstrap but no Reactor script.
 
@@ -81,7 +84,9 @@ class TestCliEntryPoint(TestCase):
         (bootstrap / "app.py").write_text(_BOOTSTRAP_SOURCE, encoding="utf-8")
 
     def _run(
-        self, *arguments: str, startup_environment: bool = False,
+        self,
+        *arguments: str,
+        startup_environment: bool = False,
     ) -> subprocess.CompletedProcess[str]:
         """Invoke the entry point from the temporary project's root.
 
@@ -108,7 +113,7 @@ class TestCliEntryPoint(TestCase):
         else:
             command.append("-B")
         command.extend(["-c", _ENTRY_POINT, *arguments])
-        return subprocess.run(  # noqa: S603
+        return subprocess.run(
             command,
             cwd=self._root,
             env=environment,
@@ -128,8 +133,12 @@ class TestCliEntryPoint(TestCase):
             Assertions verify that spaces and shell characters remain literal.
         """
         arguments = (
-            "serve", "--port=9000", "value with spaces", 'quoted"value',
-            "literal;value", "",
+            "serve",
+            "--port=9000",
+            "value with spaces",
+            'quoted"value',
+            "literal;value",
+            "",
         )
         result = self._run(*arguments)
 
@@ -162,7 +171,8 @@ class TestCliEntryPoint(TestCase):
             Assertions verify inherited protection and the absence of pyc files.
         """
         (self._root / "orionis_cli_child.py").write_text(
-            "VALUE = 1\n", encoding="utf-8",
+            "VALUE = 1\n",
+            encoding="utf-8",
         )
 
         result = self._run("spawn-child")
@@ -183,7 +193,8 @@ class TestCliEntryPoint(TestCase):
             Assertions verify that no startup or application cache is written.
         """
         (self._root / "orionis_cli_child.py").write_text(
-            "VALUE = 1\n", encoding="utf-8",
+            "VALUE = 1\n",
+            encoding="utf-8",
         )
 
         result = self._run("spawn-child", startup_environment=True)
@@ -311,7 +322,8 @@ class TestCliEntryPoint(TestCase):
             Assertions verify that bootstrap import failures remain visible.
         """
         (self._root / "bootstrap" / "__init__.py").write_text(
-            "", encoding="utf-8",
+            "",
+            encoding="utf-8",
         )
         (self._root / "bootstrap" / "app.py").unlink()
 
@@ -335,5 +347,6 @@ class TestCliEntryPoint(TestCase):
         )
 
         self.assertEqual(
-            manifest["project"]["scripts"]["orionis"], "orionis.console.cli:main",
+            manifest["project"]["scripts"]["orionis"],
+            "orionis.console.cli:main",
         )

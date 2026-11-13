@@ -1,9 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import argparse
 from unittest.mock import AsyncMock, Mock, patch
 from orionis.console.commands.db.seed import DbSeedCommand
 from orionis.console.commands.seed.seed import SeedCommand
 from orionis.database.migrations.events import MigrationEvents
 from orionis.test import TestCase
+
 
 class TestDbSeedCommand(TestCase):
     """Verify the Laravel-style command shares the existing seeding path."""

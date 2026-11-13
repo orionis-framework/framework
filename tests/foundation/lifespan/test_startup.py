@@ -1,9 +1,12 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import time
 from io import StringIO
 from typing import Never
 from rich.console import Console
 from orionis.foundation.lifespan import startup
 from orionis.test import TestCase
+
 
 class _ImmediateConsole(Console):
     __slots__ = ()
@@ -23,6 +26,7 @@ class _ImmediateConsole(Console):
         """
         message = "Lifecycle panels must remain visible while hooks run."
         raise AssertionError(message)
+
 
 class _LifespanApplication:
     __slots__ = ("_debug", "_production", "_start_at")
@@ -76,6 +80,7 @@ class _LifespanApplication:
             Startup epoch in nanoseconds.
         """
         return self._start_at
+
 
 class TestStartupDisplay(TestCase):
     def setUp(self) -> None:

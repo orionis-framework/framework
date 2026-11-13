@@ -2,6 +2,7 @@
 
 from types import MappingProxyType
 
+
 def get_core_scheduler_mapping() -> MappingProxyType:
     """
     Return an immutable mapping with core scheduler module and class information.
@@ -15,6 +16,7 @@ def get_core_scheduler_mapping() -> MappingProxyType:
     return MappingProxyType(
         {"module": "orionis.console.base.scheduler", "class": "BaseScheduler"},
     )
+
 
 CORE_SCHEDULER: MappingProxyType = get_core_scheduler_mapping()
 """Core scheduler used by ``core_scheduler``."""

@@ -1,15 +1,15 @@
+# ruff: noqa: PLR0913, TC001
+# Match the shared capture signature and expose its container annotation at runtime.
 """Adapt MCP failure observation without invoking protocol presentation."""
 
 import asyncio
-from typing import TYPE_CHECKING
+from orionis.container.contracts.container import IContainer
 from orionis.failure.entities.context import FailureContext
 from orionis.failure.runtime import FailureRuntime, capture
 from orionis.foundation.contracts.application import IApplication
 
-if TYPE_CHECKING:
-    from orionis.container.contracts.container import IContainer
 
-async def report(  # noqa: PLR0913 - Mirrors the common contextual capture API.
+async def report(
     exception: BaseException,
     app: IContainer,
     *,
@@ -48,8 +48,10 @@ async def report(  # noqa: PLR0913 - Mirrors the common contextual capture API.
     None
         Finish available failure observation without encoding a protocol reply.
     """
-    if isinstance(exception, (asyncio.CancelledError, KeyboardInterrupt,
-                              SystemExit, GeneratorExit)):
+    if isinstance(
+        exception,
+        (asyncio.CancelledError, KeyboardInterrupt, SystemExit, GeneratorExit),
+    ):
         return
     receipt = await capture(
         exception,

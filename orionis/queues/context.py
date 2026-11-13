@@ -1,7 +1,9 @@
+# ruff: noqa: TC001
+# Keep context constructor annotations available for runtime inspection.
 """Expose the current reservation and explicit lifecycle operations."""
 
 from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING
+from orionis.queues.contracts.driver import IQueueDriver
 from orionis.queues.entities.reserved_job import ReservedJob
 from orionis.queues.exceptions import QueueLeaseError
 from orionis.queues.functions import validate_seconds
@@ -9,8 +11,6 @@ from orionis.queues.functions import validate_seconds
 type FailureCallback = Callable[[ReservedJob, Exception], Awaitable[bool]]
 """Type alias for ``Callable[[ReservedJob, Exception], Awaitable[bool]]``."""
 
-if TYPE_CHECKING:
-    from orionis.queues.contracts.driver import IQueueDriver
 
 class JobContext:
     """Expose the current reservation and explicit lifecycle operations."""

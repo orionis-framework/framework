@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Verify console dispatch uses one original failure and preserves exit codes."""
 
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -43,7 +45,12 @@ class TestConsoleFailureObservation(TestCase):
         performance.agetSeconds = AsyncMock(return_value=0.1)
         self.logger = MagicMock()
         self.reactor = Reactor(
-            self.app, loader, MagicMock(), self.logger, Catch(self.app), performance,
+            self.app,
+            loader,
+            MagicMock(),
+            self.logger,
+            Catch(self.app),
+            performance,
         )
 
     async def testExceptionArgsAndIdentityRemainUnmodified(self) -> None:

@@ -43,6 +43,7 @@ METHOD_DECODERS = MappingProxyType(
 )
 """Method decoders used by ``codecs``."""
 
+
 def decode_envelope(data: bytes) -> JsonRpcRequest:
     """
     Parse a single UTF-8 JSON-RPC message without decoding its payload.
@@ -63,6 +64,7 @@ def decode_envelope(data: bytes) -> JsonRpcRequest:
         raise McpProtocolException(-32600, "Invalid Request") from exc
     except msgspec.DecodeError as exc:
         raise McpProtocolException(-32700, "Parse error") from exc
+
 
 def decode_params(request: JsonRpcRequest) -> RequestParams:
     """
@@ -108,6 +110,7 @@ def decode_params(request: JsonRpcRequest) -> RequestParams:
         raise McpInvalidParams from exc
     return params
 
+
 def encode_error(
     exception: McpProtocolException,
     request_id: str | int | msgspec.UnsetType = msgspec.UNSET,
@@ -131,7 +134,9 @@ def encode_error(
         ErrorResponse(
             id=request_id,
             error=Error(
-                code=exception.code, message=exception.message, data=exception.data,
+                code=exception.code,
+                message=exception.message,
+                data=exception.data,
             ),
         ),
     )

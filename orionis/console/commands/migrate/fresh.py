@@ -1,12 +1,13 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Clear migration and seeder history, then rebuild the schema."""
 
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
+
 class MigrateFreshCommand(MigrationCommand):
     """Clear migration and seeder history, then rebuild the schema."""
-
-    # ruff: noqa: TC001
 
     signature: str = "migrate:fresh"
     """Signature identifier: ``migrate:fresh``."""

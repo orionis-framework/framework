@@ -1,19 +1,19 @@
+# ruff: noqa: PLR0911, TC003
+# Structural dispatch returns early; public Callable hints resolve at runtime.
 """Provide support types operations through ``unique_items``."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
+from collections.abc import Callable
 
 _UNSUPPORTED = object()
 """Sentinel distinguishing unsupported from ordinary values."""
 _SCALARS = {str, bytes, int, float, complex, bool, type(None)}
-"""Scalars definitions used by ``uniqueness``."""
+"""Exact scalar types whose native equality supports structural indexing."""
 _SMALL_INPUT = 128
-"""Small input value used by ``uniqueness``."""
+"""Maximum input size for which linear unhashable comparison avoids index overhead."""
 
-def _structural_key(value: object, active: set[int]) -> object:  # noqa: PLR0911
+
+def _structural_key(value: object, active: set[int]) -> object:
     """
     Build equality-compatible keys only for exact built-in value trees.
 
@@ -59,9 +59,10 @@ def _structural_key(value: object, active: set[int]) -> object:  # noqa: PLR0911
     finally:
         active.remove(id(value))
 
-def unique_items[T]( # NOSONAR
+
+def unique_items[T](
     items: list[T],
-    selector: Callable[[T],object],
+    selector: Callable[[T], object],
 ) -> list[T]:
     """
     Preserve the first item for each equality key, with a safe tree fast path.
@@ -80,27 +81,15 @@ def unique_items[T]( # NOSONAR
         Python equality fallback; no universal hash is assumed for custom types.
     """
     comparisons = [selector(item) for item in items]
-    try:
-        set(comparisons)
-        keys = comparisons
-    except TypeError:
-        try:
-            # Small inputs do not amortize building a complete structural index.
-            keys = (
-                [_UNSUPPORTED]
-                if len(comparisons) <= _SMALL_INPUT
-                else [_structural_key(value, set()) for value in comparisons]
-            )
-        except RecursionError:
-            keys = [_UNSUPPORTED]
-        if any(key is _UNSUPPORTED for key in keys):
-            seen_values = []
-            result = []
-            for item, value in zip(items, comparisons, strict=True):
-                if value not in seen_values:
-                    seen_values.append(value)
-                    result.append(item)
-            return result
+    keys = _comparison_keys(comparisons)
+    if keys is None:
+        seen_values = []
+        result = []
+        for item, value in zip(items, comparisons, strict=True):
+            if value not in seen_values:
+                seen_values.append(value)
+                result.append(item)
+        return result
     seen = set()
     result = []
     for item, key in zip(items, keys, strict=True):
@@ -108,3 +97,30 @@ def unique_items[T]( # NOSONAR
             seen.add(key)
             result.append(item)
     return result
+
+
+def _comparison_keys(comparisons: list[object]) -> list[object] | None:
+    """
+    Build hashable equality keys or select the linear comparison fallback.
+
+    Parameters
+    ----------
+    comparisons : list[object]
+        Selector results in input order.
+
+    Returns
+    -------
+    list[object] or None
+        Hashable keys, or None for custom, cyclic or small unhashable inputs.
+    """
+    try:
+        set(comparisons)
+    except TypeError:
+        if len(comparisons) <= _SMALL_INPUT:
+            return None
+        try:
+            keys = [_structural_key(value, set()) for value in comparisons]
+        except RecursionError:
+            return None
+        return None if any(key is _UNSUPPORTED for key in keys) else keys
+    return comparisons

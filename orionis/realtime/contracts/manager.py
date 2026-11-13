@@ -1,15 +1,14 @@
+# ruff: noqa: TC001
+# Use module-qualified runtime annotations to avoid cyclic class imports.
 """Define connection ownership and Hub delivery for registry providers."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from orionis.foundation.config.realtime.entities.realtime import RealtimeConfig
-    from orionis.realtime.clients import HubClients
-    from orionis.realtime.contracts.connection import RealtimeConnectionLike
-    from orionis.realtime.entities import BroadcastResult
-    from orionis.realtime.hub import Hub
+from orionis.foundation.config.realtime.entities.realtime import RealtimeConfig
+import orionis.realtime.clients as clients_module
+import orionis.realtime.contracts.connection as connection_module
+from orionis.realtime.entities import BroadcastResult
+import orionis.realtime.hub as hub_module
 
 
 class IConnectionManager(ABC):
@@ -37,7 +36,7 @@ class IConnectionManager(ABC):
         """
 
     @abstractmethod
-    def register(self, connection: RealtimeConnectionLike) -> None:
+    def register(self, connection: connection_module.RealtimeConnectionLike) -> None:
         """
         Register one provisional connection before its onConnect hook.
 
@@ -58,7 +57,7 @@ class IConnectionManager(ABC):
         """
 
     @abstractmethod
-    def unregister(self, connection: RealtimeConnectionLike) -> None:
+    def unregister(self, connection: connection_module.RealtimeConnectionLike) -> None:
         """
         Remove a connection and every group membership it owns.
 
@@ -75,8 +74,10 @@ class IConnectionManager(ABC):
 
     @abstractmethod
     def get(
-        self, connection_id: str, hub: type[Hub] | None = None,
-    ) -> RealtimeConnectionLike | None:
+        self,
+        connection_id: str,
+        hub: type[hub_module.Hub] | None = None,
+    ) -> connection_module.RealtimeConnectionLike | None:
         """
         Return a ready connection in the requested Hub namespace.
 
@@ -94,7 +95,7 @@ class IConnectionManager(ABC):
         """
 
     @abstractmethod
-    def snapshot(self) -> tuple[RealtimeConnectionLike, ...]:
+    def snapshot(self) -> tuple[connection_module.RealtimeConnectionLike, ...]:
         """
         Return all owned connections, including provisional connections.
 
@@ -105,7 +106,7 @@ class IConnectionManager(ABC):
         """
 
     @abstractmethod
-    def connectionIds(self, hub: type[Hub]) -> tuple[str, ...]:
+    def connectionIds(self, hub: type[hub_module.Hub]) -> tuple[str, ...]:
         """
         Snapshot ready connection identifiers in one Hub namespace.
 
@@ -121,7 +122,7 @@ class IConnectionManager(ABC):
         """
 
     @abstractmethod
-    def groupIds(self, hub: type[Hub], group: str) -> tuple[str, ...]:
+    def groupIds(self, hub: type[hub_module.Hub], group: str) -> tuple[str, ...]:
         """
         Snapshot ready members of a group within one Hub namespace.
 
@@ -194,7 +195,7 @@ class IConnectionManager(ABC):
         """
 
     @abstractmethod
-    def hub(self, hub: type[Hub]) -> HubClients:
+    def hub(self, hub: type[hub_module.Hub]) -> clients_module.HubClients:
         """
         Return client targets usable by application services.
 
@@ -216,7 +217,10 @@ class IConnectionManager(ABC):
 
     @abstractmethod
     async def broadcast(
-        self, hub: type[Hub], connection_ids: tuple[str, ...], envelope: object,
+        self,
+        hub: type[hub_module.Hub],
+        connection_ids: tuple[str, ...],
+        envelope: object,
     ) -> BroadcastResult:
         """
         Deliver one envelope through a bounded set of concurrent workers.

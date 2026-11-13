@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Distinguish unavailable request scope from broken registered view services."""
 
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -11,14 +13,28 @@ class TestViewFailureObservation(IsolatedFailureTestCase):
     """Observe failed service resolution while preserving optional fallbacks."""
 
     async def testNoSessionBindingRemainsAnOrdinaryFallback(self) -> None:
-        """Rendering without a request does not report a missing session."""
+        """
+        Keep rendering without a request from reporting a missing session.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
         app, _, handler = activate_runtime()
         with patch.object(Container, "make", AsyncMock(side_effect=ValueError)):
             self.assertIsNone(await _global_session(app)())
         self.assertEqual(handler.failures, [])
 
     async def testBrokenSessionBindingReportsOriginalFailure(self) -> None:
-        """Report a registered session provider failure and retain None."""
+        """
+        Report a registered session provider failure and retain None.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
         app, _, handler = activate_runtime()
         app.instance(ISession, MagicMock(spec=ISession))
         error = OSError("registered provider failed")
@@ -27,7 +43,14 @@ class TestViewFailureObservation(IsolatedFailureTestCase):
         self.assertEqual(handler.reports, [error])
 
     async def testBindingInspectionCannotHideOriginalFailure(self) -> None:
-        """Observe both errors if inspecting a failing container also fails."""
+        """
+        Observe both errors if inspecting a failing container also fails.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
         app, _, handler = activate_runtime()
         error, inspection = OSError("resolve"), RuntimeError("inspection")
         with (

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import ModuleType
 import orionis.background as package
 from orionis.background import BackgroundTask, BackgroundTasks
@@ -8,21 +10,9 @@ from orionis.test import TestCase
 # Public surface promised by the package.
 _EXPORTED_NAMES: frozenset[str] = frozenset({"BackgroundTask", "BackgroundTasks"})
 
+
 class TestBackgroundPackageExports(TestCase):
     """Validate the public surface exposed by ``orionis.background``."""
-
-    def testDeclaresTheExpectedPublicNames(self) -> None:
-        """Declare exactly the documented exports.
-
-        Validates that ``__all__`` lists the two classes that make up the
-        supported package surface.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(frozenset(package.__all__), _EXPORTED_NAMES)
 
     def testExportsAreSortedAndUnique(self) -> None:
         """Keep the export list sorted and free of duplicates.
@@ -30,10 +20,6 @@ class TestBackgroundPackageExports(TestCase):
         Validates that ``__all__`` is a stable, canonical listing instead
         of an accidental accumulation of names.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertEqual(package.__all__, sorted(_EXPORTED_NAMES))
 
@@ -43,10 +29,6 @@ class TestBackgroundPackageExports(TestCase):
         Validates that no public attribute beyond the declared exports is
         reachable from the package root.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         public_names = {
             name
@@ -61,10 +43,6 @@ class TestBackgroundPackageExports(TestCase):
         Validates that the package root and the concrete modules resolve
         to the same objects, so both import paths are interchangeable.
 
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
         """
         self.assertIs(BackgroundTask, TaskImplementation)
         self.assertIs(BackgroundTasks, TasksImplementation)

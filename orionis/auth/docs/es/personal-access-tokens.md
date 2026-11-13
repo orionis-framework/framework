@@ -9,9 +9,11 @@ from datetime import UTC, datetime, timedelta
 from orionis.http import response
 from orionis.support.facades import Auth
 
+
 async def issue_read_token():
     issued = await Auth.createToken(
-        "report-client", abilities=("reports.read",),
+        "report-client",
+        abilities=("reports.read",),
         expires_at=datetime.now(UTC) + timedelta(days=7),
     )
     return response.json({"token": issued.plain_text, "metadata": issued.toDict()}, 201)
@@ -27,7 +29,8 @@ El secreto aparece solo en `NewAccessToken.plain_text`. `repr` y `toDict()` lo o
 from orionis.auth import AuthorizationSnapshot
 
 snapshot = AuthorizationSnapshot(
-    permissions={"reports.read", "reports.delete"}, roles={"analyst"},
+    permissions={"reports.read", "reports.delete"},
+    roles={"analyst"},
     abilities={"reports.read"},
 )
 assert snapshot.can("reports.read")
@@ -41,7 +44,7 @@ El snapshot puede indicar un rol, pero el middleware de roles rechaza credencial
 
 En una petición token, `await Auth.revokeCurrentToken()` devuelve si revocó la credencial actual. `AccessTokenRepository` expone `create`, `findByPlainText`, `touch`, `revoke`, `revokeAll` y `purgeExpired`, todos asíncronos. Inyéctalo o su contrato en administración confiable. `revokeAll(owner)` requiere autorización del llamador para administrar al dueño.
 
-La validación rechaza credenciales malformadas, expiradas, revocadas o de dueño inactivo. La comparación utiliza helpers de tiempo constante. No bases lógica del cliente en parsear la representación del identificador/secreto.
+La validación rechaza credenciales malformadas, expiradas o revocadas. Si la identidad expone `active`, su valor debe ser `True` antes de registrar el uso del token; las identidades personalizadas sin ese atributo opcional siguen admitidas. Las claves de dueño utilizan la validación compartida de claves escalares con longitud limitada. El repositorio consulta por índice el digest SHA-256, sin comparar un secreto en texto plano almacenado. La consulta ORM combinada conserva la conexión exacta antes de callbacks retrieved o carga de relaciones; las escrituras posteriores permanecen en esa conexión. No bases lógica del cliente en parsear la representación del identificador/secreto.
 
 ## Configuración
 

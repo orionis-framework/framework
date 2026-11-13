@@ -1,12 +1,12 @@
+# ruff: noqa: TC001
+# Keep public storage annotations available for runtime reflection.
 """Define the contract for a configured storage disk."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.storage.contracts.directory import IDirectory
+from orionis.storage.contracts.file import IFile
 
-if TYPE_CHECKING:
-    from orionis.storage.contracts.directory import IDirectory
-    from orionis.storage.contracts.file import IFile
 
 class IDisk(ABC):
     """

@@ -1,9 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from abc import ABC
 from orionis.mail.entities.attachment import Attachment
 from orionis.mail.entities.content import Content
 from orionis.mail.entities.envelope import Envelope
 from orionis.mail.mailable import Mailable
 from orionis.test import TestCase
+
 
 class WelcomeMail(Mailable):
     """Declare a minimal reusable message without overriding attachments."""
@@ -45,8 +48,8 @@ class WelcomeMail(Mailable):
         """
         return Content(view="emails.welcome", text=f"Hello, {self.name}.")
 
-class TestMailable(TestCase):
 
+class TestMailable(TestCase):
     def testRequiresTheTwoDeclarativeMethods(self) -> None:
         """Require an envelope and a content declaration in every subclass.
 

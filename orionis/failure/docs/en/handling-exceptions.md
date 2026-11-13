@@ -11,12 +11,16 @@ from orionis.failure.entities import FailureContext, FailureHandling
 
 class ExceptionHandler(BaseExceptionHandler):
     async def handleFailure(
-        self, exception: BaseException, context: FailureContext,
+        self,
+        exception: BaseException,
+        context: FailureContext,
     ) -> FailureHandling | None:
         return await super().handleFailure(exception, context)
 
     async def handleResult(
-        self, value: object, context: FailureContext,
+        self,
+        value: object,
+        context: FailureContext,
     ) -> FailureHandling | None:
         return await super().handleResult(value, context)
 ```
@@ -54,12 +58,13 @@ class OrderConflict(Exception):
 
 class ExceptionHandler(BaseExceptionHandler):
     async def handleFailure(
-        self, exception: BaseException, context: FailureContext,
+        self,
+        exception: BaseException,
+        context: FailureContext,
     ) -> FailureHandling | None:
         plan = await super().handleFailure(exception, context)
-        if (
-            not isinstance(exception, OrderConflict)
-            or self.isExceptionIgnored(exception)
+        if not isinstance(exception, OrderConflict) or self.isExceptionIgnored(
+            exception
         ):
             return plan
 
@@ -68,7 +73,8 @@ class ExceptionHandler(BaseExceptionHandler):
         async def present(*, flow: str, request: object | None = None) -> object:
             if flow == "http":
                 return JSONResponse(
-                    {"message": "Order already processed"}, status_code=409,
+                    {"message": "Order already processed"},
+                    status_code=409,
                 )
             if inherited_presentation is not None:
                 return await inherited_presentation(flow=flow, request=request)

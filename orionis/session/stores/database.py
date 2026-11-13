@@ -1,9 +1,12 @@
+# ruff: noqa: PLC0415, TC001
+# Keep connection hints available and defer failure-runtime imports.
+
 """Session store that persists each session as a row in a database table."""
 
 import asyncio
 import time
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 import msgspec
 import msgspec.json as _msgjson
 from orionis.database.exceptions import QueryException
@@ -19,8 +22,7 @@ from orionis.orm.schema.types import BigInteger, String, Text
 from orionis.session.contracts.store import ISessionStore
 from orionis.session.entities.record import SessionRecord
 
-if TYPE_CHECKING:
-    from orionis.database.contracts.connection import IConnection
+from orionis.database.contracts.connection import IConnection
 
 # Default table name used when the session config does not override it.
 _DEFAULT_TABLE = "sessions"
@@ -35,6 +37,7 @@ of on every encode/decode call.
 """
 _DECODER = _msgjson.Decoder()
 """Decoder used by ``database``."""
+
 
 def _build_sessions_table(table: str) -> TableDefinition:
     """
@@ -69,6 +72,7 @@ def _build_sessions_table(table: str) -> TableDefinition:
         },
         primary_key="id",
     )
+
 
 class DatabaseSessionStore(ISessionStore):
     """
@@ -118,7 +122,7 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
-            Bind the store to *connection* and the target *table*.
+            No return value.
         """
         if not connection.supportsUniqueConstraints():
             message = (
@@ -146,7 +150,7 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
-            Create the configured table if missing using the store's definition.
+            No return value.
 
         Raises
         ------
@@ -162,7 +166,7 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
-            Create the sessions table on first use, if missing.
+            No return value.
         """
         if self._ready:
             return
@@ -202,25 +206,37 @@ class DatabaseSessionStore(ISessionStore):
 
         row = rows[0]
         expiration = row.get("expires_at")
+        if expiration is not None and not isinstance(expiration, (int, float)):
+            return None
         if expiration is None or expiration <= time.time():
-            await self._connection.delete(DeletePlan(
-                table=self._definition,
-                wheres=[
-                    WhereClause("id", value=session_id),
-                    WhereClause("expires_at", value=expiration),
-                ],
-            ))
+            await self._connection.delete(
+                DeletePlan(
+                    table=self._definition,
+                    wheres=[
+                        WhereClause("id", value=session_id),
+                        WhereClause("expires_at", value=expiration),
+                    ],
+                ),
+            )
             return None
 
         data = self.__decode(row.get("payload"))
         if data is None:
             return None
 
-        return SessionRecord(
-            id=session_id,
-            data=data,
-            expires_at=datetime.fromtimestamp(expiration, tz=UTC),
-        )
+        try:
+            expires_at = datetime.fromtimestamp(expiration, tz=UTC)
+        except (OverflowError, OSError, ValueError) as error:
+            from orionis.failure.runtime import capture_nowait
+
+            capture_nowait(
+                error,
+                flow="session",
+                phase="decode",
+                operation="database.read",
+            )
+            return None
+        return SessionRecord(id=session_id, data=data, expires_at=expires_at)
 
     async def write(self, record: SessionRecord) -> None:
         """
@@ -236,7 +252,7 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
-            Insert or replace the record keyed by its identifier.
+            No return value.
         """
         expiration = int(record.expires_at.timestamp())
 
@@ -247,11 +263,13 @@ class DatabaseSessionStore(ISessionStore):
         await self._ensureSchema()
         payload = self.__encode(record.data)
 
-        updated = await self._connection.update(UpdatePlan(
-            table=self._definition,
-            values={"payload": payload, "expires_at": expiration},
-            wheres=[WhereClause("id", value=record.id)],
-        ))
+        updated = await self._connection.update(
+            UpdatePlan(
+                table=self._definition,
+                values={"payload": payload, "expires_at": expiration},
+                wheres=[WhereClause("id", value=record.id)],
+            ),
+        )
         if not updated:
             await self.__insertOrRetryUpdate(record.id, payload, expiration)
 
@@ -263,6 +281,9 @@ class DatabaseSessionStore(ISessionStore):
     ) -> None:
         """
         Insert a new session row, falling back to an update on conflict.
+
+        Observe a failed retry separately and preserve the original insertion
+        error when recovery cannot be confirmed.
 
         Parameters
         ----------
@@ -277,27 +298,43 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
-            Insert a new session row, falling back to an update on conflict.
+            No return value.
         """
         try:
             async with self._connection.transaction():
-                await self._connection.insert(InsertPlan(
-                    table=self._definition,
-                    values=[{
-                        "id": session_id,
-                        "payload": payload,
-                        "expires_at": int(expiration),
-                    }],
-                ))
+                await self._connection.insert(
+                    InsertPlan(
+                        table=self._definition,
+                        values=[
+                            {
+                                "id": session_id,
+                                "payload": payload,
+                                "expires_at": int(expiration),
+                            },
+                        ],
+                    ),
+                )
         except QueryException as error:
-            updated = await self._connection.update(UpdatePlan(
-                table=self._definition,
-                values={"payload": payload, "expires_at": int(expiration)},
-                wheres=[WhereClause("id", value=session_id)],
-            ))
+            from orionis.failure.runtime import capture
+
+            try:
+                updated = await self._connection.update(
+                    UpdatePlan(
+                        table=self._definition,
+                        values={"payload": payload, "expires_at": int(expiration)},
+                        wheres=[WhereClause("id", value=session_id)],
+                    ),
+                )
+            except QueryException as recovery_error:
+                await capture(
+                    recovery_error,
+                    flow="session",
+                    phase="recovery",
+                    operation="database.write",
+                )
+                updated = 0
             if not updated:
                 raise
-            from orionis.failure.runtime import capture  # noqa: PLC0415
             await capture(
                 error,
                 flow="session",
@@ -325,14 +362,19 @@ class DatabaseSessionStore(ISessionStore):
         expiration = int(record.expires_at.timestamp())
         if expiration <= now:
             return False
-        affected = await self._connection.update(UpdatePlan(
-            table=self._definition,
-            values={"payload": self.__encode(record.data), "expires_at": expiration},
-            wheres=[
-                WhereClause("id", value=record.id),
-                WhereClause("expires_at", operator=">", value=int(now)),
-            ],
-        ))
+        affected = await self._connection.update(
+            UpdatePlan(
+                table=self._definition,
+                values={
+                    "payload": self.__encode(record.data),
+                    "expires_at": expiration,
+                },
+                wheres=[
+                    WhereClause("id", value=record.id),
+                    WhereClause("expires_at", operator=">", value=int(now)),
+                ],
+            ),
+        )
         return affected > 0
 
     async def delete(self, session_id: str) -> bool:
@@ -350,10 +392,12 @@ class DatabaseSessionStore(ISessionStore):
             True only when a row was deleted.
         """
         await self._ensureSchema()
-        affected = await self._connection.delete(DeletePlan(
-            table=self._definition,
-            wheres=[WhereClause("id", value=session_id)],
-        ))
+        affected = await self._connection.delete(
+            DeletePlan(
+                table=self._definition,
+                wheres=[WhereClause("id", value=session_id)],
+            ),
+        )
         return affected > 0
 
     async def gc(self) -> None:
@@ -366,13 +410,17 @@ class DatabaseSessionStore(ISessionStore):
         Returns
         -------
         None
-            Remove all rows whose ``expires_at`` is in the past.
+            No return value.
         """
         await self._ensureSchema()
-        await self._connection.delete(DeletePlan(
-            table=self._definition,
-            wheres=[WhereClause("expires_at", operator="<=", value=int(time.time()))],
-        ))
+        await self._connection.delete(
+            DeletePlan(
+                table=self._definition,
+                wheres=[
+                    WhereClause("expires_at", operator="<=", value=int(time.time())),
+                ],
+            ),
+        )
 
     # ── Serialization helpers ────────────────────────────────────────────────
 
@@ -412,7 +460,8 @@ class DatabaseSessionStore(ISessionStore):
         try:
             payload = _DECODER.decode(data)
         except (msgspec.DecodeError, UnicodeDecodeError) as error:
-            from orionis.failure.runtime import capture_nowait  # noqa: PLC0415
+            from orionis.failure.runtime import capture_nowait
+
             capture_nowait(
                 error,
                 flow="session",

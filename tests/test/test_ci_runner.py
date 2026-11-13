@@ -1,15 +1,21 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import contextlib
 import importlib.util
 import io
+import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 from orionis.test import TestCase
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from types import ModuleType
+
 
 def _load_runner() -> ModuleType:
     """Load an isolated copy of the shared CI runner.
@@ -24,6 +30,7 @@ def _load_runner() -> ModuleType:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
 
 class _RecordingProcesses:
     """Record process arguments and emit predefined exit statuses."""
@@ -43,7 +50,14 @@ class _RecordingProcesses:
         self.statuses = []
         self.error = None
 
-    def run(self, command, *, cwd, env, check):
+    def run(
+        self,
+        command: list[str],
+        *,
+        cwd: Path,
+        env: dict[str, str],
+        check: bool,
+    ) -> subprocess.CompletedProcess[bytes]:
         """Record a subprocess call without launching another interpreter.
 
         Parameters
@@ -67,6 +81,7 @@ class _RecordingProcesses:
             raise self.error
         status = self.statuses.pop(0) if self.statuses else 0
         return subprocess.CompletedProcess(command, status)
+
 
 class TestSharedCiRunner(TestCase):
     """Validate suite discovery and publication gate exit statuses."""
@@ -123,7 +138,9 @@ class TestSharedCiRunner(TestCase):
             contextlib.redirect_stderr(self.errors),
         ):
             return self.runner.run_suites(
-                self.repo, suites, continue_on_error=continue_on_error,
+                self.repo,
+                suites,
+                continue_on_error=continue_on_error,
             )
 
     def _main(self, arguments: list[str]) -> int:
@@ -226,6 +243,72 @@ class TestSharedCiRunner(TestCase):
         self._createFile("tests/real_database/mysql/test_connection.py")
         self.assertEqual(self.runner.discover_suites(self.repo), [])
 
+    def testDiscoveryPrunesLocalDatabaseDirectoryBeforeTraversal(self) -> None:
+        """Avoid reading excluded directories during suite discovery."""
+        self._createFile("tests/alpha/test_public.py")
+        excluded = self.repo / "tests" / "real_database"
+        excluded.mkdir()
+        scandir = os.scandir
+
+        def guarded_scandir(
+            path: str | os.PathLike[str],
+        ) -> Iterator[os.DirEntry[str]]:
+            """Reject traversal into the excluded fixture directory.
+
+            Parameters
+            ----------
+            path : str | os.PathLike[str]
+                Directory requested by the suite walker.
+
+            Returns
+            -------
+            Iterator[os.DirEntry[str]]
+                Directory entries outside the excluded fixture.
+            """
+            self.assertNotEqual(Path(path), excluded)
+            return scandir(path)
+
+        with patch("os.scandir", side_effect=guarded_scandir):
+            suites = self.runner.discover_suites(self.repo)
+        self.assertEqual([suite.directory for suite in suites], ["tests/alpha"])
+
+    def testDiscoveryPropagatesUnreadableSuiteErrors(self) -> None:
+        """Reject incomplete discovery when an allowed suite cannot be read."""
+        self._createFile("tests/alpha/test_public.py")
+        blocked = self.repo / "tests" / "alpha"
+        scandir = os.scandir
+
+        def guarded_scandir(
+            path: str | os.PathLike[str],
+        ) -> Iterator[os.DirEntry[str]]:
+            """Simulate a filesystem failure in an allowed suite.
+
+            Parameters
+            ----------
+            path : str | os.PathLike[str]
+                Directory requested by the suite walker.
+
+            Returns
+            -------
+            Iterator[os.DirEntry[str]]
+                Directory entries when access is allowed.
+
+            Raises
+            ------
+            PermissionError
+                If the requested directory is blocked by the fixture.
+            """
+            if Path(path) == blocked:
+                message = "controlled traversal failure"
+                raise PermissionError(message)
+            return scandir(path)
+
+        with (
+            patch("os.scandir", side_effect=guarded_scandir),
+            self.assertRaises(PermissionError),
+        ):
+            self.runner.discover_suites(self.repo)
+
     def testFailureStopsBeforeStartingTheNextSuite(self) -> None:
         """
         Preserve the failing exit code and stop subsequent processes.
@@ -327,22 +410,25 @@ class TestSharedCiRunner(TestCase):
         """
         self.processes.statuses = [7]
         self.assertEqual(
-            self._main(["--continue-on-error", "--verbosity=0"]), 7,
+            self._main(["--continue-on-error", "--verbosity=0"]),
+            7,
         )
         repo = Path(self.runner.__file__).resolve().parents[2]
         self.assertEqual(
-            len(self.processes.calls), len(self.runner.discover_suites(repo)),
+            len(self.processes.calls),
+            len(self.runner.discover_suites(repo)),
         )
         for command, cwd, _, _ in self.processes.calls:
             self.assertIn("--verbosity=0", command)
             self.assertNotIn("--start-dir=tests/real_database", command)
             self.assertEqual(cwd, repo)
         root_commands = [
-            command for command, _, _, _ in self.processes.calls
+            command
+            for command, _, _, _ in self.processes.calls
             if "--file-pattern=test_example.py" in command
         ]
         self.assertEqual(len(root_commands), 1)
-        self.assertIn("--start-dir=tests", root_commands[0])
+        self.assertIn("--start-dir=tests/test_example.py", root_commands[0])
 
     def testCliReportsProcessStartupFailure(self) -> None:
         """

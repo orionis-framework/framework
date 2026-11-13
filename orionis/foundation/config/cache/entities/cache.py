@@ -11,6 +11,7 @@ from orionis.support.entities.base import BaseEntity
 _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
 """Define the supported cache driver names."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Cache(BaseEntity):
     """

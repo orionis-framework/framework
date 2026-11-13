@@ -45,6 +45,8 @@ The connector is synchronous; Orionis runs connection, query, result, and transa
 
 Engines initialize lazily and are reused. Close direct connections when finished; let application lifecycle close managed connections. Manager `disconnect(name=None)` closes all cached connections; a supplied name closes only that connection. Do not disconnect a shared service while other tasks use it.
 
+When closing all managed connections, the manager attempts every cached connection even if one fails. It preserves cancellation when present, otherwise the first close failure, and reports additional failures centrally. Concurrent closes of a blocking checkout or its worker share completion and wait for cancellation cleanup before returning.
+
 Reads materialize full results. Filter, select columns, and paginate instead of designing a large exporter around assumed cursor streaming. Split large writes and remember each batch consumes memory. Distinguish configuration/driver errors from SQL failures; track latency, row counts, and business operations without exposing bound data. This layer does not guarantee automatic transaction retries.
 
 Independent operations use `engine.begin()` contexts and release their connection after each call; transactions retain their connection until nested levels finish. Parsed raw SQL uses an LRU cache of 256 texts without turning variable values into interpolated SQL. PostgreSQL batch inserts count rows returned by `RETURNING`, including differences when a trigger suppresses an input row.

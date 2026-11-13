@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema string type behavior."""
+
 from __future__ import annotations
 from orionis.orm.schema.types import (
     String,
@@ -6,32 +10,6 @@ from orionis.orm.schema.types.column_type import ColumnType
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
 
-class TestString(TestCase):
-    def testStringCarriesLength(self) -> None:
-        """Store the declared length on string columns.
-
-        Validates the string length parameter.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(String(120).length, 120)
-        self.assertEqual(String().length, 255)
-
-    def testStringRejectsInvalidLength(self) -> None:
-        """Raise ValueError for non-positive string lengths.
-
-        Validates the length guard.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(ValueError):
-            String(0)
 
 class TestStringOptions(TestCase):
     """Verify String constructor metadata consumed by the compiler."""
@@ -42,7 +20,7 @@ class TestStringOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = String()
         assert_column_options(
@@ -68,9 +46,9 @@ class TestStringOptions(TestCase):
         Returns
         -------
         None
-            Verify unspecified, negative, and non-integer length cases.
+            No return value.
         """
         self.assertIsNone(String(None).length)
-        for length in (-1, 1.5, "10"):
+        for length in (0, -1, 1.5, "10"):
             with self.assertRaises(ValueError):
                 String(length)  # type: ignore[arg-type]

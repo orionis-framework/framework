@@ -8,6 +8,7 @@ A request enters through an ASGI or RSGI adapter. The kernel applies global poli
 from orionis.http import Request, Response, response
 from orionis.http.base.controller import BaseController
 
+
 class CatalogController(BaseController):
     async def show(self, request: Request) -> Response:
         product_id = request.routeParam("product_id")
@@ -33,6 +34,8 @@ Requests and identities live in a scope. Do not retain `Request`, session or aut
 Each application and HTTP kernel belongs to one worker event loop; do not share them across threads or event loops. The kernel enforces `http.body_limits.max_concurrent_requests` across ASGI and RSGI requests without blocking the loop. A request retains its slot through response delivery and resource cleanup, including cancellation. Excess requests receive `503` with `Retry-After: 1` before another request scope is allocated.
 
 Framework handlers convert validation and authentication exceptions. An exception after streaming headers have been sent cannot replace the HTTP status already delivered. Arrange preparation work to fail before returning a stream.
+
+Cleanup preserves a failure escaping the current request or WebSocket, not an unrelated exception handled by its caller. Without such a failure, cleanup errors propagate. If an ASGI client disconnects before the last request-body frame, body reading raises `ConnectionError` and does not cache a partial body.
 
 ## Evidence and next steps
 

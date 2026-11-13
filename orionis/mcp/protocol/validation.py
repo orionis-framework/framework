@@ -60,6 +60,7 @@ _CONTENT_TYPES = {
 _MAX_COMPLETIONS = 100
 """Max completions value used by ``validation``."""
 
+
 def validate_json(value: object) -> None:
     """
     Reject non-JSON values and nonfinite numbers rather than changing data.
@@ -88,6 +89,7 @@ def validate_json(value: object) -> None:
         return
     message = "MCP values must contain finite JSON data"
     raise ValueError(message)
+
 
 def validate_result(result: object, method: str) -> None:
     """
@@ -121,10 +123,12 @@ def validate_result(result: object, method: str) -> None:
     value = msgspec.to_builtins(result, builtin_types=(msgspec.Raw,))
     msgspec.convert(value, type=expected, strict=True)
     validate_metadata(value.get("_meta", {}), allow_reserved=False)
+    validate_json(value.get("_meta", {}))
     if isinstance(result, CacheableResult) and result.ttlMs < 0:
         message = "MCP cache TTL must be nonnegative"
         raise ValueError(message)
     _result_payload(result)
+
 
 def _result_payload(result: object) -> None:
     """
@@ -154,6 +158,7 @@ def _result_payload(result: object) -> None:
     elif isinstance(result, CompleteCompletionResult):
         _validate_completion(result)
 
+
 def _validate_completion(result: CompleteCompletionResult) -> None:
     """
     Check completion count and total bounds before serialization.
@@ -180,6 +185,7 @@ def _validate_completion(result: CompleteCompletionResult) -> None:
         message = "Invalid completion result"
         raise ValueError(message)
 
+
 def _object(value: object) -> dict[str, object]:
     """
     Convert a public wire struct without a second JSON serialization.
@@ -200,6 +206,7 @@ def _object(value: object) -> dict[str, object]:
         raise TypeError(message)
     validate_json(value)
     return value
+
 
 def _common(value: dict[str, object]) -> None:
     """
@@ -228,6 +235,7 @@ def _common(value: dict[str, object]) -> None:
             raise ValueError(message)
         if annotations.lastModified is not msgspec.UNSET:
             datetime.fromisoformat(annotations.lastModified)
+
 
 def validate_content(content: object) -> None:
     """
@@ -264,6 +272,7 @@ def validate_content(content: object) -> None:
         for icon in cast("list[object]", value.get("icons", [])):
             msgspec.convert(icon, type=Icon, strict=True)
 
+
 def validate_resource(content: object) -> None:
     """
     Check text/blob resource contents and their explicit URI.
@@ -289,6 +298,7 @@ def validate_resource(content: object) -> None:
         base64.b64decode(cast("str", value["blob"]), validate=True)
     if "_meta" in value:
         validate_metadata(value["_meta"], allow_reserved=False)
+
 
 def _message(message: object) -> None:
     """

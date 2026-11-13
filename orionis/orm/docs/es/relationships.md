@@ -43,7 +43,7 @@ async def recruit(team_id: int):
 
 `hasMany` devuelve colección; `hasOne` y `belongsTo` devuelven modelo o `None` a través de `getResults()`. `first()` sobre una relación devuelve el primer modelo. `hasOne` no impone unicidad en la base: una relación realmente uno a uno necesita una restricción única sobre la FK.
 
-Las convenciones son `team_id` en `Player` para `Team.hasMany(Player)` y para `Player.belongsTo(Team)`, y PK como clave local/propietaria. Personaliza con `hasMany(Player, foreign_key="owner_id", local_key="id")`, `hasOne(...)` o `belongsTo(Team, foreign_key="owner_id", owner_key="id")`. Los builders de relación mantienen esas condiciones al añadir filtros.
+Las convenciones son `team_id` en `Player` para `Team.hasMany(Player)` y para `Player.belongsTo(Team)`, y PK como clave local/propietaria. Personaliza con `hasMany(Player, foreign_key="owner_id", local_key="id")`, `hasOne(...)` o `belongsTo(Team, foreign_key="owner_id", owner_key="id")`. Los builders de relación mantienen esas condiciones al añadir filtros. Si la clase relacionada no declara conexión explícita, sus consultas de relación y pivot heredan la conexión de lectura del padre. Una conexión explícita de la clase relacionada tiene prioridad, incluso si nombra la predeterminada de la aplicación. `hasOne`/`hasMany.create()` utiliza esa misma conexión, aplica el constructor y los eventos normales de guardado, y devuelve el modelo aunque un evento vete la persistencia.
 
 ## Cargar una lista sin N+1
 
@@ -51,7 +51,10 @@ Las convenciones son `team_id` en `Player` para `Team.hasMany(Player)` y para `P
 async def roster():
     teams = await Team.withRelations("players").orderBy("id").get()
     return [
-        {"team": team.name, "players": [p.toDict() for p in team.getRelation("players")]}
+        {
+            "team": team.name,
+            "players": [p.toDict() for p in team.getRelation("players")],
+        }
         for team in teams
     ]
 ```
@@ -71,6 +74,6 @@ async def replace_roles(user, role_ids: list[int]):
     return await user.roles().sync(role_ids)
 ```
 
-Este fragmento requiere un modelo de aplicación con método `roles()` y su pivot ya migrada. `attach(ids, attributes=None)` inserta vínculos y devuelve recuento; admite una identidad, modelos, iterables o un mapping de identidad a atributos pivot. `detach(ids=None)` desvincula; sin argumento elimina todos los vínculos del padre. `sync(ids)` deja exactamente esas identidades y devuelve listas `attached` y `detached`; `toggle(ids)` invierte vínculos. `wherePivot(column, value)` o `(column, operator, value)` restringe lecturas pivot.
+Este fragmento requiere un modelo de aplicación con método `roles()` y su pivot ya migrada. `attach(ids, attributes=None)` inserta vínculos y devuelve recuento; admite una identidad, modelos, iterables o un mapping de identidad a atributos pivot. Los atributos pivot adicionales no pueden sobrescribir la identidad del padre ni la relacionada proporcionadas a `attach`. La carga anticipada conserva el orden de resultados de la consulta relacionada y no multiplica una fila relacionada por existir vínculos pivot duplicados. `detach(ids=None)` desvincula; sin argumento elimina todos los vínculos del padre. `sync(ids)` deja exactamente esas identidades y devuelve listas `attached` y `detached`; `toggle(ids)` invierte vínculos. `wherePivot(column, value)` o `(column, operator, value)` restringe lecturas pivot.
 
 La implementación actual no tiene `updateExistingPivot` ni ofrece sincronización atómica implícita: `sync` consulta, elimina e inserta en pasos. Para operaciones críticas envuelve el flujo en una [transacción](../../../database/docs/es/transactions.md) de la misma conexión y define una restricción única compuesta para evitar duplicados. `detach` elimina vínculos; `delete()` sobre una relación elimina filas relacionadas. Elige deliberadamente según el efecto de negocio.

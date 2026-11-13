@@ -1,15 +1,15 @@
+# ruff: noqa: TC001
+# Keep the socket message annotation available to runtime reflection.
 """Provide realtime operations.
 
 Includes ``RPCErrorPayload``, ``Invoke``, ``Completion``, ``Cancel``.
 """
 
 from math import isfinite
-from typing import TYPE_CHECKING
 import msgspec
+from orionis.http.websocket_message import WebSocketMessage
 from orionis.realtime.decorators import MAX_TARGET_LENGTH
 from orionis.realtime.errors import ProtocolError
-if TYPE_CHECKING:
-    from orionis.http.websocket_message import WebSocketMessage
 
 MAX_ID_LENGTH = 128
 """Max id length value used by ``protocol``."""
@@ -22,6 +22,7 @@ MAX_ERROR_CODE_LENGTH = 64
 _DEFAULT_MESSAGE_LIMIT = 1024 * 1024
 """Default message limit used by ``protocol``."""
 
+
 class RPCErrorPayload(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     """Carry the public error returned by one completed invocation."""
 
@@ -30,8 +31,12 @@ class RPCErrorPayload(msgspec.Struct, frozen=True, forbid_unknown_fields=True):
     message: str
     """Human-readable message associated with this operation or result."""
 
+
 class Invoke(
-    msgspec.Struct, tag="invoke", frozen=True, forbid_unknown_fields=True,
+    msgspec.Struct,
+    tag="invoke",
+    frozen=True,
+    forbid_unknown_fields=True,
 ):
     """Request one named server operation within a bounded invocation lifetime."""
 
@@ -46,8 +51,12 @@ class Invoke(
     timeout: float | None = None
     """Maximum duration allowed for an execution attempt."""
 
+
 class Completion(
-    msgspec.Struct, tag="completion", frozen=True, forbid_unknown_fields=True,
+    msgspec.Struct,
+    tag="completion",
+    frozen=True,
+    forbid_unknown_fields=True,
 ):
     """Finish a pending server-to-client call with exactly one result or error."""
 
@@ -56,22 +65,30 @@ class Completion(
     result: object = msgspec.UNSET
     error: RPCErrorPayload | msgspec.UnsetType = msgspec.UNSET
 
+
 class Cancel(
-    msgspec.Struct, tag="cancel", frozen=True, forbid_unknown_fields=True,
+    msgspec.Struct,
+    tag="cancel",
+    frozen=True,
+    forbid_unknown_fields=True,
 ):
     """Cancel one active client-to-server invocation."""
 
     id: str
     """Identifier used to correlate or locate this protocol or storage record."""
 
+
 class Ping(msgspec.Struct, tag="ping", frozen=True, forbid_unknown_fields=True):
     """Request an application-level pong without creating a heartbeat task."""
+
 
 class Pong(msgspec.Struct, tag="pong", frozen=True, forbid_unknown_fields=True):
     """Acknowledge an application-level ping."""
 
+
 type ClientMessage = Invoke | Completion | Cancel | Ping | Pong
 """Type alias for ``Invoke | Completion | Cancel | Ping | Pong``."""
+
 
 def validate_invocation_id(value: str) -> None:
     """
@@ -94,11 +111,15 @@ def validate_invocation_id(value: str) -> None:
         nonprintable characters.
     """
     if (
-        not value or len(value) > MAX_ID_LENGTH
-        or not value.isascii() or not value.isprintable() or " " in value
+        not value
+        or len(value) > MAX_ID_LENGTH
+        or not value.isascii()
+        or not value.isprintable()
+        or " " in value
     ):
         message = "Invalid invocation identifier"
         raise ProtocolError(message)
+
 
 def _validate_invoke(message: Invoke) -> None:
     """
@@ -124,7 +145,8 @@ def _validate_invoke(message: Invoke) -> None:
         error = "Invalid invocation target"
         raise ProtocolError(error)
     if (
-        len(message.args) > MAX_ARGUMENTS or len(message.kwargs) > MAX_ARGUMENTS
+        len(message.args) > MAX_ARGUMENTS
+        or len(message.kwargs) > MAX_ARGUMENTS
         or any(not key or len(key) > MAX_TARGET_LENGTH for key in message.kwargs)
     ):
         error = "Invocation arguments exceed protocol limits"
@@ -134,6 +156,7 @@ def _validate_invoke(message: Invoke) -> None:
     ):
         error = "Invocation timeout must be finite and positive"
         raise ProtocolError(error)
+
 
 def _validate_completion(message: Completion) -> None:
     """
@@ -159,11 +182,13 @@ def _validate_completion(message: Completion) -> None:
         error = "Completion requires exactly one result or error"
         raise ProtocolError(error)
     if isinstance(message.error, RPCErrorPayload) and (
-        not message.error.code or len(message.error.code) > MAX_ERROR_CODE_LENGTH
+        not message.error.code
+        or len(message.error.code) > MAX_ERROR_CODE_LENGTH
         or len(message.error.message) > MAX_ERROR_MESSAGE_LENGTH
     ):
         error = "Completion error exceeds protocol limits"
         raise ProtocolError(error)
+
 
 class HubProtocol:
     """Encode Orionis Realtime v1 using route-selected JSON or MessagePack."""
@@ -172,7 +197,10 @@ class HubProtocol:
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, name: str = "json", *, max_message_size: int = _DEFAULT_MESSAGE_LIMIT,
+        self,
+        name: str = "json",
+        *,
+        max_message_size: int = _DEFAULT_MESSAGE_LIMIT,
     ) -> None:
         """
         Prepare reusable msgspec codecs without connection or task ownership.
@@ -199,7 +227,8 @@ class HubProtocol:
             message = "Realtime protocol must be 'json' or 'msgpack'"
             raise ValueError(message)
         if (
-            not isinstance(max_message_size, int) or isinstance(max_message_size, bool)
+            not isinstance(max_message_size, int)
+            or isinstance(max_message_size, bool)
             or max_message_size < 1
         ):
             message = "Realtime message limit must be a positive integer"
@@ -251,7 +280,8 @@ class HubProtocol:
         try:
             decoder = self._decoder
             decoded = (
-                decoder.decode(data) if isinstance(decoder, msgspec.json.Decoder)
+                decoder.decode(data)
+                if isinstance(decoder, msgspec.json.Decoder)
                 else decoder.decode(message.bytes)
             )
         except (msgspec.DecodeError, RecursionError) as exc:

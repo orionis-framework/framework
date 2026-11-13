@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value matches the password supplied in a sibling field."""
 
 from orionis.schemas.rule import Rule
@@ -6,6 +8,7 @@ from orionis.schemas.rule import Rule
 _MISSING: object = object()
 """Sentinel telling apart "field absent" from "field present but None"."""
 
+
 class ConfirmPassword(Rule):
     """
     Ensure a value matches the password supplied in a sibling field.
@@ -13,8 +16,6 @@ class ConfirmPassword(Rule):
     The rule is applied to the confirmation field and compares its value
     against the field holding the original password.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_other_field",)
     """Declare the instance attribute slots reserved by this class."""
@@ -43,7 +44,7 @@ class ConfirmPassword(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------

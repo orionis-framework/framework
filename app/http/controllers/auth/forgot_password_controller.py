@@ -1,12 +1,15 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 from app.http.schemas.auth.forgot_password import ForgotPasswordSchema
 from orionis.auth.passwords.broker import PasswordBroker
-from orionis.http.default.controllers.forgot_password_controller import \
-    ForgotPasswordController as BaseForgotPasswordController
+from orionis.http.default.controllers.forgot_password_controller import (
+    ForgotPasswordController as BaseForgotPasswordController,
+)
 from orionis.http import HTMLResponse, HttpResponse
 from orionis.http.request import Request
 
-class ForgotPasswordController(BaseForgotPasswordController):
 
+class ForgotPasswordController(BaseForgotPasswordController):
     async def index(self) -> HTMLResponse:
         """
         Render the forgot-password page.

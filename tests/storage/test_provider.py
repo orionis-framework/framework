@@ -1,4 +1,7 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
+from unittest.mock import patch
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.storage import provider as provider_module
@@ -6,6 +9,7 @@ from orionis.storage.contracts.manager import IStorageManager
 from orionis.storage.manager import StorageManager
 from orionis.storage.provider import StorageProvider
 from orionis.test import TestCase
+
 
 class _StubApp:
     """Application double capturing every binding it receives."""
@@ -18,7 +22,7 @@ class _StubApp:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.singletons: list[tuple[object, object]] = []
 
@@ -36,8 +40,10 @@ class _StubApp:
         Returns
         -------
         None
+            No return value.
         """
         self.singletons.append((abstract, concrete))
+
 
 class _StubStorageFacade:
     """Storage facade double counting how many times it was pinned."""
@@ -50,7 +56,7 @@ class _StubStorageFacade:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.pinned = 0
 
@@ -61,11 +67,12 @@ class _StubStorageFacade:
         Returns
         -------
         None
+            No return value.
         """
         self.pinned += 1
 
-class TestStorageProviderDefinition(TestCase):
 
+class TestStorageProviderDefinition(TestCase):
     def testInheritsTheFrameworkProviderBases(self) -> None:
         """Extend both ServiceProvider and DeferrableProvider.
 
@@ -74,7 +81,7 @@ class TestStorageProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(StorageProvider, ServiceProvider))
         self.assertTrue(issubclass(StorageProvider, DeferrableProvider))
@@ -87,7 +94,7 @@ class TestStorageProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         self.assertIs(StorageProvider(app).app, app)
@@ -100,7 +107,7 @@ class TestStorageProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(StorageProvider.provides(), [IStorageManager])
 
@@ -112,26 +119,12 @@ class TestStorageProviderDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(inspect.iscoroutinefunction(StorageProvider.boot))
 
+
 class TestStorageProviderRegister(TestCase):
-
-    def testRegisterBindsExactlyOneService(self) -> None:
-        """Bind a single service during registration.
-
-        Validates that no extra binding leaks into the container.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        app = _StubApp()
-        StorageProvider(app).register()
-        self.assertEqual(len(app.singletons), 1)
-
     def testRegisterBindsTheManagerAsSingleton(self) -> None:
         """Bind IStorageManager to the concrete StorageManager.
 
@@ -140,14 +133,14 @@ class TestStorageProviderRegister(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         app = _StubApp()
         StorageProvider(app).register()
-        self.assertIn((IStorageManager, StorageManager), app.singletons)
+        self.assertEqual(app.singletons, [(IStorageManager, StorageManager)])
+
 
 class TestStorageProviderBoot(TestCase):
-
     def setUp(self) -> None:
         """Replace the storage facade with a double before each test.
 
@@ -157,24 +150,11 @@ class TestStorageProviderBoot(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self._original_facade = provider_module.StorageFacade
         self._facade = _StubStorageFacade()
-        provider_module.StorageFacade = self._facade
+        self.enterContext(patch.object(provider_module, "StorageFacade", self._facade))
         self._app = _StubApp()
-
-    def tearDown(self) -> None:
-        """Restore the original storage facade after each test.
-
-        Guarantees that module-level state never leaks between tests.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        provider_module.StorageFacade = self._original_facade
 
     async def testBootPinsTheStorageFacade(self) -> None:
         """Pin the storage facade once the services are registered.
@@ -184,20 +164,8 @@ class TestStorageProviderBoot(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await StorageProvider(self._app).boot()
         self.assertEqual(self._facade.pinned, 1)
-
-    async def testBootRegistersNoAdditionalBinding(self) -> None:
-        """Keep the boot phase free of container registrations.
-
-        Validates the separation between register() and boot().
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        await StorageProvider(self._app).boot()
         self.assertEqual(self._app.singletons, [])

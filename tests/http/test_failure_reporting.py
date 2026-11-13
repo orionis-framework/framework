@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Exercise failure delivery while preserving HTTP transport behavior."""
 
 from __future__ import annotations
@@ -69,6 +71,75 @@ async def reporting_kernel(
 
 
 class TestHttpFailureReporting(TestCase):
+    async def testHandledOuterExceptionCannotHideLocalCleanupFailures(self) -> None:
+        """Propagate owned cleanup errors even inside another caller's except block.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for interface in ("asgi", "rsgi", "websocket"):
+            with self.subTest(interface=interface):
+                app, kernel, handler, _, _ = await reporting_kernel()
+                failure = OSError("owned cleanup failed")
+
+                def close(_request: Request, error: Exception = failure) -> None:
+                    """Raise the cleanup failure selected by this scenario.
+
+                    Parameters
+                    ----------
+                    _request : Request
+                        Request whose cleanup is exercised.
+                    error : Exception
+                        Failure to propagate.
+
+                    Returns
+                    -------
+                    None
+                        No return value.
+                    """
+                    raise error
+
+                socket = SimpleNamespace(
+                    accepted=True,
+                    closed=False,
+                    close=_AsyncCall(side_effect=failure),
+                )
+                unrelated = LookupError("unrelated caller exception")
+                with (
+                    replace_attribute(Request, "close", close),
+                    replace_attribute(
+                        type(kernel),
+                        "_KernelHTTP__processWebSocket",
+                        _AsyncCall(),
+                    ),
+                    operation(app, flow="http", isolated=True),
+                ):
+                    try:
+                        raise unrelated
+                    except LookupError:
+                        with self.assertRaises(OSError) as caught:
+                            if interface == "asgi":
+                                await kernel.handleASGI(
+                                    make_asgi_scope("/api"),
+                                    receive_empty,
+                                    send_noop,
+                                )
+                            elif interface == "rsgi":
+                                await kernel.handleRSGI(
+                                    _StubRsgiScope("/api"),
+                                    _StubRsgiProtocol(),
+                                )
+                            else:
+                                await kernel._KernelHTTP__runWebSocket(
+                                    None,
+                                    socket,
+                                    Interface.ASGI,
+                                )
+                self.assertIs(caught.exception, failure)
+                self.assertEqual([error for error, _ in handler.events], [failure])
+
     async def testBufferedSendFailureRetainsResponseStartedState(self) -> None:
         """Observe transport failures without attempting a second response."""
         for fail_type, started in (
@@ -104,7 +175,8 @@ class TestHttpFailureReporting(TestCase):
                     )
                 self.assertEqual([error for error, _ in handler.events], [failure])
                 self.assertEqual(
-                    handler.events[0][1].metadata["response_started"], started,
+                    handler.events[0][1].metadata["response_started"],
+                    started,
                 )
                 self.assertEqual(len(events), 2 if started else 1)
 
@@ -117,7 +189,9 @@ class TestHttpFailureReporting(TestCase):
                 failure = OSError("socket send failed")
                 if interface == "asgi":
                     transport = ASGIWebSocketTransport(
-                        {}, receive_empty, _AsyncCall(side_effect=failure),
+                        {},
+                        receive_empty,
+                        _AsyncCall(side_effect=failure),
                     )
                 else:
                     transport = RSGIWebSocketTransport(object())
@@ -163,16 +237,23 @@ class TestHttpFailureReporting(TestCase):
                 socket = SimpleNamespace(accepted=False, closed=False, close=closing)
                 with (
                     replace_attribute(
-                        type(kernel), "_KernelHTTP__processWebSocket", process,
+                        type(kernel),
+                        "_KernelHTTP__processWebSocket",
+                        process,
                     ),
                     operation(app, flow="websocket", isolated=True),
                     self.assertRaises(type(primary)) as caught,
                 ):
                     await kernel._KernelHTTP__runWebSocket(None, socket, Interface.ASGI)
                 self.assertIs(caught.exception, primary)
-                expected = [secondary] if isinstance(
-                    primary, asyncio.CancelledError,
-                ) else [primary, secondary]
+                expected = (
+                    [secondary]
+                    if isinstance(
+                        primary,
+                        asyncio.CancelledError,
+                    )
+                    else [primary, secondary]
+                )
                 self.assertEqual([error for error, _ in handler.events], expected)
                 self.assertEqual(closing.awaitCount, 1)
 
@@ -243,12 +324,14 @@ class TestHttpFailureReporting(TestCase):
                         await app(make_asgi_scope("/api"), receive_empty, send_noop)
                     else:
                         await app.__rsgi__(
-                            _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                            _StubRsgiScope("/api"),
+                            _StubRsgiProtocol(),
                         )
                 self.assertIs(caught.exception, primary)
                 self.assertEqual(sender.awaitCount, 1)
                 self.assertEqual(
-                    [error for error, _ in handler.events], [primary, secondary],
+                    [error for error, _ in handler.events],
+                    [primary, secondary],
                 )
                 self.assertEqual(
                     handler.events[1][1].parent_event_id,
@@ -264,25 +347,31 @@ class TestHttpFailureReporting(TestCase):
                 closed = []
 
                 def upload(
-                    label: str, error: Exception | None = None,
+                    label: str,
+                    error: Exception | None = None,
                     closed: list = closed,
                 ) -> object:
                     """Create one upload whose closure can fail independently."""
+
                     def close() -> None:
                         """Record the attempt before raising its exact error."""
                         closed.append(label)
                         if error is not None:
                             raise error
+
                     return SimpleNamespace(close=close)
 
-                form = FormData([
-                    ("first", upload("first", first)),
-                    ("second", upload("second", second)),
-                    ("third", upload("third")),
-                ])
+                form = FormData(
+                    [
+                        ("first", upload("first", first)),
+                        ("second", upload("second", second)),
+                        ("third", upload("third")),
+                    ],
+                )
                 sender = _AsyncCall()
                 setattr(
-                    kernel, f"_KernelHTTP__{interface}_adapter",
+                    kernel,
+                    f"_KernelHTTP__{interface}_adapter",
                     SimpleNamespace(send=sender),
                 )
 
@@ -298,13 +387,15 @@ class TestHttpFailureReporting(TestCase):
                         await app(make_asgi_scope("/api"), receive_empty, send_noop)
                     else:
                         await app.__rsgi__(
-                            _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                            _StubRsgiScope("/api"),
+                            _StubRsgiProtocol(),
                         )
                 self.assertEqual(closed, ["first", "second", "third"])
                 self.assertEqual(caught.exception.exceptions, (first, second))
                 self.assertEqual(sender.awaitCount, 1)
                 self.assertEqual(
-                    [error for error, _ in handler.events], [caught.exception],
+                    [error for error, _ in handler.events],
+                    [caught.exception],
                 )
 
     async def testRequestCleanupFailurePreservesCallerCancellation(self) -> None:
@@ -316,7 +407,8 @@ class TestHttpFailureReporting(TestCase):
                 secondary = OSError("close failed")
                 sender = _AsyncCall(side_effect=cancellation)
                 setattr(
-                    kernel, f"_KernelHTTP__{interface}_adapter",
+                    kernel,
+                    f"_KernelHTTP__{interface}_adapter",
                     SimpleNamespace(send=sender),
                 )
 
@@ -332,7 +424,8 @@ class TestHttpFailureReporting(TestCase):
                         await app(make_asgi_scope("/api"), receive_empty, send_noop)
                     else:
                         await app.__rsgi__(
-                            _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                            _StubRsgiScope("/api"),
+                            _StubRsgiProtocol(),
                         )
                 self.assertIs(caught.exception, cancellation)
                 self.assertEqual([error for error, _ in handler.events], [secondary])
@@ -370,11 +463,14 @@ class TestHttpFailureReporting(TestCase):
                 )
                 if interface == "asgi":
                     response = await app(
-                        make_asgi_scope("/api"), receive_empty, send_noop,
+                        make_asgi_scope("/api"),
+                        receive_empty,
+                        send_noop,
                     )
                 else:
                     response = await app.__rsgi__(
-                        _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                        _StubRsgiScope("/api"),
+                        _StubRsgiProtocol(),
                     )
                 self.assertIs(response, rejection)
                 self.assertEqual([value for value, _ in handler.results], [403])
@@ -409,13 +505,15 @@ class TestHttpFailureReporting(TestCase):
                 elif chaining == "suppressed":
                     primary.__suppress_context__ = True
                 chain = (
-                    primary.__cause__, primary.__context__,
+                    primary.__cause__,
+                    primary.__context__,
                     primary.__suppress_context__,
                 )
                 started, release = asyncio.Event(), asyncio.Event()
 
                 async def cleanup(
-                    primary: OSError = primary, started: asyncio.Event = started,
+                    primary: OSError = primary,
+                    started: asyncio.Event = started,
                     release: asyncio.Event = release,
                 ) -> None:
                     """Fail only after the owner has requested cancellation."""
@@ -433,8 +531,11 @@ class TestHttpFailureReporting(TestCase):
                         await waiter
                 self.assertIs(caught.exception, primary)
                 self.assertEqual(
-                    (primary.__cause__, primary.__context__,
-                     primary.__suppress_context__),
+                    (
+                        primary.__cause__,
+                        primary.__context__,
+                        primary.__suppress_context__,
+                    ),
                     chain,
                 )
                 self.assertTrue(pending.done())
@@ -478,11 +579,13 @@ class TestHttpFailureReporting(TestCase):
 
         def upload(error: Exception | None = None) -> SimpleNamespace:
             """Record file closure before optionally raising its cleanup error."""
+
             def close() -> None:
                 """Attempt this file's closure exactly once."""
                 closures.append(error)
                 if error is not None:
                     raise error
+
             return SimpleNamespace(close=close)
 
         current = upload(first)
@@ -490,13 +593,18 @@ class TestHttpFailureReporting(TestCase):
         healthy = upload()
 
         async def parse_parts(
-            parser: MultipartStreamParser, form_items: list[tuple[str, object]],
+            parser: MultipartStreamParser,
+            form_items: list[tuple[str, object]],
         ) -> None:
             """Fail after owning both a partial upload and completed fields."""
             parser._currentPart = SimpleNamespace(is_file=True, data=current)
-            form_items.extend([
-                ("field", "value"), ("completed", completed), ("healthy", healthy),
-            ])
+            form_items.extend(
+                [
+                    ("field", "value"),
+                    ("completed", completed),
+                    ("healthy", healthy),
+                ],
+            )
             raise primary
 
         parser = MultipartStreamParser(stream_chunks([]), b"boundary")
@@ -509,7 +617,8 @@ class TestHttpFailureReporting(TestCase):
         self.assertIs(caught.exception, first)
         self.assertIs(first.__context__, primary)
         self.assertEqual(
-            [error for error, _ in handler.events], [primary, first, second],
+            [error for error, _ in handler.events],
+            [primary, first, second],
         )
         self.assertEqual(closures, [first, second, None])
 
@@ -526,8 +635,10 @@ class TestHttpFailureReporting(TestCase):
                 started, release = Event(), Event()
 
                 def seek(
-                    _offset: int, primary: OSError = primary,
-                    started: Event = started, release: Event = release,
+                    _offset: int,
+                    primary: OSError = primary,
+                    started: Event = started,
+                    release: Event = release,
                 ) -> None:
                     """Keep the worker alive until cancellation can be requested."""
                     started.set()
@@ -557,7 +668,8 @@ class TestHttpFailureReporting(TestCase):
                     self.assertIs(caught.exception, primary)
                     self.assertIs(primary.__cause__, cause)
                 self.assertEqual(
-                    [error for error, _ in handler.events], [primary, secondary],
+                    [error for error, _ in handler.events],
+                    [primary, secondary],
                 )
 
     async def _assertMultipartCancellationClosesUploads(self, phase: str) -> None:
@@ -582,11 +694,13 @@ class TestHttpFailureReporting(TestCase):
 
         def upload(name: str, error: Exception | None = None) -> SimpleNamespace:
             """Create an owned upload whose closure may fail independently."""
+
             def close() -> None:
                 """Record resource closure before raising any cleanup failure."""
                 closures.append(name)
                 if error is not None:
                     raise error
+
             return SimpleNamespace(close=close)
 
         current = upload("current", secondary)
@@ -594,7 +708,8 @@ class TestHttpFailureReporting(TestCase):
         second = upload("second")
 
         async def parse_parts(
-            parser: MultipartStreamParser, form_items: list[tuple[str, object]],
+            parser: MultipartStreamParser,
+            form_items: list[tuple[str, object]],
         ) -> None:
             """Leave one current upload and two completed uploads to clean up."""
             parser._currentPart = SimpleNamespace(is_file=True, data=current)

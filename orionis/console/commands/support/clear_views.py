@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Remove compiled template bytecode from the configured view cache."""
 
 from pathlib import Path
@@ -6,10 +8,9 @@ from orionis.console.commands.support._clear import clear_files
 from orionis.console.output.console import Console
 from orionis.foundation.contracts.application import IApplication
 
+
 class ClearViewsCommand(BaseCommand):
     """Remove compiled template bytecode from the configured view cache."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = False
     """Timestamps flag used by ``ClearViewsCommand``."""

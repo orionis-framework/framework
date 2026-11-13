@@ -22,4 +22,4 @@ El código de aplicación suele interactuar mediante `Application`, que extiende
 
 Continúa por: [foundation](../../../foundation/docs/es/README.md) · [schemas](../../../schemas/docs/es/README.md).
 
-Los ejemplos que requieren bootstrap, una solicitud o servicios externos indican su contexto. Los resultados de comprobación de esta reconstrucción se distinguen de las notas históricas; no se presupone que se haya ejecutado una integración de producción.
+Los ejemplos independientes usan sus propias subclases de contenedor. El ejemplo de provider requiere registro e inicio de la aplicación, como indica su explicación.

@@ -1,7 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+from unittest.mock import patch
 from orionis.localization.contracts.loader import ITranslationLoader
 from orionis.localization.contracts.repository import ITranslationRepository
 from orionis.localization.repository import TranslationRepository
 from orionis.test import TestCase
+
 
 class _RecordingLoader(ITranslationLoader):
     """Loader double recording every locale read from disk."""
@@ -19,7 +23,7 @@ class _RecordingLoader(ITranslationLoader):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.payloads = payloads
         self.calls: list[str] = []
@@ -52,6 +56,7 @@ class _RecordingLoader(ITranslationLoader):
         """
         return tuple(sorted(self.payloads))
 
+
 class _RepositoryFixture(TestCase):
     """Provide a repository backed by a recording loader."""
 
@@ -66,11 +71,18 @@ class _RepositoryFixture(TestCase):
         -------
         None
         """
-        self._loader = _RecordingLoader({
-            "es": {"Welcome": "Bienvenido"},
-            "en": {"Welcome": "Welcome"},
-        })
+        super().setUp()
+        self.enterContext(
+            patch("orionis.localization.repository.monotonic", return_value=0),
+        )
+        self._loader = _RecordingLoader(
+            {
+                "es": {"Welcome": "Bienvenido"},
+                "en": {"Welcome": "Welcome"},
+            },
+        )
         self._repository = TranslationRepository(self._loader)
+
 
 class TestTranslationRepositoryDefinition(_RepositoryFixture):
     """Validate the structural contract of the repository."""
@@ -84,7 +96,7 @@ class TestTranslationRepositoryDefinition(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(self._repository, ITranslationRepository)
 
@@ -97,9 +109,10 @@ class TestTranslationRepositoryDefinition(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(self._repository, "__dict__"))
+
 
 class TestTranslationRepositoryCaching(_RepositoryFixture):
     """Validate that every locale is read from disk at most once."""
@@ -113,7 +126,7 @@ class TestTranslationRepositoryCaching(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         first = self._repository.get("es")
         self.assertIs(self._repository.get("es"), first)
@@ -128,7 +141,7 @@ class TestTranslationRepositoryCaching(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._repository.get("fr"), {})
         self.assertEqual(self._repository.get("fr"), {})
@@ -143,7 +156,7 @@ class TestTranslationRepositoryCaching(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(self._repository.get("es")["Welcome"], "Bienvenido")
         self.assertEqual(self._repository.get("en")["Welcome"], "Welcome")
@@ -158,12 +171,13 @@ class TestTranslationRepositoryCaching(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         translations = self._repository.get("es")
         translations["Welcome"] = "Hola"
         self.assertEqual(self._repository.get("es")["Welcome"], "Hola")
         self.assertEqual(self._loader.calls, ["es"])
+
 
 class TestTranslationRepositoryInspection(_RepositoryFixture):
     """Validate the introspection helpers of the cache."""
@@ -176,7 +190,7 @@ class TestTranslationRepositoryInspection(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(self._repository.has("es"))
         self._repository.get("es")
@@ -192,11 +206,12 @@ class TestTranslationRepositoryInspection(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._repository.get("es")
         self._repository.get("en")
         self.assertEqual(self._repository.loadedLocales(), ("es", "en"))
+
 
 class TestTranslationRepositoryEviction(_RepositoryFixture):
     """Validate cache invalidation of one or every locale."""
@@ -209,7 +224,7 @@ class TestTranslationRepositoryEviction(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._repository.get("es")
         self.assertTrue(self._repository.forget("es"))
@@ -226,7 +241,7 @@ class TestTranslationRepositoryEviction(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(self._repository.forget("es"))
 
@@ -239,7 +254,7 @@ class TestTranslationRepositoryEviction(_RepositoryFixture):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self._repository.get("es")
         self._repository.get("en")

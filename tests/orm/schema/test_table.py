@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema table behavior."""
+
 from dataclasses import FrozenInstanceError
 from orionis.orm.schema.constraints import (
     CompositeForeignKey,
@@ -8,6 +12,7 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import Integer, String
 from orionis.test import TestCase
 
+
 class TestTableDefinition(TestCase):
     """Verify table lookup and the metadata shared with the SQL compiler."""
 
@@ -17,7 +22,7 @@ class TestTableDefinition(TestCase):
         Returns
         -------
         None
-            Verify column order, membership, and missing-column behavior.
+            No return value.
         """
         columns = {"name": String(), "id": Integer()}
         table = TableDefinition("accounts", columns)
@@ -32,7 +37,7 @@ class TestTableDefinition(TestCase):
         Returns
         -------
         None
-            Verify the default factory does not share mutable column state.
+            No return value.
         """
         first = TableDefinition("first")
         second = TableDefinition("second")
@@ -47,7 +52,7 @@ class TestTableDefinition(TestCase):
         Returns
         -------
         None
-            Verify compiler metadata is preserved in an immutable table object.
+            No return value.
         """
         foreign = CompositeForeignKey(("account_id",), "accounts", ("id",))
         unique = UniqueConstraint(("tenant_id", "email"))

@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from orionis.container.enums.lifetimes import Lifetime
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class Binding(BaseEntity):
     """
@@ -23,10 +24,6 @@ class Binding(BaseEntity):
     alias : str | None
         Alias for resolving the dependency from the container.
 
-    Returns
-    -------
-    None
-        This class does not return a value upon instantiation.
     """
 
     contract: type | None = field(
@@ -75,15 +72,15 @@ class Binding(BaseEntity):
 
         Ensures that the 'lifetime' attribute is an instance of Lifetime.
 
-        Parameters
-        ----------
-        self : orionis.container.entities.Binding
-            The instance of the Binding class.
-
         Returns
         -------
         None
             This method does not return a value.
+
+        Raises
+        ------
+        TypeError
+            If the lifetime is not a member of ``Lifetime``.
         """
         # Ensure 'lifetime' is an instance of Lifetime
         if not isinstance(self.lifetime, Lifetime):

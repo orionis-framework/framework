@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401, PLR0913
+# Keep established public and external protocol names and signatures.
 """Define the contract for response implementations."""
 
 from __future__ import annotations
@@ -8,9 +10,8 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterable, Mapping
     from datetime import datetime
 
-class IResponse(ABC):
 
-    # ruff: noqa: PLR0913, ANN401
+class IResponse(ABC):
     """Define the contract for response implementations."""
 
     __slots__ = ()

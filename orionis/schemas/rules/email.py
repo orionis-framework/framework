@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string is a valid email address."""
 
 import re
@@ -22,6 +24,7 @@ _EMAIL_PATTERN = re.compile(
 )
 """Compiled pattern used to recognize email pattern."""
 
+
 class Email(Rule):
     """
     Ensure a string is a valid email address.
@@ -30,8 +33,6 @@ class Email(Rule):
     followed by a dotted domain. The whole address is capped at 254
     characters and the local part at 64, as required by RFC 5321.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -73,7 +74,7 @@ class Email(Rule):
         if len(value) > _MAX_LENGTH:
             return False
 
-        if _EMAIL_PATTERN.match(value) is None:
+        if _EMAIL_PATTERN.fullmatch(value) is None:
             return False
 
         # The local part is capped independently of the whole address; the

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 from orionis.console.base.command import BaseCommand
@@ -7,6 +9,7 @@ from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from orionis.console.args.argument import Argument
+
 
 class ConcreteTestCommand(BaseCommand):
     """
@@ -28,6 +31,7 @@ class ConcreteTestCommand(BaseCommand):
         None
             This method does not return a value.
         """
+
 
 class TestBaseCommand(TestCase):
     """Test suite for the BaseCommand implementation."""
@@ -108,9 +112,7 @@ class TestBaseCommand(TestCase):
         with self.assertRaises(NotImplementedError) as context:
             await base_command.handle()
         error_message = str(context.exception)
-        expected_message = (
-            "The 'handle' method must be implemented in the subclass."
-        )
+        expected_message = "The 'handle' method must be implemented in the subclass."
         self.assertEqual(error_message, expected_message)
 
     def testGetArgumentWithValidKey(self) -> None:
@@ -341,13 +343,15 @@ class TestBaseCommand(TestCase):
         self.command.setArguments(test_args)
         # Test individual argument retrieval
         self.assertEqual(
-            self.command.getArgument("input_file"), "/path/to/file.txt",
+            self.command.getArgument("input_file"),
+            "/path/to/file.txt",
         )
         self.assertTrue(self.command.getArgument("verbose"))
         self.assertEqual(self.command.getArgument("count"), 10)
         # Test retrieval with default
         self.assertEqual(
-            self.command.getArgument("missing", "default"), "default",
+            self.command.getArgument("missing", "default"),
+            "default",
         )
         # Test complete arguments retrieval
         all_args = self.command.getArguments()
@@ -400,13 +404,15 @@ class TestBaseCommand(TestCase):
         self.assertEqual(fresh_command.getArguments(), {})
         self.assertIsNone(fresh_command.getArgument("any_key"))
         self.assertEqual(
-            fresh_command.getArgument("any_key", "default"), "default",
+            fresh_command.getArgument("any_key", "default"),
+            "default",
         )
         # Check class attributes
         self.assertTrue(fresh_command.timestamps)
         self.assertEqual(fresh_command.signature, "test-command")
         self.assertEqual(
-            fresh_command.description, "A test command implementation",
+            fresh_command.description,
+            "A test command implementation",
         )
         self.assertEqual(fresh_command.arguments, [])
 

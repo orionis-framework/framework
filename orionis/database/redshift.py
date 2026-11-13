@@ -3,12 +3,10 @@
 from __future__ import annotations
 from importlib import import_module
 from importlib.util import find_spec
-from typing import TYPE_CHECKING
 from sqlalchemy import text
 from sqlalchemy.engine import reflection
 
-if TYPE_CHECKING:
-    from sqlalchemy.engine import Connection
+from sqlalchemy.engine import Connection
 
 if find_spec("sqlalchemy_redshift") is not None:
     RedshiftConnectorDialect = import_module(
@@ -55,8 +53,11 @@ if find_spec("sqlalchemy_redshift") is not None:
 
         @reflection.cache
         def hasTable(
-            self, connection: Connection, table_name: str,
-            schema: str | None = None, **_kw: object,
+            self,
+            connection: Connection,
+            table_name: str,
+            schema: str | None = None,
+            **_kw: object,
         ) -> bool:
             """
             Check catalog membership with bound schema and table names.
@@ -67,7 +68,7 @@ if find_spec("sqlalchemy_redshift") is not None:
 
             Parameters
             ----------
-            connection : orionis.database.Connection
+            connection : ``sqlalchemy.engine.Connection``
                 Core connection used by SQLAlchemy's reflection dispatch.
             table_name : str
                 Exact table identifier to find.
@@ -82,14 +83,19 @@ if find_spec("sqlalchemy_redshift") is not None:
                 Whether the visible catalog contains this exact table.
             """
             self._ensure_has_table_connection(connection)
-            return bool(connection.execute(text("""
+            return bool(
+                connection.execute(
+                    text("""
                 SELECT EXISTS (
                     SELECT 1 FROM svv_tables
                     WHERE table_catalog = current_database()
                       AND table_schema = COALESCE(:schema, current_schema())
                       AND table_name = :table_name
                 )
-            """), {"schema": schema, "table_name": table_name}).scalar())
+            """),
+                    {"schema": schema, "table_name": table_name},
+                ).scalar(),
+            )
 
         # Preserve the SQLAlchemy reflection protocol name.
         has_table = hasTable

@@ -23,11 +23,13 @@ from collections.abc import AsyncIterator
 from orionis.realtime import Hub, remote
 from orionis.realtime.metadata import compile_hub
 
+
 class FeedHub(Hub):
     @remote
     async def updates(self, count: int) -> AsyncIterator[int]:
         for value in range(count):
             yield value
+
 
 assert compile_hub(FeedHub)["updates"].is_stream
 ```

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import inspect
@@ -43,6 +45,7 @@ if TYPE_CHECKING:
     from orionis.http.kernel import KernelHTTP
     from orionis.session.session import Session
 
+
 @dataclass(slots=True)
 class _UnexpectedCall:
     """Record forbidden collaborator calls and fail immediately."""
@@ -68,6 +71,7 @@ class _UnexpectedCall:
         """
         self.calls += 1
         raise AssertionError(self.message)
+
 
 def _dump_path(path: str) -> Response:
     """
@@ -102,6 +106,7 @@ def _dump_path(path: str) -> Response:
     error_msg = "Execution continued after Dumper.dd()."
     raise AssertionError(error_msg)
 
+
 def dump_handler(request: Request) -> Response:
     """
     Dump the current path from an injected HTTP request.
@@ -118,6 +123,7 @@ def dump_handler(request: Request) -> Response:
     """
     return _dump_path(request.path)
 
+
 def dump_fallback() -> Response:
     """
     Dump a missing-route marker before a typed request exists.
@@ -128,6 +134,7 @@ def dump_fallback() -> Response:
         Never returned because dumping interrupts fallback handling.
     """
     return _dump_path("/missing")
+
 
 class _DumpController:
     """Exercise synchronous and asynchronous controller actions."""
@@ -206,6 +213,7 @@ class _DumpController:
         error_msg = "Execution continued after Dumper.dd()."
         raise AssertionError(error_msg)
 
+
 class _DumpMiddleware(BaseMiddleware):
     """Exercise dumping before the route handler is invoked."""
 
@@ -226,6 +234,7 @@ class _DumpMiddleware(BaseMiddleware):
             Never returned because dumping interrupts the middleware.
         """
         return dump_handler(request)
+
 
 class TestHttpDebugDumper(TestCase):
     """Use real container invocation and scopes with the kernel fixtures."""
@@ -257,13 +266,17 @@ class TestHttpDebugDumper(TestCase):
         self.enterContext(replace_attribute(os, "_exit", self.os_exit))
         self.enterContext(
             replace_attribute(
-                _StubApp, "beginScope", staticmethod(ScopeManager),
+                _StubApp,
+                "beginScope",
+                staticmethod(ScopeManager),
             ),
         )
         container = Container()
         self.enterContext(
             replace_attribute(
-                _StubApp, "invoke", staticmethod(container.invoke),
+                _StubApp,
+                "invoke",
+                staticmethod(container.invoke),
             ),
         )
         self.enterContext(
@@ -296,7 +309,9 @@ class TestHttpDebugDumper(TestCase):
             middlewares=(_DumpMiddleware,),
         )
         kernel, app, _responses, catch = await boot_kernel(
-            routes=routes, debug=debug, fallback=fallback,
+            routes=routes,
+            debug=debug,
+            fallback=fallback,
         )
         return kernel, app, catch
 
@@ -319,7 +334,8 @@ class TestHttpDebugDumper(TestCase):
         self.assertIsInstance(response, HTMLResponse)
         self.assertEqual(response.getStatusCode(), 200)
         self.assertEqual(
-            response.getHeader("content-type"), ["text/html; charset=utf-8"],
+            response.getHeader("content-type"),
+            ["text/html; charset=utf-8"],
         )
         self.assertEqual(response.getHeader("cache-control"), ["no-store"])
         body = response.getBody().decode()
@@ -330,7 +346,8 @@ class TestHttpDebugDumper(TestCase):
         self.assertNotIn("<script>", body)
         source_lines, first_line = inspect.getsourcelines(_dump_path)
         call_line = first_line + next(
-            index for index, line in enumerate(source_lines)
+            index
+            for index, line in enumerate(source_lines)
             if line.lstrip().startswith("Dumper.dd(")
         )
         filename = escape(_dump_path.__code__.co_filename)
@@ -352,7 +369,9 @@ class TestHttpDebugDumper(TestCase):
             scope["kernel"] = KernelContext.HTTP
             with self.assertRaises(HttpDump) as captured:
                 Dumper.dd(
-                    "custom-location", module_path="custom.py", line_number=42,
+                    "custom-location",
+                    module_path="custom.py",
+                    line_number=42,
                 )
 
         html = captured.exception.dumper.toHtml()
@@ -460,7 +479,8 @@ class TestHttpDebugDumper(TestCase):
                     kernel, _app, catch = await self._boot(debug=debug)
                     _manager, middleware, session_catch = _make_middleware()
                     kernel._KernelHTTP__web_middleware = (
-                        middleware, *kernel._KernelHTTP__web_middleware[1:],
+                        middleware,
+                        *kernel._KernelHTTP__web_middleware[1:],
                     )
                     previous_scope = ScopedContext.getCurrentScope()
                     session_calls.clear()
@@ -472,13 +492,15 @@ class TestHttpDebugDumper(TestCase):
                             response = await dispatch(kernel, "/web-dump")
                         else:
                             response = await kernel.handleRSGI(
-                                _StubRsgiScope("/web-dump"), _StubRsgiProtocol(),
+                                _StubRsgiScope("/web-dump"),
+                                _StubRsgiProtocol(),
                             )
 
                     self.assertEqual(session_catch.handled, [])
                     self.assertEqual(session_calls, ["abort"])
                     self.assertIs(
-                        ScopedContext.getCurrentScope(), previous_scope,
+                        ScopedContext.getCurrentScope(),
+                        previous_scope,
                     )
                     if debug:
                         self._assertDump(response, "/web-dump")
@@ -525,7 +547,8 @@ class TestHttpDebugDumper(TestCase):
         """
         kernel, _app, catch = await self._boot()
         response = await kernel.handleRSGI(
-            _StubRsgiScope("/dump"), _StubRsgiProtocol(),
+            _StubRsgiScope("/dump"),
+            _StubRsgiProtocol(),
         )
 
         self._assertDump(response, "/dump")
@@ -561,7 +584,9 @@ class TestHttpDebugDumper(TestCase):
             messages.append(message)
 
         await kernel.handleASGI(
-            make_asgi_scope("/dump"), receive_empty, send,
+            make_asgi_scope("/dump"),
+            receive_empty,
+            send,
         )
 
         self.assertEqual(messages[0]["type"], "http.response.start")
@@ -663,7 +688,8 @@ class TestHttpDebugDumper(TestCase):
                     *,
                     recorded: list[object] = keys,
                     write: Callable[
-                        [ScopeManager, object, object], None,
+                        [ScopeManager, object, object],
+                        None,
                     ] = original_setitem,
                 ) -> None:
                     """
@@ -699,7 +725,8 @@ class TestHttpDebugDumper(TestCase):
                 ):
                     asgi = await dispatch(kernel, "/api")
                     rsgi = await kernel.handleRSGI(
-                        _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                        _StubRsgiScope("/api"),
+                        _StubRsgiProtocol(),
                     )
 
                 self.assertEqual(asgi.getBody(), b"api")

@@ -1,11 +1,17 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify session storage contracts and isolated persistence behavior."""
+
 from __future__ import annotations
 from abc import ABC
+import inspect
 from orionis.session.contracts.store import ISessionStore
 from orionis.session.stores.cache import CacheSessionStore
 from orionis.session.stores.database import DatabaseSessionStore
 from orionis.session.stores.file import FileSessionStore
 from orionis.session.stores.memory import MemorySessionStore
 from orionis.test import TestCase
+
 
 class _PartialStore(ISessionStore):
     """Deliberately incomplete store used to prove the contract is enforced."""
@@ -23,7 +29,7 @@ class _PartialStore(ISessionStore):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
 
     async def write(self, record: object) -> None:
@@ -37,41 +43,32 @@ class _PartialStore(ISessionStore):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
+
 
 class TestISessionStoreContract(TestCase):
     """Unit tests for the ISessionStore abstract contract."""
 
-    def testContractIsAbstract(self) -> None:
-        """Declare ISessionStore as an abstract base class.
-
-        Validates that the contract participates in the ABC machinery
-        instead of being a plain class.
+    def testContractRequiresEveryPersistenceOperation(self) -> None:
+        """Reject complete omission and partial implementations of the contract.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertIn(
-            ABC.__name__,
-            [base.__name__ for base in ISessionStore.__mro__],
+        self.assertTrue(issubclass(ISessionStore, ABC))
+        self.assertEqual(
+            set(ISessionStore.__abstractmethods__),
+            {"read", "write", "update", "delete", "gc"},
         )
-
-    def testContractCannotBeInstantiated(self) -> None:
-        """Reject direct instantiation of the contract.
-
-        Validates that every backing store must provide a concrete
-        implementation.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(TypeError):
-            ISessionStore()  # type: ignore[abstract]
+        for implementation in (ISessionStore, _PartialStore):
+            with (
+                self.subTest(implementation=implementation.__name__),
+                self.assertRaises(TypeError),
+            ):
+                implementation()
 
     def testContractDeclaresEmptySlots(self) -> None:
         """Keep the contract slot-free so stores stay dictless.
@@ -82,38 +79,9 @@ class TestISessionStoreContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ISessionStore.__slots__, ())
-
-    def testContractDeclaresExpectedMembers(self) -> None:
-        """Expose the five persistence operations required for safe revocation.
-
-        Validate conditional update separately from unconditional creation.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        self.assertEqual(
-            set(ISessionStore.__abstractmethods__),
-            {"read", "write", "update", "delete", "gc"},
-        )
-
-    def testPartialImplementationCannotBeInstantiated(self) -> None:
-        """Reject a store that skips part of the contract.
-
-        Validates that omitting ``delete`` and ``gc`` keeps the subclass
-        abstract.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        with self.assertRaises(TypeError):
-            _PartialStore()  # type: ignore[abstract]
 
     def testEveryBuiltInStoreImplementsTheContract(self) -> None:
         """Register all shipped stores as concrete implementations.
@@ -123,7 +91,7 @@ class TestISessionStoreContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for store in (
             CacheSessionStore,
@@ -133,6 +101,9 @@ class TestISessionStoreContract(TestCase):
         ):
             self.assertTrue(issubclass(store, ISessionStore))
             self.assertEqual(store.__abstractmethods__, frozenset())
+            for name in ISessionStore.__abstractmethods__:
+                with self.subTest(store=store.__name__, method=name):
+                    self.assertTrue(inspect.iscoroutinefunction(getattr(store, name)))
 
     def testMemoryStoreInstancesHaveNoInstanceDictionary(self) -> None:
         """Build stores without a per-instance dictionary.
@@ -143,6 +114,6 @@ class TestISessionStoreContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(hasattr(MemorySessionStore(), "__dict__"))

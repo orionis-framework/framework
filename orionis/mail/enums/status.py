@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class MailStatus(StrEnum):
     """
     Enumerate the outcomes a transport can confirm for one operation.

@@ -1,3 +1,6 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+from typing import Never
 from orionis.storage.exceptions import (
     DiskNotFoundException,
     DriverNotSupportedException,
@@ -19,15 +22,16 @@ _STORAGE_EXCEPTIONS: tuple[type[StorageException], ...] = (
     UnsupportedStorageOperationException,
 )
 
-class TestStorageExceptions(TestCase):
 
-    def __raiseChained(self) -> None:
+class TestStorageExceptions(TestCase):
+    def __raiseChained(self) -> Never:
         """
         Raise a storage error caused by a lower-level failure.
 
         Returns
         -------
-        None
+        Never
+            This helper always raises.
 
         Raises
         ------
@@ -50,7 +54,7 @@ class TestStorageExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(StorageException, Exception))
 
@@ -62,7 +66,7 @@ class TestStorageExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for exception in _STORAGE_EXCEPTIONS:
             self.assertTrue(issubclass(exception, StorageException))
@@ -75,7 +79,7 @@ class TestStorageExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(len(set(_STORAGE_EXCEPTIONS)), len(_STORAGE_EXCEPTIONS))
 
@@ -87,7 +91,7 @@ class TestStorageExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error_msg = "Disk [dropbox] is not defined."
         self.assertEqual(str(DiskNotFoundException(error_msg)), error_msg)
@@ -100,12 +104,8 @@ class TestStorageExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
-        Raises
-        ------
-        DriverNotSupportedException
-            Raised by this helper to exercise the failure path.
         """
         error_msg = "Driver [dropbox] has no implementation."
         with self.assertRaises(StorageException):
@@ -119,7 +119,7 @@ class TestStorageExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(StorageFileNotFoundException) as ctx:
             self.__raiseChained()

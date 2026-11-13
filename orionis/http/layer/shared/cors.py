@@ -10,6 +10,7 @@ from orionis.http.responses import Response
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
 
+
 class CORSException(Exception):
     """Report a request rejected by cross-origin access policy."""
 
@@ -32,9 +33,7 @@ class CORSMiddleware:
     """Declare the instance attribute slots reserved by this class."""
 
     # Methods allowed in CORS preflight responses when the wildcard is used.
-    ALL_METHODS: Final[str] = (
-        "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT"
-    )
+    ALL_METHODS: Final[str] = "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT, QUERY"
     """Methods allowed in CORS preflight responses when the wildcard is used."""
 
     def __init__(
@@ -68,15 +67,10 @@ class CORSMiddleware:
         # Origins
         self.__allow_all_origins = "*" in cors.allow_origins
         """Origins."""
-        self.__allow_origins = {
-            origin.rstrip("/")
-            for origin in cors.allow_origins
-        }
+        self.__allow_origins = {origin.rstrip("/") for origin in cors.allow_origins}
         """Origins permitted by the cross-origin request policy."""
         self.__origin_regex: Pattern[str] | None = (
-            re.compile(cors.allow_origin_regex)
-            if cors.allow_origin_regex
-            else None
+            re.compile(cors.allow_origin_regex) if cors.allow_origin_regex else None
         )
         """Compiled regular expression matching permitted request origins."""
 
@@ -86,10 +80,7 @@ class CORSMiddleware:
         self.__allow_methods_value = (
             self.ALL_METHODS
             if self.__allow_all_methods
-            else ", ".join(
-                method.upper()
-                for method in cors.allow_methods
-            )
+            else ", ".join(method.upper() for method in cors.allow_methods)
         )
         """Serialized value of the Access-Control-Allow-Methods header."""
 
@@ -99,17 +90,11 @@ class CORSMiddleware:
         self.__allow_headers_value = (
             "*"
             if self.__allow_all_headers
-            else ", ".join(
-                header.lower()
-                for header in cors.allow_headers
-            )
+            else ", ".join(header.lower() for header in cors.allow_headers)
         )
         """Serialized value of the Access-Control-Allow-Headers header."""
         self.__expose_headers_value = (
-            ", ".join(
-                header.lower()
-                for header in cors.expose_headers
-            )
+            ", ".join(header.lower() for header in cors.expose_headers)
             if cors.expose_headers
             else ""
         )
@@ -121,9 +106,7 @@ class CORSMiddleware:
 
         # Pre-render the max-age header value; None disables the header.
         self.__max_age_value: str | None = (
-            str(cors.max_age)
-            if isinstance(cors.max_age, int)
-            else None
+            str(cors.max_age) if isinstance(cors.max_age, int) else None
         )
         """Pre-render the max-age header value; None disables the header."""
 
@@ -154,8 +137,7 @@ class CORSMiddleware:
             return True
 
         return bool(
-            self.__origin_regex
-            and self.__origin_regex.match(normalized),
+            self.__origin_regex and self.__origin_regex.fullmatch(normalized),
         )
 
     def __isPreflight(
@@ -206,10 +188,7 @@ class CORSMiddleware:
         existing = response.getHeader("vary")
         if existing:
             # Avoid duplicates and preserve all pre-existing directives.
-            directives = [
-                d.strip().lower()
-                for d in ", ".join(existing).split(",")
-            ]
+            directives = [d.strip().lower() for d in ", ".join(existing).split(",")]
             if value.lower() not in directives:
                 response.setHeader(
                     "vary",

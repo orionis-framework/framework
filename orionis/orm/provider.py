@@ -6,6 +6,7 @@ from orionis.orm.contracts.query_builder import IQueryBuilder
 from orionis.orm.query_builder import QueryBuilder
 from orionis.support.facades.db import DB
 
+
 class QueryBuilderProvider(ServiceProvider):
     """Register query builder services in the application container."""
 
@@ -16,7 +17,7 @@ class QueryBuilderProvider(ServiceProvider):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.app.singleton(IQueryBuilder, QueryBuilder)
 
@@ -27,6 +28,6 @@ class QueryBuilderProvider(ServiceProvider):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         await DB.pin()

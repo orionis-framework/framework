@@ -10,6 +10,7 @@ from orionis.support.entities.base import BaseEntity
 _DEFAULT_PATH: str = "storage/logs/hourly_{suffix}.log"
 """Default path identifier: ``storage/logs/hourly_{suffix}.log``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Hourly(BaseEntity):
     """
@@ -55,7 +56,8 @@ class Hourly(BaseEntity):
     retention_hours: int = field(
         default_factory=lambda: (
             Env.get("LOG_RETENTION", 24)
-            if Env.get("LOG_CHANNEL", "stack") == "hourly" else 24
+            if Env.get("LOG_CHANNEL", "stack") == "hourly"
+            else 24
         ),
         metadata={
             "description": ("The number of hours to retain log files before deletion."),

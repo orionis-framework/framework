@@ -1,18 +1,24 @@
+# ruff: noqa: PT009, PT027, SLF001, TC001, TC003
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import asyncio
-from collections.abc import AsyncIterator  # noqa: TC003 - Hub annotation reflection.
-from typing import TYPE_CHECKING, Annotated, cast
+from inspect import CORO_CLOSED, getcoroutinestate
+from collections.abc import AsyncIterator  # Hub annotation reflection.
+from typing import TYPE_CHECKING, Annotated, NoReturn, cast
+from unittest.mock import patch
 import msgspec
 from orionis.auth.context.context import AuthenticationContext
 from orionis.auth.context.functions import bind_auth_context, current_auth_context
 from orionis.auth.exceptions import AuthenticationException, AuthorizationException
 from orionis.container.container import Container
 from orionis.container.context.scope import ScopedContext, get_current_scope
-from orionis.http import WebSocket  # noqa: TC001 - Runtime method injection.
+from orionis.http import WebSocket  # Runtime method injection.
 from orionis.realtime.config import RealtimeConfig
 from orionis.realtime.connection import RealtimeConnection
 from orionis.realtime.decorators import remote
 from orionis.realtime.hub import Hub, HubContext
 from orionis.realtime.manager import ConnectionManager
+from orionis.realtime.protocol import HubProtocol, Invoke
 from orionis.realtime.runtime import HubRuntime
 from orionis.schemas.rule import Rule
 from orionis.schemas.schema import Schema
@@ -20,8 +26,10 @@ from orionis.test import TestCase
 from tests.realtime.test_connection import _RealtimePeer
 
 if TYPE_CHECKING:
+    from types import CoroutineType
     from orionis.container.context.manager import ScopeManager
     from orionis.foundation.contracts.application import IApplication
+
 
 class _Marker:
     """Represent a mutable dependency that must remain invocation-local."""
@@ -39,11 +47,15 @@ class _Marker:
         """
         self.label = ""
 
+
 class _PositiveAmount(Rule):
     """Reject nonpositive amounts after an asynchronous suspension."""
 
     async def enforce(
-        self, _field: str, value: object, _instance: object,
+        self,
+        _field: str,
+        value: object,
+        _instance: object,
     ) -> bool:
         """
         Apply a native asynchronous custom validation rule.
@@ -65,18 +77,28 @@ class _PositiveAmount(Rule):
         await asyncio.sleep(0)
         return isinstance(value, int) and value > 0
 
+
 class _Payload(Schema, forbid_unknown_fields=True):
     """Require typed client data and an asynchronous custom rule."""
 
     name: str
     amount: Annotated[int, _PositiveAmount()]
 
+
 class _Probe:
     """Collect lifecycle evidence while coordinating concurrent invocations."""
 
     __slots__ = (
-        "calls", "close_entered", "close_release", "closed_stream", "disconnects",
-        "entered", "hubs", "produced", "release", "settled",
+        "calls",
+        "close_entered",
+        "close_release",
+        "closed_stream",
+        "disconnects",
+        "entered",
+        "hubs",
+        "produced",
+        "release",
+        "settled",
     )
 
     def __init__(self) -> None:
@@ -98,6 +120,7 @@ class _Probe:
         self.close_entered = asyncio.Event()
         self.close_release = asyncio.Event()
         self.settled = []
+
 
 class _ClosableItems:
     """Model asynchronous iterator cleanup that remains pending after exhaustion."""
@@ -175,6 +198,7 @@ class _ClosableItems:
         await self._probe.close_release.wait()
         self._probe.closed_stream.set()
 
+
 class _ReplyingPeer(_RealtimePeer):
     """Reuse an invocation ID immediately when its terminal reaches the network."""
 
@@ -211,14 +235,21 @@ class _ReplyingPeer(_RealtimePeer):
             return
         envelope = msgspec.json.decode(event["text"])
         if (
-            envelope["type"] == "completion" and envelope["id"] == "reused"
+            envelope["type"] == "completion"
+            and envelope["id"] == "reused"
             and not self.replied
         ):
             self.replied = True
-            self.input({
-                "type": "invoke", "id": "reused", "target": "defaults", "args": [99],
-            })
+            self.input(
+                {
+                    "type": "invoke",
+                    "id": "reused",
+                    "target": "defaults",
+                    "args": [99],
+                },
+            )
             await asyncio.sleep(0)
+
 
 class _RuntimeHub(Hub):
     """Exercise constructor injection, RPC data and per-invocation services."""
@@ -277,7 +308,11 @@ class _RuntimeHub(Hub):
 
     @remote
     async def echo(
-        self, value: str, marker: _Marker, socket: WebSocket, context: HubContext,
+        self,
+        value: str,
+        marker: _Marker,
+        socket: WebSocket,
+        context: HubContext,
     ) -> dict:
         """
         Validate constructor, method and framework context injection.
@@ -300,7 +335,8 @@ class _RuntimeHub(Hub):
         """
         self.probe.calls.append(("echo", marker, get_current_scope()))
         return {
-            "value": value, "same_marker": marker is self.marker,
+            "value": value,
+            "same_marker": marker is self.marker,
             "same_socket": socket is self.context.socket,
             "same_context": context is self.context,
         }
@@ -357,9 +393,14 @@ class _RuntimeHub(Hub):
             State retained by this invocation's unique dependency.
         """
         marker.label = label
-        self.probe.calls.append((
-            label, marker, get_current_scope(), current_auth_context(),
-        ))
+        self.probe.calls.append(
+            (
+                label,
+                marker,
+                get_current_scope(),
+                current_auth_context(),
+            ),
+        )
         self.probe.entered.put_nowait(label)
         try:
             await self.probe.release.wait()
@@ -488,6 +529,7 @@ class _RuntimeHub(Hub):
         """
         return "not remotely exposed"
 
+
 class _RejectingHub(_RuntimeHub):
     """Reject a connection before its raw handshake is accepted."""
 
@@ -503,6 +545,7 @@ class _RejectingHub(_RuntimeHub):
             Deny the pending handshake.
         """
         await self.context.socket.reject(401)
+
 
 class _TrackedContainer(Container):
     """Use the real contextvars container while retaining scope lifetimes."""
@@ -534,6 +577,7 @@ class _TrackedContainer(Container):
         self.scopes.append(scope)
         return scope
 
+
 class TestHubRuntime(TestCase):
     """Exercise complete Hub connections with the real DI container."""
 
@@ -553,6 +597,67 @@ class TestHubRuntime(TestCase):
         self.app.instance(None, self.probe)
         self.app.scoped(None, _Marker)
         self.owned_tasks: list[asyncio.Task[None]] = []
+
+    async def testRejectedInvocationTaskClosesItsCoroutine(self) -> None:
+        """Release unadmitted invocation state when scheduling fails.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        config = RealtimeConfig()
+        manager = ConnectionManager(config)
+        runtime = HubRuntime(cast("IApplication", self.app), manager, _RuntimeHub)
+        peer = _RealtimePeer()
+        socket = peer.socket()
+        await socket.accept()
+        connection = RealtimeConnection(
+            HubContext(connection_id="rejected", socket=socket),
+            _RuntimeHub,
+            HubProtocol(),
+            config,
+        )
+        failure = RuntimeError("invocation scheduling rejected")
+        created = []
+
+        def reject(coroutine: CoroutineType) -> NoReturn:
+            """Capture the unadmitted invocation without running its body.
+
+            Parameters
+            ----------
+            coroutine : CoroutineType
+                Unscheduled invocation coroutine.
+
+            Raises
+            ------
+            RuntimeError
+                Always raise the controlled scheduling failure.
+            """
+            created.append(coroutine)
+            self.addCleanup(coroutine.close)
+            raise failure
+
+        try:
+            async with self.app.beginScope():
+                bind_auth_context(AuthenticationContext())
+                with (
+                    patch(
+                        "orionis.realtime.runtime.asyncio.create_task",
+                        side_effect=reject,
+                    ),
+                    self.assertRaises(RuntimeError) as caught,
+                ):
+                    await runtime._startInvocation(
+                        connection,
+                        Invoke(id="first", target="defaults"),
+                    )
+                self.assertIs(caught.exception, failure)
+                self.assertEqual(connection.active, {})
+                self.assertEqual(getcoroutinestate(created[0]), CORO_CLOSED)
+        finally:
+            await connection.cleanup()
+            await socket.close()
 
     async def asyncTearDown(self) -> None:
         """
@@ -601,8 +706,10 @@ class TestHubRuntime(TestCase):
             await runtime.serve(socket)
 
     async def connect(
-        self, config: RealtimeConfig | None = None,
-        hub: type[Hub] = _RuntimeHub, protocol: str = "json",
+        self,
+        config: RealtimeConfig | None = None,
+        hub: type[Hub] = _RuntimeHub,
+        protocol: str = "json",
         peer: _RealtimePeer | None = None,
     ) -> tuple[_RealtimePeer, ConnectionManager, asyncio.Task, dict]:
         """
@@ -638,7 +745,9 @@ class TestHubRuntime(TestCase):
         return peer, manager, task, ready
 
     def connection(
-        self, manager: ConnectionManager, connection_id: str,
+        self,
+        manager: ConnectionManager,
+        connection_id: str,
     ) -> RealtimeConnection:
         """
         Narrow the registry contract to the concrete connection under test.
@@ -696,10 +805,15 @@ class TestHubRuntime(TestCase):
         self.assertGreaterEqual(len(ready["connection_id"]), 24)
         peer.input({"type": "invoke", "id": "one", "target": "echo", "args": ["hi"]})
         completion = await peer.nextEnvelope()
-        self.assertEqual(completion["result"], {
-            "value": "hi", "same_marker": True,
-            "same_socket": True, "same_context": True,
-        })
+        self.assertEqual(
+            completion["result"],
+            {
+                "value": "hi",
+                "same_marker": True,
+                "same_socket": True,
+                "same_context": True,
+            },
+        )
         await self.settle(manager, ready["connection_id"])
         connect, invocation = self.probe.calls
         self.assertIsNot(connect[1], invocation[1])
@@ -725,9 +839,14 @@ class TestHubRuntime(TestCase):
         """
         peer, manager, _task, ready = await self.connect()
         for label in ("first", "second"):
-            peer.input({
-                "type": "invoke", "id": label, "target": "gated", "args": [label],
-            })
+            peer.input(
+                {
+                    "type": "invoke",
+                    "id": label,
+                    "target": "gated",
+                    "args": [label],
+                },
+            )
         await asyncio.wait_for(self.probe.entered.get(), timeout=2)
         await asyncio.wait_for(self.probe.entered.get(), timeout=2)
         first, second = self.probe.calls[-2:]
@@ -735,9 +854,13 @@ class TestHubRuntime(TestCase):
             self.assertIsNot(first[index], second[index])
         self.probe.release.set()
         results = [await peer.nextEnvelope(), await peer.nextEnvelope()]
-        self.assertEqual({item["id"]: item["result"] for item in results}, {
-            "first": "first", "second": "second",
-        })
+        self.assertEqual(
+            {item["id"]: item["result"] for item in results},
+            {
+                "first": "first",
+                "second": "second",
+            },
+        )
         await self.settle(manager, ready["connection_id"])
         self.assertFalse(first[2].isActive)
         self.assertFalse(second[2].isActive)
@@ -756,7 +879,8 @@ class TestHubRuntime(TestCase):
         for index, target in enumerate(targets):
             peer.input({"type": "invoke", "id": str(index), "target": target})
             self.assertEqual(
-                (await peer.nextEnvelope())["error"]["code"], "method_not_found",
+                (await peer.nextEnvelope())["error"]["code"],
+                "method_not_found",
             )
         peer.input({"type": "invoke", "id": "valid", "target": "defaults"})
         self.assertEqual((await peer.nextEnvelope())["result"], 7)
@@ -772,12 +896,18 @@ class TestHubRuntime(TestCase):
         """
         peer, _manager, _task, _ready = await self.connect()
         for name in ("marker", "socket", "context"):
-            peer.input({
-                "type": "invoke", "id": name, "target": "echo",
-                "args": ["valid"], "kwargs": {name: "attacker"},
-            })
+            peer.input(
+                {
+                    "type": "invoke",
+                    "id": name,
+                    "target": "echo",
+                    "args": ["valid"],
+                    "kwargs": {name: "attacker"},
+                },
+            )
             self.assertEqual(
-                (await peer.nextEnvelope())["error"]["code"], "invalid_arguments",
+                (await peer.nextEnvelope())["error"]["code"],
+                "invalid_arguments",
             )
         self.assertEqual(len(self.probe.calls), 1)
 
@@ -793,25 +923,39 @@ class TestHubRuntime(TestCase):
         peer, _manager, _task, _ready = await self.connect()
         for amount in ("not-an-int", 0):
             with self.subTest(amount=amount):
-                peer.input({
-                    "type": "invoke", "id": f"invalid-{amount}",
-                    "target": "validated", "args": [{"name": "test", "amount": amount}],
-                })
+                peer.input(
+                    {
+                        "type": "invoke",
+                        "id": f"invalid-{amount}",
+                        "target": "validated",
+                        "args": [{"name": "test", "amount": amount}],
+                    },
+                )
                 self.assertEqual(
-                    (await peer.nextEnvelope())["error"]["code"], "validation_error",
+                    (await peer.nextEnvelope())["error"]["code"],
+                    "validation_error",
                 )
         for kind in ("internal", "unauthorized", "forbidden"):
-            peer.input({
-                "type": "invoke", "id": kind, "target": "fail", "args": [kind],
-            })
+            peer.input(
+                {
+                    "type": "invoke",
+                    "id": kind,
+                    "target": "fail",
+                    "args": [kind],
+                },
+            )
             result = await peer.nextEnvelope()
             expected = "internal_error" if kind == "internal" else kind
             self.assertEqual(result["error"]["code"], expected)
             self.assertNotIn("private_database_key", str(result))
-        peer.input({
-            "type": "invoke", "id": "valid", "target": "validated",
-            "args": [{"name": "test", "amount": 9}],
-        })
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "valid",
+                "target": "validated",
+                "args": [{"name": "test", "amount": 9}],
+            },
+        )
         self.assertEqual((await peer.nextEnvelope())["result"], 9)
 
     async def testBidirectionalRpcKeepsReaderAvailableForCompletion(self) -> None:
@@ -830,9 +974,14 @@ class TestHubRuntime(TestCase):
         self.assertEqual(outgoing["target"], "refresh")
         peer.input({"type": "completion", "id": outgoing["id"], "result": {"ok": True}})
         result = await peer.nextEnvelope()
-        self.assertEqual(result, {
-            "type": "completion", "id": "client-call", "result": {"ok": True},
-        })
+        self.assertEqual(
+            result,
+            {
+                "type": "completion",
+                "id": "client-call",
+                "result": {"ok": True},
+            },
+        )
         connection = self.connection(manager, ready["connection_id"])
         self.assertEqual(connection.pending, {})
 
@@ -854,9 +1003,14 @@ class TestHubRuntime(TestCase):
         self.assertTrue(peer.envelopes.empty())
         peer.write_release.set()
         output = [await peer.nextEnvelope() for _ in range(3)]
-        self.assertEqual([item["type"] for item in output], [
-            "stream_item", "stream_item", "stream_complete",
-        ])
+        self.assertEqual(
+            [item["type"] for item in output],
+            [
+                "stream_item",
+                "stream_item",
+                "stream_complete",
+            ],
+        )
         self.assertEqual([item["item"] for item in output[:2]], [0, 1])
         self.assertTrue(self.probe.closed_stream.is_set())
 
@@ -869,21 +1023,32 @@ class TestHubRuntime(TestCase):
         None
             Verify broad annotations do not truncate a long-lived stream.
         """
-        peer, manager, _task, ready = await self.connect(RealtimeConfig(
-            invocation_timeout=0.02,
-        ))
+        peer, manager, _task, ready = await self.connect(
+            RealtimeConfig(
+                invocation_timeout=0.02,
+            ),
+        )
         peer.input({"type": "invoke", "id": "broad", "target": "broadStream"})
         await asyncio.wait_for(self.probe.entered.get(), timeout=2)
         with self.assertRaises(TimeoutError):
             await asyncio.wait_for(peer.envelopes.get(), timeout=0.08)
         self.assertFalse(self.probe.closed_stream.is_set())
         self.probe.release.set()
-        self.assertEqual(await peer.nextEnvelope(), {
-            "type": "stream_item", "id": "broad", "item": 42,
-        })
-        self.assertEqual(await peer.nextEnvelope(), {
-            "type": "stream_complete", "id": "broad",
-        })
+        self.assertEqual(
+            await peer.nextEnvelope(),
+            {
+                "type": "stream_item",
+                "id": "broad",
+                "item": 42,
+            },
+        )
+        self.assertEqual(
+            await peer.nextEnvelope(),
+            {
+                "type": "stream_complete",
+                "id": "broad",
+            },
+        )
         await self.settle(manager, ready["connection_id"])
         self.assertTrue(self.probe.closed_stream.is_set())
 
@@ -897,10 +1062,14 @@ class TestHubRuntime(TestCase):
             Verify disabling the default does not disable a client stream deadline.
         """
         peer, manager, _task, ready = await self.connect()
-        peer.input({
-            "type": "invoke", "id": "bounded", "target": "broadStream",
-            "timeout": 0.02,
-        })
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "bounded",
+                "target": "broadStream",
+                "timeout": 0.02,
+            },
+        )
         await asyncio.wait_for(self.probe.entered.get(), timeout=2)
         terminal = await peer.nextEnvelope()
         self.assertEqual(terminal["type"], "stream_complete")
@@ -919,10 +1088,14 @@ class TestHubRuntime(TestCase):
             Verify successful stream completion cannot precede aclose failure.
         """
         peer, manager, _task, ready = await self.connect()
-        peer.input({
-            "type": "invoke", "id": "close-fails", "target": "closingStream",
-            "args": ["fail"],
-        })
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "close-fails",
+                "target": "closingStream",
+                "args": ["fail"],
+            },
+        )
         self.assertEqual((await peer.nextEnvelope())["type"], "stream_item")
         terminal = await peer.nextEnvelope()
         self.assertEqual(terminal["type"], "stream_complete")
@@ -943,18 +1116,26 @@ class TestHubRuntime(TestCase):
             Verify stream success follows both iterator and invocation-scope cleanup.
         """
         peer, manager, _task, ready = await self.connect()
-        peer.input({
-            "type": "invoke", "id": "close-waits", "target": "closingStream",
-            "args": ["block"],
-        })
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "close-waits",
+                "target": "closingStream",
+                "args": ["block"],
+            },
+        )
         self.assertEqual((await peer.nextEnvelope())["type"], "stream_item")
         await asyncio.wait_for(self.probe.close_entered.wait(), timeout=2)
         self.assertTrue(peer.envelopes.empty())
         self.assertTrue(self.app.scopes[-1].isActive)
         self.probe.close_release.set()
-        self.assertEqual(await peer.nextEnvelope(), {
-            "type": "stream_complete", "id": "close-waits",
-        })
+        self.assertEqual(
+            await peer.nextEnvelope(),
+            {
+                "type": "stream_complete",
+                "id": "close-waits",
+            },
+        )
         self.assertTrue(self.probe.closed_stream.is_set())
         self.assertFalse(self.app.scopes[-1].isActive)
         await self.settle(manager, ready["connection_id"])
@@ -968,9 +1149,11 @@ class TestHubRuntime(TestCase):
         None
             Verify prolonged final delivery creates one successful terminal only.
         """
-        peer, manager, _task, ready = await self.connect(RealtimeConfig(
-            invocation_timeout=0.02,
-        ))
+        peer, manager, _task, ready = await self.connect(
+            RealtimeConfig(
+                invocation_timeout=0.02,
+            ),
+        )
         peer.pause_type = "completion"
         peer.write_release.clear()
         peer.input({"type": "invoke", "id": "write-waits", "target": "defaults"})
@@ -982,9 +1165,14 @@ class TestHubRuntime(TestCase):
         with self.assertRaises(TimeoutError):
             await asyncio.wait_for(peer.envelopes.get(), timeout=0.08)
         peer.write_release.set()
-        self.assertEqual(await peer.nextEnvelope(), {
-            "type": "completion", "id": "write-waits", "result": 7,
-        })
+        self.assertEqual(
+            await peer.nextEnvelope(),
+            {
+                "type": "completion",
+                "id": "write-waits",
+                "result": 7,
+            },
+        )
         await self.settle(manager, ready["connection_id"])
         self.assertEqual(connection.finishing, set())
         peer.input({"type": "ping"})
@@ -1002,9 +1190,14 @@ class TestHubRuntime(TestCase):
         """
         replying_peer = _ReplyingPeer()
         peer, manager, task, ready = await self.connect(peer=replying_peer)
-        peer.input({
-            "type": "invoke", "id": "reused", "target": "defaults", "args": [1],
-        })
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "reused",
+                "target": "defaults",
+                "args": [1],
+            },
+        )
         self.assertEqual((await peer.nextEnvelope())["result"], 1)
         self.assertEqual((await peer.nextEnvelope())["result"], 99)
         await self.settle(manager, ready["connection_id"])
@@ -1052,9 +1245,14 @@ class TestHubRuntime(TestCase):
             Verify no active ID leaks when cancellation arrives in one burst.
         """
         peer, manager, _task, ready = await self.connect()
-        peer.input({
-            "type": "invoke", "id": "instant", "target": "gated", "args": ["x"],
-        })
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "instant",
+                "target": "gated",
+                "args": ["x"],
+            },
+        )
         peer.input({"type": "cancel", "id": "instant"})
         result = await peer.nextEnvelope()
         self.assertEqual(result["id"], "instant")
@@ -1076,9 +1274,14 @@ class TestHubRuntime(TestCase):
         """
         peer, manager, task, ready = await self.connect()
         connection = self.connection(manager, ready["connection_id"])
-        peer.input({
-            "type": "invoke", "id": "instant", "target": "gated", "args": ["x"],
-        })
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "instant",
+                "target": "gated",
+                "args": ["x"],
+            },
+        )
         peer.disconnect()
         await asyncio.wait_for(task, timeout=2)
         self.assertEqual(connection.active, {})
@@ -1095,9 +1298,12 @@ class TestHubRuntime(TestCase):
         None
             Verify controlled overload and timeout replies.
         """
-        peer, manager, _task, ready = await self.connect(RealtimeConfig(
-            max_concurrent_invocations=1, invocation_timeout=0.05,
-        ))
+        peer, manager, _task, ready = await self.connect(
+            RealtimeConfig(
+                max_concurrent_invocations=1,
+                invocation_timeout=0.05,
+            ),
+        )
         peer.input({"type": "invoke", "id": "slow", "target": "gated", "args": ["x"]})
         await asyncio.wait_for(self.probe.entered.get(), timeout=2)
         peer.input({"type": "invoke", "id": "excess", "target": "defaults"})
@@ -1156,9 +1362,15 @@ class TestHubRuntime(TestCase):
         self.assertIn("bytes", peer.sent[1])
         peer.input({"type": "ping"}, binary=True)
         self.assertEqual(await peer.nextEnvelope(), {"type": "pong"})
-        peer.input({
-            "type": "invoke", "id": "mp", "target": "defaults", "args": [11],
-        }, binary=True)
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "mp",
+                "target": "defaults",
+                "args": [11],
+            },
+            binary=True,
+        )
         self.assertEqual((await peer.nextEnvelope())["result"], 11)
 
     async def testConnectionHookCanRejectBeforeReady(self) -> None:

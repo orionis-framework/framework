@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.http.payload.uploaded_file import UploadedFile
 
+
 class IMultipartPart(ABC):
     """
     Define the contract for a single part within a multipart HTTP request body.

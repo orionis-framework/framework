@@ -7,6 +7,7 @@ These capabilities support flows longer than simple calls while keeping requests
 ```python
 from orionis.mcp import McpResponse, Tool
 
+
 class ReportTool(Tool):
     async def handle(self):
         yield McpResponse.progress(0, total=2, message="Starting")
@@ -23,18 +24,25 @@ Handlers can return `InputRequiredResult(inputRequests=..., requestState=...)`. 
 ```python
 from orionis.mcp import InputRequiredResult, McpRequest, McpResponse, Tool
 
+
 class ConfirmTool(Tool):
     async def handle(self, request: McpRequest):
         if request.input_responses:
             return McpResponse.text("Response received; validate before acting")
-        return InputRequiredResult(inputRequests={
-            "choice": {"method": "elicitation/create", "params": {
-                "message": "Choose a label",
-                "requestedSchema": {"type": "object", "properties": {
-                    "label": {"type": "string"}
-                }},
-            }},
-        })
+        return InputRequiredResult(
+            inputRequests={
+                "choice": {
+                    "method": "elicitation/create",
+                    "params": {
+                        "message": "Choose a label",
+                        "requestedSchema": {
+                            "type": "object",
+                            "properties": {"label": {"type": "string"}},
+                        },
+                    },
+                },
+            }
+        )
 ```
 
 The example demonstrates shape rather than acting on any response. Before effects, check the key, action and validated content; decline/cancel is not acceptance. Elicitation forms support flat objects with primitive fields, not arbitrary nested schemas. Clients announce compatible capabilities in `_meta`; missing capability declarations fail before requesting input.
@@ -44,6 +52,8 @@ For trusted continuation state use `McpState.seal(request, value, ttl=300)` and 
 ## Subscribing to changes
 
 Declare `Server.list_changed=True` for catalog changes and `resource_subscriptions=True` for resources. Clients open `subscriptions/listen` with a `notifications` filter containing `toolsListChanged`, `promptsListChanged`, `resourcesListChanged` or `resourceSubscriptions`. URI access is checked at admission and during streaming as implemented by the dispatcher.
+
+Each resource update rechecks availability and authorization before delivery. Updates denied by the current policy are omitted without closing other accepted filters; later updates can resume if access is restored.
 
 After catalog changes call `await Mcp.toolsChanged(ServerClass)`, `promptsChanged`, `resourcesChanged` or `resourceUpdated(ServerClass, uri)`. The class must be registered in that manager. Notifications are scoped to that server's listeners. The default event bus is process-local with bounded buffers/subscriptions; it provides neither cross-worker delivery nor replay. Close streams/listeners on disconnect and shutdown.
 

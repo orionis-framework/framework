@@ -6,6 +6,7 @@ from orionis.environment import Env
 from orionis.foundation.config.validation import validate_integer
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class HTTPBodyLimits(BaseEntity):
     """
@@ -52,9 +53,7 @@ class HTTPBodyLimits(BaseEntity):
     max_body_size: int = field(
         default_factory=lambda: Env.get("HTTP_MAX_BODY_SIZE", 16 * 1024 * 1024),
         metadata={
-            "description": (
-                "Maximum transport bytes per request, including framing."
-            ),
+            "description": ("Maximum transport bytes per request, including framing."),
             "default": 16 * 1024 * 1024,
         },
     )
@@ -129,7 +128,8 @@ class HTTPBodyLimits(BaseEntity):
 
     max_memory_size: int = field(
         default_factory=lambda: Env.get(
-            "HTTP_MAX_MULTIPART_MEMORY_SIZE", 8 * 1024 * 1024,
+            "HTTP_MAX_MULTIPART_MEMORY_SIZE",
+            8 * 1024 * 1024,
         ),
         metadata={
             "description": (

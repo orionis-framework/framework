@@ -8,6 +8,7 @@ from orionis.support.entities.base import BaseEntity
 if TYPE_CHECKING:
     from orionis.test.enums.status import TestStatus
 
+
 @dataclass(frozen=True, kw_only=True)
 class TestResult(BaseEntity):
     """
@@ -40,12 +41,9 @@ class TestResult(BaseEntity):
     exception : str | None, optional
         Name of the raised exception class if an error occurred, otherwise None.
     line_no : int | None, optional
-        Line number in the source file where the test is defined, if applicable.
-
-    Returns
-    -------
-    None
-        This class does not return a value upon instantiation.
+        Source line associated with the failure, if available.
+    source_code : list[tuple[int, str]] | None, optional
+        Source line numbers and text surrounding the failure.
     """
 
     # Unique identifier for the test result
@@ -65,18 +63,14 @@ class TestResult(BaseEntity):
     # Status of the test execution (e.g., passed, failed)
     status: TestStatus = field(
         metadata={
-            "description": (
-                "Status of the test execution (e.g., passed, failed)."
-            ),
+            "description": ("Status of the test execution (e.g., passed, failed)."),
         },
     )
 
     # Time taken to execute the test, in seconds
     execution_time: float = field(
         metadata={
-            "description": (
-                "Time taken to execute the test, in seconds."
-            ),
+            "description": ("Time taken to execute the test, in seconds."),
         },
     )
 
@@ -84,9 +78,7 @@ class TestResult(BaseEntity):
     error_message: str | None = field(
         default=None,
         metadata={
-            "description": (
-                "Error message if the test failed, otherwise None."
-            ),
+            "description": ("Error message if the test failed, otherwise None."),
         },
     )
 
@@ -104,9 +96,7 @@ class TestResult(BaseEntity):
     class_name: str | None = field(
         default=None,
         metadata={
-            "description": (
-                "Name of the class containing the test, if applicable."
-            ),
+            "description": ("Name of the class containing the test, if applicable."),
         },
     )
 
@@ -114,9 +104,7 @@ class TestResult(BaseEntity):
     method: str | None = field(
         default=None,
         metadata={
-            "description": (
-                "Name of the method representing the test, if applicable."
-            ),
+            "description": ("Name of the method representing the test, if applicable."),
         },
     )
 
@@ -124,9 +112,7 @@ class TestResult(BaseEntity):
     module: str | None = field(
         default=None,
         metadata={
-            "description": (
-                "Name of the module containing the test, if applicable."
-            ),
+            "description": ("Name of the module containing the test, if applicable."),
         },
     )
 
@@ -134,9 +120,7 @@ class TestResult(BaseEntity):
     file_path: str | None = field(
         default=None,
         metadata={
-            "description": (
-                "Path to the file containing the test, if applicable."
-            ),
+            "description": ("Path to the file containing the test, if applicable."),
         },
     )
 
@@ -144,9 +128,7 @@ class TestResult(BaseEntity):
     doc_string: str | None = field(
         default=None,
         metadata={
-            "description": (
-                "Docstring of the test, if applicable."
-            ),
+            "description": ("Docstring of the test, if applicable."),
         },
     )
 
@@ -161,14 +143,11 @@ class TestResult(BaseEntity):
         },
     )
 
-    # Line number in the source file where the test is defined, if applicable
+    # Source line associated with the failure, if available
     line_no: int | None = field(
         default=None,
         metadata={
-            "description": (
-                "Line number in the source file where the test is defined, "
-                "if applicable."
-            ),
+            "description": ("Source line associated with the failure, if available."),
         },
     )
 
@@ -181,4 +160,3 @@ class TestResult(BaseEntity):
             ),
         },
     )
-    """Source code produced by ``field``."""

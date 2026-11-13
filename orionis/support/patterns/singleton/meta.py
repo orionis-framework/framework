@@ -5,6 +5,7 @@ import threading
 _MISSING: object = object()
 """Sentinel distinguishing missing from ordinary values."""
 
+
 class Singleton(type):
     """Create one instance per class with synchronous and asynchronous access."""
 
@@ -36,6 +37,7 @@ class Singleton(type):
         super().__init__(name, bases, namespace)
         type.__setattr__(cls, "_singleton_instance", _MISSING)
         type.__setattr__(cls, "_singleton_lock", threading.Lock())
+        type.__setattr__(cls, "_singleton_owner", None)
 
     def __call__(
         cls: type,
@@ -58,16 +60,30 @@ class Singleton(type):
         -------
         object
             The existing or newly created singleton instance.
+
+        Raises
+        ------
+        RuntimeError
+            If the constructor recursively requests the same singleton.
         """
         instance = cls._singleton_instance
         if instance is not _MISSING:
             return instance
 
+        owner = threading.get_ident()
+        if cls._singleton_owner == owner:
+            error_msg = f"Recursive singleton construction for {cls.__name__}."
+            raise RuntimeError(error_msg)
+
         with cls._singleton_lock:
             instance = cls._singleton_instance
             if instance is _MISSING:
-                instance = super().__call__(*args, **kwargs)
-                type.__setattr__(cls, "_singleton_instance", instance)
+                type.__setattr__(cls, "_singleton_owner", owner)
+                try:
+                    instance = super().__call__(*args, **kwargs)
+                    type.__setattr__(cls, "_singleton_instance", instance)
+                finally:
+                    type.__setattr__(cls, "_singleton_owner", None)
 
         return instance
 

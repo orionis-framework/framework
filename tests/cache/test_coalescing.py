@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import gc
 import tempfile
@@ -9,6 +11,7 @@ from orionis.cache.repository import _FLIGHTS, CacheRepository
 from orionis.cache.stores.file import FileCacheBackend
 from orionis.test import TestCase
 
+
 class TestCacheCoalescing(TestCase):
     """Verify opt-in miss coalescing and ordered file batches."""
 
@@ -19,11 +22,15 @@ class TestCacheCoalescing(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         backend = SimpleMemoryCache()
+        self.addAsyncCleanup(backend.close)
         repositories = [CacheRepository(backend, "same") for _ in range(2)]
+        caller_count = 500
         calls = 0
+        started = 0
+        all_started = asyncio.Event()
 
         async def resolve() -> None:
             """
@@ -32,24 +39,40 @@ class TestCacheCoalescing(TestCase):
             Returns
             -------
             None
-                Complete the operation without returning a value.
+                No return value.
             """
             nonlocal calls
             calls += 1
-            await asyncio.sleep(0.01)
+            await asyncio.wait_for(all_started.wait(), 5)
+
+        async def request(index: int) -> object:
+            """Announce each concurrent caller before requesting the shared value.
+
+            Parameters
+            ----------
+            index : int
+                Caller index selecting one of the shared repositories.
+
+            Returns
+            -------
+            object
+                Value returned by the coalesced request.
+            """
+            nonlocal started
+            started += 1
+            if started == caller_count:
+                all_started.set()
+            return await repositories[index % 2].rememberOnce(
+                "key",
+                None,
+                resolve,
+                wait_timeout=60,
+            )
 
         result = await asyncio.gather(
-            *(
-                repositories[index % 2].rememberOnce(
-                    "key",
-                    None,
-                    resolve,
-                    wait_timeout=60,
-                )
-                for index in range(500)
-            ),
+            *(request(index) for index in range(caller_count)),
         )
-        self.assertEqual(result, [None] * 500)
+        self.assertEqual(result, [None] * caller_count)
         self.assertEqual(calls, 1)
         gc.collect()
         self.assertEqual(len(_FLIGHTS), 0)
@@ -61,9 +84,11 @@ class TestCacheCoalescing(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
-        repository = CacheRepository(SimpleMemoryCache())
+        backend = SimpleMemoryCache()
+        self.addAsyncCleanup(backend.close)
+        repository = CacheRepository(backend)
         entered = asyncio.Event()
 
         async def blocked() -> None:
@@ -73,17 +98,25 @@ class TestCacheCoalescing(TestCase):
             Returns
             -------
             None
-                Complete the operation without returning a value.
+                No return value.
             """
             entered.set()
             await asyncio.Event().wait()
 
         owner = asyncio.create_task(repository.rememberOnce("key", None, blocked))
-        await entered.wait()
-        with self.assertRaises(TimeoutError):
-            await repository.rememberOnce("key", None, lambda: 2, wait_timeout=0.001)
-        self.assertEqual(await repository.rememberOnce("other", None, lambda: 3), 3)
-        owner.cancel()
+        try:
+            await asyncio.wait_for(entered.wait(), 2)
+            with self.assertRaises(TimeoutError):
+                await repository.rememberOnce(
+                    "key",
+                    None,
+                    lambda: 2,
+                    wait_timeout=0.001,
+                )
+            self.assertEqual(await repository.rememberOnce("other", None, lambda: 3), 3)
+        finally:
+            owner.cancel()
+            await asyncio.gather(owner, return_exceptions=True)
         with self.assertRaises(asyncio.CancelledError):
             await owner
 
@@ -110,9 +143,11 @@ class TestCacheCoalescing(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
-        repository = CacheRepository(SimpleMemoryCache())
+        backend = SimpleMemoryCache()
+        self.addAsyncCleanup(backend.close)
+        repository = CacheRepository(backend)
 
         async def recursive() -> int:
             """
@@ -135,7 +170,7 @@ class TestCacheCoalescing(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         with tempfile.TemporaryDirectory() as directory:
             backend = FileCacheBackend(Path(directory))

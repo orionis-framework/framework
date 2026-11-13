@@ -64,47 +64,60 @@ __all__ = [
 
 _EXPORTS = {
     "ConnectionName": (
-        "orionis.foundation.config.database.enums.connection_name", "ConnectionName",
+        "orionis.foundation.config.database.enums.connection_name",
+        "ConnectionName",
     ),
     "Connections": (
-        "orionis.foundation.config.database.entities.connections", "Connections",
+        "orionis.foundation.config.database.entities.connections",
+        "Connections",
     ),
     "Database": ("orionis.foundation.config.database.entities.database", "Database"),
     "MySQL": ("orionis.foundation.config.database.entities.mysql", "MySQL"),
     "MySQLCharset": (
-        "orionis.foundation.config.database.enums.mysql_charsets", "MySQLCharset",
+        "orionis.foundation.config.database.enums.mysql_charsets",
+        "MySQLCharset",
     ),
     "MySQLCollation": (
-        "orionis.foundation.config.database.enums.mysql_collations", "MySQLCollation",
+        "orionis.foundation.config.database.enums.mysql_collations",
+        "MySQLCollation",
     ),
     "MySQLEngine": (
-        "orionis.foundation.config.database.enums.mysql_engine", "MySQLEngine",
+        "orionis.foundation.config.database.enums.mysql_engine",
+        "MySQLEngine",
     ),
     "Oracle": ("orionis.foundation.config.database.entities.oracle", "Oracle"),
     "OracleEncoding": (
-        "orionis.foundation.config.database.enums.oracle_encoding", "OracleEncoding",
+        "orionis.foundation.config.database.enums.oracle_encoding",
+        "OracleEncoding",
     ),
     "OracleNencoding": (
-        "orionis.foundation.config.database.enums.oracle_nencoding", "OracleNencoding",
+        "orionis.foundation.config.database.enums.oracle_nencoding",
+        "OracleNencoding",
     ),
     "PGSQL": ("orionis.foundation.config.database.entities.pgsql", "PGSQL"),
     "PGSQLCharset": (
-        "orionis.foundation.config.database.enums.pgsql_charsets", "PGSQLCharset",
+        "orionis.foundation.config.database.enums.pgsql_charsets",
+        "PGSQLCharset",
     ),
     "PGSQLCollation": (
-        "orionis.foundation.config.database.enums.pgsql_collations", "PGSQLCollation",
+        "orionis.foundation.config.database.enums.pgsql_collations",
+        "PGSQLCollation",
     ),
     "PGSQLSSLMode": (
-        "orionis.foundation.config.database.enums.pgsql_mode", "PGSQLSSLMode",
+        "orionis.foundation.config.database.enums.pgsql_mode",
+        "PGSQLSSLMode",
     ),
     "Redshift": (
-        "orionis.foundation.config.database.entities.redshift", "Redshift",
+        "orionis.foundation.config.database.entities.redshift",
+        "Redshift",
     ),
     "RedshiftSSLMode": (
-        "orionis.foundation.config.database.enums.redshift_mode", "RedshiftSSLMode",
+        "orionis.foundation.config.database.enums.redshift_mode",
+        "RedshiftSSLMode",
     ),
     "SQLServer": (
-        "orionis.foundation.config.database.entities.sqlserver", "SQLServer",
+        "orionis.foundation.config.database.entities.sqlserver",
+        "SQLServer",
     ),
     "SQLServerCharset": (
         "orionis.foundation.config.database.enums.sqlserver_charset",
@@ -116,7 +129,8 @@ _EXPORTS = {
         "SQLiteForeignKey",
     ),
     "SQLiteJournalMode": (
-        "orionis.foundation.config.database.enums.sqlite_journal", "SQLiteJournalMode",
+        "orionis.foundation.config.database.enums.sqlite_journal",
+        "SQLiteJournalMode",
     ),
     "SQLiteSynchronous": (
         "orionis.foundation.config.database.enums.sqlite_synchronous",
@@ -124,6 +138,7 @@ _EXPORTS = {
     ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """Resolve and cache a public database configuration export.
@@ -144,6 +159,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """List loaded attributes and declared database configuration exports.

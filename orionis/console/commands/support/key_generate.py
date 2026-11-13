@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep the application contract available for command dependency injection.
 """Generate and persist an application encryption key."""
 
 from typing import ClassVar
@@ -10,10 +12,9 @@ from orionis.environment.key.key_generator import SecureKeyGenerator
 from orionis.foundation.config.app.enums.ciphers import Cipher
 from orionis.foundation.contracts.application import IApplication
 
+
 class KeyGenerateCommand(BaseCommand):
     """Generate and persist an application encryption key."""
-
-    # ruff: noqa: TC001
 
     timestamps: bool = False
     """Timestamps flag used by ``KeyGenerateCommand``."""
@@ -60,7 +61,7 @@ class KeyGenerateCommand(BaseCommand):
             )
             return 0
 
-        cipher = app.config("app.cipher") or Cipher.AES_256_CBC
+        cipher = app.config("app.cipher") or Cipher.AES_256_GCM
         generated_key = SecureKeyGenerator.generate(cipher)
         try:
             if not Env.set("APP_KEY", generated_key):

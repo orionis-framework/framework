@@ -1,10 +1,11 @@
+# ruff: noqa: TC001
+# Expose the session record type to runtime contract introspection.
+
 """Contract every session backing-store must satisfy."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.session.entities.record import SessionRecord
 
-if TYPE_CHECKING:
-    from orionis.session.entities.record import SessionRecord
 
 class ISessionStore(ABC):
     """
@@ -57,7 +58,7 @@ class ISessionStore(ABC):
         Returns
         -------
         None
-            Persist *record*, creating or overwriting the existing entry.
+            No return value.
         """
 
     @abstractmethod
@@ -101,5 +102,5 @@ class ISessionStore(ABC):
         Returns
         -------
         None
-            Remove all records whose ``expires_at`` is in the past.
+            No return value.
         """

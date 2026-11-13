@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Adapt an ASGI scope dictionary to the transport adapter contract."""
 
 from __future__ import annotations
@@ -12,6 +14,7 @@ if TYPE_CHECKING:
 _MISSING: Any = object()
 """Sentinel that marks per-request lazy fields as "not yet resolved"."""
 
+
 class ASGITransportAdapter(TransportAdapter):
     """
     Adapt an ASGI scope dictionary to the transport adapter contract.
@@ -21,8 +24,6 @@ class ASGITransportAdapter(TransportAdapter):
     None
         This class exposes request data accessors and state overrides.
     """
-
-    # ruff: noqa: ANN401
 
     # Store scope data, request state, and resolved fields.
     __slots__ = (

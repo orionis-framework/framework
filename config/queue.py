@@ -1,12 +1,19 @@
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.queue import (
-    Connections, Database, Drivers, Failed, Queue, Redis, Sync, Worker,
+    Connections,
+    Database,
+    Drivers,
+    Failed,
+    Queue,
+    Redis,
+    Sync,
+    Worker,
 )
+
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class BootstrapQueue(Queue):
-
     # ----------------------------------------------------------------------------------
     # default : str, optional
     # --- The default queue connection name.
@@ -24,7 +31,6 @@ class BootstrapQueue(Queue):
     # ----------------------------------------------------------------------------------
     connections: Connections | dict[str, Sync | Database | Redis | dict] = field(
         default_factory=lambda: Connections(
-
             # --------------------------------------------------------------------------
             # sync : Sync, optional
             # --- Execute jobs immediately in the dispatching process.
@@ -34,7 +40,6 @@ class BootstrapQueue(Queue):
                 queue=Env.get("QUEUE_SYNC_QUEUE", "default"),
                 retry_after=Env.get("QUEUE_SYNC_RETRY_AFTER", 90.0),
             ),
-
             # --------------------------------------------------------------------------
             # database : Database, optional
             # --- Persist jobs using a framework database connection.
@@ -47,7 +52,6 @@ class BootstrapQueue(Queue):
                 queue=Env.get("QUEUE_DB_QUEUE", "default"),
                 retry_after=Env.get("QUEUE_DB_RETRY_AFTER", 90.0),
             ),
-
             # --------------------------------------------------------------------------
             # redis : Redis, optional
             # --- Persist jobs in Redis using separate connection fields.

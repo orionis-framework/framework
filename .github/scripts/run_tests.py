@@ -1,15 +1,17 @@
+# ruff: noqa: S603, T201
+
 import argparse
+import fnmatch
 import os
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import NoReturn, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-# ruff: noqa: T201
 
 @dataclass(frozen=True, slots=True)
 class TestSuite:
@@ -33,6 +35,24 @@ class TestSuite:
             return f"Root [{self.directory}/{self.pattern}]"
         return self.directory
 
+
+def _raise_discovery_error(error: OSError) -> NoReturn:
+    """
+    Propagate traversal errors instead of silently omitting test suites.
+
+    Parameters
+    ----------
+    error : OSError
+        Filesystem error reported by the directory walker.
+
+    Raises
+    ------
+    OSError
+        Always propagate the original error.
+    """
+    raise error
+
+
 def discover_suites(repo_root: Path) -> list[TestSuite]:
     """
     Discover public test suites while excluding local real-database tests.
@@ -46,28 +66,41 @@ def discover_suites(repo_root: Path) -> list[TestSuite]:
     -------
     list[TestSuite]
         Sorted module suites followed by sorted root test files.
+
+    Raises
+    ------
+    OSError
+        If an allowed suite directory cannot be read.
     """
     # Deduplicate nested module directories while retaining individual root files.
     test_root = repo_root / "tests"
+    if not test_root.is_dir():
+        return []
     modules: set[str] = set()
     root_files: list[str] = []
-    for path in test_root.rglob("test_*.py"):
-        if not path.is_file():
-            continue
-        relative = path.relative_to(test_root)
-        # Exclude only the top-level directory reserved for local database runs.
-        if relative.parts[0] == "real_database":
-            continue
-        # Run each root file separately and group nested files by public module.
-        if len(relative.parts) == 1:
-            root_files.append(relative.name)
-        else:
-            modules.add(relative.parts[0])
+    for directory, children, filenames in test_root.walk(
+        on_error=_raise_discovery_error,
+    ):
+        # Prune before walking: excluded files must never enter discovery.
+        if directory == test_root and "real_database" in children:
+            children.remove("real_database")
+        for filename in filenames:
+            if not fnmatch.fnmatch(filename, "test_*.py"):
+                continue
+            path = directory / filename
+            if not path.is_file():
+                continue
+            relative = path.relative_to(test_root)
+            if len(relative.parts) == 1:
+                root_files.append(relative.name)
+            else:
+                modules.add(relative.parts[0])
 
     # Keep module and root-file execution order stable across platforms.
     suites = [TestSuite(f"tests/{name}") for name in sorted(modules)]
     suites.extend(TestSuite("tests", name) for name in sorted(root_files))
     return suites
+
 
 def run_suites(
     repo_root: Path,
@@ -103,19 +136,24 @@ def run_suites(
     for suite in suites:
         heading = f"Run tests: {suite.label}"
         print(f"::group::{heading}" if in_actions else heading, flush=True)
+        start_path = (
+            f"{suite.directory}/{suite.pattern}"
+            if suite.directory == "tests"
+            else suite.directory
+        )
         command = [
             sys.executable,
             "-B",
             "reactor",
             "test",
-            f"--start-dir={suite.directory}",
+            f"--start-dir={start_path}",
             f"--file-pattern={suite.pattern}",
             f"--verbosity={verbosity}",
             "--fail-fast=1",
         ]
         try:
             # Launch the active interpreter with separate command arguments.
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(
                 command,
                 cwd=repo_root,
                 env=environment,
@@ -135,6 +173,7 @@ def run_suites(
             if not continue_on_error:
                 break
     return failure
+
 
 def main(argv: Sequence[str] | None = None) -> int:
     """
@@ -179,6 +218,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except OSError as error:
         print(f"Unable to start test suite: {error}", file=sys.stderr)
         return 2
+
 
 # Propagate discovery and suite failures to the calling shell or CI job.
 if __name__ == "__main__":

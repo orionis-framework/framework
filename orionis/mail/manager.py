@@ -1,30 +1,31 @@
+# ruff: noqa: PLC0415, TC001
+# Keep runtime annotations and defer transport imports until selection.
 """Resolve central mail configuration and delegate the shared fluent pipeline."""
 
 from collections.abc import Mapping
 from dataclasses import fields, is_dataclass
 from inspect import isawaitable
-from typing import TYPE_CHECKING, cast
+from typing import cast
 from orionis.foundation.contracts.application import IApplication
 from orionis.mail.composer import MailComposer
 from orionis.mail.contracts.manager import IMailManager
 from orionis.mail.contracts.transport import IMailTransport
 from orionis.mail.entities.address import Address
+from orionis.mail.entities.attachment import Attachment
+from orionis.mail.entities.content import Content
 from orionis.mail.entities.envelope import Envelope
+from orionis.mail.entities.result import MailResult
 from orionis.mail.exceptions import MailConfigurationException
 from orionis.mail.functions import freeze_owned
 from orionis.mail.mailable import Mailable
 from orionis.mail.pending import PendingMail
+from orionis.mail.types import TransportFactory
 from orionis.support.entities.base import BaseEntity
-
-if TYPE_CHECKING:
-    from orionis.mail.entities.attachment import Attachment
-    from orionis.mail.entities.content import Content
-    from orionis.mail.entities.result import MailResult
-    from orionis.mail.types import TransportFactory
 
 # Mailer names whose driver may be omitted in the configuration.
 _CONVENTIONAL_DRIVERS = frozenset({"smtp", "file"})
 """Mailer names whose driver may be omitted in the configuration."""
+
 
 class MailManager(PendingMail, IMailManager):
     """
@@ -42,8 +43,6 @@ class MailManager(PendingMail, IMailManager):
     be registered during provider startup, before concurrent sends. Transport
     resolution and preparation keep all per-operation state in local variables.
     """
-
-    # ruff: noqa: PLC0415, TC001
 
     __slots__ = ("_app", "_composer", "_factories")
     """Declare the instance attribute slots reserved by this class."""
@@ -170,15 +169,14 @@ class MailManager(PendingMail, IMailManager):
         prepared = await self._composer.prepare(envelope, content, attachments)
 
         if factory is None:
-
             if driver == "smtp":
-
                 from orionis.mail.transports.smtp import create_smtp_transport
+
                 factory = create_smtp_transport
 
             else:
-
                 from orionis.mail.transports.file import create_file_transport
+
                 factory = create_file_transport
 
             self._factories[driver] = factory
@@ -277,6 +275,7 @@ class MailManager(PendingMail, IMailManager):
 
         normalized = freeze_owned({**settings, "driver": driver})
         return mailer, driver, cast("Mapping[str, object]", normalized)
+
 
 def _configuration_mapping(value: object) -> dict[str, object]:
     """

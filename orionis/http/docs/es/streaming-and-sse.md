@@ -8,13 +8,18 @@ Un stream evita construir un cuerpo completo en memoria y permite entregar resul
 import asyncio
 from orionis.http import response
 
+
 async def export_rows():
     yield b"id,name\n"
     yield b"1,Ada\n"
 
+
 async def example():
     result = response.stream(export_rows(), media_type="text/csv")
-    assert b"".join([chunk async for chunk in result.getStream()]) == b"id,name\n1,Ada\n"
+    assert (
+        b"".join([chunk async for chunk in result.getStream()]) == b"id,name\n1,Ada\n"
+    )
+
 
 asyncio.run(example())
 ```
@@ -26,12 +31,15 @@ asyncio.run(example())
 ```python
 from orionis.http import ServerSentEvent, response
 
+
 async def progress_events():
     for step in range(3):
         yield ServerSentEvent(event="progress", id=str(step), data=str(step))
 
+
 async def progress():
     return response.eventStream(progress_events())
+
 
 frame = ServerSentEvent(event="progress", id="7", retry=1500, data="ready").encode()
 assert b"event: progress\n" in frame
@@ -45,6 +53,10 @@ Un `id` identifica un evento; este módulo no guarda eventos ni reconstruye auto
 ## Cancelación y cierre
 
 La lectura es perezosa y se ajusta al ritmo de envío. Usa `try/finally` en productores que abren cursores, archivos o suscripciones. Las pruebas de los adaptadores cubren desconexión, cancelación y cierre de iteradores. No absorbas `CancelledError` y dejes el productor ejecutándose. Si el recurso tiene `aclose()`, su limpieza debe completarse antes de liberar el scope.
+
+HEAD no consume el stream de respuesta, pero invoca su `aclose()` cuando existe. Si falla la admisión del emisor SSE o del monitor de desconexión, se cierran las coroutines no programadas y se cancela y espera cualquier emisor admitido antes de propagar el fallo.
+
+Una fuente síncrona también transfiere el cierre de su iterador al wrapper de la respuesta. Su hook de cierre se ejecuta al agotarse, fallar el envío o procesar HEAD, incluso si el wrapper nunca empezó a iterarse.
 
 `HTTP_MONITOR_DISCONNECTS` controla monitoreo adicional para solicitudes HTTP ordinarias; SSE/WebSocket y políticas de endpoint pueden tener mecanismos propios. Verifica el adapter utilizado y la configuración de tu despliegue. Un proxy puede seguir agrupando salida aun cuando la aplicación entregue chunks; prueba el flujo completo.
 

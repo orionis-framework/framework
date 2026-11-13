@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import tempfile
 import time
@@ -53,6 +55,7 @@ from tests.http.test_kernel import (
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+
 class TestPasswordReset(TestCase):
     """Exercise persistence, races, hashing and revocation through the broker."""
 
@@ -62,17 +65,20 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Prepares isolated state for the test.
+            No return value.
         """
         self.temp = tempfile.TemporaryDirectory()
+        self.enterContext(self.temp)
         self.app = build_app()
         self.app._config["database"]["connections"]["sqlite"]["database"] = str(
             Path(self.temp.name) / "reset.sqlite",
         )
         self.manager = ConnectionManager(self.app)
         self.previous = ConnectionResolver._manager
+        self.addCleanup(ConnectionResolver.setManager, self.previous)
         ConnectionResolver.setManager(self.manager)
         self.connection = self.manager.connection("sqlite")
+        self.addAsyncCleanup(self.manager.disconnect)
         for table in (
             accounts_table(),
             tokens_table(),
@@ -90,25 +96,13 @@ class TestPasswordReset(TestCase):
             },
         )
 
-    async def asyncTearDown(self) -> None:
-        """Disconnect and remove only this test's temporary database.
-
-        Returns
-        -------
-        None
-            Restores shared state and releases test resources.
-        """
-        ConnectionResolver.setManager(self.previous)
-        await self.connection.disconnect()
-        self.temp.cleanup()
-
     async def testStoresOnlyDigestAndDoesNotChangePassword(self) -> None:
         """Issuance must not change the account or store a bearer credential.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         _, token = await self.broker.issue(" ADA@example.com ")
         row = await self.db.table("password_reset_tokens").first()
@@ -128,7 +122,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(await self.broker.issue("missing@example.com"))
         self.assertEqual(await self.db.table("password_reset_tokens").count(), 0)
@@ -139,7 +133,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         _, token = await self.broker.issue(self.user.email)
         self.assertIsNone(await self.broker.issue(self.user.email))
@@ -158,7 +152,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         results = await asyncio.gather(
             *(self.broker.issue(self.user.email) for _ in range(6)),
@@ -172,7 +166,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         _, token = await self.broker.issue(self.user.email)
         self.assertFalse(await self.broker.valid("other@example.com", token))
@@ -197,7 +191,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         guard = SessionGuard(self.app, ModelIdentityProvider(self.app, self.hashing))
         request = fake_request(Session())
@@ -226,7 +220,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         _, token = await self.broker.issue(self.user.email)
         results = await asyncio.gather(
@@ -243,7 +237,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         _, token = await self.broker.issue(self.user.email)
         with (
@@ -267,7 +261,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         _, token = await self.broker.issue(self.user.email)
         await (
@@ -287,7 +281,7 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         _, token = await self.broker.issue(self.user.email)
         await Account.query().where("id", self.user.id).delete()
@@ -306,13 +300,14 @@ class TestPasswordReset(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.put("_auth_identifier", self.user.id)
         guard = SessionGuard(self.app, ModelIdentityProvider(self.app, self.hashing))
         self.assertIsNone(await guard.resolve(fake_request(session)))
         self.assertIsNone(session.get("_auth_identifier"))
+
 
 class TestPasswordResetValidation(TestCase):
     """Enforce credential policy and trusted link configuration."""
@@ -323,7 +318,7 @@ class TestPasswordResetValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         valid = {
             "email": "ada@example.com",
@@ -348,7 +343,7 @@ class TestPasswordResetValidation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(
             Auth(passwords={"expiration": 15}).passwords,
@@ -357,6 +352,7 @@ class TestPasswordResetValidation(TestCase):
         for values in ({"expiration": 0}, {"throttle": -1}, {"expiration": True}):
             with self.assertRaises(ValueError):
                 PasswordReset(**values)
+
 
 class _View:
     """Record explicit context and errors without a live view container."""
@@ -372,12 +368,12 @@ class _View:
         Returns
         -------
         None
-            Initializes the test object.
+            No return value.
         """
         self.context = context
         self.errors = None
 
-    def withErrors(self, errors):
+    def withErrors(self, errors: object) -> _View:
         """Capture field errors without persisting any submitted input.
 
         Parameters
@@ -402,7 +398,7 @@ class _View:
             Value produced by the helper.
         """
 
-        async def render():
+        async def render() -> HTMLResponse:
             """Return an HTML form response.
 
             Returns
@@ -414,6 +410,7 @@ class _View:
 
         return render().__await__()
 
+
 class TestPasswordResetController(TestCase):
     """Test browser responses and mail construction without sending email."""
 
@@ -423,7 +420,7 @@ class TestPasswordResetController(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         controller = ForgotPasswordController()
         email = "ada+test@example.com"
@@ -455,7 +452,7 @@ class TestPasswordResetController(TestCase):
         Returns
         -------
         None
-            Retain the exact exception, execution context, and failed task outcome.
+            No return value.
         """
         app, _, handler = activate_runtime()
         failure = RuntimeError("secret-bearing-backend-error")
@@ -492,7 +489,7 @@ class TestPasswordResetController(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         controller = ForgotPasswordController()
         broker = SimpleNamespace(
@@ -523,7 +520,7 @@ class TestPasswordResetController(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         controller = ForgotPasswordController()
         broker = SimpleNamespace(issue=AsyncMock(return_value=None))
@@ -553,7 +550,7 @@ class TestPasswordResetController(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         controller = ForgotPasswordController()
         broker = SimpleNamespace(valid=AsyncMock(return_value=False))
@@ -581,7 +578,7 @@ class TestPasswordResetController(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         controller = ForgotPasswordController()
         broker = SimpleNamespace(valid=AsyncMock(return_value=True), reset=AsyncMock())
@@ -605,6 +602,7 @@ class TestPasswordResetController(TestCase):
         self.assertNotIn("password", render.call_args.kwargs)
         self.assertIsInstance(view.errors, ValidationException)
 
+
 class TestPasswordResetWeb(TestCase):
     """Compile production routes, reject missing CSRF and render real views."""
 
@@ -614,7 +612,7 @@ class TestPasswordResetWeb(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         router = make_router()
         router.auth()
@@ -630,7 +628,7 @@ class TestPasswordResetWeb(TestCase):
             self.assertEqual(route.name, name)
         original_build = _StubApp.build
 
-        async def build(app, concrete):
+        async def build(app: _StubApp, concrete: type) -> object:
             """Build middleware dependencies for the route.
 
             Parameters
@@ -664,7 +662,7 @@ class TestPasswordResetWeb(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         environment = Environment(
             loader=FileSystemLoader("resources/views"),

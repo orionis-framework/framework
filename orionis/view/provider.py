@@ -46,6 +46,7 @@ from orionis.view.globals import (
 )
 from orionis.support.facades.view import View as ViewFacade
 
+
 class ViewServiceProvider(ServiceProvider):
     """
     Register and boot the view system into the application container.
@@ -73,7 +74,7 @@ class ViewServiceProvider(ServiceProvider):
         Returns
         -------
         None
-            Bind view services as singletons in the application container.
+            No return value.
         """
         # Environment wraps and owns the Jinja2 Environment instance
         self.app.singleton(IViewEnvironment, ViewEnvironment)
@@ -91,7 +92,7 @@ class ViewServiceProvider(ServiceProvider):
         Returns
         -------
         None
-            Register globals, filters, and extensions; then pin the facade.
+            No return value.
         """
         # Resolve the shared environment singleton
         _env: IViewEnvironment = await self.app.make(IViewEnvironment)
@@ -148,9 +149,7 @@ class ViewServiceProvider(ServiceProvider):
             _env.addFilter(_name, _callback)
 
         # Register all Jinja2 extensions
-        _extensions: tuple[Any, ...] = (
-            CsrfExtension,
-        )
+        _extensions: tuple[Any, ...] = (CsrfExtension,)
 
         for _extension in _extensions:
             _env.addExtension(_extension)

@@ -8,6 +8,7 @@ import functools
 _pattern = re.compile(r"^[A-Z][A-Z0-9_]*$")
 """Precompile the regex pattern for validating environment variable names."""
 
+
 @functools.lru_cache(maxsize=512)
 def _validate_key_name(key: str) -> str:
     """
@@ -40,8 +41,7 @@ def _validate_key_name(key: str) -> str:
     # Ensure the key is of type string
     if not isinstance(key, str):
         error_msg = (
-            f"Environment variable name must be a string, got "
-            f"{type(key).__name__}."
+            f"Environment variable name must be a string, got {type(key).__name__}."
         )
         raise TypeError(error_msg)
 
@@ -56,6 +56,7 @@ def _validate_key_name(key: str) -> str:
 
     # Return the validated key if all checks pass
     return key
+
 
 # Callable alias — preserves the original public interface
 ValidateKeyName = _validate_key_name

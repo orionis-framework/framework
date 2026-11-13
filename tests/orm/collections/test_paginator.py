@@ -1,10 +1,17 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM collections paginator behavior."""
+
 from __future__ import annotations
 import json
 from orionis.orm.collections.paginator import Paginator
 from orionis.support.types.collection import Collection
 from orionis.test import TestCase
 
+
 class TestPaginator(TestCase):
+    """Verify paginator declarations and public behavior."""
+
     def _makePaginator(self, total: int, page: int, per_page: int) -> Paginator:
         """Build a paginator with dictionary items for serialization.
 
@@ -35,7 +42,7 @@ class TestPaginator(TestCase):
         Returns
         -------
         None
-            Verify the pagination arithmetic and page length.
+            No return value.
         """
         paginator = self._makePaginator(total=5, page=2, per_page=2)
         self.assertEqual(paginator.lastPage, 3)
@@ -49,7 +56,7 @@ class TestPaginator(TestCase):
         Returns
         -------
         None
-            Verify navigation from the first and last pages.
+            No return value.
         """
         first = self._makePaginator(total=4, page=1, per_page=2)
         self.assertFalse(first.hasPrevious)
@@ -65,7 +72,7 @@ class TestPaginator(TestCase):
         Returns
         -------
         None
-            Verify the empty pagination floor.
+            No return value.
         """
         paginator = Paginator(items=Collection([]), total=0, page=1, per_page=10)
         self.assertEqual(paginator.lastPage, 1)
@@ -77,7 +84,7 @@ class TestPaginator(TestCase):
         Returns
         -------
         None
-            Verify the constructor rejects zero and negative values.
+            No return value.
         """
         for invalid in (0, -1):
             with self.assertRaises(ValueError):
@@ -91,7 +98,7 @@ class TestPaginator(TestCase):
         Returns
         -------
         None
-            Verify neither page argument accepts coerced values.
+            No return value.
         """
         for invalid in (True, False, 1.5, "1", None):
             with self.assertRaises(ValueError):
@@ -113,7 +120,7 @@ class TestPaginator(TestCase):
         Returns
         -------
         None
-            Verify stored metadata and the developer representation.
+            No return value.
         """
         items = Collection([{"id": 1}])
         paginator = Paginator(items, total=-2, page=1, per_page=3)
@@ -129,7 +136,7 @@ class TestPaginator(TestCase):
         Returns
         -------
         None
-            Verify all pagination fields survive serialization.
+            No return value.
         """
         paginator = self._makePaginator(total=5, page=1, per_page=2)
         expected = {
@@ -144,6 +151,7 @@ class TestPaginator(TestCase):
         self.assertEqual(paginator.toDict(), expected)
         self.assertEqual(json.loads(paginator.toJson(sort_keys=True)), expected)
 
+
 class TestPaginationArithmetic(TestCase):
     """Check terminal guards and execution-context isolation."""
 
@@ -153,7 +161,7 @@ class TestPaginationArithmetic(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         paginator = Paginator(Collection(), total=2**60 + 1, page=1, per_page=2)
         self.assertEqual(paginator.lastPage, 2**59 + 1)

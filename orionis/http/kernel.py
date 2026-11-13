@@ -1,9 +1,11 @@
+# ruff: noqa: BLE001, C901, PLC0415, TC001, TRY400
+# Keep runtime reflection annotations and intentionally deferred imports.
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Serve concurrent requests within one worker event loop."""
 
 import asyncio
 import importlib
 import logging
-import sys
 from operator import attrgetter
 from threading import BoundedSemaphore
 from typing import TYPE_CHECKING, cast
@@ -77,6 +79,7 @@ _LOGGER = logging.getLogger(__name__)
 _SHUTDOWN_TIMEOUT = 5.0
 """Shutdown timeout value used by ``kernel``."""
 
+
 class _MiddlewareNext[T]:
     """Hold one request-local continuation that can be consumed only once."""
 
@@ -125,6 +128,7 @@ class _MiddlewareNext[T]:
             raise RuntimeError(error_msg)
         self._called = True
         return await self._terminal(*self._args)
+
 
 class _MiddlewarePipeline[T]:
     """
@@ -223,10 +227,9 @@ class _MiddlewarePipeline[T]:
         continuation = _MiddlewareNext(self.__advance, (depth + 1,))
         return await self._instances[depth].handle(self._request, continuation)
 
+
 class KernelHTTP(IKernelHTTP):
     """Serve concurrent requests within one worker event loop."""
-
-    # ruff: noqa: BLE001, PLC0415, TC001, TRY400
 
     __slots__ = (
         "__api_middleware",
@@ -318,7 +321,8 @@ class KernelHTTP(IKernelHTTP):
             Result of the operation described above.
         """
         return frozenset(
-            path for path, policy in self.__endpoint_policies.items()
+            path
+            for path, policy in self.__endpoint_policies.items()
             if policy.monitor_disconnects
         )
 
@@ -404,7 +408,9 @@ class KernelHTTP(IKernelHTTP):
             for route in self.__routes.allRoutes()
         ):
             self.__app.on(
-                Lifespan.SHUTDOWN, self.__shutdownWebSockets, runtime=Runtime.HTTP,
+                Lifespan.SHUTDOWN,
+                self.__shutdownWebSockets,
+                runtime=Runtime.HTTP,
             )
         self.__boot = True
 
@@ -484,8 +490,10 @@ class KernelHTTP(IKernelHTTP):
 
                 hub = attrgetter(action["class"])(module)
                 hub_dispatch[route_id] = realtime.HubRuntime(
-                    self.__app, await self.__app.make(contracts.IConnectionManager),
-                    hub, route.hub_protocol or "json",
+                    self.__app,
+                    await self.__app.make(contracts.IConnectionManager),
+                    hub,
+                    route.hub_protocol or "json",
                 )
             elif route.type is RouteType.FUNCTION:
                 function = attrgetter(action["function"])(module)
@@ -543,9 +551,7 @@ class KernelHTTP(IKernelHTTP):
             or not isinstance(policy_type, type)
             or not issubclass(policy_type, IHttpEndpointPolicy)
         ):
-            error_msg = (
-                "HTTP endpoint policies require a static path and policy class"
-            )
+            error_msg = "HTTP endpoint policies require a static path and policy class"
             raise TypeError(error_msg)
         policy = policy_instances.get(policy_type)
         if policy is None:
@@ -584,7 +590,8 @@ class KernelHTTP(IKernelHTTP):
         limits = http_config.get("body_limits", {})
         websocket = http_config.get("websocket", {})
         self.__websocket_config = (
-            websocket if isinstance(websocket, HTTPWebSocket)
+            websocket
+            if isinstance(websocket, HTTPWebSocket)
             else HTTPWebSocket(**websocket)
         )
         self.__websocket_slots = BoundedSemaphore(
@@ -625,7 +632,9 @@ class KernelHTTP(IKernelHTTP):
             and http_config["rate_limit"].get("rate_limit_store", "memory") == "redis"
         ):
             self.__app.on(
-                Lifespan.SHUTDOWN, self.__rate_limit.close, runtime=Runtime.HTTP,
+                Lifespan.SHUTDOWN,
+                self.__rate_limit.close,
+                runtime=Runtime.HTTP,
             )
 
     async def __rsgiResponse(
@@ -717,7 +726,10 @@ class KernelHTTP(IKernelHTTP):
             if self.__printer_enabled:
                 self.__request_printer.printRequest(adapter, response)
             return await self.__asgi_adapter.send(
-                adapter, response, receive, send,
+                adapter,
+                response,
+                receive,
+                send,
             )
         except Exception as error:
             await capture(
@@ -779,7 +791,7 @@ class KernelHTTP(IKernelHTTP):
         if response is not None or not is_asset:
             return response
         return self.__default_responses.asset(
-            path[len(DefaultResponses.ASSET_PREFIX):],
+            path[len(DefaultResponses.ASSET_PREFIX) :],
         )
 
     async def __preloadMiddleware(self) -> None:
@@ -842,7 +854,8 @@ class KernelHTTP(IKernelHTTP):
             return await terminal(request, resolved_route)
         if len(instances) == 1:
             return await instances[0].handle(
-                request, _MiddlewareNext(terminal, (request, resolved_route)),
+                request,
+                _MiddlewareNext(terminal, (request, resolved_route)),
             )
 
         # Keep continuation state local to this request.
@@ -936,7 +949,7 @@ class KernelHTTP(IKernelHTTP):
         )
         return await pipeline()
 
-    async def __callHandler( # NOSONAR
+    async def __callHandler(  # NOSONAR
         self,
         resolved_route: ResolvedRoute,
         request: Request,
@@ -1085,13 +1098,63 @@ class KernelHTTP(IKernelHTTP):
         except HttpDump as dump:
             if not self.__app.isDebug():
                 return await self.__exceptionResponse(
-                    RuntimeError(str(dump)), request, policy,
+                    RuntimeError(str(dump)),
+                    request,
+                    policy,
                 )
             try:
                 html = dump.dumper.toHtml(insert_line=dump.insert_line)
                 return await self.__default_responses.dump(html)
             except Exception as error:
                 return await self.__exceptionResponse(error, request, policy)
+
+    async def __isExpectedFailure(
+        self,
+        exc: Exception,
+        policy: IHttpEndpointPolicy | None,
+    ) -> bool:
+        """
+        Classify an error while observing failures of a custom classifier.
+
+        Parameters
+        ----------
+        exc : Exception
+            Original error whose ownership must be preserved.
+        policy : orionis.http.contracts.endpoint_policy.IHttpEndpointPolicy | None
+            Optional endpoint-specific failure policy.
+
+        Returns
+        -------
+        bool
+            Whether the original error is expected.
+        """
+        expected = isinstance(
+            exc,
+            (
+                PayloadTooLargeException,
+                ValidationException,
+                RouteNotFound,
+                MethodNotAllowed,
+            ),
+        )
+        classifier = getattr(policy, "isExpectedFailure", None)
+        if not expected and classifier is not None:
+            try:
+                expected = bool(classifier(exc))
+            except Exception as classification_error:
+                await capture(
+                    exc,
+                    app=self.__app,
+                    flow="http",
+                    phase="execution",
+                )
+                await capture(
+                    classification_error,
+                    app=self.__app,
+                    flow="http",
+                    phase="classification",
+                )
+        return expected
 
     async def __exceptionResponse(
         self,
@@ -1116,27 +1179,7 @@ class KernelHTTP(IKernelHTTP):
         orionis.http.Response
             Response produced by ordinary failure handling.
         """
-        expected = isinstance(exc, (
-            PayloadTooLargeException, ValidationException,
-            RouteNotFound, MethodNotAllowed,
-        ))
-        classifier = getattr(policy, "isExpectedFailure", None)
-        if not expected and classifier is not None:
-            try:
-                expected = bool(classifier(exc))
-            except Exception as classification_error:
-                await capture(
-                    exc,
-                    app=self.__app,
-                    flow="http",
-                    phase="execution",
-                )
-                await capture(
-                    classification_error,
-                    app=self.__app,
-                    flow="http",
-                    phase="classification",
-                )
+        expected = await self.__isExpectedFailure(exc, policy)
         if isinstance(request, Request):
             transport = request.interface.value
         elif isinstance(request, ASGITransportAdapter):
@@ -1171,7 +1214,14 @@ class KernelHTTP(IKernelHTTP):
             # Delegate unmatched routes to the registered fallback handler.
             return await self.__callFallback(self.__fallback)
         # Forward all other exceptions to the application failure handler.
-        return await self.__catch.exception(exc, request)
+        response = await self.__catch.exception(exc, request)
+        if (
+            isinstance(exc, MethodNotAllowed)
+            and response.getStatusCode() == HTTPStatus.METHOD_NOT_ALLOWED
+        ):
+            path = request.path if isinstance(request, Request) else request.path()
+            response.setHeader("Allow", ", ".join(self.__routes.options(path)))
+        return response
 
     async def __bodyLengthResponse(self, adapter: TransportAdapter) -> Response | None:
         """
@@ -1196,10 +1246,12 @@ class KernelHTTP(IKernelHTTP):
         if (
             headers.count("content-length") != 1
             or "transfer-encoding" in headers
-            or not length.isascii() or not length.isdecimal()
+            or not length.isascii()
+            or not length.isdecimal()
         ):
             return await self.__default_responses.error(
-                status_code=400, content="Invalid Content-Length framing.",
+                status_code=400,
+                content="Invalid Content-Length framing.",
                 expects_json=adapter.wantsJson(),
             )
         length = length.lstrip("0") or "0"
@@ -1210,7 +1262,7 @@ class KernelHTTP(IKernelHTTP):
             raise PayloadTooLargeException
         return None
 
-    async def __processRequest(  # noqa: C901
+    async def __processRequest(
         self,
         interface: Interface,
         adapter: TransportAdapter,
@@ -1332,11 +1384,14 @@ class KernelHTTP(IKernelHTTP):
         adapter = RSGITransportAdapter(scope)
         if getattr(scope, "proto", "http") == "ws":
             return await self.__handleWebSocket(
-                Interface.RSGI, adapter, protocol,
+                Interface.RSGI,
+                adapter,
+                protocol,
             )
         policy = (
             self.__endpoint_policies.get(normalize_request_path(adapter.path()))
-            if self.__endpoint_policies else None
+            if self.__endpoint_policies
+            else None
         )
         if policy is not None and (response := policy.before(adapter)) is not None:
             if (status := response.getStatusCode()) >= HTTPStatus.BAD_REQUEST:
@@ -1358,7 +1413,8 @@ class KernelHTTP(IKernelHTTP):
                 expected=True,
             )
             response = Response(
-                status_code=503, headers={"Retry-After": "1"},
+                status_code=503,
+                headers={"Retry-After": "1"},
                 content="HTTP request capacity exceeded.",
             )
             return await self.__rsgiResponse(adapter, response, protocol, policy)
@@ -1366,14 +1422,23 @@ class KernelHTTP(IKernelHTTP):
         self.__request_slots -= 1
         try:
             async with self.__app.beginScope() as request_context:
+                primary = None
                 try:
                     response = await self.__processRequest(
-                        Interface.RSGI, adapter, protocol, request_context, policy,
+                        Interface.RSGI,
+                        adapter,
+                        protocol,
+                        request_context,
+                        policy,
                     )
                     return await self.__rsgiResponse(
-                        adapter, response, protocol, policy,
+                        adapter,
+                        response,
+                        protocol,
+                        policy,
                     )
                 except Exception as error:
+                    primary = error
                     await capture(
                         error,
                         app=self.__app,
@@ -1381,8 +1446,10 @@ class KernelHTTP(IKernelHTTP):
                         phase="response",
                     )
                     raise
+                except BaseException as error:
+                    primary = error
+                    raise
                 finally:
-                    primary = sys.exception()
                     request = request_context[Request]
                     if isinstance(request, Request):
                         try:
@@ -1426,11 +1493,15 @@ class KernelHTTP(IKernelHTTP):
         if scope["type"] == "websocket":
             adapter["method"] = "GET"
             return await self.__handleWebSocket(
-                Interface.ASGI, adapter, receive, send,
+                Interface.ASGI,
+                adapter,
+                receive,
+                send,
             )
         policy = (
             self.__endpoint_policies.get(normalize_request_path(adapter.path()))
-            if self.__endpoint_policies else None
+            if self.__endpoint_policies
+            else None
         )
         if policy is not None and (response := policy.before(adapter)) is not None:
             if (status := response.getStatusCode()) >= HTTPStatus.BAD_REQUEST:
@@ -1452,21 +1523,32 @@ class KernelHTTP(IKernelHTTP):
                 expected=True,
             )
             response = Response(
-                status_code=503, headers={"Retry-After": "1"},
+                status_code=503,
+                headers={"Retry-After": "1"},
                 content="HTTP request capacity exceeded.",
             )
             return await self.__asgiResponse(adapter, response, receive, send, policy)
         self.__request_slots -= 1
         try:
             async with self.__app.beginScope() as request_context:
+                primary = None
                 try:
                     response = await self.__processRequest(
-                        Interface.ASGI, adapter, receive, request_context, policy,
+                        Interface.ASGI,
+                        adapter,
+                        receive,
+                        request_context,
+                        policy,
                     )
                     return await self.__asgiResponse(
-                        adapter, response, receive, send, policy,
+                        adapter,
+                        response,
+                        receive,
+                        send,
+                        policy,
                     )
                 except Exception as error:
+                    primary = error
                     await capture(
                         error,
                         app=self.__app,
@@ -1474,8 +1556,10 @@ class KernelHTTP(IKernelHTTP):
                         phase="response",
                     )
                     raise
+                except BaseException as error:
+                    primary = error
+                    raise
                 finally:
-                    primary = sys.exception()
                     request = request_context[Request]
                     if isinstance(request, Request):
                         try:
@@ -1519,7 +1603,9 @@ class KernelHTTP(IKernelHTTP):
         return bool(host) and origin == f"{scheme}://{host}"
 
     async def __callWebSocketHandler(
-        self, resolved_route: ResolvedRoute, socket: WebSocket,
+        self,
+        resolved_route: ResolvedRoute,
+        socket: WebSocket,
     ) -> None:
         """
         Invoke a preloaded connection handler through the scoped container.
@@ -1591,11 +1677,13 @@ class KernelHTTP(IKernelHTTP):
             )
         else:
             from orionis.http.adapters.websocket.rsgi import RSGIWebSocketTransport
+
             transport = RSGIWebSocketTransport(
                 cast("RSGIWebsocketProtocol", receive_or_protocol),
             )
         socket = WebSocket(
-            transport, adapter,
+            transport,
+            adapter,
             max_message_size=self.__websocket_config.max_message_size,
         )
         if not self.__websocket_slots.acquire(blocking=False):
@@ -1622,7 +1710,10 @@ class KernelHTTP(IKernelHTTP):
                 self.__websocket_tasks.discard(task)
 
     async def __runWebSocket(
-        self, adapter: TransportAdapter, socket: WebSocket, interface: Interface,
+        self,
+        adapter: TransportAdapter,
+        socket: WebSocket,
+        interface: Interface,
     ) -> None:
         """
         Run an admitted connection and observe errors before transport cleanup.
@@ -1641,11 +1732,13 @@ class KernelHTTP(IKernelHTTP):
         None
             Finish handling and attempt closure without replacing an escaping error.
         """
+        primary = None
         try:
             await self.__processWebSocket(adapter, socket)
         except WebSocketDisconnected:
             pass
         except Exception as error:
+            primary = error
             # Application exception strings may contain credentials.
             delivered = await capture(
                 error,
@@ -1662,14 +1755,25 @@ class KernelHTTP(IKernelHTTP):
                 _LOGGER.error("WebSocket handler failed")
             if socket.accepted:
                 await self.__closeWebSocket(
-                    socket, code=1011 if socket.supportsCloseDetails else 1000,
+                    socket,
+                    code=1011 if socket.supportsCloseDetails else 1000,
+                    primary=primary,
                 )
+            raise
+        except BaseException as error:
+            primary = error
             raise
         finally:
             if not socket.closed:
-                await self.__closeWebSocket(socket)
+                await self.__closeWebSocket(socket, primary=primary)
 
-    async def __closeWebSocket(self, socket: WebSocket, *, code: int = 1000) -> None:
+    async def __closeWebSocket(
+        self,
+        socket: WebSocket,
+        *,
+        code: int = 1000,
+        primary: BaseException | None = None,
+    ) -> None:
         """
         Close a connection while retaining the failure already escaping its owner.
 
@@ -1679,6 +1783,8 @@ class KernelHTTP(IKernelHTTP):
             Accepted connection or pending handshake owned by the HTTP kernel.
         code : int, optional
             Protocol close status selected by the connection owner.
+        primary : BaseException | None, optional
+            Failure escaping this connection, not an unrelated caller exception.
 
         Returns
         -------
@@ -1690,12 +1796,14 @@ class KernelHTTP(IKernelHTTP):
         Exception
             If closing fails without an existing primary error or cancellation.
         """
-        primary = sys.exception()
         try:
             await socket.close(code=code)
         except Exception as close_error:
             await capture(
-                close_error, app=self.__app, flow="websocket", phase="cleanup",
+                close_error,
+                app=self.__app,
+                flow="websocket",
+                phase="cleanup",
             )
             if primary is None:
                 raise
@@ -1723,7 +1831,9 @@ class KernelHTTP(IKernelHTTP):
             _LOGGER.warning("WebSocket handlers exceeded shutdown cleanup deadline")
 
     async def __processWebSocket(
-        self, adapter: TransportAdapter, socket: WebSocket,
+        self,
+        adapter: TransportAdapter,
+        socket: WebSocket,
     ) -> None:
         """
         Validate a handshake and run its connection middleware and handler.
@@ -1784,12 +1894,17 @@ class KernelHTTP(IKernelHTTP):
             await socket.reject(status_code=404)
             return
         socket.routeParams().update(resolved.params)
-        instances = tuple([ # NOSONAR
-            await self.__app.build(middleware)
-            for middleware in resolved.route.compiled_middlewares
-        ])
+        instances = tuple(
+            [  # NOSONAR
+                await self.__app.build(middleware)
+                for middleware in resolved.route.compiled_middlewares
+            ],
+        )
         pipeline = _MiddlewarePipeline(
-            instances, socket, self.__callWebSocketHandler, (resolved, socket),
+            instances,
+            socket,
+            self.__callWebSocketHandler,
+            (resolved, socket),
         )
         result = await pipeline()
         if result is not None:

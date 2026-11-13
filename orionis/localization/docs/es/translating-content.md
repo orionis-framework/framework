@@ -8,6 +8,9 @@ Organiza los recursos por idioma, decide un fallback y pasa el idioma explícita
 - Archivos JSON UTF-8 cuyo valor raíz sea un objeto.
 - Una ruta de idiomas válida para traducciones basadas en archivos.
 - Una aplicación Orionis iniciada al usar `orionis.support.facades.Lang`.
+
+Ejecuta los ejemplos de archivos desde una raíz de aplicación con los recursos incluidos en inglés y español. Cada bloque es independiente; solo el ejemplo de fachada requiere iniciar la aplicación.
+
 ## Inicio rápido
 
 ```python
@@ -16,7 +19,9 @@ from orionis.localization import TranslationLoader, TranslationRepository, Trans
 
 loader = TranslationLoader(Path("resources/lang"))
 repository = TranslationRepository(loader)
-translator = Translator(locale="en", fallback="en", loader=loader, repository=repository)
+translator = Translator(
+    locale="en", fallback="en", loader=loader, repository=repository
+)
 assert translator.get("Welcome") == "Welcome"
 assert translator.get("Welcome", locale="es") == "Bienvenido"
 assert translator.availableLocales() == ("en", "es")
@@ -33,7 +38,7 @@ El código del idioma distingue mayúsculas y separadores: `es-CO`, `es_CO` y `e
 
 ### Idioma por solicitud y actualizaciones
 
-Usa `Lang.get("cart.items", locale=requested_locale)` o `Lang.choice("cart.items", quantity, locale=requested_locale)`. No cambies `setLocale()` para una solicitud concurrente: el provider entrega un singleton mutable. En una plantilla Jinja pasa igualmente `locale=` a `trans`, `__` o `choice`; Jinja espera helpers async automáticamente.
+Usa `Lang.get("cart.items", locale=requested_locale)` o `Lang.choice("cart.items", quantity, locale=requested_locale)`. No cambies `setLocale()` para una solicitud concurrente: el provider entrega un singleton mutable. En una plantilla Jinja pasa igualmente `locale=` a `trans`, `__` o `choice`; estos helpers usan el mismo traductor.
 
 La caché no vigila cambios de archivos. Tras publicar recursos actualizados, reinicia cada worker o invalida los idiomas en cada proceso. `reload("es")` descarta el mapa; la lectura siguiente vuelve a cargarlo. No cambia la configuración, no actualiza otros procesos y no valida el JSON inmediatamente. Los métodos de traducción son síncronos: precalentar idiomas durante boot evita I/O de archivos en la primera solicitud.
 
@@ -51,7 +56,7 @@ Los contratos `ITranslationLoader` y `ITranslationRepository` permiten fuentes d
 
 ### Reemplazo
 
-Los placeholders usan `:name`. El traductor también reemplaza `:Name` por valor capitalizado y `:NAME` por valor en mayúsculas. Los nombres más largos se procesan primero para impedir que un nombre corto consuma un prefijo largo.
+Los placeholders usan `:name`. El traductor también reemplaza `:Name` por el valor capitalizado y `:NAME` por el valor en mayúsculas. Los nombres coincidentes más largos tienen prioridad para impedir que uno corto consuma un prefijo largo. Los valores insertados son texto literal y no se reinterpretan como placeholders.
 
 ### Selección plural
 
@@ -98,7 +103,9 @@ class MemoryLoader:
 
 loader = MemoryLoader()
 repository = TranslationRepository(loader)
-translator = Translator(locale="es", fallback="en", loader=loader, repository=repository)
+translator = Translator(
+    locale="es", fallback="en", loader=loader, repository=repository
+)
 assert translator.get("greeting", name="Ada") == "Hello Ada"
 assert translator.has("greeting")
 assert not translator.has("greeting", fallback=False)
@@ -184,9 +191,12 @@ print("cache cleared")
 ```python
 from orionis.support.facades import Lang
 
-title = Lang.get("Welcome")
-message = Lang.choice("cart.items", 3, user="Ada")
+title = Lang.get("Welcome", locale="es")
+message = Lang.choice("One item|:count items", 3)
 available = Lang.availableLocales()
+assert title == "Bienvenido"
+assert message == "3 items"
+assert "es" in available
 ```
 
 ## Configuración
@@ -210,6 +220,7 @@ La construcción directa es útil para bibliotecas y pruebas. El código de apli
 ## Errores y casos límite
 
 - Códigos malformados o similares a rutas producen `InvalidLocaleException` antes de tocar el filesystem.
+- El loader aplica la misma validación de locale al llamarlo directamente. Resuelve la raíz configurada y rechaza archivos o directorios de traducciones cuyos enlaces simbólicos o junctions salgan de ella mediante `TranslationException`; el descubrimiento omite esas entradas externas y los nombres de locale inválidos. Los enlaces hacia recursos dentro de la raíz siguen admitidos.
 - UTF-8 inválido, JSON malformado o raíz no objeto produce `TranslationSyntaxException`.
 - Un archivo eliminado entre descubrimiento y lectura produce `TranslationFileNotFoundException`.
 - Directorios/locales ausentes no son errores: descubrimiento devuelve `()` y carga `{}`.
@@ -223,7 +234,9 @@ La construcción directa es útil para bibliotecas y pruebas. El código de apli
 
 JSON se decodifica con `msgspec`; los diccionarios anidados se aplanan una vez al primer acceso al locale. Los lookups posteriores son O(1). Descubrimiento y carga son síncronos; precargue locales requeridos durante bootstrap si importa la latencia inicial.
 
-El provider comparte un traductor mutable sin lock. Las lecturas concurrentes son apropiadas después de calentar cachés, pero `setLocale`, `missing`, `reload`, `forget` y `flush` son mutaciones globales y pueden competir. Prefiera `locale=` explícito por solicitud y coordine operacionalmente la invalidación.
+El repositorio usa un lock reentrante para proteger la caché y la carga entre hilos. Cuando falta un locale, mantiene el lock durante la lectura de archivos, por lo que esas cargas se serializan. Los mapas devueltos son los propios objetos de caché; trátalos como de solo lectura, pues el repositorio no protege cambios del llamador después de entregarlos.
+
+El provider comparte un traductor mutable. El idioma activo y el handler de claves ausentes pertenecen a esa instancia compartida; usa `locale=` explícito para elegir el idioma de una solicitud. El repositorio sincroniza la invalidación de caché, pero esta afecta a todas las llamadas del proceso. Coordina los cambios de idioma activo, handler y recursos publicados con el ciclo de vida de la aplicación.
 
 ## API pública
 
@@ -233,9 +246,11 @@ El paquete exporta `TranslationLoader`, `TranslationRepository`, `Translator`, `
 
 `load(locale)` devuelve un `dict[str, str]` plano; un locale desconocido produce un diccionario vacío. `availableLocales()` devuelve una tupla ordenada tomada de archivos `.json` raíz y directorios con archivos de grupo. El loader no mantiene caché deliberadamente.
 
-### `TranslationRepository(loader)`
+### `TranslationRepository(loader, *, max_locales=256, negative_ttl=30)`
 
-`get(locale)` carga una vez y devuelve el mapa en caché. `has(locale)`, `forget(locale)`, `flush()` y `loadedLocales()` inspeccionan o invalidan esa caché local al proceso. El orden de locales cargados sigue el de inserción.
+`get(locale)` carga cuando falta una entrada y devuelve el mapa en caché. Conserva hasta `max_locales` mapas, incluidos los resultados vacíos; al alcanzar la capacidad expulsa el locale usado hace más tiempo. Los aciertos actualizan ese orden. Los mapas vacíos caducan tras `negative_ttl` segundos para detectar archivos nuevos sin reiniciar; los mapas con traducciones requieren invalidación explícita para reflejar cambios. Un TTL de cero evita conservar resultados vacíos entre lecturas.
+
+`has(locale)` consulta la caché sin cargar y retira una entrada vencida. `forget(locale)` y `flush()` invalidan una o todas las entradas. `loadedLocales()` retira entradas vencidas y devuelve los códigos ordenados del menos al más recientemente usado. Los límites se aplican de forma independiente en cada proceso.
 
 ### `Translator`
 
@@ -247,7 +262,7 @@ El paquete exporta `TranslationLoader`, `TranslationRepository`, `Translator`, `
 
 ### `LocalizationManager(app)`
 
-`translator()` crea perezosamente un traductor con `app.locale`, `app.fallback_locale` y `app.language_path`. Las rutas relativas se resuelven contra `app.basePath`.
+`translator()` crea perezosamente un traductor con `app.locale`, `app.fallback_locale` y `app.language_path`. Un lock protege su construcción y publicación inicial para que las primeras llamadas concurrentes reciban la misma instancia. Las llamadas posteriores devuelven directamente la instancia conservada. Las rutas relativas se resuelven contra `app.basePath`.
 
 ## Referencia de implementación para extensiones
 

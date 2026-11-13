@@ -1,16 +1,14 @@
+# ruff: noqa: ANN401, SLF001, BLE001, PLC0415, TC003
+# Use raw ownership tokens and observe cleanup while preserving the original failure.
 """Poll a Redis NX lease rather than relying on process-local waiter events."""
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Self
+from types import TracebackType
+from typing import Any, Self
 from uuid import uuid4
 from orionis.cache.locks.lock import CacheLock, _is_backend
 from orionis.support.concurrency import complete_on_cancel
 
-if TYPE_CHECKING:
-    from types import TracebackType
-
-# Low-level aiocache methods deliberately avoid reserializing the ownership token.
-# ruff: noqa: ANN401, SLF001, BLE001, PLC0415
 
 class RedisResolverLease:
     """Poll a Redis NX lease rather than relying on process-local waiter events."""
@@ -39,7 +37,7 @@ class RedisResolverLease:
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         self._backend = backend
         """Storage backend implementing the cache operations."""
@@ -59,7 +57,7 @@ class RedisResolverLease:
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         while True:
             try:
@@ -75,7 +73,7 @@ class RedisResolverLease:
         Returns
         -------
         None
-            Complete the operation without returning a value.
+            No return value.
         """
         async with asyncio.timeout(self._wait):
             await self._backend._redlock_release(self._key, self._owner)
@@ -99,6 +97,7 @@ class RedisResolverLease:
                 await complete_on_cancel(self._release())
             except Exception as cleanup_error:
                 from orionis.failure.runtime import capture
+
                 await capture(
                     cleanup_error,
                     flow="cache",
@@ -129,7 +128,7 @@ class RedisResolverLease:
         Returns
         -------
         None
-            Release ownership and preserve an existing protected-operation error.
+            No return value.
 
         Raises
         ------
@@ -142,6 +141,7 @@ class RedisResolverLease:
             if _value is None:
                 raise
             from orionis.failure.runtime import capture
+
             await capture(_value, flow="cache", phase="execution")
             await capture(
                 cleanup_error,
@@ -149,6 +149,7 @@ class RedisResolverLease:
                 phase="cleanup",
                 operation="lock.release",
             )
+
 
 def resolver_lease(
     backend: Any,

@@ -1,16 +1,15 @@
+# ruff: noqa: TC001
+# Resolve public enum annotations at runtime.
 """Read typed environment values through the environment service facade."""
 
 from __future__ import annotations
 from orionis.environment.contracts.env import IEnv
 from orionis.environment.core.dot_env import DotEnv
-from typing import Any, TYPE_CHECKING
+from typing import Any
+from orionis.environment.enums.value_type import EnvironmentValueType
 
-if TYPE_CHECKING:
-    from orionis.environment.enums.value_type import EnvironmentValueType
 
 class Env(IEnv):
-
-    # ruff: noqa: FBT001
     """Read typed environment values through the environment service facade."""
 
     __slots__ = ()
@@ -45,7 +44,7 @@ class Env(IEnv):
     def set(
         cls,
         key: str,
-        value: str | float | bool | list | dict | tuple | set,
+        value: object,
         type_hint: str | EnvironmentValueType | None = None,
         *,
         only_os: bool = False,
@@ -57,9 +56,10 @@ class Env(IEnv):
         ----------
         key : str
             Name of the environment variable to set or update.
-        value : str | float | bool | list | dict | tuple | set
-            Value to assign to the environment variable.
-        type_hint : str | enums.EnvironmentValueType | None, optional
+        value : object
+            Value to serialize according to the hint, or its ordinary text form
+            when no hint is supplied.
+        type_hint : str | EnvironmentValueType | None, optional
             Type hint for the variable. Supported types: 'str', 'int', 'float',
             'bool', 'list', 'dict', 'tuple', 'set', 'base64', 'path'.
         only_os : bool, optional
@@ -68,8 +68,7 @@ class Env(IEnv):
         Returns
         -------
         bool
-            True if the environment variable was set successfully, otherwise
-            False.
+            True after the environment variable is successfully assigned.
         """
         return DotEnv().set(key, value, type_hint, only_os=only_os)
 
@@ -94,8 +93,7 @@ class Env(IEnv):
         Returns
         -------
         bool
-            True if the environment variable was removed successfully,
-            False otherwise.
+            True after removal, including when the variable was already absent.
         """
         return DotEnv().unset(key, only_os=only_os)
 
@@ -142,5 +140,5 @@ class Env(IEnv):
         """
         try:
             return DotEnv().reload()
-        except (OSError, ValueError):
+        except OSError, ValueError:
             return False

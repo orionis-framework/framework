@@ -1,9 +1,12 @@
+# ruff: noqa: ARG002, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep collaborator method signatures while ignoring unused stub inputs.
 import asyncio
 import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from unittest.mock import patch
 from aiocache import SimpleMemoryCache
 from orionis.cache.repository import CacheRepository
 from orionis.cache.serializers.json import MsgspecSerializer
@@ -22,7 +25,6 @@ from orionis.session.stores.file import FileSessionStore
 from orionis.session.stores.memory import MemorySessionStore
 from orionis.test import TestCase
 
-# ruff: noqa: ANN401
 
 class _FakeCacheRepository:
     """Minimal in-memory stand-in for ICacheRepository."""
@@ -33,11 +35,11 @@ class _FakeCacheRepository:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self.data: dict[str, Any] = {}
+        self.data: dict[str, object] = {}
 
-    async def get(self, key: str) -> Any:
+    async def get(self, key: str) -> object:
         """Return a cached value by key.
 
         Parameters
@@ -47,19 +49,19 @@ class _FakeCacheRepository:
 
         Returns
         -------
-        Any
+        object
             Value produced by the helper.
         """
         return self.data.get(key)
 
-    async def set(self, key: str, value: Any, ttl: float | None = None) -> bool:  # noqa: ARG002
+    async def set(self, key: str, value: object, ttl: float | None = None) -> bool:
         """Store a cache value under its key.
 
         Parameters
         ----------
         key : str
             Value supplied for ``key``.
-        value : Any
+        value : object
             Value supplied for ``value``.
         ttl : float | None
             Value supplied for ``ttl``.
@@ -87,6 +89,7 @@ class _FakeCacheRepository:
         """
         return self.data.pop(key, None) is not None
 
+
 class _FakeCacheManager:
     """Fake ICacheManager exposing only the store() factory method."""
 
@@ -96,7 +99,7 @@ class _FakeCacheManager:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.repository = _FakeCacheRepository()
 
@@ -116,10 +119,11 @@ class _FakeCacheManager:
         self.requested_store = name
         return self.repository
 
+
 class _StubDatabaseApp:
     """Application stub exposing an in-memory SQLite configuration."""
 
-    def config(self, key: str) -> dict[str, Any]:  # noqa: ARG002
+    def config(self, key: str) -> dict[str, object]:
         """Return session configuration for the requested key.
 
         Parameters
@@ -129,7 +133,7 @@ class _StubDatabaseApp:
 
         Returns
         -------
-        dict[str, Any]
+        dict[str, object]
             Value produced by the helper.
         """
         return {
@@ -143,21 +147,22 @@ class _StubDatabaseApp:
             },
         }
 
-def _make_config(overrides: dict[str, Any] | None = None) -> dict[str, Any]:
+
+def _make_config(overrides: dict[str, object] | None = None) -> dict[str, object]:
     """
     Build a complete session configuration payload.
 
     Parameters
     ----------
-    overrides : dict[str, Any] | None
+    overrides : dict[str, object] | None
         Entries replacing the defaults.
 
     Returns
     -------
-    dict[str, Any]
+    dict[str, object]
         Configuration mapping accepted by the session entity.
     """
-    config: dict[str, Any] = {
+    config: dict[str, object] = {
         "driver": "memory",
         "lifetime": 120,
         "expire_on_close": False,
@@ -177,6 +182,7 @@ def _make_config(overrides: dict[str, Any] | None = None) -> dict[str, Any]:
         config.update(overrides)
     return config
 
+
 class _FakeRequest:
     """Request stub exposing only the cookie jar the manager reads."""
 
@@ -191,18 +197,19 @@ class _FakeRequest:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.cookies: dict[str, str] = cookies if cookies is not None else {}
         self.state = SimpleNamespace()
         self.method = "POST"
+
 
 class _RecordingCatch:
     """Turn a controller failure into a normal framework response."""
 
     __slots__ = ()
 
-    async def exception(self, error: Exception, request: object) -> JSONResponse:  # noqa: ARG002
+    async def exception(self, error: Exception, request: object) -> JSONResponse:
         """Return an error response for the middleware lifecycle probe.
 
         Parameters
@@ -219,6 +226,7 @@ class _RecordingCatch:
         """
         return JSONResponse(content={"message": "Request failed"}, status_code=500)
 
+
 class _FakeResponse:
     """Response stub recording cookie mutations issued by the manager."""
 
@@ -228,12 +236,12 @@ class _FakeResponse:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self.set_calls: list[tuple[str, str, dict[str, Any]]] = []
-        self.delete_calls: list[tuple[str, dict[str, Any]]] = []
+        self.set_calls: list[tuple[str, str, dict[str, object]]] = []
+        self.delete_calls: list[tuple[str, dict[str, object]]] = []
 
-    def setCookie(self, name: str, value: str, **options: Any) -> None:
+    def setCookie(self, name: str, value: str, **options: object) -> None:
         """Record a cookie written by the response double.
 
         Parameters
@@ -242,42 +250,43 @@ class _FakeResponse:
             Value supplied for ``name``.
         value : str
             Value supplied for ``value``.
-        **options : Any
+        **options : object
             Arguments passed to the wrapped callable.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.set_calls.append((name, value, options))
 
-    def deleteCookie(self, name: str, **options: Any) -> None:
+    def deleteCookie(self, name: str, **options: object) -> None:
         """Record a cookie removed by the response double.
 
         Parameters
         ----------
         name : str
             Value supplied for ``name``.
-        **options : Any
+        **options : object
             Arguments passed to the wrapped callable.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.delete_calls.append((name, options))
+
 
 class _FakeApplication:
     """Application stub providing config, base path and instance binding."""
 
-    def __init__(self, config: dict[str, Any], base_path: Path) -> None:
+    def __init__(self, config: dict[str, object], base_path: Path) -> None:
         """Initialize the test double with its configured state.
 
         Parameters
         ----------
-        config : dict[str, Any]
+        config : dict[str, object]
             Value supplied for ``config``.
         base_path : Path
             Value supplied for ``base_path``.
@@ -285,39 +294,39 @@ class _FakeApplication:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._config = config
         self.basePath = base_path
-        self.bindings: list[tuple[Any, Any]] = []
+        self.bindings: list[tuple[object, object]] = []
 
-    def config(self, key: str, default: Any = None) -> Any:
+    def config(self, key: str, default: object = None) -> object:
         """Return session configuration for the requested key.
 
         Parameters
         ----------
         key : str
             Value supplied for ``key``.
-        default : Any
+        default : object
             Value supplied for ``default``.
 
         Returns
         -------
-        Any
+        object
             Value produced by the helper.
         """
         return self._config if key == "session" else default
 
-    def instance(self, abstract: Any, instance: Any, **_options: Any) -> bool:
+    def instance(self, abstract: object, instance: object, **_options: object) -> bool:
         """Record the object bound to the application.
 
         Parameters
         ----------
-        abstract : Any
+        abstract : object
             Value supplied for ``abstract``.
-        instance : Any
+        instance : object
             Value supplied for ``instance``.
-        **_options : Any
+        **_options : object
             Arguments passed to the wrapped callable.
 
         Returns
@@ -327,6 +336,7 @@ class _FakeApplication:
         """
         self.bindings.append((abstract, instance))
         return True
+
 
 class _RecordingStore:
     """Store stub tracking every call made by the manager."""
@@ -342,7 +352,7 @@ class _RecordingStore:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.record = record
         self.written: list[SessionRecord] = []
@@ -376,7 +386,7 @@ class _RecordingStore:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.written.append(record)
 
@@ -418,9 +428,10 @@ class _RecordingStore:
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         return
+
 
 class TestSessionManager(TestCase):
     """Unit tests for the request-scoped SessionManager coordinator."""
@@ -432,23 +443,15 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
+            No return value.
         """
         self._tmp = tempfile.TemporaryDirectory()
+        self.enterContext(self._tmp)
         self._base_path = Path(self._tmp.name)
-
-    def tearDown(self) -> None:
-        """
-        Remove the temporary base path after each test.
-
-        Returns
-        -------
-        None
-        """
-        self._tmp.cleanup()
 
     def _makeManager(
         self,
-        overrides: dict[str, Any] | None = None,
+        overrides: dict[str, object] | None = None,
         cache: _FakeCacheManager | None = None,
     ) -> tuple[SessionManager, _FakeApplication]:
         """
@@ -456,7 +459,7 @@ class TestSessionManager(TestCase):
 
         Parameters
         ----------
-        overrides : dict[str, Any] | None
+        overrides : dict[str, object] | None
             Session configuration entries overriding the defaults.
         cache : _FakeCacheManager | None
             Cache manager used by the cache driver.
@@ -466,7 +469,7 @@ class TestSessionManager(TestCase):
         tuple[SessionManager, _FakeApplication]
             The manager under test and the application stub it uses.
         """
-        config: dict[str, Any] = _make_config(overrides)
+        config: dict[str, object] = _make_config(overrides)
         app = _FakeApplication(config, self._base_path)
         manager = SessionManager(app, cache or _FakeCacheManager())
         return manager, app
@@ -481,7 +484,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         self.assertIsInstance(manager._store, MemorySessionStore)
@@ -495,7 +498,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager({"driver": "file", "files": "sessions"})
         self.assertIsInstance(manager._store, FileSessionStore)
@@ -510,7 +513,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         cache = _FakeCacheManager()
         manager, _ = self._makeManager({"driver": "cache", "cache": "redis"}, cache)
@@ -527,7 +530,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager({"lifetime": 120})
         self.assertEqual(manager._cookie_max_age, 7200)
@@ -541,7 +544,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager({"expire_on_close": True})
         self.assertIsNone(manager._cookie_max_age)
@@ -554,7 +557,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager({"same_site": "strict"})
         self.assertEqual(manager._cookie_same_site, "strict")
@@ -569,7 +572,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -589,7 +592,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         manager._store = _RecordingStore(
@@ -615,7 +618,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -636,7 +639,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         manager._store = _RecordingStore(
@@ -661,7 +664,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, app = self._makeManager()
         manager._store = _RecordingStore()
@@ -680,7 +683,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -701,7 +704,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -726,7 +729,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -747,7 +750,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager({"lifetime": 10})
         store = _RecordingStore()
@@ -755,11 +758,12 @@ class TestSessionManager(TestCase):
         session = Session()
         session.put("a", 1)
 
-        await manager.save(_FakeResponse(), session)
+        fixed_now = datetime(2030, 1, 1, tzinfo=UTC)
+        with patch("orionis.session.manager.datetime") as clock:
+            clock.now.return_value = fixed_now
+            await manager.save(_FakeResponse(), session)
 
-        delta = store.written[0].expires_at - datetime.now(UTC)
-        self.assertGreater(delta.total_seconds(), 9 * 60)
-        self.assertLessEqual(delta.total_seconds(), 10 * 60)
+        self.assertEqual(store.written[0].expires_at, fixed_now + timedelta(minutes=10))
 
     async def testSaveRotatesIdentifierAndDropsOldRecord(self) -> None:
         """Swap the identifier when a regeneration was requested.
@@ -770,7 +774,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -793,7 +797,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -806,8 +810,8 @@ class TestSessionManager(TestCase):
 
         self.assertEqual(store.deleted, ["abc"])
         self.assertEqual(store.written, [])
-        self.assertEqual(response.delete_calls[0][0], "sessionid")
-        self.assertEqual(response.set_calls, [])
+        self.assertEqual(response.set_calls[0][0:2], ("sessionid", ""))
+        self.assertEqual(response.set_calls[0][2]["max_age"], 0)
 
     async def testSaveInvalidatedSessionWithoutIdentifierSkipsStore(self) -> None:
         """Expire the cookie without touching the store when no ID exists.
@@ -818,7 +822,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -830,7 +834,8 @@ class TestSessionManager(TestCase):
         await manager.save(response, session)
 
         self.assertEqual(store.deleted, [])
-        self.assertEqual(response.delete_calls[0][0], "sessionid")
+        self.assertEqual(response.set_calls[0][0:2], ("sessionid", ""))
+        self.assertEqual(response.set_calls[0][2]["max_age"], 0)
 
     async def testSaveRotationWithoutPreviousIdentifierSkipsDelete(self) -> None:
         """Rotate without deleting when no previous record existed.
@@ -841,7 +846,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -864,17 +869,19 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        manager, _ = self._makeManager({
-            "cookie": "orionis_session",
-            "path": "/app",
-            "domain": "example.com",
-            "secure": True,
-            "http_only": True,
-            "same_site": "strict",
-            "partitioned": True,
-        })
+        manager, _ = self._makeManager(
+            {
+                "cookie": "orionis_session",
+                "path": "/app",
+                "domain": "example.com",
+                "secure": True,
+                "http_only": True,
+                "same_site": "strict",
+                "partitioned": True,
+            },
+        )
         manager._store = _RecordingStore()
         session = Session()
         session.put("a", 1)
@@ -899,7 +906,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         session = await manager.start(_FakeRequest())
@@ -917,7 +924,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for driver in ("memory", "file"):
             manager, _ = self._makeManager({"driver": driver, "files": "sessions"})
@@ -931,7 +938,7 @@ class TestSessionManager(TestCase):
             logout.invalidate()
             await manager.save(_FakeResponse(), logout)
 
-            slow.put("late", True)
+            slow.put("late", value=True)
             rotating.regenerate()
             slow_response = _FakeResponse()
             rotating_response = _FakeResponse()
@@ -947,7 +954,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         session = await manager.start(_FakeRequest())
@@ -965,7 +972,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         store = _RecordingStore()
@@ -981,7 +988,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for backend in (
             SimpleMemoryCache(serializer=MsgspecSerializer()),
@@ -1009,7 +1016,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         session = await manager.start(_FakeRequest())
@@ -1024,7 +1031,7 @@ class TestSessionManager(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
 
             Raises
             ------
@@ -1045,7 +1052,7 @@ class TestSessionManager(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager, _ = self._makeManager()
         session = await manager.start(_FakeRequest())
@@ -1062,18 +1069,24 @@ class TestSessionManager(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             request.state.session.invalidate()
             entered.set()
             await hold.wait()
 
         pending = asyncio.create_task(middleware.handle(request, controller))
-        await entered.wait()
-        pending.cancel()
-        with self.assertRaises(asyncio.CancelledError):
-            await pending
+        try:
+            await asyncio.wait_for(entered.wait(), 5)
+            pending.cancel()
+            with self.assertRaises(asyncio.CancelledError):
+                await pending
+        finally:
+            hold.set()
+            pending.cancel()
+            await asyncio.wait_for(asyncio.gather(pending, return_exceptions=True), 5)
         self.assertIsNone(await manager._store.read(session.id))
+
 
 class TestSessionManagerDatabaseDriver(TestCase):
     """Unit tests for the database-backed store resolution."""
@@ -1085,32 +1098,24 @@ class TestSessionManagerDatabaseDriver(TestCase):
         Returns
         -------
         None
+            No return value.
         """
         self._connections = ConnectionManager(_StubDatabaseApp())
         self._previous_manager = ConnectionResolver._manager
+        self.addCleanup(ConnectionResolver.setManager, self._previous_manager)
         ConnectionResolver.setManager(self._connections)
         self._tmp = tempfile.TemporaryDirectory()
+        self.enterContext(self._tmp)
         self._base_path = Path(self._tmp.name)
+        self.addAsyncCleanup(self._connections.disconnect)
 
-    async def asyncTearDown(self) -> None:
-        """
-        Restore the previously installed connection manager.
-
-        Returns
-        -------
-        None
-        """
-        await self._connections.disconnect()
-        ConnectionResolver._manager = self._previous_manager
-        self._tmp.cleanup()
-
-    def _makeManager(self, overrides: dict[str, Any]) -> SessionManager:
+    def _makeManager(self, overrides: dict[str, object]) -> SessionManager:
         """
         Build a manager backed by the in-memory SQLite connection.
 
         Parameters
         ----------
-        overrides : dict[str, Any]
+        overrides : dict[str, object]
             Session configuration entries overriding the defaults.
 
         Returns
@@ -1130,13 +1135,15 @@ class TestSessionManagerDatabaseDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        manager = self._makeManager({
-            "driver": "database",
-            "connection": "sqlite",
-            "table": "user_sessions",
-        })
+        manager = self._makeManager(
+            {
+                "driver": "database",
+                "connection": "sqlite",
+                "table": "user_sessions",
+            },
+        )
         self.assertIsInstance(manager._store, DatabaseSessionStore)
         self.assertEqual(manager._store._table, "user_sessions")
 
@@ -1148,12 +1155,13 @@ class TestSessionManagerDatabaseDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        manager = self._makeManager({
-            "driver": "database",
-            "connection": "sqlite",
-            "table": None,
-        })
+        manager = self._makeManager(
+            {
+                "driver": "database",
+                "connection": "sqlite",
+                "table": None,
+            },
+        )
         self.assertEqual(manager._store._table, "sessions")
-

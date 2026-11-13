@@ -8,6 +8,7 @@ Usa una sesión para preferencias pequeñas o estado temporal del navegador. Los
 from orionis.http import response
 from orionis.session.contracts.session import ISession
 
+
 async def choose_theme(session: ISession):
     session.put("theme", "dark")
     return response.redirect("/settings", 303).withFlash("notice", "Theme saved")
@@ -26,24 +27,26 @@ assert session.started and session.dirty
 assert session.get("theme") == "dark"
 ```
 
-Escribir un valor igual al existente no ensucia la sesión. Sin embargo, mutar una colección obtenida puede alterar datos sin llamar a `put`; la renovación considera conservadoramente esos payloads mutables. No expongas `all()` como respuesta pública: incluye bolsas internas.
+Escribir un valor igual al existente no ensucia la sesión. Sin embargo, mutar una colección obtenida puede alterar datos sin llamar a `put`; la renovación considera conservadoramente esos payloads mutables. `all()` devuelve una copia superficial: los valores anidados siguen compartidos. Un diccionario pasado a `Session(data=...)` se conserva por referencia. No expongas `all()` como respuesta pública: incluye bolsas internas.
 
 ## Patrón POST, redirect, GET
 
-`flash(key, value)` deja datos disponibles en la petición actual y la siguiente. Al empezar otra petición, el manager descarta la bolsa vieja y promueve la nueva. No es una cola de mensajes ni persiste indefinidamente.
+`flash(key, value)` deja datos disponibles en la petición actual y la siguiente. Al empezar otra petición, el manager descarta la bolsa vieja y promueve la nueva. Los cambios de este envejecimiento se persisten aunque el handler no escriba más datos. No es una cola de mensajes ni persiste indefinidamente.
 
 ```python
 from orionis.session.session import Session
 
 session = Session()
-session.flashInput({"email": "ada@example.test", "password": "secret", "_csrf": "secret"})
+session.flashInput(
+    {"email": "ada@example.test", "password": "secret", "_csrf": "secret"}
+)
 session.flashErrors({"email": "Already registered"})
 assert session.getOldInput("email") == "ada@example.test"
 assert session.getOldInput("password") is None
 assert session.getErrors() == {"email": ["Already registered"]}
 ```
 
-`flashInput` filtra nombres de credenciales y CSRF conocidos. Excluye por tu cuenta campos secretos específicos de tu aplicación. `flashErrors` acepta mappings o excepciones de validación; normaliza valores a listas de mensajes. Varias escrituras en las bolsas reservadas se combinan.
+`flashInput` filtra nombres de credenciales y CSRF conocidos. Excluye por tu cuenta campos secretos específicos de tu aplicación. `flashErrors` acepta mappings o excepciones de validación; normaliza valores a listas de strings y conserva mensajes escalares como `0` y `False`. Un mensaje ausente o `None` en un fallo de validación individual se convierte en un string vacío. Varias escrituras en las bolsas reservadas se combinan.
 
 Las respuestas `withInput`, `withErrors` y `withFlash` encolan los mismos datos para que el middleware los aplique. No necesitas escribir dos veces. La sesión expone `setPreviousUrl`/`getPreviousUrl`; la capa web solo actualiza la navegación cuando la respuesta y petición son elegibles. Al construir un redirect-back utiliza comprobación de destino seguro del flujo HTTP, no cualquier `Referer` sin validar.
 

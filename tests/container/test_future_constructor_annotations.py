@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from orionis.container.container import Container
@@ -7,14 +9,18 @@ from orionis.container.exceptions import CircularDependencyException
 from orionis.test import TestCase
 
 if TYPE_CHECKING:
+
     class UnknownDependency:
         """Type deliberately unavailable when constructor hints resolve."""
+
 
 class _Dependency:
     """Instance registered for constructor injection."""
 
+
 class _OtherDependency:
     """Second instance registered for constructor injection."""
+
 
 class _NeedsDependency:
     """Require a dependency annotated under postponed evaluation."""
@@ -30,9 +36,10 @@ class _NeedsDependency:
         Returns
         -------
         None
-            Store the dependency supplied by the container.
+            No return value.
         """
         self.dependency = dependency
+
 
 class _NeedsTwoDependencies:
     """Require two dependencies under postponed evaluation."""
@@ -54,6 +61,7 @@ class _NeedsTwoDependencies:
         self.first = first
         self.second = second
 
+
 class _NeedsKnownAndUnknown:
     """Require one known and one unresolved postponed type."""
 
@@ -74,6 +82,7 @@ class _NeedsKnownAndUnknown:
         self.first = first
         self.second = second
 
+
 class _NeedsUnknown:
     """Carry an unresolved forward reference for compatibility testing."""
 
@@ -88,9 +97,10 @@ class _NeedsUnknown:
         Returns
         -------
         None
-            Store the unresolved dependency value.
+            No return value.
         """
         self.dependency = dependency
+
 
 class _Circular:
     """Refer to itself through a postponed constructor annotation."""
@@ -106,34 +116,21 @@ class _Circular:
         Returns
         -------
         None
-            Store the circular dependency value.
+            No return value.
         """
         self.dependency = dependency
+
 
 class TestFutureConstructorAnnotations(TestCase):
     """Resolve deferred constructor types without changing fallback behavior."""
 
     def setUp(self) -> None:
-        """Create an isolated container outside the runner's scope.
-
-        Returns
-        -------
-        None
-            The container is ready for registrations.
-        """
-        self.token = ScopedContext.setCurrentScope(None)
+        """Isolate the active scope and restore its original value during cleanup."""
+        super().setUp()
+        token = ScopedContext.setCurrentScope(None)
+        self.addCleanup(ScopedContext.reset, token)
         self.container = object.__new__(Container)
         Container.__init__(self.container)
-
-    def tearDown(self) -> None:
-        """Restore the caller's scope.
-
-        Returns
-        -------
-        None
-            The original scope is active again.
-        """
-        ScopedContext.reset(self.token)
 
     async def testBuildInjectsRegisteredDeferredConstructorType(self) -> None:
         """Resolve a string annotation to the registered runtime class.
@@ -141,7 +138,7 @@ class TestFutureConstructorAnnotations(TestCase):
         Returns
         -------
         None
-            The built object receives the exact registered instance.
+            No return value.
         """
         provided = _Dependency()
         self.container.instance(None, provided)
@@ -158,7 +155,7 @@ class TestFutureConstructorAnnotations(TestCase):
         Returns
         -------
         None
-            Existing metadata remains available without a new error.
+            No return value.
         """
         plan = constructor_plan(_NeedsUnknown, _NeedsUnknown.__init__)
 
@@ -172,7 +169,7 @@ class TestFutureConstructorAnnotations(TestCase):
         Returns
         -------
         None
-            Assert resolution and injection of deferred constructor types.
+            No return value.
         """
         first = _Dependency()
         second = _OtherDependency()
@@ -191,7 +188,7 @@ class TestFutureConstructorAnnotations(TestCase):
         Returns
         -------
         None
-            Assert that an unknown reference preserves other resolved hints.
+            No return value.
         """
         plan = constructor_plan(
             _NeedsKnownAndUnknown,
@@ -208,7 +205,7 @@ class TestFutureConstructorAnnotations(TestCase):
         Returns
         -------
         None
-            Assert resolution of class-local and module-level references.
+            No return value.
         """
 
         class LocalSelf:
@@ -243,7 +240,7 @@ class TestFutureConstructorAnnotations(TestCase):
         Returns
         -------
         None
-            Assert that an unresolved hint cannot select a string binding.
+            No return value.
         """
         self.container.instance(None, "string service")
 
@@ -256,7 +253,7 @@ class TestFutureConstructorAnnotations(TestCase):
         Returns
         -------
         None
-            Construction raises the existing circular dependency error.
+            No return value.
         """
         with self.assertRaises(CircularDependencyException):
             await self.container.build(_Circular)

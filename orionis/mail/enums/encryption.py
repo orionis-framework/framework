@@ -2,6 +2,7 @@
 
 from enum import StrEnum
 
+
 class MailEncryption(StrEnum):
     """
     Enumerate the transport security modes accepted by the SMTP driver.

@@ -1,7 +1,11 @@
+# ruff: noqa: ANN401, BLE001, PLC0415
+# Callable dispatch preserves arbitrary results and imports optional services lazily.
+# Cleanup failures retain their identity through the cancelled caller's coordinator.
 """Thread-safe, platform-aware asyncio event loop manager for the Orionis Framework."""
 
 from __future__ import annotations
 import asyncio
+import contextvars
 import inspect
 import sys
 import threading
@@ -12,13 +16,14 @@ from typing import TYPE_CHECKING, Any, ClassVar
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine, Generator
 
+
 class Loop:
     """
     Thread-safe, platform-aware asyncio event loop manager for the Orionis Framework.
 
-    Centralises every aspect of event loop lifecycle:
+    Coordinate loop selection, execution, and resource ownership:
 
-    - Optimal factory selection: uvloop (non-Windows) → ProactorEventLoop
+    - Platform factory selection: uvloop (non-Windows) → ProactorEventLoop
       (Windows) → stdlib default.
     - Per-thread loop registration through asyncio as the source of truth.
     - Synchronous entry points that reject calls from a running loop.
@@ -27,8 +32,6 @@ class Loop:
 
     All state is class-level; no instance creation is required or intended.
     """
-
-    # ruff: noqa: PLC0415, ANN401
 
     # ------------------------------------------------------------------
     # Shared class state
@@ -56,9 +59,9 @@ class Loop:
 
     # Cached optimal loop factory; ``None`` means "use asyncio default".
     # Only valid when ``_loop_factory_resolved`` is ``True``.
-    _loop_factory_cached: ClassVar[
-        Callable[[], asyncio.AbstractEventLoop] | None
-    ] = None
+    _loop_factory_cached: ClassVar[Callable[[], asyncio.AbstractEventLoop] | None] = (
+        None
+    )
     """
     Cached optimal loop factory; ``None`` means "use asyncio default". Only valid
     when ``_loop_factory_resolved`` is ``True``.
@@ -75,7 +78,6 @@ class Loop:
 
         Uses the public ``asyncio.get_running_loop()`` API with a
         ``try/except`` to avoid relying on CPython private internals.
-        The overhead is negligible when a loop is present (fast path).
 
         Returns
         -------
@@ -131,6 +133,7 @@ class Loop:
             if not cls._IS_WIN32:
                 try:
                     import uvloop  # type: ignore[import-untyped]
+
                     cls._uvloop_factory = uvloop.new_event_loop
                 except ImportError:
                     pass
@@ -150,8 +153,7 @@ class Loop:
         2. ``asyncio.ProactorEventLoop`` (Windows only).
         3. ``None`` — the caller falls back to ``asyncio.new_event_loop()``.
 
-        The result is cached after the first call; repeated invocations are
-        essentially free.
+        Cache the result after the first call to avoid repeating detection.
 
         Returns
         -------
@@ -223,9 +225,7 @@ class Loop:
                 runner.close()
         finally:
             asyncio.set_event_loop(
-                previous
-                if previous is not None and not previous.is_closed()
-                else None,
+                previous if previous is not None and not previous.is_closed() else None,
             )
 
     # ------------------------------------------------------------------
@@ -304,6 +304,77 @@ class Loop:
             return runner.run(coro)
 
     @staticmethod
+    def _reportAbandonedError(
+        error: BaseException,
+        future: asyncio.Future[Any],
+    ) -> None:
+        """
+        Observe an unconsumed worker or cleanup failure through its owner.
+
+        Parameters
+        ----------
+        error : BaseException
+            Original worker or resource-cleanup error.
+        future : asyncio.Future
+            Worker future providing the fallback exception handler's loop.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if isinstance(error, asyncio.CancelledError):
+            return
+        from orionis.failure.runtime import capture_nowait, get_runtime
+
+        runtime = get_runtime()
+        if runtime is not None:
+            capture_nowait(error, runtime=runtime)
+            return
+        future.get_loop().call_exception_handler(
+            {
+                "message": "Synchronous work failed after its caller was cancelled",
+                "exception": error,
+                "future": future,
+            },
+        )
+
+    @staticmethod
+    def _discardResult(future: asyncio.Future[Any]) -> None:
+        """
+        Release a worker result abandoned by a cancelled caller.
+
+        Parameters
+        ----------
+        future : asyncio.Future
+            Completed executor operation whose caller no longer awaits it.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if future.cancelled():
+            return
+        error = future.exception()
+        if error is not None:
+            Loop._reportAbandonedError(error, future)
+            return
+        from orionis.support.concurrency import close_abandoned_awaitable
+
+        try:
+            close_abandoned_awaitable(
+                future.result(),
+                on_error=lambda error: future.get_loop().call_soon_threadsafe(
+                    Loop._reportAbandonedError,
+                    error,
+                    future,
+                ),
+            )
+        except Exception as error:
+            Loop._reportAbandonedError(error, future)
+
+    @staticmethod
     async def execute(
         func: Callable[..., Any],
         /,
@@ -311,13 +382,17 @@ class Loop:
         **kwargs: Any,
     ) -> Any:
         """
-        Transparently execute a sync or async callable.
+        Execute a sync or async callable while preserving the calling context.
 
         Async callables are awaited directly; synchronous callables are
-        offloaded with ``asyncio.to_thread`` to avoid blocking the loop thread
+        offloaded to the default executor to avoid blocking the loop thread
         while preserving the calling context's ``contextvars``.
         If a synchronous callable returns an awaitable, including a
         generator-based coroutine, that result is awaited on the calling loop.
+        Cancellation cannot stop a synchronous callable already executing.
+        A late coroutine result is closed and a late future is cancelled;
+        late worker failures reach the active failure runtime, or the loop's
+        exception handler when no runtime is active.
 
         Parameters
         ----------
@@ -345,7 +420,31 @@ class Loop:
         if inspect.iscoroutinefunction(func):
             return await func(*args, **kwargs)
 
-        result = await asyncio.to_thread(func, *args, **kwargs)
+        from orionis.support.concurrency import wait_for_completion
+
+        loop = asyncio.get_running_loop()
+        cancelled = threading.Event()
+
+        def invoke_sync() -> object:
+            """
+            Invoke the callable unless cancellation precedes worker startup.
+
+            Returns
+            -------
+            object
+                Callable result, or None when the caller cancelled queued work.
+            """
+            if cancelled.is_set():
+                return None
+            return func(*args, **kwargs)
+
+        future = loop.run_in_executor(None, contextvars.copy_context().run, invoke_sync)
+        try:
+            result = await wait_for_completion(future)
+        except asyncio.CancelledError:
+            cancelled.set()
+            future.add_done_callback(Loop._discardResult)
+            raise
         if inspect.isawaitable(result):
             return await result
         return result
@@ -422,6 +521,7 @@ class Loop:
             Task scheduled to execute the supplied coroutine.
         """
         from orionis.failure.runtime import get_runtime
+
         runtime = get_runtime()
         if runtime is not None:
             return runtime.createTask(coro, name=name)

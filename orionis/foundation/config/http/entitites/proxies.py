@@ -6,6 +6,7 @@ from orionis.environment import Env
 from orionis.foundation.config.validation import copy_string_list
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class HTTPProxies(BaseEntity):
     """

@@ -3,6 +3,7 @@
 from orionis.container.facades.facade import Facade
 from orionis.queues.contracts.manager import IQueueManager
 
+
 class Queue(Facade):
     """Resolve the queue service through the application facade."""
 

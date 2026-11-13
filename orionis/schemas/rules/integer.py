@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a value represents a whole number."""
 
 import re
@@ -7,6 +9,7 @@ from orionis.schemas.rule import Rule
 _INTEGER_PATTERN = re.compile(r"^[+-]?\d+$")
 """Optionally signed sequence of digits, matching a whole number in text form."""
 
+
 class Integer(Rule):
     """
     Ensure a value represents a whole number.
@@ -14,8 +17,6 @@ class Integer(Rule):
     Integers pass directly, floats only when they carry no fractional part,
     and strings when they hold an optionally signed sequence of digits.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -60,6 +61,6 @@ class Integer(Rule):
             return value.is_integer()
 
         if isinstance(value, str):
-            return _INTEGER_PATTERN.match(value) is not None
+            return _INTEGER_PATTERN.fullmatch(value) is not None
 
         return False

@@ -1,4 +1,4 @@
-"""Provide test clients operations through ``McpTestResponse``, ``McpTestClient``."""
+"""Exercise MCP requests through the native dispatcher and JSON serialization."""
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -18,14 +18,15 @@ if TYPE_CHECKING:
     from orionis.container.contracts.container import IContainer
     from orionis.mcp.server.primitives import Server
 
+
 @dataclass(frozen=True, slots=True)
 class McpTestResponse:
     """Decoded result and notifications from a complete wire round trip."""
 
     message: dict[str, Any]
-    """Human-readable message associated with this operation or result."""
+    """Final decoded JSON-RPC response, or an empty mapping when none arrived."""
     notifications: tuple[dict[str, object], ...] = ()
-    """Notification categories selected by the subscriber."""
+    """Decoded notifications received before the final response."""
 
     def assertOk(self) -> None:
         """
@@ -34,11 +35,18 @@ class McpTestResponse:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value when the response succeeds.
+
+        Raises
+        ------
+        AssertionError
+            If the result is absent, malformed, or reports a protocol or tool error.
         """
-        if "error" in self.message or self.message.get("result", {}).get(
-            "isError",
-            False,
+        result = self.message.get("result")
+        if (
+            "error" in self.message
+            or not isinstance(result, dict)
+            or result.get("isError", False)
         ):
             error = "Expected a successful MCP result"
             raise AssertionError(error)
@@ -50,17 +58,30 @@ class McpTestResponse:
         Parameters
         ----------
         text : str
-            Value supplied for ``text``.
+            Substring required in at least one text content block.
 
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value when a matching text block exists.
+
+        Raises
+        ------
+        AssertionError
+            If no valid text block contains the requested substring.
         """
-        values = self.message.get("result", {}).get("content", ())
-        if not any(text in value.get("text", "") for value in values):
+        result = self.message.get("result")
+        values = result.get("content", ()) if isinstance(result, dict) else ()
+        if not isinstance(values, (list, tuple)) or not any(
+            isinstance(value, dict)
+            and value.get("type") == "text"
+            and isinstance(value.get("text"), str)
+            and text in value["text"]
+            for value in values
+        ):
             error = f"Expected MCP text to contain {text!r}"
             raise AssertionError(error)
+
 
 class McpTestClient:
     """Open scopes on the supplied container; never create a parallel application."""
@@ -81,15 +102,15 @@ class McpTestClient:
         ----------
         app : orionis.container.contracts.container.IContainer
             Application container supplying configuration and dependencies.
-        server
-            Value supplied for ``server``.
-        config : orionis.mcp.config.McpConfig | None
-            Validated configuration controlling this component.
+        server : type[orionis.mcp.server.primitives.Server] | CompiledMcpServer
+            Server declaration to compile, or an existing compiled server.
+        config : orionis.mcp.config.McpConfig | None, optional
+            Protocol limits; use the default configuration when omitted.
 
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         self.app = app
         """Application container supplying configuration and dependencies."""
@@ -102,10 +123,11 @@ class McpTestClient:
             compiled,
             config,
             InMemoryMcpEventBus(
-                config.subscription_buffer_size, config.max_subscriptions,
+                config.subscription_buffer_size,
+                config.max_subscriptions,
             ),
         )
-        """Dispatcher produced by ``McpDispatcher``."""
+        """Dispatcher sharing this client's configuration and event bus."""
 
     async def stream(
         self,
@@ -121,18 +143,18 @@ class McpTestClient:
         Parameters
         ----------
         method : str
-            Value supplied for ``method``.
-        params : dict[str, object] | None
-            Parameters decoded for the requested operation.
-        meta : dict[str, object] | None
-            Value supplied for ``meta``.
-        request_id : str | int
-            Value supplied for ``request_id``.
+            JSON-RPC method to invoke.
+        params : dict[str, object] | None, optional
+            Method parameters, defaulting to an empty mapping.
+        meta : dict[str, object] | None, optional
+            Request metadata overriding the default version and capabilities.
+        request_id : str | int, optional
+            Correlation identifier, defaulting to 1.
 
         Yields
         ------
         dict[str, object]
-            Each item produced by the documented iteration.
+            Each decoded notification or final response in wire order.
         """
         metadata = {
             PROTOCOL_VERSION: MCP_PROTOCOL_VERSION,
@@ -176,18 +198,18 @@ class McpTestClient:
         Parameters
         ----------
         method : str
-            Value supplied for ``method``.
-        params : dict[str, object] | None
-            Parameters decoded for the requested operation.
-        meta : dict[str, object] | None
-            Value supplied for ``meta``.
-        request_id : str | int
-            Value supplied for ``request_id``.
+            JSON-RPC method to invoke.
+        params : dict[str, object] | None, optional
+            Method parameters, defaulting to an empty mapping.
+        meta : dict[str, object] | None, optional
+            Request metadata overriding the default version and capabilities.
+        request_id : str | int, optional
+            Correlation identifier, defaulting to 1.
 
         Returns
         -------
         orionis.test.McpTestResponse
-            Result of the operation described above.
+            Final response and preceding notifications in wire order.
         """
         notifications = []
         final = {}
@@ -214,14 +236,14 @@ class McpTestClient:
         Parameters
         ----------
         name : str
-            Value supplied for ``name``.
-        arguments : dict[str, object] | None
-            Arguments supplied for this operation.
+            Registered tool name.
+        arguments : dict[str, object] | None, optional
+            Tool input fields, defaulting to an empty mapping.
 
         Returns
         -------
         orionis.test.McpTestResponse
-            Result of the operation described above.
+            Serialized tool result and preceding notifications.
         """
         return await self.request(
             "tools/call",

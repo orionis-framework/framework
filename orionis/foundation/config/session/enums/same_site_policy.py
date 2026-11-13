@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class SameSitePolicy(Enum):
     """
     Represent possible values for the SameSite attribute of cookies.

@@ -3,6 +3,7 @@
 import logging
 from enum import Enum
 
+
 class Level(Enum):
     """
     Enumerate standard logging levels.

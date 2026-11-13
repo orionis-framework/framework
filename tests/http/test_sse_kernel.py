@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from contextlib import suppress
 from typing import TYPE_CHECKING, ClassVar, Self
@@ -36,8 +38,16 @@ class _StreamState:
     """Observe the real request scope from producer, transport, and cleanup."""
 
     __slots__ = (
-        "closed", "container", "dependency", "error", "observations", "release",
-        "request", "scope", "started", "waiting",
+        "closed",
+        "container",
+        "dependency",
+        "error",
+        "observations",
+        "release",
+        "request",
+        "scope",
+        "started",
+        "waiting",
     )
 
     def __init__(self, container: Container) -> None:
@@ -169,7 +179,10 @@ class _EventController(BaseController):
     __slots__ = ("state",)
 
     def __init__(
-        self, request: Request, dependency: _ScopedDependency, state: _StreamState,
+        self,
+        request: Request,
+        dependency: _ScopedDependency,
+        state: _StreamState,
     ) -> None:
         """Record the dependencies supplied when constructing the controller.
 
@@ -194,7 +207,10 @@ class _EventController(BaseController):
         )
 
     async def stream(
-        self, request: Request, dependency: _ScopedDependency, cursor: int,
+        self,
+        request: Request,
+        dependency: _ScopedDependency,
+        cursor: int,
     ) -> EventStreamResponse:
         """Return SSE using action parameters resolved independently by DI.
 
@@ -273,7 +289,10 @@ class _SSEApp(_StubApp):
         return await self.container.build(concrete)
 
     async def call(
-        self, instance: object, method: str, **kwargs: object,
+        self,
+        instance: object,
+        method: str,
+        **kwargs: object,
     ) -> object:
         """Invoke a controller action through production dependency injection.
 
@@ -315,8 +334,16 @@ class _SSEPeer:
     """Expose ASGI callbacks and Granian's supported RSGI stream operations."""
 
     __slots__ = (
-        "body", "disconnected", "error", "headers", "interface", "messages",
-        "state", "status", "watcher_closed", "watching",
+        "body",
+        "disconnected",
+        "error",
+        "headers",
+        "interface",
+        "messages",
+        "state",
+        "status",
+        "watcher_closed",
+        "watching",
     )
 
     def __init__(self, interface: str, state: _StreamState) -> None:
@@ -366,9 +393,12 @@ class _SSEPeer:
             await kernel.handleASGI(scope, self.receive, self.send)
         else:
             scope = _StubRsgiScope("/events/42", method)
-            scope.headers = _StubRsgiHeaders({
-                "host": ["orionis.test"], "last-event-id": ["41"],
-            })
+            scope.headers = _StubRsgiHeaders(
+                {
+                    "host": ["orionis.test"],
+                    "last-event-id": ["41"],
+                },
+            )
             await kernel.handleRSGI(scope, self)
 
     async def receive(self) -> dict:
@@ -488,7 +518,9 @@ class TestSSEKernel(TestCase):
     """Verify SSE routing, dependency lifetime, and both real response adapters."""
 
     async def makeKernel(
-        self, *, controller: bool = False,
+        self,
+        *,
+        controller: bool = False,
     ) -> tuple[KernelHTTP, _SSEApp]:
         """Compile a real Orionis route and install production response adapters.
 
@@ -553,17 +585,30 @@ class TestSSEKernel(TestCase):
                 await asyncio.wait_for(peer.dispatch(kernel), timeout=2)
                 self.assertEqual(peer.status, 200)
                 self.assertEqual(
-                    peer.headers["content-type"], "text/event-stream; charset=utf-8",
+                    peer.headers["content-type"],
+                    "text/event-stream; charset=utf-8",
                 )
                 self.assertNotIn("content-length", peer.headers)
-                self.assertEqual(peer.body, [
-                    b"event: resume\nid: 42\ndata: 41\n\n", b": ping\n\n",
-                ])
+                self.assertEqual(
+                    peer.body,
+                    [
+                        b"event: resume\nid: 42\ndata: 41\n\n",
+                        b": ping\n\n",
+                    ],
+                )
                 phases = [item[0] for item in app.state.observations]
-                self.assertEqual(phases, [
-                    "handler", "produce", "send", "produce", "send",
-                    "cleanup", "background",
-                ])
+                self.assertEqual(
+                    phases,
+                    [
+                        "handler",
+                        "produce",
+                        "send",
+                        "produce",
+                        "send",
+                        "cleanup",
+                        "background",
+                    ],
+                )
                 self.assertEqual(app.state.closed, 1)
                 self.assertTrue(peer.watcher_closed.is_set())
                 self.assertScopeLifetime(app)
@@ -736,7 +781,8 @@ class TestSSEKernel(TestCase):
                     await asyncio.gather(*tasks, return_exceptions=True)
                 self.assertEqual(len(app.scopes), connection_count)
                 self.assertEqual(
-                    len({id(state.request) for state in app.states}), connection_count,
+                    len({id(state.request) for state in app.states}),
+                    connection_count,
                 )
                 self.assertEqual(
                     len({id(state.dependency) for state in app.states}),

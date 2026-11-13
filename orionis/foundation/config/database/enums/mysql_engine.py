@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class MySQLEngine(Enum):
     """
     Enumerate supported MySQL storage engines.

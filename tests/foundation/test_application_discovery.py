@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import sys
 from abc import abstractmethod
@@ -7,6 +9,7 @@ from unittest.mock import patch
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.foundation.application import Application
 from orionis.test import TestCase
+
 
 def make_application() -> Application:
     """Create an isolated application with initialized container state.
@@ -19,6 +22,7 @@ def make_application() -> Application:
     app = object.__new__(Application)
     Application.__init__(app)
     return app
+
 
 def abstract_registration(_self: ServiceProvider) -> None:
     """Declare an abstract provider registration method.
@@ -33,6 +37,7 @@ def abstract_registration(_self: ServiceProvider) -> None:
     None
         Leaves registration to concrete implementations.
     """
+
 
 class TestApplicationDiscovery(TestCase):
     """Verify module ownership and provider availability during startup."""

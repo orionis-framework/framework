@@ -7,6 +7,7 @@ Usa `await request.form()` para conservar campos repetidos y archivos de un form
 ```python
 from orionis.http import Request, response
 
+
 async def inspect_attachment(request: Request):
     form = await request.form()
     try:
@@ -14,12 +15,14 @@ async def inspect_attachment(request: Request):
         if len(uploads) != 1:
             return response.json({"message": "One attachment is required"}, 422)
         upload = uploads[0]
-        return response.json({
-            "filename": upload.filename,
-            "size": upload.size,
-            "extension": upload.extension,
-            "labels": form.getAll("label"),
-        })
+        return response.json(
+            {
+                "filename": upload.filename,
+                "size": upload.size,
+                "extension": upload.extension,
+                "labels": form.getAll("label"),
+            }
+        )
     finally:
         form.close()
 ```

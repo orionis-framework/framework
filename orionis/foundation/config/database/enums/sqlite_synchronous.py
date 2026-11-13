@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class SQLiteSynchronous(Enum):
     """
     Represent SQLite synchronous settings for transaction durability.
@@ -23,7 +24,7 @@ class SQLiteSynchronous(Enum):
         Enum member representing the synchronous setting.
     """
 
-    FULL = "FULL"      # Greater safety, slower
+    FULL = "FULL"  # Greater safety, slower
     NORMAL = "NORMAL"  # Balance between safety and performance
     EXTRA = "EXTRA"  # Extra durability for rollback-journal commits
-    OFF = "OFF"        # Greater speed, less safe in case of failures
+    OFF = "OFF"  # Greater speed, less safe in case of failures

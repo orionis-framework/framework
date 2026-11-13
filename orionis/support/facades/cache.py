@@ -3,6 +3,7 @@
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.container.facades.facade import Facade
 
+
 class Cache(Facade):
     """
     Facade for the cache system.
@@ -10,8 +11,9 @@ class Cache(Facade):
     Proxies all calls to the bound :class:`orionis.cache.contracts.ICacheManager`
     singleton.
 
-    Usage (facade pinned at boot)::
+    Pin the deferrable facade before accessing synchronous methods::
 
+        await Cache.pin()
         value = await Cache.get("key")
         await Cache.set("key", "value", ttl=60)
         repo  = Cache.store("redis")          # sync — returns CacheRepository

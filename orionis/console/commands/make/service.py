@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeService(MakeStubCommand):
     """Generate an application service class."""
 
@@ -17,4 +18,3 @@ class MakeService(MakeStubCommand):
     """Path key identifier: ``app_services``."""
     success_label: str = "Service"
     """Success label identifier: ``Service``."""
-

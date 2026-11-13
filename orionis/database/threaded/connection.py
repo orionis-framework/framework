@@ -1,21 +1,28 @@
+# ruff: noqa: TC002, TC003
+# Keep native checkout and callback annotations available to runtime reflection.
 """Execute one Core checkout and buffer its results on a reserved thread."""
 
 from __future__ import annotations
+import asyncio
 from functools import partial
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 from orionis.database.threaded.result import ThreadedResult
 from orionis.database.threaded.transaction import ThreadedTransaction
-from orionis.database.threaded.worker import ThreadedWorker
+from orionis.database.threaded.worker import (
+    ThreadedWorker,
+    _complete_cleanup,
+    _wait_for_completion,
+)
 
-if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping, Sequence
-    from sqlalchemy.engine import Connection, Engine
-    from sqlalchemy.sql.expression import Executable
+from collections.abc import Callable, Mapping, Sequence
+from sqlalchemy.engine import Connection, Engine
+from sqlalchemy.sql.expression import Executable
+
 
 class ThreadedConnection:
     """Execute one Core checkout and buffer its results on a reserved thread."""
 
-    __slots__ = ("_closed", "_connection", "_worker")
+    __slots__ = ("_close_task", "_closed", "_connection", "_worker")
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, connection: Connection, worker: ThreadedWorker) -> None:
@@ -24,7 +31,7 @@ class ThreadedConnection:
 
         Parameters
         ----------
-        connection : orionis.database.Connection
+        connection : ``sqlalchemy.engine.Connection``
             Open blocking Core connection.
         worker : orionis.database.threaded.worker.ThreadedWorker
             Worker reserved for this checkout.
@@ -32,14 +39,16 @@ class ThreadedConnection:
         Returns
         -------
         None
-            Initialize the connection adapter without additional I/O.
+            No return value.
         """
         self._connection = connection
         """Open blocking Core connection."""
         self._worker = worker
         """Worker reserved for this checkout."""
         self._closed = False
-        """Whether this resource has completed its close lifecycle."""
+        """Whether checkout release has started or already completed."""
+        self._close_task: asyncio.Task[None] | None = None
+        """Shared checkout release coordinator while cleanup remains pending."""
 
     @classmethod
     async def open(cls, engine: Engine) -> Self:
@@ -59,10 +68,11 @@ class ThreadedConnection:
         worker = ThreadedWorker()
         try:
             connection = await worker.run(
-                engine.connect, on_cancel=lambda raw: raw.close(),
+                engine.connect,
+                on_cancel=lambda raw: raw.close(),
             )
-        except BaseException:
-            await worker.close()
+        except BaseException as error:
+            await _complete_cleanup(worker.close(), error)
             raise
         return cls(connection, worker)
 
@@ -76,7 +86,8 @@ class ThreadedConnection:
             Transaction adapter retaining the same worker.
         """
         transaction = await self._worker.run(
-            self._connection.begin, on_cancel=lambda opened: opened.rollback(),
+            self._connection.begin,
+            on_cancel=lambda opened: opened.rollback(),
         )
         return ThreadedTransaction(transaction, self._worker)
 
@@ -125,7 +136,10 @@ class ThreadedConnection:
         return ThreadedResult(self._connection.execute(statement, parameters))
 
     async def runSync[T](
-        self, callback: Callable[..., T], *args: object, **kwargs: object,
+        self,
+        callback: Callable[..., T],
+        *args: object,
+        **kwargs: object,
     ) -> T:
         """
         Execute a Core schema callback on the connection's reserved worker.
@@ -144,25 +158,71 @@ class ThreadedConnection:
         ``T``
             Callback result after the blocking work completes.
         """
-        return await self._worker.run(partial(
-            callback, self._connection, *args, **kwargs,
-        ))
+        return await self._worker.run(
+            partial(
+                callback,
+                self._connection,
+                *args,
+                **kwargs,
+            ),
+        )
 
     async def close(self) -> None:
         """Return the checkout and join its worker, including during cancellation.
 
+        Concurrent close callers wait for the same native release and shutdown.
+
         Returns
         -------
         None
-            Complete rollback, pool release and thread shutdown.
+            No return value.
         """
-        if self._closed:
-            return
-        self._closed = True
+        if self._close_task is None:
+            if self._closed:
+                return
+            self._closed = True
+            release = self._release()
+            try:
+                self._close_task = asyncio.create_task(release)
+            except BaseException:
+                release.close()
+                self._closed = False
+                raise
+            self._close_task.add_done_callback(self._closedTask)
+        await _wait_for_completion(self._close_task)
+
+    def _closedTask(self, pending: asyncio.Task[None]) -> None:
+        """Release the completed coordinator and its copied execution context.
+
+        Parameters
+        ----------
+        pending : asyncio.Task[None]
+            Shared checkout release task that has reached a terminal state.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if self._close_task is pending:
+            self._close_task = None
+
+    async def _release(self) -> None:
+        """Return the native checkout before joining its reserved worker.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        primary: BaseException | None = None
         try:
             await self._worker.run(self._connection.close)
+        except BaseException as error:
+            primary = error
+            raise
         finally:
-            await self._worker.close()
+            await _complete_cleanup(self._worker.close(), primary)
 
     async def invalidate(self) -> None:
         """
@@ -171,6 +231,6 @@ class ThreadedConnection:
         Returns
         -------
         None
-            Close the DBAPI handle on its worker instead of returning it for reuse.
+            No return value.
         """
         await self._worker.run(self._connection.invalidate)

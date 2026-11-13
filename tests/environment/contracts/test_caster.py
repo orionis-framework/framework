@@ -1,7 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from abc import ABC
 from inspect import isabstract, signature
 from orionis.environment.contracts.caster import IEnvironmentCaster
 from orionis.environment.dynamic.caster import EnvironmentCaster
+from orionis.environment.enums.value_type import EnvironmentValueType
 from orionis.test import TestCase
 
 # Abstract surface the contract is expected to publish.
@@ -10,6 +13,7 @@ _EXPECTED_ABSTRACTS: frozenset[str] = frozenset({"get", "to"})
 # ---------------------------------------------------------------------------
 # Test doubles
 # ---------------------------------------------------------------------------
+
 
 class _CompleteCaster(IEnvironmentCaster):
     """Minimal implementation covering the whole contract."""
@@ -26,12 +30,12 @@ class _CompleteCaster(IEnvironmentCaster):
         """
         return "value"
 
-    def to(self, type_hint: str) -> str:
+    def to(self, type_hint: str | EnvironmentValueType) -> str:
         """Return a canned serialised representation.
 
         Parameters
         ----------
-        type_hint : str
+        type_hint : str | EnvironmentValueType
             Value supplied for ``type_hint``.
 
         Returns
@@ -39,7 +43,13 @@ class _CompleteCaster(IEnvironmentCaster):
         str
             Value produced by the helper.
         """
-        return f"{type_hint}:value"
+        hint = (
+            type_hint.value
+            if isinstance(type_hint, EnvironmentValueType)
+            else type_hint
+        )
+        return f"{hint}:value"
+
 
 class _IncompleteCaster(IEnvironmentCaster):
     """Implementation that deliberately leaves ``to`` unimplemented."""
@@ -56,12 +66,13 @@ class _IncompleteCaster(IEnvironmentCaster):
         """
         return "value"
 
+
 # ---------------------------------------------------------------------------
 # TestEnvironmentCasterContract
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentCasterContract(TestCase):
 
+class TestEnvironmentCasterContract(TestCase):
     def testIsAnAbstractBaseClass(self) -> None:
         """Expose the caster contract as an abstract base class.
 
@@ -71,7 +82,7 @@ class TestEnvironmentCasterContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(IEnvironmentCaster, ABC))
         self.assertTrue(isabstract(IEnvironmentCaster))
@@ -85,7 +96,7 @@ class TestEnvironmentCasterContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             IEnvironmentCaster.__abstractmethods__,
@@ -101,7 +112,7 @@ class TestEnvironmentCasterContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(IEnvironmentCaster.__dict__.get("__slots__"), ())
 
@@ -114,7 +125,7 @@ class TestEnvironmentCasterContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             IEnvironmentCaster()
@@ -128,7 +139,7 @@ class TestEnvironmentCasterContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             _IncompleteCaster()
@@ -142,14 +153,14 @@ class TestEnvironmentCasterContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         caster = _CompleteCaster()
         self.assertEqual(caster.get(), "value")
         self.assertEqual(caster.to("int"), "int:value")
 
-    def testMatchesTheParameterNamesOfTheImplementation(self) -> None:
-        """Match the parameter names published by the shipped caster.
+    def testMatchesTheSignaturesOfTheImplementation(self) -> None:
+        """Match the resolved signatures published by the shipped caster.
 
         Validates that ``EnvironmentCaster`` can be substituted wherever
         the contract is expected without changing call sites.
@@ -157,12 +168,13 @@ class TestEnvironmentCasterContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in sorted(_EXPECTED_ABSTRACTS):
-            expected = list(signature(getattr(IEnvironmentCaster, name)).parameters)
-            actual = list(signature(getattr(EnvironmentCaster, name)).parameters)
-            self.assertEqual(actual, expected)
+            with self.subTest(method=name):
+                expected = signature(getattr(IEnvironmentCaster, name), eval_str=True)
+                actual = signature(getattr(EnvironmentCaster, name), eval_str=True)
+                self.assertEqual(actual, expected)
 
     def testIsImplementedByTheShippedCaster(self) -> None:
         """Recognise the shipped caster as a valid implementation.
@@ -173,6 +185,6 @@ class TestEnvironmentCasterContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(EnvironmentCaster, IEnvironmentCaster))

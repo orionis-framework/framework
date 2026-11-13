@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a string is a valid lexicographically sortable identifier."""
 
 from orionis.schemas.rule import Rule
@@ -14,10 +16,9 @@ _LENGTH = 26
 _MAX_LEADING = "7"
 """Highest first character keeping the 48-bit timestamp within range."""
 
+
 class Ulid(Rule):
     """Ensure a string is a valid lexicographically sortable identifier."""
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -55,7 +56,7 @@ class Ulid(Rule):
         if not isinstance(value, str):
             return True
 
-        if len(value) != _LENGTH:
+        if len(value) != _LENGTH or not value.isascii():
             return False
 
         # The textual form is case-insensitive, so compare in upper case.

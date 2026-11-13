@@ -1,7 +1,11 @@
+# ruff: noqa: PLC0415, PLR2004, FBT001, DTZ007
+# Facades load lazily; positional flags and numeric modes are public contracts.
+# Parsed naive dates receive the configured timezone before being returned.
 """Provide chainable operations over a string value."""
 
 from __future__ import annotations
 import base64
+import fnmatch
 import hashlib
 import html
 import json
@@ -13,35 +17,35 @@ import uuid
 from collections.abc import Callable, Iterable
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Self
+from typing import Self
+from orionis.support.types._html import _TagStripper
 
-# Define the patterns used by string transformations.
+# Word separators shared by camel-case and StudlyCase conversion.
 _RE_CAMEL_SEP = re.compile(r"[_\-\s]+")
-"""Define the patterns used by string transformations."""
+"""Word separators shared by camel-case and StudlyCase conversion."""
 _RE_KEBAB_CAMEL = re.compile(r"([a-z0-9])([A-Z])")
-"""Compiled pattern used to recognize re kebab camel."""
+"""Boundary between a lowercase letter or digit and an uppercase letter."""
 _RE_KEBAB_SEP = re.compile(r"[_\s]+")
-"""Compiled pattern used to recognize re kebab sep."""
+"""Whitespace and underscore runs replaced by kebab-case separators."""
 _RE_KEBAB_MULTI = re.compile(r"-+")
-"""Compiled pattern used to recognize re kebab multi."""
+"""Repeated dashes collapsed during kebab-case conversion."""
 _RE_SQUISH = re.compile(r"\s+")
-"""Compiled pattern used to recognize re squish."""
+"""Whitespace runs collapsed by squish."""
 _RE_NUMBERS = re.compile(r"\D")
-"""Compiled pattern used to recognize re numbers."""
+"""Characters excluded by numeric-character extraction."""
 _RE_HEADLINE = re.compile(r"\b\w+\b")
-"""Compiled pattern used to recognize re headline."""
+"""Word tokens used to construct headline case."""
 _RE_UCSPLIT = re.compile(r"[A-Z][a-z]*|[a-z]+|\d+")
-"""Compiled pattern used to recognize re ucsplit."""
+"""Uppercase-led words, lowercase words and digit runs for ucsplit."""
 _RE_PASCAL_WORDS = re.compile(r"[A-Z][a-z]*|[a-z]+")
-"""Compiled pattern used to recognize re pascal words."""
-_RE_STRIP_TAGS = re.compile(r"<[^>]*>")
-"""Compiled pattern used to recognize re strip tags."""
-_ULID_RE = re.compile(r"^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$")
-"""Compiled pattern used to recognize ulid re."""
+"""Word segments used by PascalCase pluralization."""
+_ULID_RE = re.compile(r"[0-7][0123456789ABCDEFGHJKMNPQRSTVWXYZ]{25}")
+"""Crockford Base32 encoding constrained to the 128-bit ULID range."""
+_INTEGER_LIMIT_ERROR = "Limit must be an integer."
+"""Validation message shared by non-integer limit arguments."""
+
 
 class Stringable(str):
-
-    # ruff: noqa: PLC0415, PLR0915, PLR0912, C901, PLR2004, ANN401, S324, FBT001
     """Provide chainable operations over a string value."""
 
     __slots__ = ()
@@ -385,7 +389,12 @@ class Stringable(str):
             if case_sensitive:
                 s = str(s).replace(src, rep)
             else:
-                s = re.sub(re.escape(src), rep, str(s), flags=re.IGNORECASE)
+                s = re.sub(
+                    re.escape(src),
+                    lambda _match, rep=rep: rep,
+                    str(s),
+                    flags=re.IGNORECASE,
+                )
 
         # Return the modified string as a new Stringable instance
         return Stringable(s)
@@ -397,18 +406,25 @@ class Stringable(str):
         Parameters
         ----------
         allowed_tags : str | None, optional
-            Tags that should not be stripped. Default is None.
+            Tags to preserve, such as "<p><b>". Default is None. When nonempty,
+            recognized HTML entities in text are decoded.
 
         Returns
         -------
         orionis.support.types.Stringable
-            A new Stringable instance with tags removed.
+            A new Stringable instance with tags removed. Allowed tag attributes
+            and element text are preserved; this operation is not an HTML sanitizer.
         """
-        # If allowed_tags is specified, unescape HTML entities only.
-        if allowed_tags:
-            return Stringable(html.unescape(str(self)))
-        # Remove all tags using a regular expression.
-        return Stringable(_RE_STRIP_TAGS.sub("", str(self)))
+        if allowed_tags is not None and not isinstance(allowed_tags, str):
+            message = "Allowed tags must be a string or None."
+            raise TypeError(message)
+        allowed = frozenset(
+            re.findall(r"<\s*([a-zA-Z][a-zA-Z0-9:-]*)\s*>", allowed_tags or ""),
+        )
+        parser = _TagStripper(frozenset(tag.lower() for tag in allowed))
+        parser.feed(str(self))
+        parser.close()
+        return Stringable("".join(parser.parts))
 
     def toBase64(self: Self) -> Stringable:
         """
@@ -445,7 +461,7 @@ class Stringable(str):
         # Attempt to decode the string from Base64
         try:
             return Stringable(base64.b64decode(str(self).encode()).decode())
-        except Exception as exc:
+        except ValueError as exc:
             if strict:
                 error_msg = f"Base64 decoding failed: {exc!s}"
                 raise RuntimeError(error_msg) from exc
@@ -463,7 +479,7 @@ class Stringable(str):
             Hexadecimal string representing the MD5 hash of the input string.
         """
         # Compute the MD5 hash using hashlib and return as a hex string
-        return hashlib.md5(str(self).encode()).hexdigest()  # NOSONAR
+        return hashlib.md5(str(self).encode(), usedforsecurity=False).hexdigest()
 
     def sha1(self: Self) -> str:
         """
@@ -475,7 +491,7 @@ class Stringable(str):
             Hexadecimal string representing the SHA1 hash of the input string.
         """
         # Compute the SHA1 hash using hashlib and return as a hex string
-        return hashlib.sha1(str(self).encode()).hexdigest()  # NOSONAR
+        return hashlib.sha1(str(self).encode(), usedforsecurity=False).hexdigest()
 
     def sha256(self: Self) -> str:
         """
@@ -867,13 +883,15 @@ class Stringable(str):
         # Insert delimiter between lowercase/number and uppercase letters
         s = re.sub(
             r"([a-z0-9])([A-Z])",
-            rf"\1{delimiter}\2",
+            lambda match: match[1] + delimiter + match[2],
             str(self),
         )
         # Replace spaces and dashes with the delimiter
-        s = re.sub(r"[\s\-]+", delimiter, s)
+        s = re.sub(r"[\s\-]+", lambda _match: delimiter, s)
         # Collapse multiple delimiters into one
-        s = re.sub(rf"{re.escape(delimiter)}+", delimiter, s)
+        if not delimiter:
+            return Stringable(s.lower())
+        s = re.sub(rf"(?:{re.escape(delimiter)})+", lambda _match: delimiter, s)
         return Stringable(s.lower().strip(delimiter))
 
     def studly(self: Self) -> Stringable:
@@ -950,10 +968,12 @@ class Stringable(str):
         s = re.sub(r"[^\w\s-]", "", s)
 
         # Replace spaces and underscores with the separator
-        s = re.sub(r"[\s_]+", separator, s)
+        s = re.sub(r"[\s_]+", lambda _match: separator, s)
 
         # Collapse multiple separators into one
-        s = re.sub(rf"{re.escape(separator)}+", separator, s)
+        if not separator:
+            return Stringable(s.lower())
+        s = re.sub(rf"(?:{re.escape(separator)})+", lambda _match: separator, s)
 
         # Return the slug in lowercase, stripped of leading/trailing separators
         return Stringable(s.lower().strip(separator))
@@ -1071,12 +1091,7 @@ class Stringable(str):
         bool
             True if the string is ASCII, otherwise False.
         """
-        # Attempt to encode the string as ASCII; fail if non-ASCII chars exist
-        try:
-            self.encode("ascii")
-            return True
-        except UnicodeEncodeError:
-            return False
+        return str.isascii(self)
 
     def isJson(self: Self) -> bool:
         """
@@ -1171,7 +1186,7 @@ class Stringable(str):
             True if the string is a valid ULID, otherwise False.
         """
         # Validate the full 26-character Crockford Base32 identifier.
-        return _ULID_RE.fullmatch(self.upper()) is not None
+        return str.isascii(self) and _ULID_RE.fullmatch(self.upper()) is not None
 
     def chopStart(self: Self, needle: str | list[str]) -> Stringable:
         """
@@ -1228,7 +1243,7 @@ class Stringable(str):
         # Remove the first matching needle from the end
         for n in needles:
             if s.endswith(n):
-                s = s[: -len(n)]
+                s = s.removesuffix(n)
                 break
         return Stringable(s)
 
@@ -1251,7 +1266,7 @@ class Stringable(str):
             raise ValueError(error_msg)
         # Replace consecutive occurrences of the character with a single instance
         pattern = re.escape(character) + "+"
-        return Stringable(re.sub(pattern, character, str(self)))
+        return Stringable(re.sub(pattern, lambda _match: character, str(self)))
 
     def mask(
         self: Self,
@@ -1666,8 +1681,7 @@ class Stringable(str):
             raise TypeError(error_msg)
 
         # Normalize pattern to a list for consistent processing
-        if isinstance(pattern, str):
-            pattern = [pattern]
+        pattern = [pattern] if isinstance(pattern, str) else list(pattern)
 
         # Validate that each pattern in the list is a string
         for p in pattern:
@@ -1875,7 +1889,7 @@ class Stringable(str):
 
     def finish(self: Self, cap: str) -> Stringable:
         """
-        Ensure the string ends with a single instance of the given value.
+        Ensure the string ends with the given value.
 
         Parameters
         ----------
@@ -1904,7 +1918,7 @@ class Stringable(str):
 
     def start(self: Self, prefix: str) -> Stringable:
         """
-        Ensure the string starts with a single instance of the given prefix.
+        Ensure the string starts with the given prefix.
 
         Parameters
         ----------
@@ -1964,19 +1978,21 @@ class Stringable(str):
 
     def split(
         self: Self,
-        pattern: str | int,
+        pattern: str | int | None = None,
         limit: int = -1,
         flags: int = 0,
     ) -> list[str]:
         """
-        Split the string by a regular expression or by length.
+        Split the string by whitespace, a regular expression, or chunk length.
 
         Parameters
         ----------
-        pattern : str or int
-            Regular expression pattern or chunk length.
+        pattern : str or int or None, optional
+            Regular expression or positive chunk length. Omit or pass ``None``
+            to use native whitespace splitting.
         limit : int, optional
-            Maximum number of splits. Default is -1 (no limit).
+            Maximum whitespace or regex splits. Default is -1 (no limit).
+            Chunk splitting retains every chunk independently of this option.
         flags : int, optional
             Regular expression flags. Default is 0.
 
@@ -1984,14 +2000,26 @@ class Stringable(str):
         -------
         list of str
             List of string segments after splitting.
+
+        Raises
+        ------
+        TypeError
+            If the pattern, limit, or flags have unsupported types.
+        ValueError
+            If a chunk length is not positive or the limit is below -1.
         """
         # Validate pattern type
-        if not isinstance(pattern, (str, int)):
-            error_msg = "Pattern must be a string or an integer."
+        if isinstance(pattern, bool) or (
+            pattern is not None and not isinstance(pattern, (str, int))
+        ):
+            error_msg = "Pattern must be a string, positive integer, or None."
             raise TypeError(error_msg)
 
         # Validate limit value
-        if isinstance(limit, int) and limit < -1:
+        if isinstance(limit, bool) or not isinstance(limit, int):
+            error_msg = _INTEGER_LIMIT_ERROR
+            raise TypeError(error_msg)
+        if limit < -1:
             error_msg = "Limit must be an integer greater than or equal to -1."
             raise ValueError(error_msg)
 
@@ -2000,8 +2028,14 @@ class Stringable(str):
             error_msg = "Flags must be an integer."
             raise TypeError(error_msg)
 
+        if pattern is None:
+            return str.split(self, None, limit)
+
         # Split by chunk length if pattern is int
         if isinstance(pattern, int):
+            if pattern < 1:
+                error_msg = "Chunk length must be a positive integer."
+                raise ValueError(error_msg)
             s = str(self)
             return [s[i : i + pattern] for i in range(0, len(s), pattern)]
 
@@ -2263,19 +2297,17 @@ class Stringable(str):
                 error_msg = "Each item in replace must be a string."
                 raise TypeError(error_msg)
 
-        # Get the string representation
-        s = str(self)
-
-        # Initialize index for replacements
-        replace_idx = 0
-
-        # Replace each occurrence of search with the next item in replace
-        while search in s and replace_idx < len(replace):
-            s = s.replace(search, str(replace[replace_idx]), 1)
-            replace_idx += 1
-
-        # Return the modified string as a new Stringable instance
-        return Stringable(s)
+        if not isinstance(search, str):
+            message = "Search must be a string."
+            raise TypeError(message)
+        replacements = iter(replace)
+        return Stringable(
+            re.sub(
+                re.escape(search),
+                lambda match: next(replacements, match[0]),
+                str(self),
+            ),
+        )
 
     def replaceFirst(self: Self, search: str, replace: str) -> Stringable:
         """
@@ -2393,12 +2425,12 @@ class Stringable(str):
 
         # Replace the end if it matches the search string
         if s.endswith(search):
-            s = s[: -len(search)] + replace
+            s = s.removesuffix(search) + replace
 
         # Return the modified string as a new Stringable instance
         return Stringable(s)
 
-    def replaceMatches(  # NOSONAR
+    def replaceMatches(
         self: Self,
         pattern: str | list[str],
         replace: str | Callable,
@@ -2414,7 +2446,8 @@ class Stringable(str):
         replace : str | collections.abc.Callable
             Replacement string or callback function.
         limit : int, optional
-            Maximum number of replacements. Default is -1 (no limit).
+            Maximum replacements per pattern. Zero leaves the string unchanged;
+            -1 applies no limit. Values below -1 are invalid.
 
         Returns
         -------
@@ -2425,11 +2458,11 @@ class Stringable(str):
         if not isinstance(pattern, str) and not isinstance(pattern, list):
             error_msg = "Pattern must be a string or a list of strings."
             raise TypeError(error_msg)
-        if isinstance(pattern, list):
-            for pat in pattern:
-                if not isinstance(pat, str):
-                    error_msg = "Each pattern must be a string."
-                    raise TypeError(error_msg)
+        if isinstance(pattern, list) and any(
+            not isinstance(pat, str) for pat in pattern
+        ):
+            error_msg = "Each pattern must be a string."
+            raise TypeError(error_msg)
 
         # Validate replace argument type
         if not (isinstance(replace, str) or callable(replace)):
@@ -2437,8 +2470,13 @@ class Stringable(str):
             raise TypeError(error_msg)
         # Validate limit argument type
         if not isinstance(limit, int):
-            error_msg = "Limit must be an integer."
+            error_msg = _INTEGER_LIMIT_ERROR
             raise TypeError(error_msg)
+        if limit < -1:
+            error_msg = "Limit must be greater than or equal to -1."
+            raise ValueError(error_msg)
+        if limit == 0:
+            return Stringable(self)
 
         # Get the string representation
         s = str(self)
@@ -2447,12 +2485,9 @@ class Stringable(str):
         patterns = [pattern] if isinstance(pattern, str) else pattern
 
         # Apply each pattern replacement up to the specified limit
+        count = 0 if limit == -1 else limit
         for pat in patterns:
-            count = 0 if limit == -1 else limit
-            if callable(replace):
-                s = re.sub(pat, replace, s, count=count)
-            else:
-                s = re.sub(pat, str(replace), s, count=count)
+            s = re.sub(pat, replace, s, count=count)
 
         # Return the modified string as a new Stringable instance
         return Stringable(s)
@@ -2504,18 +2539,18 @@ class Stringable(str):
         # Return the modified string as a new Stringable instance
         return Stringable(s)
 
-    def plural(  # NOSONAR
+    def plural(
         self: Self,
-        count: int | list | Any = 2,
+        count: object = 2,
         *,
         prepend_count: bool = False,
     ) -> Stringable:
         """
-        Get the plural form of an English word.
+        Apply regular English plural suffix heuristics to a word.
 
         Parameters
         ----------
-        count : int | list | typing.Any, optional
+        count : int, float or object with __len__, optional
             Count to determine if plural is needed, by default 2
         prepend_count : bool, optional
             Whether to prepend the count, by default False
@@ -2537,33 +2572,8 @@ class Stringable(str):
 
         # Get lowercase version for comparison
         s = str(self)
-        word = s.lower()
-
-        # Determine actual count for pluralization decision
-        if hasattr(count, "__len__"):
-            actual_count = len(count)
-        elif isinstance(count, (int, float)):
-            actual_count = count
-        else:
-            actual_count = 1
-
-        # Apply pluralization rules only if count is not 1
-        if actual_count == 1:
-            result = s
-        else:
-            # Apply simple English pluralization rules
-            if word.endswith(("s", "sh", "ch", "x", "z")):
-                plural_word = s + "es"
-            elif word.endswith("y") and len(word) > 1 and word[-2] not in "aeiou":
-                plural_word = s[:-1] + "ies"
-            elif word.endswith("f"):
-                plural_word = s[:-1] + "ves"
-            elif word.endswith("fe"):
-                plural_word = s[:-2] + "ves"
-            else:
-                plural_word = s + "s"
-
-            result = plural_word
+        actual_count = len(count) if hasattr(count, "__len__") else count
+        result = s if actual_count == 1 else _pluralize_word(s)
 
         # Prepend count if requested
         if prepend_count:
@@ -2571,13 +2581,13 @@ class Stringable(str):
 
         return Stringable(result)
 
-    def pluralStudly(self: Self, count: int | list | Any = 2) -> Stringable:
+    def pluralStudly(self: Self, count: object = 2) -> Stringable:
         """
         Pluralize the last word of an English, studly caps case string.
 
         Parameters
         ----------
-        count : int | list | typing.Any, optional
+        count : int, float or object with __len__, optional
             Count to determine if plural is needed, by default 2
 
         Returns
@@ -2598,13 +2608,13 @@ class Stringable(str):
         # Fall back to pluralizing the entire string and converting to StudlyCase
         return self.plural(count).studly()
 
-    def pluralPascal(self: Self, count: int | list | Any = 2) -> Stringable:
+    def pluralPascal(self: Self, count: object = 2) -> Stringable:
         """
         Pluralize the last word of an English Pascal case string.
 
         Parameters
         ----------
-        count : int | list | typing.Any, optional
+        count : int, float or object with __len__, optional
             Count to determine if plural is needed. Default is 2.
 
         Returns
@@ -2639,7 +2649,7 @@ class Stringable(str):
 
     def singular(self: Self) -> Stringable:
         """
-        Get the singular form of an English word.
+        Apply regular English singular suffix heuristics to a word.
 
         Returns
         -------
@@ -3217,7 +3227,7 @@ class Stringable(str):
         """
         # Validate that limit is an integer
         if not isinstance(limit, int):
-            error_msg = "Limit must be an integer."
+            error_msg = _INTEGER_LIMIT_ERROR
             raise TypeError(error_msg)
 
         # Take from end if limit is negative, else from start
@@ -3315,12 +3325,13 @@ class Stringable(str):
         s = str(self)
 
         # Extract substring based on offset and optional length
-        s = s[offset : offset + length] if length is not None else s[offset:]
+        start = max(0, len(s) + offset) if offset < 0 else offset
+        s = s[start : start + length] if length is not None else s[start:]
 
         # Count non-overlapping occurrences of needle in the substring
         return s.count(needle)
 
-    def substrReplace(  # NOSONAR
+    def substrReplace(
         self: Self,
         replace: str | list[str],
         offset: int | list[int] = 0,
@@ -3336,7 +3347,8 @@ class Stringable(str):
         offset : int | list[int], optional
             Starting position(s), by default 0
         length : int | list[int] | None, optional
-            Length(s) to replace, by default None
+            Length(s) to replace. None, zero or an omitted entry inserts text
+            without removing existing characters.
 
         Returns
         -------
@@ -3356,125 +3368,21 @@ class Stringable(str):
         ValueError
             If lists have incompatible lengths.
         """
-        # Validate replace parameter
-        if not isinstance(replace, (str, list)):
-            error_msg = "Replace must be a string or a list of strings."
-            raise TypeError(error_msg)
-
-        # Validate each item in replace if it's a list
-        if isinstance(replace, list):
-            if not replace:
-                error_msg = "Replace list cannot be empty."
-                raise ValueError(error_msg)
-            for i, repl in enumerate(replace):
-                if not isinstance(repl, str):
-                    error_msg = (
-                        f"Replace item at index {i} must be a string, "
-                        f"got {type(repl).__name__}."
-                    )
-                    raise TypeError(error_msg)
-
-        # Validate offset parameter
-        if not isinstance(offset, (int, list)):
-            error_msg = "Offset must be an integer or a list of integers."
-            raise TypeError(error_msg)
-
-        # Validate each item in offset if it's a list
-        if isinstance(offset, list):
-            if not offset:
-                error_msg = "Offset list cannot be empty."
-                raise ValueError(error_msg)
-            for i, off in enumerate(offset):
-                if not isinstance(off, int):
-                    error_msg = (
-                        f"Offset item at index {i} must be an integer, "
-                        f"got {type(off).__name__}."
-                    )
-                    raise TypeError(error_msg)
-
-        # Validate length parameter
-        if length is not None:
-            if not isinstance(length, (int, list)):
-                error_msg = "Length must be an integer, a list of integers, or None."
-                raise TypeError(error_msg)
-
-            # Validate each item in length if it's a list
-            if isinstance(length, int):
-                if length < 0:
-                    error_msg = "Length cannot be negative."
-                    raise ValueError(error_msg)
-            else:  # isinstance(length, list)
-                if not length:
-                    error_msg = "Length list cannot be empty."
-                    raise ValueError(error_msg)
-                for i, leng in enumerate(length):
-                    if not isinstance(leng, int):
-                        error_msg = (
-                            f"Length item at index {i} must be an integer, "
-                            f"got {type(leng).__name__}."
-                        )
-                        raise TypeError(error_msg)
-                    if leng < 0:
-                        error_msg = f"Length item at index {i} cannot be negative."
-                        raise ValueError(error_msg)
-
-        # Normalize inputs to lists
-        if isinstance(replace, str):
-            replace = [replace]
-        if isinstance(offset, int):
-            offset = [offset]
-        if length is not None and isinstance(length, int):
-            length = [length]
-
-        # Validate list compatibility
-        max_items = len(replace)
-        if len(offset) > max_items:
-            error_msg = (
-                f"Offset list length ({len(offset)}) cannot exceed "
-                f"replace list length ({max_items})."
-            )
-            raise ValueError(error_msg)
-        if length is not None and len(length) > max_items:
-            error_msg = (
-                f"Length list length ({len(length)}) cannot exceed "
-                f"replace list length ({max_items})."
-            )
-            raise ValueError(error_msg)
-
-        # Get the string representation
-        s = str(self)
-
-        # Process replacements
-        result = s
-        for i, repl in enumerate(replace):
-            off = offset[i] if i < len(offset) else offset[-1]
-
-            # Validate offset bounds
-            if abs(off) > len(result):
-                error_msg = (
-                    f"Offset {off} is out of bounds for string of length {len(result)}."
-                )
-                raise ValueError(error_msg)
-
-            if length and i < len(length):
-                leng = length[i]
-                # Ensure we don't go beyond string boundaries
-                if off >= 0:
-                    end_pos = min(off + leng, len(result))
-                    result = result[:off] + repl + result[end_pos:]
-                else:
-                    # Handle negative offset
-                    start_pos = max(0, len(result) + off)
-                    end_pos = min(start_pos + leng, len(result))
-                    result = result[:start_pos] + repl + result[end_pos:]
-            elif off >= 0:
-                result = result[:off] + repl + result[off:]
-            else:
-                # Handle negative offset
-                insert_pos = max(0, len(result) + off)
-                result = result[:insert_pos] + repl + result[insert_pos:]
-
-        # Return the modified string as a new Stringable instance
+        replacements = _replacement_values(replace, str, "Replace")
+        offsets = _replacement_values(offset, int, "Offset")
+        lengths = None if length is None else _replacement_values(length, int, "Length")
+        if lengths is not None and any(value < 0 for value in lengths):
+            message = "Length cannot be negative."
+            raise ValueError(message)
+        for name, values in (("Offset", offsets), ("Length", lengths)):
+            if values is not None and len(values) > len(replacements):
+                message = f"{name} list cannot exceed replace list length."
+                raise ValueError(message)
+        result = str(self)
+        for index, replacement in enumerate(replacements):
+            position = offsets[min(index, len(offsets) - 1)]
+            size = lengths[index] if lengths is not None and index < len(lengths) else 0
+            result = _replace_portion(result, replacement, position, size)
         return Stringable(result)
 
     def scan(self: Self, format_str: str) -> list[str]:
@@ -3504,19 +3412,17 @@ class Stringable(str):
             error_msg = "Format string must be a string."
             raise TypeError(error_msg)
 
-        # Convert format placeholders to regex patterns
-        pattern = (
-            format_str.replace("%s", r"(\S+)")
-            .replace(
-                "%d",
-                r"(\d+)",
-            )
-            .replace("%f", r"([\d.]+)")
+        placeholders = {
+            "%s": r"(\S+)",
+            "%d": r"([+-]?\d+)",
+            "%f": r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)",
+        }
+        pattern = "".join(
+            placeholders.get(part, re.escape(part))
+            for part in re.split(r"(%[sdf])", format_str)
         )
-
-        # Find matches and return first match group as list
-        matches = re.findall(pattern, str(self))
-        return list(matches[0]) if matches else []
+        match = re.search(pattern, str(self))
+        return list(match.groups()) if match else []
 
     def prepend(self: Self, *values: str) -> Stringable:
         """
@@ -3582,6 +3488,8 @@ class Stringable(str):
         s = str(self)
         if length is None:
             return Stringable(s[start:])
+        if start < 0:
+            start = max(0, len(s) + start)
         return Stringable(s[start : start + length])
 
     def doesntContain(
@@ -3746,8 +3654,8 @@ class Stringable(str):
         """
         Convert the object to a string when JSON encoded.
 
-        This method is called when the Stringable object is being JSON serialized.
-        It returns the string representation of the object for proper JSON encoding.
+        Return plain text for callers that use an explicit serialization hook.
+        The standard JSON encoder already supports this str subclass directly.
 
         Returns
         -------
@@ -3838,8 +3746,6 @@ class Stringable(str):
         ValueError
             If the pattern list is empty.
         """
-        import fnmatch
-
         # Validate ignore_case parameter type
         if not isinstance(ignore_case, bool):
             error_msg = "ignore_case must be a boolean."
@@ -3875,7 +3781,7 @@ class Stringable(str):
             patterns = [p.lower() for p in patterns]
 
         # Check if string matches any of the patterns
-        return any(fnmatch.fnmatch(s, p) for p in patterns)
+        return any(fnmatch.fnmatchcase(s, p) for p in patterns)
 
     def containsAll(
         self: Self,
@@ -4026,19 +3932,25 @@ class Stringable(str):
         # Call the callback if the string is a valid ULID, else call default.
         return self.when(self.isUlid(), callback, default)
 
-    def toDate(self: Self, format_str: str | None = "%Y-%m-%d") -> datetime | None:
+    def toDate(self: Self, format_str: str | None = "%Y-%m-%d") -> datetime:
         """
         Convert string to a datetime object.
 
         Parameters
         ----------
         format_str : str or None, optional
-            Format string for parsing. Defaults to "%Y-%m-%d".
+            Format string for parsing. Defaults to "%Y-%m-%d". None uses ISO syntax.
 
         Returns
         -------
-        datetime.datetime or None
-            Parsed datetime object if successful, otherwise raises ValueError.
+        datetime.datetime
+            Parsed datetime with its explicit offset preserved. Naive input uses
+            the application's configured timezone.
+
+        Raises
+        ------
+        ValueError
+            If the input does not match the format or ISO syntax.
         """
         # Import necessary modules
         from orionis.support.facades.datetime import DateTime
@@ -4048,41 +3960,44 @@ class Stringable(str):
 
         # If format_str is None, use fromisoformat
         try:
-            return datetime.strptime(s, format_str).replace(
-                tzinfo=DateTime.getZoneInfo(),
+            parsed = (
+                datetime.fromisoformat(s)
+                if format_str is None
+                else datetime.strptime(s, format_str)
             )
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=DateTime.getZoneInfo())
+            return parsed
         except ValueError as err:
             error_msg = f"String '{s}' does not match format '{format_str}'"
             raise ValueError(error_msg) from err
 
-    def encrypt(self: Self) -> Stringable:
+    def encrypt(self: Self) -> str:
         """
         Encrypt the string using the Crypt facade.
 
-        This is a placeholder. In a real implementation, use a proper encryption
-        library such as cryptography.
+        Uses the application's configured encryption service.
 
         Returns
         -------
-        orionis.support.types.Stringable
-            The encrypted string as a Stringable instance.
+        str
+            The payload returned by the configured encryption service.
         """
         # Use the Crypt facade to encrypt the string.
         from orionis.support.facades.encrypter import Crypt
 
         return Crypt.encrypt(self.value())
 
-    def decrypt(self: Self) -> Stringable:
+    def decrypt(self: Self) -> str:
         """
-        Decrypt the string using a placeholder implementation.
+        Decrypt the string using the Crypt facade.
 
-        This is a placeholder. In a real implementation, use a proper decryption
-        library such as cryptography.
+        Uses the application's configured encryption service.
 
         Returns
         -------
-        orionis.support.types.Stringable
-            The decrypted string as a Stringable instance.
+        str
+            The plaintext returned by the configured encryption service.
         """
         # Use the Crypt facade to decrypt the string.
         from orionis.support.facades.encrypter import Crypt
@@ -4103,13 +4018,13 @@ class Stringable(str):
         # Escape HTML entities for safe HTML output
         return Stringable(html.escape(str(self)))
 
-    def tap(self: Self, callback: Callable[[Stringable], Any]) -> Stringable:
+    def tap(self: Self, callback: Callable[[Stringable], object]) -> Stringable:
         """
         Call the callback with the string and return the string.
 
         Parameters
         ----------
-        callback : typing.Callable[[Stringable], typing.Any]
+        callback : collections.abc.Callable[[Stringable], object]
             Function to execute with the string.
 
         Returns
@@ -4120,3 +4035,105 @@ class Stringable(str):
         # Call the callback with self, do not modify the string.
         callback(self)
         return self
+
+
+def _pluralize_word(word: str) -> str:
+    """
+    Apply the supported regular English plural suffix rules.
+
+    Parameters
+    ----------
+    word : str
+        Word whose original case is preserved.
+
+    Returns
+    -------
+    str
+        Word with a regular plural suffix.
+    """
+    lower = word.lower()
+    if lower.endswith(("s", "sh", "ch", "x", "z")):
+        return word + "es"
+    if lower.endswith("y") and len(word) > 1 and lower[-2] not in "aeiou":
+        return word[:-1] + "ies"
+    if lower.endswith("f"):
+        return word[:-1] + "ves"
+    if lower.endswith("fe"):
+        return word[:-2] + "ves"
+    return word + "s"
+
+
+def _replacement_values[T](value: T | list[T], kind: type[T], name: str) -> list[T]:
+    """
+    Validate and normalize one replacement parameter.
+
+    Parameters
+    ----------
+    value : ``T`` or list[``T``]
+        Scalar value or explicit sequence of values.
+    kind : type[``T``]
+        Required type of each value.
+    name : str
+        Public parameter label used in errors.
+
+    Returns
+    -------
+    list[``T``]
+        Nonempty sequence whose values have the required type.
+
+    Raises
+    ------
+    TypeError
+        If the scalar or a sequence member has an incompatible type.
+    ValueError
+        If an explicit list is empty.
+    """
+    if isinstance(value, kind):
+        return [value]
+    if not isinstance(value, list) or any(not isinstance(item, kind) for item in value):
+        message = (
+            f"{name} must be a {kind.__name__} or a list of {kind.__name__} values."
+        )
+        raise TypeError(message)
+    if not value:
+        message = f"{name} list cannot be empty."
+        raise ValueError(message)
+    return value
+
+
+def _replace_portion(
+    value: str,
+    replacement: str,
+    offset: int,
+    length: int,
+) -> str:
+    """
+    Replace one bounded portion of the current string.
+
+    Parameters
+    ----------
+    value : str
+        Current string after preceding replacements.
+    replacement : str
+        Literal text to insert.
+    offset : int
+        Position counted from the start, or from the end when negative.
+    length : int
+        Nonnegative number of characters to remove; zero inserts text.
+
+    Returns
+    -------
+    str
+        String with the selected portion replaced.
+
+    Raises
+    ------
+    ValueError
+        If the offset is outside the string boundaries.
+    """
+    if abs(offset) > len(value):
+        message = f"Offset {offset} is out of bounds for string of length {len(value)}."
+        raise ValueError(message)
+    start = len(value) + offset if offset < 0 else offset
+    end = min(start + length, len(value))
+    return value[:start] + replacement + value[end:]

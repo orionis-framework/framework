@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Any
 import msgspec
 from orionis.http.adapters.request.asgi import ASGITransportAdapter
@@ -11,6 +13,7 @@ from orionis.schemas.exceptions.validation import ValidationException
 from orionis.session.flash import ERRORS_KEY, OLD_INPUT_KEY
 from orionis.session.session import Session
 from orionis.test import TestCase
+
 
 class _FakeDefaultResponses:
     """Minimal stand-in for the default response factory."""
@@ -56,6 +59,7 @@ class _FakeDefaultResponses:
         """
         self.expects_json = expects_json
         return JSONResponse(content=content, status_code=status_code, headers=headers)
+
 
 def _make_request(
     body: bytes = b"",
@@ -119,6 +123,7 @@ def _make_request(
         params={},
     )
 
+
 def _make_exception() -> ValidationException:
     """
     Build a validation exception with two offending fields.
@@ -128,17 +133,19 @@ def _make_exception() -> ValidationException:
     ValidationException
         Exception carrying failures for ``email`` and ``password``.
     """
-    return ValidationException([
-        ValidationFailure(field="email", rule="pattern", message="Invalid email."),
-        ValidationFailure(
-            field="password",
-            rule="min_length",
-            message="Password too short.",
-        ),
-    ])
+    return ValidationException(
+        [
+            ValidationFailure(field="email", rule="pattern", message="Invalid email."),
+            ValidationFailure(
+                field="password",
+                rule="min_length",
+                message="Password too short.",
+            ),
+        ],
+    )
+
 
 class TestValidationResponseForJson(TestCase):
-
     async def testJsonClientGets422(self) -> None:
         """Return a 422 response when the client accepts JSON.
 
@@ -154,7 +161,9 @@ class TestValidationResponseForJson(TestCase):
             extra_headers=[(b"accept", b"application/json")],
         )
         response = await validation_response(
-            _make_exception(), request, _FakeDefaultResponses(),
+            _make_exception(),
+            request,
+            _FakeDefaultResponses(),
         )
         self.assertIsInstance(response, JSONResponse)
         self.assertEqual(response.getStatusCode(), 422)
@@ -177,7 +186,9 @@ class TestValidationResponseForJson(TestCase):
             ],
         )
         response = await validation_response(
-            _make_exception(), request, _FakeDefaultResponses(),
+            _make_exception(),
+            request,
+            _FakeDefaultResponses(),
         )
         self.assertIsInstance(response, JSONResponse)
 
@@ -196,18 +207,24 @@ class TestValidationResponseForJson(TestCase):
         responses = _FakeDefaultResponses()
         response = await validation_response(_make_exception(), request, responses)
         self.assertTrue(responses.expects_json)
-        self.assertEqual(msgspec.json.decode(response.getBody()), {
-            "message": "Invalid email. (and 1 more error)",
-            "errors": {
-                "email": [{"rule": "pattern", "message": "Invalid email."}],
-                "password": [{
-                    "rule": "min_length", "message": "Password too short.",
-                }],
+        self.assertEqual(
+            msgspec.json.decode(response.getBody()),
+            {
+                "message": "Invalid email. (and 1 more error)",
+                "errors": {
+                    "email": [{"rule": "pattern", "message": "Invalid email."}],
+                    "password": [
+                        {
+                            "rule": "min_length",
+                            "message": "Password too short.",
+                        },
+                    ],
+                },
             },
-        })
+        )
+
 
 class TestValidationResponseForWeb(TestCase):
-
     async def testBrowserIsRedirectedBack(self) -> None:
         """Redirect the browser back to the submitted form.
 
@@ -226,7 +243,9 @@ class TestValidationResponseForWeb(TestCase):
             ],
         )
         response = await validation_response(
-            _make_exception(), request, _FakeDefaultResponses(),
+            _make_exception(),
+            request,
+            _FakeDefaultResponses(),
         )
         self.assertIsInstance(response, RedirectResponse)
         self.assertEqual(response.getStatusCode(), 302)
@@ -248,7 +267,9 @@ class TestValidationResponseForWeb(TestCase):
         """
         request = _make_request(extra_headers=[(b"accept", b"text/html")])
         response = await validation_response(
-            _make_exception(), request, _FakeDefaultResponses(),
+            _make_exception(),
+            request,
+            _FakeDefaultResponses(),
         )
         flash = response.getFlashData()
         self.assertEqual(
@@ -275,7 +296,9 @@ class TestValidationResponseForWeb(TestCase):
             extra_headers=[(b"accept", b"text/html")],
         )
         response = await validation_response(
-            _make_exception(), request, _FakeDefaultResponses(),
+            _make_exception(),
+            request,
+            _FakeDefaultResponses(),
         )
         old_input = response.getFlashData()[OLD_INPUT_KEY]
         self.assertEqual(old_input, {"email": "user@mail.test"})
@@ -299,13 +322,15 @@ class TestValidationResponseForWeb(TestCase):
             ],
         )
         response = await validation_response(
-            _make_exception(), request, _FakeDefaultResponses(),
+            _make_exception(),
+            request,
+            _FakeDefaultResponses(),
         )
         self.assertIsInstance(response, RedirectResponse)
         self.assertNotIn(OLD_INPUT_KEY, response.getFlashData())
 
-class TestPreviousUrl(TestCase):
 
+class TestPreviousUrl(TestCase):
     def testSessionPreviousUrlWins(self) -> None:
         """Prefer the page recorded by the session middleware.
 
@@ -452,10 +477,15 @@ class TestPreviousUrl(TestCase):
             Assertions verify the behavior described above.
         """
         references = (
-            b"http://[invalid/path", b"http://orionis.test:invalid/path",
-            b"http://orionis.test:99999/path", b"/\\evil.test/path",
-            b"http://orionis.test\\@evil.test/path", b"/\t/evil.test/path",
-            b"/\r\nlocation", b"/path\x00", b"/path\x7f",
+            b"http://[invalid/path",
+            b"http://orionis.test:invalid/path",
+            b"http://orionis.test:99999/path",
+            b"/\\evil.test/path",
+            b"http://orionis.test\\@evil.test/path",
+            b"/\t/evil.test/path",
+            b"/\r\nlocation",
+            b"/path\x00",
+            b"/path\x7f",
         )
         for reference in references:
             with self.subTest(reference=reference):
@@ -473,7 +503,8 @@ class TestPreviousUrl(TestCase):
             Assertions verify the behavior described above.
         """
         for reference in (
-            b"HTTP://ORIONIS.TEST/register", b"http://orionis.test:80/register",
+            b"HTTP://ORIONIS.TEST/register",
+            b"http://orionis.test:80/register",
         ):
             with self.subTest(reference=reference):
                 request = _make_request(extra_headers=[(b"referer", reference)])
@@ -494,9 +525,12 @@ class TestPreviousUrl(TestCase):
             (b"[::1]:8080", b"http://[::1]:8080/register"),
         ):
             with self.subTest(host=host):
-                request = _make_request(extra_headers=[
-                    (b"host", host), (b"referer", reference),
-                ])
+                request = _make_request(
+                    extra_headers=[
+                        (b"host", host),
+                        (b"referer", reference),
+                    ],
+                )
                 self.assertEqual(previous_url(request), reference.decode())
 
     def testNormalizesTheHttpsDefaultPort(self) -> None:
@@ -515,7 +549,8 @@ class TestPreviousUrl(TestCase):
         ):
             with self.subTest(reference=reference):
                 request = _make_request(
-                    extra_headers=[(b"referer", reference)], scheme="https",
+                    extra_headers=[(b"referer", reference)],
+                    scheme="https",
                 )
                 expected = reference.decode() if accepted else request.url
                 self.assertEqual(previous_url(request), expected)

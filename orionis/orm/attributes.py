@@ -1,22 +1,23 @@
+# ruff: noqa: ANN401, TC001, TC003
+# Retain runtime annotations and dynamic attribute values.
 """Attribute handling behavior shared by every model."""
 
 from __future__ import annotations
 import json
 import uuid
 from datetime import UTC, date, datetime
-from typing import TYPE_CHECKING, Any
+from collections.abc import Callable
+from typing import Any
+from orionis.orm import metaclass as metaclass_module
 from orionis.orm.exceptions import MassAssignmentException, OrmException
 from orionis.orm.schema.types import ColumnType
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.orm.metaclass import ModelMetadata
 
 # Strings interpreted as truthy when casting to bool.
 _TRUTHY_STRINGS: frozenset[str] = frozenset({"1", "true", "yes", "on"})
 """Strings interpreted as truthy when casting to bool."""
 
-def _cast_bool(value: Any) -> bool:  # noqa: ANN401
+
+def _cast_bool(value: Any) -> bool:
     """
     Cast a raw value to ``bool`` handling common textual forms.
 
@@ -34,7 +35,8 @@ def _cast_bool(value: Any) -> bool:  # noqa: ANN401
         return value.strip().lower() in _TRUTHY_STRINGS
     return bool(value)
 
-def _cast_datetime(value: Any) -> datetime:  # noqa: ANN401
+
+def _cast_datetime(value: Any) -> datetime:
     """
     Cast a raw value to ``datetime``.
 
@@ -54,7 +56,8 @@ def _cast_datetime(value: Any) -> datetime:  # noqa: ANN401
         return datetime.fromtimestamp(value, tz=UTC)
     return datetime.fromisoformat(str(value))
 
-def _cast_date(value: Any) -> date:  # noqa: ANN401
+
+def _cast_date(value: Any) -> date:
     """
     Cast a raw value to ``date``.
 
@@ -74,7 +77,8 @@ def _cast_date(value: Any) -> date:  # noqa: ANN401
         return value
     return date.fromisoformat(str(value))
 
-def _cast_json(value: Any) -> Any:  # noqa: ANN401
+
+def _cast_json(value: Any) -> Any:
     """
     Cast a raw value to a JSON-decoded Python structure.
 
@@ -92,7 +96,8 @@ def _cast_json(value: Any) -> Any:  # noqa: ANN401
         return json.loads(value)
     return value
 
-def _cast_uuid(value: Any) -> uuid.UUID:  # noqa: ANN401
+
+def _cast_uuid(value: Any) -> uuid.UUID:
     """
     Cast a raw value to ``uuid.UUID``.
 
@@ -110,6 +115,7 @@ def _cast_uuid(value: Any) -> uuid.UUID:  # noqa: ANN401
         return value
     return uuid.UUID(str(value))
 
+
 # Registry of supported cast names.
 _CAST_HANDLERS: dict[str, Callable[[Any], Any]] = {
     "int": int,
@@ -121,6 +127,7 @@ _CAST_HANDLERS: dict[str, Callable[[Any], Any]] = {
     "uuid": _cast_uuid,
 }
 """Registry of supported cast names."""
+
 
 def get_cast_handler(cast: str) -> Callable[[Any], Any]:
     """
@@ -144,14 +151,14 @@ def get_cast_handler(cast: str) -> Callable[[Any], Any]:
     handler = _CAST_HANDLERS.get(str(cast).strip().lower())
     if handler is None:
         supported = ", ".join(sorted(_CAST_HANDLERS))
-        error_msg = (
-            f"Unsupported cast '{cast}'. Supported casts: {supported}."
-        )
+        error_msg = f"Unsupported cast '{cast}'. Supported casts: {supported}."
         raise OrmException(error_msg)
     return handler
 
+
 def serialize_for_storage(
-    meta: ModelMetadata, values: dict[str, Any],
+    meta: metaclass_module.ModelMetadata,
+    values: dict[str, Any],
 ) -> dict[str, Any]:
     """
     Convert attribute values into driver-friendly storage values.
@@ -181,17 +188,20 @@ def serialize_for_storage(
         if isinstance(value, (dict, list)):
             column = columns.get(key)
             if column is not None and column.column_type not in {
-                ColumnType.JSON, ColumnType.PICKLE_TYPE,
+                ColumnType.JSON,
+                ColumnType.PICKLE_TYPE,
             }:
                 serialized[key] = json.dumps(value)
         # UUID objects need their string form outside UUID columns.
         elif isinstance(value, uuid.UUID):
             column = columns.get(key)
             if column is not None and column.column_type not in {
-                ColumnType.UUID, ColumnType.PICKLE_TYPE,
+                ColumnType.UUID,
+                ColumnType.PICKLE_TYPE,
             }:
                 serialized[key] = str(value)
     return serialized
+
 
 class AttributesMixin:
     """
@@ -205,7 +215,7 @@ class AttributesMixin:
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    def fill(self, attributes: dict[str, Any]) -> Any:  # noqa: ANN401
+    def fill(self, attributes: dict[str, Any]) -> Any:
         """
         Mass assign the given attributes honoring the assignment rules.
 
@@ -241,7 +251,7 @@ class AttributesMixin:
             self.setAttribute(key, value)
         return self
 
-    def setAttribute(self, key: str, value: Any) -> None:  # noqa: ANN401
+    def setAttribute(self, key: str, value: Any) -> None:
         """
         Assign a single attribute applying its mutator and cast.
 
@@ -259,7 +269,7 @@ class AttributesMixin:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         meta = self.__meta__
         mutator = meta.mutators.get(key)
@@ -270,7 +280,7 @@ class AttributesMixin:
             value = handler(value)
         self._attributes[key] = value
 
-    def getAttribute(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+    def getAttribute(self, key: str, default: Any = None) -> Any:
         """
         Return a single attribute value through its accessor.
 
@@ -332,9 +342,7 @@ class AttributesMixin:
         if not hidden and not accessors and not meta.appends:
             return self._attributes.copy()
         data = {
-            key: getattr(self, accessors[key])(value)
-            if key in accessors
-            else value
+            key: getattr(self, accessors[key])(value) if key in accessors else value
             for key, value in self._attributes.items()
             if key not in hidden
         }
@@ -354,7 +362,7 @@ class AttributesMixin:
         """
         return self.toDict()
 
-    def toJson(self, **kwargs: Any) -> str:  # noqa: ANN401
+    def toJson(self, **kwargs: Any) -> str:
         """
         Serialize the visible attributes into a JSON string.
 
@@ -385,11 +393,7 @@ class AttributesMixin:
         dict
             Attribute values for the requested keys that exist.
         """
-        return {
-            key: self._attributes[key]
-            for key in keys
-            if key in self._attributes
-        }
+        return {key: self._attributes[key] for key in keys if key in self._attributes}
 
     def exclude(self, *keys: str) -> dict[str, Any]:
         """
@@ -407,7 +411,5 @@ class AttributesMixin:
         """
         excluded = frozenset(keys)
         return {
-            key: value
-            for key, value in self._attributes.items()
-            if key not in excluded
+            key: value for key, value in self._attributes.items() if key not in excluded
         }

@@ -5,9 +5,13 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.database.enums.redshift_mode import RedshiftSSLMode
 from orionis.foundation.config.validation import (
-    normalize_enum, validate_boolean, validate_integer, validate_string,
+    normalize_enum,
+    validate_boolean,
+    validate_integer,
+    validate_string,
 )
 from orionis.support.entities.base import BaseEntity
+
 
 @dataclass(frozen=True, kw_only=True)
 class Redshift(BaseEntity):
@@ -96,7 +100,8 @@ class Redshift(BaseEntity):
 
     sslmode: str | RedshiftSSLMode = field(
         default_factory=lambda: Env.get(
-            "DB_REDSHIFT_SSLMODE", RedshiftSSLMode.VERIFY_FULL,
+            "DB_REDSHIFT_SSLMODE",
+            RedshiftSSLMode.VERIFY_FULL,
         ),
         metadata={
             "description": "Certificate verification policy",
@@ -172,8 +177,14 @@ class Redshift(BaseEntity):
         validate_string(self.database, "database")
         validate_string(self.prefix, "prefix", allow_empty=True)
         for name in (
-            "host", "username", "region", "cluster_identifier", "db_user",
-            "profile", "serverless_work_group", "serverless_acct_id",
+            "host",
+            "username",
+            "region",
+            "cluster_identifier",
+            "db_user",
+            "profile",
+            "serverless_work_group",
+            "serverless_acct_id",
         ):
             value = getattr(self, name)
             if value is not None:
@@ -189,5 +200,7 @@ class Redshift(BaseEntity):
         for name in ("ssl", "iam", "is_serverless"):
             validate_boolean(getattr(self, name), name)
         object.__setattr__(
-            self, "sslmode", normalize_enum(self.sslmode, RedshiftSSLMode, "sslmode"),
+            self,
+            "sslmode",
+            normalize_enum(self.sslmode, RedshiftSSLMode, "sslmode"),
         )

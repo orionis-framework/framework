@@ -1,8 +1,11 @@
+# ruff: noqa: PLC0415
+# Resolve the manager implementation when its service is registered.
 """Service provider for the Orionis hashing system."""
 
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.support.facades.hash import Hash as HashFacade
+
 
 class HashProvider(ServiceProvider):
     """
@@ -15,8 +18,6 @@ class HashProvider(ServiceProvider):
     container overhead, including the members that stay synchronous.
     """
 
-    # ruff: noqa: PLC0415
-
     def register(self) -> None:
         """
         Bind IHashManager to HashManager as a singleton.
@@ -24,9 +25,10 @@ class HashProvider(ServiceProvider):
         Returns
         -------
         None
-            Register the hashing manager binding.
+            No return value.
         """
         from orionis.hashing import HashManager
+
         self.app.singleton(IHashManager, HashManager)
 
     async def boot(self) -> None:

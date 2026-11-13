@@ -1,3 +1,5 @@
+# ruff: noqa: ANN201, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from orionis.mcp.protocol.requests import SubscriptionFilter
 from orionis.mcp.subscriptions.event_bus import InMemoryMcpEventBus
@@ -5,6 +7,7 @@ from orionis.test import TestCase
 
 _TOOLS = "notifications/tools/list_changed"
 _RESOURCE = "notifications/resources/updated"
+
 
 class TestEventBus(TestCase):
     """No listener or producer task survives its request."""

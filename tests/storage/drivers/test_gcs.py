@@ -1,5 +1,9 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
-import importlib.util
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
+from orionis.storage.drivers import functions as driver_functions
 from orionis.foundation.config.filesystems.entitites.gcs import GCS
 from orionis.storage.drivers.gcs import GoogleStorageDriver
 from orionis.storage.exceptions import (
@@ -9,8 +13,8 @@ from orionis.storage.exceptions import (
 )
 from orionis.test import TestCase
 
-class TestGoogleStorageDriver(TestCase):
 
+class TestGoogleStorageDriver(TestCase):
     async def testUrlUsesCanonicalGoogleAddress(self) -> None:
         """Compose the canonical storage.googleapis.com URL.
 
@@ -19,7 +23,7 @@ class TestGoogleStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = GoogleStorageDriver(GCS(bucket="media"))
         self.assertEqual(
@@ -35,7 +39,7 @@ class TestGoogleStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = GoogleStorageDriver(
             GCS(bucket="media", url="https://cdn.example.com"),
@@ -53,7 +57,7 @@ class TestGoogleStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = GoogleStorageDriver(GCS(bucket="media"))
         with self.assertRaises(StoragePathException):
@@ -67,25 +71,26 @@ class TestGoogleStorageDriver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         driver = GoogleStorageDriver(GCS(bucket="media"))
         with self.assertRaises(UnsupportedStorageOperationException):
             await driver.setVisibility("f.txt", "secret")
 
     async def testOperationsRequireOptionalDependency(self) -> None:
-        """Surface the missing Google SDK with install instructions.
-
-        Only asserted when google-cloud-storage is absent from the
-        environment, so the test remains valid anywhere.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        if importlib.util.find_spec("google") is not None:
-            return
+        """Report controlled SDK absence even when the optional SDK is installed."""
+        missing = ModuleNotFoundError("Controlled optional SDK absence.")
+        importer = Mock(side_effect=missing)
         driver = GoogleStorageDriver(GCS(bucket="media"))
-        with self.assertRaises(MissingStorageDependencyException):
+        with (
+            patch.object(
+                driver_functions,
+                "importlib",
+                SimpleNamespace(import_module=importer),
+            ),
+            self.assertRaises(MissingStorageDependencyException) as caught,
+        ):
             await driver.exists("f.txt")
+        importer.assert_called_once_with("google.cloud.storage")
+        self.assertIs(caught.exception.__cause__, missing)
+        self.assertIn("orionis[gcs]", str(caught.exception))

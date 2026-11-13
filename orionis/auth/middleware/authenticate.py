@@ -1,10 +1,12 @@
+# ruff: noqa: TC001
+# Resolve public middleware and injection annotations at runtime.
 """Provide auth middleware operations.
 
 Includes ``AuthenticateMiddleware``, ``AuthenticateSessionMiddleware``,
 ``AuthenticateTokenMiddleware``.
 """
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.auth.contracts.permission_repository import IPermissionRepository
@@ -14,10 +16,9 @@ from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.responses import RedirectResponse
 
-if TYPE_CHECKING:
-    from orionis.http.layer.contracts.middleware import NextCallable
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
+from orionis.http.layer.contracts.middleware import NextCallable
+from orionis.http.request import Request
+from orionis.http.responses import Response
 
 # Status used when a browser is sent to the login page instead of
 # receiving the plain 401 error document.
@@ -26,6 +27,7 @@ _REDIRECT_STATUS: int = 302
 Status used when a browser is sent to the login page instead of receiving the plain
 401 error document.
 """
+
 
 class AuthenticateMiddleware(ResolveIdentityMiddleware):
     """
@@ -42,8 +44,6 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
     Responses of protected routes are marked as non-cacheable. Subclasses
     opt out by setting ``cache_control`` to ``None``.
     """
-
-    # ruff: noqa: TC001 (Dependency Injection)
 
     __slots__ = ("_redirect_to",)
     """Declare the instance attribute slots reserved by this class."""
@@ -73,7 +73,7 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
         Returns
         -------
         None
-            The redirect target is resolved once, at boot time.
+            No return value.
         """
         super().__init__(manager, permissions)
         self._redirect_to: str | None = app.config("auth.session.redirect_to")
@@ -152,6 +152,7 @@ class AuthenticateMiddleware(ResolveIdentityMiddleware):
         error_msg = "Unauthenticated."
         raise AuthenticationException(error_msg)
 
+
 class AuthenticateSessionMiddleware(AuthenticateMiddleware):
     """Require an identity authenticated through the HTTP session."""
 
@@ -159,6 +160,7 @@ class AuthenticateSessionMiddleware(AuthenticateMiddleware):
     """Declare that this class introduces no additional instance slots."""
 
     guard: ClassVar[str | None] = Guards.SESSION.value
+
 
 class AuthenticateTokenMiddleware(AuthenticateMiddleware):
     """Require an identity authenticated through a personal access token."""

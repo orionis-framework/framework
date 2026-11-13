@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import tests.orm.relations.test_mixin as relation_fixtures
+
 
 class TestHasOneRelation(relation_fixtures._RelationsTestCase):
     async def testAwaitShortcutReturnsModelOrNone(self) -> None:
@@ -10,7 +13,7 @@ class TestHasOneRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.AuthorProfile.create(
@@ -29,7 +32,7 @@ class TestHasOneRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.AuthorProfile.create(
@@ -48,7 +51,7 @@ class TestHasOneRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         profile = await author.profile()
@@ -62,7 +65,7 @@ class TestHasOneRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         relation = author.profile()
@@ -77,7 +80,7 @@ class TestHasOneRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.AuthorProfile.create(

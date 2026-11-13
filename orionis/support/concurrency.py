@@ -1,7 +1,10 @@
+# ruff: noqa: BLE001, PLC0415, TC003
+# Preserve cancellation while observing cleanup errors; defer failure runtime imports.
+# Keep callable annotations available to dependency reflection at runtime.
 """Provide support operations.
 
 Includes ``WorkQueueFullError``, ``wait_for_completion``, ``complete_on_cancel``,
-``BoundedExecutor``, ``threaded``.
+``close_abandoned_awaitable``, ``BoundedExecutor``, ``threaded``.
 """
 
 from __future__ import annotations
@@ -9,16 +12,103 @@ import asyncio
 import contextvars
 import inspect
 from concurrent.futures import ThreadPoolExecutor
+from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from functools import partial, wraps
 from threading import BoundedSemaphore, Lock
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
-if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable
 
 class WorkQueueFullError(RuntimeError):
     """Signal that a bounded worker pool cannot admit another operation."""
+
+
+def _cancel_abandoned_future(future: asyncio.Future[object]) -> None:
+    """Cancel an abandoned future or raise its already completed failure.
+
+    Parameters
+    ----------
+    future : asyncio.Future[object]
+        Abandoned future accessed on its owning loop.
+
+    Returns
+    -------
+    None
+        No return value.
+
+    Raises
+    ------
+    BaseException
+        Original failure if completion occurred before cancellation.
+    """
+    if future.cancelled() or future.cancel():
+        return
+    error = future.exception()
+    if error is not None:
+        raise error
+
+
+def close_abandoned_awaitable(
+    result: object,
+    *,
+    on_error: Callable[[Exception], object],
+) -> None:
+    """Release an awaitable that its cancelled owner cannot consume.
+
+    Request cancellation of futures on their owning open loops. Close other
+    awaitables only when they expose a synchronous ``close`` operation.
+
+    Parameters
+    ----------
+    result : object
+        Result produced after its owner has stopped awaiting it.
+    on_error : collections.abc.Callable[[Exception], object]
+        Observer for failures deferred to another future's owning loop.
+
+    Returns
+    -------
+    None
+        No return value.
+
+    Raises
+    ------
+    Exception
+        If closing the awaitable or scheduling cancellation fails for a reason
+        other than the owning loop already being closed.
+    """
+    if not asyncio.isfuture(result):
+        if inspect.isawaitable(result):
+            close = getattr(result, "close", None)
+            if callable(close) and not inspect.iscoroutinefunction(close):
+                close()
+        return
+
+    owner = result.get_loop()
+    if owner is asyncio.get_running_loop():
+        _cancel_abandoned_future(result)
+        return
+
+    def cancel_future() -> None:
+        """Cancel on the owner and retain failures from a completion race.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        try:
+            _cancel_abandoned_future(result)
+        except Exception as error:
+            on_error(error)
+
+    try:
+        owner.call_soon_threadsafe(cancel_future)
+    except RuntimeError:
+        if not owner.is_closed():
+            raise
+        if result.done():
+            _cancel_abandoned_future(result)
+
 
 async def wait_for_completion[T](pending: asyncio.Future[T]) -> T:
     """
@@ -44,7 +134,18 @@ async def wait_for_completion[T](pending: asyncio.Future[T]) -> T:
     notification = pending.get_loop().create_future()
 
     def completed(_pending: asyncio.Future[T]) -> None:
-        """Wake the owner without copying an exception into another future."""
+        """Wake the owner without copying an exception into another future.
+
+        Parameters
+        ----------
+        _pending : asyncio.Future[T]
+            Completed operation that triggers the notification.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
         if not notification.done():
             notification.set_result(None)
 
@@ -55,6 +156,7 @@ async def wait_for_completion[T](pending: asyncio.Future[T]) -> T:
         pending.remove_done_callback(completed)
         raise
     return pending.result()
+
 
 async def complete_on_cancel[T](
     awaitable: Awaitable[T],
@@ -82,12 +184,12 @@ async def complete_on_cancel[T](
     try:
         return await wait_for_completion(task)
     except asyncio.CancelledError:
-        from orionis.failure.runtime import capture  # noqa: PLC0415
+        from orionis.failure.runtime import capture
 
         if on_cancel is not None:
             try:
                 on_cancel()
-            except Exception as error:  # noqa: BLE001
+            except Exception as error:
                 # Repeated cancellation cannot abandon the owned operation.
                 with suppress(asyncio.CancelledError):
                     await capture(error, flow="background", phase="cancel")
@@ -99,6 +201,7 @@ async def complete_on_cancel[T](
             if error is not None:
                 await capture(error, flow="background", phase="cancelled_work")
         raise
+
 
 class BoundedExecutor:
     """Own a lazy thread pool with bounded running and queued work.
@@ -210,10 +313,12 @@ class BoundedExecutor:
     def close(self: Self) -> None:
         """Drain accepted work and release the pool's threads.
 
+        Reject further submissions once closing starts.
+
         Returns
         -------
         None
-            Further submissions fail after close starts.
+            No return value.
         """
         with self._lock:
             self._closed = True
@@ -224,15 +329,19 @@ class BoundedExecutor:
     async def aclose(self: Self) -> None:
         """Close without blocking the event loop.
 
+        Wait for accepted work to finish and join the pool's threads.
+
         Returns
         -------
         None
-            Accepted running work is finished and threads are joined.
+            No return value.
         """
         await complete_on_cancel(asyncio.to_thread(self.close))
 
+
 _CALLBACK_WORKERS = BoundedExecutor(name="orionis-callback")
 """Callback workers used by ``concurrency``."""
+
 
 def threaded[**P, T](callback: Callable[P, T]) -> Callable[P, Awaitable[T]]:
     """

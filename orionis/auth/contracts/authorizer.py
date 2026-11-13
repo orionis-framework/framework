@@ -1,12 +1,13 @@
+# ruff: noqa: TC001, TC003
+# Keep public contract annotations available to runtime introspection.
+
 """Define the component answering authorization questions."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import Iterable
+from orionis.auth.contracts.context import IAuthenticationContext
+from orionis.auth.contracts.policy import IPolicy
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-    from orionis.auth.contracts.context import IAuthenticationContext
-    from orionis.auth.contracts.policy import IPolicy
 
 class IAuthorizer(ABC):
     """
@@ -154,5 +155,5 @@ class IAuthorizer(ABC):
         Returns
         -------
         None
-            The registry is updated as a side effect.
+            No return value.
         """

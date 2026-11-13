@@ -3,6 +3,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
+
 class IDeferrableProvider(ABC):
     """Define the contract for deferrable provider implementations."""
 

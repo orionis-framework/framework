@@ -6,6 +6,7 @@ from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types._constants import DEFAULT_STRING_LENGTH
 from orionis.orm.schema.types.column_type import ColumnType
 
+
 class StrictVarChar(ColumnDefinition):
     """The SQL ``VARCHAR`` type."""
 

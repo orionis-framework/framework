@@ -1,11 +1,11 @@
+# ruff: noqa: TC003
+# Preserve the traceback type for runtime entity and constructor inspection.
 """Represent a throwable entity within the framework."""
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from types import TracebackType
 
-if TYPE_CHECKING:
-    from types import TracebackType
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Throwable:

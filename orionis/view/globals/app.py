@@ -1,14 +1,15 @@
+# ruff: noqa: TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
 """Provide view globals operations through ``_global_app``."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
+from collections.abc import Callable
 
-# ruff: noqa: ANN401
+from orionis.foundation.contracts.application import IApplication
 
-def _global_app(app: IApplication) -> Any:
+
+def _global_app(app: IApplication) -> Callable[[], IApplication]:
     """
     Build the ``app`` template global.
 
@@ -19,9 +20,10 @@ def _global_app(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable returning the application instance.
     """
+
     def application() -> IApplication:
         """
         Return the application instance.

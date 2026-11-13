@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeConsoleListener(MakeStubCommand):
     """Generate a console task listener class."""
 
@@ -19,4 +20,3 @@ class MakeConsoleListener(MakeStubCommand):
     """Success label identifier: ``Console task listener``."""
     postfix: str | None = "Listener"
     """Postfix identifier: ``Listener``."""
-

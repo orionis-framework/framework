@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import dataclasses
 from orionis.support.entities.base import BaseEntity
 from orionis.test import TestCase
@@ -23,12 +25,15 @@ _EXPECTED_FIELDS: tuple[str, ...] = (
 )
 
 # Fields that must be supplied explicitly at construction time.
-_REQUIRED_FIELDS: frozenset[str] = frozenset({
-    "id",
-    "name",
-    "status",
-    "execution_time",
-})
+_REQUIRED_FIELDS: frozenset[str] = frozenset(
+    {
+        "id",
+        "name",
+        "status",
+        "execution_time",
+    },
+)
+
 
 def _make_result(**overrides: object) -> TestResult:
     """
@@ -53,8 +58,8 @@ def _make_result(**overrides: object) -> TestResult:
     values.update(overrides)
     return TestResult(**values)  # type: ignore[arg-type]
 
-class TestTestResultDefinition(TestCase):
 
+class TestTestResultDefinition(TestCase):
     def testExtendsBaseEntity(self) -> None:
         """
         Confirm the entity inherits the shared serialisation mixin.
@@ -104,8 +109,8 @@ class TestTestResultDefinition(TestCase):
             if field.name not in _REQUIRED_FIELDS:
                 self.assertIsNone(field.default)
 
-class TestTestResultConstruction(TestCase):
 
+class TestTestResultConstruction(TestCase):
     def testRequiredFieldsAreSufficient(self) -> None:
         """
         Build an instance from the required fields alone.
@@ -151,15 +156,6 @@ class TestTestResultConstruction(TestCase):
             (42, "alpha", 1.25),
         )
 
-    def testStatusIsStored(self) -> None:
-        """
-        Store the status member supplied at construction time.
-
-        Validates that the reported outcome is preserved verbatim.
-        """
-        result = _make_result(status=TestStatus.FAILED)
-        self.assertEqual(result.status, TestStatus.FAILED)
-
     def testEveryStatusIsAccepted(self) -> None:
         """
         Accept each member of the status enumeration.
@@ -168,7 +164,8 @@ class TestTestResultConstruction(TestCase):
         outcomes.
         """
         for status in TestStatus:
-            self.assertEqual(_make_result(status=status).status, status)
+            with self.subTest(status=status):
+                self.assertIs(_make_result(status=status).status, status)
 
     def testIdentifierAcceptsArbitraryTypes(self) -> None:
         """
@@ -178,7 +175,8 @@ class TestTestResultConstruction(TestCase):
         address of the originating test instance.
         """
         for identifier in ("uuid-abc", 99, object()):
-            self.assertIs(_make_result(id=identifier).id, identifier)
+            with self.subTest(identifier=identifier):
+                self.assertIs(_make_result(id=identifier).id, identifier)
 
     def testOptionalFieldsDefaultToNone(self) -> None:
         """
@@ -256,8 +254,7 @@ class TestTestResultConstruction(TestCase):
         exception holds the raised class name.
         """
         declared = {
-            field.name: str(field.type)
-            for field in dataclasses.fields(TestResult)
+            field.name: str(field.type) for field in dataclasses.fields(TestResult)
         }
         self.assertEqual(declared["traceback"], "list[str] | None")
         self.assertEqual(declared["exception"], "str | None")
@@ -272,8 +269,8 @@ class TestTestResultConstruction(TestCase):
         lines = ["Traceback (most recent call last)\n", "AssertionError\n"]
         self.assertEqual(_make_result(traceback=lines).traceback, lines)
 
-class TestTestResultImmutability(TestCase):
 
+class TestTestResultImmutability(TestCase):
     def testAttributeAssignmentIsRejected(self) -> None:
         """
         Raise FrozenInstanceError when an attribute is reassigned.
@@ -325,8 +322,8 @@ class TestTestResultImmutability(TestCase):
         """
         self.assertIsInstance(hash(_make_result()), int)
 
-class TestTestResultSerialisation(TestCase):
 
+class TestTestResultSerialisation(TestCase):
     def testToDictExposesEveryField(self) -> None:
         """
         Export every declared field through toDict.

@@ -13,6 +13,7 @@ from orionis.http.payload.uploaded_file import UploadedFile
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+
 class MultipartPart(IMultipartPart):
     """Represent a single part within a multipart HTTP request body."""
 
@@ -78,7 +79,9 @@ class MultipartPart(IMultipartPart):
         if self.is_file:
             # File parts accumulate bytes via a spill-aware UploadedFile
             self.data = UploadedFile(
-                self.filename, self.content_type, memory_threshold,
+                self.filename,
+                self.content_type,
+                memory_threshold,
             )
             self._write = self.data.write
         else:
@@ -135,9 +138,8 @@ class MultipartPart(IMultipartPart):
                 continue
 
             # Strip surrounding single or double quotes from the value
-            if (
-                (value.startswith('"') and value.endswith('"'))
-                or (value.startswith("'") and value.endswith("'"))
+            if (value.startswith('"') and value.endswith('"')) or (
+                value.startswith("'") and value.endswith("'")
             ):
                 value = value[1:-1]
             # Unescape embedded escaped-quote sequences
@@ -181,11 +183,7 @@ class MultipartPart(IMultipartPart):
             string for field parts.
         """
         # Read the declared transfer encoding once for both code branches
-        cte = (
-            self.headers.get("content-transfer-encoding", "")
-            .strip()
-            .lower()
-        )
+        cte = self.headers.get("content-transfer-encoding", "").strip().lower()
 
         if not self.is_file:
             # Decode the field buffer using its declared transfer encoding.
@@ -202,7 +200,7 @@ class MultipartPart(IMultipartPart):
                 # Extract the charset parameter from the Content-Type header.
                 cs_idx = content_type_hdr.lower().find("charset=")
                 if cs_idx != -1:
-                    tail = content_type_hdr[cs_idx + 8:]
+                    tail = content_type_hdr[cs_idx + 8 :]
                     end = tail.find(";")
                     raw_val = tail[:end] if end != -1 else tail
                     val = raw_val.strip().strip('"').strip("'")

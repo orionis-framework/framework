@@ -1,7 +1,10 @@
+# ruff: noqa: ANN201, ANN202, PT009, TC001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Native handler injection and schema compilation evaluate these annotations.
 import asyncio
 from orionis.container.container import Container
 from orionis.mcp.config import McpConfig
-from orionis.mcp.context import McpRequest  # noqa: TC001 - Native DI resolves this type.
+from orionis.mcp.context import McpRequest
 from orionis.mcp.protocol.constants import (
     CLIENT_CAPABILITIES,
     SERVER_INFO,
@@ -13,9 +16,10 @@ from orionis.mcp.responses import McpResponse
 from orionis.mcp.server.catalog import ToolCatalog
 from orionis.mcp.server.primitives import Prompt, Resource, Server, Tool
 from orionis.schemas import Schema
-from orionis.schemas.fields import Field  # noqa: TC001
+from orionis.schemas.fields import Field
 from orionis.schemas.rule import Rule
 from orionis.test import TestCase
+
 
 class _NonNegativeAsync(Rule):
     """Reject invalid values only through native asynchronous enforcement."""
@@ -46,11 +50,14 @@ class _NonNegativeAsync(Rule):
         await asyncio.sleep(0)
         return isinstance(value, int) and value >= 0
 
+
 class _ValidatedValue(Schema):
     value: Field[int, _NonNegativeAsync()]
 
+
 class _ValidatedInput(_ValidatedValue):
     invalid_output: bool = False
+
 
 class _AsyncOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
     name = "async-output"
@@ -69,9 +76,12 @@ class _AsyncOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
         McpResponse
             Structured response subject to asynchronous schema validation.
         """
-        return McpResponse.structured({
-            "value": -1 if payload.invalid_output else payload.value,
-        })
+        return McpResponse.structured(
+            {
+                "value": -1 if payload.invalid_output else payload.value,
+            },
+        )
+
 
 class _AsyncProtocolOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
     name = "async-protocol-output"
@@ -90,9 +100,13 @@ class _AsyncProtocolOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
         CallToolResult
             Protocol result subject to asynchronous schema validation.
         """
-        return CallToolResult(content=(), structuredContent={
-            "value": -1 if payload.invalid_output else payload.value,
-        })
+        return CallToolResult(
+            content=(),
+            structuredContent={
+                "value": -1 if payload.invalid_output else payload.value,
+            },
+        )
+
 
 class _AsyncStreamingOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
     name = "async-streaming-output"
@@ -111,13 +125,17 @@ class _AsyncStreamingOutputTool(Tool[_ValidatedInput, _ValidatedValue]):
         McpResponse
             Structured response validated before the stream completes.
         """
-        yield McpResponse.structured({
-            "value": -1 if payload.invalid_output else payload.value,
-        })
+        yield McpResponse.structured(
+            {
+                "value": -1 if payload.invalid_output else payload.value,
+            },
+        )
+
 
 class _AsyncValidationServer(Server):
     name = "Async Validation"
     tools = (_AsyncOutputTool, _AsyncProtocolOutputTool, _AsyncStreamingOutputTool)
+
 
 class _Repository:
     """A trusted injectable dependency."""
@@ -134,8 +152,10 @@ class _Repository:
         """
         return "trusted"
 
+
 class _Input(Schema):
     location: str
+
 
 class _Weather(Tool[_Input]):
     name = "weather"
@@ -157,6 +177,7 @@ class _Weather(Tool[_Input]):
         """
         return McpResponse.text(f"{payload.location}:{repository.location()}")
 
+
 class _Hidden(_Weather):
     name = "hidden"
 
@@ -175,6 +196,7 @@ class _Hidden(_Weather):
         """
         return request.meta.get("visible") is True
 
+
 class _Denied(_Weather):
     name = "denied"
 
@@ -187,6 +209,7 @@ class _Denied(_Weather):
             Return the result produced by ``authorize``.
         """
         return False
+
 
 class _Structured(Tool[_Input, list[int]]):
     name = "structured"
@@ -206,6 +229,7 @@ class _Structured(Tool[_Input, list[int]]):
         """
         return McpResponse.structured([len(payload.location)])
 
+
 class _Stream(Tool):
     name = "stream"
 
@@ -221,6 +245,7 @@ class _Stream(Tool):
         yield McpResponse.progress(2, 2)
         yield McpResponse.text("finished")
 
+
 class _Broken(Tool):
     name = "broken"
 
@@ -235,6 +260,7 @@ class _Broken(Tool):
         message = "postgresql://secret-db/private/path.py"
         raise RuntimeError(message)
 
+
 class _Document(Resource):
     name = "document"
     uri = "docs://guide"
@@ -248,6 +274,7 @@ class _Document(Resource):
             Return the result produced by ``handle``.
         """
         return McpResponse.text("guide")
+
 
 class _Profile(Resource):
     name = "profile"
@@ -267,6 +294,7 @@ class _Profile(Resource):
             Return the result produced by ``handle``.
         """
         return McpResponse.text(request.params["user_id"])
+
 
 class _Prompt(Prompt):
     name = "describe"
@@ -301,6 +329,7 @@ class _Prompt(Prompt):
         """
         return Completion(values=("formal", "friendly"))
 
+
 class _Elicit(Tool):
     name = "elicit"
 
@@ -334,6 +363,7 @@ class _Elicit(Tool):
             },
         )
 
+
 class _Server(Server):
     name = "Test Server"
     tools = (_Weather, _Hidden, _Denied, _Structured, _Stream, _Broken, _Elicit)
@@ -342,9 +372,11 @@ class _Server(Server):
     list_changed = True
     resource_subscriptions = True
 
+
 class _CatalogServer(Server):
     name = "Catalog"
     tools = (ToolCatalog(_Weather, _Hidden, _Denied),)
+
 
 class TestDispatcher(TestCase):
     """Run production protocol dispatch with actual native DI and scopes."""
@@ -379,7 +411,8 @@ class TestDispatcher(TestCase):
                 valid = await client.tool(tool.name, {"value": 2})
                 valid.assertOk()
                 self.assertEqual(
-                    valid.message["result"]["structuredContent"], {"value": 2},
+                    valid.message["result"]["structuredContent"],
+                    {"value": 2},
                 )
 
                 invalid_input = await client.tool(tool.name, {"value": -1})
@@ -390,7 +423,8 @@ class TestDispatcher(TestCase):
                 )
 
                 invalid_output = await client.tool(
-                    tool.name, {"value": 2, "invalid_output": True},
+                    tool.name,
+                    {"value": 2, "invalid_output": True},
                 )
                 self.assertTrue(invalid_output.message["result"]["isError"])
                 self.assertEqual(

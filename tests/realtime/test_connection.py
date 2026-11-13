@@ -1,7 +1,11 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import gc
 import weakref
-from typing import TYPE_CHECKING
+from inspect import CORO_CLOSED, getcoroutinestate
+from typing import TYPE_CHECKING, NoReturn
+from unittest.mock import patch
 import msgspec
 from orionis.realtime.config import RealtimeConfig
 from orionis.realtime.connection import RealtimeConnection
@@ -13,6 +17,8 @@ from tests.http.test_websocket import _ASGIPeer
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    from types import CoroutineType
+
 
 class _RealtimePeer(_ASGIPeer):
     """Capture complete envelopes and expose a controlled delivery barrier."""
@@ -52,7 +58,8 @@ class _RealtimePeer(_ASGIPeer):
         envelope = None
         if event["type"] == "websocket.send":
             envelope = (
-                msgspec.json.decode(event["text"]) if "text" in event
+                msgspec.json.decode(event["text"])
+                if "text" in event
                 else msgspec.msgpack.decode(event["bytes"])
             )
             if envelope["type"] == self.pause_type:
@@ -95,7 +102,8 @@ class _RealtimePeer(_ASGIPeer):
             Add an ASGI receive event.
         """
         payload = (
-            {"bytes": msgspec.msgpack.encode(envelope)} if binary
+            {"bytes": msgspec.msgpack.encode(envelope)}
+            if binary
             else {"text": msgspec.json.encode(envelope).decode()}
         )
         self.events.put_nowait({"type": "websocket.receive", **payload})
@@ -116,9 +124,14 @@ class _RealtimePeer(_ASGIPeer):
         None
             Schedule normal reader termination.
         """
-        self.events.put_nowait({
-            "type": "websocket.disconnect", "code": code, "reason": reason,
-        })
+        self.events.put_nowait(
+            {
+                "type": "websocket.disconnect",
+                "code": code,
+                "reason": reason,
+            },
+        )
+
 
 class TestRealtimeConnection(TestCase):
     """Check per-connection result ownership and all cleanup exit paths."""
@@ -148,7 +161,8 @@ class TestRealtimeConnection(TestCase):
             await connection.socket.close()
 
     async def makeConnection(
-        self, config: RealtimeConfig | None = None,
+        self,
+        config: RealtimeConfig | None = None,
     ) -> tuple[_RealtimePeer, RealtimeConnection]:
         """
         Create an accepted connection using the actual raw API.
@@ -168,7 +182,9 @@ class TestRealtimeConnection(TestCase):
         await socket.accept()
         connection = RealtimeConnection(
             HubContext(connection_id="test-connection", socket=socket),
-            Hub, HubProtocol(), config or RealtimeConfig(),
+            Hub,
+            HubProtocol(),
+            config or RealtimeConfig(),
         )
         connection.owner = None
         connection.ready = True
@@ -196,6 +212,50 @@ class TestRealtimeConnection(TestCase):
         connection.complete(Completion(id=requests[0]["id"], result={"ok": True}))
         self.assertEqual(await first, {"ok": True})
         self.assertEqual(connection.pending, {})
+
+    async def testRejectedWriteTaskReleasesLockAndClosesItsCoroutine(self) -> None:
+        """Recover write admission when the event loop rejects task creation.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        peer, connection = await self.makeConnection()
+        failure = RuntimeError("write scheduling rejected")
+        created = []
+
+        def reject(coroutine: CoroutineType) -> NoReturn:
+            """Retain the rejected coroutine so its ownership can be checked.
+
+            Parameters
+            ----------
+            coroutine : CoroutineType
+                Unscheduled transport coroutine.
+
+            Raises
+            ------
+            RuntimeError
+                Always raise the controlled scheduling failure.
+            """
+            created.append(coroutine)
+            self.addCleanup(coroutine.close)
+            raise failure
+
+        with (
+            patch(
+                "orionis.realtime.connection.asyncio.create_task",
+                side_effect=reject,
+            ),
+            self.assertRaises(RuntimeError) as caught,
+        ):
+            await connection.send({"type": "send", "target": "rejected"})
+        self.assertIs(caught.exception, failure)
+        self.assertFalse(connection._write_lock.locked())
+        self.assertIsNone(connection._write_task)
+        self.assertEqual(getcoroutinestate(created[0]), CORO_CLOSED)
+        await connection.send({"type": "send", "target": "recovered"})
+        self.assertEqual((await peer.nextEnvelope())["target"], "recovered")
 
     async def testDuplicateLateAndForeignCompletionsRetainNothing(self) -> None:
         """
@@ -229,11 +289,15 @@ class TestRealtimeConnection(TestCase):
         peer, connection = await self.makeConnection()
         task = asyncio.create_task(connection.invoke("refresh"))
         request = await peer.nextEnvelope()
-        connection.complete(Completion(
-            id=request["id"], error=RPCErrorPayload(
-                code="client_detail", message="untrusted-private-client-data",
+        connection.complete(
+            Completion(
+                id=request["id"],
+                error=RPCErrorPayload(
+                    code="client_detail",
+                    message="untrusted-private-client-data",
+                ),
             ),
-        ))
+        )
         with self.assertRaises(ClientInvocationError) as caught:
             await task
         self.assertEqual(caught.exception.code, "client_error")
@@ -275,9 +339,11 @@ class TestRealtimeConnection(TestCase):
         None
             Verify excess invocations do not allocate or send another request.
         """
-        peer, connection = await self.makeConnection(RealtimeConfig(
-            max_pending_client_invocations=1,
-        ))
+        peer, connection = await self.makeConnection(
+            RealtimeConfig(
+                max_pending_client_invocations=1,
+            ),
+        )
         first = asyncio.create_task(connection.invoke("waiting"))
         request = await peer.nextEnvelope()
         with self.assertRaises(RuntimeError):

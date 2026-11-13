@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN202, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from abc import ABC
@@ -5,8 +7,8 @@ from unittest.mock import Mock
 from orionis.console.core.contracts.loader import ILoader
 from orionis.test import TestCase
 
-class TestILoader(TestCase):
 
+class TestILoader(TestCase):
     def testIsAbstractClass(self) -> None:
         """Verify that ILoader is an abstract class.
 
@@ -135,7 +137,9 @@ class TestILoader(TestCase):
         get_annotations = getattr(ILoader.get, "__annotations__", {})
         all_annotations = getattr(ILoader.all, "__annotations__", {})
         addfluentcommand_annotations = getattr(
-            ILoader.addFluentCommand, "__annotations__", {},
+            ILoader.addFluentCommand,
+            "__annotations__",
+            {},
         )
 
         # Verify annotations exist (even if empty dicts)
@@ -156,6 +160,7 @@ class TestILoader(TestCase):
         """
         # Test that partial implementation fails
         with self.assertRaises(TypeError):
+
             class PartialLoader(ILoader):
                 async def get(self, signature):
                     """Return the loader result required by the test double.
@@ -170,7 +175,9 @@ class TestILoader(TestCase):
                     None
                         Completes the operation described above.
                     """
+
                 # Missing other abstract methods
+
             PartialLoader()
 
     def testMethodDocstrings(self) -> None:

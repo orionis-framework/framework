@@ -1,12 +1,13 @@
+# ruff: noqa: PLR0913
+# Keep established public and external protocol names and signatures.
 """Define the contract for dumper implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-class IDumper(ABC):
 
-    # ruff: noqa: PLR0913
+class IDumper(ABC):
     """Define the contract for dumper implementations."""
 
     @staticmethod

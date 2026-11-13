@@ -16,7 +16,7 @@ The manager accepts built-in names `memory`, `file`, `redis`, `memcached`, and `
 
 Stores serialize through msgspec JSON: keep value contracts JSON-compatible and test round trips when using dates, tuples, or custom types. The rich `Serializer` described under [artifacts](source-artifacts.md) is not used by these stores. Dates may return as strings and tuples as lists; do not assume type identity.
 
-The database store creates entry and lock tables lazily; its connection needs table-creation permissions. It rejects connections lacking enforced unique constraints, such as Redshift. It does not require a dedicated cache migration. Keep table names exclusive to your application. The file store uses monotonic-clock expirations; do not treat it as durable persistence or share its files across machines with different monotonic clocks.
+The database store creates entry and lock tables lazily; its connection needs table-creation permissions. It rejects connections lacking enforced unique constraints, such as Redshift. It does not require a dedicated cache migration. Keep table names exclusive to your application. The file store persists expiration deadlines as Unix timestamps, so restarting the machine does not restart a TTL. These deadlines depend on the wall clock. The former monotonic-clock deadlines are not migrated; old expired entries are regenerated on a miss.
 
 ### Avoid simultaneous regeneration
 
@@ -45,7 +45,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-For the memory backend this uses aiocache's lease-based `RedLock`; it coordinates users of the same backend instance.
+For the memory backend this uses aiocache's lease-based `RedLock`; it coordinates users of the same backend instance. Independent memory instances do not share lock notification events; lease expiry can still admit more than one caller.
 
 ## Configuration
 
@@ -76,7 +76,7 @@ The cache package is also used by framework compilation and other modules that n
 
 ## Errors and edge cases
 
-- Missing and stored `None` are indistinguishable through `get`, but `remember` distinguishes them internally.
+- Missing and stored `None` are indistinguishable through `get`; `remember` and `rememberOnce` distinguish them with Orionis JSON stores. Custom backends must preserve absence separately to offer the same guarantee.
 - `clear()` flushes the backend namespace and does not filter by repository prefix.
 - `pull` is a read followed by delete, not one backend atomic primitive.
 - Concurrent `remember` misses can run the resolver more than once.
@@ -89,9 +89,9 @@ The cache package is also used by framework compilation and other modules that n
 
 ## Performance and concurrency
 
-Repository creation is lazy and cached per manager. Memory is process-local; file storage offloads blocking file operations and uses file locks/atomic replacement; Redis and Memcached delegate network behavior to aiocache; database storage ensures its schema lazily and uses database operations for shared coordination.
+Repository creation is lazy and cached per manager; concurrent callers publish one repository for each store. Memory is process-local; file storage offloads blocking file operations and uses file locks/atomic replacement; Redis and Memcached delegate network behavior to aiocache; database storage ensures its schema lazily and uses database operations for shared coordination.
 
-File-cache async locks are shared only within the same event loop and cache directory. Database locks poll every 0.05 seconds and use a default 10-second lease when no timeout is supplied. Other backends use a 10-second default RedLock lease. Batch methods delegate to backend multi-operations rather than looping in the repository.
+File-cache async locks are shared only within the same event loop and cache directory. Database locks poll every 0.05 seconds and use a default 10-second lease when no timeout is supplied. Other backends use a 10-second default RedLock lease. Batch methods delegate to backend multi-operations rather than looping in the repository. Cancellation of individual file operations waits for the active worker to finish. Batches finish the current operation and stop before starting another entry. Clearing a memory store also cancels its old expiry timers.
 
 
 
@@ -104,10 +104,13 @@ from orionis.support.facades import Cache
 
 
 async def cache_example() -> None:
+    await Cache.pin()
     repo = Cache.store("redis")
     value = await repo.get("key")
     await repo.set("key", value, ttl=60)
 ```
+
+The cache provider is deferred, so application boot alone need not resolve it. Await `Cache.pin()` before synchronous facade calls such as `store()`; once pinned, those calls return their values directly. Ordinary asynchronous facade calls already await service resolution.
 
 Supported configured names are `file`, `memory`, `redis`, `memcached`, and `database`. An unknown or absent store raises `CacheStoreException`.
 

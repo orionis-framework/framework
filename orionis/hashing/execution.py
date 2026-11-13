@@ -1,4 +1,4 @@
-"""Define execution for hashing."""
+"""Share bounded native workers across password hashing drivers."""
 
 from orionis.support.concurrency import BoundedExecutor
 

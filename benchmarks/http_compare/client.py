@@ -1,3 +1,5 @@
+# ruff: noqa: TRY004
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 import hashlib
 import math
 import platform
@@ -33,6 +35,7 @@ OHA_ASSETS = {
         "d692d392e958e7e8e1b16810287e74a835a62255b079ba2766a4b3b04499f267",
     ),
 }
+
 
 def install_oha(directory: Path) -> Path:
     """
@@ -73,6 +76,7 @@ def install_oha(directory: Path) -> Path:
     destination.chmod(0o755)
     return destination
 
+
 def _nonnegative_number(value: object) -> float:
     """
     Validate and convert a finite nonnegative measurement.
@@ -96,12 +100,13 @@ def _nonnegative_number(value: object) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         error_msg = "Expected a finite nonnegative number in oha output"
         # A malformed JSON payload consistently raises ValueError.
-        raise ValueError(error_msg)  # noqa: TRY004
+        raise ValueError(error_msg)
     number = float(value)
     if not math.isfinite(number) or number < 0:
         error_msg = "Expected a finite nonnegative number in oha output"
         raise ValueError(error_msg)
     return number
+
 
 def _count(value: object) -> int:
     """
@@ -128,6 +133,7 @@ def _count(value: object) -> int:
         error_msg = "Expected an integer request count in oha output"
         raise ValueError(error_msg)
     return int(number)
+
 
 def parse_measurement(raw: dict[str, Any]) -> dict[str, int | float]:
     """

@@ -1,7 +1,15 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Exercise session values, state transitions, and flash ownership."""
+
 from __future__ import annotations
+from unittest.mock import patch
 from orionis.session.flash import ERRORS_KEY, OLD_INPUT_KEY
 from orionis.session.session import Session
 from orionis.test import TestCase
+from tests.session.test_manager import _FakeRequest, _FakeResponse
+from tests.session.test_renewal import _NOW, make_manager
+
 
 class _FakeValidationException(Exception):
     """Duck-typed validation exception exposing a full error bag."""
@@ -18,97 +26,31 @@ class _FakeValidationException(Exception):
         Returns
         -------
         None
+            No return value.
         """
         super().__init__("invalid")
         self.errors = errors
+
 
 class TestSession(TestCase):
     """Unit tests for the Session runtime object."""
 
     # ── Construction ─────────────────────────────────────────────────────────
 
-    def testDefaultInitHasNullIdentifier(self) -> None:
-        """Yield None as the identifier for a brand-new session.
-
-        Validates that a session constructed without arguments has no
-        identifier assigned before the first write.
+    def testDefaultInitPreservesLazyState(self) -> None:
+        """Keep a new session inactive, unchanged, and without an identifier.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         self.assertIsNone(session.id)
-
-    def testDefaultInitNotStarted(self) -> None:
-        """Mark a brand-new session as not yet started.
-
-        Validates that the started flag is False when no arguments are
-        supplied to the constructor.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        session = Session()
         self.assertFalse(session.started)
-
-    def testDefaultInitNotDirty(self) -> None:
-        """Leave the dirty flag clear on a freshly constructed session.
-
-        Validates that a new session has no pending write when no
-        mutations have been applied.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        session = Session()
         self.assertFalse(session.dirty)
-
-    def testDefaultInitNotInvalidated(self) -> None:
-        """Leave the invalidated flag clear on construction.
-
-        Validates that a new session is not scheduled for deletion
-        unless invalidate() is explicitly called.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        session = Session()
         self.assertFalse(session.invalidated)
-
-    def testDefaultInitIsNew(self) -> None:
-        """Report isNew as True for a session not loaded from a store.
-
-        Validates that the default construction path marks the session
-        as a new one that was not restored from backing storage.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        session = Session()
         self.assertTrue(session.isNew)
-
-    def testDefaultInitWantsRegenerateFalse(self) -> None:
-        """Leave wantsRegenerate clear on construction.
-
-        Validates that a new session does not request ID rotation until
-        regenerate() is explicitly invoked.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        session = Session()
         self.assertFalse(session.wantsRegenerate)
 
     def testInitWithExplicitId(self) -> None:
@@ -120,7 +62,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="abc123")
         self.assertEqual(session.id, "abc123")
@@ -134,10 +76,15 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        session = Session(data={"key": "value"})
+        data = {"key": "value"}
+        session = Session(data=data)
         self.assertEqual(session.get("key"), "value")
+        data["key"] = "updated"
+        self.assertEqual(session.get("key"), "updated")
+        session.put("another", "entry")
+        self.assertEqual(data["another"], "entry")
 
     def testInitWithNoneDataDefaultsToEmpty(self) -> None:
         """Default to an empty dict when data is None.
@@ -148,7 +95,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(data=None)
         self.assertEqual(session.all(), {})
@@ -162,7 +109,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="x", started=True)
         self.assertTrue(session.started)
@@ -176,7 +123,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="x", is_new=False)
         self.assertFalse(session.isNew)
@@ -192,7 +139,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.put("key", "value")
@@ -208,7 +155,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.put("x", 1)
@@ -223,7 +170,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.put("x", 42)
@@ -240,7 +187,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.put("x", 1)
@@ -256,7 +203,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.put("name", "Alice")
@@ -271,7 +218,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         result = session.get("missing", "fallback")
@@ -286,7 +233,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         self.assertIsNone(session.get("missing"))
@@ -302,10 +249,10 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
-        session.put("present", True)
+        session.put("present", value=True)
         self.assertTrue(session.has("present"))
 
     def testHasReturnsFalseForMissingKey(self) -> None:
@@ -317,7 +264,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         self.assertFalse(session.has("ghost"))
@@ -333,7 +280,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="s", data={"a": 1}, started=True)
         session.forget("a")
@@ -348,7 +295,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="s", data={"a": 1}, started=True)
         session.forget("a")
@@ -363,7 +310,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="s", data={}, started=True)
         session.forget("ghost")
@@ -378,7 +325,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(data={"a": 1})
         session.forget("a")
@@ -395,7 +342,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="s", data={"a": 1, "b": 2}, started=True)
         session.clear()
@@ -404,13 +351,13 @@ class TestSession(TestCase):
     def testClearMarksDirtyWhenStarted(self) -> None:
         """Dirty the session after clearing non-empty data.
 
-        Validates that clear() signals the manager to delete the
-        session record from the backing store.
+        Validate that clear() signals the manager to persist an empty
+        payload while preserving the active session identity.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="s", data={"a": 1}, started=True)
         session.clear()
@@ -425,7 +372,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="s", data={}, started=True)
         session.clear()
@@ -442,7 +389,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("msg", "hello")
@@ -458,7 +405,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("msg", "hello")
@@ -473,7 +420,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("msg", "hello")
@@ -491,7 +438,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("notice", "saved")
@@ -507,7 +454,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         result = session.getFlash("missing", "fallback")
@@ -522,7 +469,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         self.assertIsNone(session.getFlash("missing"))
@@ -537,7 +484,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("msg", "old")
@@ -554,7 +501,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("first", "a")
@@ -571,7 +518,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("msg", "pending")
@@ -588,7 +535,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.regenerate()
@@ -603,7 +550,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.regenerate()
@@ -619,7 +566,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.regenerate()
@@ -636,7 +583,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(data={"a": 1, "b": 2})
         session.invalidate()
@@ -651,7 +598,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.invalidate()
@@ -666,7 +613,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.invalidate()
@@ -682,7 +629,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.regenerate()
@@ -694,18 +641,22 @@ class TestSession(TestCase):
     def testAllReturnsShallowCopy(self) -> None:
         """Return a shallow copy of the session payload.
 
-        Validates that mutating the returned dict does not affect the
-        internal session state.
+        Validate that top-level writes are isolated while nested values
+        retain their shared identity.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        session = Session(data={"a": 1})
+        nested = ["first"]
+        session = Session(data={"a": 1, "nested": nested})
         copy = session.all()
         copy["a"] = 99
         self.assertEqual(session.get("a"), 1)
+        self.assertIs(copy["nested"], nested)
+        copy["nested"].append("second")
+        self.assertEqual(session.get("nested"), ["first", "second"])
 
     def testAllIncludesAllKeys(self) -> None:
         """Include all stored key-value pairs in the returned dict.
@@ -716,7 +667,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(data={"x": 10, "y": 20})
         result = session.all()
@@ -733,7 +684,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("k", "v")
@@ -751,7 +702,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("k", "v")
@@ -768,7 +719,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("k", "v")
@@ -785,7 +736,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("k", "v")
@@ -803,7 +754,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session._ageFlashData()
@@ -820,7 +771,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="original")
         old_id = session._rotateId()
@@ -835,7 +786,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="original")
         old_id = session._rotateId()
@@ -851,7 +802,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.regenerate()
@@ -867,7 +818,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         old_id = session._rotateId()
@@ -884,7 +835,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.put("x", 1)
@@ -902,7 +853,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(Session().getPreviousUrl())
 
@@ -915,7 +866,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.setPreviousUrl("http://orionis.test/users/create")
@@ -933,7 +884,7 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.setPreviousUrl("http://orionis.test/login")
@@ -949,13 +900,45 @@ class TestSession(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.setPreviousUrl("http://orionis.test/login")
         session._markClean()
         session.setPreviousUrl("http://orionis.test/login")
         self.assertFalse(session.dirty)
+
+    async def testAgeFlashDataPersistsDiscardedNullBags(self) -> None:
+        """Persist removal of present null bags without inventing old flash data.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for data in (
+            {"_flash_new": None},
+            {"_flash_old": None},
+            {"_flash_new": None, "_flash_old": None},
+        ):
+            with self.subTest(bags=tuple(data)):
+                manager, store = make_manager(data=dict(data))
+                session = Session(id="restored", data=data, started=True, is_new=False)
+                session._ageFlashData()
+                self.assertEqual(session.all(), {})
+                self.assertTrue(session.dirty)
+                session._markClean()
+                session._ageFlashData()
+                self.assertFalse(session.dirty)
+                with patch("orionis.session.manager.datetime") as clock:
+                    clock.now.return_value = _NOW
+                    restored = await manager.start(
+                        _FakeRequest({"sessionid": "current"}),
+                    )
+                    await manager.save(_FakeResponse(), restored)
+                self.assertEqual(len(store.written), 1)
+                self.assertEqual(store.written[0].data, {})
+
 
 class TestSessionActivation(TestCase):
     """Unit tests for the lazy-activation rules of a session."""
@@ -969,7 +952,7 @@ class TestSessionActivation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="restored", started=True, is_new=False)
         session.put("a", 1)
@@ -984,7 +967,7 @@ class TestSessionActivation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="restored", started=True, is_new=False)
         session.flash("msg", "hi")
@@ -999,7 +982,7 @@ class TestSessionActivation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash("first", 1)
@@ -1017,7 +1000,7 @@ class TestSessionActivation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(data={"_flash_new": {"a": 1}})
         session.flash("b", 2)
@@ -1033,7 +1016,7 @@ class TestSessionActivation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(data={"a": 1})
         session.clear()
@@ -1049,12 +1032,13 @@ class TestSessionActivation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session(id="abc", started=True, is_new=False)
         session.regenerate()
         self.assertEqual(session.id, "abc")
         self.assertTrue(session.wantsRegenerate)
+
 
 class TestSessionOldInput(TestCase):
     """Unit tests for the reserved old-input flash bag."""
@@ -1068,7 +1052,7 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashInput({"email": "a@b.c", "password": "secret"})
@@ -1084,7 +1068,7 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashInput({"email": "a@b.c"})
@@ -1100,7 +1084,7 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashInput({"email": "a@b.c"})
@@ -1117,7 +1101,7 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashInput({"email": "a@b.c"})
@@ -1136,7 +1120,7 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash(OLD_INPUT_KEY, "corrupted")
@@ -1151,7 +1135,7 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashInput({"email": "a@b.c"})
@@ -1168,7 +1152,7 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Session().getOldInput("email", "fallback"), "fallback")
 
@@ -1180,7 +1164,7 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash(OLD_INPUT_KEY, "corrupted")
@@ -1195,11 +1179,12 @@ class TestSessionOldInput(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashInput({"email": "a@b.c"})
         self.assertIsNone(session.getOldInput("name"))
+
 
 class TestSessionErrors(TestCase):
     """Unit tests for the reserved validation-errors flash bag."""
@@ -1213,7 +1198,7 @@ class TestSessionErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashErrors({"email": "required"})
@@ -1228,7 +1213,7 @@ class TestSessionErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashErrors(_FakeValidationException({"email": ["invalid"]}))
@@ -1243,7 +1228,7 @@ class TestSessionErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashErrors({"email": "required"})
@@ -1262,7 +1247,7 @@ class TestSessionErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash(ERRORS_KEY, "corrupted")
@@ -1277,7 +1262,7 @@ class TestSessionErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(Session().getErrors(), {})
 
@@ -1289,7 +1274,7 @@ class TestSessionErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flash(ERRORS_KEY, "corrupted")
@@ -1303,7 +1288,7 @@ class TestSessionErrors(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         session = Session()
         session.flashErrors({"email": "required"})

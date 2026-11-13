@@ -26,6 +26,7 @@ _OPTIONS = frozenset({"tries", "timeout", "backoff"})
 _SCALAR_TYPES = frozenset({str, bytes, int, float, bool, type(None)})
 """Scalar types used by ``serializer``."""
 
+
 @dataclass(frozen=True, slots=True)
 class _JobMetadata:
     """Retain trusted class metadata independently of live job instances."""
@@ -38,6 +39,7 @@ class _JobMetadata:
     """Field-name set used for fast validation of serialized input."""
     annotations: dict[str, object]
     """Declared metadata describing behavior or validation types."""
+
 
 def _validate_annotation(annotation: object) -> bool:
     """
@@ -62,6 +64,7 @@ def _validate_annotation(annotation: object) -> bool:
         argument is Ellipsis or _validate_annotation(argument)
         for argument in get_args(annotation)
     )
+
 
 def _pack_value(value: object, depth: int = 0) -> object:
     """
@@ -99,7 +102,8 @@ def _pack_value(value: object, depth: int = 0) -> object:
         items = [_pack_value(item, depth + 1) for item in sequence]
         if value_type is tuple:
             return msgspec.msgpack.Ext(
-                _TUPLE_EXTENSION, msgspec.msgpack.encode(items),
+                _TUPLE_EXTENSION,
+                msgspec.msgpack.encode(items),
             )
         return items
     if value_type is dict:
@@ -107,11 +111,10 @@ def _pack_value(value: object, depth: int = 0) -> object:
         if any(type(key) is not str for key in mapping):
             message = "Job state dictionaries require string keys."
             raise QueuePayloadError(message)
-        return {
-            key: _pack_value(item, depth + 1) for key, item in mapping.items()
-        }
+        return {key: _pack_value(item, depth + 1) for key, item in mapping.items()}
     message = f"Job state cannot serialize objects of type {type(value).__name__}."
     raise QueuePayloadError(message)
+
 
 def _validate_unpacked_value(value: object, depth: int = 0) -> None:
     """
@@ -158,6 +161,7 @@ def _validate_unpacked_value(value: object, depth: int = 0) -> None:
     message = f"Job state cannot serialize objects of type {value_type.__name__}."
     raise QueuePayloadError(message)
 
+
 def _unpack_extension(code: int, data: memoryview) -> tuple[object, ...]:
     """
     Restore the tuple extension without importing or invoking payload types.
@@ -183,13 +187,17 @@ def _unpack_extension(code: int, data: memoryview) -> tuple[object, ...]:
         raise QueuePayloadError(message)
     return tuple(items)
 
+
 def _collect_job_fields(
     parent: type[BaseJob],
     names: dict[str, None],
     annotations: dict[str, object],
 ) -> None:
     """
-    Collect one job class's declared slots and persistent annotations.
+    Collect one job class's declared slots and resolved persistent annotations.
+
+    Evaluate postponed annotations from the trusted class's defining module
+    before distinguishing class policy from persistent fields.
 
     Parameters
     ----------
@@ -203,7 +211,7 @@ def _collect_job_fields(
     Returns
     -------
     None
-        Update the field names and annotations in place.
+        No return value.
     """
     slots = parent.__dict__.get("__slots__", ())
     if isinstance(slots, str):
@@ -211,10 +219,11 @@ def _collect_job_fields(
     for name in slots:
         if name not in {"__dict__", "__weakref__"}:
             names[name] = None
-    for name, annotation in inspect.get_annotations(parent).items():
+    for name, annotation in inspect.get_annotations(parent, eval_str=True).items():
         if name not in _OPTIONS and get_origin(annotation) is not ClassVar:
             names[name] = None
             annotations[name] = annotation
+
 
 def _job_metadata(job_type: type[BaseJob]) -> _JobMetadata:
     """

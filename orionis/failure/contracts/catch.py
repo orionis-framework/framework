@@ -1,19 +1,17 @@
+# ruff: noqa: PLC0415, TC001
+# Keep runtime annotations; load the coordinator when fallback capture runs.
 """Define the contract for catch implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.failure.entities.context import FailureContext, FailureReceipt
+from orionis.http.adapters.request.contracts.transport import TransportAdapter
+from orionis.http.request import Request
+from orionis.http.responses import Response
 
-if TYPE_CHECKING:
-    from orionis.failure.entities.context import FailureContext, FailureReceipt
-    from orionis.http.adapters.request.contracts.transport import TransportAdapter
-    from orionis.http.request import Request
-    from orionis.http.responses import Response
 
 class ICatch(ABC):
     """Define the contract for catch implementations."""
-
-    #ruff: noqa: PLC0415
 
     async def capture(
         self,
@@ -41,6 +39,7 @@ class ICatch(ABC):
             represents cancellation or process control.
         """
         from orionis.failure.runtime import get_runtime
+
         runtime = get_runtime()
         if runtime is None:
             return None

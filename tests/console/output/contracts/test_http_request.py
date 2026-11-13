@@ -1,11 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.output.contracts.http_request import IHTTPRequestPrinter
 from orionis.console.output.http_request import HTTPRequestPrinter
 from orionis.test import TestCase
 
-class TestIHTTPRequestPrinterContract(TestCase):
 
+class TestIHTTPRequestPrinterContract(TestCase):
     # ------------------------------------------------------------------ #
     #  Abstract class characteristics                                    #
     # ------------------------------------------------------------------ #
@@ -252,9 +254,13 @@ class TestIHTTPRequestPrinterContract(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertTrue(callable(HTTPRequestPrinter.printRequest))
-        self.assertNotIn("printRequest", HTTPRequestPrinter.__dict__.get(
-            "__abstractmethods__", set(),
-        ))
+        self.assertNotIn(
+            "printRequest",
+            HTTPRequestPrinter.__dict__.get(
+                "__abstractmethods__",
+                set(),
+            ),
+        )
 
     def testHTTPRequestPrinterImplementsStartTimer(self) -> None:
         """Verify that HTTPRequestPrinter provides a concrete startTimer method.
@@ -268,6 +274,10 @@ class TestIHTTPRequestPrinterContract(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertTrue(callable(HTTPRequestPrinter.startTimer))
-        self.assertNotIn("startTimer", HTTPRequestPrinter.__dict__.get(
-            "__abstractmethods__", set(),
-        ))
+        self.assertNotIn(
+            "startTimer",
+            HTTPRequestPrinter.__dict__.get(
+                "__abstractmethods__",
+                set(),
+            ),
+        )

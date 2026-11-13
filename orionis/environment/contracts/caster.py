@@ -1,11 +1,11 @@
+# ruff: noqa: TC001
+# Resolve the public contract's enum annotation during runtime introspection.
 """Define the contract for environment caster implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.environment.enums.value_type import EnvironmentValueType
 
-if TYPE_CHECKING:
-    from orionis.environment.enums.value_type import EnvironmentValueType
 
 class IEnvironmentCaster(ABC):
     """Define the contract for environment caster implementations."""
@@ -24,11 +24,6 @@ class IEnvironmentCaster(ABC):
         parsing method for that type. Supported type hints include: 'path', 'str',
         'int', 'float', 'bool', 'list', 'dict', 'tuple', 'set', and 'base64'.
         If no type hint is set, return the raw value.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------

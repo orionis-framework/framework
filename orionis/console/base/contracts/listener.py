@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.console.entities.task_event import TaskEvent
 
+
 class IBaseTaskListener(ABC):
     """Define the contract for base task listener implementations."""
 

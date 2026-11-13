@@ -1,3 +1,5 @@
+# ruff: noqa: TC001, TC003
+# Runtime service construction and transport reflection consume these annotations.
 """Provide mcp transport operations.
 
 Includes ``LineReader``, ``LineWriter``, ``McpStdioTransport``.
@@ -5,10 +7,11 @@ Includes ``LineReader``, ``LineWriter``, ``McpStdioTransport``.
 
 from __future__ import annotations
 import asyncio
+from collections.abc import AsyncIterator
 from contextlib import redirect_stdout
 from functools import partial
 import sys
-from typing import TYPE_CHECKING, Protocol
+from typing import Protocol
 import msgspec
 from orionis.failure.runtime import capture, capture_nowait, get_runtime, operation
 from orionis.http.adapters.response.streams import await_cleanup
@@ -18,15 +21,14 @@ from orionis.mcp.exceptions import McpProtocolException
 from orionis.mcp.protocol.codecs import decode_envelope, encode_error
 from orionis.mcp.protocol.requests import CancelledParams
 from orionis.mcp.reporting import report
+from orionis.mcp.streams import _create_task
 from orionis.mcp.transport.standard_io import StandardReader, StandardWriter
+from orionis.foundation.contracts.application import IApplication
+from orionis.mcp.config import McpConfig
+from orionis.mcp.contracts.event_bus import IMcpEventBus
+from orionis.mcp.protocol.requests import JsonRpcRequest
+from orionis.mcp.server.compiler import CompiledMcpServer
 
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
-    from orionis.foundation.contracts.application import IApplication
-    from orionis.mcp.config import McpConfig
-    from orionis.mcp.contracts.event_bus import IMcpEventBus
-    from orionis.mcp.protocol.requests import JsonRpcRequest
-    from orionis.mcp.server.compiler import CompiledMcpServer
 
 class LineReader(Protocol):
     """Provide one bounded input frame or empty bytes at EOF."""
@@ -41,6 +43,7 @@ class LineReader(Protocol):
             Result of the operation described above.
         """
         ...
+
 
 class LineWriter(Protocol):
     """Write a complete message with backpressure."""
@@ -60,6 +63,7 @@ class LineWriter(Protocol):
             Complete the documented operation without returning a value.
         """
         ...
+
 
 class McpStdioTransport:
     """Keep the reader available while bounded request tasks execute independently."""
@@ -170,7 +174,10 @@ class McpStdioTransport:
         except BaseException as exc:
             original = exc
             await capture(
-                exc, app=self._app, flow="mcp", phase="stream",
+                exc,
+                app=self._app,
+                flow="mcp",
+                phase="stream",
                 metadata={"transport": "stdio"},
             )
             raise
@@ -181,7 +188,10 @@ class McpStdioTransport:
                     await await_cleanup(asyncio.ensure_future(close()))
                 except BaseException as exc:
                     await capture(
-                        exc, app=self._app, flow="mcp", phase="cleanup",
+                        exc,
+                        app=self._app,
+                        flow="mcp",
+                        phase="cleanup",
                         metadata={"transport": "stdio"},
                     )
                     if original is None:
@@ -204,14 +214,19 @@ class McpStdioTransport:
             Complete the documented operation without returning a value.
         """
         with operation(
-            self._app, flow="mcp", operation=request.method,
-            correlation_id=str(request.id), isolated=True,
+            self._app,
+            flow="mcp",
+            operation=request.method,
+            correlation_id=str(request.id),
+            isolated=True,
         ):
             try:
                 async with self._app.beginScope():
                     params = self._dispatcher.decode(request)
                     result = await self._dispatcher.dispatch(
-                        request, params, transport="stdio",
+                        request,
+                        params,
+                        transport="stdio",
                     )
                     if isinstance(result.body, bytes):
                         await self._write(writer, result.body)
@@ -219,14 +234,22 @@ class McpStdioTransport:
                         await self._stream(writer, result.body)
             except McpProtocolException as exc:
                 await report(
-                    exc, self._app, transport="stdio", expected=True,
-                    operation=request.method, correlation_id=request.id,
+                    exc,
+                    self._app,
+                    transport="stdio",
+                    expected=True,
+                    operation=request.method,
+                    correlation_id=request.id,
                 )
                 await self._write(writer, encode_error(exc, request.id))
             except BaseException as exc:
                 await report(
-                    exc, self._app, transport="stdio", phase="request",
-                    operation=request.method, correlation_id=request.id,
+                    exc,
+                    self._app,
+                    transport="stdio",
+                    phase="request",
+                    operation=request.method,
+                    correlation_id=request.id,
                 )
                 raise
 
@@ -250,8 +273,12 @@ class McpStdioTransport:
             del self._active[request_id]
         if not task.cancelled() and (failure := task.exception()) is not None:
             pending = capture_nowait(
-                failure, app=self._app, flow="mcp", phase="request",
-                correlation_id=str(request_id), metadata={"transport": "stdio"},
+                failure,
+                app=self._app,
+                flow="mcp",
+                phase="request",
+                correlation_id=str(request_id),
+                metadata={"transport": "stdio"},
             )
             if pending is not None:
                 self._reports.add(pending)
@@ -279,8 +306,12 @@ class McpStdioTransport:
             params = msgspec.json.decode(request.params, type=CancelledParams)
         except (msgspec.DecodeError, msgspec.ValidationError) as exc:
             pending = capture_nowait(
-                exc, app=self._app, flow="mcp", phase="cancellation",
-                operation=request.method, expected=True,
+                exc,
+                app=self._app,
+                flow="mcp",
+                phase="cancellation",
+                operation=request.method,
+                expected=True,
                 metadata={"transport": "stdio"},
             )
             if pending is not None:
@@ -320,16 +351,23 @@ class McpStdioTransport:
                 raise McpProtocolException(-32600, "Duplicate active request ID")
             if len(self._active) >= self._config.max_concurrent_requests:
                 raise McpProtocolException(
-                    -32603, "Request capacity unavailable", status=503,
+                    -32603,
+                    "Request capacity unavailable",
+                    status=503,
                 )
-            task = asyncio.create_task(
-                self._invoke(request, writer), name="orionis.mcp.request",
+            task = _create_task(
+                self._invoke(request, writer),
+                name="orionis.mcp.request",
             )
             self._active[request_id] = task
             task.add_done_callback(partial(self._done, request_id))
         except McpProtocolException as exc:
             await report(
-                exc, self._app, transport="stdio", phase="framing", expected=True,
+                exc,
+                self._app,
+                transport="stdio",
+                phase="framing",
+                expected=True,
                 correlation_id=None if request_id is msgspec.UNSET else request_id,
             )
             await self._write(writer, encode_error(exc, request_id))
@@ -350,13 +388,14 @@ class McpStdioTransport:
         None
             Complete the documented operation without returning a value.
         """
-        failed = asyncio.create_task(self._failed.wait())
+        failed = _create_task(self._failed.wait())
         reading: asyncio.Task[bytes] | None = None
         try:
             while True:
-                reading = asyncio.create_task(reader.readline())
+                reading = _create_task(reader.readline())
                 await asyncio.wait(
-                    (reading, failed), return_when=asyncio.FIRST_COMPLETED,
+                    (reading, failed),
+                    return_when=asyncio.FIRST_COMPLETED,
                 )
                 if self._failure is not None:
                     raise self._failure
@@ -419,12 +458,17 @@ class McpStdioTransport:
                         for failure in results:
                             if isinstance(failure, BaseException):
                                 await report(
-                                    failure, self._app, transport="stdio",
+                                    failure,
+                                    self._app,
+                                    transport="stdio",
                                     phase="cleanup",
                                 )
                     if self._failure is not None:
                         await capture(
-                            self._failure, app=self._app, flow="mcp", phase="cleanup",
+                            self._failure,
+                            app=self._app,
+                            flow="mcp",
+                            phase="cleanup",
                             metadata={"transport": "stdio"},
                         )
                     if self._reports:
@@ -445,10 +489,13 @@ class McpStdioTransport:
         """
         runtime = get_runtime(self._app)
         reader = StandardReader(
-            sys.stdin.buffer, self._config.max_request_size, runtime=runtime,
+            sys.stdin.buffer,
+            self._config.max_request_size,
+            runtime=runtime,
         )
         writer = StandardWriter(
-            protocol_stdout() or sys.stdout.buffer, runtime=runtime,
+            protocol_stdout() or sys.stdout.buffer,
+            runtime=runtime,
         )
         try:
             with redirect_stdout(sys.stderr):

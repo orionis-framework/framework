@@ -1,12 +1,14 @@
+# ruff: noqa: TC001
+# Keep public session record annotations available at runtime.
+
 """In-process session store backed by a plain dictionary."""
 
 from copy import deepcopy
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING
 from orionis.session.contracts.store import ISessionStore
 
-if TYPE_CHECKING:
-    from orionis.session.entities.record import SessionRecord
+from orionis.session.entities.record import SessionRecord
+
 
 class MemorySessionStore(ISessionStore):
     """
@@ -31,7 +33,7 @@ class MemorySessionStore(ISessionStore):
         Returns
         -------
         None
-            Initialise an empty in-memory session store.
+            No return value.
         """
         self._storage: dict[str, SessionRecord] = {}
         """Entries retained by the in-memory storage backend."""
@@ -73,7 +75,7 @@ class MemorySessionStore(ISessionStore):
         Returns
         -------
         None
-            Insert or replace the record keyed by its identifier.
+            No return value.
         """
         self._storage[record.id] = deepcopy(record)
 
@@ -123,13 +125,9 @@ class MemorySessionStore(ISessionStore):
         Returns
         -------
         None
-            Evict all records whose ``expires_at`` is in the past.
+            No return value.
         """
         now = datetime.now(UTC)
-        expired = [
-            sid
-            for sid, rec in self._storage.items()
-            if rec.expires_at <= now
-        ]
+        expired = [sid for sid, rec in self._storage.items() if rec.expires_at <= now]
         for sid in expired:
             del self._storage[sid]

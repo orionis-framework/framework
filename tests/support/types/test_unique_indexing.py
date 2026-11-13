@@ -1,6 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Self
 from orionis.support.types.collection import Collection
 from orionis.test import TestCase
+
 
 class TestUniqueIndexing(TestCase):
     """Preserve equality and insertion order while indexing built-in trees."""
@@ -12,7 +15,7 @@ class TestUniqueIndexing(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         first = {"a": [1, {"x", "y"}], "b": b"value"}
         duplicate = {"b": bytearray(b"value"), "a": [True, frozenset({"y", "x"})]}
@@ -29,7 +32,7 @@ class TestUniqueIndexing(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
         rows = [{"id": [1], "v": "first"}, {"id": [1], "v": "second"}, {"id": [2]}]
         self.assertEqual(Collection(rows).unique("id").all(), [rows[0], rows[2]])
@@ -45,7 +48,7 @@ class TestUniqueIndexing(TestCase):
         Returns
         -------
         None
-            Complete the assertions without returning a value.
+            No return value.
         """
 
         class Same:

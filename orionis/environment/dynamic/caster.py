@@ -1,15 +1,17 @@
+# ruff: noqa: C901, PLR0911, PLR0912
+# Keep type-specific validation and error paths explicit.
 """Convert raw environment strings to the requested Python value type."""
 
 from __future__ import annotations
 import ast
 import base64
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import ClassVar
 from orionis.environment.contracts.caster import IEnvironmentCaster
 from orionis.environment.enums.value_type import EnvironmentValueType
 
-class EnvironmentCaster(IEnvironmentCaster):
 
+class EnvironmentCaster(IEnvironmentCaster):
     # Precompute the set of valid type hints from the
     # EnvironmentValueType enum for fast membership checks.
     """Convert raw environment strings to the requested Python value type."""
@@ -31,7 +33,7 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Returns
         -------
-        set[str]
+        frozenset[str]
             Set of valid type hint strings that can be used for environment
             value casting.
         """
@@ -67,27 +69,27 @@ class EnvironmentCaster(IEnvironmentCaster):
         """
         colon_idx = value_str.index(":")
         type_hint = value_str[:colon_idx].strip().lower()
-        raw = value_str[colon_idx + 1:].lstrip()
+        raw = value_str[colon_idx + 1 :].lstrip()
 
         # Fast-path for primitives — no object construction
         if type_hint == "int":
             stripped = raw.strip()
             try:
                 return int(stripped)
-            except ValueError as e:
-                error_msg = f"Cannot convert '{stripped}' to int: {e!s}"
-                raise ValueError(error_msg) from e
+            except ValueError:
+                error_msg = "Cannot convert environment value to int."
+                raise ValueError(error_msg) from None
 
         if type_hint == "float":
             stripped = raw.strip()
             try:
                 return float(stripped)
-            except ValueError as e:
-                error_msg = f"Cannot convert '{stripped}' to float: {e!s}"
-                raise ValueError(error_msg) from e
+            except ValueError:
+                error_msg = "Cannot convert environment value to float."
+                raise ValueError(error_msg) from None
 
         if type_hint == "bool":
-            return raw.strip().lower() in ("true", "1", "yes", "on", "enabled")
+            return EnvironmentCaster.__booleanValue(raw)
 
         if type_hint == "str":
             return raw
@@ -97,14 +99,14 @@ class EnvironmentCaster(IEnvironmentCaster):
 
     def __init__(
         self,
-        raw: str | object,
+        raw: object,
     ) -> None:
         """
         Initialize the caster by parsing input to extract type hint and value.
 
         Parameters
         ----------
-        raw : str | object
+        raw : object
             Input value to be parsed. If string containing a colon, the part
             before the colon is treated as type hint and after as value. If no
             colon is present, entire string is treated as value with no type
@@ -113,17 +115,16 @@ class EnvironmentCaster(IEnvironmentCaster):
         Returns
         -------
         None
-            Does not return a value; initializes instance attributes.
+            No return value.
         """
         # Initialize type hint and value to default None
         self.__type_hint: str | None = None
         """Initialize type hint and value to default None."""
-        self.__value_raw: str | Any = None
+        self.__value_raw: object = None
         """Raw environment value before conversion to the requested type."""
 
         # Process string inputs to extract type hint and value
         if isinstance(raw, str):
-
             # Remove leading whitespace from the input
             self.__value_raw = raw.lstrip()
 
@@ -138,13 +139,12 @@ class EnvironmentCaster(IEnvironmentCaster):
                     self.__type_hint = type_hint.strip().lower()
 
                     # Remove leading whitespace from the value part
-                    self.__value_raw = value_str.lstrip() if value_str else None
+                    self.__value_raw = value_str.lstrip()
         else:
-
             # Treat non-string input as the value with no type hint
             self.__value_raw = raw
 
-    def get(  # noqa: PLR0911, PLR0912, C901
+    def get(
         self,
     ) -> object:
         """
@@ -154,11 +154,6 @@ class EnvironmentCaster(IEnvironmentCaster):
         parsing method for that type. Supported type hints include: 'path', 'str',
         'int', 'float', 'bool', 'list', 'dict', 'tuple', 'set', and 'base64'.
         If no type hint is set, return the raw value.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------
@@ -202,22 +197,22 @@ class EnvironmentCaster(IEnvironmentCaster):
                 return self.__parseBase64()
             return self.__value_raw
         except (ValueError, TypeError) as e:
-            error_msg = (
-                f"Error processing value '{self.__value_raw}' with type hint "
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                "Error processing environment value with type hint "
                 f"'{self.__type_hint}': {e!s}"
             )
             # Re-raise the same concrete type (ValueError or TypeError)
             if isinstance(e, TypeError):
                 raise TypeError(error_msg) from e
             raise ValueError(error_msg) from e
-        except Exception as e:
-            error_msg = (
-                f"Error processing value '{self.__value_raw}' with type hint "
-                f"'{self.__type_hint}': {e!s}"
+        except AttributeError, RuntimeError, SyntaxError:
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                "Error processing environment value with type hint "
+                f"'{self.__type_hint}'."
             )
-            raise ValueError(error_msg) from e
+            raise ValueError(error_msg) from None
 
-    def to(  # noqa: PLR0911, PLR0912, C901
+    def to(
         self,
         type_hint: str | EnvironmentValueType,
     ) -> str:
@@ -284,9 +279,8 @@ class EnvironmentCaster(IEnvironmentCaster):
             raise ValueError(error_msg)
 
         except Exception as e:
-            error_msg = (
-                f"Error converting value '{self.__value_raw}' to type '{type_hint}': "
-                f"{e!s}"
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                f"Error converting environment value to type '{type_hint}': {e!s}"
             )
             raise ValueError(error_msg) from e
 
@@ -321,32 +315,23 @@ class EnvironmentCaster(IEnvironmentCaster):
             )
             raise TypeError(msg)
 
-        # Normalize input to string for Base64 validation
-        if isinstance(self.__value_raw, bytes):
-            try:
-                candidate = self.__value_raw.decode("utf-8")
-            except UnicodeDecodeError as e:
-                error_msg = f"Cannot decode bytes to UTF-8: {e}"
-                raise ValueError(error_msg) from e
-        else:
-            candidate = self.__value_raw
+        try:
+            raw_bytes = (
+                self.__value_raw.encode("utf-8")
+                if isinstance(self.__value_raw, str)
+                else self.__value_raw
+            )
+        except UnicodeEncodeError:
+            error_msg = "Error during Base64 encoding: text is not valid UTF-8."
+            raise ValueError(error_msg) from None
 
         try:
             # Check if the value is already valid Base64
-            base64.b64decode(candidate, validate=True)
-            encoded_value = candidate
-        except (base64.binascii.Error, ValueError):
+            base64.b64decode(raw_bytes, validate=True)
+            encoded_value = raw_bytes.decode("ascii")
+        except base64.binascii.Error, ValueError:
             # Value is not valid Base64, encode it
-            try:
-                raw_bytes = (
-                    self.__value_raw.encode("utf-8")
-                    if isinstance(self.__value_raw, str)
-                    else self.__value_raw
-                )
-                encoded_value = base64.b64encode(raw_bytes).decode("utf-8")
-            except (UnicodeEncodeError, UnicodeDecodeError) as e:
-                error_msg = f"Error during Base64 encoding: {e}"
-                raise ValueError(error_msg) from e
+            encoded_value = base64.b64encode(raw_bytes).decode("ascii")
 
         # Return formatted string with type hint prefix
         return f"{self.__type_hint}:{encoded_value}"
@@ -369,13 +354,8 @@ class EnvironmentCaster(IEnvironmentCaster):
             If the internal value cannot be decoded from Base64.
         """
         try:
-            # Normalize input to string for Base64 decoding
-            raw_value = self.__value_raw
-            if isinstance(raw_value, bytes):
-                raw_value = raw_value.decode("utf-8", errors="ignore")
-
             # Decode the Base64 value with validation
-            decoded = base64.b64decode(raw_value, validate=True)
+            decoded = base64.b64decode(self.__value_raw, validate=True)
 
             # Attempt to decode as UTF-8 string, fallback to raw bytes
             try:
@@ -383,9 +363,9 @@ class EnvironmentCaster(IEnvironmentCaster):
             except UnicodeDecodeError:
                 return decoded
 
-        except Exception as e:
-            error_msg = f"Cannot decode Base64 value '{self.__value_raw}': {e!s}"
-            raise ValueError(error_msg) from e
+        except ValueError, TypeError:
+            error_msg = "Cannot decode Base64 value: expected valid Base64 data."
+            raise ValueError(error_msg) from None
 
     def __parsePath(
         self,
@@ -419,21 +399,16 @@ class EnvironmentCaster(IEnvironmentCaster):
             # Convert normalized string to Path object and return POSIX representation
             return Path(normalized_path).as_posix()
 
-        except Exception as e:
+        except TypeError, ValueError:
             # Create error message for path conversion failure
-            error_msg = f"Cannot convert '{self.__value_raw}' to path: {e!s}"
-            raise ValueError(error_msg) from e
+            error_msg = "Cannot convert environment value to path."
+            raise ValueError(error_msg) from None
 
     def __toPath(
         self,
     ) -> str:
         """
         Convert internal value to absolute POSIX path string with type hint prefix.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------
@@ -458,18 +433,14 @@ class EnvironmentCaster(IEnvironmentCaster):
         raw_path = str(self.__value_raw).replace("\\", "/").strip()
 
         # Create Path object from normalized string
-        path_obj = Path(raw_path)
+        path_obj = Path(raw_path).expanduser()
 
         # Convert relative paths to absolute paths
         if not path_obj.is_absolute():
-            # Remove leading slash to avoid creating absolute path when joining
-            raw_path_no_leading = raw_path.lstrip("/\\")
-
-            # Combine with current working directory (Path.cwd() already returns Path)
-            path_obj = Path.cwd() / raw_path_no_leading
+            path_obj = Path.cwd() / path_obj
 
         # Expand user home and convert to POSIX format
-        abs_path = path_obj.expanduser().as_posix()
+        abs_path = path_obj.as_posix()
 
         # Return formatted string with type hint prefix
         return f"{self.__type_hint}:{abs_path!s}"
@@ -493,11 +464,6 @@ class EnvironmentCaster(IEnvironmentCaster):
     ) -> str:
         """
         Return the internal value as a string prefixed by the type hint.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------
@@ -547,9 +513,9 @@ class EnvironmentCaster(IEnvironmentCaster):
         # Attempt to convert the value to an integer
         try:
             return int(value)
-        except ValueError as e:
-            error_msg = f"Cannot convert '{value}' to int: {e!s}"
-            raise ValueError(error_msg) from e
+        except ValueError:
+            error_msg = "Cannot convert environment value to int."
+            raise ValueError(error_msg) from None
 
     def __toInt(
         self,
@@ -572,30 +538,30 @@ class EnvironmentCaster(IEnvironmentCaster):
         """
         # Use the value directly if it is already an integer
         if isinstance(self.__value_raw, int):
-            return f"{self.__type_hint}:{self.__value_raw!s}"
+            return f"{self.__type_hint}:{int(self.__value_raw)}"
 
         # Try to convert string values to integer
         if isinstance(self.__value_raw, str):
             try:
                 converted_value = int(self.__value_raw.strip())
                 return f"{self.__type_hint}:{converted_value!s}"
-            except ValueError as e:
-                error_msg = (
-                    f"Cannot convert string '{self.__value_raw}' to integer. "
+            except ValueError:
+                error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                    "Cannot convert environment string to integer. "
                     "Value must be a valid integer representation."
                 )
-                raise ValueError(error_msg) from e
+                raise ValueError(error_msg) from None
 
         # Attempt direct conversion for other types
         try:
             converted_value = int(self.__value_raw)
             return f"{self.__type_hint}:{converted_value!s}"
-        except (ValueError, TypeError) as e:
-            error_msg = (
+        except ValueError, TypeError:
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Value must be convertible to integer, got "
-                f"{type(self.__value_raw).__name__} with value '{self.__value_raw}'."
+                f"{type(self.__value_raw).__name__}."
             )
-            raise ValueError(error_msg) from e
+            raise ValueError(error_msg) from None
 
     def __parseFloat(
         self,
@@ -605,11 +571,6 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         Strips leading and trailing whitespace from the internal raw value and
         attempts to convert it to a float.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------
@@ -627,20 +588,15 @@ class EnvironmentCaster(IEnvironmentCaster):
         # Attempt to convert the value to a float
         try:
             return float(value)
-        except ValueError as e:
-            error_msg = f"Cannot convert '{value}' to float: {e!s}"
-            raise ValueError(error_msg) from e
+        except ValueError:
+            error_msg = "Cannot convert environment value to float."
+            raise ValueError(error_msg) from None
 
     def __toFloat(
         self,
     ) -> str:
         """
         Convert the internal value to a string with the float type hint prefix.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------
@@ -664,23 +620,23 @@ class EnvironmentCaster(IEnvironmentCaster):
             try:
                 converted_value = float(self.__value_raw.strip())
                 return f"{self.__type_hint}:{converted_value!s}"
-            except ValueError as e:
-                error_msg = (
-                    f"Cannot convert string '{self.__value_raw}' to float. "
+            except ValueError:
+                error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
+                    "Cannot convert environment string to float. "
                     "Value must be a valid floating-point representation."
                 )
-                raise ValueError(error_msg) from e
+                raise ValueError(error_msg) from None
 
         # Attempt direct conversion for other types (e.g., int)
         try:
             converted_value = float(self.__value_raw)
             return f"{self.__type_hint}:{converted_value!s}"
-        except (ValueError, TypeError) as e:
-            error_msg = (
+        except ValueError, TypeError:
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Value must be convertible to float, got "
-                f"{type(self.__value_raw).__name__} with value '{self.__value_raw}'."
+                f"{type(self.__value_raw).__name__}."
             )
-            raise TypeError(error_msg) from e
+            raise TypeError(error_msg) from None
 
     def __parseBool(
         self,
@@ -703,8 +659,28 @@ class EnvironmentCaster(IEnvironmentCaster):
         ValueError
             If the value cannot be converted to a boolean.
         """
-        # Normalize and check common boolean representations
-        value = self.__value_raw.strip().lower()
+        return self.__booleanValue(self.__value_raw)
+
+    @staticmethod
+    def __booleanValue(raw: str) -> bool:
+        """Parse the shared vocabulary for an explicitly typed boolean.
+
+        Parameters
+        ----------
+        raw : str
+            Boolean text to normalize.
+
+        Returns
+        -------
+        bool
+            The boolean represented by the text.
+
+        Raises
+        ------
+        ValueError
+            If the text is not a supported boolean spelling.
+        """
+        value = raw.strip().lower()
 
         if value in ("true", "1", "yes", "on", "enabled"):
             return True
@@ -713,7 +689,7 @@ class EnvironmentCaster(IEnvironmentCaster):
             return False
 
         error_msg = (
-            f"Cannot convert '{value}' to bool. Valid representations are: "
+            "Cannot convert environment value to bool. Valid representations are: "
             "true/false, 1/0, yes/no, on/off, enabled/disabled."
         )
         raise ValueError(error_msg)
@@ -727,11 +703,6 @@ class EnvironmentCaster(IEnvironmentCaster):
         Converts the internal value to a string representation of a boolean,
         prefixed by the type hint. Accepts common boolean representations for
         string inputs.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------
@@ -752,28 +723,19 @@ class EnvironmentCaster(IEnvironmentCaster):
 
         # Handle string inputs with common boolean representations
         if isinstance(self.__value_raw, str):
-            str_value = self.__value_raw.strip().lower()
-            if str_value in ("true", "1", "yes", "on", "enabled"):
-                return f"{self.__type_hint}:true"
-            if str_value in ("false", "0", "no", "off", "disabled"):
-                return f"{self.__type_hint}:false"
-            error_msg = (
-                f"Cannot convert string '{self.__value_raw}' to boolean. "
-                "Valid representations: "
-                "true/false, 1/0, yes/no, on/off, enabled/disabled."
-            )
-            raise ValueError(error_msg)
+            boolean_value = self.__booleanValue(self.__value_raw)
+            return f"{self.__type_hint}:{str(boolean_value).lower()}"
 
         # For other types, use Python's truthiness
         try:
             boolean_value = bool(self.__value_raw)
             return f"{self.__type_hint}:{str(boolean_value).lower()}"
-        except Exception as e:
-            error_msg = (
+        except TypeError, ValueError:
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Value must be convertible to boolean, got "
-                f"{type(self.__value_raw).__name__} with value '{self.__value_raw}'."
+                f"{type(self.__value_raw).__name__}."
             )
-            raise TypeError(error_msg) from e
+            raise TypeError(error_msg) from None
 
     def __parseList(
         self,
@@ -810,8 +772,8 @@ class EnvironmentCaster(IEnvironmentCaster):
                 raise TypeError(error_msg)
             return parsed
         except (ValueError, SyntaxError, TypeError) as e:
-            error_msg = str(e)
-            raise type(e)(error_msg) from e
+            error_msg = "Cannot convert environment value to list."
+            raise type(e)(error_msg) from None
 
     def __toList(
         self,
@@ -873,20 +835,15 @@ class EnvironmentCaster(IEnvironmentCaster):
                 error_msg = "Value is not a dict"
                 raise TypeError(error_msg)
             return parsed
-        except (ValueError, SyntaxError, TypeError) as e:
-            error_msg = f"Cannot convert '{value}' to dict: {e!s}"
-            raise ValueError(error_msg) from e
+        except ValueError, SyntaxError, TypeError:
+            error_msg = "Cannot convert environment value to dict."
+            raise ValueError(error_msg) from None
 
     def __toDict(
         self,
     ) -> str:
         """
         Convert the internal value to a string with dictionary type hint prefix.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------
@@ -942,20 +899,15 @@ class EnvironmentCaster(IEnvironmentCaster):
                 error_msg = "Value is not a tuple"
                 raise TypeError(error_msg)
             return parsed
-        except (ValueError, SyntaxError, TypeError) as e:
-            error_msg = f"Cannot convert '{value}' to tuple: {e!s}"
-            raise ValueError(error_msg) from e
+        except ValueError, SyntaxError, TypeError:
+            error_msg = "Cannot convert environment value to tuple."
+            raise ValueError(error_msg) from None
 
     def __toTuple(
         self,
     ) -> str:
         """
         Convert the internal value to a string with the tuple type hint prefix.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------
@@ -1012,20 +964,15 @@ class EnvironmentCaster(IEnvironmentCaster):
                 error_msg = "Value is not a set"
                 raise TypeError(error_msg)
             return parsed
-        except (ValueError, SyntaxError, TypeError) as e:
-            error_msg = f"Cannot convert '{value}' to set: {e!s}"
-            raise ValueError(error_msg) from e
+        except ValueError, SyntaxError, TypeError:
+            error_msg = "Cannot convert environment value to set."
+            raise ValueError(error_msg) from None
 
     def __toSet(
         self,
     ) -> str:
         """
         Convert the internal value to a string with the set type hint prefix.
-
-        Parameters
-        ----------
-        self : orionis.environment.dynamic.caster.EnvironmentCaster
-            Instance of the EnvironmentCaster class.
 
         Returns
         -------

@@ -1,5 +1,5 @@
-# localization: Official documentation
+# Localization
 
-The manual is now organized into bilingual chapters. Continue with [Official documentation](en/README.md).
+Load translations, select a locale and fallback, interpolate values, and manage the translation cache.
 
 [English](en/README.md) · [Español](es/README.md)

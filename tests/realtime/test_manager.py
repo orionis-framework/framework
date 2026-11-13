@@ -1,3 +1,5 @@
+# ruff: noqa: ASYNC109, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 import gc
 import weakref
@@ -15,15 +17,18 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from orionis.http.websocket import WebSocket
 
+
 class _Chat(Hub):
     """Provide an isolated Hub namespace for registry tests."""
 
     __slots__ = ()
 
+
 class _OtherChat(Hub):
     """Provide a distinct Hub sharing the same group names."""
 
     __slots__ = ()
+
 
 class _Codec(HubProtocol):
     """Count serializations while preserving the production wire encoding."""
@@ -64,6 +69,7 @@ class _Codec(HubProtocol):
         self.encodes += 1
         return super().encode(message)
 
+
 class _SendTracker:
     """Observe simultaneous sends while retaining deterministic backpressure."""
 
@@ -89,12 +95,22 @@ class _SendTracker:
         self.started = asyncio.Event()
         self.release = asyncio.Event()
 
+
 class _Connection:
     """Record delivery without introducing background tasks or pending futures."""
 
     __slots__ = (
-        "__weakref__", "closing", "context", "fail", "hub", "invoked", "on_send",
-        "protocol", "ready", "sent", "tracker",
+        "__weakref__",
+        "closing",
+        "context",
+        "fail",
+        "hub",
+        "invoked",
+        "on_send",
+        "protocol",
+        "ready",
+        "sent",
+        "tracker",
     )
 
     def __init__(
@@ -124,7 +140,8 @@ class _Connection:
             Initialize ready state, delivery journals and optional tracking.
         """
         self.context = HubContext(
-            connection_id=identifier, socket=cast("WebSocket", None),
+            connection_id=identifier,
+            socket=cast("WebSocket", None),
         )
         self.hub = hub
         self.protocol = protocol if protocol is not None else _Codec()
@@ -175,8 +192,10 @@ class _Connection:
                 tracker.active -= 1
 
     async def invoke(
-        self, target: str, *args: object,
-        timeout: float | None = None,  # noqa: ASYNC109 - Record forwarding semantics.
+        self,
+        target: str,
+        *args: object,
+        timeout: float | None = None,  # Record forwarding semantics.
     ) -> object:
         """
         Record one client call and return a deterministic result.
@@ -197,6 +216,7 @@ class _Connection:
         """
         self.invoked.append((target, args, timeout))
         return {"source": self.context.connection_id}
+
 
 class TestConnectionManager(TestCase):
     """Exercise registry ownership, bounded delivery and cleanup invariants."""
@@ -256,8 +276,10 @@ class TestConnectionManager(TestCase):
         self.assertEqual(await clients.all.send("notice", 1), BroadcastResult(sent=2))
         self.assertEqual(await clients.caller.send("notice"), BroadcastResult(sent=1))
         self.assertEqual(await clients.others.send("notice"), BroadcastResult(sent=1))
-        self.assertEqual(await clients.group("room").send("notice"),
-                         BroadcastResult(sent=2))
+        self.assertEqual(
+            await clients.group("room").send("notice"),
+            BroadcastResult(sent=2),
+        )
         self.assertEqual(
             await clients.clients(["first", "first", "second", "other"]).send("notice"),
             BroadcastResult(sent=2, failed=1),
@@ -266,7 +288,8 @@ class TestConnectionManager(TestCase):
         self.assertEqual(len(first.sent), 4)
         self.assertEqual(len(second.sent), 4)
         self.assertEqual(
-            await clients.client("missing").send("notice"), BroadcastResult(failed=1),
+            await clients.client("missing").send("notice"),
+            BroadcastResult(failed=1),
         )
         result = await clients.client("first").invoke("refresh", 3, timeout=5)
         self.assertEqual(result, {"source": "first"})
@@ -382,9 +405,13 @@ class TestConnectionManager(TestCase):
         ]
         for connection in connections:
             manager.register(connection)
-        result = await manager.hub(_Chat).clients(
-            ["first", "second", "binary"],
-        ).send("notice", {"text": "¡Hola!"})
+        result = (
+            await manager.hub(_Chat)
+            .clients(
+                ["first", "second", "binary"],
+            )
+            .send("notice", {"text": "¡Hola!"})
+        )
         self.assertEqual(result, BroadcastResult(sent=3))
         self.assertEqual(json_codec.encodes + second_json.encodes, 1)
         self.assertEqual(msgpack_codec.encodes, 1)

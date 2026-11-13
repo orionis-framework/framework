@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Run the configured application test suite from the console."""
 
 from typing import ClassVar
@@ -17,16 +19,16 @@ _VALID_VERBOSITY: frozenset = frozenset({0, 1, 2})
 """Valid verbosity levels accepted by the test runner."""
 
 # Test result statuses that indicate a non-passing outcome
-_FAILURE_STATUSES: frozenset[TestStatus] = frozenset({
-    TestStatus.FAILED,
-    TestStatus.ERRORED,
-})
+_FAILURE_STATUSES: frozenset[TestStatus] = frozenset(
+    {
+        TestStatus.FAILED,
+        TestStatus.ERRORED,
+    },
+)
 """Test result statuses that indicate a non-passing outcome."""
 
+
 class TestCommand(BaseCommand):
-
-    # ruff: noqa: TC001
-
     # Indicates whether timestamps will be shown in the command output
     """Run the configured application test suite from the console."""
 
@@ -67,27 +69,21 @@ class TestCommand(BaseCommand):
             name_or_flags=["--start-dir", "-s"],
             type_=str,
             required=False,
-            help=(
-                "Directory to search for tests. Defaults to 'tests'."
-            ),
+            help=("Directory to search for tests. Defaults to 'tests'."),
             dest="start_dir",
         ),
         Argument(
             name_or_flags=["--file-pattern"],
             type_=str,
             required=False,
-            help=(
-                "Filename pattern to identify test files. Defaults to 'test_*.py'."
-            ),
+            help=("Filename pattern to identify test files. Defaults to 'test_*.py'."),
             dest="file_pattern",
         ),
         Argument(
             name_or_flags=["--method-pattern"],
             type_=str,
             required=False,
-            help=(
-                "Pattern to filter specific test methods. Defaults to 'test*'."
-            ),
+            help=("Pattern to filter specific test methods. Defaults to 'test*'."),
             dest="method_pattern",
         ),
         Argument(
@@ -170,7 +166,7 @@ class TestCommand(BaseCommand):
         Returns
         -------
         int
-            Exit code indicating success (0) or failure (1).
+            Zero for nonempty results without failures or errors; one otherwise.
 
         Raises
         ------
@@ -214,6 +210,9 @@ class TestCommand(BaseCommand):
 
         # Run the tests and collect results
         results = await test_engine.run()
+        if not results:
+            self.error("No tests were executed. Check the discovery path and filters.")
+            return 1
 
         # Return 1 if any result indicates a failure or error, otherwise 0
         for result in results:

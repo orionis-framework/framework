@@ -1,10 +1,10 @@
+# ruff: noqa: TC001
+# Keep public contract annotations available for runtime inspection.
 """Declare asynchronous consumption and graceful stopping."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.queues.entities.reserved_job import ReservedJob
 
-if TYPE_CHECKING:
-    from orionis.queues.entities.reserved_job import ReservedJob
 
 class IWorker(ABC):
     """Declare asynchronous consumption and graceful stopping."""

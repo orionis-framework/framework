@@ -1,5 +1,9 @@
+# ruff: noqa: FBT003, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 import tests.orm.relations.test_mixin as relation_fixtures
+
 
 class TestHasManyRelation(relation_fixtures._RelationsTestCase):
     async def testLazyGetReturnsAllRelatedRows(self) -> None:
@@ -10,7 +14,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.Book.create({"title": "One", "author_id": author.id})
@@ -28,7 +32,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         books = await author.books().get()
@@ -42,7 +46,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ana = await relation_fixtures.Author.create({"name": "Ana"})
         bob = await relation_fixtures.Author.create({"name": "Bob"})
@@ -66,7 +70,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         await relation_fixtures.Book.create(
@@ -96,7 +100,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         relation = author.books()
@@ -111,7 +115,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         writer = await relation_fixtures.Writer.create({"name": "Mark"})
         await relation_fixtures.Article.create(
@@ -130,7 +134,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ana = await relation_fixtures.Author.create({"name": "Ana"})
         bob = await relation_fixtures.Author.create({"name": "Bob"})
@@ -157,7 +161,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ana = await relation_fixtures.Author.create({"name": "Ana"})
         bob = await relation_fixtures.Author.create({"name": "Bob"})
@@ -177,7 +181,7 @@ class TestHasManyRelation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await relation_fixtures.Book.create({"title": "Orphan", "author_id": None})
         unsaved = relation_fixtures.Author({"name": "Draft"})

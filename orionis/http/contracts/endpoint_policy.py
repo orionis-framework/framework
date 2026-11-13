@@ -1,3 +1,5 @@
+# ruff: noqa: ARG002
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Customize endpoint framing without replacing routing or middleware."""
 
 from __future__ import annotations
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
     from orionis.http.request import Request
     from orionis.http.responses import Response
 
+
 class IHttpEndpointPolicy(ABC):
     """Customize endpoint framing without replacing routing or middleware."""
 
@@ -17,7 +20,7 @@ class IHttpEndpointPolicy(ABC):
     monitor_disconnects: ClassVar[bool] = False
     """Monitor disconnects flag used by ``IHttpEndpointPolicy``."""
 
-    def isExpectedFailure(self, exception: Exception) -> bool:  # noqa: ARG002
+    def isExpectedFailure(self, exception: Exception) -> bool:
         """
         Classify a protocol rejection before global failure observation.
 
@@ -67,7 +70,9 @@ class IHttpEndpointPolicy(ABC):
 
     @abstractmethod
     async def exception(
-        self, exception: Exception, request: Request | TransportAdapter,
+        self,
+        exception: Exception,
+        request: Request | TransportAdapter,
     ) -> Response:
         """
         Report a failure and provide the endpoint's sanitized response.

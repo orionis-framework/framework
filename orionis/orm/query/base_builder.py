@@ -1,8 +1,13 @@
+# ruff: noqa: ANN401, PLC0415, SLF001, TC001, TC003
 """Engine shared by every Orionis query builder."""
 
 from __future__ import annotations
 import copy
-from typing import TYPE_CHECKING, Any, Self
+from collections.abc import AsyncIterator, Callable, Iterable
+from typing import Any, Self
+from orionis.database.contracts.connection import IConnection
+from orionis.database.contracts.connection_manager import IConnectionManager
+from orionis.database.entities.result import InsertResult
 from orionis.orm.collections.paginator import Paginator
 from orionis.orm.exceptions import InvalidQueryException
 from orionis.orm.query.expressions import (
@@ -28,11 +33,6 @@ from orionis.orm.query.expressions import (
 from orionis.orm.query.join_clause import JoinClause
 from orionis.orm.schema.table import TableDefinition
 from orionis.support.types.collection import Collection
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncIterator, Callable, Iterable
-    from orionis.database.contracts.connection import IConnection
-    from orionis.database.entities.result import InsertResult
 
 # Number of arguments in the (operator, value) where form.
 _WHERE_WITH_OPERATOR: int = 2
@@ -69,9 +69,12 @@ class QueryBuilderBase:
     and how values are serialized before being written.
     """
 
-    # ruff: noqa: ANN401
-
-    __slots__ = ("_connection_name", "_plan")
+    __slots__ = (
+        "_connection_manager",
+        "_connection_name",
+        "_plan",
+        "_resolved_connection",
+    )
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self: Self, table: TableDefinition | None = None) -> None:
@@ -86,10 +89,14 @@ class QueryBuilderBase:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self._connection_name: str | None = None
         """Name of the configured database connection to use."""
+        self._connection_manager: IConnectionManager | None = None
+        """Gateway manager retained independently of the process-wide resolver."""
+        self._resolved_connection: IConnection | None = None
+        """Exact migration checkout retained until explicitly retargeted."""
         self._plan = SelectPlan(
             table=table if table is not None else TableDefinition(name=""),
         )
@@ -143,9 +150,10 @@ class QueryBuilderBase:
             error_msg = "No table selected; call table() before running the query."
             raise InvalidQueryException(error_msg)
         probe = self.clone()
-        probe._beforeExecute()  # noqa: SLF001
-        return probe._connection().toSql(  # noqa: SLF001
-            probe.toPlan(), literal_binds=literal_binds,
+        probe._beforeExecute()
+        return probe._connection().toSql(
+            probe.toPlan(),
+            literal_binds=literal_binds,
         )
 
     def clone(self: Self) -> Self:
@@ -208,6 +216,31 @@ class QueryBuilderBase:
             The same builder, enabling fluent chaining.
         """
         self._connection_name = name
+        self._resolved_connection = None
+        return self
+
+    def _bindConnectionManager(
+        self: Self,
+        manager: IConnectionManager,
+        *,
+        connection: IConnection | None = None,
+    ) -> Self:
+        """Retain the gateway owner and an optional exact migration connection.
+
+        Parameters
+        ----------
+        manager : orionis.database.contracts.IConnectionManager
+            Manager that created this query and resolves explicit connection names.
+        connection : orionis.database.contracts.IConnection or None, optional
+            Exact migration connection, retained without opening a checkout.
+
+        Returns
+        -------
+        typing.Self
+            The same builder with its original connection owner retained.
+        """
+        self._connection_manager = manager
+        self._resolved_connection = connection
         return self
 
     # ── Subclass hooks ──────────────────────────────────────────────────────
@@ -240,10 +273,15 @@ class QueryBuilderBase:
         """
         # Imported here because the model-less builder derives from this
         # class, so importing it at module level would cycle.
-        from orionis.orm.query.raw_builder import RawQueryBuilder  # noqa: PLC0415
+        from orionis.orm.query.raw_builder import RawQueryBuilder
 
         builder = RawQueryBuilder(self._plan.table)
         builder.adoptConnection(self._connection_name)
+        if self._connection_manager is not None:
+            builder._bindConnectionManager(
+                self._connection_manager,
+                connection=self._resolved_connection,
+            )
         builder.toPlan().alias = self._plan.alias
         return builder
 
@@ -315,7 +353,7 @@ class QueryBuilderBase:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
 
     # ── Projection ──────────────────────────────────────────────────────────
@@ -1679,7 +1717,8 @@ class QueryBuilderBase:
         """
         self._beforeExecute()
         probe = self._plan.clone()
-        probe.columns = self._existsColumns()
+        if not probe.columns and not (probe.unions or probe.groups or probe.havings):
+            probe.columns = self._existsColumns()
         probe.orders = []
         probe.limit_value = 1
         probe.offset_value = None
@@ -1965,6 +2004,12 @@ class QueryBuilderBase:
         orionis.orm.exceptions.InvalidQueryException
             If the argument is not a supported subquery source.
         """
+        if isinstance(query, QueryBuilderBase):
+            if type(query)._beforeExecute is QueryBuilderBase._beforeExecute:
+                return query.toPlan()
+            prepared = query.clone()
+            prepared._beforeExecute()
+            return prepared.toPlan()
         if isinstance(query, SelectPlan):
             return query
         if callable(query):
@@ -2280,7 +2325,7 @@ class QueryBuilderBase:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------

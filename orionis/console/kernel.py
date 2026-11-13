@@ -1,6 +1,7 @@
 """Bootstrap the console runtime and dispatch command invocations."""
 
 from __future__ import annotations
+from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 from orionis.console.contracts.kernel import IKernelCLI
 from orionis.console.core.contracts.reactor import IReactor
@@ -8,16 +9,36 @@ from orionis.console.core.contracts.reactor import IReactor
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
+
 class KernelCLI(IKernelCLI):
     """Bootstrap the console runtime and dispatch command invocations."""
 
     __slots__ = ("__reactor",)
     """Declare the instance attribute slots reserved by this class."""
 
-    IGNORE_FLAGS: ClassVar[frozenset[str]] = frozenset({
-        "reactor", "-c", "-m", "-", "-i", "-q", "-B", "-O", "-OO", "-v",
-        "-vv", "-d", "-x", "-E", "-s", "-S", "-u", "-I", "-W",
-    })
+    IGNORE_FLAGS: ClassVar[frozenset[str]] = frozenset(
+        {
+            "reactor",
+            "-c",
+            "-m",
+            "-",
+            "-i",
+            "-q",
+            "-B",
+            "-O",
+            "-OO",
+            "-v",
+            "-vv",
+            "-d",
+            "-x",
+            "-E",
+            "-s",
+            "-S",
+            "-u",
+            "-I",
+            "-W",
+        },
+    )
     """Ignore flags used by ``KernelCLI``."""
 
     _HELP_FLAGS: ClassVar[frozenset[str]] = frozenset({"help", "--help", "-h"})
@@ -64,7 +85,7 @@ class KernelCLI(IKernelCLI):
             raise TypeError(error_msg)
 
         # Fallback depuration: drop leading "reactor" prefix
-        if args and "reactor" in args[0]:
+        if args and Path(args[0]).stem == "reactor":
             del args[0]
 
         # If no arguments are provided, show help

@@ -1,27 +1,36 @@
+# ruff: noqa: PLR0913, TC001, TC003
+# Preserve runtime injection and the internal migration-step arguments.
 """Runner applying and reverting the application migrations."""
 
 import time
+from functools import partial
 from heapq import nlargest
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from pathlib import Path
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.contracts.migration import Migration
 from orionis.database.contracts.migrator import IMigrator
 from orionis.database.exceptions import MigrationNotFoundException
 from orionis.database.migrations.context import migration_connection_scope
-from orionis.database.migrations.events import NO_EVENTS, MigrationEvents
+from orionis.database.migrations.discovery import _discover_steps
+from orionis.database.migrations.events import (
+    NO_EVENTS,
+    MigrationEvents,
+    _report_failure,
+)
 from orionis.foundation.contracts.application import IApplication
-from orionis.introspection.modules.inspector import ModuleInspector
-from orionis.introspection.modules.reflection import ReflectionModule
 from orionis.orm.query.expressions import (
-    DeletePlan, InsertPlan, OrderClause, SelectPlan, WhereClause,
+    DeletePlan,
+    InsertPlan,
+    OrderClause,
+    SelectPlan,
+    WhereClause,
 )
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, Integer, String
 
-if TYPE_CHECKING:
-    from pathlib import Path
 
 # Name of the table used to track already-applied migrations.
 _MIGRATIONS_TABLE: str = "migrations"
@@ -30,6 +39,7 @@ _MIGRATIONS_TABLE: str = "migrations"
 # Seeder history belongs to a schema built by the recorded migrations.
 _SEEDERS_TABLE: str = "seeders"
 """Seeder history belongs to a schema built by the recorded migrations."""
+
 
 def _build_migrations_table(table: str) -> TableDefinition:
     """
@@ -76,11 +86,13 @@ def _build_migrations_table(table: str) -> TableDefinition:
         primary_key="id",
     )
 
+
 # Define the columns used to track applied migrations.
 _MIGRATIONS_TABLE_DEFINITION: TableDefinition = _build_migrations_table(
     _MIGRATIONS_TABLE,
 )
 """Define the columns used to track applied migrations."""
+
 
 class Migrator(IMigrator):
     """
@@ -93,8 +105,6 @@ class Migrator(IMigrator):
     leaves the tracking table claiming a migration that did not fully
     apply.
     """
-
-    # ruff: noqa: TC001
 
     __slots__ = ("__app", "__conn_manager", "__discovered_cache")
     """Declare the instance attribute slots reserved by this class."""
@@ -117,7 +127,7 @@ class Migrator(IMigrator):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.__app = app
         """Application instance used to resolve the migrations directory."""
@@ -433,7 +443,7 @@ class Migrator(IMigrator):
         targets = set(nlargest(steps, {row["batch"] for row in ran}))
         return [row for row in reversed(ran) if row["batch"] in targets]
 
-    async def __runStep(  # noqa: PLR0913
+    async def __runStep(
         self,
         connection: IConnection,
         name: str,
@@ -465,7 +475,7 @@ class Migrator(IMigrator):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
 
         Raises
         ------
@@ -490,8 +500,11 @@ class Migrator(IMigrator):
                     else:
                         await instance.up()
                         await self.__insertRecord(connection, name, batch)
-        except Exception:
-            events.failed(name, time.perf_counter() - started_at)
+        except Exception as error:
+            _report_failure(
+                partial(events.failed, name, time.perf_counter() - started_at),
+                error,
+            )
             raise
         events.succeeded(name, time.perf_counter() - started_at)
 
@@ -555,36 +568,12 @@ class Migrator(IMigrator):
         if self.__discovered_cache is not None:
             return self.__discovered_cache
 
-        migrations_path = self.__migrationsPath()
-        if not migrations_path.is_dir():
-            self.__discovered_cache = {}
-            return self.__discovered_cache
-
-        modules = ModuleInspector.discoverModules(
-            base_path=self.__app.basePath,
-            target_path=migrations_path,
+        self.__discovered_cache = _discover_steps(
+            self.__app.basePath,
+            self.__migrationsPath(),
+            Migration,
+            "migration",
         )
-
-        found: dict[str, type[Migration]] = {}
-        for module_name in modules:
-            stem = module_name.rsplit(".", 1)[-1]
-            if stem == "__init__":
-                continue
-            rf_module = ReflectionModule(module_name)
-            for obj in rf_module.getClasses().values():
-                if obj.__module__ != module_name or not issubclass(obj, Migration):
-                    continue
-                previous = found.get(stem)
-                if previous is not None:
-                    error_msg = (
-                        f"Ambiguous migration '{stem}': "
-                        f"{previous.__module__}.{previous.__name__} and "
-                        f"{module_name}.{obj.__name__}."
-                    )
-                    raise ValueError(error_msg)
-                found[stem] = obj
-
-        self.__discovered_cache = dict(sorted(found.items()))
         return self.__discovered_cache
 
     # ── Tracking table ──────────────────────────────────────────────────────
@@ -601,7 +590,7 @@ class Migrator(IMigrator):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         await connection.createTable(_MIGRATIONS_TABLE_DEFINITION)
 
@@ -668,16 +657,18 @@ class Migrator(IMigrator):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         await connection.insert(
             InsertPlan(
                 table=_MIGRATIONS_TABLE_DEFINITION,
-                values=[{
-                    "migration": name,
-                    "batch": batch,
-                    "migrated_at": int(time.time()),
-                }],
+                values=[
+                    {
+                        "migration": name,
+                        "batch": batch,
+                        "migrated_at": int(time.time()),
+                    },
+                ],
             ),
         )
 
@@ -695,7 +686,7 @@ class Migrator(IMigrator):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         await connection.delete(
             DeletePlan(

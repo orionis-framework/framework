@@ -12,6 +12,7 @@ from orionis.foundation.config.mail.enums.drivers import MailDriver
 from orionis.foundation.config.validation import validate_string
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class Mail(BaseEntity):
     """

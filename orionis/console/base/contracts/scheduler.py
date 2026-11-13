@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.console.contracts.schedule import ISchedule
     from orionis.console.entities.scheduler_event import SchedulerEvent
 
+
 class IBaseScheduler(ABC):
     """Define the contract for base scheduler implementations."""
 

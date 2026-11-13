@@ -1,3 +1,8 @@
+# ruff: noqa: PT009, PT027, S603, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Run controlled Python child processes with the inherited isolation guard.
+from typing import Never
+
 import asyncio
 import os
 import subprocess
@@ -30,8 +35,14 @@ from orionis.foundation.config.database import (
     RedshiftSSLMode,
 )
 from orionis.orm.query.expressions import (
-    AggregateClause, AggregateFunction, DeletePlan, InsertPlan, LockMode,
-    SelectPlan, SubQueryColumn, UpdatePlan,
+    AggregateClause,
+    AggregateFunction,
+    DeletePlan,
+    InsertPlan,
+    LockMode,
+    SelectPlan,
+    SubQueryColumn,
+    UpdatePlan,
 )
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, Integer, String
@@ -40,6 +51,12 @@ from orionis.queues.exceptions import QueueStorageError
 from orionis.session.stores.database import DatabaseSessionStore
 from orionis.test import TestCase
 from tests.foundation.config.test_environment import ConfigurationTestCase
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 class TestRedshiftConfiguration(ConfigurationTestCase):
     """Verify lazy Redshift configuration without optional driver imports."""
@@ -50,7 +67,7 @@ class TestRedshiftConfiguration(ConfigurationTestCase):
         Returns
         -------
         None
-            Defaults serialize into connector-compatible scalar values.
+            No return value.
         """
         settings = Redshift().toDict()
         self.assertEqual(settings["driver"], "redshift")
@@ -68,7 +85,7 @@ class TestRedshiftConfiguration(ConfigurationTestCase):
         Returns
         -------
         None
-            Core and application settings retain independent snapshots.
+            No return value.
         """
         self.environment.values.update(
             DB_CONNECTION=ConnectionName.REDSHIFT,
@@ -103,7 +120,7 @@ class TestRedshiftConfiguration(ConfigurationTestCase):
         Returns
         -------
         None
-            PostgreSQL prefer mode never leaks into Redshift settings.
+            No return value.
         """
         self.environment.values.update(DB_CONNECTION="pgsql", DB_SSLMODE="prefer")
         for config_type in (Database, BootstrapDatabase):
@@ -117,7 +134,7 @@ class TestRedshiftConfiguration(ConfigurationTestCase):
         Returns
         -------
         None
-            Dictionaries become validated Redshift entities.
+            No return value.
         """
         config = Database(
             default=" REDSHIFT ",
@@ -134,12 +151,17 @@ class TestRedshiftConfiguration(ConfigurationTestCase):
         Returns
         -------
         None
-            No URLs or AWS clients are constructed by the entity.
+            No return value.
         """
         settings = Redshift(
-            host=None, username=None, password=None, iam=True,
-            is_serverless=True, serverless_work_group="analytics",
-            serverless_acct_id="123456789012", timeout=None,
+            host=None,
+            username=None,
+            password=None,
+            iam=True,
+            is_serverless=True,
+            serverless_work_group="analytics",
+            serverless_acct_id="123456789012",
+            timeout=None,
         ).toDict()
         self.assertIsNone(settings["host"])
         self.assertIsNone(settings["timeout"])
@@ -153,17 +175,29 @@ class TestRedshiftConfiguration(ConfigurationTestCase):
         Returns
         -------
         None
-            Each invalid scalar produces an explicit validation exception.
+            No return value.
         """
         for options in (
-            {"driver": "pgsql"}, {"port": 0}, {"port": 65536}, {"port": True},
-            {"port": "invalid"}, {"database": ""}, {"username": 10},
-            {"ssl": "true"}, {"sslmode": "prefer"}, {"iam": 1},
-            {"timeout": 0}, {"timeout": True}, {"region": ""},
+            {"driver": "pgsql"},
+            {"port": 0},
+            {"port": 65536},
+            {"port": True},
+            {"port": "invalid"},
+            {"database": ""},
+            {"username": 10},
+            {"ssl": "true"},
+            {"sslmode": "prefer"},
+            {"iam": 1},
+            {"timeout": 0},
+            {"timeout": True},
+            {"region": ""},
             {"is_serverless": "false"},
         ):
-            with self.subTest(options=options), self.assertRaises(
-                (TypeError, ValueError),
+            with (
+                self.subTest(options=options),
+                self.assertRaises(
+                    (TypeError, ValueError),
+                ),
             ):
                 Redshift(**options)
         with self.assertRaises(TypeError):
@@ -175,11 +209,12 @@ class TestRedshiftConfiguration(ConfigurationTestCase):
         Returns
         -------
         None
-            Mutation is rejected by the existing configuration contract.
+            No return value.
         """
         settings = Redshift()
         with self.assertRaises(FrozenInstanceError):
             settings.port = 5432
+
 
 class TestRedshiftDialect(TestCase):
     """Compile real connector statements without reaching an AWS endpoint."""
@@ -190,7 +225,7 @@ class TestRedshiftDialect(TestCase):
         Returns
         -------
         None
-            Configuration and thread-adapter tests remain independently available.
+            No return value.
         """
         if any(
             find_spec(package) is None
@@ -205,7 +240,7 @@ class TestRedshiftDialect(TestCase):
         Returns
         -------
         None
-            The registered DBAPI is the AWS connector and RETURNING is disabled.
+            No return value.
         """
         settings = {"driver": "redshift", "host": "warehouse.example.com"}
         engine = create_engine(
@@ -229,10 +264,11 @@ class TestRedshiftDialect(TestCase):
         Returns
         -------
         None
-            First engine construction neither opens sockets nor checks out handles.
+            No return value.
         """
         connection = Connection(
-            "warehouse", {"driver": "redshift", "host": "warehouse.example.com"},
+            "warehouse",
+            {"driver": "redshift", "host": "warehouse.example.com"},
         )
         self.assertIsNone(connection._engine)
         try:
@@ -249,26 +285,33 @@ class TestRedshiftDialect(TestCase):
         Returns
         -------
         None
-            Auto-generated columns remain server-owned during an insert.
+            No return value.
         """
         settings = {"driver": "redshift"}
         engine = create_engine(build_engine_url(settings), **engine_options(settings))
         try:
             table = TableDefinition(
-                name="items", primary_key="id",
+                name="items",
+                primary_key="id",
                 columns={
-                    "id": BigInteger().primary().autoIncrement(), "name": String(),
+                    "id": BigInteger().primary().autoIncrement(),
+                    "name": String(),
                 },
             )
             compiler = SQLCompiler(driver="redshift")
-            ddl = str(compiler.compileCreateTable(table).compile(
-                dialect=engine.dialect,
-            ))
+            ddl = str(
+                compiler.compileCreateTable(table).compile(
+                    dialect=engine.dialect,
+                ),
+            )
             self.assertIn("BIGINT IDENTITY(1,1)", ddl)
             self.assertNotIn("SERIAL", ddl)
-            insert = compiler.compileInsert(InsertPlan(
-                table=table, values=[{"name": "alpha"}],
-            )).compile(dialect=engine.dialect)
+            insert = compiler.compileInsert(
+                InsertPlan(
+                    table=table,
+                    values=[{"name": "alpha"}],
+                ),
+            ).compile(dialect=engine.dialect)
             self.assertNotIn("RETURNING", str(insert))
             self.assertNotIn("nextval", str(insert))
             self.assertNotIn("id", insert.params)
@@ -281,7 +324,7 @@ class TestRedshiftDialect(TestCase):
         Returns
         -------
         None
-            Schema and table names never become SQL fragments.
+            No return value.
         """
         dialect = import_module("orionis.database.redshift").RedshiftDialect()
         connection = MagicMock(spec=SqlConnection)
@@ -297,6 +340,7 @@ class TestRedshiftDialect(TestCase):
         self.assertIn("current_database()", sql)
         self.assertIn("COALESCE(:schema, current_schema())", sql)
 
+
 class TestRedshiftConsumerCapabilities(TestCase):
     """Reject consumers whose correctness requires enforced unique keys."""
 
@@ -306,7 +350,7 @@ class TestRedshiftConsumerCapabilities(TestCase):
         Returns
         -------
         None
-            The asynchronous warehouse connection remains lazy and reusable.
+            No return value.
         """
         connection = Connection("warehouse", {"driver": "redshift"})
         self.assertFalse(connection.supportsUniqueConstraints())
@@ -325,9 +369,12 @@ class TestRedshiftConsumerCapabilities(TestCase):
         application.build.assert_not_called()
         application.path.assert_not_called()
         self.assertIsNone(connection._engine)
-        self.assertTrue(Connection(
-            "sqlite", {"driver": "sqlite", "database": ":memory:"},
-        ).supportsUniqueConstraints())
+        self.assertTrue(
+            Connection(
+                "sqlite",
+                {"driver": "sqlite", "database": ":memory:"},
+            ).supportsUniqueConstraints(),
+        )
 
     def testSchedulerRejectsTheWarehouseBeforeConstructingASyncEngine(self) -> None:
         """Keep unsupported job-store uniqueness and indexes from reaching Redshift.
@@ -335,7 +382,7 @@ class TestRedshiftConsumerCapabilities(TestCase):
         Returns
         -------
         None
-            The scheduler raises a configuration error before creating an engine.
+            No return value.
         """
         application = MagicMock()
         application.config.return_value = {
@@ -358,7 +405,7 @@ class TestRedshiftConsumerCapabilities(TestCase):
         Returns
         -------
         None
-            Unsupported locks reject before a worker or network connection starts.
+            No return value.
         """
         connection = Connection("warehouse", {"driver": "redshift"})
         table = TableDefinition(name="items", columns={"id": Integer().primary()})
@@ -366,19 +413,32 @@ class TestRedshiftConsumerCapabilities(TestCase):
             plans = (
                 SelectPlan(table=table, lock=mode),
                 SelectPlan(
-                    table=table, lock=mode, distinct=True,
+                    table=table,
+                    lock=mode,
+                    distinct=True,
                     aggregate=AggregateClause(AggregateFunction.COUNT),
                 ),
-                SelectPlan(table=table, columns=(SubQueryColumn(
-                    SelectPlan(table=table, columns=("id",), lock=mode), "value",
-                ),)),
+                SelectPlan(
+                    table=table,
+                    columns=(
+                        SubQueryColumn(
+                            SelectPlan(table=table, columns=("id",), lock=mode),
+                            "value",
+                        ),
+                    ),
+                ),
             )
             for plan in plans:
-                with self.subTest(mode=mode, plan=plan), self.assertRaisesRegex(
-                    QueryException, "row-level SELECT locks",
+                with (
+                    self.subTest(mode=mode, plan=plan),
+                    self.assertRaisesRegex(
+                        QueryException,
+                        "row-level SELECT locks",
+                    ),
                 ):
                     await connection.select(plan)
         self.assertIsNone(connection._engine)
+
 
 class _BlockingQuery:
     """Pause real DBAPI work until the asynchronous test releases it."""
@@ -396,7 +456,7 @@ class _BlockingQuery:
         Returns
         -------
         None
-            Initialize a deterministic blocking query gate.
+            No return value.
         """
         self.entered = threading.Event()
         self.release = threading.Event()
@@ -426,6 +486,7 @@ class _BlockingQuery:
             raise RuntimeError(message)
         return 7
 
+
 class TestThreadedRedshiftConnection(TestCase):
     """Exercise the async adapter with real SQLite Core I/O instead of AWS services."""
 
@@ -435,31 +496,27 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Each test owns its database file, checkouts and worker threads.
+            No return value.
         """
         self._directory = TemporaryDirectory()
-        self._engine = ThreadedEngine(create_engine(
-            "sqlite:///" + (Path(self._directory.name) / "warehouse.sqlite").as_posix(),
-            connect_args={"check_same_thread": False},
-        ), "warehouse")
+        self.addCleanup(self._directory.cleanup)
+        self._engine = ThreadedEngine(
+            create_engine(
+                "sqlite:///"
+                + (Path(self._directory.name) / "warehouse.sqlite").as_posix(),
+                connect_args={"check_same_thread": False},
+            ),
+            "warehouse",
+        )
         self._connection = Connection("warehouse", {"driver": "redshift"})
         self._connection._engine = self._engine
         self._table = TableDefinition(
-            name="items", primary_key="id",
+            name="items",
+            primary_key="id",
             columns={"id": Integer().primary(), "name": String()},
         )
+        self.addAsyncCleanup(self._connection.disconnect)
         await self._connection.createTable(self._table)
-
-    async def asyncTearDown(self) -> None:
-        """Dispose the pool before deleting the test-owned database.
-
-        Returns
-        -------
-        None
-            No driver handles or adapter threads retain the temporary database.
-        """
-        await self._connection.disconnect()
-        self._directory.cleanup()
 
     async def testCoreCrudAndBatchResultsUseTheSameConnectionApi(self) -> None:
         """Run compiled plans, batch bindings and scalar reads through blocking Core.
@@ -467,26 +524,44 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Row counts, generated-key metadata and dictionaries match the native API.
+            No return value.
         """
-        inserted = await self._connection.insert(InsertPlan(
-            table=self._table, values=[{"name": "first"}],
-        ))
+        inserted = await self._connection.insert(
+            InsertPlan(
+                table=self._table,
+                values=[{"name": "first"}],
+            ),
+        )
         self.assertEqual(inserted.last_insert_id, 1)
         self.assertEqual(inserted.row_count, 1)
-        batch = await self._connection.insert(InsertPlan(
-            table=self._table, values=[{"name": "second"}, {"name": "third"}],
-        ))
+        batch = await self._connection.insert(
+            InsertPlan(
+                table=self._table,
+                values=[{"name": "second"}, {"name": "third"}],
+            ),
+        )
         self.assertEqual(batch.row_count, 2)
         self.assertIsNone(batch.last_insert_id)
         rows = await self._connection.select(SelectPlan(table=self._table))
         self.assertEqual([row["name"] for row in rows], ["first", "second", "third"])
-        self.assertEqual(await self._connection.scalar(SelectPlan(
-            table=self._table, columns=("name",),
-        )), "first")
-        self.assertEqual(await self._connection.update(UpdatePlan(
-            table=self._table, values={"name": "updated"},
-        )), 3)
+        self.assertEqual(
+            await self._connection.scalar(
+                SelectPlan(
+                    table=self._table,
+                    columns=("name",),
+                ),
+            ),
+            "first",
+        )
+        self.assertEqual(
+            await self._connection.update(
+                UpdatePlan(
+                    table=self._table,
+                    values={"name": "updated"},
+                ),
+            ),
+            3,
+        )
         deleted = await self._connection.delete(DeletePlan(table=self._table))
         self.assertEqual(deleted, 3)
         self.assertIsNone(await self._connection.scalar(SelectPlan(table=self._table)))
@@ -497,17 +572,28 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Blocking Core does not expose raw driver exceptions or credentials.
+            No return value.
         """
-        self.assertTrue(await self._connection.statement(
-            "INSERT INTO items (name) VALUES (:name)", {"name": "bound"},
-        ))
-        self.assertEqual(await self._connection.select(
-            "SELECT name FROM items WHERE name = :value", {"value": "bound"},
-        ), [{"name": "bound"}])
-        self.assertEqual(await self._connection.execute(
-            "UPDATE items SET name = :name", {"name": "changed"},
-        ), 1)
+        self.assertTrue(
+            await self._connection.statement(
+                "INSERT INTO items (name) VALUES (:name)",
+                {"name": "bound"},
+            ),
+        )
+        self.assertEqual(
+            await self._connection.select(
+                "SELECT name FROM items WHERE name = :value",
+                {"value": "bound"},
+            ),
+            [{"name": "bound"}],
+        )
+        self.assertEqual(
+            await self._connection.execute(
+                "UPDATE items SET name = :name",
+                {"name": "changed"},
+            ),
+            1,
+        )
         credential = "private-bound-value"
         with self.assertRaises(QueryException) as caught:
             await self._connection.execute(
@@ -523,24 +609,29 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Transaction state and pool ownership settle after either outcome.
+            No return value.
         """
         async with self._connection.transaction():
             self.assertTrue(self._connection.inTransaction())
             await self._connection.execute(
-                "INSERT INTO items (name) VALUES (:name)", {"name": "kept"},
+                "INSERT INTO items (name) VALUES (:name)",
+                {"name": "kept"},
             )
         with self.assertRaises(RuntimeError):
             async with self._connection.transaction():
                 await self._connection.execute(
-                    "INSERT INTO items (name) VALUES (:name)", {"name": "discarded"},
+                    "INSERT INTO items (name) VALUES (:name)",
+                    {"name": "discarded"},
                 )
                 message = "Roll back this transaction."
                 raise RuntimeError(message)
         self.assertFalse(self._connection.inTransaction())
-        self.assertEqual(await self._connection.select("SELECT name FROM items"), [
-            {"name": "kept"},
-        ])
+        self.assertEqual(
+            await self._connection.select("SELECT name FROM items"),
+            [
+                {"name": "kept"},
+            ],
+        )
         self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
 
     async def testNestedTransactionsFailWithoutLosingTheOuterTransaction(self) -> None:
@@ -549,18 +640,22 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            The outer transaction remains usable and commits normally.
+            No return value.
         """
         async with self._connection.transaction():
             with self.assertRaisesRegex(TransactionException, "nested transactions"):
                 await self._connection.begin()
             self.assertTrue(self._connection.inTransaction())
             await self._connection.execute(
-                "INSERT INTO items (name) VALUES (:name)", {"name": "outer"},
+                "INSERT INTO items (name) VALUES (:name)",
+                {"name": "outer"},
             )
-        self.assertEqual(await self._connection.select("SELECT name FROM items"), [
-            {"name": "outer"},
-        ])
+        self.assertEqual(
+            await self._connection.select("SELECT name FROM items"),
+            [
+                {"name": "outer"},
+            ],
+        )
 
     async def testCheckoutKeepsItsThreadAndResultsOutliveTheCursor(self) -> None:
         """Keep worker affinity through a checkout and materialize rows before close.
@@ -568,7 +663,7 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Results remain readable after the cursor and its worker are closed.
+            No return value.
         """
         raw = await self._engine.connect()
         try:
@@ -588,7 +683,7 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            A context-local value is visible without mutating the caller's context.
+            No return value.
         """
         marker = ContextVar("orionis_threaded_test_marker", default="missing")
         context = marker.set("request-value")
@@ -606,12 +701,14 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Every query returns its own bindings and all checkouts return to the pool.
+            No return value.
         """
-        rows = await asyncio.gather(*(
-            self._connection.select("SELECT :value AS value", {"value": value})
-            for value in range(12)
-        ))
+        rows = await asyncio.gather(
+            *(
+                self._connection.select("SELECT :value AS value", {"value": value})
+                for value in range(12)
+            ),
+        )
         self.assertEqual(rows, [[{"value": value}] for value in range(12)])
         self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
 
@@ -621,7 +718,7 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Cancelled work completes before cleanup with no lost future exceptions.
+            No return value.
         """
         loop = asyncio.get_running_loop()
         original_handler = loop.get_exception_handler()
@@ -632,14 +729,20 @@ class TestThreadedRedshiftConnection(TestCase):
                 gate = _BlockingQuery(fail=fail)
                 raw = await self._engine.connect()
                 try:
-                    await raw.runSync(lambda connection, callback=gate.wait: (
-                        connection.connection.driver_connection.create_function(
-                            "wait_for_release", 0, callback,
-                        )
-                    ))
-                    task = asyncio.create_task(raw.execute(
-                        text("SELECT wait_for_release() AS value"),
-                    ))
+                    await raw.runSync(
+                        lambda connection, callback=gate.wait: (
+                            connection.connection.driver_connection.create_function(
+                                "wait_for_release",
+                                0,
+                                callback,
+                            )
+                        ),
+                    )
+                    task = asyncio.create_task(
+                        raw.execute(
+                            text("SELECT wait_for_release() AS value"),
+                        ),
+                    )
                     self.assertTrue(await asyncio.to_thread(gate.entered.wait, 2))
                     self.assertFalse(task.done())
                     task.cancel()
@@ -664,12 +767,14 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            The caller waits for opening to settle and no checkout leaks.
+            No return value.
         """
         await self._engine.dispose()
         gate = _BlockingQuery()
         event.listen(
-            self._engine.sync_engine, "connect", lambda _dbapi, _record: gate.wait(),
+            self._engine.sync_engine,
+            "connect",
+            lambda _dbapi, _record: gate.wait(),
         )
         task = asyncio.create_task(self._engine.connect())
         try:
@@ -689,7 +794,7 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            DDL and lifecycle operations use the same worker cleanup path.
+            No return value.
         """
         self.assertTrue(await self._connection.dropTable("items"))
         with self.assertRaises(QueryException):
@@ -703,7 +808,7 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Cancellation never leaves a live connection or worker behind.
+            No return value.
         """
         gate = _BlockingQuery()
         threads_before = {thread.ident for thread in threading.enumerate()}
@@ -721,11 +826,15 @@ class TestThreadedRedshiftConnection(TestCase):
             await task
         self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
         self.assertFalse(self._connection.inTransaction())
-        self.assertEqual([
-            thread for thread in threading.enumerate()
-            if thread.name.startswith("orionis-redshift")
-            and thread.ident not in threads_before
-        ], [])
+        self.assertEqual(
+            [
+                thread
+                for thread in threading.enumerate()
+                if thread.name.startswith("orionis-redshift")
+                and thread.ident not in threads_before
+            ],
+            [],
+        )
 
     async def testCancelledCommitAndRollbackDrainBeforeConnectionRelease(self) -> None:
         """Keep transaction control outside the loop and drain repeated cancellation.
@@ -733,7 +842,7 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Completed commits persist, rollbacks discard, and every checkout closes.
+            No return value.
         """
         dialect = self._engine.sync_engine.dialect
         for control, persisted in (("commit", True), ("rollback", False)):
@@ -742,7 +851,11 @@ class TestThreadedRedshiftConnection(TestCase):
                 reached_control = asyncio.Event()
                 operation = getattr(dialect, "do_" + control)
 
-                def blocked(raw, callback=operation, blocker=gate):
+                def blocked(
+                    raw: object,
+                    callback: Callable[[object], object] = operation,
+                    blocker: _BlockingQuery = gate,
+                ) -> object:
                     """
                     Block transaction control until the test releases its gate.
 
@@ -763,7 +876,10 @@ class TestThreadedRedshiftConnection(TestCase):
                     blocker.wait()
                     return callback(raw)
 
-                async def transaction(operation=control, ready=reached_control):
+                async def transaction(
+                    operation: str = control,
+                    ready: asyncio.Event = reached_control,
+                ) -> None:
                     """
                     Apply transaction control when the suspended task is cancelled.
 
@@ -777,7 +893,7 @@ class TestThreadedRedshiftConnection(TestCase):
                     Returns
                     -------
                     None
-                        Finish the selected transaction control after cancellation.
+                        No return value.
                     """
                     await self._connection.begin()
                     try:
@@ -810,7 +926,8 @@ class TestThreadedRedshiftConnection(TestCase):
                         await asyncio.gather(task, return_exceptions=True)
                 self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
                 rows = await self._connection.select(
-                    "SELECT name FROM items WHERE name = :name", {"name": control},
+                    "SELECT name FROM items WHERE name = :name",
+                    {"name": control},
                 )
                 self.assertEqual(rows, [{"name": control}] if persisted else [])
 
@@ -820,7 +937,7 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            A cancelled close still returns the connection to the pool.
+            No return value.
         """
         raw = await self._engine.connect()
         await raw.execute(text("SELECT 1"))
@@ -828,7 +945,7 @@ class TestThreadedRedshiftConnection(TestCase):
         dialect = self._engine.sync_engine.dialect
         rollback = dialect.do_rollback
 
-        def blocked(connection):
+        def blocked(connection: object) -> object:
             """Block rollback until the cancellation test releases its gate.
 
             Parameters
@@ -864,14 +981,15 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Failed terminals close their checkout and subsequent queries still run.
+            No return value.
         """
         driver_payload = "private-credential-and-statement-payload"
         dialect = self._engine.sync_engine.dialect
         for control in ("begin", "commit", "rollback"):
             with self.subTest(control=control):
                 if control == "begin":
-                    def fail_begin(_raw):
+
+                    def fail_begin(_raw: object) -> Never:
                         """
                         Simulate a driver failure while beginning a transaction.
 
@@ -896,7 +1014,10 @@ class TestThreadedRedshiftConnection(TestCase):
                 else:
                     original = getattr(dialect, "do_" + control)
 
-                    def fail_control(raw, callback=original):
+                    def fail_control(
+                        raw: object,
+                        callback: Callable[[object], object] = original,
+                    ) -> Never:
                         """
                         Raise a driver error after completing transaction control.
 
@@ -918,6 +1039,7 @@ class TestThreadedRedshiftConnection(TestCase):
 
                     with (
                         patch.object(dialect, "do_" + control, fail_control),
+                        self.assertNoLogs("sqlalchemy.pool", level="ERROR"),
                         self.assertRaises(QueryException) as caught,
                     ):
                         if control == "commit":
@@ -927,9 +1049,12 @@ class TestThreadedRedshiftConnection(TestCase):
                 self.assertNotIn(driver_payload, str(caught.exception))
                 self.assertTrue(caught.exception.__suppress_context__)
                 self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
-                self.assertEqual(await self._connection.select("SELECT 1 AS value"), [
-                    {"value": 1},
-                ])
+                self.assertEqual(
+                    await self._connection.select("SELECT 1 AS value"),
+                    [
+                        {"value": 1},
+                    ],
+                )
 
     async def testFailedManualControlInvalidatesWithoutDriverLogs(self) -> None:
         """Discard unsettled blocking transactions before pool reset can log errors.
@@ -937,18 +1062,22 @@ class TestThreadedRedshiftConnection(TestCase):
         Returns
         -------
         None
-            Public control errors are sanitized and the next checkout succeeds.
+            No return value.
         """
         dialect = self._engine.sync_engine.dialect
         for control in ("commit", "rollback"):
             with self.subTest(control=control):
                 await self._connection.begin()
                 await self._connection.execute(
-                    "INSERT INTO items (name) VALUES (:name)", {"name": control},
+                    "INSERT INTO items (name) VALUES (:name)",
+                    {"name": control},
                 )
                 original = getattr(dialect, "do_" + control)
 
-                def fail_control(raw, callback=original):
+                def fail_control(
+                    raw: object,
+                    callback: Callable[[object], object] = original,
+                ) -> Never:
                     """
                     Simulate a driver failure after manual transaction control.
 
@@ -978,14 +1107,16 @@ class TestThreadedRedshiftConnection(TestCase):
                 self.assertTrue(caught.exception.__suppress_context__)
                 self.assertFalse(self._connection.inTransaction())
                 self.assertEqual(self._engine.sync_engine.pool.checkedout(), 0)
-                self.assertEqual(await self._connection.select("SELECT 1 AS value"), [
-                    {"value": 1},
-                ])
+                self.assertEqual(
+                    await self._connection.select("SELECT 1 AS value"),
+                    [
+                        {"value": 1},
+                    ],
+                )
+
 
 class TestRedshiftOptionalDependencies(TestCase):
     """Keep ordinary framework imports independent of the optional AWS packages."""
-
-    # ruff: noqa: S603
 
     def testMissingExtraFailsOnlyWhenTheRedshiftEngineIsRequested(self) -> None:
         """Reject missing dialect or driver lazily with the official extra hint.
@@ -993,16 +1124,18 @@ class TestRedshiftOptionalDependencies(TestCase):
         Returns
         -------
         None
-            Fresh interpreters prove both optional-package failures remain isolated.
+            No return value.
         """
         root = Path(__file__).resolve().parents[2]
-        script = """import asyncio
+        script = '''import asyncio
 import importlib.abc
 import sys
 
 class BlockPackage(importlib.abc.MetaPathFinder):
-    def findSpec(self, fullname, path=None, target=None):
-        \"\"\"Reject imports from the selected optional package.
+    def findSpec(
+        self, fullname: str, path: object = None, target: object = None,
+    ) -> None:
+        """Reject imports from the selected optional package.
 
         Parameters
         ----------
@@ -1022,7 +1155,7 @@ class BlockPackage(importlib.abc.MetaPathFinder):
         ------
         ModuleNotFoundError
             If the module belongs to the selected optional package.
-        \"\"\"
+        """
         if fullname.split('.')[0] == sys.argv[1]:
             raise ModuleNotFoundError('Optional package unavailable', name=fullname)
         return None
@@ -1048,14 +1181,14 @@ except MissingDatabaseDependencyException as error:
 else:
     raise AssertionError('The missing optional dependency was not reported')
 
-async def check_schema():
-    \"\"\"Verify schema creation reports the missing optional dependency.
+async def check_schema() -> None:
+    """Verify schema creation reports the missing optional dependency.
 
     Returns
     -------
     None
-        Assert the extra hint and disconnect the deferred connection.
-    \"\"\"
+        No return value.
+    """
     table = TableDefinition(
         name='items', columns={'id': Integer().primary().autoIncrement()},
     )
@@ -1070,17 +1203,23 @@ async def check_schema():
 
 asyncio.run(check_schema())
 print('Optional dependency isolation passed')
-"""
+'''
         for package in ("sqlalchemy_redshift", "redshift_connector"):
             with self.subTest(package=package), TemporaryDirectory() as directory:
                 result = subprocess.run(
                     [sys.executable, "-B", "-c", script, package],
-                    cwd=directory, env={**os.environ, "PYTHONPATH": str(root)},
-                    capture_output=True, text=True, encoding="utf-8",
-                    timeout=30, check=False,
+                    cwd=directory,
+                    env={
+                        **os.environ,
+                        "PYTHONPATH": os.pathsep.join(
+                            filter(None, (os.environ.get("PYTHONPATH"), str(root))),
+                        ),
+                    },
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    timeout=30,
+                    check=False,
                 )
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn("Optional dependency isolation passed", result.stdout)
-
-
-

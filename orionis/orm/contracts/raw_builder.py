@@ -1,13 +1,13 @@
+# ruff: noqa: ANN401, TC001
 """Contract for the model-less query builder over a plain table name."""
 
 from __future__ import annotations
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
+from orionis.orm.collections.paginator import Paginator
 from orionis.orm.contracts.base_builder import IQueryBuilderBase
+from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from orionis.orm.collections.paginator import Paginator
-    from orionis.support.types.collection import Collection
 
 class IRawQueryBuilder(IQueryBuilderBase):
     """
@@ -19,8 +19,6 @@ class IRawQueryBuilder(IQueryBuilderBase):
     the target table and connection, and returning plain dictionaries
     instead of hydrated instances.
     """
-
-    # ruff: noqa: ANN401
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

@@ -1,3 +1,5 @@
+# ruff: noqa: S704, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Render the framework default HTTP error and status responses."""
 
 import json
@@ -38,6 +40,7 @@ _PYTHON_VERSION: str = platform.python_version()
 _LOCALE_CONFIG_KEY: str = "app.locale"
 """Locale config key identifier: ``app.locale``."""
 
+
 def _validate_status_code(status_code: int | HTTPStatus) -> int:
     """
     Validate an HTTP status before either response format is rendered.
@@ -67,6 +70,7 @@ def _validate_status_code(status_code: int | HTTPStatus) -> int:
         raise ValueError(error_msg)
     return status_code.value if isinstance(status_code, HTTPStatus) else status_code
 
+
 def _status_message(status_code: int) -> str:
     """Return the display label for a validated HTTP status.
 
@@ -89,14 +93,18 @@ def _status_message(status_code: int) -> str:
         _STATUS_MESSAGES[status_code] = message
     return message
 
-class DefaultResponses(IDefaultResponses):
 
-    # ruff: noqa: TC001
+class DefaultResponses(IDefaultResponses):
     """Render the framework default HTTP error and status responses."""
 
     __slots__ = (
-        "__app", "__app_locale", "__app_name", "__asset_paths",
-        "__directory", "__engine", "__memory_cache",
+        "__app",
+        "__app_locale",
+        "__app_name",
+        "__asset_paths",
+        "__directory",
+        "__engine",
+        "__memory_cache",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -148,32 +156,47 @@ class DefaultResponses(IDefaultResponses):
 
     # Favicon candidates in order of preference.
     _FAVICON_CANDIDATES: ClassVar[tuple[tuple[str, dict[str, str]], ...]] = (
-        (_FAVICON_NAME, {
-            "content-type": "image/x-icon",
-            "cache-control": _FAVICON_CACHE_CONTROL_AGE,
-        }),
-        ("favicon.png", {
-            "content-type": "image/png",
-            "cache-control": _FAVICON_CACHE_CONTROL_AGE,
-        }),
-        ("favicon.svg", {
-            "content-type": "image/svg+xml",
-            "cache-control": _FAVICON_CACHE_CONTROL_AGE,
-        }),
+        (
+            _FAVICON_NAME,
+            {
+                "content-type": "image/x-icon",
+                "cache-control": _FAVICON_CACHE_CONTROL_AGE,
+            },
+        ),
+        (
+            "favicon.png",
+            {
+                "content-type": "image/png",
+                "cache-control": _FAVICON_CACHE_CONTROL_AGE,
+            },
+        ),
+        (
+            "favicon.svg",
+            {
+                "content-type": "image/svg+xml",
+                "cache-control": _FAVICON_CACHE_CONTROL_AGE,
+            },
+        ),
     )
     """Favicon candidates in order of preference."""
     _ROBOTS_CANDIDATES: ClassVar[tuple[tuple[str, dict[str, str]], ...]] = (
-        ("robots.txt", {
-            "content-type": "text/plain",
-            "cache-control": "public, max-age=3600",
-        }),
+        (
+            "robots.txt",
+            {
+                "content-type": "text/plain",
+                "cache-control": "public, max-age=3600",
+            },
+        ),
     )
     """Robots candidates definitions used by ``DefaultResponses``."""
     _SITEMAP_CANDIDATES: ClassVar[tuple[tuple[str, dict[str, str]], ...]] = (
-        ("sitemap.xml", {
-            "content-type": "application/xml",
-            "cache-control": "public, max-age=600",
-        }),
+        (
+            "sitemap.xml",
+            {
+                "content-type": "application/xml",
+                "cache-control": "public, max-age=600",
+            },
+        ),
     )
     """Sitemap candidates definitions used by ``DefaultResponses``."""
 
@@ -189,11 +212,15 @@ class DefaultResponses(IDefaultResponses):
     # Map the maintenance flag to the health response metadata.
     _HEALTH_STATES: ClassVar[dict[bool, tuple[HTTPStatus, str, str, str]]] = {
         False: (
-            HTTPStatus.OK, "Online Application", "up",
+            HTTPStatus.OK,
+            "Online Application",
+            "up",
             "state_page_200:html",
         ),
         True: (
-            HTTPStatus.SERVICE_UNAVAILABLE, "Application in Maintenance", "down",
+            HTTPStatus.SERVICE_UNAVAILABLE,
+            "Application in Maintenance",
+            "down",
             "state_page_503:html",
         ),
     }
@@ -328,7 +355,9 @@ class DefaultResponses(IDefaultResponses):
             Response with status 404.
         """
         return await self.__publicFile(
-            "favicon", self._FAVICON_CANDIDATES, "Favicon Not Found",
+            "favicon",
+            self._FAVICON_CANDIDATES,
+            "Favicon Not Found",
             fallback=self._FAVICON_CANDIDATES[0],
         )
 
@@ -345,7 +374,9 @@ class DefaultResponses(IDefaultResponses):
             FileResponse with robots.txt if found, otherwise Response with 404.
         """
         return await self.__publicFile(
-            "robots_txt", self._ROBOTS_CANDIDATES, "Robots.txt Not Found",
+            "robots_txt",
+            self._ROBOTS_CANDIDATES,
+            "Robots.txt Not Found",
             fallback=self._ROBOTS_CANDIDATES[0],
         )
 
@@ -361,7 +392,9 @@ class DefaultResponses(IDefaultResponses):
             FileResponse with sitemap.xml if found, otherwise Response with status 404.
         """
         return await self.__publicFile(
-            "sitemap_xml", self._SITEMAP_CANDIDATES, "Sitemap Not Found",
+            "sitemap_xml",
+            self._SITEMAP_CANDIDATES,
+            "Sitemap Not Found",
         )
 
     async def __publicFile(
@@ -417,7 +450,9 @@ class DefaultResponses(IDefaultResponses):
                 return response
 
         return await self.error(
-            HTTPStatus.NOT_FOUND, missing_message, expects_json=False,
+            HTTPStatus.NOT_FOUND,
+            missing_message,
+            expects_json=False,
         )
 
     @staticmethod
@@ -439,7 +474,9 @@ class DefaultResponses(IDefaultResponses):
         """
         try:
             return FileResponse(
-                path=path, headers=headers, media_type=headers["content-type"],
+                path=path,
+                headers=headers,
+                media_type=headers["content-type"],
             )
         except (OSError, ValueError) as error:
             capture_nowait(
@@ -447,7 +484,8 @@ class DefaultResponses(IDefaultResponses):
                 flow="http",
                 phase="static.file",
                 expected=isinstance(
-                    error, (FileNotFoundError, NotADirectoryError, ValueError),
+                    error,
+                    (FileNotFoundError, NotADirectoryError, ValueError),
                 ),
             )
             return None
@@ -471,9 +509,9 @@ class DefaultResponses(IDefaultResponses):
         config_maintenance: bool = self.__app.underMaintenance()
 
         # Select constants for the current maintenance state.
-        app_state, state_label, template_page, key_html = (
-            self._HEALTH_STATES[config_maintenance]
-        )
+        app_state, state_label, template_page, key_html = self._HEALTH_STATES[
+            config_maintenance
+        ]
 
         if request.wantsJson():
             # Render the current health state into a response.
@@ -552,7 +590,9 @@ class DefaultResponses(IDefaultResponses):
                 status_code = status_code.value
             data: dict = content if isinstance(content, dict) else {"message": content}
             response = JSONResponse(
-                content=data, status_code=status_code, headers=response_headers,
+                content=data,
+                status_code=status_code,
+                headers=response_headers,
             )
         else:
             # Validate HTML statuses before inspecting content or rendering templates.
@@ -567,14 +607,19 @@ class DefaultResponses(IDefaultResponses):
                 # Error descriptions are text, including HTML-marked strings.
                 description = str(content)
 
-            html = await self.__render("error", {
-                "error": status_code,
-                "digits": str(status_code),
-                "message": _status_message(status_code),
-                "description": description,
-            })
+            html = await self.__render(
+                "error",
+                {
+                    "error": status_code,
+                    "digits": str(status_code),
+                    "message": _status_message(status_code),
+                    "description": description,
+                },
+            )
             response = HTMLResponse(
-                content=html, status_code=status_code, headers=response_headers,
+                content=html,
+                status_code=status_code,
+                headers=response_headers,
             )
 
         # Preserve caller cache policies using the response's normalized headers.
@@ -612,22 +657,28 @@ class DefaultResponses(IDefaultResponses):
         traceback_data = ExceptionParser(exception).toDict()
         config = self.__app.config
         chatgpt_url, chatgpt_trace_truncated = build_chatgpt_url(
-            traceback_data, config(_LOCALE_CONFIG_KEY), request_method, request_path,
+            traceback_data,
+            config(_LOCALE_CONFIG_KEY),
+            request_method,
+            request_path,
         )
-        html = await self.__render("exception", {
-            "exception": traceback_data["error_type"],
-            "traceback": traceback_data,
-            "request_path": request_path,
-            "request_method": request_method,
-            "chatgpt_url": chatgpt_url,
-            "chatgpt_trace_truncated": chatgpt_trace_truncated,
-            "framework_version": _FRAMEWORK_VERSION,
-            "python_version": _PYTHON_VERSION,
-            "environment": config("app.env"),
-            "debug_mode": "Enabled" if config("app.debug") else "Disabled",
-            "timezone": DateTime.getTimezone(),
-            "interface": config("app.interface").upper(),
-        })
+        html = await self.__render(
+            "exception",
+            {
+                "exception": traceback_data["error_type"],
+                "traceback": traceback_data,
+                "request_path": request_path,
+                "request_method": request_method,
+                "chatgpt_url": chatgpt_url,
+                "chatgpt_trace_truncated": chatgpt_trace_truncated,
+                "framework_version": _FRAMEWORK_VERSION,
+                "python_version": _PYTHON_VERSION,
+                "environment": config("app.env"),
+                "debug_mode": "Enabled" if config("app.debug") else "Disabled",
+                "timezone": DateTime.getTimezone(),
+                "interface": config("app.interface").upper(),
+            },
+        )
         return HTMLResponse(
             content=html,
             status_code=status_code,
@@ -649,7 +700,7 @@ class DefaultResponses(IDefaultResponses):
         orionis.http.HTMLResponse
             Uncached debug page using the shared local styles and fonts.
         """
-        fragment = Markup(content)  # noqa: S704 - generated by VarDumper.toHtml()
+        fragment = Markup(content)  # generated by VarDumper.toHtml()
         html = await self.__render("dump", {"dump_html": fragment})
         return HTMLResponse(content=html, headers={"Cache-Control": "no-store"})
 

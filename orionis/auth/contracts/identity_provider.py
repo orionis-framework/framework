@@ -1,11 +1,12 @@
+# ruff: noqa: ARG002, TC001, TC003
+# Preserve the optional no-op hook signature and runtime contract types.
 """Define how a persisted identity becomes an application object."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
+from collections.abc import Mapping
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+
 
 class IIdentityProvider(ABC):
     """
@@ -19,11 +20,11 @@ class IIdentityProvider(ABC):
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    async def updateRememberToken( # NOSONAR
+    async def updateRememberToken(  # NOSONAR(S7503) - Optional async protocol hook.
         self,
-        identity: IAuthenticatable,  # noqa: ARG002
-        expected: str | None,  # noqa: ARG002
-        token: str | None,  # noqa: ARG002
+        identity: IAuthenticatable,
+        expected: str | None,
+        token: str | None,
     ) -> bool:
         """
         Optionally compare and replace a persistent credential atomically.
@@ -35,16 +36,16 @@ class IIdentityProvider(ABC):
         Parameters
         ----------
         identity : orionis.auth.contracts.IAuthenticatable
-            Value supplied for ``identity``.
+            Identity whose stored persistent credential may be changed.
         expected : str | None
-            Value supplied for ``expected``.
+            Stored token expected by the compare-and-replace operation.
         token : str | None
-            Value supplied for ``token``.
+            Replacement token, or ``None`` to revoke the stored credential.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            False when the provider does not implement persistent login support.
         """
         return False
 

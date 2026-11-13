@@ -1,18 +1,17 @@
+# ruff: noqa: TC001
+# Keep constructor and driver annotations available for runtime inspection.
 """Execute one immediate attempt through the shared worker pipeline."""
 
-from typing import TYPE_CHECKING
 from uuid import uuid4
+from orionis.foundation.contracts.application import IApplication
 from orionis.queues.contracts.driver import IQueueDriver
+from orionis.queues.contracts.serializer import IJobSerializer
+from orionis.queues.entities.envelope import JobEnvelope
 from orionis.queues.entities.reserved_job import ReservedJob
 from orionis.queues.exceptions import QueueDispatchError
-from orionis.queues.worker import Worker, WorkerOptions
+from orionis.queues.worker import FailedResolver, Worker, WorkerOptions
 from orionis.support.facades.datetime import DateTime
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
-    from orionis.queues.contracts.serializer import IJobSerializer
-    from orionis.queues.entities.envelope import JobEnvelope
-    from orionis.queues.worker import FailedResolver
 
 class SyncQueueDriver(IQueueDriver):
     """Execute one immediate attempt through the shared worker pipeline."""
@@ -90,8 +89,11 @@ class SyncQueueDriver(IQueueDriver):
             message = "The sync connection does not support delayed jobs."
             raise QueueDispatchError(message)
         reserved = ReservedJob(
-            id=envelope.id, payload=self._serializer.encodeEnvelope(envelope),
-            queue=envelope.queue, attempts=1, token=uuid4().hex,
+            id=envelope.id,
+            payload=self._serializer.encodeEnvelope(envelope),
+            queue=envelope.queue,
+            attempts=1,
+            token=uuid4().hex,
             reserved_until=DateTime.now().timestamp() + self._retry_after,
         )
         await self._worker.execute(reserved, raise_errors=True)

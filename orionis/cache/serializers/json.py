@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Match the backend serializer protocol for arbitrary decoded cache values.
 """Serialize cache payloads through msgspec JSON encoding."""
 
 from __future__ import annotations
@@ -5,9 +7,8 @@ from typing import Any
 import msgspec.json as _msgjson
 from aiocache.serializers import BaseSerializer
 
-class MsgspecSerializer(BaseSerializer):
 
-    # ruff: noqa: ANN401
+class MsgspecSerializer(BaseSerializer):
     """Serialize cache payloads through msgspec JSON encoding."""
 
     DEFAULT_ENCODING = None  # raw bytes — no UTF-8 decoding overhead
@@ -29,15 +30,15 @@ class MsgspecSerializer(BaseSerializer):
         """
         return _msgjson.encode(value)
 
-    def loads(self, data: bytes | str | float | None) -> Any:
+    def loads(self, data: object) -> Any:
         """
         Deserialize JSON *data* back to a Python object.
 
         Parameters
         ----------
-        data : bytes | str | float | None
-            Raw payload returned by the backend. Returns None when *data*
-            is None (key not found).
+        data : object
+            Raw JSON text or byte buffer returned by the backend, a native
+            counter value, or None when no stored payload exists.
 
         Returns
         -------

@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import ClassVar
 from orionis.foundation.config.logging.enums import Level
 
+
 class _IsValidLevel:
     """
     Validate if a value is a valid logging level.
@@ -95,6 +96,7 @@ class _IsValidLevel:
             If the value is not of an accepted type (int, str, or Level).
         """
         self.normalize(value)
+
 
 # Exported singleton instance
 IsValidLevel = _IsValidLevel()

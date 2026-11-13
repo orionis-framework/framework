@@ -1,6 +1,9 @@
+# ruff: noqa: TC001
+# Dependency injection resolves these public annotations at runtime.
 """Wire the localization component from the application configuration."""
 
 from pathlib import Path
+from threading import Lock
 from orionis.foundation.contracts.application import IApplication
 from orionis.localization.contracts.manager import ILocalizationManager
 from orionis.localization.contracts.translator import ITranslator
@@ -8,7 +11,6 @@ from orionis.localization.loader import TranslationLoader
 from orionis.localization.repository import TranslationRepository
 from orionis.localization.translator import Translator
 
-# ruff: noqa: TC001
 
 class LocalizationManager(ILocalizationManager):
     """
@@ -21,7 +23,7 @@ class LocalizationManager(ILocalizationManager):
 
     """
 
-    __slots__ = ("_app", "_translator")
+    __slots__ = ("_app", "_lock", "_translator")
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, app: IApplication) -> None:
@@ -36,10 +38,12 @@ class LocalizationManager(ILocalizationManager):
         Returns
         -------
         None
-            Initialize the manager with the application container.
+            No return value.
         """
         self._app = app
         """Application container providing configuration and paths."""
+        self._lock = Lock()
+        """Lock serializing construction and publication of the translator."""
         self._translator: ITranslator | None = None
         """Translator used to resolve localized messages."""
 
@@ -58,7 +62,9 @@ class LocalizationManager(ILocalizationManager):
             If the configured locale or fallback locale is malformed.
         """
         if self._translator is None:
-            self._translator = self.__buildTranslator()
+            with self._lock:
+                if self._translator is None:
+                    self._translator = self.__buildTranslator()
         return self._translator
 
     def __buildTranslator(self) -> ITranslator:

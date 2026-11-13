@@ -1,10 +1,14 @@
+# ruff: noqa: PLR0913
+# Preserve the component arguments of Pendulum's date and duration constructors.
 """Provide a high-level interface for date and time operations."""
 
 from __future__ import annotations
 import pendulum
+from pendulum.tz.exceptions import InvalidTimezone
 from datetime import datetime as stdlib_datetime
 from typing import ClassVar
 from zoneinfo import ZoneInfo
+
 
 class DateTime:
     """
@@ -13,8 +17,6 @@ class DateTime:
     All methods are class-level, using a configurable default timezone
     and locale backed by ``pendulum`` for immutable datetime arithmetic.
     """
-
-    # ruff: noqa: PLR0913
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -81,7 +83,7 @@ class DateTime:
             pendulum.timezone(timezone_name)
             cls._timezone = timezone_name
             cls._zoneinfo_cache.clear()
-        except pendulum.tz.zoneinfo.exceptions.InvalidTimezone as e:
+        except InvalidTimezone as e:
             error_msg = f"Invalid timezone '{timezone_name}': {e}"
             raise ValueError(error_msg) from e
 
@@ -101,8 +103,8 @@ class DateTime:
             This method does not return a value.
         """
         # Set the locale for pendulum and store it in the class variable
-        cls._locale = locale
         pendulum.set_locale(locale)
+        cls._locale = locale
 
     @classmethod
     def getTimezone(cls) -> str:
@@ -163,9 +165,9 @@ class DateTime:
         return pendulum.now(tz if tz is not None else cls._timezone)
 
     @classmethod
-    def today(cls, tz: str | None = None) -> pendulum.Date:
+    def today(cls, tz: str | None = None) -> pendulum.DateTime:
         """
-        Return the current date without time component.
+        Return the current date at midnight in the selected timezone.
 
         Parameters
         ----------
@@ -174,13 +176,13 @@ class DateTime:
 
         Returns
         -------
-        ``pendulum.Date``
-            The current date in the specified or default timezone.
+        ``pendulum.DateTime``
+            Midnight today in the specified or default timezone.
         """
         return pendulum.today(tz if tz is not None else cls._timezone)
 
     @classmethod
-    def tomorrow(cls, tz: str | None = None) -> pendulum.Date:
+    def tomorrow(cls, tz: str | None = None) -> pendulum.DateTime:
         """
         Return tomorrow's date in the specified or default timezone.
 
@@ -191,13 +193,13 @@ class DateTime:
 
         Returns
         -------
-        ``pendulum.Date``
-            The date for tomorrow in the specified or default timezone.
+        ``pendulum.DateTime``
+            Midnight tomorrow in the specified or default timezone.
         """
         return pendulum.tomorrow(tz if tz is not None else cls._timezone)
 
     @classmethod
-    def yesterday(cls, tz: str | None = None) -> pendulum.Date:
+    def yesterday(cls, tz: str | None = None) -> pendulum.DateTime:
         """
         Return the date for yesterday in the specified or default timezone.
 
@@ -208,8 +210,8 @@ class DateTime:
 
         Returns
         -------
-        ``pendulum.Date``
-            The date for yesterday in the specified or default timezone.
+        ``pendulum.DateTime``
+            Midnight yesterday in the specified or default timezone.
         """
         return pendulum.yesterday(tz if tz is not None else cls._timezone)
 
@@ -319,7 +321,13 @@ class DateTime:
             Datetime object expressed in the local system timezone.
         """
         return pendulum.local(
-            year, month, day, hour, minute, second, microsecond,
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            microsecond,
         )
 
     @classmethod
@@ -359,12 +367,20 @@ class DateTime:
             Datetime object with no timezone information attached.
         """
         return pendulum.naive(
-            year, month, day, hour, minute, second, microsecond,
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            microsecond,
         )
 
     @classmethod
     def fromTimestamp(
-        cls, timestamp: float, tz: str | None = None,
+        cls,
+        timestamp: float,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Convert a Unix timestamp to a datetime in the configured timezone.
@@ -464,7 +480,13 @@ class DateTime:
             Datetime object in the specified or default timezone.
         """
         return pendulum.datetime(
-            year, month, day, hour, minute, second, microsecond,
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            microsecond,
             tz=tz if tz is not None else cls._timezone,
         )
 
@@ -613,7 +635,9 @@ class DateTime:
 
     @classmethod
     def startOfDay(
-        cls, dt: pendulum.DateTime | None = None, tz: str | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Return the start of the day (00:00:00).
@@ -637,7 +661,9 @@ class DateTime:
 
     @classmethod
     def endOfDay(
-        cls, dt: pendulum.DateTime | None = None, tz: str | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Return the end of the day (23:59:59).
@@ -661,7 +687,8 @@ class DateTime:
 
     @classmethod
     def convertToLocal(
-        cls, dt: str | stdlib_datetime | pendulum.DateTime,
+        cls,
+        dt: str | stdlib_datetime | pendulum.DateTime,
     ) -> pendulum.DateTime:
         """
         Convert a date to the configured local timezone.
@@ -679,6 +706,8 @@ class DateTime:
         _tz = cls._timezone
         # Most specific type first: pendulum.DateTime ⊂ stdlib_datetime
         if isinstance(dt, pendulum.DateTime):
+            if dt.timezone_name == _tz:
+                return dt
             return dt.in_timezone(_tz)
         if isinstance(dt, str):
             return pendulum.parse(dt).in_timezone(_tz)
@@ -690,15 +719,15 @@ class DateTime:
     @classmethod
     def formatLocal(
         cls,
-        dt: pendulum.DateTime | None = None,
+        dt: str | stdlib_datetime | pendulum.DateTime | None = None,
         format_string: str = "YYYY-MM-DD HH:mm:ss",
     ) -> str:
         """
-        Format a date in the local timezone.
+        Format a date in the configured timezone and locale.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
+        dt : str | datetime.datetime | ``pendulum.DateTime`` | None, optional
             Date to format. If None, uses now().
         format_string : str, optional
             Output format string.
@@ -708,17 +737,14 @@ class DateTime:
         str
             The formatted date string.
         """
-        # Format the current time when no datetime is provided.
-        if dt is None:
-            return cls.now().format(format_string)
-        # Ensure dt is a pendulum.DateTime in the local timezone
-        if not isinstance(dt, pendulum.DateTime):
-            dt = cls.convertToLocal(dt)
-        return dt.format(format_string)
+        local = cls.now() if dt is None else cls.convertToLocal(dt)
+        return local.format(format_string, locale=cls._locale)
 
     @classmethod
     def startOfWeek(
-        cls, dt: pendulum.DateTime | None = None, tz: str | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Return the start of the week (Monday 00:00:00).
@@ -742,7 +768,9 @@ class DateTime:
 
     @classmethod
     def endOfWeek(
-        cls, dt: pendulum.DateTime | None = None, tz: str | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Return the end of the week (Sunday 23:59:59).
@@ -766,7 +794,9 @@ class DateTime:
 
     @classmethod
     def startOfMonth(
-        cls, dt: pendulum.DateTime | None = None, tz: str | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Return the start of the month (first day at 00:00:00).
@@ -790,7 +820,9 @@ class DateTime:
 
     @classmethod
     def endOfMonth(
-        cls, dt: pendulum.DateTime | None = None, tz: str | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Return the end of the month (last day at 23:59:59).
@@ -814,7 +846,9 @@ class DateTime:
 
     @classmethod
     def startOfYear(
-        cls, dt: pendulum.DateTime | None = None, tz: str | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Return the start of the year (January 1st at 00:00:00).
@@ -838,7 +872,9 @@ class DateTime:
 
     @classmethod
     def endOfYear(
-        cls, dt: pendulum.DateTime | None = None, tz: str | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
+        tz: str | None = None,
     ) -> pendulum.DateTime:
         """
         Return the end of the year (December 31st at 23:59:59).
@@ -902,7 +938,9 @@ class DateTime:
 
     @classmethod
     def addMinutes(
-        cls, dt: pendulum.DateTime, minutes: int,
+        cls,
+        dt: pendulum.DateTime,
+        minutes: int,
     ) -> pendulum.DateTime:
         """
         Add minutes to a given datetime.
@@ -924,7 +962,9 @@ class DateTime:
 
     @classmethod
     def diffInDays(
-        cls, dt1: pendulum.DateTime, dt2: pendulum.DateTime,
+        cls,
+        dt1: pendulum.DateTime,
+        dt2: pendulum.DateTime,
     ) -> int:
         """
         Calculate the difference in days between two dates.
@@ -946,7 +986,9 @@ class DateTime:
 
     @classmethod
     def diffInHours(
-        cls, dt1: pendulum.DateTime, dt2: pendulum.DateTime,
+        cls,
+        dt1: pendulum.DateTime,
+        dt2: pendulum.DateTime,
     ) -> int:
         """
         Compute the difference in hours between two dates.
@@ -968,7 +1010,8 @@ class DateTime:
 
     @classmethod
     def isWeekend(
-        cls, dt: pendulum.DateTime | None = None,
+        cls,
+        dt: pendulum.DateTime | None = None,
     ) -> bool:
         """
         Determine if the given date falls on a weekend.
@@ -991,7 +1034,7 @@ class DateTime:
     @classmethod
     def isToday(cls, dt: pendulum.DateTime) -> bool:
         """
-        Check if the given date is today.
+        Check whether the date is today in the configured timezone.
 
         Parameters
         ----------
@@ -1005,11 +1048,8 @@ class DateTime:
         """
         # Read the current date in the configured timezone.
         today = pendulum.today(cls._timezone)
-        return (
-            dt.year == today.year
-            and dt.month == today.month
-            and dt.day == today.day
-        )
+        dt = cls.convertToLocal(dt)
+        return dt.year == today.year and dt.month == today.month and dt.day == today.day
 
     @classmethod
     def isFuture(cls, dt: pendulum.DateTime) -> bool:
@@ -1092,7 +1132,9 @@ class DateTime:
 
     @classmethod
     def closest(
-        cls, dt: pendulum.DateTime, *others: pendulum.DateTime,
+        cls,
+        dt: pendulum.DateTime,
+        *others: pendulum.DateTime,
     ) -> pendulum.DateTime:
         """
         Return the datetime closest to the given one among the candidates.
@@ -1113,7 +1155,9 @@ class DateTime:
 
     @classmethod
     def farthest(
-        cls, dt: pendulum.DateTime, *others: pendulum.DateTime,
+        cls,
+        dt: pendulum.DateTime,
+        *others: pendulum.DateTime,
     ) -> pendulum.DateTime:
         """
         Return the datetime farthest from the given one among the candidates.
@@ -1176,8 +1220,13 @@ class DateTime:
             The resulting datetime after adding the specified units.
         """
         return dt.add(
-            years=years, months=months, weeks=weeks, days=days,
-            hours=hours, minutes=minutes, seconds=seconds,
+            years=years,
+            months=months,
+            weeks=weeks,
+            days=days,
+            hours=hours,
+            minutes=minutes,
+            seconds=seconds,
             microseconds=microseconds,
         )
 
@@ -1225,8 +1274,13 @@ class DateTime:
             The resulting datetime after subtracting the specified units.
         """
         return dt.subtract(
-            years=years, months=months, weeks=weeks, days=days,
-            hours=hours, minutes=minutes, seconds=seconds,
+            years=years,
+            months=months,
+            weeks=weeks,
+            days=days,
+            hours=hours,
+            minutes=minutes,
+            seconds=seconds,
             microseconds=microseconds,
         )
 
@@ -1291,7 +1345,8 @@ class DateTime:
             A human-readable string such as '3 weeks ago'.
         """
         return dt.diff_for_humans(
-            other, absolute=absolute,
+            other,
+            absolute=absolute,
             locale=locale if locale is not None else cls._locale,
         )
 

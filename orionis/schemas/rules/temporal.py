@@ -1,14 +1,14 @@
+# ruff: noqa: TC002
+# Keep public return annotations available to runtime reflection.
 """Provide schemas rules operations.
 
 Includes ``to_datetime``, ``parse_moment``, ``resolve_moment``.
 """
 
 from datetime import date, datetime
-from typing import TYPE_CHECKING
+import pendulum
 from orionis.support.facades.datetime import DateTime
 
-if TYPE_CHECKING:
-    import pendulum
 
 def to_datetime(value: object) -> pendulum.DateTime | None:
     """
@@ -35,6 +35,7 @@ def to_datetime(value: object) -> pendulum.DateTime | None:
         return parse_moment(value)
 
     return None
+
 
 def parse_moment(text: str) -> pendulum.DateTime | None:
     """
@@ -63,8 +64,9 @@ def parse_moment(text: str) -> pendulum.DateTime | None:
 
     try:
         return DateTime.parse(text, strict=False)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
+
 
 def resolve_moment(reference: object, instance: object) -> pendulum.DateTime | None:
     """

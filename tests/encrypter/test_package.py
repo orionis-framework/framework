@@ -1,8 +1,14 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify the public encryption package exports."""
+
 from orionis import encrypter as package
 from orionis.encrypter.encrypter import Encrypter
 from orionis.test import TestCase
 
+
 class TestEncrypterPackage(TestCase):
+    """Check the exported service name and implementation identity."""
 
     def testPublishesOnlyTheEncrypterClass(self) -> None:
         """Export a single public name from the package root.
@@ -13,7 +19,7 @@ class TestEncrypterPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(package.__all__, ["Encrypter"])
 
@@ -26,6 +32,6 @@ class TestEncrypterPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(package.Encrypter, Encrypter)

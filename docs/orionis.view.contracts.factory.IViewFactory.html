@@ -215,7 +215,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId37012"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId37112"> 
                     
                 </input>
 
@@ -350,19 +350,19 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IViewFactory</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/contracts/factory.py#L10" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.view.factory.ViewFactory.html" class="internal-link">orionis.view.factory.ViewFactory</a></code></p><p><a href="classIndex.html#orionis.view.contracts.factory.IViewFactory">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IViewFactory</span>(<a href="https://docs.python.org/3/library/abc.html#abc.ABC" class="intersphinx-link">ABC</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/contracts/factory.py#L11" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.view.factory.ViewFactory.html" class="internal-link">orionis.view.factory.ViewFactory</a></code></p><p><a href="classIndex.html#orionis.view.contracts.factory.IViewFactory">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Contract for the view factory.</p>
-<p>Callers use this interface to render named templates and receive
-fully formed <code><a href="orionis.http.HTMLResponse.html" class="internal-link">orionis.http.HTMLResponse</a></code> objects ready to return from
-HTTP controllers.</p>
+<p>Callers receive a <code><a href="orionis.view.pending.PendingView.html" class="internal-link">orionis.view.pending.PendingView</a></code> synchronously.
+Await that value to render a named template and obtain an
+<code><a href="orionis.http.HTMLResponse.html" class="internal-link">orionis.http.HTMLResponse</a></code> ready to return from an HTTP controller.</p>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2209">
+          <table class="children sortable" id="id2226">
   
   
   <tr class="method">
@@ -396,7 +396,7 @@ HTTP controllers.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/library/abc.html#abc.abstractmethod" class="intersphinx-link">abstractmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">make</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">**context: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="orionis.view.pending.PendingView.html" class="internal-link" title="orionis.view.pending.PendingView">PendingView</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/contracts/factory.py#L24">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/contracts/factory.py#L23">
       
       (source)
     </a>
@@ -408,9 +408,15 @@ HTTP controllers.</p>
   </div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overridden in <code><a href="orionis.view.factory.ViewFactory.html" class="internal-link">orionis.view.factory.ViewFactory</a></code></div>
-    <div><p>Prepare a template render as an awaitable, chainable response.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Template name using dot notation (e.g. <tt class="rst-docutils rst-literal">'users.index'</tt>) or a
+    <div><p>Prepare a template render as an awaitable, chainable response.</p>
+<div class="rst-admonition rst-admonition-notes">
+<p class="rst-admonition-title rst-first">Notes</p>
+<p class="rst-last">Template lookup and rendering errors are raised when the returned value
+is awaited, rather than when this method prepares it.</p>
+</div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Template name using dot notation (e.g. <tt class="rst-docutils rst-literal">'users.index'</tt>) or a
 direct path relative to a configured template directory.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**context:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Keyword arguments are forwarded as template variables.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.pending.PendingView.html" class="internal-link">orionis.view.pending.PendingView</a></code></td><td class="fieldArgDesc">Awaitable proxy that resolves to an <code><a href="orionis.http.HTMLResponse.html" class="internal-link">orionis.http.HTMLResponse</a></code> and
-accepts chained response mutators such as <tt class="rst-docutils rst-literal">withFlash()</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.exceptions.ViewTemplateNotFoundException.html" class="internal-link">orionis.view.exceptions.ViewTemplateNotFoundException</a></code></td><td>When the requested template file cannot be located.</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.exceptions.ViewRenderException.html" class="internal-link">orionis.view.exceptions.ViewRenderException</a></code></td><td>When the template engine fails during rendering.</td></tr></table></div>
+accepts chained response mutators such as <tt class="rst-docutils rst-literal">withFlash()</tt>.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -424,7 +430,7 @@ accepts chained response mutators such as <tt class="rst-docutils rst-literal">w
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/view/contracts/factory.py#L21">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/contracts/factory.py#L20">
       
       (source)
     </a>
@@ -450,7 +456,7 @@ accepts chained response mutators such as <tt class="rst-docutils rst-literal">w
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

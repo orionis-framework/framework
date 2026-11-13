@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.http.routes.fluent import FluentRoute
@@ -9,6 +11,7 @@ from tests.http.test_websocket import (
     _ASGIPeer,
     waiting_handler,
 )
+
 
 class _SignallingPeer(_ASGIPeer):
     """Signal acceptance without polling the event loop."""
@@ -44,6 +47,7 @@ class _SignallingPeer(_ASGIPeer):
         await super().send(event)
         if event["type"] == "websocket.accept":
             self.accepted.set()
+
 
 class TestWebSocketShutdown(TestCase):
     """Exercise shutdown against actual kernel connection scopes."""

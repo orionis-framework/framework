@@ -6,6 +6,7 @@ from orionis.environment import Env
 from orionis.foundation.config.validation import validate_integer, validate_string
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class HTTPWebSocket(BaseEntity):
     """
@@ -81,6 +82,7 @@ class HTTPWebSocket(BaseEntity):
         for origin in self.allow_origins:
             validate_string(origin, "allow_origins")
         object.__setattr__(
-            self, "allow_origins",
+            self,
+            "allow_origins",
             tuple(origin.lower().rstrip("/") for origin in self.allow_origins),
         )

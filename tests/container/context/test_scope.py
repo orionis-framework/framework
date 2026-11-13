@@ -1,29 +1,17 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import contextvars
 from orionis.container.context.scope import ScopedContext
 from orionis.test import TestCase
 
+
 class TestScopedContext(TestCase):
-
     def setUp(self) -> None:
-        """Reset scope to None before each test to guarantee isolation.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        ScopedContext.setCurrentScope(None)
-
-    def tearDown(self) -> None:
-        """Reset scope to None after each test to avoid state leakage.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        ScopedContext.setCurrentScope(None)
+        """Isolate the active scope and restore its original value during cleanup."""
+        super().setUp()
+        token = ScopedContext.setCurrentScope(None)
+        self.addCleanup(ScopedContext.reset, token)
 
     # ------------------------------------------------------------------
     # getCurrentScope
@@ -39,7 +27,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.assertIsNone(ScopedContext.getCurrentScope())
 
@@ -53,7 +41,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         scope = object()
         ScopedContext.setCurrentScope(scope)
@@ -69,7 +57,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         ScopedContext.setCurrentScope("initial")
         ScopedContext.setCurrentScope(None)
@@ -89,7 +77,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         token = ScopedContext.setCurrentScope("any_scope")
         self.assertIsInstance(token, contextvars.Token)
@@ -104,7 +92,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         scope_first = {"id": "first"}
         scope_second = {"id": "second"}
@@ -125,7 +113,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         for obj in ("string_scope", 42, [1, 2, 3], {"key": "val"}, object()):
             ScopedContext.setCurrentScope(obj)
@@ -145,7 +133,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         scope_a = {"name": "a"}
         scope_b = {"name": "b"}
@@ -168,7 +156,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         token = ScopedContext.setCurrentScope("temporary")
         self.assertEqual(ScopedContext.getCurrentScope(), "temporary")
@@ -186,10 +174,11 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         other_var: contextvars.ContextVar[str] = contextvars.ContextVar(
-            "other_var", default="original",
+            "other_var",
+            default="original",
         )
         other_var.set("modified")
 
@@ -214,7 +203,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         parent_scope = {"ctx": "parent"}
         ScopedContext.setCurrentScope(parent_scope)
@@ -228,7 +217,7 @@ class TestScopedContext(TestCase):
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
             child_scope_seen.append(ScopedContext.getCurrentScope())
             ScopedContext.setCurrentScope({"ctx": "child"})
@@ -251,7 +240,7 @@ class TestScopedContext(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         token_a = ScopedContext.setCurrentScope("scope_1")
         token_b = ScopedContext.setCurrentScope("scope_2")

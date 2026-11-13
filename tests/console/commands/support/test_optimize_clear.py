@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -5,6 +7,7 @@ from unittest.mock import Mock, patch
 from orionis.console.commands.support import optimize_clear
 from orionis.console.commands.support.optimize_clear import OptimizeClearCommand
 from orionis.test import TestCase
+
 
 class _Application:
     """Expose project and framework cache paths to the command."""
@@ -45,6 +48,7 @@ class _Application:
         if key != "storage_framework":
             raise KeyError(key)
         return self.basePath / "storage" / "framework"
+
 
 class TestOptimizeClearCommand(TestCase):
     """Verify that optimize:clear removes only generated artifacts."""
@@ -149,7 +153,9 @@ class TestOptimizeClearCommand(TestCase):
             remove_path = shutil.rmtree
 
             def fail_for_build(
-                path: str | Path, *args: object, **kwargs: object,
+                path: str | Path,
+                *args: object,
+                **kwargs: object,
             ) -> None:
                 """Raise a permission error for the build directory only.
 

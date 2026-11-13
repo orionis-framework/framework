@@ -457,6 +457,9 @@
     <loc>https://api.orionis-framework.com/orionis.cache.repository._Flight.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.cache.repository._Resolution.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.cache.repository.html</loc>
   </url>
   <url>
@@ -491,6 +494,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.cache.stores.memcached.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.cache.stores.memory._MemoryCache.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.cache.stores.memory.html</loc>
@@ -1366,6 +1372,15 @@
     <loc>https://api.orionis-framework.com/orionis.console.stdio.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.tasks._backend._Executor.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.tasks._backend.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.tasks._backend.SchedulerBackend.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.tasks.html</loc>
   </url>
   <url>
@@ -1606,7 +1621,13 @@
     <loc>https://api.orionis-framework.com/orionis.database.MigrationNotFoundException.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.database.migrations.context._MigrationBinding.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.database.migrations.context.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.migrations.discovery.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.migrations.events.html</loc>
@@ -1973,6 +1994,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.failure.runtime._Operation.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.failure.runtime._ThreadReport.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.failure.runtime.FailureRuntime.html</loc>
@@ -2923,6 +2947,9 @@
     <loc>https://api.orionis-framework.com/orionis.http.adapters.response.rsgi.RSGIResponseAdapter.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.http.adapters.response.streams._SyncStreamIterator.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.http.adapters.response.streams.html</loc>
   </url>
   <url>
@@ -3791,6 +3818,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.localization.types.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.localization.validators.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.logging.contracts.html</loc>
@@ -4831,6 +4861,9 @@
     <loc>https://api.orionis-framework.com/orionis.orm.relations.mixin.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.relations.relation._ConstraintScope.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.orm.relations.Relation.html</loc>
   </url>
   <url>
@@ -4891,7 +4924,7 @@
     <loc>https://api.orionis-framework.com/orionis.orm.schema.table.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.schema.TableDefinition.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.schema.table.TableDefinition.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.schema.types._constants.html</loc>
@@ -5425,9 +5458,6 @@
     <loc>https://api.orionis-framework.com/orionis.realtime.metadata._ClientParameter.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.realtime.metadata._SchemaPlan.html</loc>
-  </url>
-  <url>
     <loc>https://api.orionis-framework.com/orionis.realtime.metadata.html</loc>
   </url>
   <url>
@@ -5615,6 +5645,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rule.Rule.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.schemas.rules_executor._SchemaPlan.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.schemas.rules_executor.html</loc>
@@ -6034,6 +6067,9 @@
     <loc>https://api.orionis-framework.com/orionis.storage.drivers.AzureStorageDriver.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.storage.drivers.functions._ModeBuffer.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.storage.drivers.functions.html</loc>
   </url>
   <url>
@@ -6418,6 +6454,12 @@
     <loc>https://api.orionis-framework.com/orionis.support.system.workers.module.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.support.types._html._TagStripper.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.support.types._html.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.support.types.Collection.html</loc>
   </url>
   <url>
@@ -6448,7 +6490,7 @@
     <loc>https://api.orionis-framework.com/orionis.support.types.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.support.types.sentinel._MISSING_TYPE.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.support.types.sentinel._MissingType.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.support.types.sentinel.html</loc>
@@ -6491,6 +6533,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.test.contracts.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.test.core.engine._PatternTestLoader.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.test.core.engine.html</loc>

@@ -1,15 +1,15 @@
+# ruff: noqa: TC001
+# Resolve model and collection annotations through the lazy public package.
 """Inverse relationship: the foreign key lives on the parent row."""
 
-from __future__ import annotations
-from typing import TYPE_CHECKING
+import orionis.orm as _orm
 from orionis.orm.metaclass import snake_case
 from orionis.orm.relations.relation import Relation
 
-if TYPE_CHECKING:
-    from orionis.orm.model import Model
-    from orionis.support.types.collection import Collection
+from orionis.support.types.collection import Collection
 
-class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
+
+class BelongsToRelation[TRelated: _orm.Model](Relation[TRelated]):
     """
     Inverse relationship: the foreign key lives on the parent row.
 
@@ -24,7 +24,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
 
     def __init__(
         self,
-        parent: Model,
+        parent: _orm.Model,
         related: type[TRelated],
         foreign_key: str | None,
         owner_key: str | None,
@@ -48,7 +48,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self._foreign_key = foreign_key or f"{snake_case(related.__name__)}_id"
         """
@@ -69,7 +69,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         value = getattr(self._parent, self._foreign_key)
         if value is None:
@@ -79,7 +79,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
         else:
             self.where(self._owner_key, value)
 
-    def addEagerConstraints(self, models: list[Model]) -> None:
+    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
         """
         Constrain the query to the rows owning every child's foreign key.
 
@@ -91,7 +91,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         keys = {
             value
@@ -118,7 +118,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
 
     def match(
         self,
-        models: list[Model],
+        models: list[_orm.Model],
         results: Collection,
         name: str,
     ) -> None:
@@ -129,7 +129,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
         ----------
         models : list of orionis.orm.Model
             Child instances being eager loaded together.
-        results : collections.abc.Collection
+        results : orionis.support.types.Collection
             Owning rows produced by ``getEager``.
         name : str
             Relationship name the result is stored under.
@@ -137,7 +137,7 @@ class BelongsToRelation[TRelated: "Model"](Relation[TRelated]):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         by_owner_key = {getattr(row, self._owner_key): row for row in results}
         for model in models:

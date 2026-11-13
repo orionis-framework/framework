@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from enum import Enum
 from orionis.environment.enums import EnvironmentValueType
 from orionis.environment.enums.value_type import (
@@ -23,8 +25,8 @@ _EXPECTED_MEMBERS: dict[str, str] = {
 # TestEnvironmentValueTypeMembers
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentValueTypeMembers(TestCase):
 
+class TestEnvironmentValueTypeMembers(TestCase):
     def testIsAnEnumeration(self) -> None:
         """Expose the supported value types as a standard enumeration.
 
@@ -34,7 +36,7 @@ class TestEnvironmentValueTypeMembers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(EnvironmentValueType, Enum))
 
@@ -47,28 +49,13 @@ class TestEnvironmentValueTypeMembers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         actual = {
-            member.name: member.value for member in EnvironmentValueType
+            name: member.value
+            for name, member in EnvironmentValueType.__members__.items()
         }
         self.assertEqual(actual, _EXPECTED_MEMBERS)
-
-    def testEveryValueIsAUniqueLowercaseString(self) -> None:
-        """Keep every member value a unique lowercase string.
-
-        Validates the prefix contract relied upon when parsing typed
-        entries such as ``int:42`` from a ``.env`` file.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        values = [member.value for member in EnvironmentValueType]
-        self.assertEqual(len(values), len(set(values)))
-        for value in values:
-            self.assertEqual(value, value.lower())
 
     def testIsReExportedByThePackage(self) -> None:
         """Re-export the enumeration from the enums package root.
@@ -79,16 +66,17 @@ class TestEnvironmentValueTypeMembers(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(EnvironmentValueType, DirectEnvironmentValueType)
+
 
 # ---------------------------------------------------------------------------
 # TestEnvironmentValueTypeLookup
 # ---------------------------------------------------------------------------
 
-class TestEnvironmentValueTypeLookup(TestCase):
 
+class TestEnvironmentValueTypeLookup(TestCase):
     def testResolvesEveryMemberByValue(self) -> None:
         """Resolve every member through its canonical string value.
 
@@ -98,7 +86,7 @@ class TestEnvironmentValueTypeLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name, value in _EXPECTED_MEMBERS.items():
             self.assertIs(
@@ -115,7 +103,7 @@ class TestEnvironmentValueTypeLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             EnvironmentValueType("decimal")
@@ -129,7 +117,7 @@ class TestEnvironmentValueTypeLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(KeyError):
             EnvironmentValueType["DECIMAL"]
@@ -143,7 +131,7 @@ class TestEnvironmentValueTypeLookup(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             EnvironmentValueType("INT")

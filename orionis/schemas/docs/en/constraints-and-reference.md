@@ -22,6 +22,8 @@
 | `validator.py`, `rules_executor.py` | Payload conversion and cached nested rule execution. |
 | `coercion.py` | Opt-in, copy-on-write normalization before constraints and rules. |
 | `failure_collector.py`, `exception_parser.py` | Multi-field conversion failure recovery and messages. |
+| `constraint_plan.py` | Separate constraint plans for collecting every applicable conversion failure. |
+| `instance_payload.py` | Expand existing instances without omitting defaults or converting native leaves to JSON. |
 | `metadata.py`, `meta/` | Coercion, documentation, message, and metadata marker types. |
 | `entities/failure.py`, `exceptions/validation.py` | Immutable failure records and grouped exception output. |
 

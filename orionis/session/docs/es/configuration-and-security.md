@@ -18,8 +18,14 @@ En producción HTTPS configura Secure. `SameSite=None` requiere Secure. El inter
 ```python
 from orionis.foundation.config.session import Session as SessionConfig
 
-config = SessionConfig(driver="memory", lifetime=120, renewal_interval=300,
-                       secure=True, http_only=True, same_site="none")
+config = SessionConfig(
+    driver="memory",
+    lifetime=120,
+    renewal_interval=300,
+    secure=True,
+    http_only=True,
+    same_site="none",
+)
 assert config.renewal_interval == 300
 ```
 
@@ -38,7 +44,7 @@ session.invalidate()
 assert session.invalidated
 ```
 
-`regenerate()` solicita una rotación; el ID no cambia inmediatamente. El manager coordina la eliminación del anterior y persistencia del nuevo al guardar la respuesta. La API de login de Auth ya integra rotación: no implementes un flujo paralelo que evite su contexto. `invalidate()` limpia datos y marca eliminación/cookie expirada. `clear()` solo elimina valores; no equivale a logout seguro.
+`regenerate()` solicita una rotación; el ID no cambia inmediatamente. El manager elimina el registro anterior antes de persistir el reemplazo al guardar la respuesta; son operaciones separadas del store, no una transacción sobre ambos identificadores. La API de login de Auth ya integra rotación: no implementes un flujo paralelo que evite su contexto. `invalidate()` limpia datos y marca eliminación/cookie expirada. La expiración conserva path, dominio, Secure, HttpOnly, SameSite y Partitioned configurados, incluidos los prefijos seguros y las sesiones particionadas. `clear()` solo elimina valores; no equivale a logout seguro.
 
 ## Recuperación y fallos
 

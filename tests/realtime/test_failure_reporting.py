@@ -1,3 +1,5 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 """Verify central delivery across Hub invocations, broadcasts and cleanup."""
 
 import asyncio
@@ -114,15 +116,19 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
                     order = []
 
                     async def cleanup(
-                        error: OSError = cleanup_error, order: list = order,
+                        error: OSError = cleanup_error,
+                        order: list = order,
                     ) -> None:
                         """Fail before the connection is unregistered."""
                         order.append("cleanup")
                         raise error
 
                     async def disconnect(
-                        _connection: object, _code: int, _reason: str,
-                        error: RuntimeError | None = closing_error, order: list = order,
+                        _connection: object,
+                        _code: int,
+                        _reason: str,
+                        error: RuntimeError | None = closing_error,
+                        order: list = order,
                     ) -> None:
                         """Attempt socket closure even when owned cleanup failed."""
                         order.append("disconnect")
@@ -130,10 +136,12 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
                             raise error
 
                     connection = SimpleNamespace(
-                        cleanup=cleanup, context=SimpleNamespace(connection_id="test"),
+                        cleanup=cleanup,
+                        context=SimpleNamespace(connection_id="test"),
                     )
                     runtime = SimpleNamespace(
-                        _app=self.app, _disconnect=disconnect,
+                        _app=self.app,
+                        _disconnect=disconnect,
                         _manager=SimpleNamespace(
                             unregister=lambda _connection, order=order: order.append(
                                 "unregister",
@@ -146,7 +154,11 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
                         self.assertRaises(type(expected)) as caught,
                     ):
                         await HubRuntime._finishConnection(
-                            runtime, connection, 1000, "", original,
+                            runtime,
+                            connection,
+                            1000,
+                            "",
+                            original,
                         )
                     self.assertIs(caught.exception, expected)
                     if original is not None:
@@ -156,7 +168,8 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
                     if closing_error is not None:
                         failures.append(closing_error)
                     self.assertEqual(
-                        [error for error, _ in self.handler.events], failures,
+                        [error for error, _ in self.handler.events],
+                        failures,
                     )
 
     async def connect(self):
@@ -184,10 +197,14 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
         }
         peer, manager, task = await self.connect()
         for identifier in self.state.failures:
-            peer.input({
-                "type": "invoke", "id": identifier, "target": "fail",
-                "args": [identifier],
-            })
+            peer.input(
+                {
+                    "type": "invoke",
+                    "id": identifier,
+                    "target": "fail",
+                    "args": [identifier],
+                },
+            )
         replies = [await peer.nextEnvelope(), await peer.nextEnvelope()]
         self.assertCountEqual([reply["id"] for reply in replies], ["first", "second"])
         self.assertNotIn("private-", str(replies))
@@ -208,10 +225,14 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
         error = RPCError("conflict", "private-domain-detail")
         self.state.failures["expected"] = error
         peer, _, task = await self.connect()
-        peer.input({
-            "type": "invoke", "id": "expected", "target": "fail",
-            "args": ["expected"],
-        })
+        peer.input(
+            {
+                "type": "invoke",
+                "id": "expected",
+                "target": "fail",
+                "args": ["expected"],
+            },
+        )
         reply = await peer.nextEnvelope()
         self.assertEqual(reply["error"]["code"], "conflict")
         self.assertIs(self.handler.events[0][0], error)
@@ -241,7 +262,9 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
         manager.register(broken)
         with operation(self.app, flow="realtime", operation="broadcast"):
             result = await manager.broadcast(
-                _ReportingHub, ("healthy", "broken"), {"type": "notice"},
+                _ReportingHub,
+                ("healthy", "broken"),
+                {"type": "notice"},
             )
         self.assertEqual(result, BroadcastResult(sent=1, failed=1))
         self.assertEqual(len(healthy.sent), 1)
@@ -253,7 +276,10 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
         peer = _RealtimePeer()
         connection = RealtimeConnection(
             HubContext(connection_id="cleanup", socket=peer.socket()),
-            _ReportingHub, HubProtocol(), RealtimeConfig(), runtime=self.runtime,
+            _ReportingHub,
+            HubProtocol(),
+            RealtimeConfig(),
+            runtime=self.runtime,
         )
         ready = asyncio.Queue()
 
@@ -335,11 +361,16 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
         with operation(self.app, flow="http"):
             connection = RealtimeConnection(
                 HubContext(connection_id="late", socket=peer.socket()),
-                _ReportingHub, HubProtocol(), RealtimeConfig(), runtime=self.runtime,
+                _ReportingHub,
+                HubProtocol(),
+                RealtimeConfig(),
+                runtime=self.runtime,
             )
             with operation(self.app, flow="realtime", isolated=True):
                 asyncio.get_running_loop().call_soon(
-                    connection._observe, wrapper, "send",
+                    connection._observe,
+                    wrapper,
+                    "send",
                 )
             await asyncio.sleep(0)
             await capture(wrapper, app=self.app, flow="http")
@@ -364,7 +395,10 @@ class TestRealtimeFailureReporting(IsolatedFailureTestCase):
             await socket.accept()
             connection = RealtimeConnection(
                 HubContext(connection_id="shielded", socket=socket),
-                _ReportingHub, HubProtocol(), RealtimeConfig(), runtime=self.runtime,
+                _ReportingHub,
+                HubProtocol(),
+                RealtimeConfig(),
+                runtime=self.runtime,
             )
             connection.owner = None
 

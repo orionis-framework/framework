@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeContract(MakeStubCommand):
     """Generate an application contract class."""
 
@@ -19,4 +20,3 @@ class MakeContract(MakeStubCommand):
     """Success label identifier: ``Contract``."""
     prefix: str | None = "I"
     """Prefix identifier: ``I``."""
-

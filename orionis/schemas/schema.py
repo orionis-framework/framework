@@ -1,9 +1,12 @@
-"""Provide schemas operations through ``SchemaMeta``, ``Schema``."""
+# ruff: noqa: PLC0415, TC003, UP007
+# Resolve annotations at runtime; compile dynamic unions and defer the cyclic executor.
+"""Compile schema declarations and provide their structured representation."""
 
 from __future__ import annotations
 from annotationlib import Format, call_annotate_function
+from collections.abc import Callable
 import types
-from typing import TYPE_CHECKING, Annotated, Union, get_args, get_origin
+from typing import Annotated, Union, get_args, get_origin
 import msgspec
 from orionis.schemas.compiler import MetaCompiler
 from orionis.schemas.constraint_plan import _ConstraintMessages, register_messages
@@ -14,15 +17,17 @@ from orionis.schemas.metadata import (
     Message,
 )
 from orionis.schemas.constraints import (
-    GreaterThan, GreaterThanOrEqual,
-    LessThan, LessThanOrEqual,
-    MinLength, MaxLength,
-    MultipleOf, Pattern,
-    TimezoneAware, TimezoneNaive,
+    GreaterThan,
+    GreaterThanOrEqual,
+    LessThan,
+    LessThanOrEqual,
+    MinLength,
+    MaxLength,
+    MultipleOf,
+    Pattern,
+    TimezoneAware,
+    TimezoneNaive,
 )
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 # Mapping: ValidationMetadata subclass -> msgspec.Meta keyword argument name.
 _CONSTRAINT_MSGSPEC_KEYS: dict[type, str] = {
@@ -39,8 +44,11 @@ _CONSTRAINT_MSGSPEC_KEYS: dict[type, str] = {
 }
 """Mapping: ValidationMetadata subclass -> msgspec.Meta keyword argument name."""
 
+
 def _compile_annotation(
-    annotation: object, *, nested: bool = False,
+    annotation: object,
+    *,
+    nested: bool = False,
 ) -> tuple[object, dict[str, str]]:
     """
     Compile constraints throughout an annotation and its nested types.
@@ -71,13 +79,11 @@ def _compile_annotation(
 
     if not arguments:
         return annotation, {}
-    rewritten = tuple(
-        _compile_annotation(item, nested=True)[0] for item in arguments
-    )
+    rewritten = tuple(_compile_annotation(item, nested=True)[0] for item in arguments)
     if all(old is new for old, new in zip(arguments, rewritten, strict=True)):
         return annotation, {}
     if origin is Union or origin is types.UnionType:
-        return Union[rewritten], {}  # noqa: UP007
+        return Union[rewritten], {}
     copy_with = getattr(annotation, "copy_with", None)
     if copy_with is not None:
         return copy_with(rewritten), {}
@@ -85,7 +91,10 @@ def _compile_annotation(
 
 
 def _compile_annotated(
-    annotation: object, arguments: tuple, *, nested: bool,
+    annotation: object,
+    arguments: tuple,
+    *,
+    nested: bool,
 ) -> tuple[object, dict[str, str]]:
     """
     Compile an Annotated layer and preserve its local error messages.
@@ -136,12 +145,11 @@ def _compile_annotated(
             custom.append(item)
     compiled = annotation
     if validation:
-        compiled = Annotated[
-            (compiled_base, MetaCompiler.compile(validation), *custom)
-        ]
+        compiled = Annotated[(compiled_base, MetaCompiler.compile(validation), *custom)]
     elif compiled_base is not base:
         compiled = Annotated[(compiled_base, *metadata)]
     return register_messages(compiled, messages), messages
+
 
 # The metaclass for all Schema subclasses.  Intercept class creation to compile
 # ValidationMetadata into msgspec.Meta and collect custom metadata for later use.
@@ -150,6 +158,7 @@ _StructMeta = type(msgspec.Struct)
 The metaclass for all Schema subclasses. Intercept class creation to compile
 ValidationMetadata into msgspec.Meta and collect custom metadata for later use.
 """
+
 
 class SchemaMeta(_StructMeta):
     """Collect schema declarations and prepare their validation metadata."""
@@ -193,8 +202,8 @@ class SchemaMeta(_StructMeta):
             If constraint declarations are invalid or incompatible.
         """
         # Read the lazy annotation callback from the class namespace.
-        annotate_func: Callable[[int], dict[str, object]] | None = (
-            namespace.get("__annotate_func__")
+        annotate_func: Callable[[int], dict[str, object]] | None = namespace.get(
+            "__annotate_func__",
         )
 
         # Create a mutable container for per-field constraint messages.
@@ -204,11 +213,19 @@ class SchemaMeta(_StructMeta):
         # Wrap the annotation callback to compile metadata and extract messages.
         if annotate_func is not None:
             namespace["__annotate_func__"] = SchemaMeta._wrap(
-                annotate_func, constraint_msgs,
+                annotate_func,
+                constraint_msgs,
             )
 
         # Build the final schema class through msgspec.Struct metaclass.
         klass: SchemaMeta = super().__new__(cls, name, bases, namespace, **kwargs)
+
+        if annotate_func is None and "__annotations__" in namespace:
+            SchemaMeta._compileExplicit(
+                klass,
+                namespace["__annotations__"],
+                constraint_msgs,
+            )
 
         # Collect non-msgspec metadata from all annotated fields.
         klass.__orionis_meta__ = SchemaMeta._collect(klass)
@@ -226,13 +243,44 @@ class SchemaMeta(_StructMeta):
         }
 
         # Import lazily to avoid module-level circular dependencies.
-        from orionis.schemas.rules_executor import _build_plan  # noqa: PLC0415
+        from orionis.schemas.rules_executor import _build_plan
 
         # Prebuild and cache the validation plan at class creation time.
         _build_plan(klass)
 
         # Return the fully prepared schema class.
         return klass
+
+    @staticmethod
+    def _compileExplicit(
+        klass: type,
+        annotations: dict[str, object],
+        messages: dict[str, dict[str, str]],
+    ) -> None:
+        """
+        Compile eager or string annotations before native conversion is cached.
+
+        Parameters
+        ----------
+        klass : type
+            Newly created schema whose declaration does not use a lazy callback.
+        annotations : dict[str, object]
+            Original local annotations, including any non-field declarations.
+        messages : dict[str, dict[str, str]]
+            Mapping receiving local constraint and type messages.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        compiled = dict(annotations)
+        for field in msgspec.structs.fields(klass):
+            if field.name in annotations:
+                compiled[field.name], messages[field.name] = _compile_annotation(
+                    field.type,
+                )
+        klass.__annotations__ = compiled
 
     @staticmethod
     def _wrap(
@@ -254,6 +302,7 @@ class SchemaMeta(_StructMeta):
         collections.abc.Callable[[int], dict[str, object]]
             Callback that compiles metadata while preserving string requests.
         """
+
         def _annotate(fmt: int) -> dict[str, object]:
             """
             Resolve annotations and compile metadata for the requested format.
@@ -320,7 +369,6 @@ class SchemaMeta(_StructMeta):
 
         # Iterate through all struct fields.
         for field in msgspec.structs.fields(klass):
-
             # Process only Annotated field types.
             if _get_origin(field.type) is Annotated:
                 custom: list[object] = [
@@ -335,6 +383,7 @@ class SchemaMeta(_StructMeta):
 
         # Return collected custom metadata by field name.
         return result
+
 
 class Schema(msgspec.Struct, metaclass=SchemaMeta):
     """
@@ -360,6 +409,7 @@ class Schema(msgspec.Struct, metaclass=SchemaMeta):
         dict[str, object]
             Dictionary containing recursively converted schema field values.
         """
+
         def _convert(value: object) -> object:
             """Recursively convert structs and their supported containers.
 
@@ -387,6 +437,7 @@ class Schema(msgspec.Struct, metaclass=SchemaMeta):
             name: _convert(value)
             for name, value in msgspec.structs.asdict(self).items()
         }
+
 
 __all__: list[str] = [
     "Schema",

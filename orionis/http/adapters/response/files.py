@@ -1,3 +1,5 @@
+# ruff: noqa: BLE001
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """
 Provide http adapters response operations.
 
@@ -15,6 +17,7 @@ if TYPE_CHECKING:
     from asyncio import Future
     from pathlib import Path
     from typing import BinaryIO
+
 
 async def _drain_future[T](pending: Future[T]) -> T:
     """
@@ -34,6 +37,7 @@ async def _drain_future[T](pending: Future[T]) -> T:
         with suppress(asyncio.CancelledError, Exception):
             await wait_for_completion(pending)
     return pending.result()
+
 
 async def open_file(path: Path, start: int = 0) -> BinaryIO:
     """
@@ -75,7 +79,7 @@ async def open_file(path: Path, start: int = 0) -> BinaryIO:
         except OSError:
             try:
                 file.close()
-            except Exception as secondary:  # noqa: BLE001 - Re-raise the seek failure.
+            except Exception as secondary:  # Re-raise the seek failure.
                 cleanup_error = secondary
             raise
         return file
@@ -90,7 +94,7 @@ async def open_file(path: Path, start: int = 0) -> BinaryIO:
             try:
                 file = await _drain_future(opening)
                 await _drain_future(executor(None, file.close))
-            except Exception as error:  # noqa: BLE001 - Retain caller cancellation.
+            except Exception as error:  # Retain caller cancellation.
                 await capture(error, flow="http", phase="file.cleanup")
         raise
     except Exception as error:
@@ -100,6 +104,7 @@ async def open_file(path: Path, start: int = 0) -> BinaryIO:
     finally:
         if cleanup_error is not None:
             await capture(cleanup_error, flow="http", phase="file.cleanup")
+
 
 async def complete_file_read(pending: Future[bytes]) -> bytes:
     """
@@ -127,6 +132,6 @@ async def complete_file_read(pending: Future[bytes]) -> bytes:
         with suppress(asyncio.CancelledError):
             try:
                 await _drain_future(pending)
-            except Exception as error:  # noqa: BLE001 - Retain caller cancellation.
+            except Exception as error:  # Retain caller cancellation.
                 await capture(error, flow="http", phase="file.read")
         raise

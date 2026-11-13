@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415
+# Keep MCP optional until a test requests its client.
 """Run synchronous and asynchronous tests through the application container."""
 
 from __future__ import annotations
@@ -19,11 +21,16 @@ if TYPE_CHECKING:
     from orionis.test.clients.mcp import McpTestClient
 
 # Lifecycle hooks that must never be wrapped regardless of naming pattern.
-_LIFECYCLE_HOOKS: frozenset[str] = frozenset({
-    "setUp", "tearDown",
-    "setUpClass", "tearDownClass",
-    "asyncSetUp", "asyncTearDown",
-})
+_LIFECYCLE_HOOKS: frozenset[str] = frozenset(
+    {
+        "setUp",
+        "tearDown",
+        "setUpClass",
+        "tearDownClass",
+        "asyncSetUp",
+        "asyncTearDown",
+    },
+)
 """Lifecycle hooks that must never be wrapped regardless of naming pattern."""
 
 # Precompiled regex for the default glob pattern avoids repeated fnmatch compilation.
@@ -53,13 +60,16 @@ Context-local pattern: a value set by one run is never seen by another run execu
 in a different task or thread.
 """
 
-class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
+
+class TestCase(unittest.IsolatedAsyncioTestCase):
     """Run synchronous and asynchronous tests through the application container."""
 
     @classmethod
     def setMethodPattern(cls, pattern: str) -> None:
         """
         Set the method pattern for identifying test methods.
+
+        Store the compiled pattern in the current context.
 
         Parameters
         ----------
@@ -69,8 +79,7 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
         Returns
         -------
         None
-            This method stores the compiled pattern in the current context and
-            returns None.
+            No return value.
         """
         # Compile once and publish it to the current context only.
         _METHOD_PATTERN.set(re.compile(fnmatch.translate(pattern)))
@@ -133,10 +142,15 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
         RuntimeError
             If no container is supplied and the application is not booted.
         """
-        from orionis.test.clients.mcp import McpTestClient  # noqa: PLC0415
+        from orionis.test.clients.mcp import McpTestClient
 
-        container = app if app is not None else cast(
-            "IContainer", await Application.resolve(),
+        container = (
+            app
+            if app is not None
+            else cast(
+                "IContainer",
+                await Application.resolve(),
+            )
         )
         return McpTestClient(container, server, config)
 
@@ -150,7 +164,7 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
         Returns
         -------
         None
-            Set the loop's ``slow_callback_duration`` to the configured threshold.
+            No return value.
         """
         super()._setupAsyncioRunner()
         loop = self._asyncioRunner.get_loop()
@@ -171,7 +185,7 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
             An asynchronous wrapper that invokes the test method within the
             application context.
         """
-        @functools.wraps(method)
+
         async def wrapper(*args: object, **kwargs: object) -> object:
             """
             Invoke a test method within the application context.
@@ -191,4 +205,7 @@ class TestCase(unittest.IsolatedAsyncioTestCase): # NOSONAR
             # Execute the test method inside the application context.
             return await Application.invoke(method, *args, **kwargs)
 
-        return wrapper
+        # unittest treats a plain function stored on an instance as a static
+        # test factory. A partial keeps coroutine detection and the original
+        # signature while letting single-method discovery retain this case.
+        return functools.wraps(method)(functools.partial(wrapper))

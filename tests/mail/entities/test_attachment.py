@@ -1,10 +1,12 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from dataclasses import FrozenInstanceError
 from orionis.mail.entities.attachment import Attachment
 from orionis.mail.exceptions import MailAttachmentException
 from orionis.test import TestCase
 
-class TestAttachment(TestCase):
 
+class TestAttachment(TestCase):
     def testDeclarationNormalizesPathAndMimeType(self) -> None:
         """Normalize the logical path and lowercase an explicit MIME type.
 

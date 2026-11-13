@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from uuid import uuid4
 import msgspec
 from orionis.queues.entities.envelope import JobEnvelope
@@ -15,9 +17,14 @@ def envelope_options() -> dict[str, object]:
         Independent options with a valid job UUID.
     """
     return {
-        "id": str(uuid4()), "job": "app.jobs.mail:WelcomeJob",
-        "payload": b"state", "connection": "database", "queue": "emails",
-        "max_tries": 3, "timeout": 2.0, "backoff": (0.01, 0.02),
+        "id": str(uuid4()),
+        "job": "app.jobs.mail:WelcomeJob",
+        "payload": b"state",
+        "connection": "database",
+        "queue": "emails",
+        "max_tries": 3,
+        "timeout": 2.0,
+        "backoff": (0.01, 0.02),
     }
 
 
@@ -47,15 +54,25 @@ class TestJobEnvelope(TestCase):
             Verify corrupted execution configuration is never accepted.
         """
         for key, value in (
-            ("version", 2), ("id", "broken"), ("job", "broken"),
-            ("payload", "not bytes"), ("connection", "../connection"),
-            ("queue", "jobs:reserved"), ("max_tries", 0), ("max_tries", True),
-            ("timeout", -1), ("timeout", float("nan")),
-            ("backoff", ()), ("backoff", (-1,)),
+            ("version", 2),
+            ("id", "broken"),
+            ("job", "broken"),
+            ("payload", "not bytes"),
+            ("connection", "../connection"),
+            ("queue", "jobs:reserved"),
+            ("max_tries", 0),
+            ("max_tries", True),
+            ("timeout", -1),
+            ("timeout", float("nan")),
+            ("backoff", ()),
+            ("backoff", (-1,)),
             ("retry_until", float("inf")),
         ):
-            with self.subTest(key=key, value=value), self.assertRaises(
-                (QueuePayloadError, QueueConfigurationError),
+            with (
+                self.subTest(key=key, value=value),
+                self.assertRaises(
+                    (QueuePayloadError, QueueConfigurationError),
+                ),
             ):
                 JobEnvelope(**{**envelope_options(), key: value})
 
@@ -69,9 +86,34 @@ class TestJobEnvelope(TestCase):
         """
         serializer = JobSerializer()
         for payload in (
-            b"{", b"{}", b"[]",
+            b"{",
+            b"{}",
+            b"[]",
             msgspec.json.encode({**envelope_options(), "attempts": 1}),
             msgspec.json.encode({**envelope_options(), "timeout": "60"}),
         ):
             with self.subTest(payload=payload), self.assertRaises(QueuePayloadError):
                 serializer.decodeEnvelope(payload)
+
+    def testUnrepresentableDurationsRaiseQueueErrors(self) -> None:
+        """Reject oversized numeric options without exposing conversion overflow.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        huge = 10**400
+        for key, value, error_type in (
+            ("timeout", huge, QueueConfigurationError),
+            ("backoff", (huge,), QueueConfigurationError),
+            ("retry_until", huge, QueuePayloadError),
+            ("retry_until", -huge, QueuePayloadError),
+        ):
+            with (
+                self.subTest(key=key, negative=value == -huge),
+                self.assertRaises(error_type),
+            ):
+                JobEnvelope(**{**envelope_options(), key: value})
+        past = JobEnvelope(**{**envelope_options(), "retry_until": -1.0})
+        self.assertEqual(past.retry_until, -1.0)

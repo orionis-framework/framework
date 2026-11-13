@@ -1,21 +1,14 @@
+# ruff: noqa: TC001
+# Runtime imports keep public annotations resolvable by dependency injection.
 """Resolve translation lines for the active locale."""
 
 from __future__ import annotations
 import re
-from typing import TYPE_CHECKING
+from orionis.localization.contracts.loader import ITranslationLoader
+from orionis.localization.contracts.repository import ITranslationRepository
 from orionis.localization.contracts.translator import ITranslator
-from orionis.localization.exceptions import InvalidLocaleException
-
-if TYPE_CHECKING:
-    from orionis.localization.contracts.loader import ITranslationLoader
-    from orionis.localization.contracts.repository import ITranslationRepository
-    from orionis.localization.types import MissingKeyHandler
-
-# Safe locale codes: alphanumeric groups separated by "-" or "_".
-_LOCALE_PATTERN: re.Pattern[str] = re.compile(
-    r"^[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*$",
-)
-"""Safe locale codes: alphanumeric groups separated by "-" or "_"."""
+from orionis.localization.types import MissingKeyHandler
+from orionis.localization.validators import validate_locale
 
 # Explicit exact condition on a plural segment, e.g. "{0} none".
 _EXACT_PATTERN: re.Pattern[str] = re.compile(
@@ -30,6 +23,7 @@ _RANGE_PATTERN: re.Pattern[str] = re.compile(
     re.DOTALL,
 )
 """Explicit range condition on a plural segment, e.g. "[2,*] many"."""
+
 
 class Translator(ITranslator):
     """
@@ -83,7 +77,7 @@ class Translator(ITranslator):
         Returns
         -------
         None
-            Initialize the translator with its locales and collaborators.
+            No return value.
 
         Raises
         ------
@@ -259,7 +253,7 @@ class Translator(ITranslator):
         Returns
         -------
         None
-            Change the active locale at runtime.
+            No return value.
 
         Raises
         ------
@@ -304,7 +298,7 @@ class Translator(ITranslator):
         Returns
         -------
         None
-            Discard cached translations so they are re-read from disk.
+            No return value.
 
         Raises
         ------
@@ -344,7 +338,7 @@ class Translator(ITranslator):
         Returns
         -------
         None
-            Discard every cached translation map.
+            No return value.
         """
         self._repository.flush()
 
@@ -365,7 +359,7 @@ class Translator(ITranslator):
         Returns
         -------
         None
-            Register a handler invoked when a translation key is missing.
+            No return value.
         """
         self._missing = handler
 
@@ -390,11 +384,7 @@ class Translator(ITranslator):
         orionis.localization.InvalidLocaleException
             If the locale is empty, malformed, or unsafe for path use.
         """
-        # Reject codes that could escape the language path or be empty.
-        if not isinstance(locale, str) or _LOCALE_PATTERN.match(locale) is None:
-            error_msg = f"Invalid locale code: {locale!r}"
-            raise InvalidLocaleException(error_msg)
-        return locale
+        return validate_locale(locale)
 
     def __resolveMissing(self, key: str, locale: str) -> str:
         """
@@ -425,8 +415,8 @@ class Translator(ITranslator):
 
         Each parameter replaces its ``:key``, ``:Key``, and ``:KEY``
         variants with the raw, capitalized, and uppercased value
-        respectively. Longer parameter names are applied first so they
-        are never shadowed by shorter prefixes.
+        respectively. Longer parameter names take precedence over shorter
+        prefixes. Inserted values are literal and are not interpolated again.
 
         Parameters
         ----------
@@ -440,16 +430,31 @@ class Translator(ITranslator):
         str
             Line with every placeholder substituted.
         """
-        # Apply longer names first to avoid partial-prefix shadowing.
-        for name in sorted(replace, key=len, reverse=True):
-            value = str(replace[name])
-            line = (
-                line
-                .replace(f":{name.upper()}", value.upper())
-                .replace(f":{name.capitalize()}", value.capitalize())
-                .replace(f":{name}", value)
-            )
-        return line
+        if not replace:
+            return line
+        values = [
+            (name, str(replace[name]))
+            for name in sorted(replace, key=len, reverse=True)
+        ]
+        # Consuming the only colon leaves no prefix for another placeholder.
+        if line.count(":") <= 1 and all(":" not in value for _name, value in values):
+            for name, value in values:
+                line = (
+                    line.replace(f":{name.upper()}", value.upper())
+                    .replace(f":{name.capitalize()}", value.capitalize())
+                    .replace(f":{name}", value)
+                )
+            return line
+
+        substitutions: dict[str, str] = {}
+        for name, value in values:
+            substitutions.setdefault(f":{name.upper()}", value.upper())
+            substitutions.setdefault(f":{name.capitalize()}", value.capitalize())
+            substitutions.setdefault(f":{name}", value)
+        pattern = "|".join(
+            re.escape(name) for name in sorted(substitutions, key=len, reverse=True)
+        )
+        return re.sub(pattern, lambda match: substitutions[match[0]], line)
 
     def __matchExplicitSegment(
         self,

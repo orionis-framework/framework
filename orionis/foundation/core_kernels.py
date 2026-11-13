@@ -2,6 +2,7 @@
 
 from types import MappingProxyType
 
+
 def get_core_kernels_mapping() -> MappingProxyType:
     """
     Return an immutable mapping of core kernel class metadata.
@@ -22,6 +23,7 @@ def get_core_kernels_mapping() -> MappingProxyType:
             "KernelHTTP": {"module": "orionis.http.kernel", "class": "KernelHTTP"},
         },
     )
+
 
 CORE_KERNELS: MappingProxyType = get_core_kernels_mapping()
 """Core kernels used by ``core_kernels``."""

@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IAuthorizable(ABC):
     """
     Define how an identity is addressed by the authorization tables.

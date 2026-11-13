@@ -1,5 +1,8 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import tests.orm.relations.test_mixin as relation_fixtures
+
 
 class TestHasManyCreation(relation_fixtures._RelationsTestCase):
     async def testCreateAutoLinksForeignKey(self) -> None:
@@ -10,7 +13,7 @@ class TestHasManyCreation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         book = await author.books().create({"title": "New"})
@@ -19,6 +22,7 @@ class TestHasManyCreation(relation_fixtures._RelationsTestCase):
 
         reloaded = await author.books().get()
         self.assertEqual([b.title for b in reloaded], ["New"])
+
 
 class TestHasOneCreation(relation_fixtures._RelationsTestCase):
     async def testCreateAutoLinksForeignKey(self) -> None:
@@ -29,7 +33,7 @@ class TestHasOneCreation(relation_fixtures._RelationsTestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         author = await relation_fixtures.Author.create({"name": "Ana"})
         profile = await author.profile().create({"bio": "Fresh"})

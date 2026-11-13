@@ -12,8 +12,10 @@ from orionis.mcp.server.compiler import compile_server
 from orionis.schemas import Schema
 from orionis.test import McpTestClient
 
+
 class GreetInput(Schema):
     name: str
+
 
 class GreetTool(Tool[GreetInput, str]):
     description = "Return a greeting."
@@ -22,18 +24,22 @@ class GreetTool(Tool[GreetInput, str]):
     def handle(self, payload: GreetInput) -> McpResponse:
         return McpResponse.structured(f"Hello, {payload.name}!")
 
+
 class DemoServer(Server):
     name = "Demo"
     version = "1.0.0"
     tools = (GreetTool,)
 
+
 assert tuple(compile_server(DemoServer).tools) == ("greet",)
+
 
 async def example():
     client = McpTestClient(Container(), DemoServer)
     result = await client.tool("greet", {"name": "Ada"})
     result.assertOk()
     result.assertTextContains("Hello, Ada!")
+
 
 asyncio.run(example())
 ```
@@ -43,6 +49,8 @@ Los nombres inferidos eliminan el sufijo de primitiva y usan kebab-case. Fija `n
 ## Entrada, salida e inyección
 
 `Tool[Input, Output]` declara validación y JSON Schema; también existen atributos `input` y `output`. El handler puede ser síncrono o asíncrono. Orionis convierte payload, valida schemas y resuelve por separado parámetros de servicios y `McpRequest`. El cliente no puede reemplazar un servicio inyectado usando una clave con el mismo nombre.
+
+La conversión de entrada y salida también aplica los marcadores explícitos `Coerce` y las reglas de schemas dentro de tipos anulables, colecciones y envoltorios nativos `msgspec.Struct`. Los campos sin marcador siguen siendo estrictos. La conversión no muta los datos recibidos y ejecuta las reglas anidadas una sola vez sobre los valores convertidos.
 
 Una salida declarada se valida antes de serializar. Devuelve `McpResponse.structured(value)` con un valor compatible; los handlers deben devolver `McpResponse` o secuencias de respuestas, no un string/dict crudo. Los errores de contrato se convierten en fallos del protocolo. No prometas una estructura de respuesta incompatible con el tipo genérico. El test client pasa bytes por el dispatcher, de modo que prueba serialización real, no solo llamada directa al método.
 

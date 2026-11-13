@@ -8,6 +8,7 @@ from collections.abc import Callable
 BodyParser = Callable[[bytes], object]
 """Special type alias for synchronous body parsers."""
 
+
 class IMediaTypeRegistry(ABC):
     """
     Define the contract for a media-type-to-parser registry.

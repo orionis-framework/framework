@@ -1,10 +1,18 @@
-"""Provide hashing hashers operations through ``import_hasher_backend``."""
+# ruff: noqa: ANN401, PLC0415
+# Resolve optional backend classes dynamically without importing them during discovery.
+"""Provide shared hashing limits and lazy backend resolution."""
 
 import importlib
 from typing import Any
 from orionis.hashing.exceptions import MissingHashDependencyException
 
-# ruff: noqa: ANN401, PLC0415
+ARGON2_MAX_COST = 2**32 - 1
+"""Largest memory or time cost representable by the native Argon2 interface."""
+ARGON2_MAX_THREADS = 2**24 - 1
+"""Largest number of parallel lanes supported by Argon2."""
+ARGON2_MEMORY_PER_THREAD = 8
+"""Minimum memory in kibibytes required for each Argon2 lane."""
+
 
 def import_hasher_backend(module: str, attribute: str, package: str) -> Any:
     """
@@ -34,7 +42,7 @@ def import_hasher_backend(module: str, attribute: str, package: str) -> Any:
     try:
         imported = importlib.import_module(module)
     except (ImportError, HasherNotAvailable) as exc:
-        error_msg = (
+        error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
             f"The '{package}' package is required by this hashing driver. "
             f"Install it with: uv add '{package}'"
         )

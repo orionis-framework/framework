@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Create the configured framework session table without removing data."""
 
 from orionis.console.base.command import BaseCommand
@@ -6,10 +8,9 @@ from orionis.database.exceptions import DatabaseException
 from orionis.foundation.contracts.application import IApplication
 from orionis.session.stores.database import DatabaseSessionStore
 
+
 class SessionMigrateCommand(BaseCommand):
     """Create the configured framework session table without removing data."""
-
-    # ruff: noqa: TC001
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""

@@ -1,12 +1,13 @@
+# ruff: noqa: PLC0415, TC001, TC003
+# Keep protocol and context-manager annotations available to runtime reflection.
 """Async context manager driving a connection-level transaction."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from orionis.database.contracts.transaction import ITransaction
+from types import TracebackType
+from orionis.database.contracts.connection import IConnection
+from orionis.database.threaded.worker import _diagnostic_error
 
-if TYPE_CHECKING:
-    from types import TracebackType
-    from orionis.database.contracts.connection import IConnection
 
 class Transaction(ITransaction):
     """
@@ -32,7 +33,7 @@ class Transaction(ITransaction):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self._connection: IConnection = connection
         """Connection whose transaction lifecycle is managed."""
@@ -63,6 +64,9 @@ class Transaction(ITransaction):
         """
         Commit or roll back the transaction when leaving the context.
 
+        Keep public control calls in the owning task. If the body already
+        failed, report an ordinary rollback failure without replacing it.
+
         Parameters
         ----------
         exc_type : type of BaseException or None
@@ -81,5 +85,17 @@ class Transaction(ITransaction):
         if exc_type is None:
             await self._connection.commit()
         else:
-            await self._connection.rollback()
+            # Public transaction control must stay in the task that owns it.
+            try:
+                await self._connection.rollback()
+            except Exception as error:
+                if exc is None:
+                    raise
+                from orionis.failure.runtime import capture
+
+                await capture(
+                    _diagnostic_error(error),
+                    flow="database",
+                    phase="cleanup",
+                )
         return False

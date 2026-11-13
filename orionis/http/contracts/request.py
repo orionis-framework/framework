@@ -1,3 +1,5 @@
+# ruff: noqa: ANN401
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Define the contract for request implementations."""
 
 from __future__ import annotations
@@ -14,9 +16,8 @@ if TYPE_CHECKING:
     from orionis.http.payload.estructures.query_params import QueryParams
     from orionis.http.payload.form_data import FormData
 
-class IRequest(ABC):
 
-    # ruff: noqa: ANN401
+class IRequest(ABC):
     """Define the contract for request implementations."""
 
     __slots__ = ()
@@ -69,6 +70,7 @@ class IRequest(ABC):
         orionis.http.payload.estructures.headers.Headers
             The headers associated with the request.
         """
+
     @property
     @abstractmethod
     def queryParams(self) -> QueryParams:
@@ -152,6 +154,7 @@ class IRequest(ABC):
         str
             The URL scheme of the request.
         """
+
     @property
     @abstractmethod
     def path(self) -> str:
@@ -314,6 +317,7 @@ class IRequest(ABC):
         bool
             True if the Accept header indicates XML is preferred.
         """
+
     # ---- Body Parsing Methods ----
 
     @abstractmethod

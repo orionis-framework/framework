@@ -1,11 +1,13 @@
+# ruff: noqa: ANN401, TC003
+# Preserve arbitrary session payloads and runtime-resolvable contract annotations.
 """Contract for a single HTTP session runtime object."""
 
 from __future__ import annotations
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
+from abc import ABC, abstractmethod
+from collections.abc import Mapping
+from typing import Any
+
 
 class ISession(ABC):
     """
@@ -31,78 +33,78 @@ class ISession(ABC):
     @abstractmethod
     def id(self) -> str | None:
         """
-        Current session identifier, or ``None`` before the first write.
+        Return the current session identifier.
 
         Returns
         -------
         str | None
-            Result of the operation described above.
+            Identifier, or None before activation.
         """
 
     @property
     @abstractmethod
     def started(self) -> bool:
         """
-        ``True`` once the session has been activated by a write.
+        Report whether the session has been activated.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            True after activation or restoration from a store.
         """
 
     @property
     @abstractmethod
     def dirty(self) -> bool:
         """
-        ``True`` if pending changes must be written to the backing store.
+        Report whether changes require persistence.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            True when tracked changes require a backing-store write.
         """
 
     @property
     @abstractmethod
     def invalidated(self) -> bool:
         """
-        ``True`` when the session has been marked for full deletion.
+        Report whether the session has been invalidated.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            True when the session is marked for full deletion.
         """
 
     @property
     @abstractmethod
     def isNew(self) -> bool:
         """
-        ``True`` for sessions not loaded from a backing store.
+        Report whether the session has a new storage identity.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            True until the current identifier has been persisted.
         """
 
     @property
     @abstractmethod
     def wantsRegenerate(self) -> bool:
         """
-        ``True`` when the session ID should be rotated before saving.
+        Report whether the session requests identifier rotation.
 
         Returns
         -------
         bool
-            Result of the operation described above.
+            True when the identifier should be rotated before saving.
         """
 
     # ── Public API ──────────────────────────────────────────────────────────────
 
     @abstractmethod
-    def get(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+    def get(self, key: str, default: Any = None) -> Any:
         """
         Return the value for *key*, or *default* when absent.
 
@@ -120,7 +122,7 @@ class ISession(ABC):
         """
 
     @abstractmethod
-    def put(self, key: str, value: Any) -> None:  # noqa: ANN401
+    def put(self, key: str, value: Any) -> None:
         """
         Store *value* under *key*, activating the session on the first call.
 
@@ -134,7 +136,7 @@ class ISession(ABC):
         Returns
         -------
         None
-            Store *value* under *key*, activating the session on the first call.
+            No return value.
         """
 
     @abstractmethod
@@ -166,7 +168,7 @@ class ISession(ABC):
         Returns
         -------
         None
-            Remove *key* from session data (no-op when absent).
+            No return value.
         """
 
     @abstractmethod
@@ -177,11 +179,11 @@ class ISession(ABC):
         Returns
         -------
         None
-            Remove all data from this session.
+            No return value.
         """
 
     @abstractmethod
-    def flash(self, key: str, value: Any) -> None:  # noqa: ANN401
+    def flash(self, key: str, value: Any) -> None:
         """
         Store *value* under *key* for exactly one subsequent request.
 
@@ -195,11 +197,11 @@ class ISession(ABC):
         Returns
         -------
         None
-            Store *value* under *key* for exactly one subsequent request.
+            No return value.
         """
 
     @abstractmethod
-    def getFlash(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+    def getFlash(self, key: str, default: Any = None) -> Any:
         """
         Return the flash value for *key*.
 
@@ -233,11 +235,11 @@ class ISession(ABC):
         Returns
         -------
         None
-            Flash a submitted form payload so the next request can repopulate it.
+            No return value.
         """
 
     @abstractmethod
-    def getOldInput(self, key: str, default: Any = None) -> Any:  # noqa: ANN401
+    def getOldInput(self, key: str, default: Any = None) -> Any:
         """
         Return the value submitted for *key* in the previous request.
 
@@ -267,7 +269,7 @@ class ISession(ABC):
         Returns
         -------
         None
-            Flash validation errors for the next request.
+            No return value.
         """
 
     @abstractmethod
@@ -294,7 +296,7 @@ class ISession(ABC):
         Returns
         -------
         None
-            Remember the page the user is currently viewing.
+            No return value.
         """
 
     @abstractmethod
@@ -321,7 +323,7 @@ class ISession(ABC):
         Returns
         -------
         None
-            Request a session ID rotation (e.g. immediately after login).
+            No return value.
         """
 
     @abstractmethod
@@ -332,7 +334,7 @@ class ISession(ABC):
         Returns
         -------
         None
-            Mark the session for full deletion and clear in-memory data.
+            No return value.
         """
 
     @abstractmethod

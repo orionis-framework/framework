@@ -2,12 +2,17 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.scheduler import (
-    Database, Drivers, Memory, Redis, Scheduler, Stores,
+    Database,
+    Drivers,
+    Memory,
+    Redis,
+    Scheduler,
+    Stores,
 )
+
 
 @dataclass(frozen=True, kw_only=True)
 class BootstrapScheduler(Scheduler):
-
     # ----------------------------------------------------------------------------------
     # store : Drivers | str, optional
     # --- The default task store used by the task scheduler.
@@ -23,13 +28,11 @@ class BootstrapScheduler(Scheduler):
     # ----------------------------------------------------------------------------------
     stores: Stores | dict = field(
         default_factory=lambda: Stores(
-
             # --------------------------------------------------------------------------
             # memory : Memory, optional
             # --- In-memory task store (default driver, process-scoped).
             # --------------------------------------------------------------------------
             memory=Memory(),
-
             # --------------------------------------------------------------------------
             # redis : Redis, optional
             # --- Redis task store.
@@ -42,7 +45,6 @@ class BootstrapScheduler(Scheduler):
                 key=Env.get("REDIS_TASKS_KEY", "scheduler:tasks"),
                 run_times_key=Env.get("REDIS_RUN_TIMES_KEY", "scheduler:run_times"),
             ),
-
             # --------------------------------------------------------------------------
             # database : Database, optional
             # --- Database task store.

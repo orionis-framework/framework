@@ -1,9 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import orionis.schemas
 from orionis.schemas.schema import Schema
 from orionis.test import TestCase
 
-class TestSchemasPackage(TestCase):
 
+class TestSchemasPackage(TestCase):
     def testPackageExportsTheSchemaBaseClass(self) -> None:
         """Re-export the schema base class at package level.
 
@@ -13,7 +15,7 @@ class TestSchemasPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(orionis.schemas.Schema, Schema)
 
@@ -25,6 +27,6 @@ class TestSchemasPackage(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(orionis.schemas.__all__, ["Schema"])

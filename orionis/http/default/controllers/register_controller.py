@@ -1,3 +1,5 @@
+# ruff: noqa: TC001, BLE001
+# Resolve annotations at runtime; report failures without exposing backend details.
 """Handle the built-in account-registration endpoints."""
 
 from typing import cast
@@ -15,9 +17,8 @@ from orionis.support.facades import DB, Hash, Mail
 from orionis.support.facades.encrypter import Crypt
 from orionis.support.facades.lang import Lang
 
-class RegisterController(BaseController):
 
-    # ruff: noqa: TC001, BLE001
+class RegisterController(BaseController):
     """Handle the built-in account-registration endpoints."""
 
     REGISTER_VIEW_NAME: str = "auth.register"
@@ -61,52 +62,58 @@ class RegisterController(BaseController):
         Returns
         -------
         orionis.http.Response
-            Redirect to login after the account is created.
+            Redirect after committing the account, or render generic form errors.
+
+        Raises
+        ------
+        asyncio.CancelledError
+            If the request is cancelled, after the transaction rolls back.
         """
-        await DB.beginTransaction()
-
         try:
-
             hashed: str = await Hash.make(payload.password)
+            async with DB.transaction():
+                user = User()
+                user.name = payload.name.strip()
+                user.email = payload.email.strip().lower()
+                user.password = hashed
 
-            user = User()
-            user.name = payload.name.strip()
-            user.email = payload.email.strip().lower()
-            user.password = hashed
+                if isinstance(user, MustVerifyEmail):
+                    user.active = False
 
-            if isinstance(user, MustVerifyEmail):
-                user.active = False
-
-            await user.save()
-
-            await DB.commit()
-
+                if not await user.save():
+                    error_msg = "User persistence was vetoed"
+                    raise RuntimeError(error_msg)
         except Exception as e:
             await capture(e, flow="http", phase="registration")
-            await DB.rollback()
-            return await response.view(self.REGISTER_VIEW_NAME).withErrors({
-                "registration": str(e),
-            }).withInput(payload.toDict())
+            return (  # NOSONAR(S1110) - Await the complete fluent expression.
+                await response.view(self.REGISTER_VIEW_NAME)
+                .withErrors(
+                    {
+                        "registration": (  # NOSONAR(S1110) - Multiline value.
+                            "The account could not be created. Please try again."
+                        ),
+                    },
+                )
+                .withInput(payload.toDict())
+            )
 
         # Runs after commit: a delivery failure must never trigger a rollback.
         if isinstance(user, MustVerifyEmail):
-            return (
-                response.redirect(
-                    url=self.REGISTER_REDIRECT_PATH,
-                    background=BackgroundTask(
-                        self.sendVerificationEmail, request.baseUrl, user,
-                    ),
-                ).withFlash(
-                    "success",
-                    "Account created. Check your email to activate it.",
-                )
+            return response.redirect(
+                url=self.REGISTER_REDIRECT_PATH,
+                background=BackgroundTask(
+                    self.sendVerificationEmail,
+                    request.baseUrl,
+                    user,
+                ),
+            ).withFlash(
+                "success",
+                "Account created. Check your email to activate it.",
             )
 
-        return (
-            response.redirect(self.REGISTER_REDIRECT_PATH)
-                    .withFlash(
-                        "success", "Account created successfully. Please log in.",
-                    )
+        return response.redirect(self.REGISTER_REDIRECT_PATH).withFlash(
+            "success",
+            "Account created successfully. Please log in.",
         )
 
     async def sendVerificationEmail(
@@ -134,14 +141,16 @@ class RegisterController(BaseController):
 
         return await (
             Mail.to(user.email)
-                .subject(Lang.get("Verify Your Email"))
-                .send(Content(
+            .subject(Lang.get("Verify Your Email"))
+            .send(
+                Content(
                     view="emails.verify-email",
                     data={
                         "user_name": user.name,
                         "verification_url": verification_url,
                     },
-                ))
+                ),
+            )
         )
 
     async def verifyEmail(
@@ -161,6 +170,11 @@ class RegisterController(BaseController):
         -------
         orionis.http.Response
             Rendered outcome page reporting the verification state.
+
+        Raises
+        ------
+        RuntimeError
+            If the model refuses to persist the verification update.
         """
         user: User | None = await self.__resolveUser(
             request.queryParams.get(self.VERIFY_PARAM_NAME),
@@ -178,7 +192,9 @@ class RegisterController(BaseController):
 
         user.active = True
         user.email_verified_at = user.freshTimestamp()
-        await user.save()
+        if not await user.save():
+            error_msg = "The email address could not be verified."
+            raise RuntimeError(error_msg)
 
         return await response.view(self.VERIFY_VIEW_NAME, state="verified")
 

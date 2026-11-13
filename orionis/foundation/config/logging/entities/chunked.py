@@ -10,6 +10,7 @@ from orionis.support.entities.base import BaseEntity
 _DEFAULT_PATH: str = "storage/logs/chunked_{suffix}.log"
 """Default path identifier: ``storage/logs/chunked_{suffix}.log``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Chunked(BaseEntity):
     """

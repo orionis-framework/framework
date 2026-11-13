@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 import typing
 from orionis.mail.contracts.manager import IMailManager
@@ -5,23 +7,25 @@ from orionis.mail.manager import MailManager
 from orionis.test import TestCase
 
 # Public operations every mail manager implementation must provide.
-_EXPECTED_SURFACE = frozenset({
-    "attach",
-    "bcc",
-    "cc",
-    "extend",
-    "fromAddress",
-    "html",
-    "mailer",
-    "raw",
-    "replyTo",
-    "send",
-    "subject",
-    "to",
-})
+_EXPECTED_SURFACE = frozenset(
+    {
+        "attach",
+        "bcc",
+        "cc",
+        "extend",
+        "fromAddress",
+        "html",
+        "mailer",
+        "raw",
+        "replyTo",
+        "send",
+        "subject",
+        "to",
+    },
+)
+
 
 class TestIMailManagerContract(TestCase):
-
     def testDeclaresTheDocumentedPublicSurface(self) -> None:
         """Declare exactly the documented composition and delivery operations.
 

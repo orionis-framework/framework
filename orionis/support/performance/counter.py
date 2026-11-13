@@ -1,12 +1,12 @@
+# ruff: noqa: TC003
+# Preserve traceback annotations for public context-manager signature inspection.
 """Measure elapsed execution time with a high-resolution counter."""
 
 from __future__ import annotations
 import time
-from typing import TYPE_CHECKING, Self
+from types import TracebackType
+from typing import Self
 from orionis.support.performance.contracts.counter import IPerformanceCounter
-
-if TYPE_CHECKING:
-    from types import TracebackType
 
 _ERR_NOT_MEASURED: str = "Counter has not been started and stopped properly."
 """
@@ -23,6 +23,7 @@ _ERR_USE_STOP: str = "Cannot use astop() after start(). Use stop() instead."
 """
 Error text for use stop: ``Cannot use astop() after start(). Use stop() instead.``.
 """
+
 
 class PerformanceCounter(IPerformanceCounter):
     """Measure elapsed execution time with a high-resolution counter."""

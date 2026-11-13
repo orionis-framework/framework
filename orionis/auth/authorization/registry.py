@@ -1,10 +1,12 @@
 """Map resource classes to the policy classes protecting them."""
 
+from weakref import WeakKeyDictionary
 from orionis.auth.contracts.policy import IPolicy
 
 # Sentinel distinguishing "not cached yet" from a cached ``None`` result.
 _MISSING: object = object()
 """Sentinel distinguishing "not cached yet" from a cached ``None`` result."""
+
 
 class PolicyRegistry:
     """
@@ -12,7 +14,8 @@ class PolicyRegistry:
 
     Lookups walk the method resolution order once and memoise the result,
     so an inherited policy costs a single dictionary read after the first
-    request that needed it.
+    request that needed it. The lookup cache holds resource classes weakly;
+    only explicit registrations retain their resource and policy classes.
 
     Concurrency
     -----------
@@ -31,12 +34,14 @@ class PolicyRegistry:
         Returns
         -------
         None
-            The registry starts without any policy binding.
+            No return value.
         """
         self.__policies: dict[type, type[IPolicy]] = {}
         """Policy classes registered for each protected resource type."""
-        self.__lookup: dict[type, type[IPolicy] | None] = {}
-        """Cached resource-to-policy resolutions used during authorization."""
+        self.__lookup: WeakKeyDictionary[type, type[IPolicy] | None] = (
+            WeakKeyDictionary()
+        )
+        """Weakly keyed resolutions that do not retain unregistered resource classes."""
 
     def register(self, resource: type, policy: type[IPolicy]) -> None:
         """
@@ -52,7 +57,7 @@ class PolicyRegistry:
         Returns
         -------
         None
-            The binding is stored as a side effect.
+            No return value.
 
         Raises
         ------

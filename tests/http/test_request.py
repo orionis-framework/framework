@@ -1,3 +1,6 @@
+# ruff: noqa: PLR0913, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from xml.etree.ElementTree import ParseError
@@ -19,6 +22,7 @@ if TYPE_CHECKING:
 _BOUNDARY: str = "orionisboundary"
 _CREDENTIAL_FIELD: str = "password"
 _CSRF_VALUE: str = "abc123"
+
 
 class _StubRSGIAdapter:
     """Expose the dictionary view of a Granian RSGI scope for request tests."""
@@ -101,6 +105,7 @@ class _StubRSGIAdapter:
         """
         return self._headers
 
+
 def make_receive(body: bytes) -> Callable[[], Coroutine[Any, Any, dict[str, Any]]]:
     """
     Build an ASGI receive callable delivering a whole body at once.
@@ -128,7 +133,8 @@ def make_receive(body: bytes) -> Callable[[], Coroutine[Any, Any, dict[str, Any]
 
     return receive
 
-def make_asgi_request(  # noqa: PLR0913
+
+def make_asgi_request(
     *,
     body: bytes = b"",
     headers: list[tuple[bytes, bytes]] | None = None,
@@ -190,6 +196,7 @@ def make_asgi_request(  # noqa: PLR0913
         params=params,
     )
 
+
 def make_rsgi_request(
     *,
     host: str | None = "orionis.test",
@@ -239,6 +246,7 @@ def make_rsgi_request(
         params={},
     )
 
+
 def make_multipart_body(fields: list[tuple[str, str]]) -> bytes:
     """
     Build a multipart payload carrying only text fields.
@@ -260,6 +268,7 @@ def make_multipart_body(fields: list[tuple[str, str]]) -> bytes:
         parts.append(f"{value}\r\n")
     parts.append(f"--{_BOUNDARY}--\r\n")
     return "".join(parts).encode()
+
 
 class TestRequestConstruction(TestCase):
     """Verify request construction and transport dependency wiring."""
@@ -329,6 +338,7 @@ class TestRequestConstruction(TestCase):
             Assertions verify the behavior described above.
         """
         self.assertFalse(hasattr(make_asgi_request(), "__dict__"))
+
 
 class TestRequestLine(TestCase):
     """Verify request-line accessors and their cached values."""
@@ -446,6 +456,7 @@ class TestRequestLine(TestCase):
         """
         request = make_asgi_request(remove=("http_version",))
         self.assertEqual(request.httpVersion, "1.1")
+
 
 class TestAsgiRequestUrls(TestCase):
     """Verify URL and origin construction from ASGI scopes."""
@@ -677,6 +688,7 @@ class TestAsgiRequestUrls(TestCase):
         request = make_asgi_request()
         self.assertIs(request.baseUrl, request.baseUrl)
 
+
 class TestRsgiRequestUrls(TestCase):
     """Verify URL and query handling for RSGI scopes."""
 
@@ -773,6 +785,7 @@ class TestRsgiRequestUrls(TestCase):
         request = make_rsgi_request(scope_overrides={"query_string": None})
         self.assertEqual(len(request.queryParams), 0)
 
+
 class TestRequestStructures(TestCase):
     """Verify header, cookie, query, and request-state containers."""
 
@@ -850,6 +863,7 @@ class TestRequestStructures(TestCase):
         request = make_asgi_request()
         request.state.tenant = "acme"
         self.assertEqual(request.state.tenant, "acme")
+
 
 class TestRequestClientInformation(TestCase):
     """Verify client identity and forwarded transport information."""
@@ -946,6 +960,7 @@ class TestRequestClientInformation(TestCase):
         )
         self.assertEqual(request.forwarded, {"for": "10.0.0.7"})
         self.assertEqual(request.forwarded, {"for": "10.0.0.7"})
+
 
 class TestRequestIdentityHeaders(TestCase):
     """Verify user-agent and authentication header accessors."""
@@ -1051,6 +1066,7 @@ class TestRequestIdentityHeaders(TestCase):
         """
         request = make_asgi_request(headers=[(b"accept", b"text/html")])
         self.assertEqual(request.accept, "text/html")
+
 
 class TestRequestContentNegotiation(TestCase):
     """Verify content negotiation and AJAX detection."""
@@ -1160,6 +1176,7 @@ class TestRequestContentNegotiation(TestCase):
         self.assertTrue(request.isAjax())
         self.assertFalse(make_asgi_request().isAjax())
 
+
 class TestRequestRouteParameters(TestCase):
     """Verify route parameter lookup and mapping ownership."""
 
@@ -1218,6 +1235,7 @@ class TestRequestRouteParameters(TestCase):
         """
         self.assertIsNone(make_asgi_request().routeParam("missing"))
 
+
 class TestRequestCsrfToken(TestCase):
     """Verify CSRF token lookup from mutable request state."""
 
@@ -1249,6 +1267,7 @@ class TestRequestCsrfToken(TestCase):
         request.state.csrf_token = _CSRF_VALUE
         self.assertEqual(request.csrfToken(), _CSRF_VALUE)
         self.assertEqual(request.csrf_token, _CSRF_VALUE)
+
 
 class TestRequestBodyReading(TestCase):
     """Verify raw and decoded body access through the body stream."""
@@ -1305,6 +1324,7 @@ class TestRequestBodyReading(TestCase):
         """
         request = make_asgi_request(body="ñandú".encode())
         self.assertEqual(await request.text(), "ñandú")
+
 
 class TestRequestJsonParsing(TestCase):
     """Verify JSON parsing, caching, and error reporting."""
@@ -1429,6 +1449,7 @@ class TestRequestJsonParsing(TestCase):
         with self.assertRaises(ValueError):
             await request.json()
 
+
 class TestRequestOtherParsers(TestCase):
     """Verify XML, MessagePack, and URL-encoded body parsing."""
 
@@ -1522,6 +1543,7 @@ class TestRequestOtherParsers(TestCase):
         with self.assertRaises(UnsupportedMediaTypeException):
             await request.formUrlEncoded()
 
+
 class TestRequestMultipartParsing(TestCase):
     """Verify multipart parsing and content-type validation."""
 
@@ -1541,10 +1563,12 @@ class TestRequestMultipartParsing(TestCase):
         """
         return make_asgi_request(
             body=make_multipart_body(fields),
-            headers=[(
-                b"content-type",
-                f'multipart/form-data; boundary="{_BOUNDARY}"'.encode(),
-            )],
+            headers=[
+                (
+                    b"content-type",
+                    f'multipart/form-data; boundary="{_BOUNDARY}"'.encode(),
+                ),
+            ],
         )
 
     async def testParsesMultipartFields(self) -> None:
@@ -1594,6 +1618,7 @@ class TestRequestMultipartParsing(TestCase):
         )
         with self.assertRaises(ValueError):
             await request.form()
+
 
 class TestRequestPayloadDispatch(TestCase):
     """Verify parser selection through the media-type registry."""
@@ -1656,10 +1681,12 @@ class TestRequestPayloadDispatch(TestCase):
         """
         request = make_asgi_request(
             body=make_multipart_body([("a", "1")]),
-            headers=[(
-                b"content-type",
-                f"multipart/form-data; boundary={_BOUNDARY}".encode(),
-            )],
+            headers=[
+                (
+                    b"content-type",
+                    f"multipart/form-data; boundary={_BOUNDARY}".encode(),
+                ),
+            ],
         )
         self.assertIsInstance(await request.payload(), FormData)
 
@@ -1709,6 +1736,7 @@ class TestRequestPayloadDispatch(TestCase):
         """
         request = make_asgi_request()
         self.assertIs(request._Request__registry, DEFAULT_MEDIA_TYPES)
+
 
 class TestRequestDataDictionary(TestCase):
     """Verify body conversion into schema-validation dictionaries."""
@@ -1801,7 +1829,8 @@ class TestRequestDataDictionary(TestCase):
                     if parse_first:
                         self.assertEqual(await request.json(), value)
                     with self.assertRaisesRegex(
-                        TypeError, "JSON body must be an object",
+                        TypeError,
+                        "JSON body must be an object",
                     ):
                         await request.data()
 
@@ -1839,10 +1868,12 @@ class TestRequestDataDictionary(TestCase):
             body=make_multipart_body(
                 [("tag", "a"), ("tag", "b"), ("tag", "c"), ("name", "x")],
             ),
-            headers=[(
-                b"content-type",
-                f"multipart/form-data; boundary={_BOUNDARY}".encode(),
-            )],
+            headers=[
+                (
+                    b"content-type",
+                    f"multipart/form-data; boundary={_BOUNDARY}".encode(),
+                ),
+            ],
         )
         self.assertEqual(
             await request.data(),
@@ -1880,7 +1911,8 @@ class TestRequestDataDictionary(TestCase):
             headers=[(b"content-type", b"application/msgpack")],
         )
         with self.assertRaisesRegex(
-            ValueError, "Invalid MessagePack payload",
+            ValueError,
+            "Invalid MessagePack payload",
         ) as captured:
             await request.data()
         self.assertIsInstance(captured.exception.__cause__, DecodeError)
@@ -1902,7 +1934,8 @@ class TestRequestDataDictionary(TestCase):
                     headers=[(b"content-type", b"application/msgpack")],
                 )
                 with self.assertRaisesRegex(
-                    TypeError, "MessagePack body must be a map",
+                    TypeError,
+                    "MessagePack body must be a map",
                 ):
                     await request.data()
 

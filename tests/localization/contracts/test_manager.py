@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from orionis.localization.contracts.manager import ILocalizationManager
 from orionis.localization.manager import LocalizationManager
@@ -6,23 +8,6 @@ from orionis.test import TestCase
 # Methods every localization manager must implement.
 _ABSTRACT_METHODS: frozenset[str] = frozenset({"translator"})
 
-def parameter_names(owner: type, method: str) -> list[str]:
-    """
-    Return the parameter names declared by *method* on *owner*.
-
-    Parameters
-    ----------
-    owner : type
-        Class owning the inspected method.
-    method : str
-        Name of the method to inspect.
-
-    Returns
-    -------
-    list[str]
-        Ordered parameter names of the method signature.
-    """
-    return list(inspect.signature(getattr(owner, method)).parameters)
 
 class TestLocalizationManagerContract(TestCase):
     """Validate the manager interface and its implementation parity."""
@@ -36,7 +21,7 @@ class TestLocalizationManagerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(
             ILocalizationManager.__abstractmethods__,
@@ -52,7 +37,7 @@ class TestLocalizationManagerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(ILocalizationManager.__slots__, ())
 
@@ -65,7 +50,7 @@ class TestLocalizationManagerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(
             issubclass(LocalizationManager, ILocalizationManager),
@@ -80,11 +65,20 @@ class TestLocalizationManagerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for method in sorted(_ABSTRACT_METHODS):
-            self.assertEqual(
-                parameter_names(LocalizationManager, method),
-                parameter_names(ILocalizationManager, method),
-                method,
-            )
+            with self.subTest(method=method):
+                expected = inspect.signature(
+                    getattr(ILocalizationManager, method),
+                    eval_str=True,
+                )
+                actual = inspect.signature(
+                    getattr(LocalizationManager, method),
+                    eval_str=True,
+                )
+                self.assertEqual(
+                    list(actual.parameters.values())[1:],
+                    list(expected.parameters.values())[1:],
+                )
+                self.assertEqual(actual.return_annotation, expected.return_annotation)

@@ -1,3 +1,6 @@
+# ruff: noqa: PLR0913, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from rich.console import Console
 from orionis.console.commands.route.list import RouteListCommand
 from orionis.console.core.commands import CORE_COMMANDS
@@ -5,8 +8,10 @@ from orionis.http.routes.entities.compiled_route import CompiledRoute
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.test import TestCase
 
+
 class _AuthMiddleware:
     """Identify middleware shown in the route table."""
+
 
 class _RouteLoader:
     """Provide precompiled route buckets to the list command."""
@@ -36,7 +41,8 @@ class _RouteLoader:
         """
         return self.routes
 
-def _make_route(  # noqa: PLR0913
+
+def _make_route(
     path: str,
     method: str,
     action: dict[str, str],
@@ -77,6 +83,7 @@ def _make_route(  # noqa: PLR0913
         segment_count=path.count("/"),
         compiled_middlewares=middleware,
     )
+
 
 class TestRouteListCommand(TestCase):
     """Verify route listing, action formatting, and URI ordering."""

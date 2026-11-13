@@ -1,12 +1,16 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
+
 import dataclasses
 import sys
 import types
+
 from orionis.failure.entities.throwable import Throwable
 from orionis.test import TestCase
 
-class TestThrowableCreation(TestCase):
 
+class TestThrowableCreation(TestCase):
     def testCreatesWithAllFields(self) -> None:
         """Create a Throwable with all fields explicitly supplied.
 
@@ -16,7 +20,7 @@ class TestThrowableCreation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         tb = None
         throwable = Throwable(
@@ -38,7 +42,7 @@ class TestThrowableCreation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         throwable = Throwable(
             classtype=RuntimeError,
@@ -56,7 +60,7 @@ class TestThrowableCreation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -77,6 +81,7 @@ class TestThrowableCreation(TestCase):
             traceback=tb,
         )
         self.assertIsInstance(throwable.traceback, types.TracebackType)
+        self.assertIs(throwable.traceback, tb)
 
     def testClasstypeIsStoredExactly(self) -> None:
         """Store the supplied exception class without modification.
@@ -87,7 +92,7 @@ class TestThrowableCreation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         throwable = Throwable(
             classtype=TypeError,
@@ -105,7 +110,7 @@ class TestThrowableCreation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         throwable = Throwable(
             classtype=Exception,
@@ -124,18 +129,17 @@ class TestThrowableCreation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         throwable = Throwable(
             classtype=ValueError,
             message="first",
             args=("first", "second", "third"),
         )
-        self.assertEqual(len(throwable.args), 3)
-        self.assertEqual(throwable.args[1], "second")
+        self.assertEqual(throwable.args, ("first", "second", "third"))
+
 
 class TestThrowableImmutability(TestCase):
-
     def testIsFrozen(self) -> None:
         """Raise FrozenInstanceError when mutating a Throwable field.
 
@@ -145,7 +149,7 @@ class TestThrowableImmutability(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         throwable = Throwable(
             classtype=Exception,
@@ -164,7 +168,7 @@ class TestThrowableImmutability(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         throwable = Throwable(
             classtype=Exception,
@@ -183,7 +187,7 @@ class TestThrowableImmutability(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         t1 = Throwable(classtype=ValueError, message="x", args=("x",))
         t2 = Throwable(classtype=ValueError, message="x", args=("x",))
@@ -198,7 +202,7 @@ class TestThrowableImmutability(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         t1 = Throwable(classtype=ValueError, message="a", args=("a",))
         t2 = Throwable(classtype=ValueError, message="b", args=("b",))
@@ -213,14 +217,14 @@ class TestThrowableImmutability(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         t1 = Throwable(classtype=ValueError, message="x", args=("x",))
         t2 = Throwable(classtype=TypeError, message="x", args=("x",))
         self.assertNotEqual(t1, t2)
 
-class TestThrowableRepr(TestCase):
 
+class TestThrowableRepr(TestCase):
     def testReprContainsClassName(self) -> None:
         """Include the class name in the Throwable repr string.
 
@@ -230,7 +234,7 @@ class TestThrowableRepr(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         throwable = Throwable(
             classtype=OSError,
@@ -248,7 +252,7 @@ class TestThrowableRepr(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         throwable = Throwable(
             classtype=OSError,

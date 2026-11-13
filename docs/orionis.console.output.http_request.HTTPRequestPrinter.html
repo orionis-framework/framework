@@ -283,6 +283,16 @@
         
 
         
+            <div class="itemName"><code><a href="#__lifecycle_lock" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__lifecycle_lock">__lifecycle<wbr></wbr>_lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#__queue" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__queue">__queue</a></code>
             </div>
         
@@ -375,7 +385,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4395"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4401"> 
                     
                 </input>
 
@@ -515,6 +525,16 @@
 
         
             <div class="itemName"><code><a href="#__enabled" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__enabled">__enabled</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__lifecycle_lock" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__lifecycle_lock">__lifecycle<wbr></wbr>_lock</a></code>
             </div>
         
 
@@ -843,7 +863,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HTTPRequestPrinter</span>(<a href="orionis.console.output.contracts.http_request.IHTTPRequestPrinter.html" class="internal-link" title="orionis.console.output.contracts.http_request.IHTTPRequestPrinter">IHTTPRequestPrinter</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L58" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__init__">HTTPRequestPrinter()</a></code></p><p><a href="classIndex.html#orionis.console.output.http_request.HTTPRequestPrinter">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">HTTPRequestPrinter</span>(<a href="orionis.console.output.contracts.http_request.IHTTPRequestPrinter.html" class="internal-link" title="orionis.console.output.contracts.http_request.IHTTPRequestPrinter">IHTTPRequestPrinter</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L62" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__init__">HTTPRequestPrinter()</a></code></p><p><a href="classIndex.html#orionis.console.output.http_request.HTTPRequestPrinter">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -851,7 +871,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id455">
+          <table class="children sortable" id="id457">
   
   
   <tr class="method">
@@ -912,13 +932,18 @@
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
+    <td><code><a href="#__lifecycle_lock" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__lifecycle_lock">__lifecycle<wbr></wbr>_lock</a></code></td>
+    <td>Serialize worker startup and shutdown.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
     <td><code><a href="#__queue" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__queue">__queue</a></code></td>
     <td>Async queue and worker task (initialized by start()).</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
     <td><code><a href="#__start_timer" class="internal-link" title="orionis.console.output.http_request.HTTPRequestPrinter.__start_timer">__start<wbr></wbr>_timer</a></code></td>
-    <td>Internal timer set by startTimer(); None until first call.</td>
+    <td>Context-local timestamp set by <tt class="rst-docutils rst-literal">startTimer</tt> for each request.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
@@ -965,7 +990,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L96">
       
       (source)
     </a>
@@ -994,8 +1019,8 @@ strings, and prepares the async queue and worker task references.</p>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__worker</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L204">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__worker</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">queue: <code><a href="https://docs.python.org/3/library/asyncio-queue.html#asyncio.Queue" class="intersphinx-link">asyncio.Queue</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L227">
       
       (source)
     </a>
@@ -1010,7 +1035,7 @@ strings, and prepares the async queue and worker task references.</p>
     <div><p>Write queued lines to stdout in the background.</p>
 <p>Continuously reads lines from the internal async queue and writes
 them to stdout, flushing after each write to ensure immediate display.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">queue:</span><code><a href="https://docs.python.org/3/library/asyncio-queue.html#asyncio.Queue" class="intersphinx-link">asyncio.Queue</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></td><td class="fieldArgDesc">Queue owned by this worker until shutdown.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1025,7 +1050,7 @@ them to stdout, flushing after each write to ensure immediate display.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">printRequest</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-param">adapter: <code><a href="orionis.http.adapters.request.contracts.transport.TransportAdapter.html" class="internal-link" title="orionis.http.adapters.request.contracts.transport.TransportAdapter">TransportAdapter</a></code>, </span><span class="rst-sig-param">response: <code>Response</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L244">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L278">
       
       (source)
     </a>
@@ -1057,7 +1082,7 @@ to stdout.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setEnabled</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">enabled: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L142">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L150">
       
       (source)
     </a>
@@ -1085,7 +1110,7 @@ is suppressed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">start</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L159">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L167">
       
       (source)
     </a>
@@ -1098,9 +1123,8 @@ is suppressed.</td></tr></table><table class="fieldTable"><tr class="fieldStart"
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.output.contracts.http_request.IHTTPRequestPrinter.html#start" class="internal-link">orionis.console.output.contracts.http_request.IHTTPRequestPrinter.start</a></code></div>
     <div><p>Start the background print worker.</p>
-<p>Creates the internal async queue and spawns a background task
-to drain queued output lines. Must be called once from an async
-context before the first request is handled.</p>
+<p>Create the internal async queue and a worker, or reuse the active worker.
+Serialize startup with shutdown and close a rejected worker coroutine.</p>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
@@ -1116,7 +1140,7 @@ context before the first request is handled.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">startTimer</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L226">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L259">
       
       (source)
     </a>
@@ -1147,7 +1171,7 @@ or None if output is disabled.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">stop</span><span class="function-signature">(<span class="rst-sig-param">self: <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L178">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L195">
       
       (source)
     </a>
@@ -1160,9 +1184,10 @@ or None if output is disabled.</td></tr></table></div>
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="orionis.console.output.contracts.http_request.IHTTPRequestPrinter.html#stop" class="internal-link">orionis.console.output.contracts.http_request.IHTTPRequestPrinter.stop</a></code></div>
     <div><p>Drain remaining output and stop the background worker.</p>
-<p>Waits for every queued line to be written before cancelling the
-worker task. Safe to call even if start() was never invoked.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+<p>Close queue admission and await the worker directly, so a failed writer
+cannot strand shutdown behind unfinished queue items. Release references
+after success, failure, or cancellation. Safe before startup.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the output stream fails while writing or flushing.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/asyncio-exceptions.html#asyncio.CancelledError" class="intersphinx-link">asyncio.CancelledError</a></code></td><td>If shutdown or the worker is cancelled.</td></tr></table></div>
   </div>
 </div><div class="baseconstant">
   
@@ -1176,7 +1201,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">HTTP_COLORS</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.ClassVar" class="intersphinx-link">ClassVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L70">
       
       (source)
     </a>
@@ -1210,7 +1235,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">HTTP_MIN_STATUS_CODE</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.ClassVar" class="intersphinx-link">ClassVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L64">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L66">
       
       (source)
     </a>
@@ -1237,7 +1262,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">STATUS_COLORS</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.ClassVar" class="intersphinx-link">ClassVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L84">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L86">
       
       (source)
     </a>
@@ -1269,7 +1294,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__enabled</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L123">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L125">
       
       (source)
     </a>
@@ -1287,6 +1312,33 @@ worker task. Safe to call even if start() was never invoked.</p>
 </div><div class="baseinstancevariable">
   
   
+  <a name="orionis.console.output.http_request.HTTPRequestPrinter.__lifecycle_lock">
+    
+  </a>
+  <a name="__lifecycle_lock">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">__lifecycle_lock</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L134">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__lifecycle_lock" title="orionis.console.output.http_request.HTTPRequestPrinter.__lifecycle_lock">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Serialize worker startup and shutdown.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
   <a name="orionis.console.output.http_request.HTTPRequestPrinter.__queue">
     
   </a>
@@ -1295,8 +1347,8 @@ worker task. Safe to call even if start() was never invoked.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">__queue</span>: <code><a href="https://docs.python.org/3/library/asyncio-queue.html#asyncio.Queue" class="intersphinx-link">asyncio.Queue</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L127">
+    <span class="py-defname">__queue</span>: <code><a href="https://docs.python.org/3/library/asyncio-queue.html#asyncio.Queue" class="intersphinx-link">asyncio.Queue</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L129">
       
       (source)
     </a>
@@ -1322,8 +1374,8 @@ worker task. Safe to call even if start() was never invoked.</p>
   </a>
   <div class="functionHeader">
     
-    <span class="py-defname">__start_timer</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L133">
+    <span class="py-defname">__start_timer</span>: <code><a href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" class="intersphinx-link">ContextVar</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L138">
       
       (source)
     </a>
@@ -1335,7 +1387,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   </div>
   <div class="functionBody">
     
-    <div><p>Internal timer set by startTimer(); None until first call.</p></div>
+    <div><p>Context-local timestamp set by <tt class="rst-docutils rst-literal">startTimer</tt> for each request.</p></div>
     
   </div>
 </div><div class="baseinstancevariable">
@@ -1350,7 +1402,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__status_icons</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L112">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L114">
       
       (source)
     </a>
@@ -1377,7 +1429,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__worker_task</span>: <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L129">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L131">
       
       (source)
     </a>
@@ -1404,7 +1456,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_flush</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L139">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L147">
       
       (source)
     </a>
@@ -1431,7 +1483,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_total_width</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L110">
       
       (source)
     </a>
@@ -1458,7 +1510,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_write</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/console/output/http_request.py#L137">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/console/output/http_request.py#L145">
       
       (source)
     </a>
@@ -1484,7 +1536,7 @@ worker task. Safe to call even if start() was never invoked.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

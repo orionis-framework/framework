@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class SQLiteForeignKey(Enum):
     """
     Represent the state of foreign key constraints in SQLite.
@@ -19,5 +20,5 @@ class SQLiteForeignKey(Enum):
         The enumeration member representing the foreign key state.
     """
 
-    ON = "ON"       # Enables foreign key constraint enforcement
-    OFF = "OFF"     # Disables foreign key constraint enforcement
+    ON = "ON"  # Enables foreign key constraint enforcement
+    OFF = "OFF"  # Disables foreign key constraint enforcement

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import SimpleNamespace
 from orionis.database.dialect import (
     _MySQLParameterEscaper,
@@ -5,8 +7,8 @@ from orionis.database.dialect import (
 )
 from orionis.test import TestCase
 
-class _Driver:
 
+class _Driver:
     def escape(self, value: object) -> str:
         """Simulate the driver's removed binary converter.
 
@@ -30,6 +32,7 @@ class _Driver:
             raise TypeError(message)
         return repr(value)
 
+
 class TestMySQLBinaryParameters(TestCase):
     def testEveryBinaryByteUsesAnExactHexLiteral(self) -> None:
         """Preserve every byte in an exact binary hex literal.
@@ -37,13 +40,13 @@ class TestMySQLBinaryParameters(TestCase):
         Returns
         -------
         None
-            Verify the literal round-trips all byte values unchanged.
+            No return value.
         """
         contents = bytes(range(256))
         escaped = _MySQLParameterEscaper(_Driver().escape)(contents)
         self.assertTrue(escaped.startswith("_binary X'"))
         self.assertTrue(escaped.endswith("'"))
-        self.assertEqual(bytes.fromhex(escaped[len("_binary X'"):-1]), contents)
+        self.assertEqual(bytes.fromhex(escaped[len("_binary X'") : -1]), contents)
 
     def testMutableBinaryAndEmptyValuesRemainBinary(self) -> None:
         """Handle mutable and empty binary payloads exactly.
@@ -51,12 +54,15 @@ class TestMySQLBinaryParameters(TestCase):
         Returns
         -------
         None
-            Verify bytearray, memoryview and empty values remain binary.
+            No return value.
         """
         escaped = _MySQLParameterEscaper(_Driver().escape)
         for value in (b"", bytearray(b"a'\\\x00"), memoryview(b"\xff\x81'")):
             literal = escaped(value)
-            self.assertEqual(bytes.fromhex(literal[len("_binary X'"):-1]), bytes(value))
+            self.assertEqual(
+                bytes.fromhex(literal[len("_binary X'") : -1]),
+                bytes(value),
+            )
 
     def testNonbinaryParametersRetainTheirDriverConversion(self) -> None:
         """Delegate scalar values to the driver's escape method.
@@ -64,7 +70,7 @@ class TestMySQLBinaryParameters(TestCase):
         Returns
         -------
         None
-            Verify nonbinary values retain the driver's conversion.
+            No return value.
         """
         driver = _Driver()
         escaped = _MySQLParameterEscaper(driver.escape)
@@ -77,7 +83,7 @@ class TestMySQLBinaryParameters(TestCase):
         Returns
         -------
         None
-            Verify repeated configuration affects only the target connection.
+            No return value.
         """
         connection, other = _Driver(), _Driver()
         adapter = SimpleNamespace(driver_connection=connection)

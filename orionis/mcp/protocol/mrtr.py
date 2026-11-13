@@ -4,9 +4,8 @@ Includes ``validate_input_required``, ``validate_input_responses``.
 """
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING
 import msgspec
-from orionis.mcp.context import mutable_json
+from orionis.mcp.context import McpRequest, mutable_json
 from orionis.mcp.exceptions import McpInvalidParams, McpProtocolException
 from orionis.mcp.protocol.input_shapes import (
     EnumItems,
@@ -26,8 +25,6 @@ from orionis.mcp.protocol.results import InputRequiredResult
 from orionis.mcp.protocol.validation import validate_content, validate_json
 from orionis.mcp.server.templates import validate_uri
 
-if TYPE_CHECKING:
-    from orionis.mcp.context import McpRequest
 
 def validate_input_required(result: InputRequiredResult, request: McpRequest) -> None:
     """
@@ -51,6 +48,7 @@ def validate_input_required(result: InputRequiredResult, request: McpRequest) ->
     except (TypeError, ValueError) as exc:
         message = "Invalid input-required result"
         raise McpInvalidParams(message) from exc
+
 
 def _input_requests(result: InputRequiredResult, request: McpRequest) -> None:
     """
@@ -78,6 +76,7 @@ def _input_requests(result: InputRequiredResult, request: McpRequest) -> None:
         return
     for item in result.inputRequests.values():
         _input_request(item, request)
+
 
 def _input_request(item: dict[str, object], request: McpRequest) -> None:
     """
@@ -117,6 +116,7 @@ def _input_request(item: dict[str, object], request: McpRequest) -> None:
         message = "Unknown input request method"
         raise ValueError(message)
 
+
 def _require(request: McpRequest, capability: str, feature: str | None = None) -> None:
     """
     Require a capability, including the historical implicit form flag.
@@ -137,17 +137,21 @@ def _require(request: McpRequest, capability: str, feature: str | None = None) -
     """
     value = request.clientCapabilities.get(capability)
     supported = isinstance(value, Mapping) and (
-        feature is None or feature in value
+        feature is None
+        or feature in value
         or (capability == "elicitation" and feature == "form" and not value)
     )
     if not supported:
         raise McpProtocolException(
             -32021,
             "Missing required client capability",
-            data={"requiredCapabilities": {
-                capability: {} if feature is None else {feature: {}},
-            }},
+            data={
+                "requiredCapabilities": {
+                    capability: {} if feature is None else {feature: {}},
+                },
+            },
         )
+
 
 def _elicitation(params: dict[str, object], request: McpRequest) -> None:
     """
@@ -178,6 +182,7 @@ def _elicitation(params: dict[str, object], request: McpRequest) -> None:
     for field in schema.properties.values():
         _form_field(field)
     _require(request, "elicitation", "form")
+
 
 def _form_field(field: FormField) -> None:
     """
@@ -214,11 +219,14 @@ def _form_field(field: FormField) -> None:
         (field.min_length, field.max_length),
         (field.min_items, field.max_items),
     ):
-        if minimum is not msgspec.UNSET and maximum is not msgspec.UNSET and (
-            minimum > maximum
+        if (
+            minimum is not msgspec.UNSET
+            and maximum is not msgspec.UNSET
+            and (minimum > maximum)
         ):
             message = "Elicitation schema minimum exceeds maximum"
             raise ValueError(message)
+
 
 def _sampling(params: dict[str, object], request: McpRequest) -> None:
     """
@@ -247,11 +255,17 @@ def _sampling(params: dict[str, object], request: McpRequest) -> None:
     if value.tools is not msgspec.UNSET:
         for tool in value.tools:
             schema = tool.get("inputSchema")
-            if not isinstance(tool.get("name"), str) or not isinstance(
-                schema, dict,
-            ) or schema.get("type") != "object":
+            if (
+                not isinstance(tool.get("name"), str)
+                or not isinstance(
+                    schema,
+                    dict,
+                )
+                or schema.get("type") != "object"
+            ):
                 message = "Invalid sampling tool definition"
                 raise ValueError(message)
+
 
 def _sampling_message(message: SamplingMessage) -> None:
     """
@@ -288,6 +302,7 @@ def _sampling_message(message: SamplingMessage) -> None:
         if "_meta" in block:
             validate_metadata(block["_meta"])
 
+
 def validate_input_responses(responses: Mapping[str, object]) -> None:
     """
     Validate exact result variants without fabricating request history.
@@ -313,6 +328,7 @@ def validate_input_responses(responses: Mapping[str, object]) -> None:
     except (TypeError, ValueError) as exc:
         message = "Invalid input response"
         raise McpInvalidParams(message) from exc
+
 
 def _input_response(value: dict[str, object]) -> None:
     """

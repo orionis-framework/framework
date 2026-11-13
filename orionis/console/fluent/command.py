@@ -9,6 +9,7 @@ from orionis.console.fluent.contracts.command import ICommand
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+
 class Command(ICommand):
     """Build console command registrations through a fluent interface."""
 

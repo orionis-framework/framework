@@ -1,5 +1,4 @@
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.container.contracts.facade import IFacade
 
-class Auth(IAuthManager, IFacade):
-    ...
+class Auth(IAuthManager, IFacade): ...

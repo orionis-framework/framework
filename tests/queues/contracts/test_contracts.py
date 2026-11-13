@@ -1,4 +1,9 @@
+# ruff: noqa: PLC0415, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import inspect
+from typing import get_type_hints
+from orionis.queues.context import FailureCallback, JobContext
 from orionis.queues.contracts.driver import IQueueDriver
 from orionis.queues.contracts.failed_repository import IFailedJobRepository
 from orionis.queues.contracts.job import IJob
@@ -10,16 +15,59 @@ from orionis.queues.drivers.redis import RedisQueueDriver
 from orionis.queues.drivers.sync import SyncQueueDriver
 from orionis.queues.failed.repository import DatabaseFailedJobRepository
 from orionis.queues.manager import QueueManager
+from orionis.queues.pending import PendingDispatch
 from orionis.queues.serializer import JobSerializer
-from orionis.queues.worker import Worker
+from orionis.queues.types import DispatchCallback
+from orionis.queues.worker import FailedResolver, Worker, WorkerOptions
 from orionis.test import TestCase
 
 _CONTRACTS = (
-    IQueueDriver, IFailedJobRepository, IJob, IQueueManager, IJobSerializer, IWorker,
+    IQueueDriver,
+    IFailedJobRepository,
+    IJob,
+    IQueueManager,
+    IJobSerializer,
+    IWorker,
 )
 
 
 class TestQueueContracts(TestCase):
+    def testRuntimeAnnotationsResolveWithoutCallerNamespaces(self) -> None:
+        """Resolve public queue types without injecting missing module globals.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for owner in (
+            *_CONTRACTS,
+            DatabaseQueueDriver,
+            RedisQueueDriver,
+            SyncQueueDriver,
+            DatabaseFailedJobRepository,
+            QueueManager,
+            JobSerializer,
+            Worker,
+            WorkerOptions,
+            PendingDispatch,
+            JobContext,
+        ):
+            with self.subTest(owner=owner.__name__):
+                get_type_hints(owner)
+            for name, member in vars(owner).items():
+                method = (
+                    member.__func__
+                    if isinstance(member, (classmethod, staticmethod))
+                    else member
+                )
+                if inspect.isfunction(method) and name != "__annotate_func__":
+                    with self.subTest(owner=owner.__name__, method=name):
+                        get_type_hints(method)
+        for alias in (FailureCallback, DispatchCallback, FailedResolver):
+            with self.subTest(alias=alias.__name__):
+                self.assertIsNotNone(alias.__value__)
+
     def testAbstractContractsHaveEmptySlots(self) -> None:
         """Declare significant queue services as abstract contracts with empty slots.
 
@@ -42,10 +90,12 @@ class TestQueueContracts(TestCase):
             Verify each runtime implementation is concrete and uses slots.
         """
         for implementation, contract in (
-            (DatabaseQueueDriver, IQueueDriver), (RedisQueueDriver, IQueueDriver),
+            (DatabaseQueueDriver, IQueueDriver),
+            (RedisQueueDriver, IQueueDriver),
             (SyncQueueDriver, IQueueDriver),
             (DatabaseFailedJobRepository, IFailedJobRepository),
-            (QueueManager, IQueueManager), (JobSerializer, IJobSerializer),
+            (QueueManager, IQueueManager),
+            (JobSerializer, IJobSerializer),
             (Worker, IWorker),
         ):
             with self.subTest(implementation=implementation):

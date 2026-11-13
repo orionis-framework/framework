@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from types import MappingProxyType
 from orionis.mail.exceptions import MailAttachmentException, MailCompositionException
 from orionis.mail.functions import (
@@ -11,8 +13,8 @@ from orionis.test import TestCase
 
 _CREDENTIAL = "p@ss:word"
 
-class TestHeaderValue(TestCase):
 
+class TestHeaderValue(TestCase):
     def testReturnsSafeTextUnchanged(self) -> None:
         """Return safe header text exactly as supplied.
 
@@ -43,8 +45,8 @@ class TestHeaderValue(TestCase):
             header_value(7, "Subject")
         self.assertIn("Subject", str(failure.exception))
 
-class TestAttachmentName(TestCase):
 
+class TestAttachmentName(TestCase):
     def testAcceptsUnicodeBasenames(self) -> None:
         """Accept a visible basename with Unicode characters.
 
@@ -71,8 +73,8 @@ class TestAttachmentName(TestCase):
             with self.assertRaises(MailAttachmentException):
                 attachment_name(value)
 
-class TestMediaType(TestCase):
 
+class TestMediaType(TestCase):
     def testNormalizesTypeAndSubtypeToLowercase(self) -> None:
         """Normalize a valid type/subtype pair to lowercase.
 
@@ -100,8 +102,8 @@ class TestMediaType(TestCase):
             with self.assertRaises(MailAttachmentException):
                 media_type(value)
 
-class TestFreezeOwned(TestCase):
 
+class TestFreezeOwned(TestCase):
     def testCopiesContainersRecursively(self) -> None:
         """Convert owned containers into read-only equivalents.
 
@@ -166,8 +168,8 @@ class TestFreezeOwned(TestCase):
         self.assertEqual(frozen["first"], ("value",))
         self.assertEqual(frozen["second"], ("value",))
 
-class TestSanitizeReason(TestCase):
 
+class TestSanitizeReason(TestCase):
     def testRemovesControlCharactersAndBounds(self) -> None:
         """Collapse control characters and bound the diagnostic length.
 

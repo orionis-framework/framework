@@ -1,3 +1,6 @@
+# ruff: noqa: DTZ001, PT009, PT027, S105, S608
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use synthetic token data and fixed fixture table names, never credentials or user SQL.
 from __future__ import annotations
 from dataclasses import replace
 from datetime import datetime
@@ -21,8 +24,15 @@ from orionis.test import TestCase
 
 _TABLE_COLUMNS = {
     "users": (
-        "id", "name", "email", "email_verified_at", "password",
-        "remember_token", "active", "created_at", "updated_at",
+        "id",
+        "name",
+        "email",
+        "email_verified_at",
+        "password",
+        "remember_token",
+        "active",
+        "created_at",
+        "updated_at",
     ),
     "permissions": ("id", "name", "created_at", "updated_at"),
     "roles": ("id", "name", "created_at", "updated_at"),
@@ -30,9 +40,14 @@ _TABLE_COLUMNS = {
     "model_has_roles": ("role_id", "model_type", "model_id"),
     "role_has_permissions": ("permission_id", "role_id"),
     "password_reset_tokens": (
-        "email", "token", "user_id", "password_fingerprint", "created_at",
+        "email",
+        "token",
+        "user_id",
+        "password_fingerprint",
+        "created_at",
     ),
 }
+
 
 class TestApplicationSchemas(TestCase):
     """Exercise identity migrations beside framework-owned authentication tables."""
@@ -43,22 +58,33 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
-        self.connection = Connection("application_schemas", {
-            "driver": "sqlite",
-            "database": ":memory:",
-            "foreign_key_constraints": True,
-        })
+        self.connection = Connection(
+            "application_schemas",
+            {
+                "driver": "sqlite",
+                "database": ":memory:",
+                "foreign_key_constraints": True,
+            },
+        )
         self.addAsyncCleanup(self.connection.disconnect)
         self.manager = Mock(spec=IConnectionManager)
         self.manager.connection.return_value = self.connection
-        self.enterContext(patch.object(
-            ConnectionResolver, "_manager", self.manager,
-        ))
-        self.enterContext(patch.object(
-            SchemaFacade, "_pinned_instance", Schema(self.manager),
-        ))
+        self.enterContext(
+            patch.object(
+                ConnectionResolver,
+                "_manager",
+                self.manager,
+            ),
+        )
+        self.enterContext(
+            patch.object(
+                SchemaFacade,
+                "_pinned_instance",
+                Schema(self.manager),
+            ),
+        )
         self.migrations = [CreateUsersTable()]
         for definition in (
             *build_authorization_tables(),
@@ -73,7 +99,7 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         with migration_connection_scope(self.connection):
             for migration in self.migrations:
@@ -99,7 +125,7 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(await self._tableNames(), set(_TABLE_COLUMNS))
         self.assertEqual(
@@ -122,11 +148,13 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         primary_keys = {
             "model_has_permissions": (
-                "permission_id", "model_id", "model_type",
+                "permission_id",
+                "model_id",
+                "model_type",
             ),
             "model_has_roles": ("role_id", "model_id", "model_type"),
             "role_has_permissions": ("permission_id", "role_id"),
@@ -139,12 +167,16 @@ class TestApplicationSchemas(TestCase):
                 )
                 self.assertEqual(tuple(row["name"] for row in columns), names)
                 actual_key = tuple(
-                    row["name"] for row in sorted(
-                        columns, key=lambda row: row["pk"],
-                    ) if row["pk"]
+                    row["name"]
+                    for row in sorted(
+                        columns,
+                        key=lambda row: row["pk"],
+                    )
+                    if row["pk"]
                 )
                 self.assertEqual(
-                    actual_key, primary_keys.get(table, ("id",)),
+                    actual_key,
+                    primary_keys.get(table, ("id",)),
                 )
         user_columns = {
             row["name"]: row
@@ -154,12 +186,16 @@ class TestApplicationSchemas(TestCase):
         self.assertEqual(user_columns["name"]["type"], "VARCHAR(255)")
         self.assertEqual(user_columns["remember_token"]["type"], "VARCHAR(100)")
         self.assertEqual(user_columns["active"]["type"], "BOOLEAN")
-        nullable = {
-            name for name, row in user_columns.items() if not row["notnull"]
-        }
-        self.assertEqual(nullable, {
-            "email_verified_at", "remember_token", "created_at", "updated_at",
-        })
+        nullable = {name for name, row in user_columns.items() if not row["notnull"]}
+        self.assertEqual(
+            nullable,
+            {
+                "email_verified_at",
+                "remember_token",
+                "created_at",
+                "updated_at",
+            },
+        )
 
     async def testIndexesCoverStorageAndAuthorizationLookups(self) -> None:
         """Retain actual indexes used for expiration and authorization queries.
@@ -167,7 +203,7 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         expected = {
             "users": {(True, ("email",))},
@@ -177,7 +213,8 @@ class TestApplicationSchemas(TestCase):
             "model_has_roles": {(False, ("model_id", "model_type"))},
             "role_has_permissions": {(False, ("role_id", "permission_id"))},
             "password_reset_tokens": {
-                (False, ("created_at",)), (False, ("token",)),
+                (False, ("created_at",)),
+                (False, ("token",)),
             },
         }
         for table, required in expected.items():
@@ -189,14 +226,15 @@ class TestApplicationSchemas(TestCase):
                 actual = set()
                 for index in indexes:
                     columns = await self.connection.select(
-                        "SELECT name FROM pragma_index_info(:index) "
-                        "ORDER BY seqno",
+                        "SELECT name FROM pragma_index_info(:index) ORDER BY seqno",
                         {"index": index["name"]},
                     )
-                    actual.add((
-                        bool(index["unique"]),
-                        tuple(column["name"] for column in columns),
-                    ))
+                    actual.add(
+                        (
+                            bool(index["unique"]),
+                            tuple(column["name"] for column in columns),
+                        ),
+                    )
                 self.assertLessEqual(required, actual)
 
     async def testAuthorizationForeignKeysAndCompositeKeysAreEnforced(
@@ -207,7 +245,7 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self.connection.execute(
             "INSERT INTO permissions (id, name) VALUES (1, 'edit')",
@@ -222,7 +260,7 @@ class TestApplicationSchemas(TestCase):
         for table, foreign_key in bindings:
             with self.subTest(table=table):
                 query = (
-                    f"INSERT INTO {table} "  # noqa: S608
+                    f"INSERT INTO {table} "
                     f"({foreign_key}, model_id, model_type) "
                     "VALUES (:parent, :owner, :type)"
                 )
@@ -244,12 +282,13 @@ class TestApplicationSchemas(TestCase):
                 self.assertRaises(QueryException),
             ):
                 await self.connection.execute(
-                    query, {"permission": permission, "role": role},
+                    query,
+                    {"permission": permission, "role": role},
                 )
         for table in ("permissions", "roles"):
             with self.subTest(table=table), self.assertRaises(QueryException):
                 await self.connection.execute(
-                    f"DELETE FROM {table} WHERE id = 1",  # noqa: S608
+                    f"DELETE FROM {table} WHERE id = 1",
                 )
 
     async def testUserCrudCastsDefaultsAndHiddenAttributes(self) -> None:
@@ -258,25 +297,29 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        user = await User.create({
-            "name": "Ada", "email": "ada@example.test", "password": "digest",
-        })
+        user = await User.create(
+            {
+                "name": "Ada",
+                "email": "ada@example.test",
+                "password": "digest",
+            },
+        )
         self.assertIsInstance(user.id, int)
         loaded = await User.find(user.id)
         self.assertIsNotNone(loaded)
-        self.assertIs(loaded.active, True)
+        self.assertIs(loaded.active, expr2=True)
         self.assertIsInstance(loaded.created_at, datetime)
         self.assertIsInstance(loaded.updated_at, datetime)
         self.assertTrue(await loaded.update({"name": "Ada Lovelace"}))
         loaded.email_verified_at = "2026-09-28T10:30:00"
-        loaded.remember_token = "remember-digest"  # noqa: S105
+        loaded.remember_token = "remember-digest"
         loaded.active = 0
         self.assertTrue(await loaded.save())
         updated = await User.find(user.id)
         self.assertEqual(updated.name, "Ada Lovelace")
-        self.assertIs(updated.active, False)
+        self.assertIs(updated.active, expr2=False)
         self.assertEqual(updated.email_verified_at, datetime(2026, 9, 28, 10, 30))
         self.assertEqual(updated.password, "digest")
         serialized = updated.toDict()
@@ -284,10 +327,13 @@ class TestApplicationSchemas(TestCase):
         self.assertNotIn("remember_token", serialized)
         self.assertEqual(serialized["email"], "ada@example.test")
         with self.assertRaises(QueryException):
-            await User.create({
-                "name": "Duplicate", "email": "ada@example.test",
-                "password": "digest",
-            })
+            await User.create(
+                {
+                    "name": "Duplicate",
+                    "email": "ada@example.test",
+                    "password": "digest",
+                },
+            )
         self.assertTrue(await updated.delete())
         self.assertIsNone(await User.find(user.id))
 
@@ -297,11 +343,15 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for attribute in (
-            "id", "email_verified_at", "remember_token",
-            "created_at", "updated_at", "unknown_column",
+            "id",
+            "email_verified_at",
+            "remember_token",
+            "created_at",
+            "updated_at",
+            "unknown_column",
         ):
             with (
                 self.subTest(attribute=attribute),
@@ -317,14 +367,18 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Assert persistence of the explicitly fillable active flag.
+            No return value.
         """
-        user = await User.create({
-            "name": "Ada", "email": "inactive@example.test",
-            "password": "digest", "active": False,
-        })
+        user = await User.create(
+            {
+                "name": "Ada",
+                "email": "inactive@example.test",
+                "password": "digest",
+                "active": False,
+            },
+        )
         loaded = await User.find(user.id)
-        self.assertIs(loaded.active, False)
+        self.assertIs(loaded.active, expr2=False)
 
     async def testHistoricalMigrationKeepsItsVersionWhenUserSchemaChanges(
         self,
@@ -334,7 +388,7 @@ class TestApplicationSchemas(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(User.__meta__.table, USERS_V1)
         migration = CreateUsersTable()
@@ -353,6 +407,7 @@ class TestApplicationSchemas(TestCase):
             await migration.up()
         columns = await self.connection.select("PRAGMA table_info(users)")
         self.assertEqual(
-            tuple(row["name"] for row in columns), _TABLE_COLUMNS["users"],
+            tuple(row["name"] for row in columns),
+            _TABLE_COLUMNS["users"],
         )
         self.assertIs(User.__meta__.table, USERS_V1)

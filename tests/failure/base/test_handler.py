@@ -1,10 +1,15 @@
+# ruff: noqa: B904, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Exercise native implicit exception context as well as explicit causes.
 from __future__ import annotations
+
 import logging
 from unittest.mock import AsyncMock, MagicMock
+
 from orionis.failure.base.handler import BaseExceptionHandler
-from orionis.failure.entities.throwable import Throwable
 from orionis.failure.entities.context import FailureContext
 from orionis.failure.entities.handling import FailureHandling
+from orionis.failure.entities.throwable import Throwable
 from orionis.http.default.contracts.responses import IDefaultResponses
 from orionis.http.layer.web.exceptions import CSRFTokenMismatchException
 from orionis.http.payload.body import PayloadTooLargeException
@@ -13,6 +18,7 @@ from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.logging.contracts.logger import ILogger
 from orionis.test import TestCase
+
 
 def _make_application() -> MagicMock:
     """
@@ -26,6 +32,7 @@ def _make_application() -> MagicMock:
     application = MagicMock()
     application.config.return_value = True
     return application
+
 
 def _make_handler(
     dont_catch: frozenset[type[BaseException]] | None = None,
@@ -44,16 +51,24 @@ def _make_handler(
         A ready-to-use handler instance.
     """
     mock_responses = MagicMock(spec=IDefaultResponses)
-    handler = BaseExceptionHandler(
+    handler_type = BaseExceptionHandler
+    if dont_catch is not None:
+        handler_type = type(
+            "ConfiguredHandler",
+            (BaseExceptionHandler,),
+            {"dont_catch": dont_catch},
+        )
+    return handler_type(
         default_responses=mock_responses,
         application=_make_application(),
     )
-    if dont_catch is not None:
-        type(handler).dont_catch = dont_catch  # type: ignore[assignment]
-    return handler
 
 
-async def _complete(handler, exception, logger):
+async def _complete(
+    handler: BaseExceptionHandler,
+    exception: BaseException,
+    logger: MagicMock,
+) -> FailureHandling:
     """Execute default logging with an explicit isolated logger dependency."""
     handler._BaseExceptionHandler__application.make = AsyncMock(return_value=logger)
     handling = await handler.handleFailure(exception, FailureContext())
@@ -61,7 +76,14 @@ async def _complete(handler, exception, logger):
     return handling
 
 
-async def _present(handler, exception, *, flow, request=None, console=None):
+async def _present(
+    handler: BaseExceptionHandler,
+    exception: BaseException,
+    *,
+    flow: str,
+    request: object | None = None,
+    console: MagicMock | None = None,
+) -> object:
     """Request protocol presentation from the unified hook's deferred plan."""
     if console is not None:
         handler._BaseExceptionHandler__application.make = AsyncMock(
@@ -70,8 +92,8 @@ async def _present(handler, exception, *, flow, request=None, console=None):
     handling = await handler.handleFailure(exception, FailureContext(flow=flow))
     return await handling.present(flow=flow, request=request)
 
-class TestBaseExceptionHandlerToThrowable(TestCase):
 
+class TestBaseExceptionHandlerToThrowable(TestCase):
     def testConvertsExceptionToThrowable(self) -> None:
         """Convert a standard exception into a Throwable structure.
 
@@ -81,7 +103,7 @@ class TestBaseExceptionHandlerToThrowable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler()
         exc = ValueError("bad input")
@@ -99,24 +121,22 @@ class TestBaseExceptionHandlerToThrowable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler()
         exc = TypeError(42, "extra")
         result = handler.toThrowable(exc)
-        for arg in result.args:
-            self.assertIsInstance(arg, str)
+        self.assertEqual(result.args, ("42", "extra"))
 
     def testSingleMessageArgMatchesFirstArg(self) -> None:
-        """Set the message field to the first stringified exception argument.
+        """Preserve a single-argument RuntimeError message.
 
-        Validates that the message matches args[0] when the exception
-        carries exactly one argument.
+        The native RuntimeError text matches its sole string argument.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler()
         exc = RuntimeError("runtime failure")
@@ -126,13 +146,12 @@ class TestBaseExceptionHandlerToThrowable(TestCase):
     def testNoArgsProducesEmptyStringMessage(self) -> None:
         """Produce an empty-string message for zero-argument exceptions.
 
-        Validates the fallback path when exception.args is empty, so the
-        message field is always a string.
+        The native text of a plain Exception without arguments is empty.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler()
         exc = Exception()
@@ -148,7 +167,7 @@ class TestBaseExceptionHandlerToThrowable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler()
         exc = OSError("no tb")
@@ -164,7 +183,7 @@ class TestBaseExceptionHandlerToThrowable(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -181,23 +200,11 @@ class TestBaseExceptionHandlerToThrowable(TestCase):
         if exc is None:
             self.fail("Exception was not raised")
         result = handler.toThrowable(exc)
+        self.assertIs(result.traceback, exc.__traceback__)
         self.assertIsNotNone(result.traceback)
 
+
 class TestBaseExceptionHandlerIsExceptionIgnored(TestCase):
-
-    def tearDown(self) -> None:
-        """Reset dont_catch to the original frozenset after each test.
-
-        Ensures that class-level mutation in individual tests does not
-        bleed across the test suite.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        BaseExceptionHandler.dont_catch = frozenset()
-
     def testReturnsFalseWhenDontCatchIsEmpty(self) -> None:
         """Return False for any exception when dont_catch is an empty frozenset.
 
@@ -207,7 +214,7 @@ class TestBaseExceptionHandlerIsExceptionIgnored(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset())
         exc = ValueError("x")
@@ -222,7 +229,7 @@ class TestBaseExceptionHandlerIsExceptionIgnored(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset({ValueError}))
         exc = ValueError("ignored")
@@ -237,7 +244,7 @@ class TestBaseExceptionHandlerIsExceptionIgnored(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         class _Sub(ValueError):
@@ -256,7 +263,7 @@ class TestBaseExceptionHandlerIsExceptionIgnored(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler()
         with self.assertRaises(TypeError):
@@ -271,28 +278,15 @@ class TestBaseExceptionHandlerIsExceptionIgnored(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset({ValueError, KeyError}))
         self.assertTrue(handler.isExceptionIgnored(ValueError("v")))
         self.assertTrue(handler.isExceptionIgnored(KeyError("k")))
         self.assertFalse(handler.isExceptionIgnored(RuntimeError("r")))
 
+
 class TestBaseExceptionHandlerLogging(TestCase):
-
-    def tearDown(self) -> None:
-        """Reset dont_catch to the original frozenset after each test.
-
-        Ensures that class-level mutation in individual tests does not
-        bleed across the test suite.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        BaseExceptionHandler.dont_catch = frozenset()
-
     async def testReturnsCompletedPlanWhenNotIgnored(self) -> None:
         """Return a completed plan when the exception is not on the ignore list.
 
@@ -301,7 +295,7 @@ class TestBaseExceptionHandlerLogging(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset())
         log = MagicMock()
@@ -319,7 +313,7 @@ class TestBaseExceptionHandlerLogging(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset())
         log = MagicMock(spec=ILogger)
@@ -368,7 +362,7 @@ class TestBaseExceptionHandlerLogging(TestCase):
             (ValueError, exc, exc.__traceback__),
         )
         output = captured.output[0]
-        self.assertIn("[ValueError] bad input", output)
+        self.assertIn(f"[ValueError] {exc}", output)
         self.assertIn("Traceback (most recent call last):", output)
         self.assertIn(__file__, output)
         self.assertIn("testLogsFullTracebackOutsideExcept", output)
@@ -407,7 +401,7 @@ class TestBaseExceptionHandlerLogging(TestCase):
                             raise exc from caught
                         if chaining == "suppressed":
                             raise exc from None
-                        raise exc  # noqa: B904 - Exercise implicit context.
+                        raise exc
                 except RuntimeError:
                     pass
 
@@ -422,7 +416,8 @@ class TestBaseExceptionHandlerLogging(TestCase):
                 else:
                     self.assertIn("ValueError: original failure", output)
                     self.assertIn(
-                        "direct cause" if chaining == "cause"
+                        "direct cause"
+                        if chaining == "cause"
                         else "During handling of the above exception",
                         output,
                     )
@@ -502,7 +497,7 @@ class TestBaseExceptionHandlerLogging(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset({ValueError}))
         log = MagicMock()
@@ -521,7 +516,7 @@ class TestBaseExceptionHandlerLogging(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset({ValueError}))
         log = MagicMock(spec=ILogger)
@@ -530,21 +525,8 @@ class TestBaseExceptionHandlerLogging(TestCase):
         log.error.assert_not_called()
         log.getLogger.assert_not_called()
 
+
 class TestBaseExceptionHandlerCLIPresentation(TestCase):
-
-    def tearDown(self) -> None:
-        """Reset dont_catch to the original frozenset after each test.
-
-        Ensures that class-level mutation in individual tests does not
-        bleed across the test suite.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        BaseExceptionHandler.dont_catch = frozenset()
-
     async def testCallsConsoleExceptionWhenNotIgnored(self) -> None:
         """Forward the exception to console.exception when not ignored.
 
@@ -554,7 +536,7 @@ class TestBaseExceptionHandlerCLIPresentation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset())
         console = MagicMock()
@@ -571,7 +553,7 @@ class TestBaseExceptionHandlerCLIPresentation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler(dont_catch=frozenset({KeyError}))
         console = MagicMock()
@@ -588,28 +570,15 @@ class TestBaseExceptionHandlerCLIPresentation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         handler = _make_handler()
         console = MagicMock()
         result = await _present(handler, RuntimeError("x"), flow="cli", console=console)
         self.assertIsNone(result)
 
+
 class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
-
-    def tearDown(self) -> None:
-        """Reset dont_catch to the original frozenset after each test.
-
-        Ensures that class-level mutation in individual tests does not
-        bleed across the test suite.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        BaseExceptionHandler.dont_catch = frozenset()
-
     def _makeRequestMock(self, *, wants_json: bool = False) -> MagicMock:
         """
         Build a mock that mimics a plain HTTP Request object.
@@ -641,7 +610,7 @@ class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=404)
@@ -667,7 +636,7 @@ class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=405)
@@ -693,7 +662,7 @@ class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=413)
@@ -719,7 +688,7 @@ class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=415)
@@ -745,7 +714,7 @@ class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.error.return_value = MagicMock(status_code=419)
@@ -771,14 +740,14 @@ class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
-        handler = BaseExceptionHandler(
-            default_responses=mock_responses,
-            application=_make_application(),
-        )
-        type(handler).dont_catch = frozenset({RouteNotFound})  # type: ignore[assignment]
+        handler = type(
+            "IgnoredRouteHandler",
+            (BaseExceptionHandler,),
+            {"dont_catch": frozenset({RouteNotFound})},
+        )(mock_responses, _make_application())
 
         exc = RouteNotFound("ignored")
         req = self._makeRequestMock()
@@ -788,21 +757,8 @@ class TestBaseExceptionHandlerHTTPPresentationKnownExceptions(TestCase):
         mock_responses.error.assert_not_called()
         mock_responses.exception.assert_not_called()
 
+
 class TestBaseExceptionHandlerHTTPPresentationGenericException(TestCase):
-
-    def tearDown(self) -> None:
-        """Reset dont_catch to the original frozenset after each test.
-
-        Ensures that class-level mutation in individual tests does not
-        bleed across the test suite.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        BaseExceptionHandler.dont_catch = frozenset()
-
     async def testGenericExceptionCallsExceptionResponse(self) -> None:
         """Delegate to default_responses.exception for unmapped exceptions.
 
@@ -812,7 +768,7 @@ class TestBaseExceptionHandlerHTTPPresentationGenericException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         mock_responses.exception.return_value = MagicMock(status_code=500)
@@ -843,7 +799,7 @@ class TestBaseExceptionHandlerHTTPPresentationGenericException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         handler = BaseExceptionHandler(
@@ -872,7 +828,7 @@ class TestBaseExceptionHandlerHTTPPresentationGenericException(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         mock_responses = MagicMock(spec=IDefaultResponses)
         handler = BaseExceptionHandler(
@@ -892,21 +848,8 @@ class TestBaseExceptionHandlerHTTPPresentationGenericException(TestCase):
         call_kwargs = mock_responses.error.call_args[1]
         self.assertTrue(call_kwargs["expects_json"])
 
+
 class TestBaseExceptionHandlerDontCatch(TestCase):
-
-    def tearDown(self) -> None:
-        """Reset dont_catch to the original frozenset after each test.
-
-        Ensures that class-level mutation in individual tests does not
-        bleed across the test suite.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        BaseExceptionHandler.dont_catch = frozenset()
-
     def testDontCatchIsClassVar(self) -> None:
         """Confirm that dont_catch is a class-level attribute.
 
@@ -916,7 +859,7 @@ class TestBaseExceptionHandlerDontCatch(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(hasattr(BaseExceptionHandler, "dont_catch"))
 
@@ -929,7 +872,7 @@ class TestBaseExceptionHandlerDontCatch(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(BaseExceptionHandler.dont_catch, frozenset())
 
@@ -942,7 +885,7 @@ class TestBaseExceptionHandlerDontCatch(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsInstance(BaseExceptionHandler.dont_catch, frozenset)
 
@@ -951,7 +894,10 @@ class TestBaseExceptionHandlerPolicy(TestCase):
     """Select effects once without executing them inside the observation hook."""
 
     async def testObservationDefersLoggingAndPresentation(self) -> None:
-        """Returning the default plan cannot log before custom policy finishes."""
+        """Verify observation defers logging and presentation.
+
+        Returning the default plan cannot log before custom policy finishes.
+        """
         application = _make_application()
         logger = MagicMock(spec=ILogger)
         application.make = AsyncMock(return_value=logger)
@@ -965,7 +911,10 @@ class TestBaseExceptionHandlerPolicy(TestCase):
         responses.exception.assert_not_called()
 
     async def testExpectedAndClosedLoggerContextsDoNotResolveLogger(self) -> None:
-        """Both policy gates keep deferred presentation available without logging."""
+        """Verify expected and closed logger contexts do not resolve logger.
+
+        Both policy gates keep deferred presentation available without logging.
+        """
         for context in (
             FailureContext(expected=True),
             FailureContext(reporting_allowed=False),
@@ -982,7 +931,10 @@ class TestBaseExceptionHandlerPolicy(TestCase):
                 application.make.assert_not_called()
 
     async def testDefaultFailedResultHasNoLoggingOrPresentation(self) -> None:
-        """A declared result keeps protocol ownership and gains no fake exception."""
+        """Verify default failed result has no logging or presentation.
+
+        A declared result keeps protocol ownership and gains no fake exception.
+        """
         application = _make_application()
         responses = MagicMock(spec=IDefaultResponses)
         handler = BaseExceptionHandler(responses, application)

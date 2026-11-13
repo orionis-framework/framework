@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.enums.interfaces import Interface
 from orionis.http.payload.body import BodyStream
 from orionis.http.payload.estructures.headers import Headers
@@ -7,6 +9,7 @@ from orionis.http.payload.media_types import MediaTypeRegistry
 from orionis.http.payload.part import MultipartPart
 from orionis.http.payload.uploaded_file import UploadedFile
 from orionis.test import TestCase
+
 
 class TestPayloadStructures(TestCase):
     """Validate repeated values, ownership, and slotted payload instances."""

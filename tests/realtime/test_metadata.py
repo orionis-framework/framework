@@ -1,7 +1,11 @@
+# ruff: noqa: PT009, PT027, TC003
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import asyncio
 import gc
 import weakref
-from collections.abc import AsyncIterator  # noqa: TC003 - Runtime reflection.
+from collections.abc import AsyncIterator  # Runtime reflection.
+from copy import deepcopy
 from typing import TYPE_CHECKING, Annotated, cast
 from unittest.mock import patch
 import msgspec
@@ -11,6 +15,7 @@ from orionis.realtime import Hub, remote
 from orionis.realtime.errors import RPCError
 from orionis.realtime.metadata import compile_hub
 from orionis.schemas.constraints import StrongPassword
+from orionis.schemas.metadata import Coerce
 from orionis.schemas.schema import Schema
 from orionis.test import TestCase
 
@@ -18,8 +23,10 @@ if TYPE_CHECKING:
     from collections.abc import Callable, MutableMapping
     from orionis.realtime.metadata import RemoteMethod
 
+
 class _Service:
     """Provide an injectable dependency unrelated to client payloads."""
+
 
 class _Payload(Schema):
     """Require both a typed value and an existing Orionis custom rule."""
@@ -27,15 +34,115 @@ class _Payload(Schema):
     count: int
     password: Annotated[str, StrongPassword()]
 
+
 class _Envelope(msgspec.Struct):
     """Contain Orionis schemas inside an ordinary Struct."""
 
     values: list[_Payload]
 
+
 class _SchemaCollection(Schema):
     """Contain schema collections requiring explicit traversal."""
 
     values: list[_Payload]
+
+
+class _CoercedPayload(Schema):
+    """Keep marked numbers coercible while other fields remain strict."""
+
+    count: Annotated[int, Coerce(), msgspec.Meta(ge=1)]
+    strict: int
+
+
+class _CoercedEnvelope(msgspec.Struct):
+    """Wrap a coercible schema without making the wrapper an Orionis Schema."""
+
+    value: _CoercedPayload
+
+
+class _CoercionHub(Hub):
+    """Declare direct, nullable, nested and scalar conversion boundaries."""
+
+    @remote
+    def optional(self, value: _CoercedPayload | None = None) -> object:
+        """Return a nullable schema value.
+
+        Parameters
+        ----------
+        value : _CoercedPayload | None
+            Client-owned schema input.
+
+        Returns
+        -------
+        object
+            The validated value.
+        """
+        return value
+
+    @remote
+    def many(self, value: list[_CoercedPayload]) -> object:
+        """Return a schema collection.
+
+        Parameters
+        ----------
+        value : list[_CoercedPayload]
+            Client-owned schema inputs.
+
+        Returns
+        -------
+        object
+            The validated collection.
+        """
+        return value
+
+    @remote
+    def mapped(self, value: dict[str, _CoercedPayload]) -> object:
+        """Return a mapping of schema values.
+
+        Parameters
+        ----------
+        value : dict[str, _CoercedPayload]
+            Client-owned schema mapping.
+
+        Returns
+        -------
+        object
+            The validated mapping.
+        """
+        return value
+
+    @remote
+    def wrapped(self, value: _CoercedEnvelope) -> object:
+        """Return a plain Struct containing a schema.
+
+        Parameters
+        ----------
+        value : _CoercedEnvelope
+            Client-owned wrapper.
+
+        Returns
+        -------
+        object
+            The validated wrapper.
+        """
+        return value
+
+    @remote
+    def scalar(self, value: Annotated[int, Coerce()]) -> int:
+        """Return an explicitly coercible scalar.
+
+        Parameters
+        ----------
+        value : int
+            Client value with opt-in conversion.
+
+        Returns
+        -------
+        int
+            The converted integer.
+        """
+        return value
+
 
 class _MethodsHub(Hub):
     """Exercise dispatch, schemas, defaults and container parameters together."""
@@ -161,6 +268,7 @@ class _MethodsHub(Hub):
         """
         return "private to application"
 
+
 class TestRemoteMetadata(TestCase):
     """Verify that client data never becomes executable metadata or DI input."""
 
@@ -175,7 +283,8 @@ class TestRemoteMetadata(TestCase):
         """
         methods = compile_hub(_MethodsHub)
         self.assertEqual(
-            set(methods), {"sum", "sync", "payload", "dependency", "stream"},
+            set(methods),
+            {"sum", "sync", "payload", "dependency", "stream"},
         )
         self.assertEqual(methods["sum"].method_name, "add")
         self.assertTrue(methods["stream"].is_stream)
@@ -186,6 +295,67 @@ class TestRemoteMetadata(TestCase):
         with self.assertRaises(TypeError):
             mutable = cast("MutableMapping[str, RemoteMethod]", methods)
             mutable["helper"] = methods["sum"]
+
+    async def testCoerceAppliesToNullableCollectionsAndPlainStructWrappers(
+        self,
+    ) -> None:
+        """Apply shared coercion without mutating input or relaxing other fields.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        methods = compile_hub(_CoercionHub)
+        raw = {"count": "3", "strict": 2}
+        expected = _CoercedPayload(count=3, strict=2)
+        for name, value, converted in (
+            ("optional", raw, expected),
+            ("many", [raw], [expected]),
+            ("mapped", {"first": raw}, {"first": expected}),
+            ("wrapped", {"value": raw}, _CoercedEnvelope(value=expected)),
+            ("scalar", "7", 7),
+        ):
+            with self.subTest(method=name):
+                original = deepcopy(value)
+                self.assertEqual(
+                    await methods[name].bind([value], {}),
+                    {"value": converted},
+                )
+                self.assertEqual(value, original)
+        self.assertEqual(await methods["optional"].bind([], {}), {"value": None})
+        for invalid in (
+            {"count": "0", "strict": 2},
+            {"count": "3", "strict": "2"},
+        ):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(RPCError) as caught:
+                    await methods["optional"].bind([invalid], {})
+                self.assertEqual(caught.exception.code, "validation_error")
+
+    async def testExistingStructsCannotBypassTypeAndNativeConstraintValidation(
+        self,
+    ) -> None:
+        """Revalidate existing schema instances through every supported wrapper.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        methods = compile_hub(_CoercionHub)
+        invalid = _CoercedPayload(count=0, strict=2)
+        for name, value in (
+            ("optional", invalid),
+            ("many", [invalid]),
+            ("mapped", {"first": invalid}),
+            ("wrapped", _CoercedEnvelope(value=invalid)),
+        ):
+            with self.subTest(method=name):
+                with self.assertRaises(RPCError) as caught:
+                    await methods[name].bind([value], {})
+                self.assertEqual(caught.exception.code, "validation_error")
+        self.assertEqual(invalid.count, 0)
 
     async def testArgumentsExcludeDependenciesAndCannotOverrideThem(self) -> None:
         """
@@ -246,7 +416,8 @@ class TestRemoteMetadata(TestCase):
         """
         method = compile_hub(_MethodsHub)["sync"]
         self.assertEqual(
-            await method.bind(["a"], {"upper": True}), {"value": "a", "upper": True},
+            await method.bind(["a"], {"upper": True}),
+            {"value": "a", "upper": True},
         )
         with self.assertRaises(RPCError):
             await method.bind(["a", True], {})
@@ -281,6 +452,7 @@ class TestRemoteMetadata(TestCase):
         None
             Typed collection wrapping cannot bypass an Orionis schema rule.
         """
+
         class CollectionHub(Hub):
             @remote
             def many(self, values: list[_Payload]) -> None:
@@ -375,11 +547,13 @@ class TestRemoteMetadata(TestCase):
                 await methods[name].bind([invalid_values], {})
             self.assertEqual(exc.exception.code, "validation_error")
             self.assertEqual(
-                await methods[name].bind([valid_values], {}), {"values": expected},
+                await methods[name].bind([valid_values], {}),
+                {"values": expected},
             )
         self.assertEqual(await methods["many"].bind([[]], {}), {"values": []})
         for name, wrapper in (
-            ("wrapped", _Envelope), ("collection", _SchemaCollection),
+            ("wrapped", _Envelope),
+            ("collection", _SchemaCollection),
         ):
             with self.subTest(name=name), self.assertRaises(RPCError) as exc:
                 await methods[name].bind([{"values": [invalid]}], {})
@@ -454,6 +628,7 @@ class TestRemoteMetadata(TestCase):
         None
             No wrapper or second layer of invocation is introduced.
         """
+
         def local(self: object) -> None:
             """
             Represent an undecorated method for identity comparison.
@@ -463,6 +638,7 @@ class TestRemoteMetadata(TestCase):
             None
                 Provide the unchanged callable used by decorator assertions.
             """
+
         self.assertIs(remote(local), local)
         with self.assertRaises(ValueError):
             remote(local)
@@ -491,6 +667,7 @@ class TestRemoteMetadata(TestCase):
         None
             A duplicate dispatch name cannot silently replace a method.
         """
+
         class Duplicate(Hub):
             @remote(name="same")
             def first(self) -> None:
@@ -526,6 +703,7 @@ class TestRemoteMetadata(TestCase):
         None
             Inherited methods cannot bypass an explicitly undecorated override.
         """
+
         class Override(_MethodsHub):
             async def stream(self) -> AsyncIterator[int]:
                 """
@@ -549,6 +727,7 @@ class TestRemoteMetadata(TestCase):
         None
             Unsupported signatures never reach the runtime binder.
         """
+
         class Variadic(Hub):
             @remote
             def method(self, *values: int) -> None:

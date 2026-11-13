@@ -1,8 +1,11 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Enable native application lifespan callbacks."""
 
 from orionis.console.commands.bootstrap._base import BootstrapCommand
 from orionis.console.commands.bootstrap._service import Bootstrapper
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
+
 
 class BootstrapLifespanCommand(BootstrapCommand):
     """Enable native application lifespan callbacks."""

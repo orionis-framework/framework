@@ -14,6 +14,7 @@ if TYPE_CHECKING:
         Response,
     )
 
+
 class IDefaultResponses(ABC):
     """Define the contract for default responses implementations."""
 

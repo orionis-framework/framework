@@ -1,3 +1,5 @@
+# ruff: noqa: PLR0913
+# Keep established public and external protocol names and signatures.
 """Provide console debug operations through ``HttpDump``, ``Dumper``."""
 
 import inspect
@@ -7,6 +9,7 @@ from orionis.console.output.var_dumper import VarDumper
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import ScopedContext
 from orionis.failure.enums.kernel_type import KernelContext
+
 
 class HttpDump(RuntimeError):
     """Carry a snapshot that only the debug HTTP error boundary may render."""
@@ -31,13 +34,13 @@ class HttpDump(RuntimeError):
             Initialize the request interruption.
         """
         super().__init__(
-            "HTTP variable dumping is only available during debug "
-            "request dispatch.",
+            "HTTP variable dumping is only available during debug request dispatch.",
         )
         self.dumper = dumper
         """Configured dumper containing the cloned values."""
         self.insert_line = insert_line
         """Whether the rendered fragment includes separating lines."""
+
 
 class Dumper(IDumper):
     """Implement synchronous dumping independently of application boot.
@@ -46,8 +49,6 @@ class Dumper(IDumper):
     service through the container. Direct calls remain available for standalone
     scripts and debugging during application initialization.
     """
-
-    # ruff: noqa: PLR0913
 
     @staticmethod
     def dd(
@@ -122,20 +123,22 @@ class Dumper(IDumper):
             finally:
                 del caller_frame
 
-        dumper = VarDumper().showTypes(show=show_types)\
-            .showIndex(show=show_index)\
-            .expandAll(expand=expand_all)\
-            .maxDepth(max_depth)\
-            .modulePath(module_path)\
-            .lineNumber(line_number)\
-            .redirectOutput(redirect=redirect_output)\
+        dumper = (
+            VarDumper()
+            .showTypes(show=show_types)
+            .showIndex(show=show_index)
+            .expandAll(expand=expand_all)
+            .maxDepth(max_depth)
+            .modulePath(module_path)
+            .lineNumber(line_number)
+            .redirectOutput(redirect=redirect_output)
             .values(*args)
+        )
 
         if http_context:
             raise HttpDump(dumper, insert_line=insert_line)
 
-        return dumper.forceExit(force=True)\
-            .print(insert_line=insert_line)
+        return dumper.forceExit(force=True).print(insert_line=insert_line)
 
     @staticmethod
     def dump(
@@ -178,13 +181,16 @@ class Dumper(IDumper):
         None
             This method does not return a value.
         """
-        return VarDumper().showTypes(show=show_types)\
-            .showIndex(show=show_index)\
-            .expandAll(expand=expand_all)\
-            .maxDepth(max_depth)\
-            .modulePath(module_path)\
-            .lineNumber(line_number)\
-            .redirectOutput(redirect=redirect_output)\
-            .forceExit(force=False)\
-            .values(*args)\
+        return (
+            VarDumper()
+            .showTypes(show=show_types)
+            .showIndex(show=show_index)
+            .expandAll(expand=expand_all)
+            .maxDepth(max_depth)
+            .modulePath(module_path)
+            .lineNumber(line_number)
+            .redirectOutput(redirect=redirect_output)
+            .forceExit(force=False)
+            .values(*args)
             .print(insert_line=insert_line)
+        )

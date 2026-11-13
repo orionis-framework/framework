@@ -1,6 +1,6 @@
-import ast
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
-import textwrap
 from abc import ABC
 from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.hashers.argon2_hasher import Argon2Hasher
@@ -18,28 +18,8 @@ _ASYNC_METHODS: frozenset[str] = frozenset({"check", "make"})
 # Concrete drivers shipped by the framework.
 _DRIVERS: tuple[type[IHasher], ...] = (Argon2Hasher, BcryptHasher)
 
-def abstract_body_statements(method: object) -> list[ast.stmt]:
-    """
-    Return the statements declared inside the body of a method.
-
-    Parameters
-    ----------
-    method : object
-        Function object whose source is parsed.
-
-    Returns
-    -------
-    list[ast.stmt]
-        Statements found in the body, empty when the source does not
-        define a function.
-    """
-    node = ast.parse(textwrap.dedent(inspect.getsource(method))).body[0]
-    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-        return node.body
-    return []
 
 class TestIHasherDefinition(TestCase):
-
     def testIsAnAbstractBaseClass(self) -> None:
         """Derive from the abstract base class machinery.
 
@@ -48,7 +28,7 @@ class TestIHasherDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(IHasher, ABC))
 
@@ -60,7 +40,7 @@ class TestIHasherDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             IHasher()  # type: ignore[abstract]
@@ -74,7 +54,7 @@ class TestIHasherDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(IHasher.__dict__.get("__slots__"), ())
 
@@ -86,24 +66,28 @@ class TestIHasherDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(IHasher.__abstractmethods__, _ABSTRACT_METHODS)
 
-    def testAbstractMethodsCarryNoImplementation(self) -> None:
-        """Keep the abstract methods free of executable bodies.
-
-        Validates that no dead code hides behind the contract.
+    def testPartialImplementationsRemainAbstract(self) -> None:
+        """Require every hashing operation before allowing instantiation.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        for name in _ABSTRACT_METHODS:
-            statements = abstract_body_statements(getattr(IHasher, name))
-            self.assertEqual(len(statements), 1, msg=name)
-            self.assertIsInstance(statements[0], ast.Expr, msg=name)
+        for missing in _ABSTRACT_METHODS:
+            with self.subTest(missing=missing):
+                methods = {
+                    name: getattr(Argon2Hasher, name)
+                    for name in _ABSTRACT_METHODS
+                    if name != missing
+                }
+                incomplete = type("IncompleteHasher", (IHasher,), methods)
+                with self.assertRaises(TypeError):
+                    incomplete()
 
     def testDeclaresTheCostlyOperationsAsCoroutines(self) -> None:
         """Declare hashing and verification as coroutine functions.
@@ -114,7 +98,7 @@ class TestIHasherDefinition(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for name in _ASYNC_METHODS:
             self.assertTrue(
@@ -122,8 +106,8 @@ class TestIHasherDefinition(TestCase):
                 msg=name,
             )
 
-class TestIHasherImplementations(TestCase):
 
+class TestIHasherImplementations(TestCase):
     def testEveryDriverImplementsTheContract(self) -> None:
         """Register both shipped drivers as implementations.
 
@@ -132,7 +116,7 @@ class TestIHasherImplementations(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for driver in _DRIVERS:
             self.assertTrue(issubclass(driver, IHasher))
@@ -146,15 +130,17 @@ class TestIHasherImplementations(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for driver in _DRIVERS:
             for name in _ABSTRACT_METHODS:
-                expected = inspect.signature(getattr(IHasher, name))
-                actual = inspect.signature(getattr(driver, name))
+                expected = inspect.signature(getattr(IHasher, name), eval_str=True)
+                actual = inspect.signature(getattr(driver, name), eval_str=True)
                 self.assertEqual(
-                    list(expected.parameters),
-                    list(actual.parameters),
+                    expected.replace(
+                        parameters=tuple(expected.parameters.values())[1:],
+                    ),
+                    actual.replace(parameters=tuple(actual.parameters.values())[1:]),
                     msg=f"{driver.__name__}.{name}",
                 )
 
@@ -166,7 +152,7 @@ class TestIHasherImplementations(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for driver in _DRIVERS:
             self.assertEqual(driver.__abstractmethods__, frozenset())
@@ -180,7 +166,7 @@ class TestIHasherImplementations(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for driver in _DRIVERS:
             for name in _ASYNC_METHODS:

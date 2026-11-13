@@ -1,12 +1,13 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Report which migrations are applied and which are pending."""
 
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
+
 class MigrateStatusCommand(MigrationCommand):
     """Report which migrations are applied and which are pending."""
-
-    # ruff: noqa: TC001
 
     signature: str = "migrate:status"
     """Signature identifier: ``migrate:status``."""

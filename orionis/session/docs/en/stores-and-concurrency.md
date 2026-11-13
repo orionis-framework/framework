@@ -19,15 +19,20 @@ from datetime import UTC, datetime, timedelta
 from orionis.session.entities.record import SessionRecord
 from orionis.session.stores.memory import MemorySessionStore
 
+
 async def example():
     store = MemorySessionStore()
-    record = SessionRecord(id="docs-example", data={"count": 1},
-                           expires_at=datetime.now(UTC) + timedelta(minutes=5))
+    record = SessionRecord(
+        id="docs-example",
+        data={"count": 1},
+        expires_at=datetime.now(UTC) + timedelta(minutes=5),
+    )
     await store.write(record)
     loaded = await store.read(record.id)
     assert loaded is not None and loaded.data == {"count": 1}
     assert await store.delete(record.id)
     assert not await store.update(record)
+
 
 asyncio.run(example())
 ```
@@ -43,6 +48,10 @@ Rotation deletes the previous ID before storing the new one. Conditional updates
 ## I/O and cleanup
 
 File storage uses compact JSON, atomic replacement and bounded lock stripes. Cache delegates expiry to backend TTL; database performs conditional updates and creates its structure lazily. `gc()` collects expired records where needed; do not assume every backend removes files immediately at expiry.
+
+File paths are fixed when the store is constructed, including relative directories. Cancellation waits for active file work to finish before it propagates; it does not undo an operation already completed. Garbage collection only considers session filenames and staging names produced by the writer, leaving unrelated files in place. Staging cleanup acquires the session lock and rechecks the file age after active writers have finished.
+
+Cache TTLs use conservative whole seconds: a record can expire up to one second early. A write with less than one second remaining removes its key; a conditional update with that deadline returns `False`. The store never sends TTL zero, which some backends interpret as no expiration. Backend clocks and transport latency still affect eviction timing. Database reads reject malformed or unrepresentable stored deadlines; a failed insert followed by a failed recovery query preserves the original insert error and observes the secondary failure.
 
 For a custom store implement [ISessionStore](../../contracts/store.py), preserve independent copies where appropriate and test expiration, failed update after deletion, corruption and I/O failures. The manager integrates four current drivers: another store needs application service integration; an arbitrary `SESSION_DRIVER` string does not register a class.
 

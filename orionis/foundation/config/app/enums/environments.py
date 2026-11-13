@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class Environments(Enum):
     """
     Enumerate possible application environments.

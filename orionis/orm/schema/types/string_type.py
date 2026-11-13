@@ -1,4 +1,4 @@
-"""The base for all string and character types. In SQL, ``VARCHAR``."""
+"""Declare a variable-length SQL string using the logical ``VARCHAR`` kind."""
 
 from __future__ import annotations
 from orionis.orm.schema.column.definition import ColumnDefinition
@@ -6,8 +6,9 @@ from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types._constants import DEFAULT_STRING_LENGTH
 from orionis.orm.schema.types.column_type import ColumnType
 
+
 class String(ColumnDefinition):
-    """The base for all string and character types. In SQL, ``VARCHAR``."""
+    """Declare a variable-length SQL string using the logical ``VARCHAR`` kind."""
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -35,9 +36,11 @@ class String(ColumnDefinition):
         Raises
         ------
         ValueError
-            If the length is not a positive integer or None.
+            If the length is not a positive non-boolean integer or None.
         """
-        if length is not None and (not isinstance(length, int) or length <= 0):
+        if length is not None and (
+            not isinstance(length, int) or isinstance(length, bool) or length <= 0
+        ):
             error_msg = "String length must be a positive integer or None."
             raise ValueError(error_msg)
         super().__init__(

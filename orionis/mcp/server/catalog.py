@@ -1,10 +1,10 @@
+# ruff: noqa: TC001
+# Resolve catalog declarations and constructor annotations at runtime.
 """Hide catalog tools behind bounded search_tools and execute_tools tools."""
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from orionis.mcp.server.primitives import Tool
 
-if TYPE_CHECKING:
-    from orionis.mcp.server.primitives import Tool
 
 @dataclass(frozen=True, slots=True, init=False)
 class ToolCatalog:

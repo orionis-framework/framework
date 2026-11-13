@@ -16,6 +16,12 @@ Core sections are:
 
 Entities are frozen dataclasses and normalize nested dicts/enums into validated objects. Environment variables are read by their field default factories; see each subsystem module for the complete option set.
 
+Argon2 configuration shares the driver's native limits: memory and time costs are at most `2**32 - 1`, parallelism is at most `2**24 - 1`, and memory must provide at least 8 KiB per lane. Validating these limits does not perform hashing or allocate the configured memory.
+
+`withConfigPaths` accepts strings, path objects, or `None` for known directories. Invalid values raise `TypeError` without replacing the existing mapping. `None` still selects the default; unknown keys remain ignored.
+
+Application encryption defaults to `AES-256-GCM` and also accepts `AES-128-GCM`. Configuration rejects legacy CBC before generating or persisting a key. Previously stored CBC ciphertext is incompatible and is not decrypted; changing the cipher does not migrate existing data.
+
 ## Examples
 
 ### Validate native application configuration
@@ -50,6 +56,7 @@ A frozen dataclass declared in `config/payments.py` is discovered as the `paymen
 
 ```python
 from dataclasses import dataclass
+
 
 @dataclass(frozen=True, kw_only=True)
 class Payments:

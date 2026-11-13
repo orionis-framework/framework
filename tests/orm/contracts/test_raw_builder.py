@@ -1,7 +1,10 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 from orionis.orm.query.raw_builder import RawQueryBuilder
 from orionis.test import TestCase
 from tests.orm.contracts.test_base_builder import BASE_METHODS, assert_contract_surface
+
 
 class TestRawQueryBuilderContract(TestCase):
     """Verify raw row terminals share the same fluent query contract."""
@@ -12,7 +15,7 @@ class TestRawQueryBuilderContract(TestCase):
         Returns
         -------
         None
-            Verify the complete model-less query builder interface.
+            No return value.
         """
         expected = BASE_METHODS | frozenset(
             {
@@ -33,6 +36,6 @@ class TestRawQueryBuilderContract(TestCase):
         Returns
         -------
         None
-            Verify the interface declares its own empty slots.
+            No return value.
         """
         self.assertEqual(IRawQueryBuilder.__dict__.get("__slots__"), ())

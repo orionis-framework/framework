@@ -1,10 +1,13 @@
+# ruff: noqa: TC003
+# Public primitive metadata is consumed through runtime type reflection.
 """Provide mcp server operations.
 
 Includes ``Primitive``, ``Tool``, ``Resource``, ``Prompt``.
 """
 
 from types import MappingProxyType
-from typing import ClassVar, TYPE_CHECKING
+from collections.abc import Mapping
+from typing import ClassVar
 from orionis.mcp.protocol.metadata import (
     CacheHint,
     ContentAnnotations,
@@ -13,8 +16,6 @@ from orionis.mcp.protocol.metadata import (
     ToolAnnotations,
 )
 
-if TYPE_CHECKING:
-    from collections.abc import Mapping
 
 class Primitive:
     """Static metadata shared by tools, resources and prompts."""
@@ -35,6 +36,7 @@ class Primitive:
     cache: ClassVar[CacheHint] = CacheHint()
     """Cache policy or cached state used by this component."""
 
+
 class Tool[InputType = object, OutputType = object](Primitive):
     """Declare a typed input, optional typed output, and an injectable handle method."""
 
@@ -47,6 +49,7 @@ class Tool[InputType = object, OutputType = object](Primitive):
     """Declared schema for structured tool output."""
     annotations: ClassVar[ToolAnnotations | None] = None
     """Declared metadata describing behavior or validation types."""
+
 
 class Resource(Primitive):
     """Read a declared URI or RFC 6570 template without implicit file access."""
@@ -65,6 +68,7 @@ class Resource(Primitive):
     annotations: ClassVar[ContentAnnotations | None] = None
     """Declared metadata describing behavior or validation types."""
 
+
 class Prompt(Primitive):
     """Declare string arguments and return user/assistant prompt messages."""
 
@@ -73,6 +77,7 @@ class Prompt(Primitive):
 
     arguments: ClassVar[tuple[PromptArgument, ...]] = ()
     """Command-line argument declarations accepted by this command."""
+
 
 class Server:
     """Define a server independently of any connection or transport."""

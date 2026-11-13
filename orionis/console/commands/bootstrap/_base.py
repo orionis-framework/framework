@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Run component bootstrapping through native Reactor output and injection."""
 
 from asyncio import to_thread
@@ -7,7 +9,8 @@ from orionis.cache.file_based_cache import FileBasedCache
 from orionis.console.base.command import BaseCommand
 from orionis.console.commands.bootstrap._service import Bootstrapper
 from orionis.console.enums.styles import ANSIColors
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
+
 
 class BootstrapCommand(BaseCommand):
     """Run component bootstrapping through native Reactor output and injection."""

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -6,6 +8,7 @@ from orionis.http.layer.store import memory_rate_limit
 from orionis.http.layer.store.memory_rate_limit import MemoryRateLimitStore
 from orionis.test import TestCase
 from tests.http.test_support import replace_attribute
+
 
 class _Clock:
     """Expose an explicitly controlled monotonic time to the rate-limit store."""
@@ -35,6 +38,7 @@ class _Clock:
         """
         return self.now
 
+
 def _thread_attempts(store: MemoryRateLimitStore, barrier: Barrier) -> int:
     """Submit requests from an independent event loop in a worker thread.
 
@@ -50,6 +54,7 @@ def _thread_attempts(store: MemoryRateLimitStore, barrier: Barrier) -> int:
     int
         Number of attempts accepted by this worker.
     """
+
     async def run() -> int:
         """Count the attempts accepted by this worker.
 
@@ -62,6 +67,7 @@ def _thread_attempts(store: MemoryRateLimitStore, barrier: Barrier) -> int:
 
     barrier.wait(timeout=10)
     return asyncio.run(run())
+
 
 class TestMemoryRateLimitStore(TestCase):
     """Exercise quotas and incremental reclamation of inactive clients."""
@@ -157,9 +163,9 @@ class TestMemoryRateLimitStore(TestCase):
         """
         store = MemoryRateLimitStore()
         with replace_attribute(memory_rate_limit, "monotonic", _Clock()):
-            results = await asyncio.gather(*(
-                store.hit("client", 10, 60) for _ in range(100)
-            ))
+            results = await asyncio.gather(
+                *(store.hit("client", 10, 60) for _ in range(100)),
+            )
         self.assertEqual(sum(results), 10)
 
     async def testZeroQuotaDoesNotRetainClients(self) -> None:
@@ -241,10 +247,12 @@ class TestMemoryRateLimitStore(TestCase):
         barrier = Barrier(8)
         loop = asyncio.get_running_loop()
         with ThreadPoolExecutor(max_workers=8) as executor:
-            results = await asyncio.gather(*(
-                loop.run_in_executor(executor, _thread_attempts, store, barrier)
-                for _ in range(8)
-            ))
+            results = await asyncio.gather(
+                *(
+                    loop.run_in_executor(executor, _thread_attempts, store, barrier)
+                    for _ in range(8)
+                ),
+            )
         self.assertEqual(sum(results), 17)
         self.assertEqual(store._MemoryRateLimitStore__total_events, 17)
 
@@ -258,7 +266,10 @@ class TestMemoryRateLimitStore(TestCase):
         """
         for value in (0, -1, True, 1.5):
             for name in ("max_keys", "max_events"):
-                with self.subTest(name=name, value=value), self.assertRaises(
-                    (TypeError, ValueError),
+                with (
+                    self.subTest(name=name, value=value),
+                    self.assertRaises(
+                        (TypeError, ValueError),
+                    ),
                 ):
                     MemoryRateLimitStore(**{name: value})

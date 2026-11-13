@@ -32,20 +32,24 @@ __all__ = [
     "WhereType",
 ]
 
+_EXPRESSIONS_MODULE = "orionis.orm.query.expressions"
+"""Module defining the public query plan entities and enumerations."""
+
 _EXPORTS = {
-    "AggregateClause": ("orionis.orm.query.expressions", "AggregateClause"),
-    "AggregateFunction": ("orionis.orm.query.expressions", "AggregateFunction"),
-    "DeletePlan": ("orionis.orm.query.expressions", "DeletePlan"),
-    "InsertPlan": ("orionis.orm.query.expressions", "InsertPlan"),
+    "AggregateClause": (_EXPRESSIONS_MODULE, "AggregateClause"),
+    "AggregateFunction": (_EXPRESSIONS_MODULE, "AggregateFunction"),
+    "DeletePlan": (_EXPRESSIONS_MODULE, "DeletePlan"),
+    "InsertPlan": (_EXPRESSIONS_MODULE, "InsertPlan"),
     "ModelQueryBuilder": ("orionis.orm.query.builder", "ModelQueryBuilder"),
-    "OrderClause": ("orionis.orm.query.expressions", "OrderClause"),
-    "SelectPlan": ("orionis.orm.query.expressions", "SelectPlan"),
-    "SortDirection": ("orionis.orm.query.expressions", "SortDirection"),
-    "UpdatePlan": ("orionis.orm.query.expressions", "UpdatePlan"),
-    "WhereClause": ("orionis.orm.query.expressions", "WhereClause"),
-    "WhereType": ("orionis.orm.query.expressions", "WhereType"),
+    "OrderClause": (_EXPRESSIONS_MODULE, "OrderClause"),
+    "SelectPlan": (_EXPRESSIONS_MODULE, "SelectPlan"),
+    "SortDirection": (_EXPRESSIONS_MODULE, "SortDirection"),
+    "UpdatePlan": (_EXPRESSIONS_MODULE, "UpdatePlan"),
+    "WhereClause": (_EXPRESSIONS_MODULE, "WhereClause"),
+    "WhereType": (_EXPRESSIONS_MODULE, "WhereType"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -67,6 +71,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

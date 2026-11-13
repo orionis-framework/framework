@@ -1,12 +1,11 @@
+# ruff: noqa: TC001
+# Module-qualified annotations keep the Hub/client contract cycle resolvable.
 """Provide realtime operations through ``HubContext``, ``Hub``."""
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from orionis.http.websocket import WebSocket
-    from orionis.realtime.clients import HubClients
-    from orionis.realtime.groups import HubGroups
+from orionis.http.websocket import WebSocket
+import orionis.realtime.clients as clients_module
+import orionis.realtime.groups as groups_module
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -29,9 +28,9 @@ class Hub:
 
     context: HubContext
     """Runtime context made available to the operation and its callbacks."""
-    clients: HubClients
+    clients: clients_module.HubClients
     """Client-target selector available to hub handlers."""
-    groups: HubGroups
+    groups: groups_module.HubGroups
     """Realtime group membership and targeting interface."""
 
     async def onConnect(self) -> None:

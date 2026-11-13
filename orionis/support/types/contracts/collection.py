@@ -1,11 +1,12 @@
+# ruff: noqa: TC003
+# Keep public callback annotations available for runtime contract inspection.
 """Define the contract for collection implementations."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Self
+from collections.abc import Callable
+from typing import Any, Self
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 class ICollection(ABC):
     """Define the contract for collection implementations."""
@@ -65,17 +66,17 @@ class ICollection(ABC):
         Returns
         -------
         object
-            The last item in the filtered collection, or raises IndexError if empty.
+            The last item in the filtered collection, or None if empty.
         """
 
     @abstractmethod
-    def all(self: Self) -> list[Any]:
+    def all(self: Self) -> list[Any] | dict[Any, Any]:
         """
         Return all items in the collection.
 
         Returns
         -------
-        list of typing.Any
+        list[typing.Any] | dict[typing.Any, typing.Any]
             All items contained in the collection.
         """
 
@@ -864,7 +865,7 @@ class ICollection(ABC):
 
         Raises
         ------
-        ValueError
+        TypeError
             If the 'items' parameter is not a list or Collection.
         """
 

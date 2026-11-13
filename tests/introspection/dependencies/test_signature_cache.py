@@ -1,3 +1,7 @@
+# ruff: noqa: N805, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Use a nonstandard receiver name to verify binding instead of name guessing.
+
 import gc
 import inspect
 import weakref
@@ -9,10 +13,11 @@ from orionis.introspection.dependencies.reflection import (
 )
 from orionis.test import TestCase
 
+
 class _Controller:
     """Provide ordinary, class and static methods for reflection."""
 
-    def handle(receiver, value: int = 7, /, *, label: str = "ok") -> tuple:  # noqa: N805
+    def handle(receiver, value: int = 7, /, *, label: str = "ok") -> tuple:
         """Return the explicit parameters.
 
         Parameters
@@ -63,8 +68,15 @@ class _Controller:
         """
         return value
 
+
 class TestSignatureCache(TestCase):
     """Exercise cached dependency signatures across request-owned instances."""
+
+    def setUp(self) -> None:
+        """Isolate global signature entries and release them after every case."""
+        for cache in (_get_signature, _get_resolved_signature):
+            cache.cache_clear()
+            self.addCleanup(cache.cache_clear)
 
     def testBoundSignaturesDoNotRetainControllers(self) -> None:
         """Reuse one signature and release every transient controller.
@@ -72,8 +84,10 @@ class TestSignatureCache(TestCase):
         Returns
         -------
         None
-            All weak references have expired after collection.
+            No return value.
         """
+        # The test runner can populate signatures after setUp; measure only
+        # controller reflection from this point onward.
         _get_signature.cache_clear()
         _get_resolved_signature.cache_clear()
         references = []
@@ -95,7 +109,7 @@ class TestSignatureCache(TestCase):
         Returns
         -------
         None
-            Bound and unbound signatures keep their correct argument order.
+            No return value.
         """
         bound = ReflectDependencies(_Controller().handle).callableSignature()
         unbound = ReflectDependencies(_Controller.handle).callableSignature()
@@ -109,13 +123,15 @@ class TestSignatureCache(TestCase):
         Returns
         -------
         None
-            Every descriptor exposes only its explicit argument.
+            No return value.
         """
         for target in (_Controller, _Controller()):
             reflection = ReflectDependencies(target)
             for name in ("classAction", "staticAction"):
-                self.assertEqual(tuple(reflection.methodSignature(name).ordered),
-                                 ("value",))
+                self.assertEqual(
+                    tuple(reflection.methodSignature(name).ordered),
+                    ("value",),
+                )
 
     def testWrappedAndCustomSignaturesKeepBoundSemantics(self) -> None:
         """Honor explicit signatures and wrapped methods before binding.
@@ -123,7 +139,7 @@ class TestSignatureCache(TestCase):
         Returns
         -------
         None
-            Dependency metadata matches the signature Python exposes.
+            No return value.
         """
 
         @wraps(_Controller.handle)
@@ -145,11 +161,12 @@ class TestSignatureCache(TestCase):
             return _Controller.handle(*args, **kwargs)
 
         custom = type("CustomController", (), {"handle": wrapped})
-        wrapped.__signature__ = inspect.Signature([
-            inspect.Parameter("receiver", inspect.Parameter.POSITIONAL_ONLY),
-            inspect.Parameter("count", inspect.Parameter.KEYWORD_ONLY, default=3),
-        ])
+        wrapped.__signature__ = inspect.Signature(
+            [
+                inspect.Parameter("receiver", inspect.Parameter.POSITIONAL_ONLY),
+                inspect.Parameter("count", inspect.Parameter.KEYWORD_ONLY, default=3),
+            ],
+        )
         reflected = ReflectDependencies(custom().handle).callableSignature()
         self.assertEqual(tuple(reflected.ordered), ("count",))
         self.assertEqual(reflected.ordered["count"].default, 3)
-

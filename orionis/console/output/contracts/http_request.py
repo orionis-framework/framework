@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.http.adapters.request.contracts.transport import TransportAdapter
     from orionis.http.responses import Response
+
+
 class IHTTPRequestPrinter(ABC):
     """Define the contract for http request printer implementations."""
 
@@ -97,4 +99,3 @@ class IHTTPRequestPrinter(ABC):
         None
             This method does not return a value.
         """
-

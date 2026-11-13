@@ -1,16 +1,20 @@
+# ruff: noqa: PLC0415, TC001, TC003
+# Preserve runtime injection and load recovery reporting only on failure.
 """Apply new seeders exactly once on the selected database connection."""
 
 import time
-from typing import TYPE_CHECKING, Any
+from functools import partial
+from typing import Any
+from pathlib import Path
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.exceptions import QueryException
 from orionis.database.migrations.context import migration_connection_scope
+from orionis.database.migrations.discovery import _discover_steps
+from orionis.database.migrations.events import _report_failure
 from orionis.database.seeders.events import NO_EVENTS, SeederEvents
 from orionis.database.seeders.seeder import Seeder
 from orionis.foundation.contracts.application import IApplication
-from orionis.introspection.modules.inspector import ModuleInspector
-from orionis.introspection.modules.reflection import ReflectionModule
 from orionis.orm.query.expressions import (
     InsertPlan,
     OrderClause,
@@ -23,8 +27,6 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, Integer, String
 
-if TYPE_CHECKING:
-    from pathlib import Path
 
 class _ClaimFailed(Exception):
     """Signal that inserting a seeder claim failed inside a transaction."""
@@ -44,11 +46,12 @@ class _ClaimFailed(Exception):
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         self.error = error
         """Query failure that prevented the claim."""
         super().__init__(str(error))
+
 
 def _build_seeders_table() -> TableDefinition:
     """
@@ -82,8 +85,10 @@ def _build_seeders_table() -> TableDefinition:
         primary_key="id",
     )
 
+
 _SEEDERS_TABLE: TableDefinition = _build_seeders_table()
 """Seeders table used by ``runner``."""
+
 
 class SeederRunner:
     """
@@ -97,7 +102,6 @@ class SeederRunner:
     """
 
     # The container resolves constructor dependencies from runtime types.
-    # ruff: noqa: TC001, PLC0415
 
     __slots__ = ("__app", "__conn_manager", "__discovered_cache")
     """Declare the instance attribute slots reserved by this class."""
@@ -120,7 +124,7 @@ class SeederRunner:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
         """
         self.__app = app
         """Application providing the seeder directory."""
@@ -189,7 +193,7 @@ class SeederRunner:
         Returns
         -------
         None
-            The table is available for tracking operations.
+            No return value.
         """
         try:
             await connection.createTable(_SEEDERS_TABLE)
@@ -201,6 +205,7 @@ class SeederRunner:
             except QueryException:
                 raise exc from None
             from orionis.failure.runtime import capture
+
             await capture(
                 exc,
                 app=self.__app,
@@ -238,35 +243,12 @@ class SeederRunner:
         if self.__discovered_cache is not None:
             return self.__discovered_cache
 
-        path = self.__seedersPath()
-        if not path.is_dir():
-            self.__discovered_cache = {}
-            return self.__discovered_cache
-
-        modules = ModuleInspector.discoverModules(
-            base_path=self.__app.basePath,
-            target_path=path,
+        self.__discovered_cache = _discover_steps(
+            self.__app.basePath,
+            self.__seedersPath(),
+            Seeder,
+            "seeder",
         )
-        found: dict[str, type[Seeder]] = {}
-        for module_name in modules:
-            stem = module_name.rsplit(".", 1)[-1]
-            if stem == "__init__":
-                continue
-            rf_module = ReflectionModule(module_name)
-            for obj in rf_module.getClasses().values():
-                if obj.__module__ != module_name or not issubclass(obj, Seeder):
-                    continue
-                previous = found.get(stem)
-                if previous is not None:
-                    error_msg = (
-                        f"Ambiguous seeder '{stem}': "
-                        f"{previous.__module__}.{previous.__name__} and "
-                        f"{module_name}.{obj.__name__}."
-                    )
-                    raise ValueError(error_msg)
-                found[stem] = obj
-
-        self.__discovered_cache = dict(sorted(found.items()))
         return self.__discovered_cache
 
     async def __getRan(self, connection: IConnection) -> list[dict[str, Any]]:
@@ -295,6 +277,10 @@ class SeederRunner:
         """
         Check whether another transaction committed this seeder.
 
+        Observe a failed recovery read without replacing the pending claim error.
+        The caller propagates that original error when recovery is unconfirmed.
+        Return False after observing a QueryException that prevents the lookup.
+
         Parameters
         ----------
         connection : orionis.database.contracts.IConnection
@@ -305,16 +291,28 @@ class SeederRunner:
         Returns
         -------
         bool
-            Whether the tracking row is committed.
+            Whether a committed tracking row was confirmed by the recovery read.
         """
-        rows = await connection.select(
-            SelectPlan(
-                table=_SEEDERS_TABLE,
-                columns=("id",),
-                wheres=[WhereClause(column="seeder", value=name)],
-                limit_value=1,
-            ),
-        )
+        try:
+            rows = await connection.select(
+                SelectPlan(
+                    table=_SEEDERS_TABLE,
+                    columns=("id",),
+                    wheres=[WhereClause(column="seeder", value=name)],
+                    limit_value=1,
+                ),
+            )
+        except QueryException as error:
+            from orionis.failure.runtime import capture
+
+            await capture(
+                error,
+                app=self.__app,
+                flow="database",
+                phase="recovery",
+                operation="seeders.claim",
+            )
+            return False
         return bool(rows)
 
     async def __runStep(
@@ -354,11 +352,13 @@ class SeederRunner:
                     await connection.insert(
                         InsertPlan(
                             table=_SEEDERS_TABLE,
-                            values=[{
-                                "seeder": name,
-                                "batch": batch,
-                                "seeded_at": 0,
-                            }],
+                            values=[
+                                {
+                                    "seeder": name,
+                                    "batch": batch,
+                                    "seeded_at": 0,
+                                },
+                            ],
                         ),
                     )
                 except QueryException as exc:
@@ -379,6 +379,7 @@ class SeederRunner:
         except _ClaimFailed as exc:
             if await self.__isRecorded(connection, name):
                 from orionis.failure.runtime import capture
+
                 await capture(
                     exc.error,
                     app=self.__app,
@@ -388,12 +389,19 @@ class SeederRunner:
                     expected=True,
                 )
                 return False
-            events.started(name)
-            events.failed(name, time.perf_counter() - started_at)
-            raise exc.error from exc
-        except Exception:
+            _report_failure(partial(events.started, name), exc.error)
+            _report_failure(
+                partial(events.failed, name, time.perf_counter() - started_at),
+                exc.error,
+            )
+            # Preserve the original driver cause instead of the internal wrapper.
+            raise exc.error from exc.error.__cause__
+        except Exception as error:
             if started:
-                events.failed(name, time.perf_counter() - started_at)
+                _report_failure(
+                    partial(events.failed, name, time.perf_counter() - started_at),
+                    error,
+                )
             raise
 
         events.succeeded(name, time.perf_counter() - started_at)

@@ -1,3 +1,7 @@
+# ruff: noqa: ARG002, PLC0415, PLR0913
+# Keep rule interface parameter names compatible with keyword callers.
+# Load ORM dependencies only when the uniqueness rule executes.
+# Preserve the existing rule configuration signature.
 """Ensure a value is not already stored in a database column."""
 
 from typing import TYPE_CHECKING
@@ -6,6 +10,7 @@ from orionis.schemas.rule import Rule
 if TYPE_CHECKING:
     from orionis.orm.query.expressions import SelectPlan
 
+
 class Unique(Rule):
     """
     Ensure a value is not already stored in a database column.
@@ -13,8 +18,6 @@ class Unique(Rule):
     Validation awaits the current connection and preserves its event loop
     and active transaction.
     """
-
-    # ruff: noqa: ARG002, PLC0415, PLR0913
 
     __message__ = "Value must be unique."
     """Error text for message: ``Value must be unique.``."""
@@ -56,7 +59,7 @@ class Unique(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
         """
         super().__init__(message=message)
         self._table: str = table

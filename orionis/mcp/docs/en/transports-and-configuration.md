@@ -7,16 +7,20 @@ from orionis.mcp import McpResponse, Server, Tool
 from orionis.schemas import Schema
 from orionis.support.facades import Mcp
 
+
 class GreetInput(Schema):
     name: str
+
 
 class GreetTool(Tool[GreetInput, str]):
     def handle(self, payload: GreetInput) -> McpResponse:
         return McpResponse.structured(f"Hello, {payload.name}!")
 
+
 class ApplicationServer(Server):
     name = "Application"
     tools = (GreetTool,)
+
 
 Mcp.web("/mcp/application", ApplicationServer)
 Mcp.local("application", ApplicationServer)
@@ -60,7 +64,11 @@ Start a registered handle with `python -B reactor mcp:start application`; `pytho
 
 STDIO uses line-delimited JSON; stdout is reserved for protocol frames and diagnostics belong on stderr. The transport bounds reads/concurrency, accepts cancellation notifications and shares the HTTP dispatcher. Never print ordinary logging to stdout inside handlers.
 
+Output is acknowledged only after the complete frame is written and flushed, including when a raw stream accepts partial writes. A stream that accepts no bytes fails explicitly; the transport does not discard the remainder or spin retrying a blocked output.
+
 ## Budgets
+
+The provider accepts a `McpConfig`, a configuration mapping, or `None` for defaults. Falsy values of another type (`False`, `0`, `""` or `[]`) are invalid and fail before any service is registered; they do not silently select defaults.
 
 | Variable | Default |
 |---|---:|

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import ast
 import re
 from functools import cache
@@ -15,6 +17,7 @@ _METHOD_NAME = re.compile(r"_{0,2}[a-z][a-zA-Z0-9]*")
 _FUNCTION_NAME = re.compile(r"_?[a-z][a-z0-9_]*")
 _TEST_NAME = re.compile(r"test[A-Z][a-zA-Z0-9]*")
 
+
 @cache
 def source_trees() -> tuple[tuple[Path, ast.Module], ...]:
     """
@@ -31,6 +34,7 @@ def source_trees() -> tuple[tuple[Path, ast.Module], ...]:
         for path in sorted(directory.rglob("*.py"))
     )
 
+
 def function_definitions() -> Iterator[tuple[Path, _Function, bool]]:
     """
     Enumerate functions and distinguish class methods from standalone helpers.
@@ -42,12 +46,14 @@ def function_definitions() -> Iterator[tuple[Path, _Function, bool]]:
     """
     for path, tree in source_trees():
         parents = {
-            child: node for node in ast.walk(tree)
+            child: node
+            for node in ast.walk(tree)
             for child in ast.iter_child_nodes(node)
         }
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 yield path, node, isinstance(parents[node], ast.ClassDef)
+
 
 def function_arguments(function: _Function) -> Iterator[ast.arg]:
     """
@@ -70,6 +76,7 @@ def function_arguments(function: _Function) -> Iterator[ast.arg]:
         yield function.args.vararg
     if function.args.kwarg is not None:
         yield function.args.kwarg
+
 
 class TestHTTPConventions(TestCase):
     """Enforce HTTP naming, documentation, annotations, and test dependencies."""
@@ -114,9 +121,9 @@ class TestHTTPConventions(TestCase):
             if path.parts[0] != "tests":
                 continue
             missing = [
-                argument.arg for argument in function_arguments(function)
-                if argument.arg not in {"self", "cls"}
-                and argument.annotation is None
+                argument.arg
+                for argument in function_arguments(function)
+                if argument.arg not in {"self", "cls"} and argument.annotation is None
             ]
             if function.returns is None or missing:
                 invalid.append(f"{path}:{function.lineno}:{function.name}")
@@ -179,7 +186,8 @@ class TestHTTPConventions(TestCase):
         invalid = []
         for path, function, is_method in function_definitions():
             if (
-                path.parts[0] == "tests" and is_method
+                path.parts[0] == "tests"
+                and is_method
                 and function.name.startswith("test")
                 and isinstance(function, ast.AsyncFunctionDef)
                 and not any(

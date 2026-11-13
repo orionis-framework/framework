@@ -1,9 +1,10 @@
+# ruff: noqa: PYI021
+# Keep public facade methods documented alongside their static signatures.
 from orionis.console.fluent.contracts.task import ITask
 from orionis.container.contracts.facade import IFacade
-from orionis.http.routes.contracts.router import IRouter
+from orionis.console.contracts.schedule import ISchedule
 
-class Schedule(IRouter, IFacade):
-
+class Schedule(ISchedule, IFacade):
     @classmethod
     def command(
         cls,
@@ -11,4 +12,4 @@ class Schedule(IRouter, IFacade):
         args: list[str] | None = None,
         purpose: str | None = None,
     ) -> ITask:
-        ...
+        """Add a command for fluent configuration."""

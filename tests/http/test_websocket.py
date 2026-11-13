@@ -1,10 +1,13 @@
+# ruff: noqa: PT009, PT027, SLF001, TC001, TC003
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import asyncio
-from collections.abc import Callable  # noqa: TC003 - Runtime test reflection.
+from collections.abc import Callable  # Runtime test reflection.
 from threading import BoundedSemaphore
 from types import SimpleNamespace
 from typing import TYPE_CHECKING, ClassVar, cast
 from orionis.container.container import Container
-from orionis.container.context.manager import ScopeManager  # noqa: TC001
+from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import get_current_scope
 from orionis.foundation.config.http import HTTP, HTTPWebSocket
 from orionis.http import WebSocket, WebSocketDisconnected, WebSocketMiddleware
@@ -20,12 +23,16 @@ from orionis.http.routes.router import Router
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
 from orionis.test import TestCase
 from tests.http.test_kernel import (
-    _StubApp, _StubRsgiHeaders, boot_kernel, make_asgi_scope,
+    _StubApp,
+    _StubRsgiHeaders,
+    boot_kernel,
+    make_asgi_scope,
 )
 
 if TYPE_CHECKING:
     from granian._granian import RSGIWebsocketProtocol
     from granian.rsgi import Scope
+
 
 class _ASGIPeer:
     """Model one server connection with queued events and recorded output."""
@@ -106,8 +113,10 @@ class _ASGIPeer:
         """
         return WebSocket(
             ASGIWebSocketTransport(self.scope, self.receive, self.send),
-            ASGITransportAdapter(self.scope), max_message_size=max_message_size,
+            ASGITransportAdapter(self.scope),
+            max_message_size=max_message_size,
         )
+
 
 class _RSGIPeer:
     """Model the documented Granian WebsocketProtocol and transport methods."""
@@ -123,9 +132,16 @@ class _RSGIPeer:
             Initialize the RSGI scope and protocol recorders.
         """
         self.scope = SimpleNamespace(
-            proto="ws", method="GET", path="/socket", scheme="http",
-            http_version="1.1", rsgi_version="1.6", client="127.0.0.1:42",
-            server="127.0.0.1:80", authority=None, query_string="",
+            proto="ws",
+            method="GET",
+            path="/socket",
+            scheme="http",
+            http_version="1.1",
+            rsgi_version="1.6",
+            client="127.0.0.1:42",
+            server="127.0.0.1:80",
+            authority=None,
+            query_string="",
             headers=_StubRsgiHeaders({"host": ["orionis.test"]}),
         )
         self.accepts = 0
@@ -221,6 +237,7 @@ class _RSGIPeer:
             max_message_size=max_message_size,
         )
 
+
 class _BlockingAccept(_ASGIPeer):
     """Pause after the server receives an accept event."""
 
@@ -256,6 +273,7 @@ class _BlockingAccept(_ASGIPeer):
             self.accept_entered.set()
             await self.release_accept.wait()
 
+
 class _DisconnectedOnClose(_ASGIPeer):
     """Disconnect after acceptance when the server attempts error closure."""
 
@@ -277,6 +295,7 @@ class _DisconnectedOnClose(_ASGIPeer):
         if event["type"] == "websocket.close":
             self.fail_send = True
         await super().send(event)
+
 
 class TestWebSocketTransport(TestCase):
     """Check public messaging, protocol state transitions and disconnects."""
@@ -302,9 +321,13 @@ class TestWebSocketTransport(TestCase):
         await socket.send(b"binary")
         self.assertEqual(peer.sent[-2]["text"], '{"ok":true}')
         self.assertEqual(peer.sent[-1]["bytes"], b"binary")
-        peer.events.put_nowait({
-            "type": "websocket.disconnect", "code": 1001, "reason": "left",
-        })
+        peer.events.put_nowait(
+            {
+                "type": "websocket.disconnect",
+                "code": 1001,
+                "reason": "left",
+            },
+        )
         message = await socket.receive()
         self.assertTrue(message.isDisconnect())
         self.assertEqual((message.code, message.reason), (1001, "left"))
@@ -358,7 +381,8 @@ class TestWebSocketTransport(TestCase):
                     self.assertEqual(peer.sent[1]["body"], b"")
                 else:
                     self.assertEqual(
-                        peer.sent, [{"type": "websocket.close", "code": 1008}],
+                        peer.sent,
+                        [{"type": "websocket.close", "code": 1008}],
                     )
 
     async def testAcceptanceRequiredAndSingleUse(self) -> None:
@@ -503,10 +527,12 @@ class TestWebSocketTransport(TestCase):
         self.assertTrue(socket.closed)
         self.assertEqual(peer.sent[-1]["type"], "websocket.close")
 
+
 class _ScopedDependency:
     """Identify the scoped service owned by a single connection."""
 
     __slots__ = ()
+
 
 class _ScopedApp(_StubApp):
     """Use the actual container for connection dependencies and lifetime scopes."""
@@ -596,6 +622,7 @@ class _ScopedApp(_StubApp):
         """
         return await self.container.call(instance, method, **kwargs)
 
+
 class _ConnectionMiddleware(WebSocketMiddleware):
     """Require the same scoped dependency observed by the handler."""
 
@@ -634,6 +661,7 @@ class _ConnectionMiddleware(WebSocketMiddleware):
         socket.state.dependency = self.dependency
         await call_next()
 
+
 class _RejectMiddleware(WebSocketMiddleware):
     """Deny a pending connection without calling its handler."""
 
@@ -655,6 +683,7 @@ class _RejectMiddleware(WebSocketMiddleware):
             Send an unauthorized handshake rejection.
         """
         await socket.reject(status_code=401)
+
 
 class _DoubleNext(WebSocketMiddleware):
     """Exercise the continuation's single-consumption guard."""
@@ -679,6 +708,7 @@ class _DoubleNext(WebSocketMiddleware):
         await call_next()
         await call_next()
 
+
 async def echo_handler(socket: WebSocket, room: int = 0) -> None:
     """Accept the connection and echo one message with its converted room ID.
 
@@ -697,8 +727,11 @@ async def echo_handler(socket: WebSocket, room: int = 0) -> None:
     await socket.accept()
     await socket.sendJson({"room": room, "message": (await socket.receive()).data})
 
+
 async def scoped_handler(
-    socket: WebSocket, dependency: _ScopedDependency, **_params: object,
+    socket: WebSocket,
+    dependency: _ScopedDependency,
+    **_params: object,
 ) -> None:
     """Verify middleware and handler injection share one service per connection.
 
@@ -722,6 +755,7 @@ async def scoped_handler(
     await socket.accept()
     await socket.sendJson({"dependency": id(dependency)})
 
+
 async def failure_handler(socket: WebSocket, **_params: object) -> None:
     """Fail after acceptance to exercise error closure and scope cleanup.
 
@@ -741,6 +775,7 @@ async def failure_handler(socket: WebSocket, **_params: object) -> None:
     error_msg = "Connection handler failed"
     raise RuntimeError(error_msg)
 
+
 async def waiting_handler(socket: WebSocket, **_params: object) -> None:
     """Wait for peer data while holding the connection lifetime scope.
 
@@ -758,6 +793,7 @@ async def waiting_handler(socket: WebSocket, **_params: object) -> None:
     """
     await socket.accept()
     await socket.receive()
+
 
 class _SocketController:
     """Exercise controller construction and action argument injection."""
@@ -799,6 +835,7 @@ class _SocketController:
             raise RuntimeError(error_msg)
         await echo_handler(socket, room)
 
+
 class TestWebSocketKernel(TestCase):
     """Check routing and connection lifetimes with actual container injection."""
 
@@ -826,7 +863,9 @@ class TestWebSocketKernel(TestCase):
             Container._instances.pop(type(app.container), None)
 
     async def makeKernel(
-        self, action: object = echo_handler, middleware: tuple = (),
+        self,
+        action: object = echo_handler,
+        middleware: tuple = (),
     ) -> tuple:
         """Compile a dynamic route and bind a real container behind the kernel.
 
@@ -1030,7 +1069,8 @@ class TestWebSocketKernel(TestCase):
         with self.assertRaisesRegex(RuntimeError, "already been called"):
             await kernel.handleASGI(peer.scope, peer.receive, peer.send)
         self.assertEqual(
-            sum(event["type"] == "websocket.send" for event in peer.sent), 1,
+            sum(event["type"] == "websocket.send" for event in peer.sent),
+            1,
         )
 
     async def testMissingRouteAndGlobalGuardsRejectHandshake(self) -> None:
@@ -1061,11 +1101,13 @@ class TestWebSocketKernel(TestCase):
         kernel, app = await self.makeKernel()
         config = dict(app.config_data["http"])
         config["rate_limit"] = {
-            "rate_limit_enabled": True, "rate_limit_requests": 1,
+            "rate_limit_enabled": True,
+            "rate_limit_requests": 1,
             "rate_limit_window_seconds": 60,
         }
         kernel._KernelHTTP__defaultMiddleware(
-            config, kernel._KernelHTTP__default_responses,
+            config,
+            kernel._KernelHTTP__default_responses,
         )
         first = _ASGIPeer("/socket/1", denial=True)
         first.events.put_nowait({"type": "websocket.receive", "text": "allowed"})
@@ -1117,5 +1159,6 @@ class TestWebSocketKernel(TestCase):
         with self.assertRaises(TypeError):
             HTTPWebSocket(max_message_size=True)
         self.assertEqual(
-            HTTP(websocket={"max_connections": 3}).websocket.max_connections, 3,
+            HTTP(websocket={"max_connections": 3}).websocket.max_connections,
+            3,
         )

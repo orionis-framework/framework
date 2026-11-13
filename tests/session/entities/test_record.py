@@ -1,8 +1,11 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import fields, is_dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from orionis.session.entities.record import SessionRecord
 from orionis.test import TestCase
+
 
 class TestSessionRecord(TestCase):
     """Unit tests for the SessionRecord dataclass."""
@@ -16,12 +19,12 @@ class TestSessionRecord(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = SessionRecord(
             id="my-id",
             data={},
-            expires_at=datetime.now(UTC) + timedelta(hours=1),
+            expires_at=datetime(2030, 1, 1, tzinfo=UTC),
         )
         self.assertEqual(record.id, "my-id")
 
@@ -34,13 +37,13 @@ class TestSessionRecord(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"user_id": 7, "role": "editor"}
         record = SessionRecord(
             id="d",
             data=payload,
-            expires_at=datetime.now(UTC) + timedelta(hours=1),
+            expires_at=datetime(2030, 1, 1, tzinfo=UTC),
         )
         self.assertEqual(record.data, payload)
 
@@ -53,7 +56,7 @@ class TestSessionRecord(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ts = datetime(2030, 1, 1, tzinfo=UTC)
         record = SessionRecord(id="e", data={}, expires_at=ts)
@@ -68,12 +71,12 @@ class TestSessionRecord(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = SessionRecord(
             id="empty",
             data={},
-            expires_at=datetime.now(UTC) + timedelta(minutes=30),
+            expires_at=datetime(2030, 1, 1, tzinfo=UTC),
         )
         self.assertEqual(record.data, {})
 
@@ -86,9 +89,9 @@ class TestSessionRecord(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        ts = datetime.now(UTC) + timedelta(hours=1)
+        ts = datetime(2030, 1, 1, tzinfo=UTC)
         r1 = SessionRecord(id="x", data={"a": 1}, expires_at=ts)
         r2 = SessionRecord(id="x", data={"a": 1}, expires_at=ts)
         self.assertTrue(is_dataclass(SessionRecord))
@@ -103,7 +106,7 @@ class TestSessionRecord(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         names = [f.name for f in fields(SessionRecord)]
         self.assertEqual(names, ["id", "data", "expires_at"])
@@ -117,12 +120,12 @@ class TestSessionRecord(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = SessionRecord(
             id="slots",
             data={},
-            expires_at=datetime.now(UTC) + timedelta(hours=1),
+            expires_at=datetime(2030, 1, 1, tzinfo=UTC),
         )
         self.assertFalse(hasattr(record, "__dict__"))
 
@@ -135,12 +138,12 @@ class TestSessionRecord(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         record = SessionRecord(
             id="mutable",
             data={},
-            expires_at=datetime.now(UTC) + timedelta(hours=1),
+            expires_at=datetime(2030, 1, 1, tzinfo=UTC),
         )
         record.id = "changed"
         self.assertEqual(record.id, "changed")

@@ -1,5 +1,6 @@
 """Report a terminal connection failure with available close details."""
 
+
 class WebSocketDisconnected(RuntimeError):
     """Report a terminal connection failure with available close details."""
 

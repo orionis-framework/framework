@@ -1,20 +1,21 @@
+# ruff: noqa: TC001, TC003
+# Keep public callback and application annotations resolvable at runtime.
 """Provide view globals operations.
 
 Includes ``_disk_file_url``, ``_global_asset``, ``_global_secure_asset``.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from collections.abc import Awaitable, Callable
+
 from orionis.foundation.config.filesystems import DiskName
+from orionis.foundation.contracts.application import IApplication
 from orionis.storage.contracts.manager import IStorageManager
 from orionis.view.globals.url import _to_secure_url
 
-if TYPE_CHECKING:
-    from orionis.foundation.contracts.application import IApplication
-
-# ruff: noqa: ANN401
-
 _PUBLIC_DISK: str = DiskName.PUBLIC.value
+
 
 async def _disk_file_url(
     app: IApplication,
@@ -46,7 +47,8 @@ async def _disk_file_url(
     storage: IStorageManager = await app.make(IStorageManager)
     return await storage.disk(disk or _PUBLIC_DISK).file(path).url()
 
-def _global_asset(app: IApplication) -> Any:
+
+def _global_asset(app: IApplication) -> Callable[..., Awaitable[str]]:
     """
     Build the async ``asset`` template global bound to the application.
 
@@ -57,9 +59,10 @@ def _global_asset(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that builds the public URL of a stored file.
     """
+
     async def asset(path: str, disk: str | None = None) -> str:
         """
         Build the public URL of a file stored on a disk.
@@ -85,7 +88,8 @@ def _global_asset(app: IApplication) -> Any:
 
     return asset
 
-def _global_secure_asset(app: IApplication) -> Any:
+
+def _global_secure_asset(app: IApplication) -> Callable[..., Awaitable[str]]:
     """
     Build the async ``secure_asset`` template global bound to the app.
 
@@ -96,9 +100,10 @@ def _global_secure_asset(app: IApplication) -> Any:
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Async callable that builds the HTTPS URL of a stored file.
     """
+
     async def secure_asset(path: str, disk: str | None = None) -> str:
         """
         Build the HTTPS URL of a file stored on a disk.

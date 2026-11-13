@@ -30,20 +30,29 @@ __all__ = [
     "UniqueFake",
 ]
 
+_EXCEPTIONS_MODULE = "orionis.orm.factories.exceptions"
+"""Defining module shared by public factory exception exports."""
+_FAKE_MODULE = "orionis.orm.factories.fake"
+"""Defining module shared by public fake-data view exports."""
+
 _EXPORTS = {
     "Factory": ("orionis.orm.factories.factory", "Factory"),
-    "FactoryConcurrencyException": ("orionis.orm.factories.exceptions", "FactoryConcurrencyException"),
-    "FactoryConfigurationException": ("orionis.orm.factories.exceptions", "FactoryConfigurationException"),
-    "FactoryDefinitionException": ("orionis.orm.factories.exceptions", "FactoryDefinitionException"),
-    "FactoryDependencyException": ("orionis.orm.factories.exceptions", "FactoryDependencyException"),
-    "FactoryException": ("orionis.orm.factories.exceptions", "FactoryException"),
-    "FactoryPersistenceException": ("orionis.orm.factories.exceptions", "FactoryPersistenceException"),
-    "Fake": ("orionis.orm.factories.fake", "Fake"),
-    "OptionalFake": ("orionis.orm.factories.fake", "OptionalFake"),
+    "FactoryConcurrencyException": (_EXCEPTIONS_MODULE, "FactoryConcurrencyException"),
+    "FactoryConfigurationException": (
+        _EXCEPTIONS_MODULE,
+        "FactoryConfigurationException",
+    ),
+    "FactoryDefinitionException": (_EXCEPTIONS_MODULE, "FactoryDefinitionException"),
+    "FactoryDependencyException": (_EXCEPTIONS_MODULE, "FactoryDependencyException"),
+    "FactoryException": (_EXCEPTIONS_MODULE, "FactoryException"),
+    "FactoryPersistenceException": (_EXCEPTIONS_MODULE, "FactoryPersistenceException"),
+    "Fake": (_FAKE_MODULE, "Fake"),
+    "OptionalFake": (_FAKE_MODULE, "OptionalFake"),
     "Sequence": ("orionis.orm.factories.sequence", "Sequence"),
-    "UniqueFake": ("orionis.orm.factories.fake", "UniqueFake"),
+    "UniqueFake": (_FAKE_MODULE, "UniqueFake"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -65,6 +74,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

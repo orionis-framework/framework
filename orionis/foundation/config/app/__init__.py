@@ -17,9 +17,13 @@ __all__ = [
 _EXPORTS = {
     "App": ("orionis.foundation.config.app.entities.app", "App"),
     "Cipher": ("orionis.foundation.config.app.enums.ciphers", "Cipher"),
-    "Environments": ("orionis.foundation.config.app.enums.environments", "Environments"),
+    "Environments": (
+        "orionis.foundation.config.app.enums.environments",
+        "Environments",
+    ),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """
@@ -41,6 +45,7 @@ def __getattr__(name: str) -> object:
         If the requested attribute is not exported.
     """
     return _resolve_export(globals(), _EXPORTS, name)
+
 
 def __dir__() -> list[str]:
     """

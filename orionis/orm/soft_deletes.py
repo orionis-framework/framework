@@ -1,10 +1,10 @@
+# ruff: noqa: TC003
+# Retain runtime annotations and dynamic attribute values.
 """Soft delete behavior shared by every model."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from datetime import datetime
 
-if TYPE_CHECKING:
-    from datetime import datetime
 
 class SoftDeletesMixin:
     """
@@ -41,7 +41,7 @@ class SoftDeletesMixin:
         bool
             ``True`` when the row was restored, ``False`` when the model
             does not soft delete, was never persisted, or a listener
-            vetoed the operation.
+            vetoed the operation, or no stored row matched.
 
         Raises
         ------
@@ -56,7 +56,8 @@ class SoftDeletesMixin:
 
         self._attributes[column] = None
         restored = await self._performUpdate()
-        await self.fireEvent("restored")
+        if restored:
+            await self.fireEvent("restored")
         return restored
 
     async def forceDelete(self) -> bool:
@@ -67,7 +68,7 @@ class SoftDeletesMixin:
         -------
         bool
             ``True`` when a row was removed, ``False`` for unsaved
-            models or when a listener vetoed the operation.
+            models, missing rows, or when a listener vetoed the operation.
 
         Raises
         ------
@@ -80,7 +81,8 @@ class SoftDeletesMixin:
             return False
 
         deleted = await self._performForceDelete()
-        await self.fireEvent("deleted")
+        if deleted:
+            await self.fireEvent("deleted")
         return deleted
 
     async def _performSoftDelete(self, timestamp: datetime) -> bool:

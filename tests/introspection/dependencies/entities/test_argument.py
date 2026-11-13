@@ -1,7 +1,10 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import FrozenInstanceError
 from orionis.introspection.dependencies.entities.argument import Argument
 from orionis.test import TestCase
+
 
 def _make_argument(**overrides: object) -> Argument:
     """Create a valid Argument instance with sensible defaults.
@@ -27,12 +30,13 @@ def _make_argument(**overrides: object) -> Argument:
     defaults.update(overrides)
     return Argument(**defaults)  # type: ignore[arg-type]
 
+
 # ===========================================================================
 # TestArgument
 # ===========================================================================
 
-class TestArgument(TestCase):
 
+class TestArgument(TestCase):
     def testCanBeInstantiatedWithRequiredFields(self) -> None:
         """
         Assert that Argument can be created with all required fields.
@@ -40,7 +44,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument()
         self.assertIsInstance(arg, Argument)
@@ -52,7 +56,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument(name="my_dep")
         self.assertEqual(arg.name, "my_dep")
@@ -64,7 +68,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument(resolved=True)
         self.assertTrue(arg.resolved)
@@ -76,7 +80,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument(module_name="orionis.services.log")
         self.assertEqual(arg.module_name, "orionis.services.log")
@@ -88,7 +92,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument(class_name="Logger")
         self.assertEqual(arg.class_name, "Logger")
@@ -100,7 +104,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument(type=str)
         self.assertIs(arg.type, str)
@@ -112,7 +116,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument(full_class_path="orionis.services.log.Logger")
         self.assertEqual(arg.full_class_path, "orionis.services.log.Logger")
@@ -124,7 +128,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument()
         self.assertFalse(arg.is_keyword_only)
@@ -136,7 +140,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument(is_keyword_only=True)
         self.assertTrue(arg.is_keyword_only)
@@ -148,7 +152,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument()
         self.assertIsNone(arg.default)
@@ -160,7 +164,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument(default="fallback", resolved=False)
         self.assertEqual(arg.default, "fallback")
@@ -172,7 +176,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = _make_argument()
         with self.assertRaises(FrozenInstanceError):
@@ -185,7 +189,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             _make_argument(module_name=123)
@@ -197,7 +201,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             _make_argument(class_name=42)
@@ -209,7 +213,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             _make_argument(full_class_path=99)
@@ -221,7 +225,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(ValueError):
             _make_argument(type=None, resolved=True, default=None)
@@ -233,7 +237,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg = Argument(
             name="optional_dep",
@@ -253,7 +257,7 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         arg1 = _make_argument()
         arg2 = _make_argument()
@@ -266,7 +270,6 @@ class TestArgument(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(hash(_make_argument()), hash(_make_argument()))
-

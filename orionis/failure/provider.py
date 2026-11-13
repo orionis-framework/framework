@@ -6,6 +6,7 @@ from orionis.failure.catch import Catch
 from orionis.failure.contracts.catch import ICatch
 from orionis.support.facades.catch import Catch as CatchFacade
 
+
 class CatchProvider(ServiceProvider):
     """Register catch services in the application container."""
 
@@ -13,16 +14,10 @@ class CatchProvider(ServiceProvider):
         """
         Register the Catch service as a singleton in the application container.
 
-        Parameters
-        ----------
-        self : orionis.failure.provider.CatchProvider
-            The instance of the CathcProvider class.
-
         Returns
         -------
         None
-            This method does not return a value. It registers the Catch service
-            as a singleton in the application container.
+            No return value.
 
         Notes
         -----
@@ -34,18 +29,11 @@ class CatchProvider(ServiceProvider):
 
     async def boot(self) -> None:
         """
-        Boot the Catch service provider after registration.
-
-        Parameters
-        ----------
-        self : orionis.failure.provider.CatchProvider
-            Instance of the CathcProvider class.
+        Resolve and pin the Catch facade after service registration.
 
         Returns
         -------
         None
-            This method does not return a value. It performs asynchronous
-            initialization for the Catch service provider after all services
-            have been registered.
+            No return value.
         """
         await CatchFacade.pin()

@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from types import TracebackType
     from orionis.http.payload.uploaded_file import UploadedFile
 
+
 class IFormData(ABC):
     """
     Define the contract for parsed multipart form data.

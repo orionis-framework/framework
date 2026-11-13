@@ -1,22 +1,21 @@
+# ruff: noqa: ANN401, TC001
+# Retain arbitrary template context and the public deferred-result runtime type.
 """Contract for the view factory."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, TYPE_CHECKING
+from typing import Any
+from orionis.view.pending import PendingView
 
-if TYPE_CHECKING:
-    from orionis.view.pending import PendingView
 
 class IViewFactory(ABC):
     """
     Contract for the view factory.
 
-    Callers use this interface to render named templates and receive
-    fully formed :class:`orionis.http.HTMLResponse` objects ready to return from
-    HTTP controllers.
+    Callers receive a :class:`orionis.view.pending.PendingView` synchronously.
+    Await that value to render a named template and obtain an
+    :class:`orionis.http.HTMLResponse` ready to return from an HTTP controller.
     """
-
-    # ruff: noqa: ANN401
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -40,10 +39,8 @@ class IViewFactory(ABC):
             Awaitable proxy that resolves to an :class:`orionis.http.HTMLResponse` and
             accepts chained response mutators such as ``withFlash()``.
 
-        Raises
-        ------
-        orionis.view.exceptions.ViewTemplateNotFoundException
-            When the requested template file cannot be located.
-        orionis.view.exceptions.ViewRenderException
-            When the template engine fails during rendering.
+        Notes
+        -----
+        Template lookup and rendering errors are raised when the returned value
+        is awaited, rather than when this method prepares it.
         """

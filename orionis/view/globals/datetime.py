@@ -1,52 +1,57 @@
+# ruff: noqa: TC002, TC003
+# Keep public callback and application annotations resolvable at runtime.
 """Provide view globals operations through ``_global_now``, ``_global_today``."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+
+from collections.abc import Callable
+
+import pendulum
+
 from orionis.support.facades.datetime import DateTime
 
-if TYPE_CHECKING:
-    import pendulum
 
-# ruff: noqa: ANN401
-
-def _global_now() -> Any:
+def _global_now() -> Callable[[], pendulum.DateTime]:
     """
     Build the ``now`` template global.
 
     Returns
     -------
-    typing.Any
+    collections.abc.Callable
         Callable returning the current date and time.
     """
+
     def now() -> pendulum.DateTime:
         """
         Return the current date and time.
 
         Returns
         -------
-        orionis.support.facades.DateTime
+        pendulum.DateTime
             The current date and time.
         """
         return DateTime.now()
 
     return now
 
-def _global_today() -> Any:
+
+def _global_today() -> Callable[[], pendulum.DateTime]:
     """
     Build the ``today`` template global.
 
     Returns
     -------
-    typing.Any
-        Callable returning the current date without time component.
+    collections.abc.Callable
+        Callable returning the current date at midnight.
     """
-    def today() -> pendulum.Date:
+
+    def today() -> pendulum.DateTime:
         """
-        Return the current date without time component.
+        Return midnight on the current date in the configured timezone.
 
         Returns
         -------
-        orionis.orm.schema.types.Date
+        pendulum.DateTime
             The current date in the configured timezone.
         """
         return DateTime.today()

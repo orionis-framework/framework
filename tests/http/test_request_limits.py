@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415, PLR2004, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 from __future__ import annotations
 import asyncio
 from functools import partial
@@ -31,6 +34,7 @@ if TYPE_CHECKING:
     from orionis.http.middleware import NextCallable
     from orionis.http.responses import Response
 
+
 class _BodyReader(BaseMiddleware):
     """Consume the body using the kernel-created request and its limits."""
 
@@ -53,6 +57,7 @@ class _BodyReader(BaseMiddleware):
         """
         await request.body()
         return await call_next()
+
 
 class _FormReader(BaseMiddleware):
     """Retain a parsed upload to inspect its deterministic kernel cleanup."""
@@ -87,6 +92,7 @@ class _FormReader(BaseMiddleware):
         self.upload = (await request.form()).get("file")
         return await call_next()
 
+
 class _BlockingAdapter:
     """Block successful response delivery while allowing overload responses."""
 
@@ -104,7 +110,10 @@ class _BlockingAdapter:
         self.release = asyncio.Event()
 
     async def send(
-        self, _adapter: object, response: Response, *_transport: object,
+        self,
+        _adapter: object,
+        response: Response,
+        *_transport: object,
     ) -> Response:
         """Keep an accepted request active until released or cancelled.
 
@@ -126,6 +135,7 @@ class _BlockingAdapter:
             self.started.set()
             await self.release.wait()
         return response
+
 
 class TestKernelBodyLimits(TestCase):
     """Verify limits are effective through complete kernel request lifecycles."""
@@ -150,14 +160,19 @@ class TestKernelBodyLimits(TestCase):
 
                     asgi_request = partial(
                         kernel.handleASGI,
-                        make_asgi_scope("/api"), receive_empty, send_noop,
+                        make_asgi_scope("/api"),
+                        receive_empty,
+                        send_noop,
                     )
                     rsgi_request = partial(
-                        kernel.handleRSGI, _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                        kernel.handleRSGI,
+                        _StubRsgiScope("/api"),
+                        _StubRsgiProtocol(),
                     )
                     first, other = (
                         (asgi_request, rsgi_request)
-                        if interface == "asgi" else (rsgi_request, asgi_request)
+                        if interface == "asgi"
+                        else (rsgi_request, asgi_request)
                     )
                     task = asyncio.create_task(first())
                     try:
@@ -186,6 +201,7 @@ class TestKernelBodyLimits(TestCase):
         None
             Verify the original error propagates and subsequent requests succeed.
         """
+
         async def fail_send(*_args: object) -> None:
             """Raise the transport failure after a request has been admitted.
 
@@ -219,16 +235,20 @@ class TestKernelBodyLimits(TestCase):
                 ):
                     if interface == "asgi":
                         await kernel.handleASGI(
-                            make_asgi_scope("/api"), receive_empty, send_noop,
+                            make_asgi_scope("/api"),
+                            receive_empty,
+                            send_noop,
                         )
                     else:
                         await kernel.handleRSGI(
-                            _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                            _StubRsgiScope("/api"),
+                            _StubRsgiProtocol(),
                         )
                 self.assertEqual(len(app.scopes), 1)
                 self.assertEqual((await dispatch(kernel, "/api")).getStatusCode(), 200)
                 recovered = await kernel.handleRSGI(
-                    _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                    _StubRsgiScope("/api"),
+                    _StubRsgiProtocol(),
                 )
                 self.assertEqual(recovered.getStatusCode(), 200)
 
@@ -283,7 +303,9 @@ class TestKernelBodyLimits(TestCase):
         """
         kernel, _app, _responses, catch = await boot_kernel()
         response = await dispatch(
-            kernel, "/api", headers=[(b"content-length", b"9" * 5000)],
+            kernel,
+            "/api",
+            headers=[(b"content-length", b"9" * 5000)],
         )
         self.assertEqual(response.getStatusCode(), 413)
         self.assertEqual(catch.handled, [])
@@ -322,7 +344,9 @@ class TestKernelBodyLimits(TestCase):
         )
         kernel._KernelHTTP__api_middleware = (_BodyReader(),)
         response = await kernel.handleASGI(
-            make_asgi_scope("/api"), _BodyReceive([b"12345"]), send_noop,
+            make_asgi_scope("/api"),
+            _BodyReceive([b"12345"]),
+            send_noop,
         )
         self.assertEqual(response.getStatusCode(), 413)
 
@@ -339,7 +363,8 @@ class TestKernelBodyLimits(TestCase):
         )
         kernel._KernelHTTP__api_middleware = (_BodyReader(),)
         response = await kernel.handleRSGI(
-            _StubRsgiScope("/api"), _RsgiBody([b"12", b"345"]),
+            _StubRsgiScope("/api"),
+            _RsgiBody([b"12", b"345"]),
         )
         self.assertEqual(response.getStatusCode(), 413)
         self.assertEqual(catch.handled, [])
@@ -404,7 +429,8 @@ class TestKernelBodyLimits(TestCase):
         try:
             self.assertFalse(reader.upload._file.closed)
             response = await kernel.handleRSGI(
-                _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                _StubRsgiScope("/api"),
+                _StubRsgiProtocol(),
             )
             self.assertEqual(response.getStatusCode(), 503)
             self.assertEqual(response.getHeader("retry-after"), ["1"])
@@ -417,7 +443,9 @@ class TestKernelBodyLimits(TestCase):
         adapter.release.set()
         kernel._KernelHTTP__api_middleware = ()
         response = await kernel.handleASGI(
-            make_asgi_scope("/api"), receive_empty, send_noop,
+            make_asgi_scope("/api"),
+            receive_empty,
+            send_noop,
         )
         self.assertEqual(response.getStatusCode(), 200)
 
@@ -440,7 +468,8 @@ class TestKernelBodyLimits(TestCase):
         finished = Event()
 
         def write_chunk(
-            _file: UploadedFile, chunk: bytes | bytearray | memoryview,
+            _file: UploadedFile,
+            chunk: bytes | bytearray | memoryview,
         ) -> None:
             """Block at the worker barrier before writing the retained buffer.
 
@@ -489,7 +518,8 @@ class TestKernelBodyLimits(TestCase):
                 self.assertFalse(task.done())
                 self.assertFalse(upload._file.closed)
                 response = await kernel.handleRSGI(
-                    _StubRsgiScope("/api"), _StubRsgiProtocol(),
+                    _StubRsgiScope("/api"),
+                    _StubRsgiProtocol(),
                 )
                 self.assertEqual(response.getStatusCode(), 503)
                 self.assertEqual(len(app.scopes), 1)

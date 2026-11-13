@@ -1,3 +1,5 @@
+# ruff: noqa: TC001, TC002
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Display available commands and their usage information."""
 
 from rich.console import Console
@@ -15,15 +17,12 @@ _USAGE_HEADER: str = (
 
 # Show the help option after the registered commands.
 _USAGE_FOOTER: str = (
-    "\n[bold cyan]Options:[/]\n"
-    "  -h, --help    Show this help message and exit"
+    "\n[bold cyan]Options:[/]\n  -h, --help    Show this help message and exit"
 )
 """Show the help option after the registered commands."""
 
+
 class HelpCommand(BaseCommand):
-
-    # ruff: noqa: TC001, TC002
-
     # Control whether this command includes timestamps in its output.
     """Display available commands and their usage information."""
 
@@ -73,8 +72,7 @@ class HelpCommand(BaseCommand):
 
         # Format one aligned help row for each registered command.
         rows: list[str] = [
-            f"  [bold yellow]{sig:<{max_sig_len}}[/]  {desc}\n"
-            for sig, desc in pairs
+            f"  [bold yellow]{sig:<{max_sig_len}}[/]  {desc}\n" for sig, desc in pairs
         ]
         usage = _USAGE_HEADER + "".join(rows) + _USAGE_FOOTER
 

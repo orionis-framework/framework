@@ -1,15 +1,12 @@
-"""Provide container facades operations through ``FacadeMeta``, ``ScopedFacadeMeta``."""
+# ruff: noqa: TC003
+# Keep deferred-dispatch protocol annotations available at runtime.
+"""Dispatch facade attributes while preserving Python introspection protocols."""
 
 import inspect
-from typing import TYPE_CHECKING
+from collections.abc import Callable, Generator
+from functools import lru_cache
+from types import TracebackType
 
-if TYPE_CHECKING:
-    from collections.abc import Generator
-    from types import TracebackType
-
-# Cache for dispatcher functions to avoid recreating them on every access.
-_dispatcher_cache: dict[tuple[type, str], object] = {}
-"""Cache for dispatcher functions to avoid recreating them on every access."""
 
 class _FacadeDispatch:
     """Deferred facade call, awaitable and usable as an async context manager.
@@ -121,7 +118,7 @@ class _FacadeDispatch:
         exc_type: type[BaseException] | None,
         exc: BaseException | None,
         traceback: TracebackType | None,
-    ) -> bool:
+    ) -> bool | None:
         """
         Exit the async context manager entered by ``__aenter__``.
 
@@ -136,11 +133,49 @@ class _FacadeDispatch:
 
         Returns
         -------
-        bool
+        bool or None
             Whatever the resolved context manager returns from its own
             ``__aexit__``.
         """
         return await self._context.__aexit__(exc_type, exc, traceback)
+
+
+@lru_cache(maxsize=1024)
+def _dispatcher_for(cls: type, name: str) -> Callable[..., _FacadeDispatch]:
+    """Reuse a dispatcher within a bounded cache of facade attributes.
+
+    Parameters
+    ----------
+    cls : type
+        Facade class requesting the attribute.
+    name : str
+        Service attribute dispatched after resolution.
+
+    Returns
+    -------
+    collections.abc.Callable
+        Function creating a deferred call without resolving a service.
+    """
+
+    def dispatcher(*args: object, **kwargs: object) -> _FacadeDispatch:
+        """Build the deferred call for this attribute access.
+
+        Parameters
+        ----------
+        *args : object
+            Positional arguments forwarded to the target callable.
+        **kwargs : object
+            Keyword arguments forwarded to the target callable.
+
+        Returns
+        -------
+        orionis.container.facades.meta._FacadeDispatch
+            Awaitable call supporting asynchronous context management.
+        """
+        return _FacadeDispatch(cls, name, args, kwargs)
+
+    return dispatcher
+
 
 class FacadeMeta(type):
     """Resolve the facade meta service through the application facade."""
@@ -162,43 +197,20 @@ class FacadeMeta(type):
             Return the pinned attribute when an instance is pinned;
             otherwise return a dispatcher that defers resolution until
             the call is awaited or entered as an async context manager.
+
+        Raises
+        ------
+        AttributeError
+            If an undefined Python protocol attribute is requested.
         """
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError(name)
         # Use pinned instances for direct, zero-resolution access.
         if cls._pinned_instance is not None:
             return getattr(cls._pinned_instance, name)
 
-        # Return a cached dispatcher when one already exists for this (class, attr).
-        # This avoids creating a new function object and closure on every access.
-        cache_key = (cls, name)
-        cached = _dispatcher_cache.get(cache_key)
-        if cached is not None:
-            return cached
+        return _dispatcher_for(cls, name)
 
-        # Build the dispatcher once and store it for subsequent calls.
-        def dispatcher(*args: object, **kwargs: object) -> _FacadeDispatch:
-            """
-            Build the deferred call for this attribute access.
-
-            Parameters
-            ----------
-            *args : object
-                Pass positional arguments to the target callable.
-            **kwargs : object
-                Pass keyword arguments to the target callable.
-
-            Returns
-            -------
-            orionis.container.facades.meta._FacadeDispatch
-                Deferred call, awaitable directly or usable as an async
-                context manager.
-            """
-            return _FacadeDispatch(cls, name, args, kwargs)
-
-        # Cache the dispatcher for future accesses to avoid recreating it.
-        _dispatcher_cache[cache_key] = dispatcher
-
-        # Return the newly created dispatcher for this attribute access.
-        return dispatcher
 
 class ScopedFacadeMeta(FacadeMeta):
     """Dispatch attributes exclusively to the active scope's service."""
@@ -220,7 +232,11 @@ class ScopedFacadeMeta(FacadeMeta):
 
         Raises
         ------
+        AttributeError
+            If an undefined Python protocol attribute is requested.
         RuntimeError
             If the scope is closed or the service has not been bound.
         """
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError(name)
         return getattr(cls.scopedInstance(), name)

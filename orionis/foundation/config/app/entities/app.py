@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415
+# Resolve key generation only when validated application configuration needs it.
 """Represent application configuration settings."""
 
 import base64
@@ -5,12 +7,14 @@ from dataclasses import dataclass, field
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from orionis.environment import Env
 from orionis.foundation.config.app.enums import Cipher, Environments
+from orionis.foundation.config.app.enums.ciphers import _AUTHENTICATED_CIPHERS
 from orionis.foundation.config.validation import (
     normalize_enum,
     validate_boolean,
     validate_string,
 )
 from orionis.support.entities.base import BaseEntity
+
 
 @dataclass(frozen=True, kw_only=True)
 class App(BaseEntity):
@@ -36,7 +40,7 @@ class App(BaseEntity):
         Relative path to the JSON translation files. Default is
         'resources/lang/'.
     cipher : str | orionis.foundation.config.app.Cipher, optional
-        The cipher used for encryption. Default is 'AES_256_CBC'.
+        The authenticated cipher used for encryption. Default is 'AES-256-GCM'.
     key : str | bytes | None, optional
         The encryption key, normalized to bytes. None generates a persistent key.
     maintenance : bool, optional
@@ -105,10 +109,10 @@ class App(BaseEntity):
     )
 
     cipher: str | Cipher = field(
-        default_factory=lambda: Env.get("APP_CIPHER", Cipher.AES_256_CBC.value),
+        default_factory=lambda: Env.get("APP_CIPHER", Cipher.AES_256_GCM.value),
         metadata={
-            "description": "The cipher used for encryption. Defaults to 'AES_256_CBC'.",
-            "default": "AES-256-CBC",
+            "description": "The authenticated cipher. Defaults to 'AES-256-GCM'.",
+            "default": "AES-256-GCM",
         },
     )
 
@@ -134,7 +138,12 @@ class App(BaseEntity):
         Returns
         -------
         None
-            Complete validation and normalization in place.
+            No return value.
+
+        Raises
+        ------
+        ValueError
+            If the cipher is not authenticated or another setting is invalid.
         """
         super().__post_init__()
 
@@ -151,6 +160,11 @@ class App(BaseEntity):
             "cipher",
             normalize_enum(self.cipher, Cipher, "cipher"),
         )
+        if self.cipher not in _AUTHENTICATED_CIPHERS:
+            message = (
+                "'cipher' must use authenticated AES-GCM; legacy CBC is not supported."
+            )
+            raise ValueError(message)
 
         # Reject timezones that the standard library cannot resolve.
         try:
@@ -167,10 +181,10 @@ class App(BaseEntity):
         Returns
         -------
         None
-            Store the validated key as bytes and persist generated keys.
+            No return value.
         """
         # Resolve key support after the application configuration module is loaded.
-        from orionis.environment.key.key_generator import (  # noqa: PLC0415
+        from orionis.environment.key.key_generator import (
             SecureKeyGenerator,
         )
 

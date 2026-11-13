@@ -1,7 +1,10 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a numeric value carries a given number of decimal places."""
 
 from decimal import Decimal, InvalidOperation
 from orionis.schemas.rule import Rule
+
 
 class DecimalPlaces(Rule):
     """
@@ -10,8 +13,6 @@ class DecimalPlaces(Rule):
     A single bound requires an exact number of places, while supplying
     ``maximum`` accepts any count within the inclusive range.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ("_maximum", "_minimum")
     """Declare the instance attribute slots reserved by this class."""
@@ -47,7 +48,7 @@ class DecimalPlaces(Rule):
         Returns
         -------
         None
-            This method initializes the instance and returns None.
+            No return value.
 
         Raises
         ------
@@ -98,13 +99,16 @@ class DecimalPlaces(Rule):
         if isinstance(value, bool):
             return False
 
-        if not isinstance(value, int | float | str | Decimal):
+        if isinstance(value, int):
+            return self._minimum <= 0 <= self._maximum
+
+        if not isinstance(value, float | str | Decimal):
             return False
 
         try:
             # The textual form is used so trailing zeros are preserved.
             number = Decimal(str(value))
-        except (InvalidOperation, ValueError):
+        except InvalidOperation, ValueError:
             return False
 
         exponent = number.as_tuple().exponent

@@ -1,9 +1,15 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify template normalization and async rendering contracts."""
+
 from concurrent.futures import ThreadPoolExecutor
+from unittest.mock import patch
 import jinja2
 from orionis.test import TestCase
 from orionis.view import engine as engine_module
 from orionis.view.engine import Jinja2Engine
 from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundException
+
 
 class _StubTemplate:
     """Template double recording the context passed to render_async."""
@@ -15,7 +21,8 @@ class _StubTemplate:
         html: str = "",
         error: Exception | None = None,
     ) -> None:
-        """Configure the template output or rendering failure.
+        """
+        Configure the template output or rendering failure.
 
         Parameters
         ----------
@@ -23,6 +30,11 @@ class _StubTemplate:
             HTML returned by ``render_async``.
         error : Exception | None, optional
             Exception raised by ``render_async`` when provided.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.html: str = html
         self.error: Exception | None = error
@@ -55,6 +67,7 @@ class _StubTemplate:
     # Preserve the Jinja2 template protocol name.
     render_async = renderAsync
 
+
 class _StubJinjaEnvironment:
     """Jinja2 environment double resolving a single stubbed template."""
 
@@ -65,7 +78,8 @@ class _StubJinjaEnvironment:
         template: _StubTemplate | None = None,
         error: Exception | None = None,
     ) -> None:
-        """Configure the template lookup result or failure.
+        """
+        Configure the template lookup result or failure.
 
         Parameters
         ----------
@@ -73,6 +87,11 @@ class _StubJinjaEnvironment:
             Template returned by ``get_template``.
         error : Exception | None, optional
             Exception raised by ``get_template`` when provided.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.template: _StubTemplate | None = template
         self.error: Exception | None = error
@@ -105,18 +124,25 @@ class _StubJinjaEnvironment:
     # Preserve the Jinja2 environment protocol name.
     get_template = getTemplate
 
+
 class _StubViewEnvironment:
     """View environment double exposing a stubbed Jinja2 environment."""
 
     __slots__ = ("calls", "jinja")
 
     def __init__(self, jinja: _StubJinjaEnvironment) -> None:
-        """Store the Jinja2 environment used by the view double.
+        """
+        Store the Jinja2 environment used by the view double.
 
         Parameters
         ----------
         jinja : _StubJinjaEnvironment
             Environment returned by ``getJinjaEnvironment``.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         self.jinja: _StubJinjaEnvironment = jinja
         self.calls: int = 0
@@ -133,25 +159,22 @@ class _StubViewEnvironment:
         self.calls += 1
         return self.jinja
 
-class TestJinja2EngineNormalisePath(TestCase):
 
+class TestJinja2EngineNormalisePath(TestCase):
     def setUp(self) -> None:
         """
         Clear the module-level path cache before each test.
 
         Keeps every case deterministic regardless of the order in which
         templates were normalised by previous tests.
-        """
-        engine_module._PATH_CACHE.clear()
 
-    def tearDown(self) -> None:
+        Returns
+        -------
+        None
+            No return value.
         """
-        Clear the module-level path cache after each test.
-
-        Prevents memoised entries from leaking into unrelated test
-        modules sharing the same process.
-        """
-        engine_module._PATH_CACHE.clear()
+        super().setUp()
+        self.enterContext(patch.dict(engine_module._PATH_CACHE, clear=True))
 
     def testDotNotationConvertsToSlashPath(self) -> None:
         """
@@ -159,6 +182,11 @@ class TestJinja2EngineNormalisePath(TestCase):
 
         Validates that dots are replaced with forward slashes and the
         .html extension is appended when absent.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         result = Jinja2Engine._normalisePath("users.index")
         self.assertEqual(result, "users/index.html")
@@ -169,6 +197,11 @@ class TestJinja2EngineNormalisePath(TestCase):
 
         Validates that a path containing a forward slash and an existing
         extension is not modified by the normalisation step.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         result = Jinja2Engine._normalisePath("users/index.html")
         self.assertEqual(result, "users/index.html")
@@ -179,6 +212,11 @@ class TestJinja2EngineNormalisePath(TestCase):
 
         Validates that when a slash is present but no extension exists
         in the last segment, the default .html suffix is added.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         result = Jinja2Engine._normalisePath("users/index")
         self.assertEqual(result, "users/index.html")
@@ -189,6 +227,11 @@ class TestJinja2EngineNormalisePath(TestCase):
 
         Validates that a bare word without slash or dot produces a
         .html filename in the normalised output.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         result = Jinja2Engine._normalisePath("nav")
         self.assertEqual(result, "nav.html")
@@ -199,29 +242,14 @@ class TestJinja2EngineNormalisePath(TestCase):
 
         Validates that three or more dot-separated segments are all
         converted to slash separators with .html appended.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         result = Jinja2Engine._normalisePath("admin.users.index")
         self.assertEqual(result, "admin/users/index.html")
-
-    def testNestedDirectPathWithExtensionIsUnchanged(self) -> None:
-        """
-        Return a deeply nested direct path with extension unchanged.
-
-        Validates that the presence of a slash signals direct-path mode
-        for arbitrarily deep template paths.
-        """
-        result = Jinja2Engine._normalisePath("partials/nav.html")
-        self.assertEqual(result, "partials/nav.html")
-
-    def testTwoDotSegmentsConvertsCorrectly(self) -> None:
-        """
-        Convert a two-segment dot-notation name to a slash path.
-
-        Validates the basic two-segment case: module.template becomes
-        module/template.html.
-        """
-        result = Jinja2Engine._normalisePath("layout.base")
-        self.assertEqual(result, "layout/base.html")
 
     def testDirectPathWithNonHtmlExtensionIsUnchanged(self) -> None:
         """
@@ -229,6 +257,11 @@ class TestJinja2EngineNormalisePath(TestCase):
 
         Validates that any existing dot in the last path segment prevents
         a double extension from being appended.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         result = Jinja2Engine._normalisePath("emails/welcome.txt")
         self.assertEqual(result, "emails/welcome.txt")
@@ -239,6 +272,11 @@ class TestJinja2EngineNormalisePath(TestCase):
 
         Validates that the identifier to path translation is computed
         only once per template name.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         Jinja2Engine._normalisePath("users.index")
         self.assertEqual(
@@ -247,20 +285,23 @@ class TestJinja2EngineNormalisePath(TestCase):
         )
 
     def testNormalisePathCacheHasABoundedSize(self) -> None:
-        """Discard the oldest template name after the cache reaches its limit.
+        """
+        Discard the oldest template name after the cache reaches its limit.
 
         Returns
         -------
         None
-            Assertions verify the bound and retention of recent names.
+            No return value.
         """
         for index in range(engine_module._PATH_CACHE_MAX + 1):
             Jinja2Engine._normalisePath(f"template{index}")
 
         self.assertEqual(len(engine_module._PATH_CACHE), engine_module._PATH_CACHE_MAX)
         self.assertNotIn("template0", engine_module._PATH_CACHE)
-        self.assertIn(f"template{engine_module._PATH_CACHE_MAX}",
-                      engine_module._PATH_CACHE)
+        self.assertIn(
+            f"template{engine_module._PATH_CACHE_MAX}",
+            engine_module._PATH_CACHE,
+        )
 
     def testNormalisePathCacheHandlesConcurrentMisses(self) -> None:
         """
@@ -269,7 +310,7 @@ class TestJinja2EngineNormalisePath(TestCase):
         Returns
         -------
         None
-            Assert valid cache insertion and eviction under concurrent misses.
+            No return value.
         """
         templates = [f"concurrent{index}" for index in range(2048)]
 
@@ -279,25 +320,22 @@ class TestJinja2EngineNormalisePath(TestCase):
         self.assertEqual(paths, [f"{name}.html" for name in templates])
         self.assertEqual(len(engine_module._PATH_CACHE), engine_module._PATH_CACHE_MAX)
 
-class TestJinja2EngineRender(TestCase):
 
+class TestJinja2EngineRender(TestCase):
     def setUp(self) -> None:
         """
         Clear the module-level path cache before each test.
 
         Guarantees that cache-hit assertions observe only the entries
         produced by the test itself.
-        """
-        engine_module._PATH_CACHE.clear()
 
-    def tearDown(self) -> None:
+        Returns
+        -------
+        None
+            No return value.
         """
-        Clear the module-level path cache after each test.
-
-        Prevents memoised entries from leaking into unrelated test
-        modules sharing the same process.
-        """
-        engine_module._PATH_CACHE.clear()
+        super().setUp()
+        self.enterContext(patch.dict(engine_module._PATH_CACHE, clear=True))
 
     def _buildEngine(
         self,
@@ -333,6 +371,11 @@ class TestJinja2EngineRender(TestCase):
 
         Validates that the environment reference is cached instead of
         being fetched on every render.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         view_env = _StubViewEnvironment(_StubJinjaEnvironment())
         Jinja2Engine(view_env)
@@ -344,6 +387,11 @@ class TestJinja2EngineRender(TestCase):
 
         Validates that the engine delegates to the Jinja2 template's
         render_async and returns the resulting HTML unchanged.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine, _, _ = self._buildEngine(html="<h1>Hello</h1>")
         result = await engine.render("users.index", {"name": "World"})
@@ -355,6 +403,11 @@ class TestJinja2EngineRender(TestCase):
 
         Validates that the engine translates dot notation to a file path
         before calling get_template on the Jinja2 environment.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine, jinja, _ = self._buildEngine()
         await engine.render("users.index", {})
@@ -366,6 +419,11 @@ class TestJinja2EngineRender(TestCase):
 
         Validates that the module-level cache short-circuits the
         identifier translation on subsequent renders.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine, jinja, _ = self._buildEngine()
         engine_module._PATH_CACHE["users.index"] = "cached/path.html"
@@ -378,36 +436,15 @@ class TestJinja2EngineRender(TestCase):
 
         Validates that all variables in the context mapping are passed
         through to the Jinja2 template during rendering.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine, _, template = self._buildEngine(html="<p>ok</p>")
         await engine.render("page.index", {"title": "Home", "count": 3})
         self.assertEqual(template.calls, [{"title": "Home", "count": 3}])
-
-    async def testRenderRaisesViewTemplateNotFoundOnMissingTemplate(self) -> None:
-        """
-        Raise ViewTemplateNotFoundException when the template is missing.
-
-        Validates that a Jinja2 TemplateNotFound error is wrapped and
-        re-raised as the framework's ViewTemplateNotFoundException.
-        """
-        engine, _, _ = self._buildEngine(
-            lookup_error=jinja2.TemplateNotFound("users/index.html"),
-        )
-        with self.assertRaises(ViewTemplateNotFoundException):
-            await engine.render("users.index", {})
-
-    async def testRenderRaisesViewRenderExceptionOnTemplateError(self) -> None:
-        """
-        Raise ViewRenderException when Jinja2 fails during rendering.
-
-        Validates that a Jinja2 TemplateError raised by render_async is
-        wrapped and re-raised as the framework's ViewRenderException.
-        """
-        engine, _, _ = self._buildEngine(
-            error=jinja2.TemplateError("syntax error"),
-        )
-        with self.assertRaises(ViewRenderException):
-            await engine.render("users.index", {})
 
     async def testViewTemplateNotFoundPreservesChainedCause(self) -> None:
         """
@@ -415,6 +452,11 @@ class TestJinja2EngineRender(TestCase):
 
         Validates that the ViewTemplateNotFoundException chains the
         original TemplateNotFound exception via the from clause.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         original = jinja2.TemplateNotFound("missing.html")
         engine, _, _ = self._buildEngine(lookup_error=original)
@@ -428,6 +470,11 @@ class TestJinja2EngineRender(TestCase):
 
         Validates that the ViewRenderException chains the original
         TemplateError exception via the from clause.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         original = jinja2.TemplateError("bad syntax")
         engine, _, _ = self._buildEngine(error=original)
@@ -441,6 +488,11 @@ class TestJinja2EngineRender(TestCase):
 
         Validates that passing an empty dict does not cause errors and
         the engine returns the expected HTML string.
+
+        Returns
+        -------
+        None
+            No return value.
         """
         engine, _, _ = self._buildEngine(html="<p>static</p>")
         result = await engine.render("static.page", {})

@@ -4,6 +4,7 @@ from __future__ import annotations
 from abc import abstractmethod
 from orionis.hashing.contracts.hasher import IHasher
 
+
 class IHashManager(IHasher):
     """
     Define the contract for the hashing manager.
@@ -25,7 +26,7 @@ class IHashManager(IHasher):
         ----------
         name : str | None
             Driver name (``'argon2'`` or ``'bcrypt'``). ``None`` selects
-            the configured default driver.
+            the configured default driver. An empty string also selects it.
 
         Returns
         -------

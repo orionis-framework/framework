@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import msgspec
 from orionis.schemas.compiler import MetaCompiler, MetadataConflictError
 from orionis.schemas.constraints import (
@@ -21,8 +23,8 @@ from orionis.schemas.metadata import (
 )
 from orionis.test import TestCase
 
-class TestMetaCompilerCompile(TestCase):
 
+class TestMetaCompilerCompile(TestCase):
     def testCompileEmptyListReturnsDefaultMeta(self) -> None:
         """Compile an empty metadata list and return a default msgspec.Meta.
 
@@ -32,7 +34,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([])
         self.assertIsInstance(result, msgspec.Meta)
@@ -46,7 +48,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([GreaterThan(5)])
         self.assertEqual(result.gt, 5)
@@ -60,7 +62,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([GreaterThanOrEqual(0)])
         self.assertEqual(result.ge, 0)
@@ -74,7 +76,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([LessThan(100)])
         self.assertEqual(result.lt, 100)
@@ -88,7 +90,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([LessThanOrEqual(99)])
         self.assertEqual(result.le, 99)
@@ -102,7 +104,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([MultipleOf(3)])
         self.assertEqual(result.multiple_of, 3)
@@ -116,7 +118,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([Pattern(r"^\d+$")])
         self.assertEqual(result.pattern, r"^\d+$")
@@ -130,7 +132,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([MinLength(2)])
         self.assertEqual(result.min_length, 2)
@@ -144,7 +146,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([MaxLength(50)])
         self.assertEqual(result.max_length, 50)
@@ -158,7 +160,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([TimezoneAware()])
         self.assertTrue(result.tz)
@@ -172,7 +174,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([TimezoneNaive()])
         self.assertFalse(result.tz)
@@ -186,7 +188,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([Title("My Field")])
         self.assertEqual(result.title, "My Field")
@@ -200,7 +202,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([Description("A description.")])
         self.assertEqual(result.description, "A description.")
@@ -214,7 +216,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([Examples([1, "two", 3.0])])
         self.assertEqual(result.examples, [1, "two", 3.0])
@@ -228,7 +230,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([ExtraJsonSchema({"readOnly": True})])
         self.assertEqual(result.extra_json_schema, {"readOnly": True})
@@ -242,7 +244,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile([Extra({"key": "value"})])
         self.assertEqual(result.extra, {"key": "value"})
@@ -256,7 +258,7 @@ class TestMetaCompilerCompile(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile(
             [GreaterThanOrEqual(0), LessThanOrEqual(100), MultipleOf(5)],
@@ -265,8 +267,8 @@ class TestMetaCompilerCompile(TestCase):
         self.assertEqual(result.le, 100)
         self.assertEqual(result.multiple_of, 5)
 
-class TestMetaCompilerConflicts(TestCase):
 
+class TestMetaCompilerConflicts(TestCase):
     def testDuplicateConstraintRaises(self) -> None:
         """Raise MetadataConflictError when the same constraint type appears twice.
 
@@ -276,7 +278,7 @@ class TestMetaCompilerConflicts(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([MinLength(2), MinLength(5)])
@@ -290,7 +292,7 @@ class TestMetaCompilerConflicts(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([GreaterThan(5), GreaterThanOrEqual(5)])
@@ -304,7 +306,7 @@ class TestMetaCompilerConflicts(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([LessThan(10), LessThanOrEqual(10)])
@@ -318,7 +320,7 @@ class TestMetaCompilerConflicts(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([GreaterThan(10), LessThan(5)])
@@ -332,7 +334,7 @@ class TestMetaCompilerConflicts(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([MinLength(100), MaxLength(10)])
@@ -346,7 +348,7 @@ class TestMetaCompilerConflicts(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([TimezoneAware(), TimezoneNaive()])
@@ -360,7 +362,7 @@ class TestMetaCompilerConflicts(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([GreaterThanOrEqual(10), LessThan(10)])
@@ -374,7 +376,7 @@ class TestMetaCompilerConflicts(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = MetaCompiler.compile(
             [GreaterThanOrEqual(5), LessThanOrEqual(5)],
@@ -382,8 +384,8 @@ class TestMetaCompilerConflicts(TestCase):
         self.assertEqual(result.ge, 5)
         self.assertEqual(result.le, 5)
 
-class TestMetaCompilerInvalidValues(TestCase):
 
+class TestMetaCompilerInvalidValues(TestCase):
     def testMultipleOfZeroRaises(self) -> None:
         """Raise MetadataConflictError when MultipleOf value is zero.
 
@@ -393,7 +395,7 @@ class TestMetaCompilerInvalidValues(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([MultipleOf(0)])
@@ -406,7 +408,7 @@ class TestMetaCompilerInvalidValues(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([MultipleOf(-2)])
@@ -420,7 +422,7 @@ class TestMetaCompilerInvalidValues(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([MinLength(-1)])
@@ -434,13 +436,13 @@ class TestMetaCompilerInvalidValues(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(MetadataConflictError):
             MetaCompiler.compile([MaxLength(-1)])
 
-class TestMetaCompilerContract(TestCase):
 
+class TestMetaCompilerContract(TestCase):
     def testCompilerDeclaresSlots(self) -> None:
         """Confirm the compiler stores no per-instance state.
 
@@ -449,9 +451,12 @@ class TestMetaCompilerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(MetaCompiler.__slots__, ())
+        instance = MetaCompiler()
+        self.assertFalse(hasattr(instance, "__dict__"))
+        with self.assertRaises(AttributeError):
+            instance.undeclared = "unsupported"
 
     def testMetadataConflictErrorIsValueError(self) -> None:
         """Confirm MetadataConflictError inherits from ValueError.
@@ -462,6 +467,6 @@ class TestMetaCompilerContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertTrue(issubclass(MetadataConflictError, ValueError))

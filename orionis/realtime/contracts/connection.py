@@ -1,11 +1,12 @@
+# ruff: noqa: ASYNC109, TC001
+# Keep the existing boundary behavior and deliberately shaped fixtures.
+# Resolve protocol annotations without eagerly accessing a partially defined Hub.
 """Describe the connection surface required by the worker-local registry."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Protocol
-
-if TYPE_CHECKING:
-    from orionis.realtime.hub import Hub, HubContext
-    from orionis.realtime.protocol import HubProtocol
+from typing import Protocol
+import orionis.realtime.hub as hub_module
+from orionis.realtime.protocol import HubProtocol
 
 
 class RealtimeConnectionLike(Protocol):
@@ -15,7 +16,7 @@ class RealtimeConnectionLike(Protocol):
     """Declare that this class introduces no additional instance slots."""
 
     @property
-    def context(self) -> HubContext:
+    def context(self) -> hub_module.HubContext:
         """
         Return the immutable connection identity and handshake context.
 
@@ -27,7 +28,7 @@ class RealtimeConnectionLike(Protocol):
         ...
 
     @property
-    def hub(self) -> type[Hub]:
+    def hub(self) -> type[hub_module.Hub]:
         """
         Return the Hub namespace owning this connection.
 
@@ -96,8 +97,10 @@ class RealtimeConnectionLike(Protocol):
         ...
 
     async def invoke(
-        self, target: str, *args: object,
-        timeout: float | None = None,  # noqa: ASYNC109 - Client completion deadline.
+        self,
+        target: str,
+        *args: object,
+        timeout: float | None = None,  # Client completion deadline.
     ) -> object:
         """
         Invoke one client method and await its correlated completion.

@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from orionis.console.entities.command import Command
     from orionis.console.fluent.contracts.command import ICommand
 
+
 class ILoader(ABC):
     """Define the contract for loader implementations."""
 
@@ -42,7 +43,7 @@ class ILoader(ABC):
     def addFluentCommand(
         self,
         signature: str,
-        handler: list[type[Any], str | None],
+        handler: list[type[Any] | str | None],
     ) -> ICommand:
         """
         Define a new command using the fluent interface.

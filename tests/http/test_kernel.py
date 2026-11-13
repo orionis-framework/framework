@@ -1,3 +1,6 @@
+# ruff: noqa: PLR0913, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep established public and external protocol names and signatures.
 from __future__ import annotations
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any, ClassVar, Self
@@ -24,6 +27,7 @@ from orionis.http.responses import HTMLResponse, JSONResponse, Response
 from orionis.http.routes.entities.compiled_route import CompiledRoute
 from orionis.http.routes.enums.route_types import RouteType
 from orionis.http.routes.exceptions.route_not_found import RouteNotFound
+from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
 from orionis.http.routes.loader import RouteLoader
 from orionis.schemas.entities.failure import ValidationFailure
 from orionis.schemas.exceptions.validation import ValidationException
@@ -40,6 +44,7 @@ _MODULE: str = __name__
 # Route handlers resolved by the kernel dispatch tables.
 # ---------------------------------------------------------------------------
 
+
 def web_handler() -> Response:
     """
     Return a plain response for a web-group route.
@@ -50,6 +55,7 @@ def web_handler() -> Response:
         Response carrying a fixed marker body.
     """
     return Response(content="web")
+
 
 def api_handler() -> Response:
     """
@@ -62,6 +68,7 @@ def api_handler() -> Response:
     """
     return Response(content="api")
 
+
 def dict_handler() -> dict[str, int]:
     """
     Return a mapping the kernel must coerce into a JSON response.
@@ -73,10 +80,12 @@ def dict_handler() -> dict[str, int]:
     """
     return {"answer": 42}
 
+
 class _Payload(msgspec.Struct):
     """Structured payload returned by a handler."""
 
     name: str
+
 
 def struct_handler() -> _Payload:
     """
@@ -89,6 +98,7 @@ def struct_handler() -> _Payload:
     """
     return _Payload(name="orionis")
 
+
 def invalid_handler() -> None:
     """
     Return nothing so the kernel rejects the handler result.
@@ -99,6 +109,7 @@ def invalid_handler() -> None:
         Deliberately not a response object.
     """
     return
+
 
 def failing_handler() -> Response:
     """
@@ -116,6 +127,7 @@ def failing_handler() -> Response:
     """
     error_msg = "handler exploded"
     raise RuntimeError(error_msg)
+
 
 def validation_handler() -> Response:
     """
@@ -135,6 +147,7 @@ def validation_handler() -> Response:
         ValidationFailure(field="email", rule="pattern", message="Invalid."),
     )
 
+
 def fallback_function() -> Response:
     """
     Return the response produced by a callable fallback.
@@ -145,6 +158,7 @@ def fallback_function() -> Response:
         Response carrying a fixed marker body.
     """
     return Response(content="fallback-function")
+
 
 class _Controller:
     """Controller resolved through the class dispatch table."""
@@ -162,6 +176,7 @@ class _Controller:
         """
         return Response(content="controller")
 
+
 class _FallbackController:
     """Controller registered as the route fallback."""
 
@@ -177,6 +192,7 @@ class _FallbackController:
             Response carrying a fixed marker body.
         """
         return Response(content="fallback-controller")
+
 
 class _BrokenFallbackController:
     """Fallback controller that does not honour the response contract."""
@@ -194,9 +210,11 @@ class _BrokenFallbackController:
         """
         return
 
+
 # ---------------------------------------------------------------------------
 # Middleware doubles.
 # ---------------------------------------------------------------------------
+
 
 class _RecordingMiddleware(BaseMiddleware):
     """Route middleware recording every invocation."""
@@ -226,6 +244,7 @@ class _RecordingMiddleware(BaseMiddleware):
         response.setHeader("x-route-middleware", "1")
         return response
 
+
 class _SessionMiddlewareDouble(BaseMiddleware):
     """Stand-in for the session middleware installed by the kernel."""
 
@@ -252,6 +271,7 @@ class _SessionMiddlewareDouble(BaseMiddleware):
         _SessionMiddlewareDouble.calls.append(request.path)
         return await call_next()
 
+
 class _IdentityMiddlewareDouble(BaseMiddleware):
     """Leave identity resolution to the authentication integration suite."""
 
@@ -273,6 +293,7 @@ class _IdentityMiddlewareDouble(BaseMiddleware):
             Value produced by the helper.
         """
         return await call_next()
+
 
 class _DoubleNextMiddleware(BaseMiddleware):
     """Middleware that wrongly advances the pipeline twice."""
@@ -298,9 +319,11 @@ class _DoubleNextMiddleware(BaseMiddleware):
         await call_next()
         return await call_next()
 
+
 # ---------------------------------------------------------------------------
 # Application and transport doubles.
 # ---------------------------------------------------------------------------
+
 
 class _StubScope:
     """Container scope double recording per-request bindings."""
@@ -392,6 +415,7 @@ class _StubScope:
             The bound instance, or None when absent.
         """
         return self.entries.get(key)
+
 
 class _StubDefaultResponses:
     """Default response factory double preserving the response formats."""
@@ -488,6 +512,7 @@ class _StubDefaultResponses:
         """
         return HTMLResponse(content=content, headers={"Cache-Control": "no-store"})
 
+
 class _StubCatch:
     """Failure handler double translating exceptions into responses."""
 
@@ -521,6 +546,7 @@ class _StubCatch:
         """
         self.handled.append(exc)
         return Response(content=str(exc), status_code=500)
+
 
 class _StubRouteLoader:
     """Route loader double publishing pre-built compiled routes."""
@@ -567,6 +593,7 @@ class _StubRouteLoader:
             Fallback descriptor, or ``None`` when unset.
         """
         return self._fallback
+
 
 class _StubRequestPrinter:
     """Debug request printer double recording its activity."""
@@ -627,6 +654,7 @@ class _StubRequestPrinter:
         """
         self.printed.append(response)
 
+
 class _StubResponseAdapter:
     """Response adapter double returning the response it would send."""
 
@@ -668,11 +696,17 @@ class _StubResponseAdapter:
         self.sent.append(response)
         return response
 
+
 class _StubApp:
     """Application double resolving the kernel collaborators."""
 
     __slots__ = (
-        "build_calls", "builds", "config_data", "debug", "maintenance", "scopes",
+        "build_calls",
+        "builds",
+        "config_data",
+        "debug",
+        "maintenance",
+        "scopes",
     )
 
     def __init__(
@@ -843,6 +877,7 @@ class _StubApp:
         """
         return getattr(instance, method)(**kwargs)
 
+
 class _StubRsgiHeaders:
     """Header container mimicking the Granian RSGI header map."""
 
@@ -892,6 +927,7 @@ class _StubRsgiHeaders:
         """
         return self._data[key]
 
+
 class _ViewFactoryDouble:
     """Record template rendering performed by a view route."""
 
@@ -920,6 +956,7 @@ class _ViewFactoryDouble:
         """
         self.templates.append(name)
         return Response(content=f"rendered:{name}")
+
 
 class _MaintenancePassThrough:
     """Allow selected requests through the maintenance collaborator."""
@@ -957,6 +994,7 @@ class _MaintenancePassThrough:
         """
         self.paths.append(adapter.path())
         self.states.append(bool(under_maintenance))
+
 
 class _StubRsgiScope:
     """Granian RSGI scope double exposing the fields the adapter reads."""
@@ -1002,6 +1040,7 @@ class _StubRsgiScope:
         self.authority = "orionis.test"
         self.headers = _StubRsgiHeaders({"host": ["orionis.test"]})
 
+
 class _StubRsgiProtocol:
     """RSGI protocol double yielding an empty request body."""
 
@@ -1019,11 +1058,13 @@ class _StubRsgiProtocol:
         return
         yield b""
 
+
 # ---------------------------------------------------------------------------
 # Fixtures.
 # ---------------------------------------------------------------------------
 
-def make_route(  # noqa: PLR0913
+
+def make_route(
     path: str,
     method: str = "GET",
     *,
@@ -1074,6 +1115,7 @@ def make_route(  # noqa: PLR0913
         compiled_middlewares=middlewares,
     )
 
+
 def make_routes() -> dict[str, dict]:
     """
     Build the compiled route tables used across the kernel tests.
@@ -1116,6 +1158,7 @@ def make_routes() -> dict[str, dict]:
         },
     }
 
+
 def make_http_config(
     *,
     csrf_enabled: bool = False,
@@ -1152,7 +1195,8 @@ def make_http_config(
         "csrf": {"enabled": csrf_enabled},
     }
 
-async def boot_kernel(  # noqa: PLR0913
+
+async def boot_kernel(
     *,
     routes: dict[str, dict] | None = None,
     fallback: tuple | None = None,
@@ -1218,6 +1262,7 @@ async def boot_kernel(  # noqa: PLR0913
     await kernel.boot()
     return kernel, app, responses, catch
 
+
 def make_asgi_scope(
     path: str,
     method: str = "GET",
@@ -1252,6 +1297,7 @@ def make_asgi_scope(
         "http_version": "1.1",
     }
 
+
 async def receive_empty() -> dict[str, Any]:
     """
     Return an empty ASGI request message.
@@ -1262,6 +1308,7 @@ async def receive_empty() -> dict[str, Any]:
         Message declaring an empty, complete body.
     """
     return {"type": "http.request", "body": b"", "more_body": False}
+
 
 async def send_noop(_message: object) -> None:
     """Discard an ASGI response message.
@@ -1277,6 +1324,7 @@ async def send_noop(_message: object) -> None:
         Completes the operation described above.
     """
     return
+
 
 async def dispatch(
     kernel: KernelHTTP,
@@ -1309,6 +1357,7 @@ async def dispatch(
         send_noop,
     )
 
+
 def make_request_double(path: str) -> Request:
     """
     Build a lightweight request for middleware pipeline tests.
@@ -1332,12 +1381,13 @@ def make_request_double(path: str) -> Request:
         ),
     )
 
+
 # ---------------------------------------------------------------------------
 # Tests.
 # ---------------------------------------------------------------------------
 
-class TestMiddlewarePipeline(TestCase):
 
+class TestMiddlewarePipeline(TestCase):
     async def testInvokesTheTerminalWithoutMiddleware(self) -> None:
         """Call the terminal handler when the stack is empty.
 
@@ -1373,7 +1423,7 @@ class TestMiddlewarePipeline(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        _RecordingMiddleware.calls = [] # NOSONAR
+        self.enterContext(replace_attribute(_RecordingMiddleware, "calls", []))
         request = make_request_double("/x")
 
         async def terminal() -> Response:
@@ -1425,8 +1475,8 @@ class TestMiddlewarePipeline(TestCase):
         with self.assertRaises(RuntimeError):
             await pipeline()
 
-class TestKernelBoot(TestCase):
 
+class TestKernelBoot(TestCase):
     async def testBootWiresEveryCollaborator(self) -> None:
         """Resolve every collaborator exactly once during boot.
 
@@ -1574,8 +1624,8 @@ class TestKernelBoot(TestCase):
         kernel, _app, _responses, _catch = await boot_kernel()
         self.assertFalse(hasattr(kernel, "__dict__"))
 
-class TestKernelDispatch(TestCase):
 
+class TestKernelDispatch(TestCase):
     async def testReusesDefaultsAndBuildsOtherControllersPerRequest(self) -> None:
         """Retain the bootstrapped default factory without sharing user controllers.
 
@@ -1589,7 +1639,8 @@ class TestKernelDispatch(TestCase):
             make_route("/health", controller="DefaultResponses"),
             action={
                 "module": "orionis.http.default.responses",
-                "class": "DefaultResponses", "method": "health",
+                "class": "DefaultResponses",
+                "method": "health",
             },
         )
         kernel, app, responses, catch = await boot_kernel(routes=routes)
@@ -1616,7 +1667,8 @@ class TestKernelDispatch(TestCase):
             make_route("/health", controller="DefaultResponses"),
             action={
                 "module": "orionis.http.default.responses",
-                "class": "DefaultResponses", "method": "health",
+                "class": "DefaultResponses",
+                "method": "health",
             },
         )
         kernel, _app, responses, catch = await boot_kernel(
@@ -1678,7 +1730,7 @@ class TestKernelDispatch(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        _SessionMiddlewareDouble.calls = [] # NOSONAR
+        self.enterContext(replace_attribute(_SessionMiddlewareDouble, "calls", []))
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/web")
         self.assertEqual(response.getBody(), b"web")
@@ -1751,7 +1803,7 @@ class TestKernelDispatch(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        _RecordingMiddleware.calls = [] # NOSONAR
+        self.enterContext(replace_attribute(_RecordingMiddleware, "calls", []))
         kernel, _app, _responses, _catch = await boot_kernel()
         response = await dispatch(kernel, "/guarded")
         self.assertEqual(_RecordingMiddleware.calls, ["/guarded"])
@@ -1767,7 +1819,7 @@ class TestKernelDispatch(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        _RecordingMiddleware.calls = [] # NOSONAR
+        self.enterContext(replace_attribute(_RecordingMiddleware, "calls", []))
         kernel, _app, _responses, _catch = await boot_kernel()
         kernel._KernelHTTP__middleware_cache.clear()
         response = await dispatch(kernel, "/guarded")
@@ -1790,8 +1842,8 @@ class TestKernelDispatch(TestCase):
         self.assertEqual(scope.tags["kernel"], KernelContext.HTTP)
         self.assertIsInstance(scope.entries[Request], Request)
 
-class TestKernelGlobalMiddleware(TestCase):
 
+class TestKernelGlobalMiddleware(TestCase):
     async def testAssetsRemainAvailableDuringMaintenance(self) -> None:
         """Serve default-page assets before maintenance or session middleware.
 
@@ -1800,12 +1852,14 @@ class TestKernelGlobalMiddleware(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        _SessionMiddlewareDouble.calls = [] # NOSONAR
+        self.enterContext(replace_attribute(_SessionMiddlewareDouble, "calls", []))
         kernel, _app, responses, catch = await boot_kernel(maintenance=True)
         for method in ("GET", "HEAD"):
             with self.subTest(method=method):
                 response = await dispatch(
-                    kernel, "/_orionis/assets/css/default.css", method,
+                    kernel,
+                    "/_orionis/assets/css/default.css",
+                    method,
                 )
                 self.assertEqual(response.getStatusCode(), 200)
         self.assertEqual(responses.asset_paths, ["css/default.css"] * 2)
@@ -1837,7 +1891,8 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(rejected.getStatusCode(), 429)
         self.assertEqual(after.getStatusCode(), 200)
         self.assertEqual(
-            responses.asset_paths, ["css/default.css", "js/default.js"],
+            responses.asset_paths,
+            ["css/default.css", "js/default.js"],
         )
         self.assertEqual(catch.handled, [])
 
@@ -1856,7 +1911,9 @@ class TestKernelGlobalMiddleware(TestCase):
         ):
             with self.subTest(headers=headers):
                 response = await dispatch(
-                    kernel, "/_orionis/assets/css/default.css", headers=headers,
+                    kernel,
+                    "/_orionis/assets/css/default.css",
+                    headers=headers,
                 )
                 self.assertEqual(response.getStatusCode(), 400)
         self.assertEqual(responses.asset_paths, [])
@@ -1872,11 +1929,13 @@ class TestKernelGlobalMiddleware(TestCase):
         """
         kernel, _app, responses, catch = await boot_kernel(maintenance=True)
         security = kernel_module.SecurityMiddleware(
-            {"allowed_hosts": ["orionis.test"]}, responses,
+            {"allowed_hosts": ["orionis.test"]},
+            responses,
         )
         with replace_attribute(kernel, "_KernelHTTP__security", security):
             response = await dispatch(
-                kernel, "/_orionis/assets/css/default.css",
+                kernel,
+                "/_orionis/assets/css/default.css",
                 headers=[(b"host", b"untrusted.test")],
             )
         self.assertEqual(response.getStatusCode(), 400)
@@ -1895,7 +1954,9 @@ class TestKernelGlobalMiddleware(TestCase):
         for method in ("POST", "PUT", "DELETE", "OPTIONS"):
             with self.subTest(method=method):
                 response = await dispatch(
-                    kernel, "/_orionis/assets/css/default.css", method,
+                    kernel,
+                    "/_orionis/assets/css/default.css",
+                    method,
                 )
                 self.assertEqual(response.getStatusCode(), 405)
                 self.assertEqual(response.getHeader("Allow"), ["GET, HEAD"])
@@ -1913,11 +1974,14 @@ class TestKernelGlobalMiddleware(TestCase):
         kernel, _app, _responses, catch = await boot_kernel(maintenance=True)
         maintenance = _MaintenancePassThrough()
         with replace_attribute(
-            kernel, "_KernelHTTP__under_maintenance", maintenance,
+            kernel,
+            "_KernelHTTP__under_maintenance",
+            maintenance,
         ):
             allowed = await dispatch(kernel, "/api")
             rejected = await dispatch(
-                kernel, "/api",
+                kernel,
+                "/api",
                 headers=[(b"host", b"one.test"), (b"host", b"two.test")],
             )
         self.assertEqual(allowed.getBody(), b"api")
@@ -2021,7 +2085,57 @@ class TestKernelGlobalMiddleware(TestCase):
         self.assertEqual(response.getStatusCode(), 204)
         self.assertTrue(response.hasHeader("access-control-allow-methods"))
 
+
 class TestKernelOptionsRequests(TestCase):
+    async def testMethodNotAllowedAddsTheResolvedAllowHeader(self) -> None:
+        """Include the actual method set when the failure presenter emits 405.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        kernel, _app, _responses, catcher = await boot_kernel()
+
+        async def method_response(
+            _catcher: object,
+            error: Exception,
+            _request: object,
+        ) -> Response:
+            """Keep the presenter independent from route-header computation.
+
+            Parameters
+            ----------
+            _catcher : object
+                Presenter instance.
+            error : Exception
+                Resolved route failure.
+            _request : object
+                Request placeholder.
+
+            Returns
+            -------
+            Response
+                Standard method-not-allowed presentation.
+            """
+            self.assertIsInstance(error, MethodNotAllowed)
+            return Response(status_code=405)
+
+        with replace_attribute(type(catcher), "exception", method_response):
+            for interface in ("asgi", "rsgi"):
+                with self.subTest(interface=interface):
+                    if interface == "asgi":
+                        response = await dispatch(kernel, "/web", "DELETE")
+                    else:
+                        response = await kernel.handleRSGI(
+                            _StubRsgiScope("/web", "DELETE"),
+                            _StubRsgiProtocol(),
+                        )
+                    self.assertEqual(response.getStatusCode(), 405)
+                    self.assertEqual(
+                        response.getHeader("Allow"),
+                        ["GET, HEAD, OPTIONS"],
+                    )
 
     async def testAdvertisesTheAllowedMethods(self) -> None:
         """Answer an ``OPTIONS`` request with the allowed methods.
@@ -2053,8 +2167,8 @@ class TestKernelOptionsRequests(TestCase):
         response = await dispatch(kernel, "/api", "OPTIONS")
         self.assertTrue(response.hasHeader("Accept-Query"))
 
-class TestKernelValidationFailures(TestCase):
 
+class TestKernelValidationFailures(TestCase):
     async def testWebRoutesRedirectBackWithTheErrors(self) -> None:
         """Redirect a browser back when validation fails on a web route.
 
@@ -2085,8 +2199,8 @@ class TestKernelValidationFailures(TestCase):
         self.assertEqual(response.getStatusCode(), 422)
         self.assertTrue(responses.calls[-1][2])
 
-class TestKernelFailureHandling(TestCase):
 
+class TestKernelFailureHandling(TestCase):
     async def testRejectsANoncallableFallbackDescriptor(self) -> None:
         """Reject a fallback descriptor containing neither handler form.
 
@@ -2181,8 +2295,8 @@ class TestKernelFailureHandling(TestCase):
         with self.assertRaises(TypeError):
             await dispatch(kernel, "/nowhere")
 
-class TestKernelRequestLogging(TestCase):
 
+class TestKernelRequestLogging(TestCase):
     async def testLogsRequestsInDebugMode(self) -> None:
         """Log every request while the application runs in debug mode.
 
@@ -2216,8 +2330,8 @@ class TestKernelRequestLogging(TestCase):
         self.assertEqual(printer.timers, 0)
         self.assertEqual(printer.printed, [])
 
-class TestKernelRateLimiting(TestCase):
 
+class TestKernelRateLimiting(TestCase):
     async def testSkipsTheLimiterWhenDisabled(self) -> None:
         """Bypass the limiter entirely when it is turned off.
 
@@ -2272,8 +2386,8 @@ class TestKernelRateLimiting(TestCase):
         await dispatch(kernel, "/api")
         self.assertEqual((await dispatch(kernel, "/api")).getStatusCode(), 429)
 
-class TestKernelRsgiEntryPoint(TestCase):
 
+class TestKernelRsgiEntryPoint(TestCase):
     async def testServesPackagedAssetsDuringMaintenance(self) -> None:
         """Serve assets through the shared path for the RSGI transport.
 
@@ -2325,6 +2439,7 @@ class TestKernelRsgiEntryPoint(TestCase):
         await kernel.handleRSGI(_StubRsgiScope("/api"), _StubRsgiProtocol())
         self.assertEqual(len(app.builds[HTTPRequestPrinter].printed), 1)
 
+
 class TestMiddlewareTerminalArguments(TestCase):
     """Verify argument forwarding through the middleware terminal."""
 
@@ -2357,7 +2472,10 @@ class TestMiddlewareTerminalArguments(TestCase):
             return expected
 
         pipeline = kernel_module._MiddlewarePipeline(
-            (), None, terminal, ("request", "route"),
+            (),
+            None,
+            terminal,
+            ("request", "route"),
         )
         self.assertIs(await pipeline(), expected)
         with self.assertRaises(RuntimeError):

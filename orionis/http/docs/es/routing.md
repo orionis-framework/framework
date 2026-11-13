@@ -8,16 +8,22 @@ Declara rutas durante el arranque, normalmente en `routes/web.py` o `routes/api.
 from orionis.http import Request, response
 from orionis.support.facades import Route
 
+
 async def show_product(request: Request):
     return response.json({"id": request.routeParam("product_id")})
+
 
 async def create_product():
     return response.json({"created": True}, status_code=201)
 
-Route.group(prefix="/catalog", routes=[
-    Route.get("/products/{product_id:int}", show_product).name("products.show"),
-    Route.post("/products", create_product).name("products.create"),
-])
+
+Route.group(
+    prefix="/catalog",
+    routes=[
+        Route.get("/products/{product_id:int}", show_product).name("products.show"),
+        Route.post("/products", create_product).name("products.create"),
+    ],
+)
 ```
 
 La URL de lectura es `/catalog/products/42`. El grupo recibe rutas ya registradas; no es un context manager ni una función decoradora. Puedes incluir otros `RouteGroup` para anidar prefijos. `middleware`, `without_middleware` y `public` son opciones del grupo; un `public` explícito en una ruta conserva prioridad sobre el heredado. Un grupo vacío no configura declaraciones posteriores.
@@ -42,7 +48,9 @@ Una acción puede ser una función, una clase invokable o `[Controller, "method"
 ```python
 from orionis.auth.middleware import AuthenticateTokenMiddleware
 
-Route.get("/private/product/{product_id:int}", show_product).middleware(AuthenticateTokenMiddleware)
+Route.get("/private/product/{product_id:int}", show_product).middleware(
+    AuthenticateTokenMiddleware
+)
 ```
 
 Los nombres sirven para identificar rutas y generar enlaces en servicios que consumen el router.
@@ -50,6 +58,8 @@ Los nombres sirven para identificar rutas y generar enlaces en servicios que con
 ## Conflictos, fallback y caché
 
 Las rutas estáticas tienen búsqueda directa; las dinámicas se compilan y ordenan por especificidad. Los conflictos estáticos, estructuras dinámicas ambiguas, nombres incompatibles y acciones sin completar fallan en registro/compilación. Solo existe un fallback, declarado con `Route.fallback(handler)`. Un método incorrecto tiene tratamiento distinto de una ruta ausente.
+
+La respuesta `OPTIONS` y el encabezado `Allow` de una respuesta `405` enumeran métodos cuya conversión completa de parámetros es válida. Una coincidencia de regex rechazada por su convertidor, como un entero demasiado grande, no constituye una ruta disponible. GET también permite HEAD; los paths reconocidos incluyen OPTIONS.
 
 Los GET predeterminados de favicon, robots y sitemap pueden reemplazarse declarando la misma ruta. No dependas de sobrescribir rutas normales. Cuando uses modo compilado, conserva clases y funciones con nombres importables; lambdas y clases locales no son un contrato portable de caché. La caché contiene versión y se rechaza si es incompatible.
 

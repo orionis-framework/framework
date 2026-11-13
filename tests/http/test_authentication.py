@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
 from typing import TYPE_CHECKING, ClassVar
 import msgspec
@@ -56,6 +58,7 @@ if TYPE_CHECKING:
 _CREDENTIAL = "test-api-credential"
 _CSRF = "test-csrf-value"
 
+
 def identity_handler() -> JSONResponse:
     """Expose the identity visible to a controller in the current request.
 
@@ -66,12 +69,15 @@ def identity_handler() -> JSONResponse:
     """
     context = current_auth_context()
     request = ScopedContext.getCurrentScope()[Request]
-    return JSONResponse({
-        "identifier": context.identifier(),
-        "guard": context.guard,
-        "abilities": sorted(context.abilities or ()),
-        "session": getattr(request.state, "session", None) is not None,
-    })
+    return JSONResponse(
+        {
+            "identifier": context.identifier(),
+            "guard": context.guard,
+            "abilities": sorted(context.abilities or ()),
+            "session": getattr(request.state, "session", None) is not None,
+        },
+    )
+
 
 class _Session:
     """Request-local session populated by the session restoration fixture."""
@@ -126,6 +132,7 @@ class _Session:
         """
         self.data.pop(key, None)
 
+
 class _RestoreSession(BaseMiddleware):
     """Restore a session for web requests without opening external storage."""
 
@@ -149,6 +156,7 @@ class _RestoreSession(BaseMiddleware):
         request.state.session = _Session(request.headers.get("x-session-identity"))
         return await call_next()
 
+
 class _Identity(Authenticatable, Authorizable):
     """Identity double mixing both authentication concerns."""
 
@@ -171,6 +179,7 @@ class _Identity(Authenticatable, Authorizable):
         """
         self.id = identifier
         self.password = password
+
 
 class _Identities:
     """Record identity lookups while yielding to concurrent requests."""
@@ -206,6 +215,7 @@ class _Identities:
             return _Identity(int(identifier), "")
         return None
 
+
 class _Tokens:
     """Record token lookups and usage updates without external storage."""
 
@@ -239,8 +249,11 @@ class _Tokens:
         if value != _CREDENTIAL:
             return None
         return AccessToken(
-            id=1, tokenable_id=7, tokenable_type=_Identity(7, "").getAuthorizableType(),
-            name="tests", abilities=frozenset({"users.view"}),
+            id=1,
+            tokenable_id="7",
+            tokenable_type=_Identity(7, "").getAuthorizableType(),
+            name="tests",
+            abilities=frozenset({"users.view"}),
         )
 
     async def touch(self, identifier: object) -> bool:
@@ -259,6 +272,7 @@ class _Tokens:
         self.touches.append(identifier)
         return True
 
+
 class _AuthApp(_StubApp):
     """Open real container scopes for the kernel's public entry point."""
 
@@ -274,6 +288,7 @@ class _AuthApp(_StubApp):
         """
         return ScopeManager()
 
+
 class _CanViewUsers(RequirePermissionMiddleware):
     """Require a permission after the kernel has established an identity."""
 
@@ -281,8 +296,11 @@ class _CanViewUsers(RequirePermissionMiddleware):
 
     permissions: ClassVar[tuple[str, ...]] = ("users.view",)
 
+
 async def boot_auth_kernel(
-    *, csrf_enabled: bool = False, default_guard: str = "session",
+    *,
+    csrf_enabled: bool = False,
+    default_guard: str = "session",
 ) -> tuple[KernelHTTP, _Identities, _Tokens, _StubCatch]:
     """Boot real routing, guards and middleware with in-memory collaborators.
 
@@ -330,25 +348,33 @@ async def boot_auth_kernel(
     identities = _Identities()
     tokens = _Tokens()
     repository = _StaticRepository()
-    authorizer = _RecordingAuthorizer(True)
+    authorizer = _RecordingAuthorizer(verdict=True)
     manager = AuthManager(
-        app, authorizer, repository, SessionGuard(app, identities),
-        TokenGuard(tokens, identities), tokens,
+        app,
+        authorizer,
+        repository,
+        SessionGuard(app, identities),
+        TokenGuard(tokens, identities),
+        tokens,
     )
     for middleware in (
-        ResolveIdentityMiddleware, ResolveSessionIdentityMiddleware,
+        ResolveIdentityMiddleware,
+        ResolveSessionIdentityMiddleware,
         ResolveTokenIdentityMiddleware,
     ):
         app.builds[middleware] = middleware(manager, repository)
     for middleware in (
-        AuthenticateMiddleware, AuthenticateSessionMiddleware,
-        AuthenticateTokenMiddleware, GuestMiddleware,
+        AuthenticateMiddleware,
+        AuthenticateSessionMiddleware,
+        AuthenticateTokenMiddleware,
+        GuestMiddleware,
     ):
         app.builds[middleware] = middleware(app, manager, repository)
     app.builds[_CanViewUsers] = _CanViewUsers(authorizer)
     kernel = KernelHTTP(app, catch)
     await kernel.boot()
     return kernel, identities, tokens, catch
+
 
 class TestAutomaticAuthentication(TestCase):
     """Validate optional identity resolution before application middleware."""
@@ -408,15 +434,19 @@ class TestAutomaticAuthentication(TestCase):
         """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         for path in ("/api/public", "/api/private", "/api/generic"):
-            response = await dispatch(kernel, path, headers=[
-                (b"authorization", f"Bearer {_CREDENTIAL}".encode()),
-            ])
+            response = await dispatch(
+                kernel,
+                path,
+                headers=[
+                    (b"authorization", f"Bearer {_CREDENTIAL}".encode()),
+                ],
+            )
             data = msgspec.json.decode(response.getBody())
             self.assertEqual(data["identifier"], 7)
             self.assertEqual(data["guard"], "token")
             self.assertEqual(data["abilities"], ["users.view"])
             self.assertFalse(data["session"])
-        self.assertEqual(identities.calls, [7] * 3)
+        self.assertEqual(identities.calls, ["7"] * 3)
         self.assertEqual(tokens.lookups, [_CREDENTIAL] * 3)
         self.assertEqual(tokens.touches, [1] * 3)
         self.assertEqual(catch.handled, [])
@@ -440,7 +470,7 @@ class TestAutomaticAuthentication(TestCase):
         api = msgspec.json.decode(api_response.getBody())
         self.assertEqual(web["identifier"], 8)
         self.assertEqual(api["identifier"], 7)
-        self.assertEqual(identities.calls, ["8", 7])
+        self.assertEqual(identities.calls, ["8", "7"])
         self.assertEqual(tokens.lookups, [_CREDENTIAL])
         self.assertEqual(catch.handled, [])
 
@@ -494,15 +524,17 @@ class TestAutomaticAuthentication(TestCase):
         """
         kernel, identities, tokens, catch = await boot_auth_kernel()
         scope = _StubRsgiScope("/api/public")
-        scope.headers = _StubRsgiHeaders({
-            "host": ["orionis.test"],
-            "authorization": [f"Bearer {_CREDENTIAL}"],
-        })
+        scope.headers = _StubRsgiHeaders(
+            {
+                "host": ["orionis.test"],
+                "authorization": [f"Bearer {_CREDENTIAL}"],
+            },
+        )
         response = await kernel.handleRSGI(scope, _StubRsgiProtocol())
         data = msgspec.json.decode(response.getBody())
         self.assertEqual(data["identifier"], 7)
         self.assertEqual(data["guard"], "token")
-        self.assertEqual(identities.calls, [7])
+        self.assertEqual(identities.calls, ["7"])
         self.assertEqual(tokens.touches, [1])
         self.assertEqual(catch.handled, [])
 
@@ -515,9 +547,14 @@ class TestAutomaticAuthentication(TestCase):
             Assertions verify the behavior described above.
         """
         kernel, identities, tokens, catch = await boot_auth_kernel()
-        response = await dispatch(kernel, "/api/public", "OPTIONS", [
-            (b"authorization", f"Bearer {_CREDENTIAL}".encode()),
-        ])
+        response = await dispatch(
+            kernel,
+            "/api/public",
+            "OPTIONS",
+            [
+                (b"authorization", f"Bearer {_CREDENTIAL}".encode()),
+            ],
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(identities.calls, [])
         self.assertEqual(tokens.lookups, [])
@@ -585,10 +622,16 @@ class TestAutomaticAuthentication(TestCase):
         """
         kernel, _identities, _tokens, catch = await boot_auth_kernel()
         original = current_auth_context()
-        responses = await asyncio.gather(*(
-            dispatch(kernel, "/public", headers=[(b"x-session-identity", identifier)])
-            for identifier in (b"7", b"8", b"") * 5
-        ))
+        responses = await asyncio.gather(
+            *(
+                dispatch(
+                    kernel,
+                    "/public",
+                    headers=[(b"x-session-identity", identifier)],
+                )
+                for identifier in (b"7", b"8", b"") * 5
+            ),
+        )
         self.assertEqual(
             [
                 msgspec.json.decode(response.getBody())["identifier"]

@@ -5,6 +5,7 @@ import traceback
 from typing import Any
 from orionis.support.formatter.exceptions.contracts.parser import IExceptionParser
 
+
 class ExceptionParser(IExceptionParser):
     """Extract structured details from exceptions and tracebacks."""
 
@@ -29,14 +30,13 @@ class ExceptionParser(IExceptionParser):
             Complete the documented operation without returning a value.
         """
         tb = traceback.TracebackException.from_exception(
-            exception, capture_locals=False,
+            exception,
+            capture_locals=False,
         )
         self._tb = tb
         """Tb supplied through ``tb``."""
         self._exc_type: str = (
-            tb.exc_type.__name__
-            if tb.exc_type
-            else type(exception).__name__
+            tb.exc_type.__name__ if tb.exc_type else type(exception).__name__
         )
         """Type of the exception being formatted."""
         self._error_code: Any = getattr(exception, "code", None)
@@ -138,21 +138,21 @@ class ExceptionParser(IExceptionParser):
             frame_line = frame.line
             lines, source = self._getSourceCode(source_filename, source_lineno)
 
-            frames.append({
-                "id": frame_id,
-                "filename": (
-                    filename.replace("\\", "/")
-                    if "\\" in filename else filename
-                ),
-                "lineno": lineno,
-                "name": frame_name or "<unknown>",
-                "line_code": frame_line,
-                "code": source,
-                "lines": lines,
-                "code_with_lines": [
-                    f"{ln}:{cd}"
-                    for ln, cd in zip(lines, source, strict=True)
-                ],
-            })
+            frames.append(
+                {
+                    "id": frame_id,
+                    "filename": (
+                        filename.replace("\\", "/") if "\\" in filename else filename
+                    ),
+                    "lineno": lineno,
+                    "name": frame_name or "<unknown>",
+                    "line_code": frame_line,
+                    "code": source,
+                    "lines": lines,
+                    "code_with_lines": [
+                        f"{ln}:{cd}" for ln, cd in zip(lines, source, strict=True)
+                    ],
+                },
+            )
 
         return frames

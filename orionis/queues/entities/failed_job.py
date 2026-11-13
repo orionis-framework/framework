@@ -2,6 +2,7 @@
 
 import msgspec
 
+
 class FailedJob(msgspec.Struct, frozen=True, kw_only=True):
     """Preserve the payload and exception associated with terminal failure."""
 

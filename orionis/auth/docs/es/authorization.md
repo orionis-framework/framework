@@ -12,6 +12,7 @@ Define los nombres de roles y permisos del negocio, sus asignaciones y las polí
 from orionis.auth.authorization.registrar import PermissionRegistrar
 from orionis.auth.contracts.authorizable import IAuthorizable
 
+
 async def make_editor(registrar: PermissionRegistrar, user: IAuthorizable):
     await registrar.createPermission("posts.publish")
     await registrar.createRole("editor")
@@ -21,10 +22,13 @@ async def make_editor(registrar: PermissionRegistrar, user: IAuthorizable):
 
 Obtén el registrar mediante el contenedor y pasa una identidad de origen confiable. `givePermissionTo`/`revokePermissionFrom` manejan permisos directos, `removeRole` quita roles y `revokeFromRole` elimina permisos de un rol. Las restricciones únicas arbitran duplicados concurrentes. `Authorizable.AUTHORIZABLE_TYPE` puede fijar un tipo estable en vez del path de clase; cambiarlo después altera vínculos con registros existentes.
 
+Los identificadores admiten enteros o cadenas no vacías de hasta 255 caracteres; los booleanos y enteros demasiado grandes se rechazan antes de acceder a la base de datos. Si falla una escritura y después falla la consulta para comprobar un duplicado, el registrar observa el fallo secundario y vuelve a lanzar el error original de escritura.
+
 ## Proteger una ruta
 
 ```python
 from orionis.auth.middleware import RequirePermissionMiddleware
+
 
 class CanPublish(RequirePermissionMiddleware):
     permissions = ("posts.publish",)
@@ -41,9 +45,11 @@ En controladores usa `await Auth.can(...)`, `cannot`, `canAny`, `canAll`, `hasRo
 from dataclasses import dataclass
 from orionis.auth import Policy
 
+
 @dataclass
 class Article:
     owner_id: int
+
 
 class ArticlePolicy(Policy):
     async def update(self, identity, article: Article) -> bool:
@@ -54,8 +60,10 @@ Registra `Auth.registerPolicy(Article, ArticlePolicy)` durante boot. En un handl
 
 Las habilidades pueden ser síncronas o asíncronas y deben devolver `True`. `before` es un hook **asíncrono** que devuelve `True`, `False` o `None` para delegar. La política se resuelve nuevamente mediante el contenedor por evaluación. Política o método ausente produce `PolicyNotFoundException`; nombres privados y `before` no son habilidades invocables.
 
+Los registros explícitos conservan sus clases de recurso y política. La caché de resultados heredados y ausencias usa claves débiles: consultar una subclase temporal no registrada no la mantiene viva. Registra las políticas durante el arranque de la aplicación.
+
 ## Intersección con tokens
 
-`AuthorizationSnapshot(permissions, roles, abilities=None)` no restringe permisos de identidad cuando abilities es `None`; una colección vacía niega todos. Para permisos, el acceso es la intersección de permisos de identidad y abilities. Para políticas, el nombre de habilidad también debe estar en abilities cuando el token las limita, antes de ejecutar `before`. Declarar una cadena en un token no crea privilegios.
+`AuthorizationSnapshot(permissions, roles, abilities=None)` no restringe permisos de identidad cuando abilities es `None`; una colección vacía niega todos. Para permisos, el acceso es la intersección de permisos de identidad y abilities. Para políticas, el nombre de habilidad también debe estar en abilities cuando el token las limita, antes de ejecutar `before`. Declarar una cadena en un token no crea privilegios. El snapshot copia sus entradas en conjuntos inmutables y expone propiedades de solo lectura; modificar las colecciones originales no cambia un snapshot existente.
 
 Evidencia: [registrar](../../authorization/registrar.py), [authorizer](../../authorization/authorizer.py), [snapshot](../../authorization/snapshot.py). Pruebas: [permisos](../../../../tests/auth/test_permissions.py), [políticas](../../../../tests/auth/test_authorizer.py), [snapshot](../../../../tests/auth/test_snapshot.py). Continúa con [tokens](personal-access-tokens.md).

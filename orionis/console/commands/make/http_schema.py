@@ -2,6 +2,7 @@
 
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeHttpSchema(MakeStubCommand):
     """Generate an HTTP validation schema class."""
 
@@ -19,4 +20,3 @@ class MakeHttpSchema(MakeStubCommand):
     """Success label identifier: ``HTTP schema``."""
     postfix: str | None = "Schema"
     """Postfix identifier: ``Schema``."""
-

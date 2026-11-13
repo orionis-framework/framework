@@ -1,3 +1,5 @@
+# ruff: noqa: C901
+# Keep the existing boundary behavior and deliberately shaped fixtures.
 """Provide http payload operations.
 
 Includes ``PayloadTooLargeException``, ``BodyStream``.
@@ -18,8 +20,10 @@ _DEFAULT_LIMITS = {
 }
 """Default limits used by ``body``."""
 
+
 class PayloadTooLargeException(ValueError):
     """Raise when the request body exceeds the configured size limit."""
+
 
 class BodyStream(IBodyStream):
     """
@@ -88,7 +92,8 @@ class BodyStream(IBodyStream):
         self.__is_rsgi: bool = interface is Interface.RSGI
         """Record which transport provides the body chunks."""
         for name, value in (
-            ("max_body_size", max_body_size), ("max_buffer_size", max_buffer_size),
+            ("max_body_size", max_body_size),
+            ("max_buffer_size", max_buffer_size),
         ):
             if value is not None:
                 if not isinstance(value, int) or isinstance(value, bool):
@@ -137,7 +142,7 @@ class BodyStream(IBodyStream):
         """
         return self.__consumed
 
-    async def stream(self) -> AsyncGenerator[bytes]:  # NOSONAR # noqa: C901
+    async def stream(self) -> AsyncGenerator[bytes]:  # NOSONAR
         """
         Yield body chunks from the transport.
 
@@ -154,6 +159,8 @@ class BodyStream(IBodyStream):
         RuntimeError
             If the stream was consumed by a streaming consumer
             (e.g. multipart) before the body was buffered.
+        ConnectionError
+            If the ASGI client disconnects before the final request-body frame.
         orionis.http.payload.body.PayloadTooLargeException
             If incoming data exceeds ``max_body_size``.
         """
@@ -188,6 +195,9 @@ class BodyStream(IBodyStream):
         # ASGI: poll the receive callable until more_body is False.
         while True:
             message = await self.__receive()
+            if message.get("type") == "http.disconnect":
+                error_msg = "Client disconnected before completing the request body"
+                raise ConnectionError(error_msg)
             chunk = message.get("body", b"")
             if chunk:
                 total += len(chunk)

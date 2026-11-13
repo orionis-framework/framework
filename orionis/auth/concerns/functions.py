@@ -12,6 +12,7 @@ _FALLBACK_PRIMARY_KEY: str = "id"
 _MAX_KEY_LENGTH: int = 255
 """Max key length value used by ``functions``."""
 
+
 def authorizable_key(identity: object) -> tuple[str, str]:
     """
     Normalize a persisted identity's polymorphic authorization key.
@@ -46,10 +47,14 @@ def authorizable_key(identity: object) -> tuple[str, str]:
         or isinstance(identifier, bool)
     ):
         raise AuthException(error_msg)
+    # Reject obviously oversized integers before Python's decimal conversion limit.
+    if isinstance(identifier, int) and identifier.bit_length() > 4 * _MAX_KEY_LENGTH:
+        raise AuthException(error_msg)
     key = str(identifier)
     if not key or len(key) > _MAX_KEY_LENGTH:
         raise AuthException(error_msg)
     return kind, key
+
 
 def model_primary_key(instance: object) -> str:
     """

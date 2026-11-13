@@ -26,15 +26,17 @@ print(reflected.getModuleWithCallableName())
 
 ### Clasificación de miembros
 
-Los wrappers de clase e instancia clasifican miembros públicos, protegidos, privados, dunder y “magic”. Los métodos se separan además entre instancia, clase y estáticos, y entre síncronos y asíncronos. Los nombres privados con mangling de Python se presentan sin el prefijo de clase, por lo que se usa el nombre del código fuente.
+Los wrappers de clase e instancia clasifican miembros públicos, protegidos, privados, dunder y “magic”. Los métodos se separan además entre instancia, clase y estáticos, y entre síncronos y asíncronos. Los nombres privados con mangling se reconocen por el marcador exacto `_ClassName__` y se exponen como `__name`, conservando los dos guiones bajos del nombre original. Una clase cuyo nombre contiene solo guiones bajos no activa mangling. Los recorridos de clase clasifican miembros declarados; no prometen una lista completa de miembros heredados. Los atributos de instancia incluyen slots heredados con valor y excluyen miembros callable. Cambiar el nombre o módulo de una clase actualiza sus metadatos de identidad tras invalidar la caché; el prefijo privado conserva el nombre de declaración original porque Python no vuelve a transformar los miembros existentes.
 
 ### Firmas de dependencias
 
-`ReflectDependencies` convierte la firma de un constructor, método o callable en un `Signature` con mapas `resolved`, `unresolved` y ordenado por declaración de valores `Argument` inmutables. Se omiten `self`, `cls`, `*args` y `**kwargs`. Un parámetro con valor predeterminado se resuelve con el tipo de ese valor; una anotación no builtin se resuelve para buscar en el contenedor; un parámetro requerido sin anotación o solo builtin queda sin resolver. Las subclases de `msgspec.Struct` se marcan como schemas.
+`ReflectDependencies` convierte la firma de un constructor, método o callable en un `Signature` con mapas `resolved`, `unresolved` y ordenado por declaración de valores `Argument` inmutables. Se omite el receptor ligado de instancia o clase según el descriptor, independientemente de su nombre. Los parámetros llamados `self` o `cls` de funciones ordinarias y métodos estáticos se conservan como argumentos explícitos. Se omiten `*args` y `**kwargs`. Un parámetro con valor predeterminado se resuelve con el tipo de ese valor; una anotación no builtin se resuelve para buscar en el contenedor; un parámetro requerido sin anotación o solo builtin queda sin resolver. Las subclases de `msgspec.Struct` se marcan como schemas.
 
 ### Caché
 
-Los wrappers guardan localmente scans, código fuente, archivos, anotaciones y firmas. El análisis de dependencias usa cachés LRU de módulo acotadas a 1.024 entradas. `ModuleInspector.loadClass()` también conserva clases por nombre totalmente calificado. La caché de métodos ligados evita retener instancias de controladores.
+Los wrappers guardan localmente scans, código fuente, archivos, anotaciones y firmas. El análisis de dependencias usa cachés LRU de módulo acotadas a 1.024 entradas. `ModuleInspector.loadClass()` usa la caché de importación de Python y lee el atributo de clase actual en cada llamada, por lo que observa módulos o clases reemplazados. La caché de métodos ligados evita retener instancias de controladores. `ReflectDependencies` inspecciona objetos callable no hashables sin usar la caché LRU compartida.
+
+`clearCache()` limpia los metadatos locales del wrapper e invalida las cachés compartidas de firmas y los planes de invocación. Otros wrappers existentes conservan sus resultados locales hasta que se llama a su propio `clearCache()`.
 
 ## Ejemplos
 

@@ -27,16 +27,6 @@ _ValidationError = msgspec.ValidationError
 _INVALID = object()
 """Sentinel distinguishing invalid from ordinary values."""
 
-# Cache: schema type -> tuple of
-# (encode_name, field_type, required, nested, rules, attribute, default, factory).
-_FIELD_PLAN_CACHE: dict[type, tuple] = {}
-"""
-Cache: schema type -> tuple of (encode_name, field_type, required, nested, rules,
-attribute, default, factory).
-"""
-
-# Bind the field plan lookup.
-_plan_get = _FIELD_PLAN_CACHE.get
 
 def _nested_schema(tp: object) -> type[msgspec.Struct] | None:
     """
@@ -74,9 +64,13 @@ def _nested_schema(tp: object) -> type[msgspec.Struct] | None:
         return tp
     return None
 
+
 def _field_plan(schema: type) -> tuple:
     """
-    Return a cached plan for collecting field validation failures.
+    Return a class-owned plan for collecting field validation failures.
+
+    Retain field types and rules only through their schema owner. Look up the
+    exact class so subclasses do not reuse a parent's incomplete field plan.
 
     Parameters
     ----------
@@ -90,7 +84,7 @@ def _field_plan(schema: type) -> tuple:
         rules, attribute, default, factory)``, where ``rules`` holds the bound
         custom validators and ``attribute`` is the Python field name.
     """
-    cached = _plan_get(schema)
+    cached = schema.__dict__.get("__orionis_failure_plan__")
     if cached is not None:
         return cached
 
@@ -106,9 +100,8 @@ def _field_plan(schema: type) -> tuple:
             f.encode_name,
             f.type,
             f.required,
-            _nested_schema(f.type) or (
-                f.type if _type_contains_nested(f.type) else None
-            ),
+            _nested_schema(f.type)
+            or (f.type if _type_contains_nested(f.type) else None),
             rules_by_name.get(f.encode_name, ()),
             f.name,
             f.default,
@@ -116,8 +109,9 @@ def _field_plan(schema: type) -> tuple:
         )
         for f in msgspec.structs.fields(schema)
     )
-    _FIELD_PLAN_CACHE[schema] = plan
+    schema.__orionis_failure_plan__ = plan
     return plan
+
 
 def _payload_fields(payload: Mapping | list | tuple, schema: type) -> Mapping:
     """
@@ -143,8 +137,8 @@ def _payload_fields(payload: Mapping | list | tuple, schema: type) -> Mapping:
         for entry, value in zip(_field_plan(schema), payload[offset:], strict=False)
     }
 
-class FailureCollector:
 
+class FailureCollector:
     # Prevent per-instance dictionaries; the class is used statically.
     """Collect and organize validation failures by field path."""
 
@@ -183,8 +177,7 @@ class FailureCollector:
         blamed = False
 
         if isinstance(payload, Mapping) or (
-            schema.__struct_config__.array_like
-            and isinstance(payload, list | tuple)
+            schema.__struct_config__.array_like and isinstance(payload, list | tuple)
         ):
             blamed = await cls._collect(payload, schema, schema, "", failures)
 
@@ -238,9 +231,15 @@ class FailureCollector:
         pending: list[tuple[str, object, tuple, object | None]] = []
 
         for (
-            name, field_type, required, nested, rules, attribute, default, factory,
+            name,
+            field_type,
+            required,
+            nested,
+            rules,
+            attribute,
+            default,
+            factory,
         ) in _field_plan(schema):
-
             if name in payload:
                 value = payload[name]
             elif required:
@@ -264,7 +263,11 @@ class FailureCollector:
             except _ValidationError as exc:
                 blamed = True
                 converted, field_failures = await cls._recover(
-                    exc, value, field_type, root, name,
+                    exc,
+                    value,
+                    field_type,
+                    root,
+                    name,
                 )
                 failures.extend(
                     ValidationFailure(
@@ -287,8 +290,12 @@ class FailureCollector:
 
     @classmethod
     async def _recover(
-        cls, error: msgspec.ValidationError, value: object,
-        annotation: object, root: type, path: str,
+        cls,
+        error: msgspec.ValidationError,
+        value: object,
+        annotation: object,
+        root: type,
+        path: str,
     ) -> tuple[object, list[ValidationFailure]]:
         """
         Recover a type-compatible value and collect its validation failures.
@@ -326,7 +333,10 @@ class FailureCollector:
 
     @staticmethod
     def _constraints(
-        value: object, probes: tuple, root: type, path: str,
+        value: object,
+        probes: tuple,
+        root: type,
+        path: str,
     ) -> list[ValidationFailure]:
         """
         Collect independent constraint failures with their declared codes.
@@ -357,14 +367,18 @@ class FailureCollector:
                 # those are reported by the structural traversal instead.
                 if failure.field == path and failure.rule != "type":
                     messages = getattr(root, "__orionis_constraints__", {})
-                    custom = (
-                        local_message if local_message is not None
+                    custom = (  # NOSONAR(S1110) - Group the multiline conditional.
+                        local_message
+                        if local_message is not None
                         else messages.get(path, {}).get(code)
                     )
-                    failures.append(ValidationFailure(
-                        field=path, rule=code,
-                        message=custom if custom is not None else failure.message,
-                    ))
+                    failures.append(
+                        ValidationFailure(
+                            field=path,
+                            rule=code,
+                            message=custom if custom is not None else failure.message,
+                        ),
+                    )
         return failures
 
     @classmethod
@@ -392,14 +406,13 @@ class FailureCollector:
         Returns
         -------
         None
-            Append rule failures to ``failures``.
+            No return value.
         """
         if not pending:
             return
         instance = types.SimpleNamespace(**converted_values)
 
         for path, value, rules, nested in pending:
-
             # Nested schemas converted fine, so their own rules run as usual.
             if nested is not None and value is not None:
                 await _collect_nested(value, path + ".", failures)
@@ -453,7 +466,8 @@ class FailureCollector:
             children = await cls._blameCollection(error, value, annotation, root, path)
             known = {(failure.field, failure.rule) for failure in failures}
             failures.extend(
-                failure for failure in children
+                failure
+                for failure in children
                 if (failure.field, failure.rule) not in known
             )
             return failures
@@ -464,7 +478,9 @@ class FailureCollector:
         custom = annotation_messages(nested).get(original.rule)
         if custom is not None:
             original = ValidationFailure(
-                field=original.field, rule=original.rule, message=custom,
+                field=original.field,
+                rule=original.rule,
+                message=custom,
             )
         return [original]
 
@@ -489,7 +505,8 @@ class FailureCollector:
 
     @staticmethod
     def _matchingSchema(
-        schema: type[msgspec.Struct], value: object,
+        schema: type[msgspec.Struct],
+        value: object,
     ) -> type[msgspec.Struct] | None:
         """
         Match a schema's object or array representation and optional tag.
@@ -541,17 +558,13 @@ class FailureCollector:
         args = get_args(annotation)
         items: Iterable[tuple[str, object, object]]
         if isinstance(value, Mapping):
-            items = (
-                (f"{path}[{key!r}]", item, args[1])
-                for key, item in value.items()
-            )
+            items = ((f"{path}[{key!r}]", item, args[1]) for key, item in value.items())
         elif isinstance(value, list | tuple | set | frozenset):
             items = (
                 (f"{path}[{index}]", item, item_type)
                 for index, item in enumerate(value)
-                if (
-                    item_type := _collection_item_type(annotation, str(index))
-                ) is not None
+                if (item_type := _collection_item_type(annotation, str(index)))
+                is not None
             )
         else:
             return [ValidationErrorParser.parseAt(error, root, path)]
@@ -563,9 +576,15 @@ class FailureCollector:
                 converted = _convert(item, type=item_type)
             except _ValidationError as exc:
                 blamed = True
-                failures.extend(await cls._blame(
-                    exc, item, item_type, root, item_path,
-                ))
+                failures.extend(
+                    await cls._blame(
+                        exc,
+                        item,
+                        item_type,
+                        root,
+                        item_path,
+                    ),
+                )
             else:
                 await _collect_nested(converted, item_path + ".", failures)
 

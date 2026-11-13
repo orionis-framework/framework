@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.console.args.argument import Argument
 from orionis.console.entities.command import Command as CommandEntity
@@ -5,10 +7,11 @@ from orionis.console.fluent.command import Command
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.test import TestCase
 
+
 class _Handler:
     """Minimal concrete class used as command handler in tests."""
 
-    def handle(self) -> None: # NOSONAR
+    def handle(self) -> None:  # NOSONAR
         """Return a completed command result.
 
         Returns
@@ -17,7 +20,7 @@ class _Handler:
             Completes the operation described above.
         """
 
-    def execute(self) -> None: # NOSONAR
+    def execute(self) -> None:  # NOSONAR
         """Run the execute helper.
 
         Returns
@@ -26,8 +29,8 @@ class _Handler:
             Completes the operation described above.
         """
 
-class TestFluentCommand(TestCase):
 
+class TestFluentCommand(TestCase):
     def _cmd(self, **kwargs: object) -> Command:
         """
         Build a Command with sensible defaults.

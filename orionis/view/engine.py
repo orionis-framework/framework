@@ -1,4 +1,6 @@
-"""Jinja2-based implementation of :class:`orionis.view.contracts.engine.IViewEngine`."""
+# ruff: noqa: TC001
+# Keep constructor annotations available to runtime dependency inspection.
+"""Render templates asynchronously through the configured Jinja2 environment."""
 
 from collections import OrderedDict
 from threading import Lock, RLock
@@ -24,17 +26,16 @@ _PATH_CACHE_LOCK = Lock()
 _TEMPLATE_WORKERS = BoundedExecutor(2, max_pending=64, name="orionis-template")
 """Template workers used by ``engine``."""
 
+
 class Jinja2Engine(IViewEngine):
     """
-    Jinja2-based implementation of :class:`orionis.view.contracts.engine.IViewEngine`.
+    Render templates with Jinja2 through the view-engine contract.
 
     Converts dot-notation template names to filesystem paths and delegates
     all rendering to Jinja2's async rendering pipeline (``render_async``).
     The synchronous ``render`` method of Jinja2 is **never** called from
     this class.
     """
-
-    # ruff: noqa: TC001
 
     __slots__ = ("_environment", "_jinja", "_load_lock")
     """Declare the instance attribute slots reserved by this class."""
@@ -52,7 +53,7 @@ class Jinja2Engine(IViewEngine):
         Returns
         -------
         None
-            Initialise the engine with the configured view environment.
+            No return value.
         """
         self._environment: IViewEnvironment = environment
         """
@@ -98,7 +99,7 @@ class Jinja2Engine(IViewEngine):
         Returns
         -------
         None
-            Jinja's existing bounded and bytecode caches receive compiled templates.
+            No return value.
         """
         for template in templates:
             await _TEMPLATE_WORKERS.run(self._load, self._normalisePath(template))
@@ -107,9 +108,9 @@ class Jinja2Engine(IViewEngine):
         """
         Render a template asynchronously using Jinja2.
 
-        Dot-notation identifiers are converted to slash-delimited paths
-        with a ``.html`` suffix automatically appended when the name
-        carries no extension (e.g. ``'users.index'`` → ``'users/index.html'``).
+        Interpret identifiers without ``/`` as dot notation, including their
+        final segment (``'users.index'`` becomes ``'users/index.html'``).
+        Include ``/`` to pass a relative filename with an extension directly.
 
         Parameters
         ----------
@@ -130,7 +131,9 @@ class Jinja2Engine(IViewEngine):
             When the template file cannot be located by the configured
             loaders.
         orionis.view.exceptions.ViewRenderException
-            When Jinja2 raises any error during rendering.
+            When Jinja2 raises a template error while loading or rendering.
+        orionis.support.concurrency.WorkQueueFullError
+            When the bounded template workers cannot admit a cold load.
         """
         # Normalise template identifier to a filesystem path
         _path: str = _PATH_CACHE.get(template) or self._normalisePath(template)
@@ -150,10 +153,13 @@ class Jinja2Engine(IViewEngine):
             if _tmpl is None:
                 _tmpl = await _TEMPLATE_WORKERS.run(self._load, _path)
         except jinja2.TemplateNotFound as exc:
-            error_msg: str = (
+            error_msg: str = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Template not found: '{_path}'.  Check the configured view paths."
             )
             raise ViewTemplateNotFoundException(error_msg) from exc
+        except jinja2.TemplateError as exc:
+            error_msg = f"Load error in template '{_path}': {exc}"
+            raise ViewRenderException(error_msg) from exc
 
         try:
             return await _tmpl.render_async(**context)

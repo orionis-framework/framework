@@ -2,6 +2,10 @@
 
 Orionis resolves the current identity through browser sessions or personal access tokens and evaluates permissions, roles and policies. Context belongs to a request; shared services do not retain a global user.
 
+A retained context becomes a guest when replaced or when its request scope closes. Permission readers check that ownership again after waiting for another reader. Session operations queued behind another authentication transition also require a live request before invoking the guard.
+
+Public contracts resolve lazily from `orionis.auth.contracts`. Direct module imports and package reexports retain the same type identities without circular guard/entity initialization.
+
 1. [Identity and session login](identity-and-session.md): models, guards, login and logout.
 2. [Permissions, roles and policies](authorization.md): protect capabilities and resources.
 3. [Personal access tokens](personal-access-tokens.md): issue, restrict and revoke credentials.

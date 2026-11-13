@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class File(BaseEntity):
     """

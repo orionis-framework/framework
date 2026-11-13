@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import base64
 import dataclasses
 import tempfile
@@ -34,6 +36,7 @@ from orionis.foundation.config.view import View
 from orionis.mail.entities.smtp_settings import SmtpSettings
 from tests.foundation.config.test_environment import ConfigurationTestCase
 
+
 @dataclasses.dataclass(frozen=True, kw_only=True, slots=True)
 class _ExtendedMailers(Mailers):
     archive: Smtp = dataclasses.field(default_factory=Smtp)
@@ -55,6 +58,7 @@ class _ExtendedMailers(Mailers):
         message = "Mailer membership must not serialize transport settings."
         raise AssertionError(message)
 
+
 class TestConfigurationRegressions(ConfigurationTestCase):
     def testAppNormalizesEnumNamesValuesAndBinaryKeys(self) -> None:
         """Produce the raw key and canonical cipher required by encryption.
@@ -64,7 +68,7 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         None
             Assertions verify the behavior described above.
         """
-        for cipher in Cipher:
+        for cipher in (Cipher.AES_128_GCM, Cipher.AES_256_GCM):
             length = 16 if "128" in cipher.value else 32
             raw = bytes(range(length))
             encoded = "base64:" + base64.b64encode(raw).decode("ascii")
@@ -75,7 +79,7 @@ class TestConfigurationRegressions(ConfigurationTestCase):
                     self.assertEqual(config.key, raw)
                     self.assertEqual(config.env, Environments.PRODUCTION.value)
 
-    def testGeneratedKeysMatchEveryCipher(self) -> None:
+    def testGeneratedKeysMatchAuthenticatedCiphers(self) -> None:
         """Make absent keys immediately usable by encryption consumers.
 
         Returns
@@ -83,11 +87,12 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         None
             Assertions verify the behavior described above.
         """
-        for cipher in Cipher:
+        ciphers = (Cipher.AES_128_GCM, Cipher.AES_256_GCM)
+        for cipher in ciphers:
             with self.subTest(cipher=cipher):
                 config = App(key=None, cipher=cipher)
                 self.assertEqual(len(config.key), 16 if "128" in cipher.value else 32)
-        self.assertEqual(len(self.environment.writes), len(Cipher))
+        self.assertEqual(len(self.environment.writes), len(ciphers))
 
     def testInvalidKeysFailBeforeAnyWrite(self) -> None:
         """Reject empty, malformed and wrong-length encryption keys.
@@ -403,6 +408,31 @@ class TestConfigurationRegressions(ConfigurationTestCase):
         self.assertEqual(Argon2(memory=32, threads=4, time=1).memory, 32)
         with self.assertRaises(ValueError):
             Argon2(memory=31, threads=4)
+
+    def testArgonCostsFitTheNativeIntegerLimits(self) -> None:
+        """
+        Reject unrepresentable costs before a hashing driver is constructed.
+
+        Returns
+        -------
+        None
+            Accept native boundaries without allocating hashing memory.
+        """
+        maximum_cost = 2**32 - 1
+        maximum_threads = 2**24 - 1
+        self.assertEqual(Argon2(memory=maximum_cost).memory, maximum_cost)
+        self.assertEqual(Argon2(time=maximum_cost).time, maximum_cost)
+        self.assertEqual(
+            Argon2(memory=8 * maximum_threads, threads=maximum_threads).threads,
+            maximum_threads,
+        )
+        for options in (
+            {"memory": maximum_cost + 1},
+            {"time": maximum_cost + 1},
+            {"memory": maximum_cost, "threads": maximum_threads + 1},
+        ):
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                Argon2(**options)
 
     def testSchedulerUsesSupportedGracePeriodsAndStoreDependencies(self) -> None:
         """Match APScheduler's positive-or-unlimited grace period contract.

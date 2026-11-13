@@ -3,6 +3,7 @@
 from orionis.container.facades.facade import Facade
 from orionis.orm.contracts.query_builder import IQueryBuilder
 
+
 class DB(Facade):
     """Resolve the db service through the application facade."""
 

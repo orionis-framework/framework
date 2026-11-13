@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 
+
 class IAuthenticatable(ABC):
     """
     Define the minimum surface an application identity must expose.

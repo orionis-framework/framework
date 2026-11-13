@@ -1,10 +1,11 @@
+# ruff: noqa: TC003
+# Keep public callback and application annotations resolvable at runtime.
 """Provide view globals operations through ``_global_auth``."""
 
-from typing import TYPE_CHECKING
+from collections.abc import Callable
+
 from orionis.support.facades import Auth
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
 
 def _global_auth() -> Callable[[], type[Auth]]:
     """
@@ -12,9 +13,10 @@ def _global_auth() -> Callable[[], type[Auth]]:
 
     Returns
     -------
-    collections.abc.Callable[[], type[orionis.support.facades.Auth]]
+    collections.abc.Callable
         Callable exposing the authentication facade without caching a user.
     """
+
     def auth() -> type[Auth]:
         """
         Return the authentication facade for the active request.

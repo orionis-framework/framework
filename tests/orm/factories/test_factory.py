@@ -1,11 +1,16 @@
+# ruff: noqa: ARG002, PT009, PT027, S603, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Preserve model event hook signatures and run only controlled interpreter probes.
 import asyncio
 import json
 import subprocess
 import sys
+from contextlib import aclosing
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, ClassVar, Self
+from unittest.mock import patch
 from faker import Faker
 from faker.exceptions import UniquenessException
 from app.models.user import User
@@ -34,6 +39,7 @@ from orionis.orm.factories.exceptions import (
 from orionis.orm.resolver import ConnectionResolver
 from orionis.support.types.collection import Collection
 from orionis.test import TestCase
+
 
 class FactoryUser(Model):
     """Exercise real assignment, casts, defaults, timestamps, and persistence."""
@@ -66,6 +72,7 @@ class FactoryUser(Model):
         """
         return value.strip().lower()
 
+
 class UserFactory(Factory[FactoryUser]):
     """Provide an explicit definition suitable for every strategy."""
 
@@ -96,6 +103,7 @@ class UserFactory(Factory[FactoryUser]):
         """
         return self.state({"active": False})
 
+
 class _ConstantUniqueFactory(UserFactory):
     """Use a finite provider to expose unique lifecycle deterministically."""
 
@@ -113,6 +121,7 @@ class _ConstantUniqueFactory(UserFactory):
         )
         return values
 
+
 class _SharedDefinitionFactory(UserFactory):
     """Return an intentionally reused mapping to verify input isolation."""
 
@@ -124,7 +133,7 @@ class _SharedDefinitionFactory(UserFactory):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         super().__init__(seed=42)
         self.calls = 0
@@ -146,10 +155,12 @@ class _SharedDefinitionFactory(UserFactory):
         self.calls += 1
         return self.attributes
 
+
 class _MissingDefinitionFactory(Factory[FactoryUser]):
     """Leave the abstract definition unimplemented."""
 
     model = FactoryUser
+
 
 class _CopyAwareMapping(dict[str, object]):
     """Expose a custom dictionary copy protocol without instance state."""
@@ -173,6 +184,7 @@ class _CopyAwareMapping(dict[str, object]):
         memo[id(self)] = copied
         return copied
 
+
 class _AsyncDefinitionFactory(UserFactory):
     """Declare an invalid asynchronous definition."""
 
@@ -185,6 +197,7 @@ class _AsyncDefinitionFactory(UserFactory):
             Empty invalid definition fixture.
         """
         return {}
+
 
 class _FactoryDependency:
     """Supply a concrete dependency through the native container."""
@@ -200,6 +213,7 @@ class _FactoryDependency:
             Name supplied by the dependency.
         """
         return "Injected dependency"
+
 
 class _InjectedFactory(UserFactory):
     """Retain runtime constructor annotations used by Orionis DI."""
@@ -227,7 +241,7 @@ class _InjectedFactory(UserFactory):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         super().__init__(locale=locale, seed=seed)
         self.dependency = dependency
@@ -241,6 +255,7 @@ class _InjectedFactory(UserFactory):
             Faker data enriched by the dependency.
         """
         return {**super().definition(), "name": self.dependency.name()}
+
 
 class _DatabaseConfig:
     """Supply only the configuration interface needed by ConnectionManager."""
@@ -258,11 +273,11 @@ class _DatabaseConfig:
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.database = database
 
-    def config(self, key: str) -> dict[str, Any]:  # noqa: ARG002
+    def config(self, key: str) -> dict[str, Any]:
         """Return the file-backed database configuration.
 
         Parameters
@@ -282,6 +297,7 @@ class _DatabaseConfig:
             },
         }
 
+
 class _LifecycleObserver:
     """Observe the model's existing event lifecycle without replacing save."""
 
@@ -293,7 +309,7 @@ class _LifecycleObserver:
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.events: list[tuple[str, bool]] = []
 
@@ -308,7 +324,7 @@ class _LifecycleObserver:
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.events.append(("saving", user._exists))
 
@@ -323,7 +339,7 @@ class _LifecycleObserver:
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         await asyncio.sleep(0)
         self.events.append(("creating", user._exists))
@@ -340,7 +356,7 @@ class _LifecycleObserver:
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         await asyncio.sleep(0)
         self.events.append(("created", user._exists))
@@ -356,9 +372,10 @@ class _LifecycleObserver:
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.events.append(("saved", user._exists))
+
 
 class _PauseObserver:
     """Hold a genuine save event so concurrent access can be tested."""
@@ -371,12 +388,12 @@ class _PauseObserver:
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.entered = asyncio.Event()
         self.release = asyncio.Event()
 
-    async def saving(self, user: FactoryUser) -> None:  # noqa: ARG002
+    async def saving(self, user: FactoryUser) -> None:
         """Pause a write inside the model's ordinary event pipeline.
 
         Parameters
@@ -387,10 +404,11 @@ class _PauseObserver:
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.entered.set()
         await self.release.wait()
+
 
 def _indexed_email(index: int) -> dict[str, Any]:
     """Generate addresses from the factory-local sequence index.
@@ -407,6 +425,7 @@ def _indexed_email(index: int) -> dict[str, Any]:
     """
     return {"email": f"user{index + 1}@example.test"}
 
+
 def _mutating_state(attributes: dict[str, Any]) -> dict[str, Any]:
     """Mutate only the callback's defensive copy of current attributes.
 
@@ -422,6 +441,7 @@ def _mutating_state(attributes: dict[str, Any]) -> dict[str, Any]:
     """
     attributes["profile"]["tags"].append("incidental")
     return {"name": f"{attributes['name']} changed"}
+
 
 def _run_locale_probe(mode: str) -> dict[str, object]:
     """Check factory construction before app startup in a fresh interpreter.
@@ -457,7 +477,7 @@ print(json.dumps({
     "booted": after.isBooted if after is not None else False,
 }))
 """
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(
         [sys.executable, "-B", "-c", source, mode],
         cwd=Path(__file__).resolve().parents[3],
         check=True,
@@ -468,6 +488,7 @@ print(json.dumps({
     )
     return json.loads(result.stdout)
 
+
 class TestFactoryGeneration(TestCase):
     """Test public generation without requiring database resolution."""
 
@@ -477,7 +498,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = ApplicationUserFactory(seed=42)
         user = factory.make()
@@ -493,7 +514,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         attributes = UserFactory(seed=42).definition()
         self.assertIsInstance(attributes["name"], str)
@@ -509,7 +530,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         user = UserFactory().make(
             email="  OVERRIDE@EXAMPLE.TEST  ",
@@ -522,7 +543,7 @@ class TestFactoryGeneration(TestCase):
         self.assertIsNone(user.created_at)
         self.assertIsNone(user.tier)
         self.assertEqual(user.email, "override@example.test")
-        self.assertIs(user.active, False)
+        self.assertIs(user.active, expr2=False)
         self.assertEqual(user.profile, {"tags": ["cast"]})
 
     def testCountReturnsFrameworkCollectionForMultipleModels(self) -> None:
@@ -531,7 +552,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = UserFactory(seed=42)
         self.assertIs(factory.count(3), factory)
@@ -547,7 +568,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = _SharedDefinitionFactory().count(0)
         users = factory.make()
@@ -561,7 +582,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = (
             _SharedDefinitionFactory()
@@ -580,7 +601,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         user = (
             UserFactory()
@@ -596,7 +617,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = UserFactory()
         self.assertIs(factory.inactive(), factory)
@@ -609,7 +630,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         state = {"profile": {"tags": ["original"]}}
         factory = UserFactory().state(state).count(2)
@@ -628,7 +649,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = _SharedDefinitionFactory().state(_mutating_state)
         user = factory.make()
@@ -644,7 +665,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         profile = {"tags": ["input"]}
         users = UserFactory().count(2).make(profile=profile)
@@ -658,7 +679,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = _SharedDefinitionFactory().count(2)
         factory.attributes = {
@@ -677,7 +698,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         shared = []
         profile = {"first": shared, "second": shared}
@@ -696,7 +717,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = _SharedDefinitionFactory()
         self.assertEqual(factory.make(name="temporary").name, "temporary")
@@ -708,10 +729,11 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = _SharedDefinitionFactory().count(10000)
         iterator = factory.iterMake()
+        self.addCleanup(iterator.close)
         self.assertEqual(factory.calls, 0)
         self.assertIsInstance(next(iterator), FactoryUser)
         self.assertEqual(factory.calls, 1)
@@ -725,7 +747,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = UserFactory().count(2)
         iterator = factory.iterMake()
@@ -754,7 +776,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         first = UserFactory(seed=42)
         second = UserFactory(seed=42)
@@ -772,7 +794,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         first = UserFactory(seed=42).count(5).make()
         second = UserFactory(seed=43).count(5).make()
@@ -787,7 +809,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         for locale in ("en_US", "es_CO"):
             with self.subTest(locale=locale):
@@ -803,7 +825,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = _ConstantUniqueFactory(seed=42)
         self.assertEqual(factory.make().email, "only@example.test")
@@ -818,7 +840,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         first = _ConstantUniqueFactory(seed=42).make()
         second = _ConstantUniqueFactory(seed=42).make()
@@ -832,7 +854,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = UserFactory()
         for field in ("tier", "id", "created_at", "_exists", "unknown"):
@@ -849,7 +871,7 @@ class TestFactoryGeneration(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         container = object.__new__(Container)
         Container.__init__(container)
@@ -861,6 +883,7 @@ class TestFactoryGeneration(TestCase):
         self.assertEqual(user.name, "Injected dependency")
         self.assertEqual(user.email, UserFactory(seed=42).make().email)
 
+
 class TestFactoryLocale(TestCase):
     """Resolve the application locale without changing its startup lifecycle."""
 
@@ -870,7 +893,7 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.app = Application.current()
         self.assertIsNotNone(self.app)
@@ -882,7 +905,7 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.app.config("app.locale", "es_CO")
         first = UserFactory(seed=42)
@@ -898,7 +921,7 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         for locale, expected in (
             ("en", "en_US"),
@@ -916,7 +939,7 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.addCleanup(
             self.app.config,
@@ -940,7 +963,7 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.app.config("app.locale", "es_CO")
         factory = UserFactory(locale="fr_FR", seed=42)
@@ -953,7 +976,7 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.app.config("app.locale", "es_CO")
         factory = UserFactory(locale="not_a_real_locale", seed=42)
@@ -968,7 +991,7 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         result = _run_locale_probe("absent")
         self.assertEqual(result["locales"], ["en_US"])
@@ -982,7 +1005,7 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         result = _run_locale_probe("unconfigured")
         self.assertEqual(result["locales"], ["en_US"])
@@ -997,12 +1020,13 @@ class TestFactoryLocale(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.app.config("app.locale", "es_CO")
         factory = await self.app.build(UserFactory, seed=42)
         self.assertEqual(factory.fake.locales, ["es_CO"])
         self.assertEqual(factory.definition(), UserFactory(seed=42).definition())
+
 
 class TestFactoryValidation(TestCase):
     """Verify deliberate configuration errors and diagnostic boundaries."""
@@ -1013,7 +1037,7 @@ class TestFactoryValidation(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(FactoryConfigurationException):
             Factory()
@@ -1037,7 +1061,7 @@ class TestFactoryValidation(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         noncallable_type = type(
             "NoncallableFactory",
@@ -1063,7 +1087,7 @@ class TestFactoryValidation(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = _SharedDefinitionFactory()
         for value in (None, [], "attributes", {1: "non-string key"}):
@@ -1080,7 +1104,7 @@ class TestFactoryValidation(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         for count in (-1, True, False, 1.5, "2", None):
             with (
@@ -1095,7 +1119,7 @@ class TestFactoryValidation(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         for locale in ("", " ", [], 1):
             with (
@@ -1116,7 +1140,7 @@ class TestFactoryValidation(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         for state in (None, [], "state", 42):
             with (
@@ -1139,7 +1163,7 @@ class TestFactoryValidation(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = UserFactory().state(lambda _attributes: [])
         with self.assertRaises(FactoryDefinitionException):
@@ -1147,6 +1171,7 @@ class TestFactoryValidation(TestCase):
         factory = UserFactory().sequence(Sequence(lambda _index: {1: "value"}))
         with self.assertRaises(FactoryDefinitionException):
             factory.make()
+
 
 class TestFactoryPersistence(TestCase):
     """Exercise saves and concurrent factories against a real SQLite file."""
@@ -1157,17 +1182,15 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         self.directory = TemporaryDirectory(prefix="orionis-factories-")
         self.addCleanup(self.directory.cleanup)
         database = str(Path(self.directory.name) / "factories.sqlite")
         self.manager = ConnectionManager(_DatabaseConfig(database))
-        self.previous_manager = ConnectionResolver._manager
-        ConnectionResolver.setManager(self.manager)
+        self.enterContext(patch.object(ConnectionResolver, "_manager", self.manager))
+        self.enterContext(patch.dict(FactoryUser.__meta__.events, clear=True))
         self.addAsyncCleanup(self.manager.disconnect)
-        self.addCleanup(ConnectionResolver.setManager, self.previous_manager)
-        self.addCleanup(FactoryUser.flushEvents)
         await self.manager.connection().createTable(FactoryUser.__meta__.table)
 
     async def testApplicationFactoryPersistsUserWithAnExplicitPasswordHash(
@@ -1178,7 +1201,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         await self.manager.connection().createTable(User.__meta__.table)
         hasher = Argon2Hasher(memory=8, threads=1, time=1)
@@ -1208,7 +1231,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         user = await UserFactory(seed=42).create(
             name="Persisted",
@@ -1232,7 +1255,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         observer = _LifecycleObserver()
         FactoryUser.observe(observer)
@@ -1246,7 +1269,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         observer = _LifecycleObserver()
         FactoryUser.observe(observer)
@@ -1269,7 +1292,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         users = await UserFactory().count(3).sequence(Sequence(_indexed_email)).create()
         self.assertIsInstance(users, Collection)
@@ -1283,7 +1306,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = _SharedDefinitionFactory().count(0)
         users = await factory.create()
@@ -1298,15 +1321,14 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = UserFactory().count(10000)
-        iterator = factory.iterCreate()
-        self.assertEqual(await FactoryUser.query().count(), 0)
-        user = await anext(iterator)
-        self.assertTrue(user._exists)
-        self.assertEqual(await FactoryUser.query().count(), 1)
-        await iterator.aclose()
+        async with aclosing(factory.iterCreate()) as iterator:
+            self.assertEqual(await FactoryUser.query().count(), 0)
+            user = await anext(iterator)
+            self.assertTrue(user._exists)
+            self.assertEqual(await FactoryUser.query().count(), 1)
         await factory.count(1).create()
         self.assertEqual(await FactoryUser.query().count(), 2)
 
@@ -1316,7 +1338,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         FactoryUser.registerEvent("creating", lambda _user: False)
         factory = UserFactory()
@@ -1332,7 +1354,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = UserFactory()
         await factory.create(email="duplicate@example.test")
@@ -1347,7 +1369,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         factory = (
             UserFactory()
@@ -1370,7 +1392,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         connection = self.manager.connection()
         await connection.begin()
@@ -1388,7 +1410,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         first = UserFactory(seed=42).count(5)
         second = UserFactory(seed=42).count(5)
@@ -1427,7 +1449,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         observer = _PauseObserver()
         FactoryUser.observe(observer)
@@ -1453,7 +1475,7 @@ class TestFactoryPersistence(TestCase):
         Returns
         -------
         None
-            Verify the behavior described above.
+            No return value.
         """
         observer = _PauseObserver()
         FactoryUser.observe(observer)

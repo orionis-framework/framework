@@ -14,11 +14,15 @@ __all__ = [
 ]
 
 _EXPORTS = {
-    "AccessTokenRepository": ("orionis.auth.tokens.repository", "AccessTokenRepository"),
+    "AccessTokenRepository": (
+        "orionis.auth.tokens.repository",
+        "AccessTokenRepository",
+    ),
     "generate_token_secret": ("orionis.auth.tokens.functions", "generate_token_secret"),
     "hash_token_secret": ("orionis.auth.tokens.functions", "hash_token_secret"),
 }
 """Public export names mapped to their defining modules and attributes."""
+
 
 def __getattr__(name: str) -> object:
     """

@@ -1,12 +1,15 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 from app.http.schemas.auth.login import LoginSchema
 from orionis.auth.contracts.manager import IAuthManager
 from orionis.http import HttpResponse
-from orionis.http.default.controllers.login_controller import \
-    LoginController as BaseLoginController
+from orionis.http.default.controllers.login_controller import (
+    LoginController as BaseLoginController,
+)
 from orionis.http.request import Request
 
-class LoginController(BaseLoginController):
 
+class LoginController(BaseLoginController):
     async def index(
         self,
     ) -> HttpResponse:

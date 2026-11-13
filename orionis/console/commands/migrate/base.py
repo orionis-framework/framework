@@ -6,6 +6,7 @@ from orionis.console.base.command import BaseCommand
 from orionis.console.output.executor import Executor
 from orionis.database.migrations.events import MigrationEvents
 
+
 class MigrationCommand(BaseCommand):
     """
     Base class shared by every migration console command.

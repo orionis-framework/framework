@@ -13,6 +13,7 @@ from orionis.orm.factories.exceptions import (
 type SequenceEntry = dict[str, Any] | Callable[[int], dict[str, Any]]
 """Type alias for ``dict[str, Any] | Callable[[int], dict[str, Any]]``."""
 
+
 class Sequence:
     """
     Describe cycling attributes without owning a shared counter.
@@ -41,7 +42,7 @@ class Sequence:
         Returns
         -------
         None
-            Apply the described operation.
+            No return value.
         """
         if not entries:
             error_msg = "A sequence requires at least one entry."
@@ -56,8 +57,7 @@ class Sequence:
                 raise FactoryConfigurationException(error_msg)
             try:
                 validated.append(
-                    entry if is_callback
-                    else copy_attributes(entry, "Sequence"),
+                    entry if is_callback else copy_attributes(entry, "Sequence"),
                 )
             except FactoryDefinitionException as exc:
                 error_msg = "Sequence entries must be dictionaries or callbacks."

@@ -1,14 +1,19 @@
+# ruff: noqa: ARG001, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# The injected method accepts an unused receiver to preserve its signature.
+
 import inspect
 from orionis.introspection.dependencies.entities.signature import Signature
 from orionis.introspection.instances.reflection import ReflectionInstance
 from orionis.test import TestCase
+
 
 class SampleReflected:
     """Sample class used as a fixture for ReflectionInstance tests."""
 
     public_attr: int
     _protected_attr: str
-    __private_attr: str # NOSONAR
+    __private_attr: str
 
     def __init__(self, x: int = 10) -> None:
         """
@@ -22,7 +27,7 @@ class SampleReflected:
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.public_attr = x
         self._protected_attr = "prot"
@@ -42,7 +47,7 @@ class SampleReflected:
         """
         return self.public_attr
 
-    async def publicAsyncMethod(self) -> int: # NOSONAR
+    async def publicAsyncMethod(self) -> int:
         """
         Return the value of public_attr asynchronously.
 
@@ -64,7 +69,7 @@ class SampleReflected:
         """
         return self._protected_attr
 
-    async def _protectedAsyncMethod(self) -> str: # NOSONAR
+    async def _protectedAsyncMethod(self) -> str:
         """
         Return the value of _protected_attr asynchronously.
 
@@ -75,7 +80,7 @@ class SampleReflected:
         """
         return self._protected_attr
 
-    def __privateMethod(self) -> str: # NOSONAR
+    def __privateMethod(self) -> str:
         """
         Return the value of __private_attr.
 
@@ -86,7 +91,7 @@ class SampleReflected:
         """
         return self.__private_attr
 
-    async def __privateAsyncMethod(self) -> str: # NOSONAR
+    async def __privateAsyncMethod(self) -> str:
         """
         Return the value of __private_attr asynchronously.
 
@@ -148,7 +153,7 @@ class SampleReflected:
         return cls.__name__
 
     @classmethod
-    def __privateClassMethod(cls) -> str: # NOSONAR
+    def __privateClassMethod(cls) -> str:
         """
         Return the class name (private).
 
@@ -160,7 +165,7 @@ class SampleReflected:
         return cls.__name__
 
     @classmethod
-    async def __privateAsyncClassMethod(cls) -> str: # NOSONAR
+    async def __privateAsyncClassMethod(cls) -> str:
         """
         Return the class name asynchronously (private).
 
@@ -222,7 +227,7 @@ class SampleReflected:
         return "prot_async_static"
 
     @staticmethod
-    def __privateStaticMethod() -> str: # NOSONAR
+    def __privateStaticMethod() -> str:
         """
         Return a private static string identifier.
 
@@ -234,7 +239,7 @@ class SampleReflected:
         return "priv_static"
 
     @staticmethod
-    async def __privateAsyncStaticMethod() -> str: # NOSONAR
+    async def __privateAsyncStaticMethod() -> str:
         """
         Return a private static string identifier asynchronously.
 
@@ -283,6 +288,7 @@ class SampleReflected:
         """
         return self.__private_attr
 
+
 def _make_mutable_instance() -> ReflectionInstance:
     """
     Return a ReflectionInstance wrapping a fresh mutable class.
@@ -323,6 +329,7 @@ def _make_mutable_instance() -> ReflectionInstance:
 
     return ReflectionInstance(MutableSample())
 
+
 class _DunderPropertySample:
     """Class whose only property uses a dunder name."""
 
@@ -337,6 +344,7 @@ class _DunderPropertySample:
             Always returns 0.
         """
         return 0
+
 
 def _make_moduleless_instance() -> ReflectionInstance:
     """
@@ -354,7 +362,8 @@ def _make_moduleless_instance() -> ReflectionInstance:
     )
     return ReflectionInstance(klass())
 
-def _replacement_method(self) -> int:  # noqa: ARG001
+
+def _replacement_method(self: object) -> int:
     """
     Return a fixed integer used when injecting methods at runtime.
 
@@ -364,6 +373,7 @@ def _replacement_method(self) -> int:  # noqa: ARG001
         Always returns 3.
     """
     return 3
+
 
 # Accessors that trigger the lazy single-pass member scan on first use
 _SCAN_TRIGGERING_GETTERS = (
@@ -409,8 +419,8 @@ _SCAN_TRIGGERING_GETTERS = (
     "getPrivateProperties",
 )
 
-class TestReflectionInstanceInit(TestCase):
 
+class TestReflectionInstanceInit(TestCase):
     def testInitWithValidInstanceSucceeds(self) -> None:
         """
         Assert that passing a valid user-defined instance does not raise.
@@ -418,7 +428,7 @@ class TestReflectionInstanceInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         self.assertIsInstance(ri, ReflectionInstance)
@@ -430,7 +440,7 @@ class TestReflectionInstanceInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionInstance(SampleReflected)
@@ -442,7 +452,7 @@ class TestReflectionInstanceInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionInstance(42)
@@ -454,13 +464,13 @@ class TestReflectionInstanceInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionInstance(None)
 
-class TestReflectionInstanceCacheProtocol(TestCase):
 
+class TestReflectionInstanceCacheProtocol(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for cache protocol tests.
@@ -468,7 +478,7 @@ class TestReflectionInstanceCacheProtocol(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -479,7 +489,7 @@ class TestReflectionInstanceCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.ri["test_key"] = "test_value"
         self.assertEqual(self.ri["test_key"], "test_value")
@@ -491,7 +501,7 @@ class TestReflectionInstanceCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.ri["exists"] = 1
         self.assertIn("exists", self.ri)
@@ -503,7 +513,7 @@ class TestReflectionInstanceCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("missing_key_xyz", self.ri)
 
@@ -514,14 +524,14 @@ class TestReflectionInstanceCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.ri["to_delete"] = "bye"
         del self.ri["to_delete"]
         self.assertNotIn("to_delete", self.ri)
 
-class TestReflectionInstanceIdentity(TestCase):
 
+class TestReflectionInstanceIdentity(TestCase):
     def setUp(self) -> None:
         """
         Instantiate SampleReflected and wrap it for identity tests.
@@ -529,7 +539,7 @@ class TestReflectionInstanceIdentity(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.instance = SampleReflected()
         self.ri = ReflectionInstance(self.instance)
@@ -541,7 +551,7 @@ class TestReflectionInstanceIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.ri.getInstance(), self.instance)
 
@@ -552,7 +562,7 @@ class TestReflectionInstanceIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.ri.getClass(), SampleReflected)
 
@@ -563,7 +573,7 @@ class TestReflectionInstanceIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.ri.getClassName(), "SampleReflected")
 
@@ -574,7 +584,7 @@ class TestReflectionInstanceIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         name = self.ri.getModuleName()
         self.assertIsInstance(name, str)
@@ -587,13 +597,13 @@ class TestReflectionInstanceIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         full = self.ri.getModuleWithClassName()
         self.assertIn("SampleReflected", full)
 
-class TestReflectionInstanceMetadata(TestCase):
 
+class TestReflectionInstanceMetadata(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for metadata retrieval tests.
@@ -601,7 +611,7 @@ class TestReflectionInstanceMetadata(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -612,7 +622,7 @@ class TestReflectionInstanceMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         doc = self.ri.getDocstring()
         self.assertIsNotNone(doc)
@@ -625,7 +635,7 @@ class TestReflectionInstanceMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         bases = self.ri.getBaseClasses()
         self.assertIsInstance(bases, tuple)
@@ -638,14 +648,14 @@ class TestReflectionInstanceMetadata(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         path = self.ri.getFile()
         self.assertIsNotNone(path)
         self.assertIsInstance(path, str)
 
-class TestReflectionInstanceSourceCode(TestCase):
 
+class TestReflectionInstanceSourceCode(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for source code retrieval tests.
@@ -653,7 +663,7 @@ class TestReflectionInstanceSourceCode(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -664,7 +674,7 @@ class TestReflectionInstanceSourceCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         src = self.ri.getSourceCode()
         self.assertIsInstance(src, str)
@@ -677,7 +687,7 @@ class TestReflectionInstanceSourceCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         src = self.ri.getSourceCode("publicMethod")
         self.assertIsInstance(src, str)
@@ -690,7 +700,7 @@ class TestReflectionInstanceSourceCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         src = self.ri.getSourceCode("no_such_method_xyz")
         self.assertIsNone(src)
@@ -702,14 +712,14 @@ class TestReflectionInstanceSourceCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         first = self.ri.getSourceCode()
         second = self.ri.getSourceCode()
         self.assertIs(first, second)
 
-class TestReflectionInstanceAnnotations(TestCase):
 
+class TestReflectionInstanceAnnotations(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for annotation retrieval tests.
@@ -717,7 +727,7 @@ class TestReflectionInstanceAnnotations(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -728,7 +738,7 @@ class TestReflectionInstanceAnnotations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getAnnotations(), dict)
 
@@ -739,7 +749,7 @@ class TestReflectionInstanceAnnotations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         annotations = self.ri.getAnnotations()
         self.assertIn("public_attr", annotations)
@@ -752,14 +762,14 @@ class TestReflectionInstanceAnnotations(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         annotations = self.ri.getAnnotations()
         self.assertIn("__private_attr", annotations)
         self.assertEqual(annotations["__private_attr"], str)
 
-class TestReflectionInstancePublicAttributes(TestCase):
 
+class TestReflectionInstancePublicAttributes(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for public attribute tests.
@@ -767,7 +777,7 @@ class TestReflectionInstancePublicAttributes(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -778,7 +788,7 @@ class TestReflectionInstancePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getPublicAttributes(), dict)
 
@@ -789,7 +799,7 @@ class TestReflectionInstancePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("public_attr", self.ri.getPublicAttributes())
 
@@ -800,12 +810,12 @@ class TestReflectionInstancePublicAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("_protected_attr", self.ri.getPublicAttributes())
 
-class TestReflectionInstanceProtectedAttributes(TestCase):
 
+class TestReflectionInstanceProtectedAttributes(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for protected attribute tests.
@@ -813,7 +823,7 @@ class TestReflectionInstanceProtectedAttributes(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -824,7 +834,7 @@ class TestReflectionInstanceProtectedAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getProtectedAttributes(), dict)
 
@@ -835,12 +845,12 @@ class TestReflectionInstanceProtectedAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protected_attr", self.ri.getProtectedAttributes())
 
-class TestReflectionInstancePrivateAttributes(TestCase):
 
+class TestReflectionInstancePrivateAttributes(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for private attribute tests.
@@ -848,7 +858,7 @@ class TestReflectionInstancePrivateAttributes(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -859,7 +869,7 @@ class TestReflectionInstancePrivateAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getPrivateAttributes(), dict)
 
@@ -870,14 +880,14 @@ class TestReflectionInstancePrivateAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         private = self.ri.getPrivateAttributes()
         self.assertIn("__private_attr", private)
         self.assertEqual(private["__private_attr"], "priv")
 
-class TestReflectionInstanceDunderAttributes(TestCase):
 
+class TestReflectionInstanceDunderAttributes(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for dunder attribute tests.
@@ -885,7 +895,7 @@ class TestReflectionInstanceDunderAttributes(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -896,7 +906,7 @@ class TestReflectionInstanceDunderAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getDunderAttributes(), dict)
 
@@ -907,15 +917,15 @@ class TestReflectionInstanceDunderAttributes(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(
             self.ri.getMagicAttributes(),
             self.ri.getDunderAttributes(),
         )
 
-class TestReflectionInstanceAttributeOps(TestCase):
 
+class TestReflectionInstanceAttributeOps(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for attribute operation tests.
@@ -923,7 +933,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -934,7 +944,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(self.ri.hasAttribute("public_attr"))
 
@@ -945,7 +955,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertFalse(self.ri.hasAttribute("nonexistent_xyz"))
 
@@ -956,7 +966,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.ri.getAttribute("public_attr"), 10)
 
@@ -967,7 +977,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(
             self.ri.getAttribute("nonexistent_xyz", "fallback"),
@@ -981,7 +991,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         result = ri.setAttribute("public_attr", 99)
@@ -995,7 +1005,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             self.ri.setAttribute("bad", lambda: None)
@@ -1007,7 +1017,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.ri.setAttribute("class", "value")
@@ -1019,7 +1029,7 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         ri.setAttribute("temp_attr", "toRemove")
@@ -1034,14 +1044,14 @@ class TestReflectionInstanceAttributeOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         # publicMethod has a docstring; retrieve it via instance attribute path
         doc = self.ri.getAttributeDocstring("publicMethod")
         self.assertIsInstance(doc, (str, type(None)))
 
-class TestReflectionInstancePublicMethods(TestCase):
 
+class TestReflectionInstancePublicMethods(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for public method discovery tests.
@@ -1049,7 +1059,7 @@ class TestReflectionInstancePublicMethods(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1060,7 +1070,7 @@ class TestReflectionInstancePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getPublicMethods(), list)
 
@@ -1071,7 +1081,7 @@ class TestReflectionInstancePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicMethod", self.ri.getPublicMethods())
 
@@ -1082,7 +1092,7 @@ class TestReflectionInstancePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicMethod", self.ri.getPublicSyncMethods())
 
@@ -1093,7 +1103,7 @@ class TestReflectionInstancePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicAsyncMethod", self.ri.getPublicAsyncMethods())
 
@@ -1104,12 +1114,12 @@ class TestReflectionInstancePublicMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(self.ri.hasMethod("publicMethod"))
 
-class TestReflectionInstanceProtectedMethods(TestCase):
 
+class TestReflectionInstanceProtectedMethods(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for protected method discovery tests.
@@ -1117,7 +1127,7 @@ class TestReflectionInstanceProtectedMethods(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1128,7 +1138,7 @@ class TestReflectionInstanceProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getProtectedMethods(), list)
 
@@ -1139,7 +1149,7 @@ class TestReflectionInstanceProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protectedMethod", self.ri.getProtectedMethods())
 
@@ -1150,15 +1160,15 @@ class TestReflectionInstanceProtectedMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedAsyncMethod",
             self.ri.getProtectedAsyncMethods(),
         )
 
-class TestReflectionInstancePrivateMethods(TestCase):
 
+class TestReflectionInstancePrivateMethods(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for private method discovery tests.
@@ -1166,7 +1176,7 @@ class TestReflectionInstancePrivateMethods(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1177,7 +1187,7 @@ class TestReflectionInstancePrivateMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getPrivateMethods(), list)
 
@@ -1188,7 +1198,7 @@ class TestReflectionInstancePrivateMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateMethod", self.ri.getPrivateMethods())
 
@@ -1199,12 +1209,12 @@ class TestReflectionInstancePrivateMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateAsyncMethod", self.ri.getPrivateAsyncMethods())
 
-class TestReflectionInstanceClassMethods(TestCase):
 
+class TestReflectionInstanceClassMethods(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for class method discovery tests.
@@ -1212,7 +1222,7 @@ class TestReflectionInstanceClassMethods(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1223,7 +1233,7 @@ class TestReflectionInstanceClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicClassMethod", self.ri.getPublicClassMethods())
 
@@ -1234,7 +1244,7 @@ class TestReflectionInstanceClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicClassMethod", self.ri.getPublicClassSyncMethods())
 
@@ -1245,7 +1255,7 @@ class TestReflectionInstanceClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "publicAsyncClassMethod",
@@ -1259,7 +1269,7 @@ class TestReflectionInstanceClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedClassMethod",
@@ -1273,7 +1283,7 @@ class TestReflectionInstanceClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedAsyncClassMethod",
@@ -1287,7 +1297,7 @@ class TestReflectionInstanceClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateClassMethod", self.ri.getPrivateClassMethods())
 
@@ -1298,15 +1308,15 @@ class TestReflectionInstanceClassMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "__privateAsyncClassMethod",
             self.ri.getPrivateClassAsyncMethods(),
         )
 
-class TestReflectionInstanceStaticMethods(TestCase):
 
+class TestReflectionInstanceStaticMethods(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for static method discovery tests.
@@ -1314,7 +1324,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1325,7 +1335,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicStaticMethod", self.ri.getPublicStaticMethods())
 
@@ -1336,7 +1346,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicStaticMethod", self.ri.getPublicStaticSyncMethods())
 
@@ -1347,7 +1357,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "publicAsyncStaticMethod",
@@ -1361,7 +1371,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedStaticMethod",
@@ -1375,7 +1385,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "_protectedAsyncStaticMethod",
@@ -1389,7 +1399,7 @@ class TestReflectionInstanceStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateStaticMethod", self.ri.getPrivateStaticMethods())
 
@@ -1400,15 +1410,15 @@ class TestReflectionInstanceStaticMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn(
             "__privateAsyncStaticMethod",
             self.ri.getPrivateStaticAsyncMethods(),
         )
 
-class TestReflectionInstanceDunderMethods(TestCase):
 
+class TestReflectionInstanceDunderMethods(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for dunder method discovery tests.
@@ -1416,7 +1426,7 @@ class TestReflectionInstanceDunderMethods(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1427,7 +1437,7 @@ class TestReflectionInstanceDunderMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getDunderMethods(), list)
 
@@ -1438,7 +1448,7 @@ class TestReflectionInstanceDunderMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__init__", self.ri.getDunderMethods())
 
@@ -1449,12 +1459,12 @@ class TestReflectionInstanceDunderMethods(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.ri.getMagicMethods(), self.ri.getDunderMethods())
 
-class TestReflectionInstanceMethodOps(TestCase):
 
+class TestReflectionInstanceMethodOps(TestCase):
     def testSetMethodReturnsTrueAndAttributeIsCallable(self) -> None:
         """
         Assert that setMethod returns True and the callable is accessible.
@@ -1462,7 +1472,7 @@ class TestReflectionInstanceMethodOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         result = ri.setMethod("injected", lambda: "hello")
@@ -1476,7 +1486,7 @@ class TestReflectionInstanceMethodOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         with self.assertRaises(TypeError):
@@ -1489,7 +1499,7 @@ class TestReflectionInstanceMethodOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         with self.assertRaises(AttributeError):
@@ -1502,7 +1512,7 @@ class TestReflectionInstanceMethodOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = _make_mutable_instance()
         self.assertTrue(ri.hasMethod("toRemove"))
@@ -1516,7 +1526,7 @@ class TestReflectionInstanceMethodOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         with self.assertRaises(AttributeError):
@@ -1529,7 +1539,7 @@ class TestReflectionInstanceMethodOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         sig = ri.getMethodSignature("publicMethod")
@@ -1542,7 +1552,7 @@ class TestReflectionInstanceMethodOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         doc = ri.getMethodDocstring("publicMethod")
@@ -1555,14 +1565,14 @@ class TestReflectionInstanceMethodOps(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         ri = ReflectionInstance(SampleReflected())
         with self.assertRaises(AttributeError):
             ri.getMethodDocstring("nonexistent_method_xyz")
 
-class TestReflectionInstanceProperties(TestCase):
 
+class TestReflectionInstanceProperties(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for property discovery tests.
@@ -1570,7 +1580,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1581,7 +1591,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.ri.getProperties(), list)
 
@@ -1592,7 +1602,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicProperty", self.ri.getProperties())
 
@@ -1603,7 +1613,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("publicProperty", self.ri.getPublicProperties())
 
@@ -1614,7 +1624,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("_protectedProperty", self.ri.getProtectedProperties())
 
@@ -1625,7 +1635,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("__privateProperty", self.ri.getPrivateProperties())
 
@@ -1636,7 +1646,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.ri.getProperty("publicProperty"), 10)
 
@@ -1647,7 +1657,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.ri.getProperty("nonexistent_prop_xyz")
@@ -1659,7 +1669,7 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.ri.getPropertySignature("publicProperty")
         self.assertIsInstance(sig, inspect.Signature)
@@ -1671,13 +1681,13 @@ class TestReflectionInstanceProperties(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         doc = self.ri.getPropertyDocstring("publicProperty")
         self.assertIsInstance(doc, str)
 
-class TestReflectionInstanceDependencies(TestCase):
 
+class TestReflectionInstanceDependencies(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for dependency inspection tests.
@@ -1685,7 +1695,7 @@ class TestReflectionInstanceDependencies(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1696,7 +1706,7 @@ class TestReflectionInstanceDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.ri.constructorSignature()
         self.assertIsInstance(sig, Signature)
@@ -1708,7 +1718,7 @@ class TestReflectionInstanceDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.ri.constructorSignature()
         self.assertTrue(hasattr(sig, "resolved"))
@@ -1720,7 +1730,7 @@ class TestReflectionInstanceDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         sig = self.ri.methodSignature("publicMethod")
         self.assertIsInstance(sig, Signature)
@@ -1732,13 +1742,13 @@ class TestReflectionInstanceDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.ri.methodSignature("nonexistent_method_xyz")
 
-class TestReflectionInstanceClearCache(TestCase):
 
+class TestReflectionInstanceClearCache(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for cache clearing tests.
@@ -1746,7 +1756,7 @@ class TestReflectionInstanceClearCache(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1757,7 +1767,7 @@ class TestReflectionInstanceClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.ri.clearCache())
 
@@ -1768,14 +1778,14 @@ class TestReflectionInstanceClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.ri["sentinel"] = "value"
         self.ri.clearCache()
         self.assertNotIn("sentinel", self.ri)
 
-class TestReflectionInstanceLazyScan(TestCase):
 
+class TestReflectionInstanceLazyScan(TestCase):
     def testEveryAccessorTriggersTheLazyScanOnItsOwn(self) -> None:
         """
         Assert that each accessor populates the member cache by itself.
@@ -1783,7 +1793,7 @@ class TestReflectionInstanceLazyScan(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
@@ -1796,8 +1806,8 @@ class TestReflectionInstanceLazyScan(TestCase):
             result = getattr(reflection, getter)()
             self.assertIsInstance(result, (dict, list), msg=getter)
 
-class TestReflectionInstancePrivateAccess(TestCase):
 
+class TestReflectionInstancePrivateAccess(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for private member access tests.
@@ -1805,7 +1815,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -1816,7 +1826,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         source = self.ri.getSourceCode("__privateMethod")
         self.assertIn("def __privateMethod", source)
@@ -1828,7 +1838,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         signature = self.ri.getMethodSignature("__privateMethod")
         self.assertIsInstance(signature, inspect.Signature)
@@ -1840,7 +1850,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         docstring = self.ri.getMethodDocstring("__privateMethod")
         self.assertIn("__private_attr", docstring)
@@ -1852,7 +1862,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.ri.getProperty("__privateProperty"), "priv")
 
@@ -1863,7 +1873,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         signature = self.ri.getPropertySignature("__privateProperty")
         self.assertIsInstance(signature, inspect.Signature)
@@ -1875,7 +1885,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         docstring = self.ri.getPropertyDocstring("__privateProperty")
         self.assertIn("__private_attr", docstring)
@@ -1887,7 +1897,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNotNone(self.ri.methodSignature("__privateMethod"))
 
@@ -1898,7 +1908,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(
             self.ri.getAttributeDocstring("__private_attr"),
@@ -1912,7 +1922,7 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = _make_mutable_instance()
         self.assertTrue(reflection.setAttribute("__hidden", 5))
@@ -1927,19 +1937,25 @@ class TestReflectionInstancePrivateAccess(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
 
         Notes
         -----
-        ``setMethod`` binds the callable on the instance, so the injected
-        member surfaces through the instance variable scan.
+        ``setMethod`` stores the callable on the instance; the method scan
+        presents its source-level private name.
         """
         reflection = _make_mutable_instance()
         self.assertTrue(reflection.setMethod("__injected", _replacement_method))
-        self.assertIn("__injected", reflection.getPrivateAttributes())
+        self.assertIn("__injected", reflection.getPrivateMethods())
+        self.assertEqual(
+            reflection.getInstance().__dict__["_MutableSample__injected"](
+                reflection.getInstance(),
+            ),
+            3,
+        )
+
 
 class TestReflectionInstanceMemoization(TestCase):
-
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for memoization tests.
@@ -1947,20 +1963,9 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
-
-    def testClassSourceCodeIsMemoized(self) -> None:
-        """
-        Assert that getSourceCode returns the cached class source.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIs(self.ri.getSourceCode(), self.ri.getSourceCode())
 
     def testMethodSourceCodeIsMemoized(self) -> None:
         """
@@ -1969,7 +1974,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.ri.getSourceCode("publicMethod"),
@@ -1983,7 +1988,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.ri.getFile(), self.ri.getFile())
 
@@ -1994,7 +1999,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.ri.getAnnotations(), self.ri.getAnnotations())
 
@@ -2005,7 +2010,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.ri.getAttributes(), self.ri.getAttributes())
 
@@ -2016,7 +2021,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.ri.getMethodSignature("publicMethod"),
@@ -2030,7 +2035,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.ri.getMethodDocstring("publicMethod"),
@@ -2044,7 +2049,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.ri.getPropertySignature("publicProperty"),
@@ -2058,7 +2063,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.ri.getPropertyDocstring("publicProperty"),
@@ -2072,7 +2077,7 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.ri.constructorSignature(),
@@ -2086,15 +2091,15 @@ class TestReflectionInstanceMemoization(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(
             self.ri.methodSignature("publicMethod"),
             self.ri.methodSignature("publicMethod"),
         )
 
-class TestReflectionInstanceErrorBranches(TestCase):
 
+class TestReflectionInstanceErrorBranches(TestCase):
     def setUp(self) -> None:
         """
         Instantiate a ReflectionInstance for error branch tests.
@@ -2102,7 +2107,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            This method does not return a value.
+            No return value.
         """
         self.ri = ReflectionInstance(SampleReflected())
 
@@ -2113,7 +2118,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         klass = type("_MainScoped", (), {"__module__": "__main__"})
         with self.assertRaises(ValueError):
@@ -2126,7 +2131,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = _make_moduleless_instance()
         self.assertIsNone(reflection.getSourceCode())
@@ -2138,7 +2143,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = _make_moduleless_instance()
         self.assertIsNone(reflection.getFile())
@@ -2150,7 +2155,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.ri.getMethodSignature("ghostMethod")
@@ -2162,7 +2167,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.ri.getPropertySignature("ghostProperty")
@@ -2174,7 +2179,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.ri.getPropertyDocstring("ghostProperty")
@@ -2186,7 +2191,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.ri.getAttributeDocstring("ghost_attr")
@@ -2198,7 +2203,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(AttributeError):
             self.ri.removeAttribute("ghost_attr")
@@ -2210,8 +2215,7 @@ class TestReflectionInstanceErrorBranches(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         reflection = ReflectionInstance(_DunderPropertySample())
         self.assertEqual(reflection.getProperties(), [])
-

@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0415, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Keep runtime reflection annotations and intentionally deferred imports.
 import asyncio
 from dataclasses import FrozenInstanceError
 from types import MappingProxyType
@@ -10,6 +13,7 @@ from orionis.test import TestCase
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Iterator
+
 
 class _AsyncEvents:
     """Record lazy source iteration and deterministic asynchronous cleanup."""
@@ -72,6 +76,7 @@ class _AsyncEvents:
         """
         self.closed += 1
 
+
 class _FailingIterable(_AsyncEvents):
     """Fail when creating an iterator to exercise unstarted-source cleanup."""
 
@@ -87,6 +92,7 @@ class _FailingIterable(_AsyncEvents):
         """
         error_msg = "cannot create iterator"
         raise RuntimeError(error_msg)
+
 
 class _ClosingEvents(_AsyncEvents):
     """Suspend asynchronous cleanup until a test permits completion."""
@@ -127,8 +133,8 @@ class _ClosingEvents(_AsyncEvents):
         if self.close_error is not None:
             raise self.close_error
 
-class TestServerSentEvent(TestCase):
 
+class TestServerSentEvent(TestCase):
     def testEncodesIndividualFields(self) -> None:
         """Encode each field with exact LF framing and no implicit payload.
 
@@ -159,7 +165,11 @@ class TestServerSentEvent(TestCase):
             Verify the field order and exact combined frame.
         """
         event = ServerSentEvent(
-            data="ready", event="connected", id="1", retry=500, comment="ping",
+            data="ready",
+            event="connected",
+            id="1",
+            retry=500,
+            comment="ping",
         )
         self.assertEqual(
             event.encode(),
@@ -176,7 +186,8 @@ class TestServerSentEvent(TestCase):
         """
         event = ServerSentEvent(data="first\r\nsecond\rthird\n")
         self.assertEqual(
-            event.encode(), b"data: first\ndata: second\ndata: third\ndata: \n\n",
+            event.encode(),
+            b"data: first\ndata: second\ndata: third\ndata: \n\n",
         )
 
     def testNormalizesCommentNewlines(self) -> None:
@@ -200,7 +211,8 @@ class TestServerSentEvent(TestCase):
         """
         data = "left\u2028middle\u2029right\vfinal"
         self.assertEqual(
-            ServerSentEvent(data=data).encode(), f"data: {data}\n\n".encode(),
+            ServerSentEvent(data=data).encode(),
+            f"data: {data}\n\n".encode(),
         )
 
     def testEncodesUnicodeAsUtf8(self) -> None:
@@ -213,7 +225,8 @@ class TestServerSentEvent(TestCase):
         """
         event = ServerSentEvent(data="¡Hola 世界! 🌍", event="aviso", id="é")
         self.assertEqual(
-            event.encode(), "event: aviso\nid: é\ndata: ¡Hola 世界! 🌍\n\n".encode(),
+            event.encode(),
+            "event: aviso\nid: é\ndata: ¡Hola 世界! 🌍\n\n".encode(),
         )
 
     def testEmptyStringsRemainExplicitFields(self) -> None:
@@ -306,8 +319,8 @@ class TestServerSentEvent(TestCase):
             event.data = "changed"
         self.assertFalse(hasattr(event, "__dict__"))
 
-class TestEventStreamResponse(TestCase):
 
+class TestEventStreamResponse(TestCase):
     async def asyncSetUp(self) -> None:
         """Capture unexpected event-loop errors during stream lifecycle tests.
 
@@ -334,7 +347,9 @@ class TestEventStreamResponse(TestCase):
         self.assertEqual(self.loop_errors, [])
 
     def recordLoopError(
-        self, _loop: asyncio.AbstractEventLoop, context: dict,
+        self,
+        _loop: asyncio.AbstractEventLoop,
+        context: dict,
     ) -> None:
         """Retain unexpected background errors for the teardown assertion.
 
@@ -375,11 +390,14 @@ class TestEventStreamResponse(TestCase):
             Verify default SSE headers and omitted hop-by-hop headers.
         """
         result = EventStreamResponse([])
-        self.assertEqual(result.getStringHeaders(), [
-            ("content-type", "text/event-stream; charset=utf-8"),
-            ("cache-control", "no-cache"),
-            ("x-accel-buffering", "no"),
-        ])
+        self.assertEqual(
+            result.getStringHeaders(),
+            [
+                ("content-type", "text/event-stream; charset=utf-8"),
+                ("cache-control", "no-cache"),
+                ("x-accel-buffering", "no"),
+            ],
+        )
         self.assertFalse(result.hasHeader("connection"))
         self.assertFalse(result.hasHeader("content-length"))
 
@@ -391,13 +409,15 @@ class TestEventStreamResponse(TestCase):
         None
             Verify explicit headers are preserved without mutating their source.
         """
-        headers = MappingProxyType({
-            "Content-Type": "text/event-stream; custom=true",
-            "Cache-Control": "private, no-store",
-            "X-Accel-Buffering": "yes",
-            "Content-Length": "100",
-            "X-Application": "events",
-        })
+        headers = MappingProxyType(
+            {
+                "Content-Type": "text/event-stream; custom=true",
+                "Cache-Control": "private, no-store",
+                "X-Accel-Buffering": "yes",
+                "Content-Length": "100",
+                "X-Application": "events",
+            },
+        )
         result = EventStreamResponse([], status_code=201, headers=headers)
         self.assertEqual(result.getStatusCode(), 201)
         self.assertEqual(result.getHeader("content-type"), [headers["Content-Type"]])
@@ -462,6 +482,7 @@ class TestEventStreamResponse(TestCase):
         None
             Verify asynchronous event values are encoded as expected.
         """
+
         async def events() -> AsyncIterator[ServerSentEvent | str]:
             """Yield a text event and a manual heartbeat.
 
@@ -489,8 +510,15 @@ class TestEventStreamResponse(TestCase):
             Verify raw text and structured data produce identical frames.
         """
         values = (
-            "", "plain", "\n", "\r", "\r\n", "first\r\nsecond\rthird\n",
-            "\n\nlast\n", "left\u2028middle\u2029right\vfinal", "nul\0value",
+            "",
+            "plain",
+            "\n",
+            "\r",
+            "\r\n",
+            "first\r\nsecond\rthird\n",
+            "\n\nlast\n",
+            "left\u2028middle\u2029right\vfinal",
+            "nul\0value",
             "\u00e9\u4e16\u754c",
         )
         expected = [ServerSentEvent(data=value).encode() for value in values]
@@ -723,8 +751,8 @@ class TestEventStreamResponse(TestCase):
         self.assertIsInstance(caught.exception.__cause__, asyncio.CancelledError)
         self.assertEqual(source.closed, 1)
 
-class TestEventStreamFactory(TestCase):
 
+class TestEventStreamFactory(TestCase):
     async def testFactoryForwardsArgumentsAndDefersBackground(self) -> None:
         """Use the public factory with the existing response options.
 

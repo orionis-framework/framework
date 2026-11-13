@@ -1,9 +1,10 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Describe registered servers without opening their transports."""
 
 from orionis.console.base.command import BaseCommand
 from orionis.mcp.contracts.manager import IMcpManager
 
-# ruff: noqa: TC001
 
 class McpListCommand(BaseCommand):
     """Describe registered servers without opening their transports."""

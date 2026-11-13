@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Roll back migrations and immediately apply them again."""
 
 from typing import ClassVar
@@ -5,10 +7,9 @@ from orionis.console.args.argument import Argument
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
+
 class MigrateRefreshCommand(MigrationCommand):
     """Roll back migrations and immediately apply them again."""
-
-    # ruff: noqa: TC001
 
     signature: str = "migrate:refresh"
     """Signature identifier: ``migrate:refresh``."""

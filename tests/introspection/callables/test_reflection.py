@@ -1,3 +1,7 @@
+# ruff: noqa: ARG001, E731, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# An unused defaulted parameter and an assigned lambda are reflection targets.
+
 import inspect
 import types
 from orionis.introspection.callables.reflection import ReflectionCallable
@@ -8,7 +12,8 @@ from orionis.test import TestCase
 # Test fixtures
 # ---------------------------------------------------------------------------
 
-def _simple_function(x: int, y: str = "hello") -> bool:  # noqa: ARG001
+
+def _simple_function(x: int, y: str = "hello") -> bool:
     """Return whether x is positive.
 
     Parameters
@@ -25,18 +30,21 @@ def _simple_function(x: int, y: str = "hello") -> bool:  # noqa: ARG001
     """
     return x > 0
 
-def _no_doc_function():
+
+def _no_doc_function() -> None:
     """Provide a callable whose runtime docstring is absent.
 
     Returns
     -------
     None
-        No value is returned when the fixture is called.
+        No return value.
     """
+
 
 _no_doc_function.__doc__ = None
 
-_lambda = lambda a, b: a + b  # noqa: E731
+_lambda = lambda a, b: a + b
+
 
 class _SampleClass:
     def regularMethod(self, value: int) -> int:
@@ -70,6 +78,7 @@ class _SampleClass:
         """
         return n + 1
 
+
 # Function whose code object points at a synthetic file, so that the
 # interpreter cannot recover its source lines.
 _sourceless_function = types.FunctionType(
@@ -82,8 +91,8 @@ _sourceless_function = types.FunctionType(
 # __init__ / construction
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableInit(TestCase):
 
+class TestReflectionCallableInit(TestCase):
     def testInitWithRegularFunctionSucceeds(self) -> None:
         """
         Assert that wrapping a plain function does not raise.
@@ -91,7 +100,7 @@ class TestReflectionCallableInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_simple_function)
         self.assertIsInstance(rc, ReflectionCallable)
@@ -103,7 +112,7 @@ class TestReflectionCallableInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_lambda)
         self.assertIsInstance(rc, ReflectionCallable)
@@ -115,7 +124,7 @@ class TestReflectionCallableInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         obj = _SampleClass()
         rc = ReflectionCallable(obj.regularMethod)
@@ -128,7 +137,7 @@ class TestReflectionCallableInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_SampleClass.staticMethod)
         self.assertIsInstance(rc, ReflectionCallable)
@@ -140,7 +149,7 @@ class TestReflectionCallableInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionCallable(42)  # type: ignore[arg-type]
@@ -152,7 +161,7 @@ class TestReflectionCallableInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
 
         class _Plain:
@@ -168,24 +177,25 @@ class TestReflectionCallableInit(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         with self.assertRaises(TypeError):
             ReflectionCallable(len)  # type: ignore[arg-type]
+
 
 # ---------------------------------------------------------------------------
 # Cache protocol  (__getitem__, __setitem__, __contains__, __delitem__)
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableCacheProtocol(TestCase):
 
+class TestReflectionCallableCacheProtocol(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionCallable for cache tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionCallable(_simple_function)
 
@@ -196,7 +206,7 @@ class TestReflectionCallableCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rc["my_key"] = "my_value"
         self.assertEqual(self.rc["my_key"], "my_value")
@@ -208,7 +218,7 @@ class TestReflectionCallableCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rc["exists"] = True
         self.assertIn("exists", self.rc)
@@ -220,7 +230,7 @@ class TestReflectionCallableCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertNotIn("ghost_key", self.rc)
 
@@ -231,7 +241,7 @@ class TestReflectionCallableCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rc["absent_key"])
 
@@ -242,7 +252,7 @@ class TestReflectionCallableCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rc["to_delete"] = 99
         del self.rc["to_delete"]
@@ -255,23 +265,24 @@ class TestReflectionCallableCacheProtocol(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         del self.rc["never_existed"]  # must not raise
+
 
 # ---------------------------------------------------------------------------
 # Identity methods
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableIdentity(TestCase):
 
+class TestReflectionCallableIdentity(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionCallable for identity tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionCallable(_simple_function)
 
@@ -282,20 +293,9 @@ class TestReflectionCallableIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIs(self.rc.getCallable(), _simple_function)
-
-    def testGetNameReturnsStr(self) -> None:
-        """
-        Assert that getName returns a str.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        self.assertIsInstance(self.rc.getName(), str)
 
     def testGetNameMatchesFunctionName(self) -> None:
         """
@@ -304,7 +304,7 @@ class TestReflectionCallableIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.rc.getName(), "_simple_function")
 
@@ -315,33 +315,9 @@ class TestReflectionCallableIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getModuleName(), str)
-
-    def testGetModuleWithCallableNameContainsName(self) -> None:
-        """
-        Assert that getModuleWithCallableName contains the callable name.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        fqn = self.rc.getModuleWithCallableName()
-        self.assertIn("_simple_function", fqn)
-
-    def testGetModuleWithCallableNameContainsModule(self) -> None:
-        """
-        Assert that getModuleWithCallableName contains the module name.
-
-        Returns
-        -------
-        None
-            Raises AssertionError on failure.
-        """
-        fqn = self.rc.getModuleWithCallableName()
-        self.assertIn(self.rc.getModuleName(), fqn)
 
     def testGetModuleWithCallableNameFormat(self) -> None:
         """
@@ -350,19 +326,20 @@ class TestReflectionCallableIdentity(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         fqn = self.rc.getModuleWithCallableName()
         module, _, name = fqn.rpartition(".")
         self.assertEqual(name, "_simple_function")
         self.assertEqual(module, self.rc.getModuleName())
 
+
 # ---------------------------------------------------------------------------
 # Docstring
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableDocstring(TestCase):
 
+class TestReflectionCallableDocstring(TestCase):
     def testGetDocstringReturnsStr(self) -> None:
         """
         Assert that getDocstring returns a str for a documented function.
@@ -370,7 +347,7 @@ class TestReflectionCallableDocstring(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_simple_function)
         self.assertIsInstance(rc.getDocstring(), str)
@@ -382,7 +359,7 @@ class TestReflectionCallableDocstring(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_simple_function)
         self.assertIn("positive", rc.getDocstring())
@@ -394,24 +371,25 @@ class TestReflectionCallableDocstring(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_no_doc_function)
         self.assertEqual(rc.getDocstring(), "")
+
 
 # ---------------------------------------------------------------------------
 # Source code
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableSourceCode(TestCase):
 
+class TestReflectionCallableSourceCode(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionCallable for source-code tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionCallable(_simple_function)
 
@@ -422,7 +400,7 @@ class TestReflectionCallableSourceCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getSourceCode(), str)
 
@@ -433,7 +411,7 @@ class TestReflectionCallableSourceCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         source = self.rc.getSourceCode()
         self.assertIn("def _simple_function", source)
@@ -445,7 +423,7 @@ class TestReflectionCallableSourceCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         first = self.rc.getSourceCode()
         second = self.rc.getSourceCode()
@@ -458,25 +436,26 @@ class TestReflectionCallableSourceCode(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_sourceless_function)
         with self.assertRaises(AttributeError):
             rc.getSourceCode()
 
+
 # ---------------------------------------------------------------------------
 # File path
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableFile(TestCase):
 
+class TestReflectionCallableFile(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionCallable for file-path tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionCallable(_simple_function)
 
@@ -487,7 +466,7 @@ class TestReflectionCallableFile(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getFile(), str)
 
@@ -498,7 +477,7 @@ class TestReflectionCallableFile(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertTrue(self.rc.getFile().endswith(".py"))
 
@@ -509,25 +488,26 @@ class TestReflectionCallableFile(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         first = self.rc.getFile()
         second = self.rc.getFile()
         self.assertIs(first, second)
 
+
 # ---------------------------------------------------------------------------
 # Signature
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableSignature(TestCase):
 
+class TestReflectionCallableSignature(TestCase):
     def setUp(self) -> None:
         """Initialise a ReflectionCallable for signature tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionCallable(_simple_function)
 
@@ -538,7 +518,7 @@ class TestReflectionCallableSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsInstance(self.rc.getSignature(), inspect.Signature)
 
@@ -549,7 +529,7 @@ class TestReflectionCallableSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("x", self.rc.getSignature().parameters)
 
@@ -560,7 +540,7 @@ class TestReflectionCallableSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("y", self.rc.getSignature().parameters)
 
@@ -571,7 +551,7 @@ class TestReflectionCallableSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         param_y = self.rc.getSignature().parameters["y"]
         self.assertEqual(param_y.default, "hello")
@@ -583,7 +563,7 @@ class TestReflectionCallableSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         first = self.rc.getSignature()
         second = self.rc.getSignature()
@@ -596,19 +576,20 @@ class TestReflectionCallableSignature(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_lambda)
         sig = rc.getSignature()
         self.assertIn("a", sig.parameters)
         self.assertIn("b", sig.parameters)
 
+
 # ---------------------------------------------------------------------------
 # Dependencies
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableDependencies(TestCase):
 
+class TestReflectionCallableDependencies(TestCase):
     def testGetDependenciesReturnsSignature(self) -> None:
         """
         Assert that getDependencies returns a Signature instance.
@@ -616,7 +597,7 @@ class TestReflectionCallableDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_simple_function)
         result = rc.getDependencies()
@@ -629,7 +610,7 @@ class TestReflectionCallableDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         rc = ReflectionCallable(_simple_function)
         first = rc.getDependencies()
@@ -643,35 +624,36 @@ class TestReflectionCallableDependencies(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
 
-        def _bare() -> None: # NOSONAR
+        def _bare() -> None:
             """Run the bare helper.
 
             Returns
             -------
             None
-                Completes the operation described above.
+                No return value.
             """
 
         rc = ReflectionCallable(_bare)
         deps = rc.getDependencies()
         self.assertTrue(deps.noArgumentsRequired())
 
+
 # ---------------------------------------------------------------------------
 # clearCache
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableClearCache(TestCase):
 
+class TestReflectionCallableClearCache(TestCase):
     def setUp(self) -> None:
         """Initialise a shared ReflectionCallable for clearCache tests.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.rc = ReflectionCallable(_simple_function)
 
@@ -682,7 +664,7 @@ class TestReflectionCallableClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIsNone(self.rc.clearCache())
 
@@ -693,7 +675,7 @@ class TestReflectionCallableClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.rc["my_key"] = "value"
         self.rc.clearCache()
@@ -706,7 +688,7 @@ class TestReflectionCallableClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         _ = self.rc.getSourceCode()
         self.rc.clearCache()
@@ -719,26 +701,27 @@ class TestReflectionCallableClearCache(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         _ = self.rc.getSignature()
         self.rc.clearCache()
         sig = self.rc.getSignature()
         self.assertIsInstance(sig, inspect.Signature)
 
+
 # ---------------------------------------------------------------------------
 # Bound method specific behaviour
 # ---------------------------------------------------------------------------
 
-class TestReflectionCallableBoundMethod(TestCase):
 
+class TestReflectionCallableBoundMethod(TestCase):
     def setUp(self) -> None:
         """Initialise a bound method ReflectionCallable.
 
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self.obj = _SampleClass()
         self.rc = ReflectionCallable(self.obj.regularMethod)
@@ -750,7 +733,7 @@ class TestReflectionCallableBoundMethod(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertEqual(self.rc.getName(), "regularMethod")
 
@@ -761,7 +744,7 @@ class TestReflectionCallableBoundMethod(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         params = self.rc.getSignature().parameters
         self.assertNotIn("self", params)
@@ -774,6 +757,6 @@ class TestReflectionCallableBoundMethod(TestCase):
         Returns
         -------
         None
-            Raises AssertionError on failure.
+            No return value.
         """
         self.assertIn("regularMethod", self.rc.getSourceCode())

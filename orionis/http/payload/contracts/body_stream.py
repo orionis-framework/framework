@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
+
 class IBodyStream(ABC):
     """
     Define the minimal contract for reading an HTTP request body.

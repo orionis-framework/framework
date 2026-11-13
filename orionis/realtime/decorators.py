@@ -4,15 +4,14 @@ Includes ``validate_remote_name``, ``remote``, ``remote``, ``remote``.
 """
 
 from types import FunctionType
-from typing import TYPE_CHECKING, cast, overload
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
+from typing import cast, overload
+from collections.abc import Callable
 
 MAX_TARGET_LENGTH = 128
 """Max target length value used by ``decorators``."""
 REMOTE_ATTRIBUTE = "__orionis_remote_name__"
 """Remote attribute identifier: ``__orionis_remote_name__``."""
+
 
 def validate_remote_name(name: str) -> None:
     """
@@ -35,24 +34,31 @@ def validate_remote_name(name: str) -> None:
         128 characters.
     """
     if (
-        not isinstance(name, str) or not name.isidentifier()
-        or name.startswith("_") or len(name) > MAX_TARGET_LENGTH
+        not isinstance(name, str)
+        or not name.isidentifier()
+        or name.startswith("_")
+        or len(name) > MAX_TARGET_LENGTH
     ):
         message = "Remote names must be public identifiers of at most 128 characters"
         raise ValueError(message)
 
+
 @overload
-def remote[F: Callable](function: F, *, name: str | None = None) -> F:
-    ...
+def remote[F: Callable](function: F, *, name: str | None = None) -> F: ...
+
 
 @overload
 def remote[F: Callable](
-    function: None = None, *, name: str | None = None,
-) -> Callable[[F], F]:
-    ...
+    function: None = None,
+    *,
+    name: str | None = None,
+) -> Callable[[F], F]: ...
+
 
 def remote[F: Callable](
-    function: F | None = None, *, name: str | None = None,
+    function: F | None = None,
+    *,
+    name: str | None = None,
 ) -> F | Callable[[F], F]:
     """
     Mark an instance method for remote dispatch without wrapping it.

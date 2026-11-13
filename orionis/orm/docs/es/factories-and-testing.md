@@ -25,9 +25,12 @@ class ProductFactory(Factory[Product]):
         return {"name": self.fake.word(), "status": "draft"}
 
 
-products = ProductFactory(seed=7).count(2).sequence(
-    Sequence({"status": "draft"}, {"status": "published"})
-).make()
+products = (
+    ProductFactory(seed=7)
+    .count(2)
+    .sequence(Sequence({"status": "draft"}, {"status": "published"}))
+    .make()
+)
 assert [product.status for product in products] == ["draft", "published"]
 assert all(product.isDirty("name") for product in products)
 ```
@@ -40,7 +43,7 @@ assert all(product.isDirty("name") for product in products)
 
 `Sequence({...}, {...})` rota estados; admite estados callable según el contrato de secuencia. El índice pertenece a la factory y avanza entre generaciones. No dependas de un índice global compartido entre tests.
 
-`self.fake` es la facade de Faker con nombres camelCase: `firstName()`, `safeEmail()` y `word()` son ejemplos. `locale=` selecciona idioma; sin él se intenta `app.locale` y se utiliza `en_US` si no hay configuración/locale usable. `fake.unique` conserva valores vistos por esa instancia; `clearUnique()` permite reiniciar ese registro. Unicidad de Faker no garantiza unicidad contra filas existentes en la base. No uses estos datos para credenciales reales.
+`self.fake` es la facade de Faker con nombres camelCase: `firstName()`, `safeEmail()` y `word()` son ejemplos. `locale=` selecciona idioma; sin él se intenta `app.locale` y se utiliza `en_US` si no hay configuración/locale usable. `fake.unique` conserva valores vistos por esa instancia; `clearUnique()` permite reiniciar ese registro. Una vista unique derivada comparte inicialmente el historial de valores; limpiar esa vista inicia un historial independiente, conforme al comportamiento de Faker. La unicidad de Faker no garantiza unicidad contra filas existentes en la base. No uses estos datos para credenciales reales.
 
 `fake.optional` ofrece una vista de proveedores con parámetro `prob`; `fake.addProvider(provider)` registra proveedores personalizados e invalida métodos cacheados. `seedInstance(seed)` y `seedLocale(locale, seed)` permiten reseed explícito; `locales` devuelve una lista independiente. `UniqueFake` y `OptionalFake` están exportadas para tipado y extensión de estas vistas, sin exponer servicios dentro de los atributos generados.
 
@@ -76,6 +79,6 @@ async def create_first_product():
 
 Este ejemplo persiste solo el primero y necesita infraestructura de base. No es una API de lectura streaming del ORM.
 
-Una factory conserva contador, estados, secuencia y estado de Faker. Su uso solapado o reconfiguración durante iteración produce `FactoryConcurrencyException`: crea una instancia por tarea. `FactoryConfigurationException` y `FactoryDefinitionException` distinguen definición inválida de error de persistencia. Los fallos SQL conservan los errores de la capa de base de datos.
+Una factory conserva contador, estados, secuencia y estado de Faker. Su uso solapado o reconfiguración durante iteración produce `FactoryConcurrencyException`: crea una instancia por tarea. `FactoryConfigurationException` informa de configuración inválida de la factory; `FactoryDefinitionException`, de definiciones generadas inválidas. `FactoryPersistenceException` informa de un veto de guardado o un resultado de persistencia no utilizable. Los fallos SQL conservan los errores de la capa de base de datos.
 
 Para pruebas aisladas, usa SQLite en memoria y un gestor/resolver propios, como los tests del módulo. `ConnectionResolver.setManager(manager)` instala el puente global y `clear()` lo elimina; no sustituyas ese global mientras otras pruebas/tareas consultan. Las pruebas de dialecto requieren el servidor correspondiente. Integra estas prácticas con el módulo [Testing](../../../test/docs/es/README.md).

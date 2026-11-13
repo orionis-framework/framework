@@ -11,6 +11,7 @@ from orionis.support.entities.base import BaseEntity
 _CONNECTION_NAMES: frozenset[str] = frozenset(ConnectionName._member_names_)
 """Define the supported database connection names."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Database(BaseEntity):
     """

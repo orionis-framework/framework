@@ -7,6 +7,7 @@ from orionis.foundation.config.database.enums import PGSQLCharset, PGSQLSSLMode
 from orionis.foundation.config.validation import normalize_enum, validate_integer
 from orionis.support.entities.base import BaseEntity
 
+
 @dataclass(frozen=True, kw_only=True)
 class PGSQL(BaseEntity):
     """

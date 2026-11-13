@@ -1,3 +1,5 @@
+# ruff: noqa: PLR2004, PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from operator import setitem
 from uuid import UUID
 from orionis.http.routes.exceptions.method_not_allowed import MethodNotAllowed
@@ -12,6 +14,7 @@ from tests.http.routes.test_nested_routing import (
     make_router,
     route_handler,
 )
+
 
 class TestRouteResolverBehavior(TestCase):
     """Cover dynamic indexes, precedence, failure paths and cache isolation."""
@@ -165,7 +168,8 @@ class TestRouteResolverBehavior(TestCase):
             for index in range(24):
                 path = f"/api/{prefix}/r{index}/42"
                 expected = next(
-                    route for route in tables["GET"]["dynamic"]
+                    route
+                    for route in tables["GET"]["dynamic"]
                     if route.regex.fullmatch(path)
                 )
                 result = resolver.resolve("GET", path)
@@ -195,13 +199,15 @@ class TestRouteResolverBehavior(TestCase):
             for prefix in ("r0", "r15", "r31", "unknown"):
                 path = f"/{prefix}/last"
                 expected = next(
-                    route for route in tables["GET"]["dynamic"]
+                    route
+                    for route in tables["GET"]["dynamic"]
                     if route.regex.fullmatch(path)
                 )
                 with self.subTest(position=position, path=path):
                     self.assertIs(resolver.resolve("GET", path).route, expected)
                     self.assertEqual(
-                        resolver.options(path), ["GET", "HEAD", "OPTIONS"],
+                        resolver.options(path),
+                        ["GET", "HEAD", "OPTIONS"],
                     )
                     with self.assertRaises(MethodNotAllowed):
                         resolver.resolve("POST", path)
@@ -226,7 +232,8 @@ class TestRouteResolverBehavior(TestCase):
             self.assertEqual(result.route.name, "partial")
             self.assertEqual(result.params, {"stem": prefix})
         self.assertEqual(
-            resolver.resolve("GET", "/api/r31-tail/42").params, {"id": 42},
+            resolver.resolve("GET", "/api/r31-tail/42").params,
+            {"id": 42},
         )
         with self.assertRaises(RouteNotFound):
             resolver.resolve("GET", "/api/unknown/end")
@@ -249,7 +256,8 @@ class TestRouteResolverBehavior(TestCase):
             for index in range(12):
                 path = f"/{prefix}/w{index}-text"
                 expected = next(
-                    route for route in tables["GET"]["dynamic"]
+                    route
+                    for route in tables["GET"]["dynamic"]
                     if route.regex.fullmatch(path)
                 )
                 self.assertIs(resolver.resolve("GET", path).route, expected)
@@ -302,7 +310,8 @@ class TestRouteResolverBehavior(TestCase):
         self.assertIsNot(resolver.resolve("GET", "/items/1"), current)
         uncached = RouteResolver(compile_router(router), hot_cache_size=0)
         self.assertIsNot(
-            uncached.resolve("GET", "/items/1"), uncached.resolve("GET", "/items/1"),
+            uncached.resolve("GET", "/items/1"),
+            uncached.resolve("GET", "/items/1"),
         )
 
     def testCachedParametersCannotBeMutated(self) -> None:
@@ -377,6 +386,29 @@ class TestRouteResolverBehavior(TestCase):
         with self.assertRaises(RouteNotFound):
             RouteResolver(compile_router(router)).resolve("GET", "/items/" + "9" * 5000)
 
+    def testOptionsAndMethodErrorsHonorRejectedParameterConversions(self) -> None:
+        """Do not advertise methods whose converters reject the requested path.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        router = make_router()
+        router.get("/items/{id:int}", route_handler)
+        path = "/items/" + "9" * 5000
+        resolver = RouteResolver(compile_router(router))
+        with self.subTest(case="unsupported path"):
+            self.assertEqual(resolver.options(path), [])
+            with self.assertRaises(RouteNotFound):
+                resolver.resolve("POST", path)
+        router.post("/items/{value:str}", route_handler)
+        resolver = RouteResolver(compile_router(router))
+        self.assertEqual(resolver.options(path), ["OPTIONS", "POST"])
+        self.assertEqual(resolver.resolve("POST", path).params["value"], "9" * 5000)
+        with self.assertRaises(MethodNotAllowed):
+            resolver.resolve("DELETE", path)
+
     def testConversionFailureAllowsLaterDynamicRoute(self) -> None:
         """Resolve a later matching route when a converter rejects the path.
 
@@ -425,6 +457,7 @@ class TestRouteResolverBehavior(TestCase):
         routes = resolver.allRoutes()
         routes.clear()
         self.assertEqual(len(resolver.allRoutes()), 4)
+
 
 class TestInvalidRouteDefinitions(TestCase):
     """Reject definitions before they reach request dispatch."""
@@ -551,7 +584,8 @@ class TestInvalidRouteDefinitions(TestCase):
         resolver = RouteResolver(compile_router(router))
         for path in ("/page", "/tuple"):
             self.assertEqual(
-                resolver.resolve("GET", path).route.action["method"], "index",
+                resolver.resolve("GET", path).route.action["method"],
+                "index",
             )
         for view in ("", " ", 42):
             with self.subTest(view=view), self.assertRaises(ValueError):

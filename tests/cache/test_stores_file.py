@@ -1,14 +1,17 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import asyncio
 import tempfile
 import threading
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from orionis.cache.stores.file import FileCacheBackend
 from orionis.test import TestCase
 
-class TestFileCacheBackend(TestCase):
 
+class TestFileCacheBackend(TestCase):
     def setUp(self) -> None:
         """Create a temporary directory and a FileCacheBackend before each test.
 
@@ -18,24 +21,12 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._path = Path(self._tmpdir.name)
         self._backend = FileCacheBackend(self._path)
-
-    def tearDown(self) -> None:
-        """Remove the temporary directory after each test.
-
-        Ensures all cache files created during the test are cleaned up
-        regardless of whether the test passed or failed.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     # ── get ──────────────────────────────────────────────────────────────────
 
@@ -48,7 +39,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.get("absent")
         self.assertIsNone(result)
@@ -62,7 +53,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.get("absent", default="fallback")
         self.assertEqual(result, "fallback")
@@ -75,7 +66,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("k1", "hello")
         result = await self._backend.get("k1")
@@ -90,12 +81,16 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("ttl_key", "data", ttl=0.05)
-        await asyncio.sleep(0.1)
-        result = await self._backend.get("ttl_key")
-        self.assertIsNone(result)
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.file.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("ttl_key", "data", ttl=0.05)
+            clock.now += 0.1
+            self.assertIsNone(await self._backend.get("ttl_key"))
 
     # ── set ──────────────────────────────────────────────────────────────────
 
@@ -107,7 +102,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.set("k", "v")
         self.assertTrue(result)
@@ -121,7 +116,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("k", "first")
         await self._backend.set("k", "second")
@@ -137,11 +132,16 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("persist", 42, ttl=None)
-        result = await self._backend.get("persist")
-        self.assertEqual(result, 42)
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.file.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("persist", 42, ttl=None)
+            clock.now += 10**9
+            self.assertEqual(await self._backend.get("persist"), 42)
 
     async def testSetStoresNoneValue(self) -> None:
         """Store and retrieve an explicit None value.
@@ -152,7 +152,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("null_key", None)
         result = await self._backend.get("null_key", default="missing")
@@ -168,7 +168,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("ex", "val")
         self.assertTrue(await self._backend.exists("ex"))
@@ -181,7 +181,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertFalse(await self._backend.exists("ghost"))
 
@@ -193,11 +193,16 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("exp", "x", ttl=0.05)
-        await asyncio.sleep(0.1)
-        self.assertFalse(await self._backend.exists("exp"))
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.file.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("exp", "x", ttl=0.05)
+            clock.now += 0.1
+            self.assertFalse(await self._backend.exists("exp"))
 
     # ── delete ───────────────────────────────────────────────────────────────
 
@@ -209,11 +214,12 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("del", "v")
         result = await self._backend.delete("del")
         self.assertEqual(result, 1)
+        self.assertIsNone(await self._backend.get("del"))
 
     async def testDeleteMissingKeyReturnsZero(self) -> None:
         """Return 0 when deleting a key that does not exist.
@@ -223,25 +229,10 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.delete("never_set")
         self.assertEqual(result, 0)
-
-    async def testDeletedKeyIsNoLongerAccessible(self) -> None:
-        """Confirm the key is gone after a delete call.
-
-        Validates that get returns the default value after a successful
-        deletion.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        await self._backend.set("gone", "data")
-        await self._backend.delete("gone")
-        self.assertIsNone(await self._backend.get("gone"))
 
     # ── clear ────────────────────────────────────────────────────────────────
 
@@ -253,7 +244,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("a", 1)
         await self._backend.set("b", 2)
@@ -271,7 +262,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.clear()
         self.assertTrue(result)
@@ -287,7 +278,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("x", 10)
         await self._backend.set("y", 20)
@@ -303,7 +294,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         results = await self._backend.multiGet(["m1", "m2"], default=0)
         self.assertEqual(results, [0, 0])
@@ -317,7 +308,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("p", "val")
         camel = await self._backend.multiGet(["p"])
@@ -335,7 +326,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         pairs = [("q1", "a"), ("q2", "b")]
         result = await self._backend.multiSet(pairs)
@@ -352,7 +343,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.multi_set([("alias_k", "alias_v")])
         self.assertTrue(result)
@@ -368,7 +359,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.add("new_k", "new_v")
         self.assertTrue(result)
@@ -383,28 +374,12 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("dup", "original")
         with self.assertRaises(ValueError):
             await self._backend.add("dup", "conflict")
-
-    async def testAddDoesNotOverwriteExistingValue(self) -> None:
-        """Leave the existing value unchanged when add raises.
-
-        Validates that the ValueError from add does not corrupt the
-        previously stored entry.
-
-        Returns
-        -------
-        None
-            Assertions verify the behavior described above.
-        """
-        import contextlib
-        await self._backend.set("safe", "kept")
-        with contextlib.suppress(ValueError):
-            await self._backend.add("safe", "new")
-        self.assertEqual(await self._backend.get("safe"), "kept")
+        self.assertEqual(await self._backend.get("dup"), "original")
 
     # ── increment ────────────────────────────────────────────────────────────
 
@@ -416,7 +391,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         result = await self._backend.increment("cnt", 5)
         self.assertEqual(result, 5)
@@ -430,7 +405,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("counter", 10)
         result = await self._backend.increment("counter", 3)
@@ -444,7 +419,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("one", 0)
         result = await self._backend.increment("one")
@@ -459,7 +434,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("dec", 10)
         result = await self._backend.increment("dec", -4)
@@ -476,7 +451,7 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         nested = self._path / "deep" / "nested"
         FileCacheBackend(nested)
@@ -491,15 +466,15 @@ class TestFileCacheBackend(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await self._backend.set("kA", "A")
         await self._backend.set("kB", "B")
         self.assertEqual(await self._backend.get("kA"), "A")
         self.assertEqual(await self._backend.get("kB"), "B")
 
-class TestFileCacheBackendConcurrency(TestCase):
 
+class TestFileCacheBackendConcurrency(TestCase):
     def setUp(self) -> None:
         """Create a temporary directory and a FileCacheBackend before each test.
 
@@ -509,23 +484,12 @@ class TestFileCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
         self._path = Path(self._tmpdir.name)
         self._backend = FileCacheBackend(self._path)
-
-    def tearDown(self) -> None:
-        """Remove the temporary directory after each test.
-
-        Ensures every file written by the concurrent tasks is cleaned up.
-
-        Returns
-        -------
-        None
-            Completes the operation described above.
-        """
-        self._tmpdir.cleanup()
 
     async def testConcurrentWritesToTheSamePathNeverMixPayloads(self) -> None:
         """Keep every concurrent write of one key internally consistent.
@@ -537,7 +501,7 @@ class TestFileCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payloads = [{"writer": index, "data": "x" * 500} for index in range(20)]
         await asyncio.gather(
@@ -557,7 +521,7 @@ class TestFileCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
 
         async def attempt(index: int) -> bool:
@@ -592,7 +556,7 @@ class TestFileCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         await asyncio.gather(*(self._backend.increment("hits") for _ in range(25)))
         self.assertEqual(await self._backend.get("hits"), 25)
@@ -604,7 +568,7 @@ class TestFileCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assert that concurrent backend increments preserve every update.
+            No return value.
         """
         other = FileCacheBackend(self._path)
         backends = (self._backend, other)
@@ -622,11 +586,33 @@ class TestFileCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assert that cache clearing waits for an active staged write.
+            No return value.
         """
         staged = threading.Event()
         resume = threading.Event()
+        clear_attempted = threading.Event()
         original = FileCacheBackend._FileCacheBackend__replaceSync
+        original_lock = FileCacheBackend._FileCacheBackend__lock
+
+        def observe_lock(backend: FileCacheBackend, file: Path) -> object:
+            """Signal the clear worker's attempt to acquire the writer's real lock.
+
+            Parameters
+            ----------
+            backend : FileCacheBackend
+                Backend selecting the real lock stripe.
+            file : Path
+                Entry whose staging file is being protected.
+
+            Returns
+            -------
+            object
+                Original filesystem lock context manager.
+            """
+            lock = original_lock(backend, file)
+            if staged.is_set():
+                clear_attempted.set()
+            return lock
 
         def staged_replace(backend: FileCacheBackend, tmp: Path, file: Path) -> None:
             """Hold the staged write until the clear operation starts.
@@ -646,18 +632,27 @@ class TestFileCacheBackendConcurrency(TestCase):
                 raise TimeoutError(msg)
             original(backend, tmp, file)
 
-        with patch.object(
-            FileCacheBackend, "_FileCacheBackend__replaceSync", staged_replace,
+        with (
+            patch.object(
+                FileCacheBackend,
+                "_FileCacheBackend__replaceSync",
+                staged_replace,
+            ),
+            patch.object(FileCacheBackend, "_FileCacheBackend__lock", observe_lock),
         ):
             writer = asyncio.create_task(self._backend.set("staged", "value"))
-            self.assertTrue(await asyncio.to_thread(staged.wait, 2))
-            clear = asyncio.create_task(self._backend.clear())
-            await asyncio.sleep(0.05)
-            cleared_while_staged = clear.done()
-            resume.set()
-            results = await asyncio.gather(writer, clear, return_exceptions=True)
+            tasks = [writer]
+            try:
+                self.assertTrue(await asyncio.to_thread(staged.wait, 2))
+                clear = asyncio.create_task(self._backend.clear())
+                tasks.append(clear)
+                self.assertTrue(await asyncio.to_thread(clear_attempted.wait, 2))
+                self.assertFalse(clear.done())
+                self.assertTrue(list(self._path.glob("*.tmp")))
+            finally:
+                resume.set()
+                results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        self.assertFalse(cleared_while_staged)
         self.assertEqual(results, [True, True])
 
     async def testIncrementPreservesTheExistingExpiry(self) -> None:
@@ -669,16 +664,18 @@ class TestFileCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("ttl_counter", 1, ttl=0.5)
-        await asyncio.sleep(0.3)
-        self.assertEqual(await self._backend.increment("ttl_counter"), 2)
-
-        # Read past the original deadline, but before a renewed 0.5 s TTL
-        # from increment would expire.
-        await asyncio.sleep(0.25)
-        self.assertIsNone(await self._backend.get("ttl_counter"))
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.file.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("ttl_counter", 1, ttl=0.5)
+            clock.now += 0.3
+            self.assertEqual(await self._backend.increment("ttl_counter"), 2)
+            clock.now += 0.25
+            self.assertIsNone(await self._backend.get("ttl_counter"))
 
     async def testIncrementOverAnExpiredKeyRestartsWithoutExpiry(self) -> None:
         """Restart the counter from zero once the previous entry expired.
@@ -689,12 +686,15 @@ class TestFileCacheBackendConcurrency(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        await self._backend.set("stale", 7, ttl=0.05)
-        await asyncio.sleep(0.1)
-
-        self.assertEqual(await self._backend.increment("stale", 3), 3)
-        await asyncio.sleep(0.1)
-        self.assertEqual(await self._backend.get("stale"), 3)
-
+        clock = SimpleNamespace(now=100.125)
+        with patch(
+            "orionis.cache.stores.file.time",
+            SimpleNamespace(time=lambda: clock.now),
+        ):
+            await self._backend.set("stale", 7, ttl=0.05)
+            clock.now += 0.1
+            self.assertEqual(await self._backend.increment("stale", 3), 3)
+            clock.now += 10**9
+            self.assertEqual(await self._backend.get("stale"), 3)

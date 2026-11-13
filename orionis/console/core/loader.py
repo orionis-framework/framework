@@ -1,8 +1,11 @@
+# ruff: noqa: PLC0415, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Discover command classes and prepare their runtime registrations."""
 
 import argparse
 import importlib
 import re
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from orionis.cache.contracts.file_based_cache import IFileBasedCache
@@ -30,8 +33,53 @@ _SIGNATURE_RE: re.Pattern[str] = re.compile(
 )
 """Compiled pattern used to recognize signature re."""
 
+
+def _restore_argument_type(type_name: str) -> Callable[..., object]:
+    """Resolve a cached parser callable without hiding its import failures.
+
+    Parameters
+    ----------
+    type_name : str
+        Module-qualified callable name, including any class nesting.
+
+    Returns
+    -------
+    collections.abc.Callable[``...``, object]
+        Resolved argument converter.
+
+    Raises
+    ------
+    ImportError
+        If the converter cannot be resolved or its module fails to import.
+    TypeError
+        If the resolved object is not callable.
+    """
+    parts = type_name.split(".")
+    for index in range(len(parts) - 1, 0, -1):
+        module_path = ".".join(parts[:index])
+        try:
+            resolved = importlib.import_module(module_path)
+        except ModuleNotFoundError as error:
+            # Negation must cover both module-name comparisons.
+            if error.name is None or not (  # NOSONAR(S1110)
+                module_path == error.name or module_path.startswith(error.name + ".")
+            ):
+                raise
+            continue
+        try:
+            for attribute in parts[index:]:
+                resolved = getattr(resolved, attribute)
+        except AttributeError:
+            continue
+        if not isinstance(resolved, Callable):
+            message = f"Command argument type {type_name!r} must be callable."
+            raise TypeError(message)
+        return resolved
+    message = f"Cannot resolve command argument type {type_name!r}."
+    raise ImportError(message)
+
+
 class Loader(ILoader):
-    # ruff: noqa: TC001
     """Discover command classes and prepare their runtime registrations."""
 
     def __init__(self, app: IApplication) -> None:
@@ -156,7 +204,7 @@ class Loader(ILoader):
     def addFluentCommand(
         self,
         signature: str,
-        handler: list[type[Any], str | None],
+        handler: list[type[Any] | str | None],
     ) -> ICommand:
         """
         Define a new command using the fluent interface.
@@ -225,7 +273,7 @@ class Loader(ILoader):
             Registers core commands internally for later lookup and execution.
         """
         # Import implementations only when cached command metadata is unavailable.
-        from orionis.console.core.commands import CORE_COMMANDS  # noqa: PLC0415
+        from orionis.console.core.commands import CORE_COMMANDS
 
         # Iterate and register each core command
         for obj in CORE_COMMANDS:
@@ -381,7 +429,7 @@ class Loader(ILoader):
         try:
             signature = obj.signature
         except AttributeError as exc:
-            error_msg = (
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 f"Command class {obj.__name__} must have a 'signature' attribute."
             )
             raise ValueError(error_msg) from exc
@@ -573,6 +621,8 @@ class Loader(ILoader):
             "nargs": arg.nargs,
             "const": "__MISSING__" if isinstance(const, _MISSING_TYPE) else const,
             "default": "__MISSING__" if isinstance(default, _MISSING_TYPE) else default,
+            "const_missing": isinstance(const, _MISSING_TYPE),
+            "default_missing": isinstance(default, _MISSING_TYPE),
             "type_": (
                 f"{type_.__module__}.{type_.__qualname__}"
                 if type_ is not None
@@ -610,26 +660,18 @@ class Loader(ILoader):
         # Restore callable type from module-qualified string.
         type_str = d.get("type_")
         if type_str is not None:
-            parts = type_str.split(".")
-            d["type_"] = None
-            for index in range(len(parts) - 1, 0, -1):
-                try:
-                    resolved = importlib.import_module(".".join(parts[:index]))
-                except ImportError:
-                    continue
-                try:
-                    for attribute in parts[index:]:
-                        resolved = getattr(resolved, attribute)
-                except AttributeError:
-                    continue
-                d["type_"] = resolved
-                break
+            d["type_"] = _restore_argument_type(type_str)
 
-        # Restore MISSING sentinel from string marker.
-        if d.get("const") == "__MISSING__":
-            d["const"] = _MISSING
-        if d.get("default") == "__MISSING__":
-            d["default"] = _MISSING
+        # Older caches have only the string marker; new flags preserve literal values.
+        for name in ("const", "default"):
+            missing = d.pop(f"{name}_missing", _MISSING)
+            if missing is not _MISSING and type(missing) is not bool:
+                message = f"Cached {name}_missing must be a boolean."
+                raise TypeError(message)
+            if missing is True or (
+                missing is _MISSING and d.get(name) == "__MISSING__"
+            ):
+                d[name] = _MISSING
 
         # Restore tuple metavar from list.
         if isinstance(d.get("metavar"), list):

@@ -1,3 +1,6 @@
+# ruff: noqa: ARG002, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Exercise required hook signatures, synthetic secrets, and declared column names.
 from __future__ import annotations
 from orionis.database.connection_manager import ConnectionManager
 from orionis.database.exceptions import ConnectionNotFoundException
@@ -5,10 +8,11 @@ from orionis.orm.exceptions import OrmConfigurationException
 from orionis.orm.resolver import ConnectionResolver
 from orionis.test import TestCase
 
+
 class _StubApp:
     """Minimal application stub exposing the database configuration."""
 
-    def config(self, key: str) -> dict:  # noqa: ARG002
+    def config(self, key: str) -> dict:
         """Run the config helper.
 
         Parameters
@@ -28,6 +32,7 @@ class _StubApp:
             },
         }
 
+
 class TestConnectionResolver(TestCase):
     def setUp(self) -> None:
         """Snapshot the globally installed manager before each test.
@@ -37,7 +42,7 @@ class TestConnectionResolver(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         self._previous = ConnectionResolver._manager
 
@@ -49,7 +54,7 @@ class TestConnectionResolver(TestCase):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         ConnectionResolver._manager = self._previous
 
@@ -61,7 +66,7 @@ class TestConnectionResolver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ConnectionResolver.clear()
         with self.assertRaises(OrmConfigurationException):
@@ -77,7 +82,7 @@ class TestConnectionResolver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         manager = ConnectionManager(_StubApp())
         ConnectionResolver.setManager(manager)
@@ -99,7 +104,7 @@ class TestConnectionResolver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ConnectionResolver.setManager(ConnectionManager(_StubApp()))
         ConnectionResolver.clear()
@@ -115,7 +120,7 @@ class TestConnectionResolver(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         ConnectionResolver.setManager(ConnectionManager(_StubApp()))
         with self.assertRaises(ConnectionNotFoundException):

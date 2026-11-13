@@ -34,6 +34,8 @@ Named durable connections must use distinct tables or Redis prefixes. Failed sto
 
 The built-in failed-job repository uses the database. It initializes lazily when required; choosing Redis or sync does not remove this requirement for terminal failures. Prepare its connection and permissions before production. Redshift is rejected for database queues and failed-job storage because it does not enforce required unique keys.
 
+If concurrent schema creation or failed-job insertion fails, recovery checks whether another operation already completed it. If that lookup also raises a database query error, the original creation or insertion error and its cause are preserved; the recovery error is observed through the central failure runtime. An unconfirmed table is not marked ready, and an unconfirmed record is not reported as persisted.
+
 ## Prepare queue tables
 
 Create queue storage before dispatching jobs or starting workers:
@@ -62,5 +64,9 @@ assert failed.hasColumn("traceback")
 Database dispatch uses the managed SQL connection and participates in a task-owned [transaction](../../../database/docs/en/transactions.md) on that same connection. Rollback removes the pending message too. Another connection or Redis is outside that SQL unit. There is no general dispatch `afterCommit` API or distributed protocol coordinating these systems.
 
 The provider registers serializer and manager singletons, discovers jobs, pins `Queue`, and closes owned resources during shutdown. `await Queue.connection(name)` returns a cached driver; `await Queue.close()` closes queue clients without disconnecting shared database services. Application lifecycle should normally own cleanup.
+
+Closing waits for admitted initialization, detaches the cached resources, and attempts every close even if one fails. It preserves the first error and observes secondary errors centrally; caller cancellation waits for owned cleanup. Initialization cannot close its own manager. Stop new work before shutdown: resolution after a snapshot has been detached may create a fresh client, and a later use may reopen services.
+
+Durations and absolute retry deadlines must have a finite floating-point representation. Oversized integers fail with queue-specific configuration or payload errors rather than an unhandled numeric overflow; finite past deadlines remain valid declarations for the worker to reject as expired.
 
 For extensions, `IQueueDriver` defines async `push`, `reserve`, `release`, `delete`, `size`, `clear`, and `close`. Drivers must honor fencing, expiration, and envelope/reservation contracts. Stock configuration recognizes only the three built-in drivers; implementing the contract does not automatically register a new driver name with the manager.

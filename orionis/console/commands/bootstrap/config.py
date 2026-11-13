@@ -1,10 +1,13 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Recover missing official configuration files from the master branch."""
 
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.bootstrap._base import BootstrapCommand
 from orionis.console.commands.bootstrap._config import ConfigBootstrapper
-from orionis.foundation.contracts.application import IApplication  # noqa: TC001
+from orionis.foundation.contracts.application import IApplication
+
 
 class BootstrapConfigCommand(BootstrapCommand):
     """Recover missing official configuration files from the master branch."""

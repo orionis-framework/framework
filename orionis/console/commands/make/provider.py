@@ -4,6 +4,7 @@ from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.make._base import MakeStubCommand
 
+
 class MakeProvider(MakeStubCommand):
     """Generate an eager or deferred application provider."""
 
@@ -51,4 +52,3 @@ class MakeProvider(MakeStubCommand):
             if self.getArgument("deferred", default=False)
             else "provider_eager"
         )
-

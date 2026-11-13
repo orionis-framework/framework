@@ -1,11 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.foundation.config.database.entities.connections import Connections
 from orionis.foundation.config.database.entities.database import Database
 from orionis.foundation.config.database.entities.sqlserver import SQLServer
 from orionis.test import TestCase
 
-class TestSQLServerEntity(TestCase):
 
+class TestSQLServerEntity(TestCase):
     def testDefaultsAreValid(self) -> None:
         """Build the entity with its default values.
 
@@ -18,7 +20,7 @@ class TestSQLServerEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SQLServer()
         self.assertEqual(entity.driver, "sqlserver")
@@ -35,7 +37,7 @@ class TestSQLServerEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entity = SQLServer(port=1433, username="sa")
         self.assertEqual(entity.port, 1433)
@@ -49,7 +51,7 @@ class TestSQLServerEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             SQLServer(driver="mssql")
@@ -62,7 +64,7 @@ class TestSQLServerEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             SQLServer(port=0)
@@ -77,7 +79,7 @@ class TestSQLServerEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             SQLServer(host="")
@@ -92,7 +94,7 @@ class TestSQLServerEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             SQLServer(username="")
@@ -107,13 +109,13 @@ class TestSQLServerEntity(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             SQLServer(odbc_driver="")
 
-class TestConnectionsWithSqlServer(TestCase):
 
+class TestConnectionsWithSqlServer(TestCase):
     def testConnectionsExposeSqlServerEntry(self) -> None:
         """Expose a sqlserver entry converted to its entity.
 
@@ -122,7 +124,7 @@ class TestConnectionsWithSqlServer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         connections = Connections()
         self.assertIsInstance(connections.sqlserver, SQLServer)
@@ -138,7 +140,7 @@ class TestConnectionsWithSqlServer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         database = Database(default="sqlserver")
         self.assertEqual(database.default, "sqlserver")
@@ -151,7 +153,7 @@ class TestConnectionsWithSqlServer(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(TypeError):
             Connections(sqlserver=42)

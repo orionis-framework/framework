@@ -1,15 +1,18 @@
+# ruff: noqa: ANN003, PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from dataclasses import fields, is_dataclass
 from orionis.console.entities.command import Command
 from orionis.support.entities.base import BaseEntity
 from orionis.test import TestCase
 
+
 class _DummyClass:
     """Minimal class used as the obj field in Command fixtures."""
 
-class TestCommandEntity(TestCase):
 
-    def _make(self, **kwargs) -> Command:# noqa: ANN003
+class TestCommandEntity(TestCase):
+    def _make(self, **kwargs) -> Command:
         """
         Build a minimal valid Command instance.
 

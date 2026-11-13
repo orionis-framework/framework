@@ -285,7 +285,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5356"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId5386"> 
                     
                 </input>
 
@@ -503,7 +503,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedshiftDialect</span>(<a href="orionis.database.redshift.html#RedshiftConnectorDialect" class="internal-link" title="orionis.database.redshift.RedshiftConnectorDialect">RedshiftConnectorDialect</a>): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L22" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.database.redshift.RedshiftDialect">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">RedshiftDialect</span>(<a href="orionis.database.redshift.html#RedshiftConnectorDialect" class="internal-link" title="orionis.database.redshift.RedshiftConnectorDialect">RedshiftConnectorDialect</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L20" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.database.redshift.RedshiftDialect">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -517,7 +517,7 @@ constructed.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id552">
+          <table class="children sortable" id="id560">
   
   
   <tr class="method">
@@ -586,7 +586,7 @@ constructed.</p>
     
     <div><span class="decorator">@reflection.cache<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hasTable</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>Connection</code>, </span><span class="rst-sig-param">table_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">**_kw: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L54">
       
       (source)
     </a>
@@ -602,7 +602,7 @@ constructed.</p>
 <p>The upstream reflection helper interpolates these identifiers into
 SQL string literals. CREATE TABLE's checkfirst path must keep them
 as values even when quoted identifiers contain apostrophes.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><a href="orionis.database.Connection.html" class="internal-link">orionis.database.Connection</a></code></td><td class="fieldArgDesc">Core connection used by SQLAlchemy's reflection dispatch.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Exact table identifier to find.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Explicit namespace, or the current schema when omitted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**_kw:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Reflection options accepted by the SQLAlchemy interface.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the visible catalog contains this exact table.</td></tr></table></div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">connection:</span><code><tt class="rst-docutils rst-literal">sqlalchemy.engine.Connection</tt></code></td><td class="fieldArgDesc">Core connection used by SQLAlchemy's reflection dispatch.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">table<wbr></wbr>_name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Exact table identifier to find.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">schema:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Explicit namespace, or the current schema when omitted.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**_kw:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Reflection options accepted by the SQLAlchemy interface.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the visible catalog contains this exact table.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -616,7 +616,7 @@ as values even when quoted identifiers contain apostrophes.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L31">
       
       (source)
     </a>
@@ -643,7 +643,7 @@ as values even when quoted identifiers contain apostrophes.</p>
   <div class="functionHeader">
     
     <span class="py-defname">delete_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L38">
       
       (source)
     </a>
@@ -670,7 +670,7 @@ as values even when quoted identifiers contain apostrophes.</p>
   <div class="functionHeader">
     
     <span class="py-defname">insert_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L34">
       
       (source)
     </a>
@@ -697,7 +697,7 @@ as values even when quoted identifiers contain apostrophes.</p>
   <div class="functionHeader">
     
     <span class="py-defname">postfetch_lastrowid</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L44">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L42">
       
       (source)
     </a>
@@ -724,7 +724,7 @@ as values even when quoted identifiers contain apostrophes.</p>
   <div class="functionHeader">
     
     <span class="py-defname">preexecute_autoincrement_sequences</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L42">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L40">
       
       (source)
     </a>
@@ -751,7 +751,7 @@ as values even when quoted identifiers contain apostrophes.</p>
   <div class="functionHeader">
     
     <span class="py-defname">supports_statement_cache</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L44">
       
       (source)
     </a>
@@ -778,7 +778,7 @@ as values even when quoted identifiers contain apostrophes.</p>
   <div class="functionHeader">
     
     <span class="py-defname">update_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L38">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L36">
       
       (source)
     </a>
@@ -805,7 +805,7 @@ as values even when quoted identifiers contain apostrophes.</p>
   <div class="functionHeader">
     
     <span class="py-defname">use_insertmanyvalues_wo_returning</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/database/redshift.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/redshift.py#L48">
       
       (source)
     </a>
@@ -832,7 +832,7 @@ Core can page supported multi-value INSERTs without RETURNING.</p></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

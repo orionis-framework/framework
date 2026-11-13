@@ -4,6 +4,7 @@ from __future__ import annotations
 from orionis.container.facades.facade import Facade
 from orionis.view.contracts.factory import IViewFactory
 
+
 class View(Facade):
     """Resolve the view service through the application facade."""
 

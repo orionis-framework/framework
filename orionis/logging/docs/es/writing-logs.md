@@ -72,7 +72,10 @@ class App:
             "default": "stack",
             "channels": {
                 "stack": {"path": "storage/logs/stack.log", "level": "INFO"},
-                "daily": {"path": "storage/logs/daily_{suffix}.log", "level": "WARNING"},
+                "daily": {
+                    "path": "storage/logs/daily_{suffix}.log",
+                    "level": "WARNING",
+                },
             },
         }
 
@@ -98,7 +101,7 @@ Log.error("Job failed")
 
 `LoggerProvider` enlaza `ILogger` a `Logger` como singleton con alias `x-orionis-ILogger` y fija `Log` al iniciar. El manejo de fallos inyecta `ILogger`; las tareas en segundo plano usan la facade. Otros módulos dependen del contrato sin conocer la rotación.
 
-El nombre estándar se comparte en todo el proceso. Crear o inicializar otro `Logger` de Orionis cierra y reemplaza handlers de ese logger, por lo que la aplicación debe usar el singleton del provider.
+El nombre estándar se comparte en todo el proceso. Inicializar otro `Logger` de Orionis cierra y reemplaza handlers de ese logger, por lo que la aplicación debe usar el singleton del provider.
 
 
 
@@ -109,6 +112,7 @@ El nombre estándar se comparte en todo el proceso. Crear o inicializar otro `Lo
 - `switchChannel(name)` reemplaza el handler y devuelve si tuvo éxito.
 - `reloadConfiguration()` cierra handlers, relee `app.config("logging")`, reconstruye y registra un mensaje de éxito.
 - `close()` libera archivos y permite reconstrucción lazy posterior.
+- `await aclose()` ejecuta la limpieza fuera del event loop, incluido el drenaje de registros en cola.
 - `getActiveChannels()` / `getActiveChannel()` informan el estado de handlers.
 - `getAvailableChannels()` devuelve nombres configurados sin inicializar I/O.
 

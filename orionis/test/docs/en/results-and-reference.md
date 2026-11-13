@@ -21,16 +21,17 @@ Framework integrations also expose:
 - Running an application-aware case without a booted application causes dependency resolution to fail.
 - Lifecycle methods (`setUp`, `tearDown`, class and async variants) are never wrapped as test methods.
 - Import failures found by the loader are preserved in the suite instead of being removed by method filtering.
+- Class fixture errors and skips are recorded even before the first test starts; outcomes outside an active test have zero execution time. Error source locations follow the supplied traceback, including when the result is recorded after exception handling has finished.
 - `McpTestResponse.assertOk()` fails for JSON-RPC errors and tool results with `isError=True`.
 - `request()` is for finite MCP exchanges; use `stream()` for subscriptions or other open-ended responses.
 - Unexpected successes are failures, while expected failures are exported as skipped results.
 - A failing subtest is represented in exported results and honors fail-fast behavior.
-- JSON result filenames use second-resolution timestamps, so multiple cached runs in the same second target the same path.
+- JSON result filenames combine a timestamp and a unique identifier; runs in the same second retain separate reports.
 - Rich's emoji output needs a Unicode-capable terminal; on legacy Windows code pages, set `PYTHONUTF8=1`.
 
 ## Performance and concurrency
 
-Discovery creates a fresh `TestLoader` and suite each time. Execution is moved to the default thread executor, while each `TestCase` owns its asyncio loop. Method patterns are context-local, and result processor state is instance-local, allowing independent runs without shared verbosity or result lists.
+Discovery creates a fresh `TestLoader` and suite each time. Execution moves to the default thread executor with a copy of the caller's context variables, while each `TestCase` owns its asyncio loop. Each engine applies its own method pattern during discovery and restores the previous context afterward. Result processor state is instance-local, so runs do not share verbosity or result lists. The Python import cache remains process-wide: discovery rejects a test module imported from another application root instead of silently reusing it. Run projects with overlapping module names in separate processes.
 
 MCP requests create independent application scopes and close stream bodies in `finally`. The compiled MCP server and in-memory event bus are retained by the client, so reuse one client when testing multiple operations against the same server while keeping each request scoped.
 
@@ -61,9 +62,11 @@ import unittest
 
 from orionis.test.executors.runner import TestRunner
 
+
 class PlainCase(unittest.TestCase):
     def testValue(self) -> None:
         self.assertTrue(True)
+
 
 suite = unittest.defaultTestLoader.loadTestsFromTestCase(PlainCase)
 result = TestRunner(verbosity=0, with_panel=False).run(suite)

@@ -24,6 +24,7 @@ _PARAM_RE: re.Pattern = re.compile(r"\{(\w+)(?::(\w+))?\}")
 _NAMED_GROUP_RE: re.Pattern = re.compile(r"\(\?P<\w+>")
 """Precompiled pattern to normalise named capture groups for collision detection."""
 
+
 def _validate_literal(fragment: str, path: str) -> None:
     """
     Reject unmatched braces and malformed parameter declarations.
@@ -48,6 +49,7 @@ def _validate_literal(fragment: str, path: str) -> None:
     if "{" in fragment or "}" in fragment:
         error_msg = f"Malformed route parameter in path '{path}'"
         raise ValueError(error_msg)
+
 
 def _action_name(handler: Callable | type) -> str:
     """
@@ -102,6 +104,7 @@ def _register_name(names: dict[str, str], route: dict) -> None:
         if previous != route["path"]:
             error_msg = f"Route name '{name}' refers to multiple paths."
             raise ValueError(error_msg)
+
 
 class RouteCompiler(IRouteCompiler):
     """Compile declared routes into runtime dispatch metadata."""
@@ -233,7 +236,7 @@ class RouteCompiler(IRouteCompiler):
 
     # ── Private helpers ───────────────────────────────────────────────────────
 
-    def __compileRoute( # NOSONAR
+    def __compileRoute(  # NOSONAR
         self,
         route: dict,
         app_middleware: list[type] | None = None,
@@ -258,7 +261,8 @@ class RouteCompiler(IRouteCompiler):
         # global and route-specific middleware and exclusions.
         protocol = (
             RouteProtocol.WEBSOCKET
-            if route["method"] == "WEBSOCKET" else RouteProtocol.HTTP
+            if route["method"] == "WEBSOCKET"
+            else RouteProtocol.HTTP
         )
         if RouteProtocol(route.get("protocol", protocol)) is not protocol:
             error_msg = "Route protocol does not match its dispatch method"
@@ -269,7 +273,7 @@ class RouteCompiler(IRouteCompiler):
         stack: list[type[BaseMiddleware]] = []
 
         # Global middleware first
-        for mw in (() if protocol is RouteProtocol.WEBSOCKET else app_middleware or ()):
+        for mw in () if protocol is RouteProtocol.WEBSOCKET else app_middleware or ():
             if mw in without_middleware or mw in seen:
                 continue
             seen.add(mw)
@@ -426,9 +430,7 @@ class RouteCompiler(IRouteCompiler):
             if type_name is None:
                 type_name = "str"
             if type_name not in param_types:
-                error_msg = (
-                    f"Unknown parameter type: '{type_name}' in path '{path}'"
-                )
+                error_msg = f"Unknown parameter type: '{type_name}' in path '{path}'"
                 raise ValueError(error_msg)
             type_info = param_types[type_name]
             parts.append(f"(?P<{name}>{type_info['pattern']})")

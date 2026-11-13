@@ -1,6 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import UTC, datetime, time
 from orionis.logging.handlers.daily_suffix_resolver import DailySuffixResolver
 from orionis.test import TestCase
+
 
 def _make_resolver(at_time: time | None = None) -> DailySuffixResolver:
     """Return a daily resolver pinned to UTC.
@@ -19,8 +22,8 @@ def _make_resolver(at_time: time | None = None) -> DailySuffixResolver:
     resolver.tz = UTC
     return resolver
 
-class TestDailySuffixResolverSuffix(TestCase):
 
+class TestDailySuffixResolverSuffix(TestCase):
     def testSuffixUsesTheDailyPattern(self) -> None:
         """Build the suffix from the date of the given datetime.
 
@@ -29,7 +32,7 @@ class TestDailySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         moment = datetime(2025, 3, 31, 10, 0, 0, tzinfo=UTC)
         self.assertEqual(_make_resolver().getSuffix(dt=moment), "2025-03-31")
@@ -43,12 +46,12 @@ class TestDailySuffixResolverSuffix(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertRegex(_make_resolver().getSuffix(), r"^\d{4}-\d{2}-\d{2}$")
 
-class TestDailySuffixResolverRotation(TestCase):
 
+class TestDailySuffixResolverRotation(TestCase):
     def testDefaultRotationTimeIsMidnight(self) -> None:
         """Rotate at midnight when no time is configured.
 
@@ -57,7 +60,7 @@ class TestDailySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_make_resolver().at_time, time(0, 0, 0))
 
@@ -69,7 +72,7 @@ class TestDailySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertEqual(_make_resolver(time(18, 0, 0)).at_time, time(18, 0, 0))
 
@@ -82,7 +85,7 @@ class TestDailySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 14, 30, 0, tzinfo=UTC)
         self.assertEqual(
@@ -99,7 +102,7 @@ class TestDailySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 14, 30, 0, tzinfo=UTC)
         self.assertEqual(
@@ -116,7 +119,7 @@ class TestDailySuffixResolverRotation(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         current = datetime(2025, 4, 9, 0, 0, 0, tzinfo=UTC)
         self.assertEqual(

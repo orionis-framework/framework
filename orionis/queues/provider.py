@@ -8,6 +8,7 @@ from orionis.queues.manager import QueueManager
 from orionis.queues.serializer import JobSerializer
 from orionis.support.facades.queue import Queue
 
+
 class QueueProvider(ServiceProvider):
     """
     Register queue services eagerly while keeping backend I/O lazy.

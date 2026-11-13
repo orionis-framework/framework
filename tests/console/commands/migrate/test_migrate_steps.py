@@ -1,8 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from unittest.mock import AsyncMock, Mock, patch
 from orionis.console.commands.migrate.refresh import MigrateRefreshCommand
 from orionis.console.commands.migrate.rollback import MigrateRollbackCommand
 from orionis.database.migrations.migrator import Migrator
 from orionis.test import TestCase
+
 
 class TestMigrationStepCommands(TestCase):
     """Verify migration step arguments reach the migrator unchanged."""

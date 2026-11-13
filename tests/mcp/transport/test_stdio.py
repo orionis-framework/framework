@@ -1,4 +1,7 @@
+# ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import asyncio
+import inspect
 import io
 import msgspec
 from orionis.container.container import Container
@@ -38,6 +41,7 @@ class _Reader:
         """
         return await self.queue.get()
 
+
 class _Writer:
     """Capture indivisible output frames and optionally simulate a broken pipe."""
 
@@ -74,6 +78,56 @@ class _Writer:
         self.writes.append(data)
         await self.queue.put(msgspec.json.decode(data))
 
+
+class _ShortOutput(io.BytesIO):
+    """Simulate a raw pipe that accepts only part of each write."""
+
+    def __init__(self, limit: int | None) -> None:
+        """Store the maximum accepted bytes per call.
+
+        Parameters
+        ----------
+        limit : int | None
+            Positive partial-write size, or a zero-progress result.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        super().__init__()
+        self.limit = limit
+        self.flushes = 0
+
+    def write(self, data):
+        """Write only the accepted prefix or report no progress.
+
+        Parameters
+        ----------
+        data : object
+            Bytes offered by the writer daemon.
+
+        Returns
+        -------
+        int | None
+            Number of accepted bytes, or None when blocked.
+        """
+        if self.limit in (None, 0):
+            return self.limit
+        return super().write(data[: self.limit])
+
+    def flush(self) -> None:
+        """Record completed-frame flushes.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self.flushes += 1
+        super().flush()
+
+
 class _App:
     """Own real container scopes and deterministic dispatch lifecycle observations."""
 
@@ -102,6 +156,7 @@ class _App:
             Return the result produced by ``beginScope``.
         """
         return self.container.beginScope()
+
 
 class _Dispatcher:
     """Observe concurrency without involving primitive-specific behavior."""
@@ -179,6 +234,7 @@ class _Dispatcher:
                 },
             ),
         )
+
 
 class TestStdioTransport(TestCase):
     """Keep cancellation independent of running tools and unrelated calls."""
@@ -292,6 +348,57 @@ class TestStdioTransport(TestCase):
         self.assertTrue(all(not scope.isActive for scope in self.app.scopes.values()))
         self.assertTrue(all(frame.count(b"\n") == 1 for frame in self.writer.writes))
         self.assertEqual(transport._active, {})
+
+    async def testRejectedRequestTaskClosesItsCoroutineWithoutAdmission(self) -> None:
+        """Do not leak an unstarted invocation when the task factory rejects it.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        transport = self.transport()
+        loop = asyncio.get_running_loop()
+        factory = loop.get_task_factory()
+        rejected = []
+        failure = RuntimeError("Request task rejected")
+
+        def reject(_loop, coroutine, **_kwargs: object):
+            """Record the unscheduled coroutine and reject its admission.
+
+            Parameters
+            ----------
+            _loop : object
+                Current event loop.
+            coroutine : object
+                Coroutine offered to the factory.
+            **_kwargs : object
+                Task creation options.
+
+            Returns
+            -------
+            None
+                No return value.
+            """
+            rejected.append(coroutine)
+            raise failure
+
+        loop.set_task_factory(reject)
+        try:
+            with self.assertRaises(RuntimeError) as caught:
+                await transport._accept(self.frame(), self.writer)
+        finally:
+            loop.set_task_factory(factory)
+        try:
+            self.assertIs(caught.exception, failure)
+            self.assertEqual(transport._active, {})
+            self.assertEqual(
+                [inspect.getcoroutinestate(item) for item in rejected],
+                [inspect.CORO_CLOSED],
+            )
+        finally:
+            for coroutine in rejected:
+                coroutine.close()
 
     async def testCancellationSuppressesResultAndReaderRemainsLive(self):
         """Process cancellation on the shared channel while the tool is suspended.
@@ -423,3 +530,40 @@ class TestStdioTransport(TestCase):
         finally:
             reader.close()
             writer.close()
+
+    async def testDaemonWritesTheCompleteFrameAcrossShortWrites(self) -> None:
+        """Acknowledge a frame only after every byte and its flush succeed.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        output = _ShortOutput(3)
+        writer = StandardWriter(output)
+        data = b'{"value":"complete"}\n'
+        try:
+            await asyncio.wait_for(writer.write(data), 1)
+            self.assertEqual(output.getvalue(), data)
+            self.assertEqual(output.flushes, 1)
+        finally:
+            writer.close()
+
+    async def testDaemonRejectsZeroProgressWithoutAcknowledgingSuccess(self) -> None:
+        """Surface blocked writes instead of discarding the remainder of a frame.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        for limit in (None, 0):
+            with self.subTest(limit=limit):
+                output = _ShortOutput(limit)
+                writer = StandardWriter(output)
+                try:
+                    with self.assertRaises(OSError):
+                        await asyncio.wait_for(writer.write(b"frame\n"), 1)
+                    self.assertEqual(output.flushes, 0)
+                finally:
+                    writer.close()

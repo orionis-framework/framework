@@ -1,17 +1,17 @@
+# ruff: noqa: TC001, TC003
+# Keep public extension annotations available for runtime reflection.
 """Define the contract for the storage manager."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from collections.abc import Callable
+from orionis.http.payload.contracts.uploaded_file import (
+    IUploadedFile as IHttpUploadedFile,
+)
+from orionis.storage.contracts.disk import IDisk
+from orionis.storage.contracts.driver import IStorageDriver
+from orionis.storage.contracts.uploaded_file import IUploadedFile
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-    from orionis.http.payload.contracts.uploaded_file import (
-        IUploadedFile as IHttpUploadedFile,
-    )
-    from orionis.storage.contracts.disk import IDisk
-    from orionis.storage.contracts.driver import IStorageDriver
-    from orionis.storage.contracts.uploaded_file import IUploadedFile
 
 class IStorageManager(ABC):
     """
@@ -91,7 +91,7 @@ class IStorageManager(ABC):
         Returns
         -------
         None
-            Register a custom driver factory under *driver*.
+            No return value.
         """
 
     @abstractmethod

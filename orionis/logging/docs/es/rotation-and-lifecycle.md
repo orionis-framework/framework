@@ -10,6 +10,8 @@ El límite de tamaño se comprueba antes de escribir utilizando bytes ya registr
 
 `switchChannel()` quita handlers antes de crear el reemplazo. Un `False` después de un error no implica que el canal anterior siga activo. Comprueba `getActiveChannel()` y registra el fallo por un canal operativo disponible. `reloadConfiguration()` lee otra vez `app.config("logging")`: no vuelve a cargar automáticamente `.env` ni archivos Python. Cambiar el archivo en disco no es por sí solo un cambio de configuración de una aplicación ya iniciada.
 
+La recarga desconecta todos los handlers anteriores e intenta cerrar cada uno. Si falla la limpieza, deja el logger sin handler activo y lanza `RuntimeError` con el primer fallo como causa; los fallos adicionales llegan al coordinador central de errores. Solo relee la configuración cuando la limpieza termina correctamente. Detén los productores concurrentes antes de recargar, cambiar de canal o cerrar: estas operaciones no garantizan la entrega de registros emitidos durante la transición.
+
 ### Extender la salida
 
 `getLogger()` permite integrar handlers estándar. La siguiente recarga o cierre puede retirarlos: coordina su ownership. Para una política de rotación propia puedes construir `AdvancedRotatingFileHandler` con una implementación de `SuffixResolver` (`getSuffix`, `getNextRotationTime`); la factory integrada solo conoce los seis nombres documentados. No hay registro `extend()` de canales en `Logger`. Sustituye `ILogger` en tu provider si necesitas otra política global.
@@ -21,9 +23,11 @@ Los locks son de hilo, no de proceso. Varios workers sobre el mismo patrón pued
 
 Los canales de tiempo usan un resolver y rotan cuando cambia su sufijo. Hourly usa `YYYY-MM-DD_HH`, daily `YYYY-MM-DD`, weekly año/semana ISO y monthly `YYYY-MM`. `chunked` rota al alcanzar `mb_size` en bytes codificados, genera sufijos timestamp/contador y comprime rotados con gzip.
 
+`getNextRotationTime()` convierte las entradas con zona horaria a la zona del resolver e interpreta las entradas sin zona en esa misma zona. El siguiente límite semanal o mensual puede ocurrir más tarde el lunes o el primer día del mes actual; una entrada situada exactamente en el límite avanza al periodo siguiente. Estos cálculos no programan la rotación del handler.
+
 ### Retención
 
-Los handlers rotativos examinan solo archivos que coinciden con su template, los ordenan por modificación y eliminan los que exceden el backup count. La retención representa periodos del canal: horas, días, semanas, meses o cantidad de archivos; no una duración universal.
+Los handlers rotativos examinan solo archivos que coinciden con su template, los ordenan por modificación y eliminan los que exceden el backup count. Cada archivo coincidente cuenta por separado, incluidos un archivo plano y su archivo gzip. Estas cantidades no garantizan una duración. La compresión reemplaza un archivo gzip solo cuando su temporal está completo; si falla, conserva el archivo original y cualquier gzip anterior.
 
 ## Configuración
 
@@ -38,8 +42,9 @@ Los handlers rotativos examinan solo archivos que coinciden con su template, los
 | Hora de rotación daily | `LOG_ROTATION_TIME` | `00:00:00` |
 | Tamaño chunk | `LOG_MB_SIZE` | 10 MiB |
 | Retención chunk | `LOG_FILES` | 5 archivos |
+| Capacidad de cola por handler | `LOG_QUEUE_CAPACITY` | 0 (síncrono) |
 
-`LOG_PATH` y `LOG_RETENTION` sobrescriben solo el canal de `LOG_CHANNEL`; edite `config/logging.py` o use claves dedicadas para overrides independientes. Las rutas parten de la raíz. Los templates rotativos deberían contener `{suffix}` para separar periodos.
+`LOG_PATH` y `LOG_RETENTION` sobrescriben solo el canal de `LOG_CHANNEL`; edita `config/logging.py` o usa claves dedicadas para overrides independientes. Las rutas relativas parten de la raíz de la aplicación; las absolutas se usan tal como se proporcionan. Los templates rotativos deberían contener `{suffix}` para separar periodos.
 
 
 
@@ -60,7 +65,12 @@ class App:
             "default": "stack",
             "channels": {
                 "stack": {"path": "stack.log", "level": "INFO"},
-                "chunked": {"path": "chunk_{suffix}.log", "level": "INFO", "mb_size": 1, "files": 2},
+                "chunked": {
+                    "path": "chunk_{suffix}.log",
+                    "level": "INFO",
+                    "mb_size": 1,
+                    "files": 2,
+                },
             },
         }
 
@@ -121,7 +131,7 @@ with TemporaryDirectory() as root:
 - Niveles string se normalizan con nombres estándar; desconocidos se vuelven `INFO`.
 - Errores I/O de rotación/compresión/retención se manejan defensivamente; logging estándar puede reportar errores de handler.
 - Retención `0` elimina rotados coincidentes. Templates sin `{suffix}` impiden archivos separados.
-- `close()` es idempotente y suprime errores comunes; usar el wrapper después lo reconstruye.
+- `close()` intenta cerrar todos los handlers y es idempotente. Observa y suprime errores comunes de limpieza `OSError`, `RuntimeError` y `ValueError`, pero propaga los fallos retenidos de entrega en cola o inesperados después de limpiar. Usar el wrapper después lo reconstruye.
 - Procesos múltiples escriben independientemente y no coordinan locks de rotación.
 
 

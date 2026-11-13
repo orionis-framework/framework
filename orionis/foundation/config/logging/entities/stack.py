@@ -10,6 +10,7 @@ from orionis.support.entities.base import BaseEntity
 _DEFAULT_PATH: str = "storage/logs/stack.log"
 """Default path identifier: ``storage/logs/stack.log``."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Stack(BaseEntity):
     """

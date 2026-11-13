@@ -9,6 +9,7 @@ from orionis.support.entities.base import BaseEntity
 _CONNECTION_ENTITIES = (("sync", Sync), ("database", Database), ("redis", Redis))
 """Connection entities definitions used by ``connections``."""
 
+
 @dataclass(frozen=True, kw_only=True, slots=True)
 class Connections(BaseEntity):
     """

@@ -1,6 +1,9 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.http.payload.media_types import MediaTypeRegistry
 from orionis.http.payload.parsers import parse_json, parse_text
 from orionis.test import TestCase
+
 
 class TestMediaTypeRegistryInit(TestCase):
     """Verify MediaTypeRegistry initialisation."""
@@ -59,6 +62,7 @@ class TestMediaTypeRegistryInit(TestCase):
         registry = MediaTypeRegistry(None)
         self.assertIsNone(registry.get("text/plain"))
 
+
 class TestMediaTypeRegistryRegister(TestCase):
     """Verify MediaTypeRegistry.register()."""
 
@@ -104,6 +108,7 @@ class TestMediaTypeRegistryRegister(TestCase):
         registry.register("TEXT/PLAIN", parse_text)
         self.assertIs(registry.get("text/plain"), parse_text)
 
+
 class TestMediaTypeRegistryGet(TestCase):
     """Verify MediaTypeRegistry.get()."""
 
@@ -145,6 +150,7 @@ class TestMediaTypeRegistryGet(TestCase):
         """
         registry = MediaTypeRegistry()
         self.assertIsNone(registry.get("application/x-custom"))
+
 
 class TestMediaTypeRegistryExtend(TestCase):
     """Verify MediaTypeRegistry.extend()."""

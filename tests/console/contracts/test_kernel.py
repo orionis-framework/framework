@@ -1,11 +1,13 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import inspect
 from orionis.console.contracts.kernel import IKernelCLI
 from orionis.console.kernel import KernelCLI
 from orionis.test import TestCase
 
-class TestIKernelCLIContract(TestCase):
 
+class TestIKernelCLIContract(TestCase):
     # ------------------------------------------------------------------ #
     #  Abstract structure                                                #
     # ------------------------------------------------------------------ #

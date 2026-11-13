@@ -11,6 +11,7 @@ from orionis.support.entities.base import BaseEntity
 _CHANNEL_OPTIONS: frozenset[str] = frozenset(f.name for f in fields(Channels))
 """Pre-computed channel option names."""
 
+
 @dataclass(frozen=True, kw_only=True)
 class Logging(BaseEntity):
     """

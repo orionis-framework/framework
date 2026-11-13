@@ -1,3 +1,7 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema definition behavior."""
+
 from __future__ import annotations
 from copy import copy
 from orionis.orm.schema.column.definition import ColumnDefinition
@@ -10,7 +14,9 @@ from orionis.orm.schema.types import (
 )
 from orionis.test import TestCase
 
+
 class TestColumnDefinitions(TestCase):
+    """Verify column definitions declarations and public behavior."""
 
     def testCopyPreservesAbsentAndExplicitDefaults(self) -> None:
         """Copy declarations without changing their default semantics.
@@ -18,7 +24,7 @@ class TestColumnDefinitions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         original = Integer().primary().autoIncrement()
         duplicate = copy(original)
@@ -34,7 +40,7 @@ class TestColumnDefinitions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         configured = ColumnDefinition(
             ColumnType.STRING,
@@ -56,7 +62,7 @@ class TestColumnDefinitions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         column = Integer().primary().autoIncrement().unique().index().nullable()
         self.assertTrue(column.is_primary)
@@ -73,7 +79,7 @@ class TestColumnDefinitions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         plain = Integer()
         self.assertFalse(plain.hasDefault())
@@ -89,7 +95,7 @@ class TestColumnDefinitions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         column = Integer().foreign("companies.id")
         self.assertEqual(
@@ -106,7 +112,7 @@ class TestColumnDefinitions(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         with self.assertRaises(ValueError):
             Integer().foreign("companies")

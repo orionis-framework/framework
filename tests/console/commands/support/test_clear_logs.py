@@ -1,9 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 from orionis.console.commands.support.clear_logs import ClearLogsCommand
 from orionis.logging.contracts.logger import ILogger
 from orionis.test import TestCase
+
 
 class _Application:
     """Expose the configured logs directory to the command."""
@@ -68,6 +71,7 @@ class _Application:
         if key != "storage_logs":
             raise KeyError(key)
         return self.logs_path
+
 
 class TestClearLogsCommand(TestCase):
     """Verify cleanup of framework log files."""
@@ -194,7 +198,9 @@ class TestClearLogsCommand(TestCase):
             original_unlink = Path.unlink
 
             def unlink_with_failure(
-                path: Path, *args: object, **kwargs: object,
+                path: Path,
+                *args: object,
+                **kwargs: object,
             ) -> None:
                 """Raise for one log and unlink all other paths.
 
@@ -221,7 +227,9 @@ class TestClearLogsCommand(TestCase):
             logger = Mock(spec=ILogger)
             with patch.object(Path, "unlink", new=unlink_with_failure):
                 result = ClearLogsCommand().handle(
-                    _Application(logs), console, logger,
+                    _Application(logs),
+                    console,
+                    logger,
                 )
 
             self.assertEqual(result, 1)
@@ -270,7 +278,9 @@ class TestClearLogsCommand(TestCase):
 
             with patch.object(Path, "unlink", new=unlink_after_close):
                 result = ClearLogsCommand().handle(
-                    _Application(logs), Mock(), logger,
+                    _Application(logs),
+                    Mock(),
+                    logger,
                 )
 
             self.assertEqual(result, 0)

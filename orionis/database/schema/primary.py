@@ -1,5 +1,6 @@
 """Describe a primary-key constraint on a table."""
 
+
 class PrimaryKey:
     """Describe a primary-key constraint on a table."""
 
@@ -19,7 +20,15 @@ class PrimaryKey:
         Returns
         -------
         None
-            Complete the documented operation without returning a value.
+            No return value.
+
+        Raises
+        ------
+        ValueError
+            If no columns are provided.
         """
+        if not columns:
+            message = "A primary key requires at least one column."
+            raise ValueError(message)
         self.columns: tuple[str, ...] = columns
         """The column names for the primary key."""

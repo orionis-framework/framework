@@ -1,11 +1,15 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 from orionis.container.container import Container
 from orionis.container.context.scope import ScopedContext
 from orionis.schemas.schema import Schema
 from orionis.test import TestCase
 
+
 class _Dependency:
     """Represent a service that can be passed or injected."""
+
 
 class _NeedsDependency:
     """Receive a service during construction."""
@@ -20,10 +24,12 @@ class _NeedsDependency:
         """
         self.dependency = dependency
 
+
 class _Payload(Schema):
     """Represent a request payload that may be supplied explicitly."""
 
     value: int
+
 
 class _NeedsPayload:
     """Receive a payload during construction."""
@@ -37,6 +43,7 @@ class _NeedsPayload:
             Validated request payload.
         """
         self.payload = payload
+
 
 class _Action:
     """Expose a service-dependent controller action."""
@@ -55,6 +62,7 @@ class _Action:
             Selected service.
         """
         return dependency
+
 
 class _NamedArguments:
     """Expose parameters with names often used for variadic arguments."""
@@ -81,32 +89,17 @@ class _NamedArguments:
         """
         return args, kwargs
 
+
 class TestExplicitInjection(TestCase):
     """Preserve caller arguments in the presence of dependency bindings."""
 
     def setUp(self) -> None:
-        """
-        Create a container without an inherited request scope.
-
-        Returns
-        -------
-        None
-            Prepare an isolated container and save the previous request scope.
-        """
-        self.token = ScopedContext.setCurrentScope(None)
+        """Isolate the active scope and restore its original value during cleanup."""
+        super().setUp()
+        token = ScopedContext.setCurrentScope(None)
+        self.addCleanup(ScopedContext.reset, token)
         self.container = object.__new__(Container)
         Container.__init__(self.container)
-
-    def tearDown(self) -> None:
-        """
-        Restore the request scope active before the test.
-
-        Returns
-        -------
-        None
-            Restore the request scope saved before the test.
-        """
-        ScopedContext.reset(self.token)
 
     async def testExplicitConstructorArgumentWinsOverBinding(self) -> None:
         """
@@ -115,7 +108,7 @@ class TestExplicitInjection(TestCase):
         Returns
         -------
         None
-            Assert that an explicit constructor service overrides its binding.
+            No return value.
         """
         bound = _Dependency()
         explicit = _Dependency()
@@ -132,7 +125,7 @@ class TestExplicitInjection(TestCase):
         Returns
         -------
         None
-            Assert that an explicit action service overrides its binding.
+            No return value.
         """
         bound = _Dependency()
         explicit = _Dependency()
@@ -149,7 +142,7 @@ class TestExplicitInjection(TestCase):
         Returns
         -------
         None
-            Assert that supplied schema data avoids request resolution.
+            No return value.
         """
         payload = _Payload(value=7)
 
@@ -164,7 +157,7 @@ class TestExplicitInjection(TestCase):
         Returns
         -------
         None
-            Assert that explicit dependencies do not start deferred providers.
+            No return value.
         """
         path = f"{_Dependency.__module__}.{_Dependency.__name__}"
         self.container._deferred_providers[path] = {
@@ -184,7 +177,7 @@ class TestExplicitInjection(TestCase):
         Returns
         -------
         None
-            Assert a class validation error for an unhashable build target.
+            No return value.
         """
         with self.assertRaisesRegex(TypeError, "expects a class type"):
             await self.container.build([])
@@ -196,7 +189,7 @@ class TestExplicitInjection(TestCase):
         Returns
         -------
         None
-            Assert injection into ordinary parameters named args and kwargs.
+            No return value.
         """
         shared = _Dependency()
         self.container.instance(None, shared)

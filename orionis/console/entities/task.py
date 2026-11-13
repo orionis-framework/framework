@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from apscheduler.triggers.date import DateTrigger
     from apscheduler.triggers.interval import IntervalTrigger
 
+
 @dataclass(kw_only=True)
 class Task(BaseEntity):
     """

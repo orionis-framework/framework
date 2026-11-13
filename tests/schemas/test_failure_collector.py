@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from typing import Annotated
 import msgspec
 from orionis.schemas.entities.failure import ValidationFailure
@@ -14,6 +16,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 # Rule and schema fixtures
 # ---------------------------------------------------------------------------
+
 
 class _RejectRule(Rule):
     """Rule rejecting every value it inspects."""
@@ -46,30 +49,38 @@ class _RejectRule(Rule):
         """
         return False
 
+
 class _Address(Schema):
     zip_code: str
 
+
 class _RuledAddress(Schema):
     code: Annotated[str, _RejectRule()]
+
 
 class _Person(Schema):
     name: str
     age: int
 
+
 class _PartialDefaults(Schema):
     age: int
     label: str = "default"
 
+
 class _OptionalNested(Schema):
     address: _Address | None
+
 
 class _NestedParent(Schema):
     child: _RuledAddress
     count: int
 
+
 class _RuledParent(Schema):
     code: Annotated[str, _RejectRule()]
     count: int
+
 
 def _conversion_error(payload: object, schema: type) -> msgspec.ValidationError:
     """
@@ -99,6 +110,7 @@ def _conversion_error(payload: object, schema: type) -> msgspec.ValidationError:
     error_msg = "The payload converted without raising a validation error."
     raise AssertionError(error_msg)
 
+
 def _uncached_struct(name: str, meta: dict[str, list[object]] | None = None) -> type:
     """
     Build a struct that mimics a schema without a cached validation plan.
@@ -119,8 +131,8 @@ def _uncached_struct(name: str, meta: dict[str, list[object]] | None = None) -> 
     klass.__orionis_meta__ = {} if meta is None else meta
     return klass
 
-class TestNestedSchema(TestCase):
 
+class TestNestedSchema(TestCase):
     def testBareSchemaIsReturned(self) -> None:
         """Return the schema declared directly by a field annotation.
 
@@ -129,7 +141,7 @@ class TestNestedSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(_nested_schema(_Address), _Address)
 
@@ -141,7 +153,7 @@ class TestNestedSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(_nested_schema(Annotated[_Address, Title("A")]), _Address)
 
@@ -153,7 +165,7 @@ class TestNestedSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(_nested_schema(_Address | None), _Address)
 
@@ -165,7 +177,7 @@ class TestNestedSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(_nested_schema(int | str))
 
@@ -177,12 +189,12 @@ class TestNestedSchema(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIsNone(_nested_schema(str))
 
-class TestFieldPlan(TestCase):
 
+class TestFieldPlan(TestCase):
     def testPlanIsCachedPerSchema(self) -> None:
         """Return the very same plan object on repeated calls.
 
@@ -191,7 +203,7 @@ class TestFieldPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         self.assertIs(_field_plan(_Person), _field_plan(_Person))
 
@@ -203,7 +215,7 @@ class TestFieldPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entries = {entry[0]: entry for entry in _field_plan(_PartialDefaults)}
         self.assertEqual(set(entries), {"age", "label"})
@@ -219,7 +231,7 @@ class TestFieldPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entries = {entry[0]: entry for entry in _field_plan(_OptionalNested)}
         self.assertIs(entries["address"][3], _Address)
@@ -232,7 +244,7 @@ class TestFieldPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         entries = {entry[0]: entry for entry in _field_plan(_RuledParent)}
         self.assertEqual(len(entries["code"][4]), 1)
@@ -246,14 +258,14 @@ class TestFieldPlan(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         klass = _uncached_struct("_FieldPlanColdRules", {"code": [_RejectRule()]})
         entries = {entry[0]: entry for entry in _field_plan(klass)}
         self.assertEqual(len(entries["code"][4]), 1)
 
-class TestFailureCollectorCollect(TestCase):
 
+class TestFailureCollectorCollect(TestCase):
     async def testEveryMissingRequiredFieldIsReported(self) -> None:
         """Report each required field absent from the payload.
 
@@ -262,7 +274,7 @@ class TestFailureCollectorCollect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({}, _Person)
         failures = await FailureCollector.collect({}, _Person, error)
@@ -277,7 +289,7 @@ class TestFailureCollectorCollect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"age": "not-an-int"}
         error = _conversion_error(payload, _PartialDefaults)
@@ -292,7 +304,7 @@ class TestFailureCollectorCollect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = [1, 2]
         error = _conversion_error(payload, _Person)
@@ -308,7 +320,7 @@ class TestFailureCollectorCollect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({}, _Person)
         self.assertIsInstance(await FailureCollector.collect({}, _Person, error), tuple)
@@ -321,7 +333,7 @@ class TestFailureCollectorCollect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"child": {"code": 123}, "count": 1}
         error = _conversion_error(payload, _NestedParent)
@@ -336,7 +348,7 @@ class TestFailureCollectorCollect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"child": 5, "count": 1}
         error = _conversion_error(payload, _NestedParent)
@@ -351,7 +363,7 @@ class TestFailureCollectorCollect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"code": "abc", "count": "not-an-int"}
         error = _conversion_error(payload, _RuledParent)
@@ -367,15 +379,15 @@ class TestFailureCollectorCollect(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         payload = {"child": {"code": "abc"}, "count": "not-an-int"}
         error = _conversion_error(payload, _NestedParent)
         failures = await FailureCollector.collect(payload, _NestedParent, error)
         self.assertEqual({f.field for f in failures}, {"child.code", "count"})
 
-class TestFailureCollectorEnforce(TestCase):
 
+class TestFailureCollectorEnforce(TestCase):
     async def testUncachedNestedPlanIsBuiltOnDemand(self) -> None:
         """Build the nested rule plan when the value type is not cached.
 
@@ -384,12 +396,14 @@ class TestFailureCollectorEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         klass = _uncached_struct("_EnforceColdChild", {"code": [_RejectRule()]})
         failures: list[ValidationFailure] = []
         await FailureCollector._enforce(
-            [("child", klass(code="abc"), (), klass)], {}, failures,
+            [("child", klass(code="abc"), (), klass)],
+            {},
+            failures,
         )
         self.assertEqual([f.field for f in failures], ["child.code"])
 
@@ -401,7 +415,7 @@ class TestFailureCollectorEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failures: list[ValidationFailure] = []
         await FailureCollector._enforce([("address", None, (), _Address)], {}, failures)
@@ -415,16 +429,18 @@ class TestFailureCollectorEnforce(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         failures: list[ValidationFailure] = []
         await FailureCollector._enforce(
-            [("address", _Address(zip_code="10001"), (), _Address)], {}, failures,
+            [("address", _Address(zip_code="10001"), (), _Address)],
+            {},
+            failures,
         )
         self.assertEqual(failures, [])
 
-class TestFailureCollectorBlame(TestCase):
 
+class TestFailureCollectorBlame(TestCase):
     async def testCleanNestedMappingFallsBackToTheParsedError(self) -> None:
         """Report the parsed error when the nested mapping blames no field.
 
@@ -434,16 +450,20 @@ class TestFailureCollectorBlame(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         error = _conversion_error({"zip_code": 1}, _Address)
         failures = await FailureCollector._blame(
-            error, {"zip_code": "10001"}, _Address, _OptionalNested, "address",
+            error,
+            {"zip_code": "10001"},
+            _Address,
+            _OptionalNested,
+            "address",
         )
         self.assertEqual([f.field for f in failures], ["address.zip_code"])
 
-class TestFailureCollectorContract(TestCase):
 
+class TestFailureCollectorContract(TestCase):
     def testCollectorDeclaresSlots(self) -> None:
         """Confirm the collector stores no per-instance state.
 
@@ -452,6 +472,9 @@ class TestFailureCollectorContract(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
-        self.assertEqual(FailureCollector.__slots__, ())
+        instance = FailureCollector()
+        self.assertFalse(hasattr(instance, "__dict__"))
+        with self.assertRaises(AttributeError):
+            instance.undeclared = "unsupported"

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from dataclasses import FrozenInstanceError, fields
 from orionis.orm.query.expressions import (
     AggregateClause,
@@ -20,6 +22,7 @@ from orionis.orm.query.expressions import (
 from orionis.orm.schema.table import TableDefinition
 from orionis.test import TestCase
 
+
 class TestQueryExpressions(TestCase):
     """Verify plan ownership and the intermediate query representation."""
 
@@ -29,7 +32,7 @@ class TestQueryExpressions(TestCase):
         Returns
         -------
         None
-            Verify list independence and intentionally shared clause objects.
+            No return value.
         """
         table = TableDefinition("users")
         subquery = SelectPlan(TableDefinition("posts"), columns=("id",))
@@ -81,7 +84,7 @@ class TestQueryExpressions(TestCase):
         Returns
         -------
         None
-            Verify mutating one fresh plan cannot change another plan.
+            No return value.
         """
         table = TableDefinition("users")
         for plan_type in (SelectPlan, InsertPlan, UpdatePlan, DeletePlan):
@@ -99,7 +102,7 @@ class TestQueryExpressions(TestCase):
         Returns
         -------
         None
-            Verify fragment bindings are independent and metadata is immutable.
+            No return value.
         """
         fragment = RawExpression("amount + :increment", {"increment": 2}, "total")
         self.assertEqual(fragment.bindings, {"increment": 2})

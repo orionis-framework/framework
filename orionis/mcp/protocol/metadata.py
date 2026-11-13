@@ -6,6 +6,7 @@ Includes ``CacheHint``, ``Icon``, ``ToolAnnotations``, ``ContentAnnotations``.
 from typing import Literal
 import msgspec
 
+
 class CacheHint(msgspec.Struct, frozen=True, kw_only=True):
     """Describe client cache freshness without caching server-side results."""
 
@@ -38,7 +39,9 @@ class CacheHint(msgspec.Struct, frozen=True, kw_only=True):
             message = "Cache scope must be public or private."
             raise ValueError(message)
 
+
 CacheHints = CacheHint
+
 
 class Icon(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """An icon reference; the server never fetches its source."""
@@ -73,6 +76,7 @@ class Icon(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
             message = "MCP icon sources must use HTTPS or data URIs."
             raise ValueError(message)
 
+
 class ToolAnnotations(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """Describe tool behavior as hints, never as authorization rules."""
 
@@ -97,6 +101,7 @@ class ToolAnnotations(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=T
         default=msgspec.UNSET,
     )
     """Open world produced by ``msgspec.field``."""
+
 
 class ContentAnnotations(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """Resource/content audience, relevance, and modification hints."""
@@ -129,6 +134,7 @@ class ContentAnnotations(msgspec.Struct, frozen=True, kw_only=True, omit_default
             message = "Content priority must be between zero and one."
             raise ValueError(message)
 
+
 class PromptArgument(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """Declare one string-valued prompt argument."""
 
@@ -138,6 +144,7 @@ class PromptArgument(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=Tr
     description: str | msgspec.UnsetType = msgspec.UNSET
     required: bool = False
     """Required flag used by ``PromptArgument``."""
+
 
 class ServerInfo(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """Describe one compiled server implementation."""
@@ -155,6 +162,7 @@ class ServerInfo(msgspec.Struct, frozen=True, kw_only=True, omit_defaults=True):
     """Website url produced by ``msgspec.field``."""
     icons: tuple[Icon, ...] | msgspec.UnsetType = msgspec.UNSET
 
+
 class PrimitiveMetadata(msgspec.Struct, frozen=True, kw_only=True):
     """Common typed fields used to validate static registry metadata at boot."""
 
@@ -164,9 +172,11 @@ class PrimitiveMetadata(msgspec.Struct, frozen=True, kw_only=True):
     description: str | msgspec.UnsetType = msgspec.UNSET
     icons: tuple[Icon, ...] | msgspec.UnsetType = msgspec.UNSET
     meta: dict[str, object] | msgspec.UnsetType = msgspec.field(
-        name="_meta", default=msgspec.UNSET,
+        name="_meta",
+        default=msgspec.UNSET,
     )
     """Meta produced by ``msgspec.field``."""
+
 
 class ToolMetadata(PrimitiveMetadata, frozen=True, kw_only=True):
     """A native tool schema with optional behavioral hints."""
@@ -174,25 +184,30 @@ class ToolMetadata(PrimitiveMetadata, frozen=True, kw_only=True):
     input_schema: dict[str, object] = msgspec.field(name="inputSchema")
     """JSON Schema describing the accepted input."""
     output_schema: dict[str, object] | msgspec.UnsetType = msgspec.field(
-        name="outputSchema", default=msgspec.UNSET,
+        name="outputSchema",
+        default=msgspec.UNSET,
     )
     """JSON Schema describing the declared structured output."""
     annotations: ToolAnnotations | msgspec.UnsetType = msgspec.UNSET
+
 
 class ResourceMetadata(PrimitiveMetadata, frozen=True, kw_only=True):
     """A resource or template already validated by the URI compiler."""
 
     uri: str | msgspec.UnsetType = msgspec.UNSET
     uri_template: str | msgspec.UnsetType = msgspec.field(
-        name="uriTemplate", default=msgspec.UNSET,
+        name="uriTemplate",
+        default=msgspec.UNSET,
     )
     """Uri template produced by ``msgspec.field``."""
     mime_type: str | msgspec.UnsetType = msgspec.field(
-        name="mimeType", default=msgspec.UNSET,
+        name="mimeType",
+        default=msgspec.UNSET,
     )
     """Media type describing the resource content."""
     size: int | msgspec.UnsetType = msgspec.UNSET
     annotations: ContentAnnotations | msgspec.UnsetType = msgspec.UNSET
+
 
 class PromptMetadata(PrimitiveMetadata, frozen=True, kw_only=True):
     """Prompt descriptors and their string-valued argument declarations."""

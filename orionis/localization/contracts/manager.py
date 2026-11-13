@@ -1,11 +1,11 @@
+# ruff: noqa: TC001
+# Runtime imports keep the public contract annotations introspectable.
 """Define the contract for the localization manager."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.localization.contracts.translator import ITranslator
 
-if TYPE_CHECKING:
-    from orionis.localization.contracts.translator import ITranslator
 
 class ILocalizationManager(ABC):
     """

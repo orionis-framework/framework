@@ -1,9 +1,12 @@
+# ruff: noqa: ARG002
+# Keep rule interface parameter names compatible with keyword callers.
 """Ensure a URL points at a hostname that currently resolves."""
 
 import asyncio
 import socket
 from urllib.parse import urlsplit
 from orionis.schemas.rule import Rule
+
 
 class ActiveUrl(Rule):
     """
@@ -13,8 +16,6 @@ class ActiveUrl(Rule):
     resolver, so the check succeeds only when an ``A`` or ``AAAA`` record
     exists. Resolution is awaited without blocking the calling event loop.
     """
-
-    # ruff: noqa: ARG002
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
@@ -57,8 +58,11 @@ class ActiveUrl(Rule):
             return False
         try:
             await asyncio.get_running_loop().getaddrinfo(
-                host, None, family=socket.AF_UNSPEC, type=socket.SOCK_STREAM,
+                host,
+                None,
+                family=socket.AF_UNSPEC,
+                type=socket.SOCK_STREAM,
             )
-        except (OSError, UnicodeError):
+        except OSError, UnicodeError:
             return False
         return True

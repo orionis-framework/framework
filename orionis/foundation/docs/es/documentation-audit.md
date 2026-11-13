@@ -103,12 +103,12 @@ Compilar un bloque o ejecutar su definición de función/clase no equivale a eje
 - `SeederRunner.seed()` no acepta selección de clase ni `force`; timestamps y soft deletes requieren columnas explícitas. `Model.create()` devuelve una instancia aunque un evento vete `save()`.
 - Bulk update/delete no ejecutan eventos por instancia ni aplican límites de lectura. Pivot no tiene `updateExistingPivot`; `sync()` no abre transacción automáticamente.
 - La preparación MIME y lectura de adjuntos es secuencial y completa en memoria; el resultado STORED del transporte file no es entrega SMTP.
-- Los handlers `Tool` devuelven `McpResponse`; retornar un valor crudo puede compilar sin funcionar en dispatch. El enlace predeterminado de verificación de email cifra identidad sin un plazo dedicado y el registro predeterminado puede exponer `str(exception)`; ambos requieren política de aplicación.
+- Los handlers `Tool` devuelven `McpResponse`; retornar un valor crudo puede compilar sin funcionar en dispatch. El enlace predeterminado de verificación de email cifra identidad sin un plazo dedicado y requiere política de aplicación. El registro ahora reporta fallos del backend centralmente y muestra un mensaje genérico en el formulario; consulta [respuestas HTTP predeterminadas](../../../http/docs/es/default-responses.md).
 - Locale es estado compartido; usa selección explícita por solicitud. Realtime y el event bus MCP predeterminados son locales al worker.
-- CBC y GCM ofrecen garantías diferentes; locks/leases, expiración file, spooling cloud, scheduler y reintentos tienen límites explicados en sus manuales.
+- El cifrado de aplicación acepta AES-GCM autenticado y rechaza CBC heredado; los límites de locks, expiración, almacenamiento temporal cloud, planificación y reintentos se explican en sus manuales.
 - `Stringable.toHtmlString()` usa `html.escape`; `forPage(page, number)` normaliza page inferior a 1. Los tests no hacen rollback automático de caché o base de datos.
 
-Posible problema de implementación para herramientas: `inspect.signature(AuthorizationSnapshot)` falla por `Iterable` importado únicamente bajo `TYPE_CHECKING` en [snapshot.py](../../../auth/authorization/snapshot.py). Se reprodujo el `NameError`; `annotation_format=annotationlib.Format.STRING` y la construcción directa funcionan. No se cambió la implementación.
+El problema de reflexión observado anteriormente en `AuthorizationSnapshot` ya no está presente en las fuentes: [snapshot.py](../../../auth/authorization/snapshot.py) mantiene `Iterable` disponible en runtime para la anotación de su constructor público.
 
 ## Navegación y preparación de FASE 2
 

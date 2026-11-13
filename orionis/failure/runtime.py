@@ -1,13 +1,16 @@
+# ruff: noqa: BLE001, PLC0415, PLR0913, S110, SLF001, TC003
+# Preserve originals at reporting boundaries; last-resort stderr cannot recurse.
+# Helpers share private registries; lazy imports and runtime annotations are required.
 """
 Observe failures only inside an activated application runtime.
 
-This module deliberately depends only on the standard library and failure
-entities. Protocols keep ownership of responses, cancellation and recovery.
+Core imports use the standard library and failure entities. Cancelled-work
+cleanup lazily reuses the shared awaitable utility. Protocols keep ownership of
+responses, cancellation and recovery.
 """
 
 # Keyword context fields keep allocations on the error path. Helpers in this
 # module cooperate with the private ledger and pending-report registry.
-# ruff: noqa: PLR0913, SLF001
 
 from __future__ import annotations
 import asyncio
@@ -16,15 +19,22 @@ import sys
 from dataclasses import replace
 from contextlib import contextmanager
 from concurrent.futures import Future as ThreadFuture
+from collections.abc import Callable, Generator, Mapping
+from functools import partial
 from threading import Lock
-from typing import TYPE_CHECKING, Self, cast
+from typing import Self, cast
 from uuid import uuid4
+from weakref import ReferenceType, ref
 from orionis.failure.entities.context import FailureContext, FailureReceipt
 from orionis.failure.entities.handling import FailureHandling
 
-if TYPE_CHECKING:
-    from collections.abc import Generator, Mapping
-    from concurrent.futures import Future
+_CONTROL_EXCEPTIONS = (
+    asyncio.CancelledError,
+    KeyboardInterrupt,
+    SystemExit,
+    GeneratorExit,
+)
+"""Control-flow signals excluded from application failure reporting."""
 
 _current: contextvars.ContextVar[_Operation | None] = contextvars.ContextVar(
     "orionis_failure_operation",
@@ -36,6 +46,7 @@ _reporting: contextvars.ContextVar[FailureRuntime | None] = contextvars.ContextV
     default=None,
 )
 """Runtime executing reporting effects, used to prevent recursive delivery."""
+
 
 def _emergency(
     exception: BaseException | None,
@@ -57,7 +68,7 @@ def _emergency(
     Returns
     -------
     None
-        Emit a minimal stderr diagnostic and suppress ordinary write errors.
+        No return value.
     """
     try:
         primary_name = type(exception).__name__ if exception is not None else "result"
@@ -70,8 +81,9 @@ def _emergency(
             f"Orionis failure {context.event_id}: {primary_name}; "
             f"reporting unavailable ({secondary_name}).\n",
         )
-    except Exception:  # noqa: BLE001, S110 - Last resort must not recurse.
+    except Exception:
         pass
+
 
 async def _cancellation_checkpoint() -> int:
     """
@@ -115,6 +127,7 @@ def _find_runtime(app: object | None = None) -> FailureRuntime | None:
     current = _current.get()
     return current.runtime if current is not None else None
 
+
 def get_runtime(app: object | None = None) -> FailureRuntime | None:
     """
     Return the active runtime for an application or current operation.
@@ -132,6 +145,7 @@ def get_runtime(app: object | None = None) -> FailureRuntime | None:
     runtime = _find_runtime(app)
     return runtime if runtime is not None and runtime.active else None
 
+
 @contextmanager
 def _handler_dependencies() -> Generator[None]:
     """
@@ -142,7 +156,7 @@ def _handler_dependencies() -> Generator[None]:
     None
         Enter a scope-free context and restore the previous contexts on exit.
     """
-    from orionis.container.context.scope import (  # noqa: PLC0415
+    from orionis.container.context.scope import (
         reset_scope,
         set_current_scope,
     )
@@ -155,11 +169,18 @@ def _handler_dependencies() -> Generator[None]:
         _current.reset(failure_token)
         reset_scope(token)
 
+
 class _Incident:
     """Keep deferred effects and their completion inside an operation ledger."""
 
     __slots__ = (
-        "abandoned", "context", "exception", "handling", "ready", "receipt", "started",
+        "abandoned",
+        "context",
+        "exception",
+        "handling",
+        "ready",
+        "receipt",
+        "started",
     )
     """Incident fields retained only for the owning operation's lifetime."""
 
@@ -177,7 +198,7 @@ class _Incident:
         Returns
         -------
         None
-            Store the failure and prepare an unresolved completion signal.
+            No return value.
         """
         self.exception = exception
         """Original exception used for incident identity and native traceback."""
@@ -201,8 +222,7 @@ class _Incident:
         Returns
         -------
         None
-            Degrade the receipt and finish the incident only if delivery has not
-            started.
+            No return value.
         """
         if not self.started:
             self.abandoned = True
@@ -216,7 +236,7 @@ class _Incident:
         Returns
         -------
         None
-            Preserve the event identifier and replace receipt and completion state.
+            No return value.
         """
         self.abandoned = False
         self.receipt = FailureReceipt(event_id=self.receipt.event_id)
@@ -234,7 +254,7 @@ class _Incident:
         Returns
         -------
         None
-            Set the plan and resolve the completion signal if it is still pending.
+            No return value.
         """
         self.handling = handling
         if not self.ready.done():
@@ -250,7 +270,7 @@ class _Incident:
         Returns
         -------
         None
-            Resume after the incident's completion signal is resolved.
+            No return value.
 
         Raises
         ------
@@ -273,7 +293,7 @@ class _Incident:
                 Returns
                 -------
                 None
-                    Set the signal result to ``None`` unless it is already done.
+                    No return value.
                 """
                 if not signal.done():
                     signal.set_result(None)
@@ -292,7 +312,7 @@ class _Incident:
                 Returns
                 -------
                 None
-                    Schedule the callback unless the loop can no longer accept it.
+                    No return value.
                 """
                 try:
                     loop.call_soon_threadsafe(callback)
@@ -302,6 +322,7 @@ class _Incident:
 
             self.ready.add_done_callback(finished)
             await notification
+
 
 class _Operation:
     """Own an error-only ledger for one execution and its nested boundaries."""
@@ -350,7 +371,7 @@ class _Operation:
         Returns
         -------
         None
-            Store execution metadata and defer ledger allocation until an incident.
+            No return value.
         """
         self.runtime = runtime
         """Application coordinator associated with this execution boundary."""
@@ -361,8 +382,9 @@ class _Operation:
         self.correlation_id = correlation_id
         """Correlation identifier allocated lazily when an incident occurs."""
         self.parent = (
-            parent if parent is not None and not parent.closed
-            and parent.runtime is runtime else None
+            parent
+            if parent is not None and not parent.closed and parent.runtime is runtime
+            else None
         )
         """Live enclosing operation belonging to the same runtime, if any."""
         self.owns = isolated or self.parent is None
@@ -438,14 +460,19 @@ class _Operation:
             Direct receipt, or the first child receipt when every group member
             has been observed; ``None`` otherwise.
         """
-        found = self.incident(error)
-        if found is not None:
-            return found.receipt
-        if isinstance(error, BaseExceptionGroup):
-            receipts = [self.lookup(child) for child in error.exceptions]
-            if receipts and all(receipts):
-                return receipts[0]
-        return None
+        pending = [error]
+        first_receipt = None
+        while pending:
+            candidate = pending.pop()
+            found = self.incident(candidate)
+            if found is not None:
+                if first_receipt is None:
+                    first_receipt = found.receipt
+            elif isinstance(candidate, BaseExceptionGroup):
+                pending.extend(reversed(candidate.exceptions))
+            else:
+                return None
+        return first_receipt
 
     def adopt(self, incident: _Incident) -> None:
         """
@@ -459,7 +486,7 @@ class _Operation:
         Returns
         -------
         None
-            Record the incident unless this operation or its owner has closed.
+            No return value.
         """
         if self.closed:
             return
@@ -482,7 +509,7 @@ class _Operation:
         Returns
         -------
         None
-            Transfer matching incidents when a parent and owned ledger exist.
+            No return value.
         """
         if self.parent is None or not self.ledger:
             return
@@ -496,7 +523,10 @@ class _Operation:
                 self.parent.adopt(found)
 
     def __exit__(
-        self, exc_type: object, error: BaseException | None, traceback: object,
+        self,
+        exc_type: object,
+        error: BaseException | None,
+        traceback: object,
     ) -> None:
         """
         Restore the parent context and release this operation's ledger.
@@ -513,8 +543,7 @@ class _Operation:
         Returns
         -------
         None
-            Propagate escaping incident records and close without suppressing
-            the exception.
+            No return value.
         """
         # Explicitly transfer incident identity when a nested operation raises
         # back to its parent; independent attempts keep independent ledgers.
@@ -525,6 +554,7 @@ class _Operation:
         self.closed = True
         if self.owns and self.ledger is not None:
             self.ledger.clear()
+
 
 class _InactiveOperation:
     """Allocation-free context when no application observation is active."""
@@ -549,7 +579,7 @@ class _InactiveOperation:
         """
         return self
 
-    def __exit__(self, *_args: object) -> None:
+    def __exit__(self, *_args: object) -> bool:
         """
         Leave the inactive context without suppressing exceptions.
 
@@ -560,13 +590,15 @@ class _InactiveOperation:
 
         Returns
         -------
-        None
-            Leave observation state unchanged and do not suppress exceptions.
+        bool
+            False, preserving observation state and exception propagation.
         """
-        return # NOSONAR
+        return False
+
 
 _inactive_operation = _InactiveOperation()
 """Shared no-op boundary used when observation is inactive."""
+
 
 class _BorrowedOperation:
     """Reuse identical nested metadata without replacing or closing its owner."""
@@ -585,7 +617,7 @@ class _BorrowedOperation:
         """
         return _current.get()
 
-    def __exit__(self, *_args: object) -> None:
+    def __exit__(self, *_args: object) -> bool:
         """
         Leave the borrowed context without closing its owner.
 
@@ -596,13 +628,15 @@ class _BorrowedOperation:
 
         Returns
         -------
-        None
-            Preserve the owning operation and do not suppress exceptions.
+        bool
+            False, preserving the owning operation and exception propagation.
         """
-        return # NOSONAR
+        return False
+
 
 _borrowed_operation = _BorrowedOperation()
 """Shared context manager for an identical nested operation."""
+
 
 def operation(
     app: object | None = None,
@@ -648,14 +682,24 @@ def operation(
     if runtime is None and (current is None or current.runtime is None):
         return _inactive_operation
     if (
-        not isolated and current is not None and not current.closed
-        and current.runtime is runtime and current.flow == flow
-        and current.name == operation and current.correlation_id == correlation_id
+        not isolated
+        and current is not None
+        and not current.closed
+        and current.runtime is runtime
+        and current.flow == flow
+        and current.name == operation
+        and current.correlation_id == correlation_id
     ):
         return _borrowed_operation
     return _Operation(
-        runtime, flow, operation, correlation_id, isolated=isolated, parent=current,
+        runtime,
+        flow,
+        operation,
+        correlation_id,
+        isolated=isolated,
+        parent=current,
     )
+
 
 def current_operation() -> _Operation | None:
     """
@@ -668,6 +712,7 @@ def current_operation() -> _Operation | None:
     """
     current = _current.get()
     return current if current is not None and not current.closed else None
+
 
 def _runtime_operation(runtime: FailureRuntime) -> _Operation | None:
     """
@@ -686,8 +731,11 @@ def _runtime_operation(runtime: FailureRuntime) -> _Operation | None:
     current = current_operation()
     return current if current is not None and current.runtime is runtime else None
 
+
 def _previous_receipt(
-    exception: BaseException, current: _Operation | None, incident: _Incident | None,
+    exception: BaseException,
+    current: _Operation | None,
+    incident: _Incident | None,
 ) -> FailureReceipt | None:
     """
     Reuse a direct incident receipt or an already observed group's receipt.
@@ -710,8 +758,11 @@ def _previous_receipt(
         return incident.receipt
     return current.lookup(exception) if current is not None else None
 
+
 def _parent_context(
-    exception: BaseException, context: FailureContext, current: _Operation | None,
+    exception: BaseException,
+    context: FailureContext,
+    current: _Operation | None,
 ) -> FailureContext:
     """
     Link a secondary failure to an already observed cause.
@@ -733,11 +784,14 @@ def _parent_context(
     """
     if current is None or context.parent_event_id is not None:
         return context
-    cause = exception.__cause__ or exception.__context__
+    cause = exception.__cause__
+    if cause is None:
+        cause = exception.__context__
     parent = current.lookup(cause) if cause is not None else None
     if parent is not None:
         return cast("FailureContext", replace(context, parent_event_id=parent.event_id))
     return context
+
 
 def handoff(
     exception: BaseException,
@@ -784,11 +838,16 @@ def handoff(
         target.adopt(incident)
     return True
 
+
 class FailureRuntime:
     """Own one application's handler, active lifetimes and pending reports."""
 
     def __init__(
-        self, app: object, handler: object | None = None, *, timeout: float = 5.0,
+        self,
+        app: object,
+        handler: object | None = None,
+        *,
+        timeout: float = 5.0,
     ) -> None:
         """
         Initialize runtime ownership, reporting state, and task registries.
@@ -806,7 +865,7 @@ class FailureRuntime:
         Returns
         -------
         None
-            Store configuration without activating observation.
+            No return value.
         """
         self.app = app
         """Application providing dependency resolution and hook invocation."""
@@ -820,12 +879,16 @@ class FailureRuntime:
         """Owners retaining observation while final resource closure completes."""
         self._loop: asyncio.AbstractEventLoop | None = None
         """Serving loop used to schedule notification from native threads."""
-        self._pending: set[asyncio.Task] = set()
-        """Outstanding loop-local failure notifications to drain."""
+        self._pending: set[asyncio.Future] = set()
+        """Loop-local reports and abandoned futures retained through cleanup."""
         self._tasks: set[asyncio.Task] = set()
         """Supervised application tasks cancelled and drained at final shutdown."""
-        self._thread_pending: set[Future] = set()
-        """Cross-thread notification futures retained until completion."""
+        self._shutting_down = False
+        """Reject new work until a valid activation reopens task admission."""
+        self._shutdown_pending: asyncio.Task[None] | None = None
+        """Shared shutdown coordinator retained only while cleanup is pending."""
+        self._thread_pending: set[ThreadFuture] = set()
+        """Submissions retained until ownership transfers to a loop-side task."""
         self._pending_lock = Lock()
         """Serialize incident reservation and pending cross-thread registries."""
         self._prepare_lock = asyncio.Lock()
@@ -885,7 +948,7 @@ class FailureRuntime:
         Returns
         -------
         None
-            Cache the handler while serializing concurrent resolution attempts.
+            No return value.
         """
         if self.handler is not None:
             return
@@ -907,16 +970,22 @@ class FailureRuntime:
         Returns
         -------
         None
-            Enable reporting for a newly registered owner and retain its event loop.
+            No return value.
 
         Raises
         ------
         RuntimeError
-            If no event loop is running in the current thread.
+            If no event loop is running or earlier shutdown is still pending.
         """
+        pending = self._shutdown_pending
+        if pending is not None and not pending.done():
+            message = "Cannot activate a runtime while shutdown is pending."
+            raise RuntimeError(message)
+        loop = asyncio.get_running_loop()
         if owner not in self._owners:
             self._reporting_enabled = True
-        self._loop = asyncio.get_running_loop()
+        self._loop = loop
+        self._shutting_down = False
         self._owners.add(owner)
 
     async def start(self, owner: object) -> None:
@@ -931,10 +1000,30 @@ class FailureRuntime:
         Returns
         -------
         None
-            Register the owner while holding the runtime lifecycle lock.
+            No return value.
+
+        Raises
+        ------
+        RuntimeError
+            If cleanup or its reporter attempts to await its own restart.
         """
-        async with self.lifecycle_lock:
-            self.activate(owner)
+        while True:
+            pending = self._shutdown_pending
+            if pending is not None and not pending.done():
+                current = asyncio.current_task()
+                if (
+                    current in self._tasks
+                    or current in self._pending
+                    or _reporting.get() is self
+                ):
+                    message = "Runtime cleanup cannot restart its own runtime."
+                    raise RuntimeError(message)
+                await asyncio.shield(pending)
+            async with self.lifecycle_lock:
+                pending = self._shutdown_pending
+                if pending is None or pending.done():
+                    self.activate(owner)
+                    return
 
     def deactivate(self, owner: object) -> None:
         """
@@ -948,7 +1037,7 @@ class FailureRuntime:
         Returns
         -------
         None
-            Remove the token from both ownership sets without affecting other owners.
+            No return value.
         """
         self._owners.discard(owner)
         self._closing_owners.discard(owner)
@@ -967,7 +1056,7 @@ class FailureRuntime:
         Returns
         -------
         None
-            Move an active owner to the closing set; leave other tokens unchanged.
+            No return value.
         """
         if owner in self._owners:
             self._owners.remove(owner)
@@ -980,7 +1069,7 @@ class FailureRuntime:
         Returns
         -------
         None
-            Leave activation unchanged and suppress subsequent logging actions.
+            No return value.
         """
         self._reporting_enabled = False
 
@@ -1060,7 +1149,9 @@ class FailureRuntime:
         return True, handling
 
     async def _defaultHandling(
-        self, exception: BaseException, context: FailureContext,
+        self,
+        exception: BaseException,
+        context: FailureContext,
     ) -> FailureHandling | None:
         """
         Select native failure effects after application policy fails.
@@ -1082,7 +1173,8 @@ class FailureRuntime:
         BaseException
             If caller cancellation or another control-flow exception must propagate.
         """
-        from orionis.failure.base.handler import BaseExceptionHandler  # noqa: PLC0415
+        from orionis.failure.base.handler import BaseExceptionHandler
+
         cancellations = await _cancellation_checkpoint()
         try:
             async with asyncio.timeout(self.timeout):
@@ -1095,7 +1187,9 @@ class FailureRuntime:
                             )
                     handler = self._fallback_handler
                 return await BaseExceptionHandler.handleFailure(
-                    handler, exception, context,
+                    handler,
+                    exception,
+                    context,
                 )
         except BaseException as secondary:
             if isinstance(secondary, asyncio.CancelledError):
@@ -1131,13 +1225,20 @@ class FailureRuntime:
             owner = current._owner()
             if owner.correlation_id is None:
                 owner.correlation_id = uuid4().hex
-            return cast("FailureContext", replace(
-                context, correlation_id=current.correlation_id or owner.correlation_id,
-            ))
+            return cast(
+                "FailureContext",
+                replace(
+                    context,
+                    correlation_id=current.correlation_id or owner.correlation_id,
+                ),
+            )
         return context
 
     def _begin(
-        self, exception: BaseException, *, context: FailureContext,
+        self,
+        exception: BaseException,
+        *,
+        context: FailureContext,
         claimed: _Incident | None = None,
     ) -> tuple[FailureContext, FailureReceipt, _Incident | None]:
         """
@@ -1178,8 +1279,11 @@ class FailureRuntime:
             return self._recordIncident(exception, context, current, incident)
 
     def _recordIncident(
-        self, exception: BaseException, context: FailureContext,
-        current: _Operation | None, incident: _Incident | None,
+        self,
+        exception: BaseException,
+        context: FailureContext,
+        current: _Operation | None,
+        incident: _Incident | None,
     ) -> tuple[FailureContext, FailureReceipt, _Incident]:
         """
         Record a new or reclaimed incident before invoking a handler.
@@ -1219,7 +1323,9 @@ class FailureRuntime:
         return context, receipt, incident
 
     async def _completeHandling(
-        self, handling: FailureHandling | None, exception: BaseException | None,
+        self,
+        handling: FailureHandling | None,
+        exception: BaseException | None,
         context: FailureContext,
     ) -> tuple[bool, bool]:
         """
@@ -1266,7 +1372,10 @@ class FailureRuntime:
         return handling.reported, handling.degraded
 
     async def capture(
-        self, exception: BaseException, *, context: FailureContext,
+        self,
+        exception: BaseException,
+        *,
+        context: FailureContext,
         _incident: _Incident | None = None,
     ) -> FailureReceipt | None:
         """
@@ -1300,15 +1409,14 @@ class FailureRuntime:
             if _incident is not None:
                 _incident.abandon()
             return None
-        if isinstance(
-            exception,
-            (asyncio.CancelledError, KeyboardInterrupt, SystemExit, GeneratorExit),
-        ):
+        if isinstance(exception, _CONTROL_EXCEPTIONS):
             if _incident is not None:
                 _incident.abandon()
             return None
         context, receipt, incident = self._begin(
-            exception, context=context, claimed=_incident,
+            exception,
+            context=context,
+            claimed=_incident,
         )
         if receipt.duplicate:
             return receipt
@@ -1324,13 +1432,18 @@ class FailureRuntime:
         return receipt
 
     async def dispatchFailure(
-        self, exception: BaseException, *, context: FailureContext,
+        self,
+        exception: BaseException,
+        *,
+        context: FailureContext,
     ) -> tuple[FailureReceipt, FailureHandling | None]:
         """
         Select and complete failure effects without requesting presentation.
 
         Allow explicitly invoked standalone handling without activating the
         runtime; normal framework observation enters through ``capture``.
+        Control-flow signals return an undelivered receipt and no plan without
+        invoking application policy; exception groups remain intact.
 
         Parameters
         ----------
@@ -1352,6 +1465,8 @@ class FailureRuntime:
         if context.event_id is None:
             context = replace(context, event_id=uuid4().hex)
         receipt = FailureReceipt(event_id=context.event_id)
+        if isinstance(exception, _CONTROL_EXCEPTIONS):
+            return receipt, None
         reporter = _reporting.get()
         if reporter is not None and reporter.app is self.app:
             _emergency(exception, context)
@@ -1363,27 +1478,38 @@ class FailureRuntime:
         handling = None
         try:
             delivered, handling = await self._attempt(
-                "handleFailure", exception, context,
-                exception=exception, context=context,
+                "handleFailure",
+                exception,
+                context,
+                exception=exception,
+                context=context,
             )
             if not delivered:
                 degraded = True
                 handling = await self._defaultHandling(exception, context)
             reported, effects_failed = await self._completeHandling(
-                handling, exception, context,
+                handling,
+                exception,
+                context,
             )
             degraded = degraded or effects_failed
-        except Exception as secondary:  # noqa: BLE001 - Preserve the original.
+        except Exception as secondary:
             degraded = True
             _emergency(exception, context, secondary)
         finally:
             _reporting.reset(token)
         return replace(
-            receipt, delivered=delivered, reported=reported, degraded=degraded,
+            receipt,
+            delivered=delivered,
+            reported=reported,
+            degraded=degraded,
         ), handling
 
     async def handlingFor(
-        self, exception: BaseException, *, context: FailureContext,
+        self,
+        exception: BaseException,
+        *,
+        context: FailureContext,
     ) -> FailureHandling | None:
         """
         Return the selected plan without observing the exception twice.
@@ -1421,12 +1547,20 @@ class FailureRuntime:
                     break
                 return incident.handling
             return await self._fallbackPresentation(
-                exception, context, receipt, current, incident,
+                exception,
+                context,
+                receipt,
+                current,
+                incident,
             )
 
     async def _fallbackPresentation(
-        self, exception: BaseException, context: FailureContext,
-        receipt: FailureReceipt, current: _Operation | None, incident: _Incident | None,
+        self,
+        exception: BaseException,
+        context: FailureContext,
+        receipt: FailureReceipt,
+        current: _Operation | None,
+        incident: _Incident | None,
     ) -> FailureHandling | None:
         """
         Share native presentation planning for an incident without a plan.
@@ -1470,7 +1604,10 @@ class FailureRuntime:
         return handling
 
     async def captureResult(
-        self, value: object, *, context: FailureContext,
+        self,
+        value: object,
+        *,
+        context: FailureContext,
     ) -> FailureReceipt | None:
         """
         Observe a declared failed result without constructing an exception.
@@ -1506,22 +1643,35 @@ class FailureRuntime:
         token = _reporting.set(self)
         try:
             delivered, handling = await self._attempt(
-                "handleResult", None, context, value=value, context=context,
+                "handleResult",
+                None,
+                context,
+                value=value,
+                context=context,
             )
             reported, degraded = await self._completeHandling(handling, None, context)
-            return cast("FailureReceipt", replace(
-                receipt, delivered=delivered, reported=reported,
-                degraded=not delivered or degraded,
-            ))
-        except Exception as secondary:  # noqa: BLE001 - Preserve the outcome.
+            return cast(
+                "FailureReceipt",
+                replace(
+                    receipt,
+                    delivered=delivered,
+                    reported=reported,
+                    degraded=not delivered or degraded,
+                ),
+            )
+        except Exception as secondary:
             _emergency(None, context, secondary)
             return cast("FailureReceipt", replace(receipt, degraded=True))
         finally:
             _reporting.reset(token)
 
     async def presentHandling(
-        self, handling: FailureHandling, exception: BaseException, *,
-        context: FailureContext, request: object | None = None,
+        self,
+        handling: FailureHandling,
+        exception: BaseException,
+        *,
+        context: FailureContext,
+        request: object | None = None,
     ) -> object:
         """
         Present a selected plan with bounded, nonrecursive failure handling.
@@ -1555,7 +1705,8 @@ class FailureRuntime:
         incident = current.incident(exception) if current is not None else None
         diagnostic_context = (
             incident.context
-            if incident is not None and incident.context is not None else context
+            if incident is not None and incident.context is not None
+            else context
         )
         cancellations = await _cancellation_checkpoint()
         token = _reporting.set(self)
@@ -1584,17 +1735,18 @@ class FailureRuntime:
         Await owned callback reports until no pending report remains.
 
         Include reports enqueued during draining. Return immediately from this
-        runtime's application reporter to avoid self-deadlock. Yield after joining
-        completed reports so their queued ownership callbacks can run.
+        runtime's application reporter or an adopted cleanup task to avoid
+        self-deadlock. Yield after joining completed reports so their queued
+        ownership callbacks can run.
 
         Returns
         -------
         None
-            Wait for loop-side and cross-thread report registries to empty.
+            No return value.
         """
         # A hook cannot join itself (including its cross-thread submission),
         # or a parent task awaiting that hook. Its external owner does the drain.
-        if _reporting.get() is self:
+        if _reporting.get() is self or asyncio.current_task() in self._pending:
             return
         while True:
             with self._pending_lock:
@@ -1611,10 +1763,19 @@ class FailureRuntime:
             await asyncio.sleep(0)
 
     def createTask(
-        self, coroutine: object, *, name: str | None = None,
+        self,
+        coroutine: object,
+        *,
+        name: str | None = None,
     ) -> asyncio.Task:
         """
         Create and supervise application work until shutdown.
+
+        During shutdown, cancel new work before entering its awaitable. Valid
+        activation or startup reopens admission after cleanup. If scheduling
+        fails, close only the runtime wrapper; the original remains caller-owned.
+        Adopted futures on the running loop remain owned until cancellation
+        cleanup completes, without cancelling an already unwinding task again.
 
         Parameters
         ----------
@@ -1648,19 +1809,57 @@ class FailureRuntime:
             BaseException
                 If the work fails or is cancelled, after attempted observation.
             """
+            if self._shutting_down:
+                raise asyncio.CancelledError
             with operation(
-                runtime=self, flow="background", operation=name, isolated=True,
+                runtime=self,
+                flow="background",
+                operation=name,
+                isolated=True,
             ):
                 try:
                     return await coroutine
                 except BaseException as error:
                     await capture(
-                        error, runtime=self, flow="background", operation=name,
+                        error,
+                        runtime=self,
+                        flow="background",
+                        operation=name,
                     )
                     raise
 
-        task = asyncio.create_task(run(), name=name)
+        supervised = asyncio.isfuture(coroutine) and (
+            coroutine in self._tasks or coroutine in self._pending
+        )
+        wrapper = run()
+        try:
+            task = asyncio.create_task(wrapper, name=name)
+        except BaseException:
+            wrapper.close()
+            raise
         self._tasks.add(task)
+
+        def observe_cleanup(error: BaseException) -> None:
+            """
+            Observe an abandoned awaitable's cleanup failure once.
+
+            Parameters
+            ----------
+            error : BaseException
+                Original synchronous or deferred cleanup failure.
+
+            Returns
+            -------
+            None
+                No return value.
+            """
+            capture_nowait(
+                error,
+                runtime=self,
+                flow="background",
+                phase="cancelled_cleanup",
+                operation=name,
+            )
 
         def finished(completed: asyncio.Task) -> None:
             """
@@ -1674,26 +1873,116 @@ class FailureRuntime:
             Returns
             -------
             None
-                Remove task ownership, close the coroutine after cancellation
-                when possible, and retrieve unhandled exceptions.
+                No return value.
             """
             self._tasks.discard(completed)
             if completed.cancelled():
                 # Cancellation before first execution never entered run().
-                if hasattr(coroutine, "close"):
-                    coroutine.close()
+                self._finishCancelledWork(
+                    coroutine,
+                    supervised=supervised,
+                    on_error=observe_cleanup,
+                )
             else:
                 completed.exception()
 
         task.add_done_callback(finished)
         return task
 
+    def _finishCancelledWork(
+        self,
+        awaitable: object,
+        *,
+        supervised: bool,
+        on_error: Callable[[BaseException], object],
+    ) -> None:
+        """
+        Cancel abandoned work and retain local futures until cleanup completes.
+
+        Parameters
+        ----------
+        awaitable : object
+            Application work whose supervising wrapper was cancelled.
+        supervised : bool
+            Whether this runtime already owned the future at wrapper registration.
+        on_error : collections.abc.Callable[[BaseException], object]
+            Central observer for original cleanup failures.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        from orionis.support.concurrency import close_abandoned_awaitable
+
+        future = (
+            awaitable
+            if asyncio.isfuture(awaitable)
+            and awaitable.get_loop() is asyncio.get_running_loop()
+            else None
+        )
+        retained = future is not None and future in self._pending
+        supervised = future is not None and (
+            supervised or future in self._tasks or retained
+        )
+        cancelling = isinstance(future, asyncio.Task) and future.cancelling() > 0
+        if not cancelling and not (supervised and future.done()):
+            try:
+                close_abandoned_awaitable(awaitable, on_error=on_error)
+            except Exception as error:
+                on_error(error)
+        if future is None or future.done() or retained:
+            return
+        # Cancellation has already been requested. Draining must not request it
+        # again while the adopted task is inside its asynchronous finally block.
+        self._tasks.discard(future)
+        self._pending.add(future)
+
+        future.add_done_callback(
+            partial(
+                self._settleCancelledFuture,
+                supervised=supervised,
+                on_error=on_error,
+            ),
+        )
+
+    def _settleCancelledFuture(
+        self,
+        completed: asyncio.Future,
+        *,
+        supervised: bool,
+        on_error: Callable[[BaseException], object],
+    ) -> None:
+        """
+        Release completed cleanup and observe only unsupervised failures.
+
+        Parameters
+        ----------
+        completed : asyncio.Future
+            Adopted local future whose cleanup has reached a terminal state.
+        supervised : bool
+            Whether another runtime observer already owns this failure.
+        on_error : collections.abc.Callable[[BaseException], object]
+            Central observer for original cleanup failures.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self._pending.discard(completed)
+        error = None if completed.cancelled() else completed.exception()
+        if error is not None and not supervised:
+            on_error(error)
+
     async def shutdown(self, *, exclude: asyncio.Task | None = None) -> None:
         """
         Cancel owned application tasks and drain their failure reports.
 
         Exclude the current task and return immediately from a reporting callback
-        to avoid waiting on the reporter itself.
+        or adopted cleanup task to avoid self-deadlock. Concurrent callers share
+        one cleanup task; cancelling a waiter does not cancel that cleanup. Keep
+        admission closed until a subsequent valid activation or startup.
 
         Parameters
         ----------
@@ -1704,19 +1993,80 @@ class FailureRuntime:
         Returns
         -------
         None
-            Await task cleanup and all pending callback reports.
+            No return value.
         """
         if _reporting.get() is self:
             return
-        tasks = tuple(
-            task for task in self._tasks
-            if task is not asyncio.current_task() and task is not exclude
-        )
-        for task in tasks:
-            task.cancel()
-        if tasks:
-            await asyncio.gather(*tasks, return_exceptions=True)
-        await self.drain()
+        current = asyncio.current_task()
+        if current in self._pending:
+            return
+        pending = self._shutdown_pending
+        if pending is not None and not pending.done():
+            if current in self._tasks or current is pending:
+                return
+        else:
+            self._shutting_down = True
+            excluded = frozenset(
+                task for task in (current, exclude) if task is not None
+            )
+            cleanup = self._drainShutdown(excluded)
+            try:
+                pending = asyncio.create_task(cleanup)
+            except BaseException:
+                cleanup.close()
+                raise
+            self._shutdown_pending = pending
+            pending.add_done_callback(self._shutdownFinished)
+        await asyncio.shield(pending)
+
+    async def _drainShutdown(self, excluded: frozenset[asyncio.Task]) -> None:
+        """
+        Settle owned work and reports while admission remains closed.
+
+        Parameters
+        ----------
+        excluded : frozenset[asyncio.Task]
+            Lifecycle owners that are waiting for this coordinator.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        while True:
+            tasks = tuple(task for task in self._tasks if task not in excluded)
+            if tasks:
+                for task in tasks:
+                    task.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
+                # Release done callbacks, including cleanup of unstarted children.
+                await asyncio.sleep(0)
+                continue
+            await self.drain()
+            if all(task in excluded for task in self._tasks):
+                return
+
+    def _shutdownFinished(self, completed: asyncio.Task[None]) -> None:
+        """
+        Release the coordinator context and retrieve an unclaimed failure.
+
+        Parameters
+        ----------
+        completed : asyncio.Task[None]
+            Shared shutdown coordinator that finished or was cancelled.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        if self._shutdown_pending is completed:
+            self._shutdown_pending = None
+        if not completed.cancelled():
+            error = completed.exception()
+            if error is not None:
+                capture_nowait(error, runtime=self, flow="lifecycle", phase="cleanup")
+
 
 async def prepare(app: object) -> FailureRuntime | None:
     """
@@ -1737,7 +2087,7 @@ async def prepare(app: object) -> FailureRuntime | None:
     if runtime is None:
         if getattr(app, "isCreated", False) is not True:
             return None
-        from orionis.failure.contracts.catch import ICatch  # noqa: PLC0415
+        from orionis.failure.contracts.catch import ICatch
 
         if app.bound(ICatch) is not True:
             return None
@@ -1745,6 +2095,7 @@ async def prepare(app: object) -> FailureRuntime | None:
         app._failure_runtime = runtime
     await runtime.prepare()
     return runtime
+
 
 def _context(
     *,
@@ -1784,9 +2135,7 @@ def _context(
     FailureContext
         Immutable, sanitized context enriched by the current matching operation.
     """
-    current = _current.get()
-    if current is not None and current.runtime is not runtime:
-        current = None
+    current = _runtime_operation(runtime)
     if current is not None:
         if flow == "runtime":
             flow = current.flow
@@ -1803,6 +2152,7 @@ def _context(
         expected=expected,
         metadata=metadata or {},
     )
+
 
 async def capture(
     exception: BaseException,
@@ -1876,6 +2226,7 @@ async def capture(
         ),
     )
 
+
 async def capture_result(
     value: object,
     *,
@@ -1940,10 +2291,12 @@ async def capture_result(
         ),
     )
 
+
 def _completed_receipt(
-    loop: asyncio.AbstractEventLoop, running: asyncio.AbstractEventLoop | None,
+    loop: asyncio.AbstractEventLoop,
+    running: asyncio.AbstractEventLoop | None,
     receipt: FailureReceipt,
-) -> asyncio.Future | Future:
+) -> asyncio.Future | ThreadFuture:
     """
     Return a completed receipt future for the caller's event-loop context.
 
@@ -1966,8 +2319,11 @@ def _completed_receipt(
     complete.set_result(receipt)
     return complete
 
+
 def _pending_incident(
-    runtime: FailureRuntime, exception: BaseException, context: FailureContext,
+    runtime: FailureRuntime,
+    exception: BaseException,
+    context: FailureContext,
 ) -> tuple[FailureContext, _Incident | None, FailureReceipt | None]:
     """
     Claim or reuse callback incident identity while its operation is live.
@@ -2009,6 +2365,7 @@ def _pending_incident(
         incident.context = context
         return context, incident, None
 
+
 def capture_nowait(
     exception: BaseException,
     *,
@@ -2020,7 +2377,7 @@ def capture_nowait(
     correlation_id: str | None = None,
     expected: bool = False,
     metadata: Mapping[str, object] | None = None,
-) -> asyncio.Task | Future | None:
+) -> asyncio.Future | ThreadFuture | None:
     """
     Schedule supervised exception observation from a callback or worker.
 
@@ -2052,11 +2409,16 @@ def capture_nowait(
     -------
     asyncio.Task or asyncio.Future or concurrent.futures.Future or None
         Supervised report task or receipt future, or ``None`` when observation
-        is inactive or cannot be scheduled. Cross-thread callers receive a
-        thread-safe future.
+        is inactive, the exception is a control signal, or admission cannot be
+        scheduled. Cross-thread callers receive a thread-safe future; cancelling
+        it preserves ownership of admitted work until its cleanup completes.
     """
     runtime = runtime if isinstance(runtime, FailureRuntime) else get_runtime(app)
-    if runtime is None or not runtime.active:
+    if (
+        runtime is None
+        or not runtime.active
+        or isinstance(exception, _CONTROL_EXCEPTIONS)
+    ):
         return None
     context = _context(
         runtime=runtime,
@@ -2081,12 +2443,53 @@ def capture_nowait(
         context = replace(context, event_id=uuid4().hex)
         _emergency(exception, context)
         return _completed_receipt(
-            loop, running, FailureReceipt(event_id=context.event_id, degraded=True),
+            loop,
+            running,
+            FailureReceipt(event_id=context.event_id, degraded=True),
         )
 
     context, incident, previous = _pending_incident(runtime, exception, context)
     if previous is not None:
         return _completed_receipt(loop, running, previous)
+
+    if running is loop:
+        return _submit_loop(runtime, loop, exception, context, incident)
+    return _ThreadReport(runtime, loop, exception, context, incident).submit()
+
+
+def _submit_loop(
+    runtime: FailureRuntime,
+    loop: asyncio.AbstractEventLoop,
+    exception: BaseException,
+    context: FailureContext,
+    incident: _Incident,
+) -> asyncio.Task | None:
+    """
+    Admit a callback report on its running loop and retain task ownership.
+
+    Parameters
+    ----------
+    runtime : FailureRuntime
+        Runtime that owns the report and incident ledger.
+    loop : asyncio.AbstractEventLoop
+        Running event loop accepting the reporting coroutine.
+    exception : BaseException
+        Original failure to observe.
+    context : FailureContext
+        Metadata allocated before admission.
+    incident : _Incident
+        Claimed incident to abandon if admission fails.
+
+    Returns
+    -------
+    asyncio.Task or None
+        Owned reporting task, or ``None`` after an ordinary admission failure.
+
+    Raises
+    ------
+    BaseException
+        If admission raises a control-flow signal after cleanup.
+    """
 
     def done(task: asyncio.Task) -> None:
         """
@@ -2100,8 +2503,7 @@ def capture_nowait(
         Returns
         -------
         None
-            Remove the task, abandon an unstarted claim, and emit fallback
-            diagnostics for an exceptional report exit.
+            No return value.
         """
         runtime._pending.discard(task)
         incident.abandon()
@@ -2109,79 +2511,231 @@ def capture_nowait(
         if error is not None:
             _emergency(exception, context, error)
 
-    if running is loop:
-        task = loop.create_task(runtime.capture(
-            exception, context=context, _incident=incident,
-        ))
-        runtime._pending.add(task)
-        task.add_done_callback(done)
-        return task
-
-    return _submit_thread(runtime, loop, exception, context, incident)
-
-def _submit_thread(
-    runtime: FailureRuntime, loop: asyncio.AbstractEventLoop,
-    exception: BaseException, context: FailureContext, incident: _Incident,
-) -> Future | None:
-    """
-    Submit and track failure delivery on the runtime's event loop.
-
-    Parameters
-    ----------
-    runtime : FailureRuntime
-        Runtime retaining ownership of the cross-thread report.
-    loop : asyncio.AbstractEventLoop
-        Event loop on which delivery must run.
-    exception : BaseException
-        Original failure to deliver.
-    context : FailureContext
-        Incident metadata already claimed by the originating callback.
-    incident : _Incident
-        Pending incident whose completion must be retained or abandoned.
-
-    Returns
-    -------
-    concurrent.futures.Future or None
-        Thread-safe delivery future, or ``None`` after a scheduling failure has
-        been diagnosed and the incident abandoned.
-    """
     coroutine = runtime.capture(exception, context=context, _incident=incident)
     try:
-        # Publish submission and ownership together: drain must not finish
-        # between scheduling a thread's coroutine and registering its future.
-        with runtime._pending_lock:
-            future = asyncio.run_coroutine_threadsafe(coroutine, loop)
-            runtime._thread_pending.add(future)
-    except RuntimeError as secondary:
+        task = loop.create_task(coroutine)
+    except BaseException as secondary:
         coroutine.close()
         incident.abandon()
+        if not isinstance(secondary, Exception):
+            raise
         _emergency(exception, context, secondary)
         return None
-    def finished(result: Future) -> None:
+    runtime._pending.add(task)
+    task.add_done_callback(done)
+    return task
+
+
+class _ThreadReport:
+    """Transfer report ownership from a worker submission to its loop task."""
+
+    __slots__ = (
+        "_context",
+        "_coroutine",
+        "_exception",
+        "_future",
+        "_incident",
+        "_loop",
+        "_runtime",
+    )
+    """Submission state retained through admission and terminal delivery."""
+
+    def __init__(
+        self,
+        runtime: FailureRuntime,
+        loop: asyncio.AbstractEventLoop,
+        exception: BaseException,
+        context: FailureContext,
+        incident: _Incident,
+    ) -> None:
         """
-        Collect a cross-thread report outcome and release its registration.
+        Retain one submission until admission and terminal task completion.
 
         Parameters
         ----------
-        result : concurrent.futures.Future
-            Completed thread-safe future for a loop-side report.
+        runtime : FailureRuntime
+            Runtime owning the cross-thread report.
+        loop : asyncio.AbstractEventLoop
+            Event loop that must execute the report.
+        exception : BaseException
+            Original failure to deliver.
+        context : FailureContext
+            Incident metadata claimed by the originating callback.
+        incident : _Incident
+            Pending incident to retain or abandon at completion.
 
         Returns
         -------
         None
-            Drop pending ownership, abandon an unstarted incident, and diagnose
-            an exceptional result without treating cancellation as a failure.
+            No return value.
         """
-        with runtime._pending_lock:
-            runtime._thread_pending.discard(result)
-        incident.abandon()
-        if not result.cancelled():
-            error = result.exception()
-            if error is not None:
-                _emergency(exception, context, error)
+        self._runtime = runtime
+        """Runtime retaining pending report ownership."""
+        self._loop = loop
+        """Event loop receiving the reporting coroutine."""
+        self._exception = exception
+        """Original application failure."""
+        self._context = context
+        """Incident metadata shared by admission and diagnosis."""
+        self._incident = incident
+        """Claim whose unused delivery must be abandoned."""
+        self._coroutine = runtime.capture(
+            exception,
+            context=context,
+            _incident=incident,
+        )
+        """Reporting coroutine owned until admitted or closed."""
+        self._future = ThreadFuture()
+        """Public future that stays cancellable until task completion."""
 
-    future.add_done_callback(finished)
-    return future
+    def _releaseSubmission(self) -> None:
+        """
+        Release a submission after admission or a terminal scheduling failure.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        with self._runtime._pending_lock:
+            self._runtime._thread_pending.discard(self._future)
+
+    def _reject(self, secondary: BaseException) -> None:
+        """
+        Close unadmitted work and settle its public future before diagnosis.
+
+        Parameters
+        ----------
+        secondary : BaseException
+            Original failure to enqueue or create the reporting task.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self._coroutine.close()
+        self._incident.abandon()
+        self._releaseSubmission()
+        if self._future.set_running_or_notify_cancel():
+            self._future.set_exception(secondary)
+        if isinstance(secondary, Exception):
+            _emergency(self._exception, self._context, secondary)
+
+    def _finished(self, task: asyncio.Task) -> None:
+        """
+        Transfer a terminal task outcome and release loop-side ownership.
+
+        Parameters
+        ----------
+        task : asyncio.Task
+            Reporting task whose actual cleanup has completed.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        self._runtime._pending.discard(task)
+        self._incident.abandon()
+        if task.cancelled():
+            self._future.cancel()
+            return
+        error = task.exception()
+        if self._future.set_running_or_notify_cancel():
+            if error is None:
+                self._future.set_result(task.result())
+            else:
+                self._future.set_exception(error)
+        if error is not None:
+            _emergency(self._exception, self._context, error)
+
+    def _admit(self) -> None:
+        """
+        Transfer a published submission to a real task on the owning loop.
+
+        Returns
+        -------
+        None
+            No return value.
+
+        Raises
+        ------
+        BaseException
+            If task creation raises a control-flow signal after cleanup.
+        """
+        if self._future.cancelled():
+            self._coroutine.close()
+            self._incident.abandon()
+            self._releaseSubmission()
+            return
+        try:
+            # Eager factories can enter capture and acquire the registry lock.
+            task = self._loop.create_task(self._coroutine)
+        except BaseException as secondary:
+            self._reject(secondary)
+            if not isinstance(secondary, Exception):
+                raise
+            return
+        self._runtime._pending.add(task)
+        self._releaseSubmission()
+        task.add_done_callback(self._finished)
+        self._future.add_done_callback(partial(self._cancelTask, ref(task)))
+
+    @staticmethod
+    def _cancelTask(
+        reference: ReferenceType[asyncio.Task],
+        result: ThreadFuture,
+    ) -> None:
+        """
+        Forward public cancellation without releasing task ownership.
+
+        Parameters
+        ----------
+        reference : weakref.ReferenceType[asyncio.Task]
+            Non-owning reference so a retained receipt future releases context.
+        result : concurrent.futures.Future
+            Public future that may have been cancelled by any thread.
+
+        Returns
+        -------
+        None
+            No return value.
+        """
+        task = reference()
+        if result.cancelled() and task is not None:
+            try:
+                task.get_loop().call_soon_threadsafe(task.cancel)
+            except RuntimeError:
+                # A closed loop cannot resume its remaining tasks.
+                return
+
+    def submit(self) -> ThreadFuture | None:
+        """
+        Publish ownership before enqueueing the loop-side admission callback.
+
+        Returns
+        -------
+        concurrent.futures.Future or None
+            Cancellable delivery future, or ``None`` if enqueueing failed.
+
+        Raises
+        ------
+        BaseException
+            If enqueueing raises a control-flow signal after cleanup.
+        """
+        # The loop can acquire the registry lock while a worker is enqueuing.
+        with self._runtime._pending_lock:
+            self._runtime._thread_pending.add(self._future)
+        try:
+            self._loop.call_soon_threadsafe(self._admit)
+        except BaseException as secondary:
+            self._reject(secondary)
+            if not isinstance(secondary, Exception):
+                raise
+            return None
+        return self._future
+
 
 def is_reporting() -> bool:
     """
@@ -2194,6 +2748,7 @@ def is_reporting() -> bool:
     """
     return _reporting.get() is not None
 
+
 def reporting_runtime() -> FailureRuntime | None:
     """
     Return the reporter identity bound to the current context.
@@ -2204,6 +2759,7 @@ def reporting_runtime() -> FailureRuntime | None:
         Current reporting runtime, or ``None`` outside reporter execution.
     """
     return _reporting.get()
+
 
 @contextmanager
 def reporting_from(runtime: FailureRuntime) -> Generator[None]:

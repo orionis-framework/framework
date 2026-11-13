@@ -1,11 +1,11 @@
+# ruff: noqa: TC001
+# Preserve concrete types for runtime inspection of the public contract.
 """Define the authenticated state bound to a single request."""
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.auth.contracts.authenticatable import IAuthenticatable
+from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
 
-if TYPE_CHECKING:
-    from orionis.auth.contracts.authenticatable import IAuthenticatable
-    from orionis.auth.contracts.snapshot import IAuthorizationSnapshot
 
 class IAuthenticationContext(ABC):
     """

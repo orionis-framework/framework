@@ -1,3 +1,5 @@
+# ruff: noqa: PLC0415, SLF001, TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Register application routes and configure their shared dispatch options."""
 
 from collections.abc import Sequence
@@ -22,16 +24,17 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from orionis.realtime.hub import Hub
 
-class Router(IRouter):
 
-    # ruff: noqa: TC001 (DI)
+class Router(IRouter):
     """Register application routes and configure their shared dispatch options."""
 
-    _DEFAULT_PATHS = frozenset({
-        "/favicon.ico",
-        "/robots.txt",
-        "/sitemap.xml",
-    })
+    _DEFAULT_PATHS = frozenset(
+        {
+            "/favicon.ico",
+            "/robots.txt",
+            "/sitemap.xml",
+        },
+    )
     """Default paths used by ``Router``."""
 
     def __init__(
@@ -115,8 +118,8 @@ class Router(IRouter):
         orionis.http.routes.fluent.FluentRoute
             The registered FluentRoute instance.
         """
-        fluent_route = (
-            FluentRoute(method, path, action, view=view)._kind(self.__current_kind) # noqa: SLF001
+        fluent_route = FluentRoute(method, path, action, view=view)._kind(
+            self.__current_kind,
         )
         normalized_path = fluent_route.path
         if method == "GET" and normalized_path in self._DEFAULT_PATHS:
@@ -201,8 +204,8 @@ class Router(IRouter):
         ValueError
             If the protocol is unsupported.
         """
-        route = FluentRoute("WEBSOCKET", path)._hub(hub, protocol)  # noqa: SLF001
-        route._kind(self.__current_kind)  # noqa: SLF001
+        route = FluentRoute("WEBSOCKET", path)._hub(hub, protocol)
+        route._kind(self.__current_kind)
         self.__routes[route.id] = route
         return route
 
@@ -250,7 +253,7 @@ class Router(IRouter):
 
         # Keep the application-specific auth controllers out of imports for
         # applications that do not register the built-in auth routes.
-        from orionis.http.routes.auth import build_auth_routes  # noqa: PLC0415
+        from orionis.http.routes.auth import build_auth_routes
 
         build_auth_routes(
             self,
@@ -475,8 +478,7 @@ class Router(IRouter):
         """
         if self.__fallback != (None, None):
             error_msg = (
-                "Fallback route already registered. "
-                "Only one fallback is allowed."
+                "Fallback route already registered. Only one fallback is allowed."
             )
             raise FallbackRouteAlreadyRegisteredException(error_msg)
 
@@ -540,10 +542,11 @@ class Router(IRouter):
             )
             excluded = frozenset(
                 flatten_middleware(without_middleware)
-                if without_middleware is not None else (),
+                if without_middleware is not None
+                else (),
             )
         except TypeError as exc:
-            error_msg = (
+            error_msg = (  # NOSONAR(S1110) - Preserve multiline grouping.
                 "Group middleware and without_middleware must contain "
                 "BaseMiddleware subclasses."
             )
@@ -551,7 +554,10 @@ class Router(IRouter):
 
         for route in members:
             route.inheritGroup(
-                normalized_prefix, parent_middleware, excluded, public=public,
+                normalized_prefix,
+                parent_middleware,
+                excluded,
+                public=public,
             )
             self.__routes[route.id] = route
         return RouteGroup(members)

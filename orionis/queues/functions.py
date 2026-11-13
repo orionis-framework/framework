@@ -11,6 +11,28 @@ from orionis.support.facades.datetime import DateTime
 _NAME_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}\Z")
 """Compiled pattern used to recognize name pattern."""
 
+
+def _is_finite_number(value: object) -> bool:
+    """Recognize finite primitive numbers without overflowing during conversion.
+
+    Parameters
+    ----------
+    value : object
+        Numeric configuration value to inspect.
+
+    Returns
+    -------
+    bool
+        Whether the value is a non-boolean number with a finite float conversion.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
+
+
 def validate_name(value: str, label: str) -> str:
     """
     Validate a logical queue or connection name.
@@ -56,13 +78,7 @@ def validate_seconds(
     float
         The normalized duration.
     """
-    if (
-        isinstance(value, bool)
-        or not isinstance(value, (int, float))
-        or not math.isfinite(value)
-        or value < 0
-        or (positive and value == 0)
-    ):
+    if not _is_finite_number(value) or value < 0 or (positive and value == 0):
         requirement = "positive" if positive else "nonnegative"
         message = f"{label} must be finite and {requirement}."
         raise QueueConfigurationError(message)

@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class MySQLCollation(Enum):
     """
     Enumerate common MySQL collations.

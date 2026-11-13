@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Revert the most recently applied migration batches."""
 
 from typing import ClassVar
@@ -5,10 +7,9 @@ from orionis.console.args.argument import Argument
 from orionis.console.commands.migrate.base import MigrationCommand
 from orionis.database.migrations.migrator import Migrator
 
+
 class MigrateRollbackCommand(MigrationCommand):
     """Revert the most recently applied migration batches."""
-
-    # ruff: noqa: TC001
 
     signature: str = "migrate:rollback"
     """Signature identifier: ``migrate:rollback``."""

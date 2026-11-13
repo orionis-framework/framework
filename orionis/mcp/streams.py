@@ -1,10 +1,42 @@
 """Provide mcp operations through ``AsyncClosable``, ``OwnedStream``."""
 
 import asyncio
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncIterator, Coroutine, Iterator
 from typing import Protocol
 from orionis.failure.runtime import capture
 from orionis.http.adapters.response.streams import await_cleanup
+
+
+def _create_task[T](
+    coroutine: Coroutine[object, object, T],
+    *,
+    name: str | None = None,
+) -> asyncio.Task[T]:
+    """Close an owned coroutine when the loop refuses to schedule it.
+
+    Parameters
+    ----------
+    coroutine : collections.abc.Coroutine[object, object, ``T``]
+        Operation whose ownership is transferred only after successful admission.
+    name : str | None, optional
+        Diagnostic task name.
+
+    Returns
+    -------
+    asyncio.Task[``T``]
+        Task owning the admitted coroutine.
+
+    Raises
+    ------
+    BaseException
+        If task creation fails, after closing the unowned coroutine.
+    """
+    try:
+        return asyncio.create_task(coroutine, name=name)
+    except BaseException:
+        coroutine.close()
+        raise
+
 
 def _caller_cancelled(error: BaseException, cancellations: int) -> bool:
     """
@@ -27,6 +59,7 @@ def _caller_cancelled(error: BaseException, cancellations: int) -> bool:
         return False
     return task.cancelling() > cancellations
 
+
 class AsyncClosable(Protocol):
     """Describe the awaited close operation of an owned asynchronous source."""
 
@@ -44,6 +77,7 @@ class AsyncClosable(Protocol):
         """
         ...
 
+
 class OwnedStream[T](AsyncClosable):
     """Join source cleanup before propagating delivery errors or cancellation."""
 
@@ -51,7 +85,8 @@ class OwnedStream[T](AsyncClosable):
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(
-        self, source: AsyncIterator[T] | Iterator[T],
+        self,
+        source: AsyncIterator[T] | Iterator[T],
         owner: OwnedStream[object] | None = None,
     ) -> None:
         """
@@ -134,7 +169,10 @@ class OwnedStream[T](AsyncClosable):
                     await self._close(parent_event_id=parent)
                 except (Exception, asyncio.CancelledError) as cleanup:
                     await capture(
-                        cleanup, flow="mcp", phase="cleanup", parent_event_id=parent,
+                        cleanup,
+                        flow="mcp",
+                        phase="cleanup",
+                        parent_event_id=parent,
                     )
                     if _caller_cancelled(cleanup, cancellations):
                         raise
@@ -173,7 +211,7 @@ class OwnedStream[T](AsyncClosable):
         """
         if self._cleanup is None:
             self._closed = True
-            self._cleanup = asyncio.ensure_future(self._closeOwned(parent_event_id))
+            self._cleanup = _create_task(self._closeOwned(parent_event_id))
         await await_cleanup(self._cleanup)
 
     async def _closeOwned(self, parent_event_id: str | None = None) -> None:
@@ -213,7 +251,10 @@ class OwnedStream[T](AsyncClosable):
         except BaseException as exc:
             original = exc
             receipt = await capture(
-                exc, flow="mcp", phase="cleanup", parent_event_id=parent_event_id,
+                exc,
+                flow="mcp",
+                phase="cleanup",
+                parent_event_id=parent_event_id,
             )
             if receipt is not None:
                 parent_event_id = receipt.event_id
@@ -222,11 +263,14 @@ class OwnedStream[T](AsyncClosable):
             if self._owner is not None:
                 try:
                     await OwnedStream._close(
-                        self._owner, parent_event_id=parent_event_id,
+                        self._owner,
+                        parent_event_id=parent_event_id,
                     )
                 except (Exception, asyncio.CancelledError) as cleanup:
                     await capture(
-                        cleanup, flow="mcp", phase="cleanup",
+                        cleanup,
+                        flow="mcp",
+                        phase="cleanup",
                         parent_event_id=parent_event_id,
                     )
                     if original is None or _caller_cancelled(cleanup, cancellations):

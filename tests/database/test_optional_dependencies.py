@@ -1,7 +1,11 @@
+# ruff: noqa: PT009, S603
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+# Run a controlled Python child process with the inherited isolation guard.
 import subprocess
 import sys
 from pathlib import Path
 from orionis.test import TestCase
+
 
 class TestPostgresqlOptionalDependency(TestCase):
     """Keep PostgreSQL optional regardless of locally installed drivers."""
@@ -12,14 +16,30 @@ class TestPostgresqlOptionalDependency(TestCase):
         Returns
         -------
         None
-            PostgreSQL reports its extra on first use without breaking SQLite.
+            No return value.
         """
-        script = """import asyncio
+        script = '''import asyncio
 import importlib.abc
 import sys
 
 class MissingAsyncpg(importlib.abc.MetaPathFinder):
-    def findSpec(self, fullname, path=None, target=None):
+    def findSpec(
+        self, fullname: str, path: object = None, target: object = None,
+    ) -> None:
+        """Block imports of the optional PostgreSQL driver.
+
+        Parameters
+        ----------
+        fullname : str
+            Requested module name.
+        path, target : object, optional
+            Importlib arguments unused by this controlled blocker.
+
+        Returns
+        -------
+        None
+            Allow other modules to resolve through the remaining finders.
+        """
         if fullname.split('.')[0] == 'asyncpg':
             raise ModuleNotFoundError('Optional driver unavailable', name=fullname)
         return None
@@ -37,7 +57,8 @@ assert 'asyncpg' not in sys.modules
 pgsql = Connection('pgsql', {'driver': 'pgsql', 'database': 'orionis'})
 assert pgsql._engine is None
 
-async def check_backends():
+async def check_backends() -> None:
+    """Verify optional PostgreSQL failure without affecting SQLite."""
     sqlite = Connection('sqlite', {'driver': 'sqlite', 'database': ':memory:'})
     try:
         assert await sqlite.select('SELECT 1 AS value') == [{'value': 1}]
@@ -55,11 +76,14 @@ async def check_backends():
 
 asyncio.run(check_backends())
 print('PostgreSQL isolation passed')
-"""
-        result = subprocess.run(  # noqa: S603
+'''
+        result = subprocess.run(
             [sys.executable, "-B", "-c", script],
             cwd=Path(__file__).resolve().parents[2],
-            check=False, capture_output=True, text=True, encoding="utf-8",
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
             timeout=30,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

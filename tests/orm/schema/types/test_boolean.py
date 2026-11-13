@@ -1,7 +1,12 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
+"""Verify ORM schema boolean behavior."""
+
 from orionis.orm.schema.types.boolean import Boolean
 from orionis.orm.schema.types.column_type import ColumnType
 from orionis.test import TestCase
 from tests.orm.schema.types.test_package import assert_column_options
+
 
 class TestBooleanOptions(TestCase):
     """Verify Boolean constructor metadata consumed by the compiler."""
@@ -12,7 +17,7 @@ class TestBooleanOptions(TestCase):
         Returns
         -------
         None
-            Verify fresh declarations and independent configured metadata.
+            No return value.
         """
         default = Boolean()
         assert_column_options(

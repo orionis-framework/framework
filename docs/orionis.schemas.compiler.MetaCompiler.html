@@ -194,6 +194,36 @@
         
 
         
+            <div class="itemName"><code><a href="#_validateLengthRange" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateLengthRange">_validate<wbr></wbr>Length<wbr></wbr>Range</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validateNumericBounds" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateNumericBounds">_validate<wbr></wbr>Numeric<wbr></wbr>Bounds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validateValues" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateValues">_validate<wbr></wbr>Values</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#compile" class="internal-link" title="orionis.schemas.compiler.MetaCompiler.compile">compile</a></code>
             </div>
         
@@ -245,7 +275,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25981"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId26047"> 
                     
                 </input>
 
@@ -305,6 +335,36 @@
         
 
         
+            <div class="itemName"><code><a href="#_validateLengthRange" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateLengthRange">_validate<wbr></wbr>Length<wbr></wbr>Range</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validateNumericBounds" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateNumericBounds">_validate<wbr></wbr>Numeric<wbr></wbr>Bounds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_validateValues" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateValues">_validate<wbr></wbr>Values</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#compile" class="internal-link" title="orionis.schemas.compiler.MetaCompiler.compile">compile</a></code>
             </div>
         
@@ -347,7 +407,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId25982"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId26048"> 
                     
                 </input>
 
@@ -456,7 +516,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MetaCompiler</span>: <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/schemas/compiler.py#L46" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.schemas.compiler.MetaCompiler">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">MetaCompiler</span>: <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L47" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.schemas.compiler.MetaCompiler">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -470,7 +530,7 @@ application code.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1839">
+          <table class="children sortable" id="id1851">
   
   
   <tr class="staticmethod">
@@ -487,7 +547,22 @@ application code.</p>
     
     <td>Static Method</td>
     <td><code><a href="#_validateConflicts" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateConflicts">_validate<wbr></wbr>Conflicts</a></code></td>
-    <td>Validate the indexed metadata for all semantic conflicts in a single pass.</td>
+    <td>Validate numeric bounds, length ranges and individual metadata values.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_validateLengthRange" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateLengthRange">_validate<wbr></wbr>Length<wbr></wbr>Range</a></code></td>
+    <td>Reject a minimum length greater than the declared maximum.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_validateNumericBounds" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateNumericBounds">_validate<wbr></wbr>Numeric<wbr></wbr>Bounds</a></code></td>
+    <td>Reject ambiguous or impossible combinations of numeric bounds.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#_validateValues" class="internal-link" title="orionis.schemas.compiler.MetaCompiler._validateValues">_validate<wbr></wbr>Values</a></code></td>
+    <td>Reject conflicting timezones, nonpositive divisors and negative lengths.</td>
   </tr><tr class="staticmethod">
     
     <td>Static Method</td>
@@ -519,7 +594,7 @@ application code.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_build</span><span class="function-signature">(<span class="rst-sig-param">seen: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></span>) -&gt; <code>msgspec.Meta</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/schemas/compiler.py#L234">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L298">
       
       (source)
     </a>
@@ -550,7 +625,7 @@ here in one go, each guarded by an O(1) dict look-up.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_index</span><span class="function-signature long-signature">(<span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/schemas/compiler.py#L87">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L88">
       
       (source)
     </a>
@@ -577,7 +652,7 @@ here in one go, each guarded by an O(1) dict look-up.</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_validateConflicts</span><span class="function-signature">(<span class="rst-sig-param">seen: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/schemas/compiler.py#L124">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L125">
       
       (source)
     </a>
@@ -589,13 +664,88 @@ here in one go, each guarded by an O(1) dict look-up.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Validate the indexed metadata for all semantic conflicts in a single pass.</p>
-<p>Checks are applied in order: ambiguous bounds, impossible numeric ranges,
-impossible length ranges, mutually exclusive timezone flags, and invalid
-individual values.  All checks are inlined to eliminate five separate
-staticmethod call overheads and to consolidate shared <tt class="rst-docutils rst-literal">seen.get()</tt>
-calls (MinLength and MaxLength are looked up once instead of twice).</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></td><td class="fieldArgDesc">The indexed metadata mapping produced by <tt class="rst-docutils rst-literal">_index</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.schemas.compiler.MetadataConflictError.html" class="internal-link">orionis.schemas.compiler.MetadataConflictError</a></code></td><td>On any detected conflict.</td></tr></table></div>
+    <div><p>Validate numeric bounds, length ranges and individual metadata values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></td><td class="fieldArgDesc">The indexed metadata mapping produced by <tt class="rst-docutils rst-literal">_index</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.schemas.compiler.MetadataConflictError.html" class="internal-link">orionis.schemas.compiler.MetadataConflictError</a></code></td><td>On any detected conflict.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.schemas.compiler.MetaCompiler._validateLengthRange">
+    
+  </a>
+  <a name="_validateLengthRange">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_validateLengthRange</span><span class="function-signature">(<span class="rst-sig-param">seen: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L208">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_validateLengthRange" title="orionis.schemas.compiler.MetaCompiler._validateLengthRange">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reject a minimum length greater than the declared maximum.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></td><td class="fieldArgDesc">Indexed declarations to compare.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.schemas.compiler.MetadataConflictError.html" class="internal-link" title="orionis.schemas.compiler.MetadataConflictError">MetadataConflictError</a></code></td><td>If no length can satisfy both bounds.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.schemas.compiler.MetaCompiler._validateNumericBounds">
+    
+  </a>
+  <a name="_validateNumericBounds">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_validateNumericBounds</span><span class="function-signature">(<span class="rst-sig-param">seen: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L151">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_validateNumericBounds" title="orionis.schemas.compiler.MetaCompiler._validateNumericBounds">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reject ambiguous or impossible combinations of numeric bounds.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></td><td class="fieldArgDesc">Indexed declarations with at most one of each concrete metadata type.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.schemas.compiler.MetadataConflictError.html" class="internal-link" title="orionis.schemas.compiler.MetadataConflictError">MetadataConflictError</a></code></td><td>If numeric bounds overlap ambiguously or permit no valid values.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
+  <a name="orionis.schemas.compiler.MetaCompiler._validateValues">
+    
+  </a>
+  <a name="_validateValues">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_validateValues</span><span class="function-signature">(<span class="rst-sig-param">seen: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L244">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_validateValues" title="orionis.schemas.compiler.MetaCompiler._validateValues">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Reject conflicting timezones, nonpositive divisors and negative lengths.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">seen:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>], <a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></td><td class="fieldArgDesc">Indexed declarations whose individual values must be valid.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.schemas.compiler.MetadataConflictError.html" class="internal-link" title="orionis.schemas.compiler.MetadataConflictError">MetadataConflictError</a></code></td><td>If timezone requirements conflict or an individual value is invalid.</td></tr></table></div>
   </div>
 </div><div class="basestaticmethod">
   
@@ -610,7 +760,7 @@ calls (MinLength and MaxLength are looked up once instead of twice).</p>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">compile</span><span class="function-signature">(<span class="rst-sig-param">metadata: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="orionis.schemas.meta.validation.ValidationMetadata.html" class="internal-link" title="orionis.schemas.meta.validation.ValidationMetadata">ValidationMetadata</a>]</code></span>) -&gt; <code>msgspec.Meta</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/schemas/compiler.py#L60">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L61">
       
       (source)
     </a>
@@ -639,7 +789,7 @@ before the descriptor is constructed.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/schemas/compiler.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/schemas/compiler.py#L58">
       
       (source)
     </a>
@@ -665,7 +815,7 @@ before the descriptor is constructed.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

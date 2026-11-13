@@ -3,12 +3,14 @@
 from __future__ import annotations
 from enum import StrEnum
 
+
 class Visibility(StrEnum):
     """
     Enumerate the visibility levels supported by storage drivers.
 
     Members inherit from :class:`str`, so they can be passed anywhere a
-    plain visibility string is accepted.
+    plain visibility string is accepted. Actual access controls depend
+    on the selected driver and platform.
 
     Attributes
     ----------

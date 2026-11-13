@@ -275,7 +275,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33290"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId33358"> 
                     
                 </input>
 
@@ -483,27 +483,29 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">CacheSessionStore</span>(ISessionStore): <a href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L15" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.session.stores.cache.CacheSessionStore.__init__">CacheSessionStore(cache, store)</a></code></p><p><a href="classIndex.html#orionis.session.stores.cache.CacheSessionStore">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">CacheSessionStore</span>(ISessionStore): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L18" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.session.stores.cache.CacheSessionStore.__init__">CacheSessionStore(cache, store)</a></code></p><p><a href="classIndex.html#orionis.session.stores.cache.CacheSessionStore">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
           <div><p>Session store backed by the framework's cache system.</p>
-<p>Each session is persisted as a single cache entry whose TTL mirrors
-<tt class="rst-docutils rst-literal">record.expires_at</tt>.  Expiry is therefore delegated entirely to the
-underlying cache backend (file, database, Redis, ...); no in-process
-bookkeeping or manual sweeping is required.</p>
+<p>Persist each session as one cache entry. Truncate its remaining TTL to
+whole seconds so rounding cannot prolong the record's deadline. This can
+expire a record up to one second early; deadlines less than one full
+second away cannot be persisted or renewed. Actual eviction timing still
+depends on the backend, its clock and transport latency.</p>
 <div class="rst-admonition rst-admonition-notes">
 <p class="rst-admonition-title rst-first">Notes</p>
 <p class="rst-last"><tt class="rst-docutils rst-literal">ICacheManager</tt> exposes no way to enumerate stored keys, so this
 store cannot (and does not need to) implement an active
 <code><a href="#gc" class="internal-link">orionis.session.stores.cache.CacheSessionStore.gc</a></code>:
-the backend evicts expired entries on its own.</p>
+the backend enforces expiration. Physical removal of stale entries depends
+on that backend's cleanup policy and may occur only when they are read.</p>
 </div>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2020">
+          <table class="children sortable" id="id2033">
   
   
   <tr class="method">
@@ -520,7 +522,7 @@ the backend evicts expired entries on its own.</p>
     
     <td>Async Method</td>
     <td><code><a href="#gc" class="internal-link" title="orionis.session.stores.cache.CacheSessionStore.gc">gc</a></code></td>
-    <td>No-op: expiry is enforced natively by the cache backend's TTL.</td>
+    <td>Leave expiration cleanup to the cache backend's TTL.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
@@ -567,7 +569,7 @@ the backend evicts expired entries on its own.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">cache: <code>ICacheManager</code>, </span><span class="rst-sig-param">store: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L37">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L40">
       
       (source)
     </a>
@@ -580,7 +582,7 @@ the backend evicts expired entries on its own.</p>
   <div class="docstring functionBody">
     
     <div><p>Bind the store to the requested (or default) cache repository.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cache:</span><code><a href="orionis.cache.contracts.ICacheManager.html" class="internal-link">orionis.cache.contracts.ICacheManager</a></code></td><td class="fieldArgDesc">The application's cache manager.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">store:</span><code>str | None, <em>optional</em></code></td><td class="fieldArgDesc">Name of the cache store to use.  <tt class="rst-docutils rst-literal">None</tt> selects the
-configured default store.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Bind the store to the requested (or default) cache repository.</td></tr></table></div>
+configured default store.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -595,7 +597,7 @@ configured default store.</td></tr></table><table class="fieldTable"><tr class="
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L154">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L158">
       
       (source)
     </a>
@@ -622,7 +624,7 @@ configured default store.</td></tr></table><table class="fieldTable"><tr class="
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">gc</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L170">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L174">
       
       (source)
     </a>
@@ -634,7 +636,7 @@ configured default store.</td></tr></table><table class="fieldTable"><tr class="
   </div>
   <div class="docstring functionBody">
     
-    <div><p>No-op: expiry is enforced natively by the cache backend's TTL.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No-op: expiry is enforced natively by the cache backend's TTL.</td></tr></table></div>
+    <div><p>Leave expiration cleanup to the cache backend's TTL.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -649,7 +651,7 @@ configured default store.</td></tr></table><table class="fieldTable"><tr class="
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">read</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">session_id: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L60">
       
       (source)
     </a>
@@ -676,7 +678,7 @@ configured default store.</td></tr></table><table class="fieldTable"><tr class="
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">update</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L127">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L130">
       
       (source)
     </a>
@@ -688,7 +690,8 @@ configured default store.</td></tr></table><table class="fieldTable"><tr class="
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Replace a live cache session without recreating a missing key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">Replacement record.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the cache atomically replaced a live record.</td></tr></table></div>
+    <div><p>Replace a live cache session without recreating a missing key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">Replacement record.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the cache atomically replaced a live record. Return False
+when the replacement has less than one full second remaining.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -703,7 +706,7 @@ configured default store.</td></tr></table><table class="fieldTable"><tr class="
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">write</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link" title="orionis.session.entities.record.SessionRecord">SessionRecord</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L97">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L100">
       
       (source)
     </a>
@@ -717,8 +720,8 @@ configured default store.</td></tr></table><table class="fieldTable"><tr class="
     
     <div><p>Insert or replace the record keyed by its identifier.</p>
 <p>The cache entry's TTL is derived from <tt class="rst-docutils rst-literal">record.expires_at</tt>; a
-record that has already expired is deleted instead of written.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">The record to persist.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Insert or replace the record keyed by its identifier.</td></tr></table></div>
+record with less than one full second remaining is deleted instead.</p>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="orionis.session.entities.record.SessionRecord.html" class="internal-link">orionis.session.entities.record.SessionRecord</a></code></td><td class="fieldArgDesc">The record to persist.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">No return value.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -732,7 +735,7 @@ record that has already expired is deleted instead of written.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L37">
       
       (source)
     </a>
@@ -759,7 +762,7 @@ record that has already expired is deleted instead of written.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_repository</span>: <code>ICacheRepository</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/b10b327e5c10b2ce5a01e23282ea4e5cc3396307/orionis/session/stores/cache.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/session/stores/cache.py#L57">
       
       (source)
     </a>
@@ -785,7 +788,7 @@ record that has already expired is deleted instead of written.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-09 23:28:22.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

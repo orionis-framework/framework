@@ -1,11 +1,11 @@
+# ruff: noqa: TC003
+# Resolve datetime annotations when inspecting the public resolver contract.
 """Define how rotating log files derive their time-based suffixes."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from datetime import datetime
 
-if TYPE_CHECKING:
-    from datetime import datetime
 
 class SuffixResolver(ABC):
     """Define how rotating log files derive their time-based suffixes."""

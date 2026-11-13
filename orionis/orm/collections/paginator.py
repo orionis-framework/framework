@@ -1,18 +1,19 @@
+# Resolve collection annotations and forward arbitrary JSON encoder options.
+# ruff: noqa: ANN401, TC001
 """Length-aware page of query results."""
 
 from __future__ import annotations
 import json
-from typing import TYPE_CHECKING, Any
+from typing import Any
+from orionis.support.types.collection import Collection
 
-if TYPE_CHECKING:
-    from orionis.support.types.collection import Collection
 
 class Paginator:
     """
     Length-aware page of query results.
 
-    Wraps a :class:`collections.abc.Collection` of items together with the pagination
-    metadata required to render page controls: total row count, current
+    Wraps a :class:`orionis.support.types.Collection` of items
+    with the metadata required to render page controls: total row count, current
     page, page size, and derived navigation flags.
     """
 
@@ -31,7 +32,7 @@ class Paginator:
 
         Parameters
         ----------
-        items : collections.abc.Collection
+        items : orionis.support.types.Collection
             Items for the current page.
         total : int
             Total number of rows across all pages.
@@ -76,7 +77,7 @@ class Paginator:
 
         Returns
         -------
-        collections.abc.Collection
+        orionis.support.types.Collection
             Items of the current page.
         """
         return self._items
@@ -174,7 +175,7 @@ class Paginator:
             "hasPrevious": self.hasPrevious,
         }
 
-    def toJson(self, **kwargs: Any) -> str:  # noqa: ANN401
+    def toJson(self, **kwargs: Any) -> str:
         """
         Serialize the page and its metadata into a JSON string.
 

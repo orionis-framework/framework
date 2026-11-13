@@ -1,3 +1,5 @@
+# ruff: noqa: TC001
+# Keep runtime reflection annotations and intentionally deferred imports.
 """Validate sign-in credentials and the remember-session option."""
 
 from orionis.schemas import Schema
@@ -5,9 +7,8 @@ from orionis.schemas.constraints import Email, MinLength
 from orionis.schemas.fields import Field, Nullable
 from orionis.schemas.metadata import Message
 
-class LoginSchema(Schema):
 
-    # ruff: noqa: TC001
+class LoginSchema(Schema):
     """Validate sign-in credentials and the remember-session option."""
 
     email: Field[

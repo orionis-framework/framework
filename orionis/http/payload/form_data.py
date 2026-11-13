@@ -1,3 +1,5 @@
+# ruff: noqa: BLE001
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Hold parsed multipart form fields and uploaded files."""
 
 from __future__ import annotations
@@ -8,6 +10,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from types import TracebackType
     from orionis.http.payload.uploaded_file import UploadedFile
+
 
 class FormData(IFormData):
     """
@@ -271,7 +274,7 @@ class FormData(IFormData):
             if not isinstance(v, str):
                 try:
                     v.close()
-                except Exception as error:  # noqa: BLE001 - Re-raise after closing all.
+                except Exception as error:  # Re-raise after closing all.
                     failures.append(error)
         if len(failures) == 1:
             raise failures[0]

@@ -1,3 +1,5 @@
+# ruff: noqa: BLE001
+# Preserve error ownership, cleanup, and non-recursive failure reporting.
 """Web-layer middleware that enforces Cross-Site Request Forgery protection."""
 
 import secrets
@@ -290,7 +292,7 @@ class CSRFTokenMiddleware(BaseMiddleware):
 
         try:
             body: dict = await request.data()
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:
             # Malformed body: treat as missing token — let comparison fail.
             await capture(error, flow="http", phase="csrf.input", expected=True)
             return None
@@ -345,7 +347,9 @@ class CSRFTokenMiddleware(BaseMiddleware):
         if session is not None:
             if session.invalidated:
                 response.deleteCookie(
-                    cfg.cookie_name, path=cfg.cookie_path, domain=cfg.cookie_domain,
+                    cfg.cookie_name,
+                    path=cfg.cookie_path,
+                    domain=cfg.cookie_domain,
                 )
                 return
             token = session.get(self._session_key) or token

@@ -1,3 +1,5 @@
+# ruff: noqa: PT009
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.mail.exceptions import (
     MailAttachmentException,
     MailCompositionException,
@@ -7,8 +9,8 @@ from orionis.mail.exceptions import (
 )
 from orionis.test import TestCase
 
-class TestMailExceptions(TestCase):
 
+class TestMailExceptions(TestCase):
     def testEveryFailureSharesOneBaseClass(self) -> None:
         """Derive every mail failure from a single catchable base.
 

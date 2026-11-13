@@ -1,9 +1,11 @@
+# ruff: noqa: PT009, PT027
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from orionis.mail.entities.content import Content
 from orionis.mail.exceptions import MailCompositionException
 from orionis.test import TestCase
 
-class TestContent(TestCase):
 
+class TestContent(TestCase):
     def testDeclaresViewsAndLiteralsSeparately(self) -> None:
         """Keep view identifiers and literal bodies in their own fields.
 

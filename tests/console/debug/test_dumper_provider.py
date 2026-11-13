@@ -1,3 +1,5 @@
+# ruff: noqa: PT009, PT027, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import inspect
 from unittest.mock import AsyncMock, MagicMock, patch
 from orionis.console.debug.contracts.dumper import IDumper
@@ -11,8 +13,8 @@ from orionis.foundation.core_providers import CORE_PROVIDER_METADATA
 from orionis.support.facades.debug import Debug
 from orionis.test import TestCase
 
-class TestDumperProvider(TestCase):
 
+class TestDumperProvider(TestCase):
     def testIsAnEagerCoreProvider(self) -> None:
         """
         Verify that the dumper is an eager core provider with asynchronous boot.
@@ -44,7 +46,9 @@ class TestDumperProvider(TestCase):
         DumperProvider(app).register()
 
         app.singleton.assert_called_once_with(
-            IDumper, Dumper, alias="x-orionis-IDumper",
+            IDumper,
+            Dumper,
+            alias="x-orionis-IDumper",
         )
         self.assertEqual(Debug.getFacadeAccessor(), "x-orionis-IDumper")
 
@@ -68,7 +72,8 @@ class TestDumperProvider(TestCase):
         service = await container.make(IDumper)
         self.assertIsInstance(service, Dumper)
         self.assertIs(
-            await container.make(Debug.getFacadeAccessor()), service,
+            await container.make(Debug.getFacadeAccessor()),
+            service,
         )
 
         with (

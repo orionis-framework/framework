@@ -6,6 +6,7 @@ from faker.config import AVAILABLE_LOCALES
 from orionis.foundation.application import Application
 from orionis.orm.factories.fake import Fake
 
+
 def _application_locale() -> str:
     """
     Read the configured locale without initializing an application.
@@ -24,6 +25,7 @@ def _application_locale() -> str:
         # Application.config() is unavailable before configuration is loaded.
         return "en_US"
     return locale if isinstance(locale, str) and locale.strip() else "en_US"
+
 
 def create_faker(locale: str | None, seed: int | None) -> Fake:
     """

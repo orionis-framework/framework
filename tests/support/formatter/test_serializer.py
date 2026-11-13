@@ -1,3 +1,5 @@
+# ruff: noqa: PLR2004, PT009, SLF001
+# Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from unittest.mock import patch
 from orionis.support.formatter.exceptions.parser import ExceptionParser
 from orionis.support.formatter.serializer import Parser
@@ -6,6 +8,7 @@ from orionis.test import TestCase
 # ---------------------------------------------------------------------------
 # Custom exception fixtures
 # ---------------------------------------------------------------------------
+
 
 class _AppError(Exception):
     """Custom exception with a numeric error code."""
@@ -23,21 +26,23 @@ class _AppError(Exception):
         Returns
         -------
         None
-            Completes the operation described above.
+            No return value.
         """
         super().__init__(message)
         self.code = code
 
+
 class _NoCodeError(Exception):
     """Custom exception without a code attribute."""
+
 
 # ---------------------------------------------------------------------------
 # Tests for Parser (serializer.py)
 # ---------------------------------------------------------------------------
 
-class TestParser(TestCase):
 
-    def testExceptionReturnsExceptionParser(self):
+class TestParser(TestCase):
+    def testExceptionReturnsExceptionParser(self) -> None:
         """Return an ExceptionParser from the factory method.
 
         Validates that Parser.exception() produces an instance of
@@ -46,13 +51,13 @@ class TestParser(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = ValueError("test")
         result = Parser.exception(exc)
         self.assertIsInstance(result, ExceptionParser)
 
-    def testExceptionAcceptsAnyExceptionType(self):
+    def testExceptionAcceptsAnyExceptionType(self) -> None:
         """Accept any Exception subclass as input.
 
         Validates that Parser.exception() works with different
@@ -61,14 +66,14 @@ class TestParser(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for exc_cls in (ValueError, RuntimeError, TypeError, KeyError):
             exc = exc_cls("msg")
             result = Parser.exception(exc)
             self.assertIsInstance(result, ExceptionParser)
 
-    def testExceptionResultHasToDictMethod(self):
+    def testExceptionResultHasToDictMethod(self) -> None:
         """Expose toDict on the returned ExceptionParser.
 
         Validates that the object returned by Parser.exception()
@@ -77,22 +82,24 @@ class TestParser(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = Exception("test")
         result = Parser.exception(exc)
         self.assertTrue(callable(result.toDict))
 
+
 # ---------------------------------------------------------------------------
 # Tests for ExceptionParser (exceptions/parser.py)
 # ---------------------------------------------------------------------------
+
 
 class TestExceptionParserToDict(TestCase):
     """Unit tests for ExceptionParser.toDict()."""
 
     # ------------------------------------------------ return structure
 
-    def testToDictReturnsDict(self):
+    def testToDictReturnsDict(self) -> None:
         """Return a dict from toDict.
 
         Validates that toDict produces a plain dict instance
@@ -101,13 +108,13 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = ValueError("something went wrong")
         result = ExceptionParser(exc).toDict()
         self.assertIsInstance(result, dict)
 
-    def testToDictContainsRequiredKeys(self):
+    def testToDictContainsRequiredKeys(self) -> None:
         """Include required keys in toDict output.
 
         Validates that the dict returned by toDict contains the
@@ -117,7 +124,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = RuntimeError("fail")
         result = ExceptionParser(exc).toDict()
@@ -128,7 +135,7 @@ class TestExceptionParserToDict(TestCase):
 
     # ------------------------------------------------ error_type
 
-    def testToDictErrorTypeMatchesExceptionClass(self):
+    def testToDictErrorTypeMatchesExceptionClass(self) -> None:
         """Report the correct exception class name as error_type.
 
         Validates that error_type reflects the actual class name
@@ -137,13 +144,13 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = ValueError("bad value")
         result = ExceptionParser(exc).toDict()
         self.assertEqual(result["error_type"], "ValueError")
 
-    def testToDictErrorTypeForRuntimeError(self):
+    def testToDictErrorTypeForRuntimeError(self) -> None:
         """Report RuntimeError as error_type for RuntimeError exceptions.
 
         Validates that the error_type field correctly identifies
@@ -152,13 +159,13 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = RuntimeError("oops")
         result = ExceptionParser(exc).toDict()
         self.assertEqual(result["error_type"], "RuntimeError")
 
-    def testToDictErrorTypeForCustomException(self):
+    def testToDictErrorTypeForCustomException(self) -> None:
         """Report custom exception class name as error_type.
 
         Validates that error_type reflects the name of a user-defined
@@ -167,13 +174,13 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = _AppError("custom", code=500)
         result = ExceptionParser(exc).toDict()
         self.assertEqual(result["error_type"], "_AppError")
 
-    def testToDictErrorTypeIsString(self):
+    def testToDictErrorTypeIsString(self) -> None:
         """Return error_type as a str instance.
 
         Validates that error_type is always a string, never None
@@ -182,7 +189,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = Exception("generic")
         result = ExceptionParser(exc).toDict()
@@ -190,7 +197,7 @@ class TestExceptionParserToDict(TestCase):
 
     # ------------------------------------------------ error_message
 
-    def testToDictErrorMessageIsString(self):
+    def testToDictErrorMessageIsString(self) -> None:
         """Return error_message as a str instance.
 
         Validates that error_message is always a string in the
@@ -199,13 +206,13 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = ValueError("test message")
         result = ExceptionParser(exc).toDict()
         self.assertIsInstance(result["error_message"], str)
 
-    def testToDictErrorMessageIsNotEmpty(self):
+    def testToDictErrorMessageIsNotEmpty(self) -> None:
         """Return non-empty error_message for a raised exception.
 
         Validates that the error_message field is not empty when
@@ -214,7 +221,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = ValueError("non-empty message")
         result = ExceptionParser(exc).toDict()
@@ -222,7 +229,7 @@ class TestExceptionParserToDict(TestCase):
 
     # ------------------------------------------------ error_code
 
-    def testToDictErrorCodeIsNoneWhenNotPresent(self):
+    def testToDictErrorCodeIsNoneWhenNotPresent(self) -> None:
         """Return None for error_code when the attribute is absent.
 
         Validates that error_code is None for exceptions that do
@@ -231,13 +238,13 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = _NoCodeError("no code here")
         result = ExceptionParser(exc).toDict()
         self.assertIsNone(result["error_code"])
 
-    def testToDictErrorCodeReflectsCustomCode(self):
+    def testToDictErrorCodeReflectsCustomCode(self) -> None:
         """Return the custom error code from the exception.
 
         Validates that error_code matches the code attribute set
@@ -246,13 +253,13 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = _AppError("custom error", code=404)
         result = ExceptionParser(exc).toDict()
         self.assertEqual(result["error_code"], 404)
 
-    def testToDictErrorCodeForBuiltinExceptions(self):
+    def testToDictErrorCodeForBuiltinExceptions(self) -> None:
         """Return None for error_code on standard exceptions.
 
         Validates that built-in exceptions without a code attribute
@@ -261,7 +268,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         for exc_cls in (ValueError, TypeError, RuntimeError):
             exc = exc_cls("msg")
@@ -270,7 +277,7 @@ class TestExceptionParserToDict(TestCase):
 
     # ------------------------------------------------ stack_trace
 
-    def testToDictStackTraceIsList(self):
+    def testToDictStackTraceIsList(self) -> None:
         """Return stack_trace as a list.
 
         Validates that the stack_trace field in toDict output is
@@ -279,13 +286,13 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = ValueError("trace test")
         result = ExceptionParser(exc).toDict()
         self.assertIsInstance(result["stack_trace"], list)
 
-    def testToDictStackTraceContainsDictsWhenRaised(self):
+    def testToDictStackTraceContainsDictsWhenRaised(self) -> None:
         """Populate stack_trace with dicts for a raised exception.
 
         Validates that each entry in stack_trace is a dict when
@@ -294,7 +301,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -307,11 +314,11 @@ class TestExceptionParserToDict(TestCase):
         except ValueError as exc:
             result = ExceptionParser(exc).toDict()
 
-        if result["stack_trace"]:
-            for frame in result["stack_trace"]:
-                self.assertIsInstance(frame, dict)
+        self.assertTrue(result["stack_trace"])
+        for frame in result["stack_trace"]:
+            self.assertIsInstance(frame, dict)
 
-    def testToDictStackTraceFrameHasRequiredKeys(self):
+    def testToDictStackTraceFrameHasRequiredKeys(self) -> None:
         """Include required keys in each stack frame dict.
 
         Validates that stack_trace frames contain the keys:
@@ -321,7 +328,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -334,6 +341,7 @@ class TestExceptionParserToDict(TestCase):
         except RuntimeError as exc:
             result = ExceptionParser(exc).toDict()
 
+        self.assertTrue(result["stack_trace"])
         for frame in result["stack_trace"]:
             self.assertIn("id", frame)
             self.assertIn("filename", frame)
@@ -344,7 +352,7 @@ class TestExceptionParserToDict(TestCase):
             self.assertIn("lines", frame)
             self.assertIn("code_with_lines", frame)
 
-    def testToDictStackTraceFrameIdIsInt(self):
+    def testToDictStackTraceFrameIdIsInt(self) -> None:
         """Return integer ids in stack frame entries.
 
         Validates that the 'id' field in each stack frame is an
@@ -353,7 +361,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -366,25 +374,27 @@ class TestExceptionParserToDict(TestCase):
         except TypeError as exc:
             result = ExceptionParser(exc).toDict()
 
+        self.assertTrue(result["stack_trace"])
         for frame in result["stack_trace"]:
             self.assertIsInstance(frame["id"], int)
 
-    def testToDictStackTraceFrameIdsIncreaseFromMostRecent(self):
+    def testToDictStackTraceFrameIdsIncreaseFromMostRecent(self) -> None:
         """Assign frame identifiers in most-recent-first order.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         try:
-            def inner():
+
+            def inner() -> None:
                 """Raise an inner error for stack-frame inspection.
 
                 Returns
                 -------
                 None
-                    Completes the operation described above.
+                    No return value.
 
                 Raises
                 ------
@@ -398,12 +408,13 @@ class TestExceptionParserToDict(TestCase):
         except ValueError as exc:
             frames = ExceptionParser(exc).toDict()["stack_trace"]
 
+        self.assertEqual(len(frames), 2)
         self.assertEqual(
             [frame["id"] for frame in frames],
             list(range(1, len(frames) + 1)),
         )
 
-    def testToDictStackTraceFilenameUsesForwardSlashes(self):
+    def testToDictStackTraceFilenameUsesForwardSlashes(self) -> None:
         """Use forward slashes in frame filenames.
 
         Validates that backslashes in file paths are normalized
@@ -412,7 +423,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -425,10 +436,11 @@ class TestExceptionParserToDict(TestCase):
         except ValueError as exc:
             result = ExceptionParser(exc).toDict()
 
+        self.assertTrue(result["stack_trace"])
         for frame in result["stack_trace"]:
             self.assertNotIn("\\", frame["filename"])
 
-    def testToDictStackTraceCodeIsList(self):
+    def testToDictStackTraceCodeIsList(self) -> None:
         """Return 'code' as a list in each stack frame.
 
         Validates that the 'code' field in each stack frame is
@@ -437,7 +449,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -450,10 +462,11 @@ class TestExceptionParserToDict(TestCase):
         except ValueError as exc:
             result = ExceptionParser(exc).toDict()
 
+        self.assertTrue(result["stack_trace"])
         for frame in result["stack_trace"]:
             self.assertIsInstance(frame["code"], list)
 
-    def testToDictStackTraceLinesIsListOfInts(self):
+    def testToDictStackTraceLinesIsListOfInts(self) -> None:
         """Return 'lines' as a list of ints in each stack frame.
 
         Validates that line numbers in stack frames are stored as
@@ -462,7 +475,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -475,11 +488,12 @@ class TestExceptionParserToDict(TestCase):
         except ValueError as exc:
             result = ExceptionParser(exc).toDict()
 
+        self.assertTrue(result["stack_trace"])
         for frame in result["stack_trace"]:
             for ln in frame["lines"]:
                 self.assertIsInstance(ln, int)
 
-    def testToDictStackTraceCodeWithLinesContainsColon(self):
+    def testToDictStackTraceCodeWithLinesContainsColon(self) -> None:
         """Format code_with_lines entries as 'lineno:code'.
 
         Validates that each entry in code_with_lines uses the
@@ -488,7 +502,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -501,11 +515,12 @@ class TestExceptionParserToDict(TestCase):
         except ValueError as exc:
             result = ExceptionParser(exc).toDict()
 
+        self.assertTrue(result["stack_trace"])
         for frame in result["stack_trace"]:
             for entry in frame["code_with_lines"]:
                 self.assertIn(":", entry)
 
-    def testToDictStackTraceIsMostRecentFirst(self):
+    def testToDictStackTraceIsMostRecentFirst(self) -> None:
         """Order stack frames with the most recent frame first.
 
         Validates that stack_trace is reversed so the innermost
@@ -514,16 +529,17 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         try:
-            def inner():
+
+            def inner() -> None:
                 """Raise an inner error for stack-frame inspection.
 
                 Returns
                 -------
                 None
-                    Completes the operation described above.
+                    No return value.
 
                 Raises
                 ------
@@ -532,6 +548,7 @@ class TestExceptionParserToDict(TestCase):
                 """
                 error_msg = "inner error"
                 raise ValueError(error_msg)
+
             inner()
         except ValueError as exc:
             result = ExceptionParser(exc).toDict()
@@ -544,7 +561,7 @@ class TestExceptionParserToDict(TestCase):
 
     # ------------------------------------------------ edge cases
 
-    def testToDictWithBaseException(self):
+    def testToDictWithBaseException(self) -> None:
         """Handle base Exception class correctly.
 
         Validates that toDict works without error for the most
@@ -553,14 +570,14 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = Exception("base")
         result = ExceptionParser(exc).toDict()
         self.assertEqual(result["error_type"], "Exception")
         self.assertIsInstance(result["stack_trace"], list)
 
-    def testToDictWithKeyError(self):
+    def testToDictWithKeyError(self) -> None:
         """Handle KeyError serialization correctly.
 
         Validates that KeyError (whose str includes quotes) is
@@ -569,7 +586,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         try:
             d: dict = {}
@@ -578,7 +595,7 @@ class TestExceptionParserToDict(TestCase):
             result = ExceptionParser(exc).toDict()
         self.assertEqual(result["error_type"], "KeyError")
 
-    def testToDictWithZeroDivisionError(self):
+    def testToDictWithZeroDivisionError(self) -> None:
         """Handle ZeroDivisionError serialization.
 
         Validates that a ZeroDivisionError raised in code is parsed
@@ -587,7 +604,7 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         try:
             _ = 1 / 0
@@ -596,7 +613,7 @@ class TestExceptionParserToDict(TestCase):
         self.assertEqual(result["error_type"], "ZeroDivisionError")
         self.assertGreater(len(result["stack_trace"]), 0)
 
-    def testToDictWithExceptionConstructedDirectly(self):
+    def testToDictWithExceptionConstructedDirectly(self) -> None:
         """Parse exceptions constructed without raising.
 
         Validates that an exception instantiated but not raised
@@ -605,22 +622,22 @@ class TestExceptionParserToDict(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         exc = ValueError("not raised")
         result = ExceptionParser(exc).toDict()
         self.assertEqual(result["error_type"], "ValueError")
         self.assertIsInstance(result["stack_trace"], list)
 
-class TestExceptionParserGetSourceCode(TestCase):
 
-    def testSourceContextIncludesTwoLinesBeforeAndAfter(self):
+class TestExceptionParserGetSourceCode(TestCase):
+    def testSourceContextIncludesTwoLinesBeforeAndAfter(self) -> None:
         """Return the requested line and two neighboring lines per side.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         parser = ExceptionParser.__new__(ExceptionParser)
         source = [f"line {number}\n" for number in range(1, 11)]
@@ -633,13 +650,13 @@ class TestExceptionParserGetSourceCode(TestCase):
         self.assertEqual(lines, [3, 4, 5, 6, 7])
         self.assertEqual(code, [f"line {number}" for number in lines])
 
-    def testSourceContextClipsAtFileBoundaries(self):
+    def testSourceContextClipsAtFileBoundaries(self) -> None:
         """Limit source context to lines present in the file.
 
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
         """
         parser = ExceptionParser.__new__(ExceptionParser)
         source = [f"line {number}\n" for number in range(1, 11)]
@@ -652,7 +669,7 @@ class TestExceptionParserGetSourceCode(TestCase):
         self.assertEqual(lines, [1, 2, 3])
         self.assertEqual(code, ["line 1", "line 2", "line 3"])
 
-    def testSourceCodeLinesAreIncludedInFrames(self):
+    def testSourceCodeLinesAreIncludedInFrames(self) -> None:
         """Include surrounding source lines in stack frames.
 
         Validates that a raised exception with a known source file
@@ -661,7 +678,7 @@ class TestExceptionParserGetSourceCode(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -678,7 +695,7 @@ class TestExceptionParserGetSourceCode(TestCase):
         has_code = any(len(f["code"]) > 0 for f in result["stack_trace"])
         self.assertTrue(has_code)
 
-    def testLineNumbersArePositiveIntegers(self):
+    def testLineNumbersArePositiveIntegers(self) -> None:
         """Return positive integers for all line numbers in frames.
 
         Validates that every line number reported in stack frames
@@ -687,7 +704,7 @@ class TestExceptionParserGetSourceCode(TestCase):
         Returns
         -------
         None
-            Assertions verify the behavior described above.
+            No return value.
 
         Raises
         ------
@@ -700,6 +717,7 @@ class TestExceptionParserGetSourceCode(TestCase):
         except ValueError as exc:
             result = ExceptionParser(exc).toDict()
 
+        self.assertTrue(result["stack_trace"])
         for frame in result["stack_trace"]:
-            if frame["lineno"]:
-                self.assertGreater(frame["lineno"], 0)
+            self.assertIsInstance(frame["lineno"], int)
+            self.assertGreater(frame["lineno"], 0)

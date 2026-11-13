@@ -1,11 +1,11 @@
+# ruff: noqa: TC001
+# Resolve the public mapping annotation during runtime introspection.
 """Define the contract for translation file loaders."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from orionis.localization.types import TranslationMap
 
-if TYPE_CHECKING:
-    from orionis.localization.types import TranslationMap
 
 class ITranslationLoader(ABC):
     """
@@ -44,6 +44,10 @@ class ITranslationLoader(ABC):
 
         Raises
         ------
+        orionis.localization.InvalidLocaleException
+            If the locale code is malformed or contains path components.
+        orionis.localization.TranslationException
+            If a source resolves outside the configured language directory.
         orionis.localization.TranslationSyntaxException
             If a translation file is not UTF-8 encoded, contains
             invalid JSON, or its root element is not an object.

@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class PGSQLCharset(Enum):
     """
     Enumerate PostgreSQL encodings supported for database storage.

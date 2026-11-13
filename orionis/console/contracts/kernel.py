@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from orionis.foundation.contracts.application import IApplication
 
+
 class IKernelCLI(ABC):
     """Define the contract for kernel cli implementations."""
 

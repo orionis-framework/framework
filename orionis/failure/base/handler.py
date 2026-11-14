@@ -4,6 +4,7 @@
 
 from functools import partial
 from typing import ClassVar
+import warnings
 from orionis.auth.context.functions import current_auth_context
 from orionis.auth.exceptions import (
     AuthenticationException,
@@ -291,3 +292,126 @@ class BaseExceptionHandler(IBaseExceptionHandler):
             exception=exception,
             status_code=500,
         )
+
+    # Deprecated compatibility methods. Keep last for removal in a future version.
+
+    async def report(
+        self,
+        exception: BaseException,
+        log: ILogger,
+    ) -> Throwable | None:
+        """
+        Log an exception immediately using the supplied logger.
+
+        Parameters
+        ----------
+        exception : BaseException
+            The exception instance that was caught.
+        log : orionis.logging.contracts.ILogger
+            The logger instance for error reporting.
+
+        Returns
+        -------
+        orionis.failure.entities.Throwable or None
+            The structured exception if reported, otherwise None when ignored.
+
+        Warnings
+        --------
+        Deprecated and will be removed in a future version. Override
+        ``handleFailure`` and return a ``FailureHandling`` plan instead.
+        Calling this method emits ``DeprecationWarning``.
+        """
+        warnings.warn(
+            "BaseExceptionHandler.report() is deprecated and will be removed "
+            "in a future version. Override handleFailure() and return a "
+            "FailureHandling plan instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        if self.isExceptionIgnored(exception):
+            return None
+
+        throwable = self.toThrowable(exception)
+        log.getLogger().error(
+            "[%s] %s",
+            throwable.classtype.__name__,
+            throwable.message,
+            exc_info=(type(exception), exception, throwable.traceback),
+        )
+        return throwable
+
+    async def handleCLI(
+        self,
+        exception: BaseException,
+        console: Console,
+    ) -> None:
+        """
+        Render an exception immediately using the supplied console.
+
+        Parameters
+        ----------
+        exception : BaseException
+            The exception instance that was caught.
+        console : orionis.console.output.console.Console
+            The console instance for output.
+
+        Returns
+        -------
+        None
+            This method does not return a value.
+
+        Warnings
+        --------
+        Deprecated and will be removed in a future version. Override
+        ``handleFailure`` and return a ``FailureHandling`` plan instead.
+        Calling this method emits ``DeprecationWarning``.
+        """
+        warnings.warn(
+            "BaseExceptionHandler.handleCLI() is deprecated and will be removed "
+            "in a future version. Override handleFailure() and return a "
+            "FailureHandling plan instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        if self.isExceptionIgnored(exception):
+            return
+
+        console.exception(exception)
+
+    async def handleHTTP(
+        self,
+        exception: BaseException,
+        request: Request | TransportAdapter,
+    ) -> Response | None:
+        """
+        Render an exception immediately as an HTTP response.
+
+        Parameters
+        ----------
+        exception : BaseException
+            The exception instance that was caught.
+        request
+            The HTTP request instance or transport adapter that was being processed.
+
+        Returns
+        -------
+        orionis.http.Response | None
+            The HTTP response if handled, otherwise None when ignored.
+
+        Warnings
+        --------
+        Deprecated and will be removed in a future version. Override
+        ``handleFailure`` and return a ``FailureHandling`` plan instead.
+        Calling this method emits ``DeprecationWarning``.
+        """
+        warnings.warn(
+            "BaseExceptionHandler.handleHTTP() is deprecated and will be removed "
+            "in a future version. Override handleFailure() and return a "
+            "FailureHandling plan instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        if self.isExceptionIgnored(exception):
+            return None
+
+        return await self.__present(exception, flow="http", request=request)

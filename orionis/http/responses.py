@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from orionis.http.enums.status import HTTPStatus
 
 _STATUS_CODE_TYPE_ERROR = "status_code must be an integer"
+"""Describe the required integer status-code type."""
 
 
 class Response(_FlashData, IResponse):
@@ -153,7 +154,7 @@ class Response(_FlashData, IResponse):
 
         Returns
         -------
-        Self
+        typing.Self
             The same response, enabling fluent chaining.
 
         Raises
@@ -188,7 +189,7 @@ class Response(_FlashData, IResponse):
 
         Returns
         -------
-        Self
+        typing.Self
             The same response, enabling fluent chaining.
 
         Raises
@@ -215,7 +216,7 @@ class Response(_FlashData, IResponse):
 
         Returns
         -------
-        Self
+        typing.Self
             The same response, enabling fluent chaining.
 
         Raises
@@ -1176,7 +1177,7 @@ class RedirectResponse(Response):
 
         Returns
         -------
-        Self
+        typing.Self
             The same response, enabling fluent chaining.
 
         Raises

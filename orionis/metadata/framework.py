@@ -40,5 +40,5 @@ SKELETON = "https://github.com/orionis-framework/skeleton"
 """URL to the project's skeleton or template repository (for initial setup)."""
 
 # Current version of the framework
-VERSION = "1.5.1"
+VERSION = "1.6.0"
 """Current version of the framework."""

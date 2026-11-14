@@ -236,6 +236,35 @@ value: "not a valid type!"
                         diagnostics,
                     )
 
+    def testCompilerPredicateTypeRendersWithoutUnavailableLinks(self) -> None:
+        """Render the UUID predicate helper without unavailable external links.
+
+        Returns
+        -------
+        None
+            Keep the SQLAlchemy column type literal in the helper documentation.
+        """
+        from pydoctor import epydoc2stan  # pyright: ignore[reportMissingImports]
+        from pydoctor.stanutils import flatten  # pyright: ignore[reportMissingImports]
+
+        compiler = (
+            Path(__file__).resolve().parents[2] / "orionis" / "database" / "compiler.py"
+        )
+        system, diagnostics = self._buildSystem(
+            compiler.read_text(encoding="utf-8"),
+        )
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            flatten(
+                epydoc2stan.format_docstring(
+                    system.allobjects["example.SQLCompiler._predicateValue"],
+                ),
+            )
+        self.assertNotIn(
+            'Cannot find link target for "sqlalchemy.sql.elements.ColumnElement"',
+            diagnostics + output.getvalue(),
+        )
+
     def testCaseInsensitivePageNamesRemainDistinct(self) -> None:
         """Keep a re-exported class from overwriting its module on Windows.
 

@@ -109,7 +109,9 @@ Los registros de incidentes y sus identificadores se asignan en los caminos de f
 
 ## Migrar un handler personalizado
 
-Este cambio rompe compatibilidad. `report`, `handleHTTP` y `handleCLI` se eliminaron del contrato del handler y del handler base. Runtime y Catch no llaman los overrides antiguos y no hay wrappers de compatibilidad.
+El contrato del handler expone únicamente `handleFailure` y `handleResult`. `BaseExceptionHandler` conserva `report`, `handleHTTP` y `handleCLI` para llamadas directas y delegación mediante `super()`, manteniendo su comportamiento anterior. Estos métodos de compatibilidad emiten `DeprecationWarning` y se eliminarán en una versión futura.
+
+El runtime y Catch siguen canalizando las excepciones mediante `handleFailure`; no invocan automáticamente los overrides antiguos. Migra el manejo personalizado a los dos hooks actuales:
 
 1. Mueve la política de excepciones a `handleFailure(exception, context)` y la de resultados fallidos a `handleResult(value, context)`.
 2. Parte de `plan = await super().handleFailure(exception, context)` para conservar el comportamiento nativo. Retorna ese plan; esperarlo y descartar su retorno pierde los efectos diferidos.

@@ -3008,7 +3008,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_betweenExpression" class="internal-link" title="orionis.database.SQLCompiler._betweenExpression">_between<wbr></wbr>Expression</a></code>
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_combineExpressions" class="internal-link" title="orionis.database.SQLCompiler._combineExpressions">_combine<wbr></wbr>Expressions</a></code>
             </div>
         
 
@@ -3018,7 +3018,7 @@
         
 
         
-            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_combineExpressions" class="internal-link" title="orionis.database.SQLCompiler._combineExpressions">_combine<wbr></wbr>Expressions</a></code>
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_predicateValue" class="internal-link" title="orionis.database.SQLCompiler._predicateValue">_predicate<wbr></wbr>Value</a></code>
             </div>
         
 
@@ -3129,6 +3129,16 @@
 
         
             <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_basicExpression" class="internal-link" title="orionis.database.SQLCompiler._basicExpression">_basic<wbr></wbr>Expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.database.SQLCompiler.html#_betweenExpression" class="internal-link" title="orionis.database.SQLCompiler._betweenExpression">_between<wbr></wbr>Expression</a></code>
             </div>
         
 
@@ -4113,7 +4123,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Connection</span>(<a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L129" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.Connection.__init__">Connection(name, config)</a></code></p><p><a href="classIndex.html#orionis.database.Connection">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Connection</span>(<a href="orionis.database.contracts.IConnection.html" class="internal-link" title="orionis.database.contracts.IConnection">IConnection</a>): <a href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L129" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.database.Connection.__init__">Connection(name, config)</a></code></p><p><a href="classIndex.html#orionis.database.Connection">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -4308,7 +4318,7 @@ support savepoints or returning server-generated identity values.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L145">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L145">
       
       (source)
     </a>
@@ -4337,7 +4347,7 @@ support savepoints or returning server-generated identity values.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_acquire</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">sqlite_immediate: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code>AbstractAsyncContextManager[<wbr></wbr>AsyncConnection | ThreadedConnection] | _TransactionState</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L852">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L852">
       
       (source)
     </a>
@@ -4368,7 +4378,7 @@ Leave existing transactions and other database drivers unchanged.</td></tr></tab
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_getEngine</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>AsyncEngine | ThreadedEngine</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L792">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L792">
       
       (source)
     </a>
@@ -4395,7 +4405,7 @@ Leave existing transactions and other database drivers unchanged.</td></tr></tab
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_queryException</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">error: <code>SQLAlchemyError</code></span>) -&gt; <code><a href="orionis.database.QueryException.html" class="internal-link" title="orionis.database.QueryException">QueryException</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L1000">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L1000">
       
       (source)
     </a>
@@ -4422,7 +4432,7 @@ Leave existing transactions and other database drivers unchanged.</td></tr></tab
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_releaseIfSettled</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">state: <code>_TransactionState</code>, </span><span class="rst-sig-param">primary: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L1018">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L1018">
       
       (source)
     </a>
@@ -4449,7 +4459,7 @@ Leave existing transactions and other database drivers unchanged.</td></tr></tab
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_run</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>AsyncConnection | ThreadedConnection</code>, </span><span class="rst-sig-param">statement: <code>Any</code>, </span><span class="rst-sig-param">parameters: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | Sequence[<wbr></wbr>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>CursorResult[<wbr></wbr>Any] | ThreadedResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L955">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L955">
       
       (source)
     </a>
@@ -4476,7 +4486,7 @@ Leave existing transactions and other database drivers unchanged.</td></tr></tab
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_transactionState</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>_TransactionState | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L826">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L826">
       
       (source)
     </a>
@@ -4503,7 +4513,7 @@ Leave existing transactions and other database drivers unchanged.</td></tr></tab
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">begin</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L591">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L591">
       
       (source)
     </a>
@@ -4531,7 +4541,7 @@ or an active transaction belongs to another task.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">commit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L644">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L644">
       
       (source)
     </a>
@@ -4558,7 +4568,7 @@ or an active transaction belongs to another task.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">createTable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">table: <code>TableDefinition</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">if_not_exists: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L508">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L508">
       
       (source)
     </a>
@@ -4585,7 +4595,7 @@ or an active transaction belongs to another task.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>DeletePlan</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L392">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L392">
       
       (source)
     </a>
@@ -4612,7 +4622,7 @@ or an active transaction belongs to another task.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">disconnect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L768">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L768">
       
       (source)
     </a>
@@ -4639,7 +4649,7 @@ or an active transaction belongs to another task.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">dropTable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">schema: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">if_exists: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L550">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L550">
       
       (source)
     </a>
@@ -4667,7 +4677,7 @@ or an active transaction belongs to another task.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">execute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L446">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L446">
       
       (source)
     </a>
@@ -4694,7 +4704,7 @@ or an active transaction belongs to another task.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getName</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L193">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L193">
       
       (source)
     </a>
@@ -4721,7 +4731,7 @@ or an active transaction belongs to another task.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">insert</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>InsertPlan</code></span>) -&gt; <code>InsertResult</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L306">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L306">
       
       (source)
     </a>
@@ -4749,7 +4759,7 @@ reported only for single-row inserts when the driver provides one.</td></tr></ta
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">inTransaction</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L750">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L750">
       
       (source)
     </a>
@@ -4776,7 +4786,7 @@ reported only for single-row inserts when the driver provides one.</td></tr></ta
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">rollback</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L691">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L691">
       
       (source)
     </a>
@@ -4803,7 +4813,7 @@ reported only for single-row inserts when the driver provides one.</td></tr></ta
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">scalar</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>SelectPlan</code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L419">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L419">
       
       (source)
     </a>
@@ -4830,7 +4840,7 @@ reported only for single-row inserts when the driver provides one.</td></tr></ta
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">select</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">query: <code>SelectPlan | <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L268">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L268">
       
       (source)
     </a>
@@ -4858,7 +4868,7 @@ Return an empty list when no rows match.</td></tr></table><table class="fieldTab
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">statement</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">sql: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bindings: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L475">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L475">
       
       (source)
     </a>
@@ -4887,7 +4897,7 @@ Return an empty list when no rows match.</td></tr></table><table class="fieldTab
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">supportsUniqueConstraints</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L204">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L204">
       
       (source)
     </a>
@@ -4914,7 +4924,7 @@ Return an empty list when no rows match.</td></tr></table><table class="fieldTab
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toSql</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>SelectPlan</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">literal_binds: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L215">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L215">
       
       (source)
     </a>
@@ -4942,7 +4952,7 @@ may contain sensitive data; some types cannot be rendered literally.</td></tr></
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">transaction</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code>ITransaction</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L738">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L738">
       
       (source)
     </a>
@@ -4970,7 +4980,7 @@ when its block raises an exception.</td></tr></table></div>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">update</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">plan: <code>UpdatePlan</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L365">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L365">
       
       (source)
     </a>
@@ -4996,7 +5006,7 @@ when its block raises an exception.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L142">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L142">
       
       (source)
     </a>
@@ -5023,7 +5033,7 @@ when its block raises an exception.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_compiler</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L181">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L181">
       
       (source)
     </a>
@@ -5050,7 +5060,7 @@ when its block raises an exception.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_config</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L177">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L177">
       
       (source)
     </a>
@@ -5077,7 +5087,7 @@ when its block raises an exception.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_engine</span>: <code>AsyncEngine | ThreadedEngine | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L179">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L179">
       
       (source)
     </a>
@@ -5104,7 +5114,7 @@ when its block raises an exception.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_name</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L175">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L175">
       
       (source)
     </a>
@@ -5131,7 +5141,7 @@ when its block raises an exception.</td></tr></table></div>
   <div class="functionHeader">
     
     <span class="py-defname">_tx_state</span>: <code>ContextVar[<wbr></wbr>_TransactionState | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/connection.py#L187">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/connection.py#L187">
       
       (source)
     </a>
@@ -5157,7 +5167,7 @@ when its block raises an exception.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 22:12:39.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

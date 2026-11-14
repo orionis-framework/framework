@@ -390,7 +390,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ViewFactory</span>(<a href="orionis.view.contracts.factory.IViewFactory.html" class="internal-link" title="orionis.view.contracts.factory.IViewFactory">IViewFactory</a>): <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/factory.py#L11" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.view.factory.ViewFactory.__init__">ViewFactory(engine)</a></code></p><p><a href="classIndex.html#orionis.view.factory.ViewFactory">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ViewFactory</span>(<a href="orionis.view.contracts.factory.IViewFactory.html" class="internal-link" title="orionis.view.contracts.factory.IViewFactory">IViewFactory</a>): <a href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/view/factory.py#L14" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.view.factory.ViewFactory.__init__">ViewFactory(engine)</a></code></p><p><a href="classIndex.html#orionis.view.factory.ViewFactory">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -404,7 +404,7 @@ mutations. Await the returned value to render through the injected
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2237">
+          <table class="children sortable" id="id2242">
   
   
   <tr class="method">
@@ -448,7 +448,7 @@ mutations. Await the returned value to render through the injected
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">engine: <code><a href="orionis.view.contracts.engine.IViewEngine.html" class="internal-link" title="orionis.view.contracts.engine.IViewEngine">IViewEngine</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/factory.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/view/factory.py#L28">
       
       (source)
     </a>
@@ -474,8 +474,8 @@ mutations. Await the returned value to render through the injected
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">make</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">**context: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="orionis.view.pending.PendingView.html" class="internal-link" title="orionis.view.pending.PendingView">PendingView</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/factory.py#L42">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">make</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">status_code: <code>HTTPStatus | <a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 200, </span><span class="rst-sig-param">headers: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">background: <code>BackgroundTask | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">context: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">**variables: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="orionis.view.pending.PendingView.html" class="internal-link" title="orionis.view.pending.PendingView">PendingView</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/view/factory.py#L45">
       
       (source)
     </a>
@@ -491,13 +491,14 @@ mutations. Await the returned value to render through the injected
 <div class="rst-admonition rst-admonition-notes">
 <p class="rst-admonition-title rst-first">Notes</p>
 <p class="rst-last">Template lookup and rendering errors are raised when the returned value
-is awaited, rather than when this method prepares it.</p>
+is awaited, rather than when this method prepares it.
+Response options are also validated on await; chained mutations are
+applied after the initial options, in call order.</p>
 </div>
 <table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">template:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Template name using dot notation (e.g. <tt class="rst-docutils rst-literal">'users.index'</tt>) or a
-relative path (e.g. <tt class="rst-docutils rst-literal">'users/index.html'</tt>).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**context:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Keyword arguments forwarded as template variables.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.pending.PendingView.html" class="internal-link">orionis.view.pending.PendingView</a></code></td><td class="fieldArgDesc">Awaitable proxy that renders the template on <tt class="rst-docutils rst-literal">await</tt> and
-accepts chained response mutators such as <tt class="rst-docutils rst-literal">withInput()</tt>,
-<tt class="rst-docutils rst-literal">withErrors()</tt>, <tt class="rst-docutils rst-literal">withFlash()</tt>, <tt class="rst-docutils rst-literal">withCookie()</tt> or
-<tt class="rst-docutils rst-literal">withoutCookie()</tt>.</td></tr></table></div>
+relative path (e.g. <tt class="rst-docutils rst-literal">'users/index.html'</tt>).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">status<wbr></wbr>_code:</span><code>orionis.http.enums.HTTPStatus | int, <em>optional</em></code></td><td class="fieldArgDesc">HTTP status code for the rendered response.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">headers:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Response headers. The SSR marker is added when not supplied.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">background:</span><code>orionis.background.BackgroundTask | None, <em>optional</em></code></td><td class="fieldArgDesc">Task to run after the response is sent.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">context:</span><code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">collections.abc.Mapping</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a>] | None, <em>optional</em></code></td><td class="fieldArgDesc">Template variables, including names reserved for response options.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">**variables:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Additional template variables, overriding matching context entries.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.view.pending.PendingView.html" class="internal-link">orionis.view.pending.PendingView</a></code></td><td class="fieldArgDesc">Awaitable proxy that renders the template on <tt class="rst-docutils rst-literal">await</tt> and
+accepts chained response mutators such as <tt class="rst-docutils rst-literal">withStatusCode()</tt>,
+<tt class="rst-docutils rst-literal">withHeaders()</tt>, <tt class="rst-docutils rst-literal">withBackground()</tt> or <tt class="rst-docutils rst-literal">withErrors()</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If <em>context</em> is neither a mapping nor <tt class="rst-docutils rst-literal">None</tt>.</td></tr></table></div>
   </div>
 </div><div class="baseclassvariable">
   
@@ -511,7 +512,7 @@ accepts chained response mutators such as <tt class="rst-docutils rst-literal">w
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/factory.py#L22">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/view/factory.py#L25">
       
       (source)
     </a>
@@ -538,7 +539,7 @@ accepts chained response mutators such as <tt class="rst-docutils rst-literal">w
   <div class="functionHeader">
     
     <span class="py-defname">_engine</span>: <code><a href="orionis.view.contracts.engine.IViewEngine.html" class="internal-link" title="orionis.view.contracts.engine.IViewEngine">IViewEngine</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/view/factory.py#L39">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/view/factory.py#L42">
       
       (source)
     </a>
@@ -564,7 +565,7 @@ accepts chained response mutators such as <tt class="rst-docutils rst-literal">w
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 22:12:39.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

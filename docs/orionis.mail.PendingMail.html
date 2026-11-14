@@ -2336,7 +2336,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">PendingMail</span>: <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L23" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.PendingMail.__init__">PendingMail(delivery, options, mailable_builder)</a></code></p><p><a href="classIndex.html#orionis.mail.PendingMail">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">PendingMail</span>: <a href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L23" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.mail.PendingMail.__init__">PendingMail(delivery, options, mailable_builder)</a></code></p><p><a href="classIndex.html#orionis.mail.PendingMail">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -2349,7 +2349,7 @@ recipients.</p>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1364">
+          <table class="children sortable" id="id1365">
   
   
   <tr class="method">
@@ -2468,7 +2468,7 @@ recipients.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">delivery: <code>Delivery</code>, </span><span class="rst-sig-param">options: <code>MailOptions | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">mailable_builder: <code>Callable[<wbr></wbr>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.mail.Mailable.html" class="internal-link" title="orionis.mail.Mailable">Mailable</a>]], <wbr></wbr>Awaitable[<wbr></wbr><a href="orionis.mail.Mailable.html" class="internal-link" title="orionis.mail.Mailable">Mailable</a>]] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L36">
       
       (source)
     </a>
@@ -2495,7 +2495,7 @@ recipients.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_derive</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">message: <code><a href="orionis.mail.Message.html" class="internal-link" title="orionis.mail.Message">Message</a></code></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L378">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L378">
       
       (source)
     </a>
@@ -2522,7 +2522,7 @@ recipients.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_sendDirect</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">content: <code><a href="orionis.mail.entities.Content.html" class="internal-link" title="orionis.mail.entities.Content">Content</a></code>, </span><span class="rst-sig-param">callback: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L398">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L398">
       
       (source)
     </a>
@@ -2549,7 +2549,7 @@ recipients.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_sendMailable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">mailable: <code><a href="orionis.mail.Mailable.html" class="internal-link" title="orionis.mail.Mailable">Mailable</a></code></span>) -&gt; <code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L431">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L431">
       
       (source)
     </a>
@@ -2576,7 +2576,7 @@ recipients.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">attach</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">attachment: <code><a href="orionis.mail.entities.Attachment.html" class="internal-link" title="orionis.mail.entities.Attachment">Attachment</a></code></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L204">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L204">
       
       (source)
     </a>
@@ -2603,7 +2603,7 @@ recipients.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">bcc</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addresses: <code>Recipients</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L152">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L152">
       
       (source)
     </a>
@@ -2630,7 +2630,7 @@ recipients.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">cc</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addresses: <code>Recipients</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L134">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L134">
       
       (source)
     </a>
@@ -2657,7 +2657,7 @@ recipients.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">fromAddress</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">address: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="orionis.mail.entities.Address.html" class="internal-link" title="orionis.mail.entities.Address">Address</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L94">
       
       (source)
     </a>
@@ -2684,7 +2684,7 @@ recipients.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">html</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">html: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">callback: <code>MessageCallback | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L349">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L349">
       
       (source)
     </a>
@@ -2711,7 +2711,7 @@ recipients.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">mailer</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L66">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L66">
       
       (source)
     </a>
@@ -2738,7 +2738,7 @@ recipients.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">raw</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">text: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">callback: <code>MessageCallback | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L320">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L320">
       
       (source)
     </a>
@@ -2765,7 +2765,7 @@ recipients.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">replyTo</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addresses: <code>Recipients</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L170">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L170">
       
       (source)
     </a>
@@ -2792,7 +2792,7 @@ recipients.</p>
     <div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">mailable: <code><a href="orionis.mail.Mailable.html" class="internal-link" title="orionis.mail.Mailable">Mailable</a> | <a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr><a href="orionis.mail.Mailable.html" class="internal-link" title="orionis.mail.Mailable">Mailable</a>]</code>, </span><span class="rst-sig-symbol">/</span>) -&gt; <code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">view: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-symbol">/, </span><span class="rst-sig-param">data: <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">callback: <code>MessageCallback | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">send</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">content: <code><a href="orionis.mail.entities.Content.html" class="internal-link" title="orionis.mail.entities.Content">Content</a></code>, </span><span class="rst-sig-symbol">/, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">callback: <code>MessageCallback | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.entities.MailResult.html" class="internal-link" title="orionis.mail.entities.MailResult">MailResult</a></code>:</span></div></div>
     
     
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L220">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L220">
       
       (source)
     </a>
@@ -2820,7 +2820,7 @@ content are invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="o
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">subject</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L188">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L188">
       
       (source)
     </a>
@@ -2847,7 +2847,7 @@ content are invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="o
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">to</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">addresses: <code>Recipients</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.mail.PendingMail.html" class="internal-link" title="orionis.mail.PendingMail">PendingMail</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L116">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L116">
       
       (source)
     </a>
@@ -2873,7 +2873,7 @@ content are invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="o
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L33">
       
       (source)
     </a>
@@ -2900,7 +2900,7 @@ content are invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="o
   <div class="functionHeader">
     
     <span class="py-defname">_delivery</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L59">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L59">
       
       (source)
     </a>
@@ -2927,7 +2927,7 @@ content are invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="o
   <div class="functionHeader">
     
     <span class="py-defname">_mailable_builder</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L61">
       
       (source)
     </a>
@@ -2954,7 +2954,7 @@ content are invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="o
   <div class="functionHeader">
     
     <span class="py-defname">_options</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/mail/pending.py#L63">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/mail/pending.py#L63">
       
       (source)
     </a>
@@ -2980,7 +2980,7 @@ content are invalid.</td></tr><tr><td class="fieldArgContainer"><code><a href="o
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 22:12:39.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

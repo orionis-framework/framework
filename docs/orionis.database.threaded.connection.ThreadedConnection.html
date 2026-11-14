@@ -610,7 +610,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ThreadedConnection</span>: <a href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L22" class="sourceLink">(source)</a></code></p><p>Constructors: <code><a href="#open" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection.open">ThreadedConnection.open(engine)</a></code>, <code><a href="#__init__" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection.__init__">ThreadedConnection(connection, worker)</a></code></p><p><a href="classIndex.html#orionis.database.threaded.connection.ThreadedConnection">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ThreadedConnection</span>: <a href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L22" class="sourceLink">(source)</a></code></p><p>Constructors: <code><a href="#open" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection.open">ThreadedConnection.open(engine)</a></code>, <code><a href="#__init__" class="internal-link" title="orionis.database.threaded.connection.ThreadedConnection.__init__">ThreadedConnection(connection, worker)</a></code></p><p><a href="classIndex.html#orionis.database.threaded.connection.ThreadedConnection">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -717,7 +717,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#classmethod" class="intersphinx-link">classmethod</a><br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">open</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">cls</span>, </span><span class="rst-sig-param">engine: <code>Engine</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L53">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L53">
       
       (source)
     </a>
@@ -744,7 +744,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">connection: <code>Connection</code>, </span><span class="rst-sig-param">worker: <code><a href="orionis.database.threaded.worker.ThreadedWorker.html" class="internal-link" title="orionis.database.threaded.worker.ThreadedWorker">ThreadedWorker</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L28">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L28">
       
       (source)
     </a>
@@ -771,7 +771,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_closedTask</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">pending: <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L194">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L194">
       
       (source)
     </a>
@@ -798,7 +798,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_execute</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">statement: <code>Executable</code>, </span><span class="rst-sig-param">parameters: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>) -&gt; <code><a href="orionis.database.threaded.result.ThreadedResult.html" class="internal-link" title="orionis.database.threaded.result.ThreadedResult">ThreadedResult</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L116">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L116">
       
       (source)
     </a>
@@ -825,7 +825,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">_release</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L210">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L210">
       
       (source)
     </a>
@@ -852,7 +852,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">begin</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="orionis.database.threaded.transaction.ThreadedTransaction.html" class="internal-link" title="orionis.database.threaded.transaction.ThreadedTransaction">ThreadedTransaction</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L79">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L79">
       
       (source)
     </a>
@@ -879,7 +879,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L170">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L170">
       
       (source)
     </a>
@@ -908,7 +908,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">execute</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">statement: <code>Executable</code>, </span><span class="rst-sig-param">parameters: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>] | <a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" class="intersphinx-link">Sequence</a>[<wbr></wbr><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping" class="intersphinx-link">Mapping</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.database.threaded.result.ThreadedResult.html" class="internal-link" title="orionis.database.threaded.result.ThreadedResult">ThreadedResult</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L94">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L94">
       
       (source)
     </a>
@@ -935,7 +935,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">invalidate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L227">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L227">
       
       (source)
     </a>
@@ -962,7 +962,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">runSync</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">callback: <code><a href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" class="intersphinx-link">Callable</a>[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr>T]</code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code>T</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L138">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L138">
       
       (source)
     </a>
@@ -988,7 +988,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L25">
       
       (source)
     </a>
@@ -1015,7 +1015,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_close_task</span>: <code><a href="https://docs.python.org/3/library/asyncio-task.html#asyncio.Task" class="intersphinx-link">asyncio.Task</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L50">
       
       (source)
     </a>
@@ -1042,7 +1042,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_closed</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L48">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L48">
       
       (source)
     </a>
@@ -1069,7 +1069,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_connection</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L44">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L44">
       
       (source)
     </a>
@@ -1096,7 +1096,7 @@
   <div class="functionHeader">
     
     <span class="py-defname">_worker</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/036d04bac1381cc4f35c49431bb41a77d18419c3/orionis/database/threaded/connection.py#L46">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/database/threaded/connection.py#L46">
       
       (source)
     </a>
@@ -1122,7 +1122,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 08:58:46.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 22:12:39.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

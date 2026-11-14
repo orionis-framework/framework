@@ -1,36 +1,39 @@
-# Comparación HTTP de Orionis, FastAPI, Litestar y Starlette
+# HTTP Comparison of Orionis, FastAPI, Litestar, and Starlette
 
-La suite compara cinco configuraciones en una misma máquina mediante `GET /`.
-Todas responden `200 OK` con el texto exacto `Hello World` (11 bytes).
+The suite compares five configurations on the same machine using `GET /`.
+Each returns `200 OK` with the exact text `Hello World` (11 bytes).
 
-## Servidores
+## Servers
 
-| Framework | Interfaz | Servidor |
+| Framework | Interface | Server |
 | --- | --- | --- |
-| Orionis | RSGI | Granian 2.8.4 |
-| Orionis | ASGI | Granian 2.8.4 |
-| FastAPI | ASGI | Uvicorn 0.54.0 |
-| Litestar | ASGI | Uvicorn 0.54.0 |
-| Starlette | ASGI | Uvicorn 0.54.0 |
+| Orionis | RSGI | Granian |
+| Orionis | ASGI | Granian |
+| FastAPI | ASGI | Uvicorn |
+| Litestar | ASGI | Uvicorn |
+| Starlette | ASGI | Uvicorn |
 
-Cada configuración se ejecuta con **1, 2, 3 y 4 workers**, HTTP/1.1 con
-keep-alive y event loop `asyncio`.
+Exact versions are pinned in the `benchmark` group of
+[`pyproject.toml`](../../pyproject.toml) and resolved in `uv.lock`.
+The runner validates the selected servers against those same versions.
 
-El servidor solicita un puerto efímero al sistema operativo (`--port 0`).
-El runner obtiene el puerto del listener de sus propios procesos, sin liberar
-una reserva para volver a enlazarla ni adivinar un puerto ajeno. Esto no añade
-peticiones HTTP de preparación: solo Orionis recibe precalentamiento.
+Each configuration runs with **1, 2, 3, and 4 workers**, HTTP/1.1 keep-alive,
+and the `asyncio` event loop.
 
-En Linux, el lanzador de Uvicorn activa `TCP_NODELAY` en el socket TCP antes
-de compartirlo entre workers. Así conserva la política usada por `asyncio`
-con un solo worker y evita el retardo de Nagle y ACK diferido en respuestas
-pequeñas. No modifica los handlers, el protocolo `h11` ni los parámetros de
-carga. El ajuste se registra como `uvicorn_multi_worker_tcp_nodelay` en
-`diagnostics.json`.
+The server requests an ephemeral port from the operating system (`--port 0`).
+The runner discovers the listener port from its own processes without releasing
+a reserved port for rebinding or guessing another process's port. This adds no
+HTTP preparation requests: only Orionis receives warmup.
 
-## Instalación y ejecución
+On Linux, the Uvicorn launcher enables `TCP_NODELAY` on the TCP socket before
+sharing it between workers. This preserves the policy used by `asyncio` with
+one worker and avoids Nagle and delayed ACK latency for small responses.
+Handlers, the `h11` protocol, and load settings remain unchanged. The setting
+is recorded as `uvicorn_multi_worker_tcp_nodelay` in `diagnostics.json`.
 
-Desde la raíz del repositorio:
+## Installation and Execution
+
+From the repository root:
 
 ```text
 uv python install 3.14.8
@@ -38,35 +41,39 @@ uv sync --locked --group benchmark --no-default-groups --python 3.14.8
 uv run --no-sync python -B -m benchmarks.http_compare.run
 ```
 
-La comparación completa se ejecuta en Ubuntu 24.04 con Python 3.14.8.
-En Windows, usa `--workers 1`. Puedes seleccionar casos con `--frameworks`
-y consultar las opciones de ejecución con `--help`.
-Cada ejecución requiere una carpeta de salida nueva o vacía.
+The full comparison runs on Ubuntu 24.04 with Python 3.14.8.
+On Windows, use `--workers 1`. Select cases with `--frameworks` and inspect
+available options with `--help`.
+Each run requires a new or empty output directory.
 
-## Resultados
+## Results
 
-Las [gráficas del README principal](../../README.md#http-benchmarks) muestran
-las solicitudes HTTP 200 por segundo para cada cantidad de workers.
-La [tabla completa de resultados](https://github.com/orionis-framework/framework/blob/benchmark-results/http-compare/summary.md)
-incluye throughput, latencia media, p50, p95, p99, estado y errores.
+The [main README charts](../../README.md#http-benchmarks) show HTTP 200 requests
+per second for each worker count. The [published reports][reports] include
+throughput, mean latency, p50, p95, p99, status, and errors.
 
-Se publica la mediana de tres mediciones de 10 segundos por configuración.
-Las latencias se expresan en milisegundos y no se mezclan cantidades de workers.
+Results use the median of three 10-second measurements per configuration.
+Latencies are expressed in milliseconds, and worker counts are kept separate.
 
-Los archivos se guardan en `benchmark-results/http-compare/`:
+Files are saved in `benchmark-results/http-compare/`:
 
-| Archivo | Contenido |
+| File | Contents |
 | --- | --- |
-| `summary.md` | Tabla de resultados. |
-| `summary.csv` | Resultados para hojas de cálculo. |
-| `summary.json` | Resultados estructurados por framework y workers. |
-| `throughput-N-workers.svg` | Gráfica de throughput por cantidad de workers. |
+| `summary.md` | Results table. |
+| `summary.csv` | Results for spreadsheets. |
+| `summary.json` | Structured results by framework and worker count. |
+| `throughput-N-workers.svg` | Throughput chart for each worker count. |
 
-Los casos fallidos se indican explícitamente y no publican métricas.
-Los detalles técnicos se conservan por separado en `diagnostics.json`.
-Las gráficas solo se generan cuando toda la comparación termina sin errores.
+Failed cases are explicitly labeled and do not publish metrics.
+Technical details are retained separately in `diagnostics.json`.
+Configuration errors and execution exceptions also appear on stderr, including
+the GitHub Actions log. Charts are generated only when the entire comparison
+finishes without errors.
 
-GitHub Actions ejecuta la comparación con cada `push` a `1.x` y permite
-iniciarla desde **Actions → HTTP Framework Comparison → Run workflow**.
-La tabla aparece en el resumen del job. Las ejecuciones exitosas en `1.x`
-publican las gráficas y los resúmenes en la rama `benchmark-results`.
+GitHub Actions runs the comparison on every push to `1.x`. It can also be started
+from **Actions → HTTP Framework Comparison → Run workflow**.
+The table appears in the job summary. Successful runs on `1.x` publish charts
+and summaries to the `benchmark-results` branch.
+
+[reports]:
+    https://github.com/orionis-framework/framework/tree/benchmark-results/http-compare

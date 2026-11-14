@@ -16,6 +16,7 @@ import socket
 import subprocess
 import sys
 import time
+import tomllib
 from contextlib import suppress
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -23,8 +24,10 @@ from http import HTTPStatus
 from importlib import metadata
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import Any, Self
+
 import psutil
+
 from benchmarks.http_compare.client import OHA_VERSION, install_oha, parse_measurement
 from benchmarks.http_compare.report import (
     FAILED_COMPARISON,
@@ -38,7 +41,7 @@ from benchmarks.http_compare.report import (
 # These commands run local, fixed benchmark applications, without a shell.
 
 REPO = Path(__file__).resolve().parents[2]
-SERVER_VERSIONS = {"granian": "2.8.4", "uvicorn": "0.54.0"}
+SERVER_PACKAGES = ("granian", "uvicorn")
 STARTUP_TIMEOUT = 60
 HTTP_1_1 = 11
 WINDOWS_LIMIT = (
@@ -65,18 +68,39 @@ class Framework:
     module: str
 
     @property
-    def target(self) -> str:
-        """Return the factory target without importing optional frameworks."""
+    def target(self: Self) -> str:
+        """
+        Return the factory target without importing optional frameworks.
+
+        Returns
+        -------
+        str
+            Import path and callable name for the application factory.
+        """
         return f"benchmarks.http_compare.apps.{self.module}:create_application"
 
     @property
-    def server(self) -> str:
-        """Use Granian for Orionis and Uvicorn for the other frameworks."""
+    def server(self: Self) -> str:
+        """
+        Select Granian for Orionis and Uvicorn for the other frameworks.
+
+        Returns
+        -------
+        str
+            Server package assigned to this framework.
+        """
         return "granian" if self.module == "orionis" else "uvicorn"
 
     @property
-    def requires_warmup(self) -> bool:
-        """Enable HTTP preparation and load warmup only for Orionis."""
+    def requires_warmup(self: Self) -> bool:
+        """
+        Enable HTTP preparation and load warmup only for Orionis.
+
+        Returns
+        -------
+        bool
+            Whether this framework requires HTTP preparation and load warmup.
+        """
         return self.module == "orionis"
 
 
@@ -93,7 +117,26 @@ FRAMEWORKS = {
 
 
 def positive_number(value: str) -> float:
-    """Parse a finite positive duration in seconds."""
+    """
+    Parse a finite positive duration in seconds.
+
+    Parameters
+    ----------
+    value : str
+        Command-line duration to parse.
+
+    Returns
+    -------
+    float
+        Finite duration greater than zero.
+
+    Raises
+    ------
+    argparse.ArgumentTypeError
+        If the parsed duration is nonfinite or nonpositive.
+    ValueError
+        If the value cannot be parsed as a float.
+    """
     number = float(value)
     if not math.isfinite(number) or number <= 0:
         error_msg = "must be finite and greater than zero"
@@ -102,7 +145,26 @@ def positive_number(value: str) -> float:
 
 
 def positive_integer(value: str) -> int:
-    """Parse a positive connection or repetition count."""
+    """
+    Parse a positive connection or repetition count.
+
+    Parameters
+    ----------
+    value : str
+        Command-line count to parse.
+
+    Returns
+    -------
+    int
+        Count greater than zero.
+
+    Raises
+    ------
+    argparse.ArgumentTypeError
+        If the parsed count is nonpositive.
+    ValueError
+        If the value cannot be parsed as an integer.
+    """
     number = int(value)
     if number < 1:
         error_msg = "must be greater than zero"
@@ -111,7 +173,14 @@ def positive_integer(value: str) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    """Build the comparison CLI without importing benchmark applications."""
+    """
+    Build the comparison CLI without importing benchmark applications.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Parser containing benchmark options, defaults, and validation.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--workers",
@@ -156,7 +225,19 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _git(*arguments: str) -> str:
-    """Read Git metadata, reporting unavailable values as unknown."""
+    """
+    Read Git metadata, reporting unavailable values as unknown.
+
+    Parameters
+    ----------
+    *arguments : str
+        Git command and arguments to execute in the repository.
+
+    Returns
+    -------
+    str
+        Stripped command output, or ``unknown`` if Git is absent or fails.
+    """
     executable = shutil.which("git")
     if executable is None:
         return "unknown"
@@ -174,9 +255,16 @@ def _git(*arguments: str) -> str:
 
 
 def collect_environment() -> dict[str, Any]:
-    """Collect runtime, hardware, dependencies and source provenance."""
+    """
+    Collect runtime, hardware, dependencies, and source provenance.
+
+    Returns
+    -------
+    dict[str, Any]
+        Runtime metadata, installed versions, Git state, and lockfile digest.
+    """
     versions = {}
-    for package in ("orionis", *SERVER_VERSIONS, "fastapi", "litestar", "starlette"):
+    for package in ("orionis", *SERVER_PACKAGES, "fastapi", "litestar", "starlette"):
         try:
             versions[package] = metadata.version(package)
         except metadata.PackageNotFoundError:
@@ -231,19 +319,68 @@ def collect_environment() -> dict[str, Any]:
 
 
 def check_server_versions(frameworks: list[str], versions: dict[str, str]) -> None:
-    """Require the pinned versions of the servers selected for this run."""
+    """
+    Require selected server versions pinned in the benchmark dependency group.
+
+    Parameters
+    ----------
+    frameworks : list[str]
+        Framework names selected for the comparison.
+    versions : dict[str, str]
+        Installed package versions collected from the environment.
+
+    Returns
+    -------
+    None
+        Validate selected servers against the benchmark dependency pins.
+
+    Raises
+    ------
+    RuntimeError
+        If a selected server lacks an exact pin or its installed version differs.
+    """
+    with (REPO / "pyproject.toml").open("rb") as stream:
+        requirements = tomllib.load(stream)["dependency-groups"]["benchmark"]
+    pins = {
+        server: version
+        for requirement in requirements
+        if isinstance(requirement, str) and "==" in requirement
+        for server, version in [requirement.split("==", 1)]
+    }
     for server in dict.fromkeys(FRAMEWORKS[name].server for name in frameworks):
-        version = SERVER_VERSIONS[server]
-        if versions[server] != version:
+        if server not in pins:
             error_msg = (
-                f"{server.capitalize()} {version} required; "
+                f"Pin {server} with == in pyproject.toml's benchmark dependency group"
+            )
+            raise RuntimeError(error_msg)
+        version = pins[server]
+        installed = versions.get(server, "not installed")
+        if installed != version:
+            error_msg = (
+                f"{server.capitalize()} {version} required; found {installed}; "
                 "run uv sync --locked --group benchmark"
             )
             raise RuntimeError(error_msg)
 
 
 def server_command(framework: Framework, workers: int, port: int) -> list[str]:
-    """Build the assigned server command with matching HTTP and load settings."""
+    """
+    Build the assigned server command with matching HTTP and load settings.
+
+    Parameters
+    ----------
+    framework : Framework
+        Application factory and native server configuration.
+    workers : int
+        Number of server workers to start.
+    port : int
+        Loopback port, or zero to request an ephemeral port.
+
+    Returns
+    -------
+    list[str]
+        Server command and arguments for execution without a shell.
+    """
     server_module = (
         "benchmarks.http_compare.uvicorn_server"
         if framework.server == "uvicorn"
@@ -305,7 +442,21 @@ def track_children(
     process: subprocess.Popen[bytes],
     known: dict[int, psutil.Process],
 ) -> None:
-    """Retain owned worker identities for cleanup even after they are orphaned."""
+    """
+    Retain owned worker identities for cleanup even after they are orphaned.
+
+    Parameters
+    ----------
+    process : subprocess.Popen[bytes]
+        Owned server process whose descendants are inspected.
+    known : dict[int, psutil.Process]
+        Worker identities to update in place.
+
+    Returns
+    -------
+    None
+        Add current descendants to the retained worker identities.
+    """
     with suppress(psutil.NoSuchProcess):
         for child in psutil.Process(process.pid).children(recursive=True):
             known[child.pid] = child
@@ -315,7 +466,26 @@ def stop_server(
     process: subprocess.Popen[bytes],
     known: dict[int, psutil.Process] | None = None,
 ) -> None:
-    """Terminate and reap only the owned server process tree."""
+    """
+    Terminate and reap only the owned server process tree.
+
+    Parameters
+    ----------
+    process : subprocess.Popen[bytes]
+        Owned server process to stop and reap.
+    known : dict[int, psutil.Process] | None, optional
+        Previously retained worker identities, if available.
+
+    Returns
+    -------
+    None
+        Stop the owned server and workers, escalating to forced termination.
+
+    Raises
+    ------
+    RuntimeError
+        If tracked Windows workers survive forced termination.
+    """
     if sys.platform != "win32":
         # A dedicated session also retains ownership of orphaned worker processes.
         with suppress(ProcessLookupError):
@@ -354,7 +524,28 @@ def check_workers(
     worker_pids: set[int],
     known: dict[int, psutil.Process],
 ) -> None:
-    """Require every worker announced by the server to remain alive and owned."""
+    """
+    Require every worker announced by the server to remain alive and owned.
+
+    Parameters
+    ----------
+    process : subprocess.Popen[bytes]
+        Owned server process that must remain alive.
+    worker_pids : set[int]
+        Worker identifiers announced after application startup.
+    known : dict[int, psutil.Process]
+        Retained worker identities to refresh before validation.
+
+    Returns
+    -------
+    None
+        Confirm that the server and all announced workers remain alive and owned.
+
+    Raises
+    ------
+    RuntimeError
+        If the server exits, no workers are announced, or a worker is unavailable.
+    """
     track_children(process, known)
     if process.poll() is not None:
         error_msg = f"Server exited with code {process.returncode}; see server log"
@@ -384,14 +575,14 @@ def _listening_port(
 
     Parameters
     ----------
-    process : subprocess.Popen
+    process : subprocess.Popen[bytes]
         Owned server process.
     known : dict[int, psutil.Process]
         Retained identities of that process and its workers.
 
     Returns
     -------
-    int or None
+    int | None
         Unique loopback listener port, or None before binding completes.
 
     Raises
@@ -426,7 +617,24 @@ def _listening_port(
 def _probe_response(
     connection: http.client.HTTPConnection,
 ) -> None:
-    """Validate an unmeasured Hello World response on a keep-alive connection."""
+    """
+    Validate an unmeasured Hello World response on a keep-alive connection.
+
+    Parameters
+    ----------
+    connection : http.client.HTTPConnection
+        Connection used to request and validate the root endpoint.
+
+    Returns
+    -------
+    None
+        Confirm the expected status, payload, content type, and keep-alive policy.
+
+    Raises
+    ------
+    RuntimeError
+        If the response differs from the expected persistent HTTP/1.1 response.
+    """
     connection.request("GET", "/")
     response = connection.getresponse()
     body = response.read()
@@ -446,7 +654,21 @@ def _probe_response(
 
 
 def started_workers(events: str, framework: Framework) -> set[int]:
-    """Read native worker PIDs only after their application startup completes."""
+    """
+    Read native worker PIDs only after their application startup completes.
+
+    Parameters
+    ----------
+    events : str
+        Native server log contents.
+    framework : Framework
+        Framework whose server determines the expected log format.
+
+    Returns
+    -------
+    set[int]
+        Worker identifiers with completed startup events in the log.
+    """
     if framework.server == "uvicorn":
         pids = {
             int(pid)
@@ -479,7 +701,7 @@ def _probe_server(port: int, *, requires_warmup: bool) -> None:
     Returns
     -------
     None
-        No return value.
+        Confirm connectivity and complete HTTP preparation when requested.
     """
     if not requires_warmup:
         socket.create_connection(("127.0.0.1", port), timeout=1).close()
@@ -501,7 +723,36 @@ def wait_until_ready(
     *,
     framework: Framework,
 ) -> set[int]:
-    """Wait for native server startup, probing HTTP only for Orionis."""
+    """
+    Wait for native server startup, probing HTTP only for Orionis.
+
+    Parameters
+    ----------
+    process : subprocess.Popen[bytes]
+        Owned server process to monitor.
+    port : int
+        Listener port, or zero to resolve the assigned port from owned processes.
+    log_path : Path
+        File containing native server startup events.
+    workers : int
+        Expected number of ready workers.
+    known : dict[int, psutil.Process]
+        Retained worker identities to refresh during startup.
+    framework : Framework
+        Server configuration and HTTP preparation policy.
+
+    Returns
+    -------
+    set[int]
+        Identifiers of the live, owned workers after readiness checks succeed.
+
+    Raises
+    ------
+    RuntimeError
+        If the server exits or a worker or HTTP response fails validation.
+    TimeoutError
+        If the expected workers do not become ready before the startup deadline.
+    """
     deadline = time.monotonic() + STARTUP_TIMEOUT
     while time.monotonic() < deadline:
         track_children(process, known)
@@ -544,7 +795,29 @@ def run_load(
     output: Path,
     commands: list[dict[str, Any]],
 ) -> dict[str, int | float]:
-    """Run oha with direct diagnostic files and return normalized measurements."""
+    """
+    Run oha with direct diagnostic files and return normalized measurements.
+
+    Parameters
+    ----------
+    oha : Path
+        Verified load-generator executable.
+    url : str
+        Root endpoint to measure.
+    seconds : float
+        Requested load duration in seconds.
+    connections : int
+        Number of concurrent client connections.
+    output : Path
+        Destination for the raw JSON measurement.
+    commands : list[dict[str, Any]]
+        Command records to update in place.
+
+    Returns
+    -------
+    dict[str, int | float]
+        Normalized request counts, errors, elapsed time, throughput, and latencies.
+    """
     command = [
         str(oha),
         "--no-tui",
@@ -589,7 +862,31 @@ def benchmark_case(
     commands: list[dict[str, Any]],
     row: dict[str, Any],
 ) -> None:
-    """Measure an isolated server, warming only Orionis and always cleaning up."""
+    """
+    Measure an isolated server, warming only Orionis and always cleaning up.
+
+    Parameters
+    ----------
+    framework : Framework
+        Application factory and server configuration to measure.
+    workers : int
+        Number of server workers to start.
+    args : argparse.Namespace
+        Parsed warmup, duration, connection, and repetition settings.
+    oha : Path
+        Verified load-generator executable.
+    output : Path
+        Report directory containing raw measurements and server logs.
+    commands : list[dict[str, Any]]
+        Command records to update in place.
+    row : dict[str, Any]
+        Case result to populate with samples and aggregate metrics.
+
+    Returns
+    -------
+    None
+        Record measurements in the result row and stop the owned server.
+    """
     prefix = f"{framework.name}-workers-{workers}"
     with TemporaryDirectory(prefix="http-compare-app-") as temporary:
         directory = Path(temporary)
@@ -675,7 +972,26 @@ def benchmark_case(
 
 
 def resolve_oha(explicit: Path | None, directory: Path) -> Path:
-    """Locate or download oha and verify its pinned version."""
+    """
+    Locate or download oha and verify its pinned version.
+
+    Parameters
+    ----------
+    explicit : Path | None
+        Requested executable path, or None to search PATH and then download.
+    directory : Path
+        Destination for a verified download when no executable is supplied.
+
+    Returns
+    -------
+    Path
+        Executable path whose reported version matches the pinned oha version.
+
+    Raises
+    ------
+    RuntimeError
+        If the executable reports a different version or download validation fails.
+    """
     if explicit is not None:
         path = explicit.resolve()
     elif found := shutil.which("oha"):
@@ -704,7 +1020,27 @@ def _run_matrix(
     report: dict[str, Any],
     commands: list[dict[str, Any]],
 ) -> None:
-    """Run shuffled cases sequentially, preserving failures and partial results."""
+    """
+    Run shuffled cases sequentially, preserving failures and partial results.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed benchmark options, including the execution-order seed.
+    oha : Path
+        Verified load-generator executable.
+    output : Path
+        Directory for reports, command records, and measurements.
+    report : dict[str, Any]
+        Settings and results to update after each comparison case.
+    commands : list[dict[str, Any]]
+        Command records to update and persist after each case.
+
+    Returns
+    -------
+    None
+        Update the report and save completed cases, including failures.
+    """
     settings = report["settings"]
     # Seeded benchmark ordering is reproducible and not security-sensitive.
     generator = random.Random(args.seed)
@@ -733,7 +1069,7 @@ def _run_matrix(
                 for metric in METRICS:
                     row.pop(metric, None)
                 print(
-                    f"FAILED: {name}, {workers} workers. {FAILED_COMPARISON}",
+                    f"FAILED: {name}, {workers} workers: {error}. {FAILED_COMPARISON}",
                     file=sys.stderr,
                     flush=True,
                 )
@@ -742,7 +1078,19 @@ def _run_matrix(
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Run the comparison CLI and persist reports, including partial failures."""
+    """
+    Run the comparison CLI and persist reports, including partial failures.
+
+    Parameters
+    ----------
+    argv : list[str] | None, optional
+        Arguments to parse, or None to use the process command line.
+
+    Returns
+    -------
+    int
+        Zero after a successful comparison, or one for failed or incomplete runs.
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     output = args.output_dir.resolve()
@@ -791,7 +1139,7 @@ def main(argv: list[str] | None = None) -> int:
             _run_matrix(args, oha, output, report, commands)
     except BENCHMARK_ERRORS as error:
         report["error"] = str(error)
-        print(FAILED_COMPARISON, file=sys.stderr, flush=True)
+        print(f"{FAILED_COMPARISON} {error}", file=sys.stderr, flush=True)
     except KeyboardInterrupt:
         report["error"] = "Interrupted by user"
         for row in report["results"]:

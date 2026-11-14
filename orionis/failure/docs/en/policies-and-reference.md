@@ -106,7 +106,9 @@ Incident records and identifiers are allocated on failure paths. Execution bound
 
 ## Migrate a custom handler
 
-This is a breaking contract change. `report`, `handleHTTP`, and `handleCLI` have been removed from the handler contract and the base handler. Runtime and Catch do not call old overrides, and there are no compatibility wrappers.
+The handler contract exposes only `handleFailure` and `handleResult`. `BaseExceptionHandler` retains `report`, `handleHTTP`, and `handleCLI` for direct calls and delegation through `super()`, preserving their previous behavior. These compatibility methods emit `DeprecationWarning` and will be removed in a future release.
+
+The runtime and Catch continue routing exceptions through `handleFailure`; they do not automatically invoke legacy overrides. Migrate custom handling to the two current hooks:
 
 1. Move exception policy into `handleFailure(exception, context)` and failed-result policy into `handleResult(value, context)`.
 2. Start from `plan = await super().handleFailure(exception, context)` to retain native behavior. Return that plan; awaiting and discarding it loses the deferred effects.

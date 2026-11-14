@@ -24,7 +24,9 @@ class TestLocalStorageEdges(TestCase):
     def setUp(self) -> None:
         """Create a disposable disk with real file and directory entries."""
         super().setUp()
-        self.parent = Path(self.enterContext(TemporaryDirectory()))
+        # Match the driver's canonical paths before installing targeted mocks.
+        # Windows runners may expose the temporary directory through an 8.3 alias.
+        self.parent = Path(self.enterContext(TemporaryDirectory())).resolve()
         self.root = self.parent / "root"
         self.driver = LocalStorageDriver(self.root)
         (self.root / "data").write_bytes(b"payload")

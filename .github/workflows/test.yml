@@ -31,10 +31,10 @@ jobs:
         run: uv python install 3.14
 
       - name: 📦 Sync Dependencies
-        run: uv sync
+        run: uv sync --locked
 
       - name: 🔍 Lint Orionis
         run: uv run ruff check ./orionis/ --statistics
 
       - name: 🧪 Run All Test Suites
-        run: uv run python -B .github/scripts/run_tests.py
+        run: uv run python -B .github/scripts/run_tests.py --continue-on-error --windows-temp

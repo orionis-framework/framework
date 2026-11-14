@@ -1,16 +1,22 @@
 # ruff: noqa: S603, T201
 
 import argparse
+import ctypes
 import fnmatch
 import os
 import subprocess
 import sys
+import tempfile
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import NoReturn, TYPE_CHECKING
 
+if sys.platform == "win32":
+    import _winapi
+
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Iterator, Sequence
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,12 +108,89 @@ def discover_suites(repo_root: Path) -> list[TestSuite]:
     return suites
 
 
+def _short_path(directory: Path) -> Path:
+    """Return the Windows short spelling of an existing directory.
+
+    Parameters
+    ----------
+    directory : pathlib.Path
+        Existing canonical directory to translate.
+
+    Returns
+    -------
+    pathlib.Path
+        Short path, or the unchanged path when 8.3 names are disabled.
+
+    Raises
+    ------
+    OSError
+        If Windows cannot query the directory spelling.
+    """
+    get_short_path_name = ctypes.windll.kernel32.GetShortPathNameW
+    length = get_short_path_name(str(directory), None, 0)
+    if not length:
+        raise ctypes.WinError()
+    buffer = ctypes.create_unicode_buffer(length)
+    if not get_short_path_name(str(directory), buffer, length):
+        raise ctypes.WinError()
+    return Path(buffer.value)
+
+
+@contextmanager
+def _windows_temp_directory(*, enabled: bool) -> Iterator[Path | None]:
+    """Exercise Windows aliases, spaces and Unicode in one test-suite pass.
+
+    Parameters
+    ----------
+    enabled : bool
+        Whether the caller requested the Windows temporary-path profile.
+
+    Yields
+    ------
+    pathlib.Path or None
+        Temporary alias retained until every subprocess finishes, or None
+        when the profile is disabled or the operating system is not Windows.
+
+    Raises
+    ------
+    OSError
+        If the temporary directory or its alias cannot be prepared or removed.
+    """
+    if not enabled or sys.platform != "win32":
+        yield None
+        return
+    with tempfile.TemporaryDirectory(prefix="orionis-ci-windows-") as name:
+        root = Path(name).resolve()
+        target = root / "target"
+        target.mkdir()
+        alias = _short_path(target)
+        junction = root / "alias"
+        use_junction = alias == target
+        if use_junction:
+            # A junction needs no administrator rights and works without 8.3.
+            _winapi.CreateJunction(str(target), str(junction))
+            alias = junction
+        try:
+            temporary = alias / "Temporary files ñ"
+            temporary.mkdir()
+            if temporary == temporary.resolve():
+                message = "Windows temporary-path profile requires a real alias."
+                raise OSError(message)
+            print(f"Windows temporary directory: {temporary}", flush=True)
+            yield temporary
+        finally:
+            # Remove the junction itself before cleaning the owned target tree.
+            if use_junction:
+                junction.rmdir()
+
+
 def run_suites(
     repo_root: Path,
     suites: Sequence[TestSuite],
     *,
     verbosity: int = 1,
     continue_on_error: bool = False,
+    temporary_directory: Path | None = None,
 ) -> int:
     """
     Run isolated suites and retain the first failing exit code.
@@ -121,7 +204,9 @@ def run_suites(
     verbosity : int, optional
         Reactor output detail, by default 1.
     continue_on_error : bool, optional
-        Run remaining suites after a failure, by default False.
+        Run remaining tests and suites after a failure, by default False.
+    temporary_directory : pathlib.Path or None, optional
+        TMPDIR, TEMP and TMP directory inherited by every test subprocess.
 
     Returns
     -------
@@ -130,6 +215,12 @@ def run_suites(
     """
     # Give child interpreters consistent encoding and preserve the caller's setup.
     environment = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+    if temporary_directory is not None:
+        environment.update({
+            "TMPDIR": str(temporary_directory),
+            "TEMP": str(temporary_directory),
+            "TMP": str(temporary_directory),
+        })
     in_actions = environment.get("GITHUB_ACTIONS") == "true"
     failure = 0
     # Isolate suites in separate interpreters and group their CI log output.
@@ -149,7 +240,7 @@ def run_suites(
             f"--start-dir={start_path}",
             f"--file-pattern={suite.pattern}",
             f"--verbosity={verbosity}",
-            "--fail-fast=1",
+            f"--fail-fast={int(not continue_on_error)}",
         ]
         try:
             # Launch the active interpreter with separate command arguments.
@@ -194,6 +285,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--list", action="store_true", dest="list_suites")
     parser.add_argument("--verbosity", type=int, choices=(0, 1, 2), default=2)
     parser.add_argument("--continue-on-error", action="store_true")
+    parser.add_argument(
+        "--windows-temp",
+        action="store_true",
+        help="Exercise temporary path aliases, spaces and Unicode on Windows.",
+    )
     args = parser.parse_args(argv)
     repo_root = Path(__file__).resolve().parents[2]
     suites = discover_suites(repo_root)
@@ -209,12 +305,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     # Convert subprocess startup errors into an explicit CLI failure status.
     try:
-        return run_suites(
-            repo_root,
-            suites,
-            verbosity=args.verbosity,
-            continue_on_error=args.continue_on_error,
-        )
+        with _windows_temp_directory(enabled=args.windows_temp) as temporary:
+            return run_suites(
+                repo_root,
+                suites,
+                verbosity=args.verbosity,
+                continue_on_error=args.continue_on_error,
+                temporary_directory=temporary,
+            )
     except OSError as error:
         print(f"Unable to start test suite: {error}", file=sys.stderr)
         return 2

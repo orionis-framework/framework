@@ -268,7 +268,8 @@ class TestStoreRegressions(TestCase):
                 try:
                     await asyncio.wait_for(started.wait(), timeout=5)
                     staging = await asyncio.to_thread(
-                        lambda: next(folder.glob("*.tmp")),
+                        # Match the canonical paths passed to unlink by the store.
+                        lambda: next(folder.glob("*.tmp")).resolve(),
                     )
                     original_lock = FileSessionStore._lock
                     original_unlink = os.unlink

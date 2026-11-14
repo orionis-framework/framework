@@ -5,6 +5,7 @@ import traceback
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Self
+from unittest.mock import patch
 from uuid import NAMESPACE_URL, uuid4, uuid5
 from orionis.container.container import Container
 from orionis.container.context.scope import ScopedContext
@@ -849,12 +850,22 @@ class TestWorker(TestCase):
             Assert that the remaining lease bounds execution time.
         """
         await self.driver.push(envelope(self.serializer, GateJob(1), tries=1))
-        reserved = await self.driver.reserve(("default",), 0.04)
-        started = current_time()
-        with self.assertLogs("orionis.queues.worker", level="ERROR") as logs:
+        reserved = await self.driver.reserve(("default",), 90)
+        # Control the remaining lease instead of measuring runner scheduling time.
+        now = reserved.reserved_until - 0.04
+        with (
+            patch("orionis.queues.worker.current_time", return_value=now),
+            patch(
+                "orionis.queues.worker.asyncio.timeout",
+                wraps=asyncio.timeout,
+            ) as execution_timeout,
+            self.assertLogs("orionis.queues.worker", level="ERROR") as logs,
+        ):
             await self.worker.execute(reserved)
-        self.assertLess(current_time() - started, 0.3)
+        execution_timeout.assert_called_once()
+        self.assertAlmostEqual(execution_timeout.call_args.args[0], 0.038, places=6)
         self.assertIn("TimeoutError", "\n".join(logs.output))
+        self.assertEqual((await self.failed.all())[0].exception_type, "TimeoutError")
         self.assertEqual(self.state.events, [])
         self.assertFalse(self.state.gate.is_set())
 
@@ -1023,10 +1034,26 @@ class TestWorker(TestCase):
         None
             Assert prompt shutdown while the worker is sleeping.
         """
-        task = asyncio.create_task(self.worker.run())
-        await asyncio.sleep(0)
-        self.worker.stop()
-        self.assertEqual(await asyncio.wait_for(task, 0.1), 0)
+        self.worker._sleep = 60
+        polling = asyncio.Event()
+        wait_for_stop = self.worker._stop.wait
+
+        async def wait_until_stopped() -> bool:
+            """Observe entry into polling before awaiting the real stop event."""
+            polling.set()
+            return await wait_for_stop()
+
+        with patch.object(self.worker._stop, "wait", side_effect=wait_until_stopped):
+            task = asyncio.create_task(self.worker.run())
+            try:
+                await asyncio.wait_for(polling.wait(), timeout=5)
+                self.worker.stop()
+                self.assertEqual(await asyncio.wait_for(task, timeout=5), 0)
+            finally:
+                self.worker.stop()
+                if not task.done():
+                    task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
 
     async def testCancellationPreservesOriginalWhenReleaseFails(self) -> None:
         """

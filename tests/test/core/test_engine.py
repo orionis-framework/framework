@@ -651,7 +651,8 @@ class TestTestingEngineDiscovery(_EngineTestCase):
 
     def testDiscoverRejectsAnUnreadableSubdirectory(self) -> None:
         """Propagate traversal errors instead of dropping an unreadable branch."""
-        blocked = self._suite_dir / "blocked"
+        # Discovery canonicalizes its root, including Windows 8.3 aliases.
+        blocked = (self._suite_dir / "blocked").resolve()
         blocked.mkdir()
         original = os.scandir
 

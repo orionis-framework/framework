@@ -129,7 +129,8 @@ class TestNamingConventions(unittest.TestCase):
         """
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            blocked = root / "orionis" / "unreadable"
+            # The source walker resolves __file__, including temporary path aliases.
+            blocked = (root / "orionis" / "unreadable").resolve()
             blocked.mkdir(parents=True)
             (root / "tests").mkdir()
             scan = os.scandir
@@ -175,7 +176,7 @@ class TestNamingConventions(unittest.TestCase):
         """Prune the local database tree before scanning or parsing its contents."""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            excluded = root / "tests" / "real_database"
+            excluded = (root / "tests" / "real_database").resolve()
             excluded.mkdir(parents=True)
             # Invalid source makes accidental parsing fail independently of traversal.
             (excluded / "test_private.py").write_text(

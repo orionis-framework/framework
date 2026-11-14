@@ -1,4 +1,4 @@
-# ruff: noqa: PT009, PT027
+# ruff: noqa: PT009, PT027, SLF001
 # Preserve native TestCase assertions, boundary probes, and fixture signatures.
 import contextlib
 import importlib.util
@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 from typing import TYPE_CHECKING
+from unittest import skipUnless
 from unittest.mock import patch
 from orionis.test import TestCase
 
@@ -335,6 +336,91 @@ class TestSharedCiRunner(TestCase):
         self.processes.statuses = [7, 0, 3]
         self.assertEqual(self._runSuites(continue_on_error=True), 7)
         self.assertEqual(len(self.processes.calls), 3)
+        for command, _, _, _ in self.processes.calls:
+            self.assertIn("--fail-fast=0", command)
+
+    def testTemporaryDirectoryIsInheritedWithoutChangingTheCaller(self) -> None:
+        """Pass the chosen temporary path to every child without global changes."""
+        temporary = self.repo / "Temporary files ñ"
+        with (
+            patch.dict(os.environ, {
+                "TMPDIR": "caller-tmpdir",
+                "TEMP": "caller-temp",
+                "TMP": "caller-tmp",
+            }),
+            contextlib.redirect_stdout(self.output),
+        ):
+            self.assertEqual(
+                self.runner.run_suites(
+                    self.repo,
+                    [self.runner.TestSuite("tests/alpha")],
+                    temporary_directory=temporary,
+                ),
+                0,
+            )
+            self.assertEqual(os.environ["TEMP"], "caller-temp")
+            self.assertEqual(os.environ["TMP"], "caller-tmp")
+            self.assertEqual(os.environ["TMPDIR"], "caller-tmpdir")
+        _, _, environment, _ = self.processes.calls[0]
+        self.assertEqual(environment["TEMP"], str(temporary))
+        self.assertEqual(environment["TMP"], str(temporary))
+        self.assertEqual(environment["TMPDIR"], str(temporary))
+
+    @skipUnless(sys.platform == "win32", "Requires Windows path aliases")
+    def testWindowsTemporaryProfileUsesAnAliasWithSpacesAndUnicode(self) -> None:
+        """Exercise the real Windows alias and clean the owned tree afterward."""
+        with (
+            contextlib.redirect_stdout(self.output),
+            self.runner._windows_temp_directory(enabled=True) as temporary,
+        ):
+            canonical = temporary.resolve()
+            root = canonical.parents[1]
+            self.assertNotEqual(temporary, canonical)
+            self.assertIn(" ", temporary.name)
+            self.assertIn("ñ", temporary.name)
+            probe = temporary / "probe.txt"
+            probe.write_text("payload", encoding="utf-8")
+            self.assertTrue(probe.samefile(canonical / "probe.txt"))
+        self.assertFalse(root.exists())
+
+    @skipUnless(sys.platform == "win32", "Requires Windows directory junctions")
+    def testWindowsTemporaryProfileFallsBackWhenShortNamesAreDisabled(self) -> None:
+        """Keep alias coverage on Windows volumes without 8.3 names."""
+        with (
+            patch.object(self.runner, "_short_path", side_effect=Path),
+            contextlib.redirect_stdout(self.output),
+            self.runner._windows_temp_directory(enabled=True) as temporary,
+        ):
+            root = temporary.resolve().parents[1]
+            self.assertTrue(temporary.parent.is_junction())
+            self.assertNotEqual(temporary, temporary.resolve())
+            (temporary / "probe.txt").write_text("payload", encoding="utf-8")
+        self.assertFalse(root.exists())
+
+    @skipUnless(sys.platform == "win32", "Requires Windows directory junctions")
+    def testWindowsTemporaryProfileCleansJunctionAfterFailure(self) -> None:
+        """Clean the alias and its target after a test-process startup error."""
+        failure = OSError("controlled subprocess startup failure")
+        with (
+            patch.object(self.runner, "_short_path", side_effect=Path),
+            contextlib.redirect_stdout(self.output),
+            self.assertRaises(OSError) as caught,
+            self.runner._windows_temp_directory(enabled=True) as temporary,
+        ):
+            root = temporary.resolve().parents[1]
+            raise failure
+        self.assertIs(caught.exception, failure)
+        self.assertFalse(root.exists())
+
+    def testWindowsTemporaryProfileIsInactiveOnOtherPlatforms(self) -> None:
+        """Avoid Windows API calls on non-Windows test workers."""
+        with (
+            patch.object(self.runner.sys, "platform", "linux"),
+            patch.object(self.runner, "_short_path") as short_path,
+            self.runner._windows_temp_directory(enabled=True) as temporary,
+        ):
+            self.assertIsNone(temporary)
+        short_path.assert_not_called()
 
     def testSuccessfulSuitesUseTheActivePythonAndRepository(self) -> None:
         """
@@ -420,6 +506,7 @@ class TestSharedCiRunner(TestCase):
         )
         for command, cwd, _, _ in self.processes.calls:
             self.assertIn("--verbosity=0", command)
+            self.assertIn("--fail-fast=0", command)
             self.assertNotIn("--start-dir=tests/real_database", command)
             self.assertEqual(cwd, repo)
         root_commands = [
@@ -429,6 +516,33 @@ class TestSharedCiRunner(TestCase):
         ]
         self.assertEqual(len(root_commands), 1)
         self.assertIn("--start-dir=tests/test_example.py", root_commands[0])
+
+    def testCliPassesTheWindowsTemporaryProfileToEverySuite(self) -> None:
+        """Retain the selected profile through every isolated test process."""
+        temporary = self.repo / "Temporary files ñ"
+        with patch.object(
+            self.runner,
+            "_windows_temp_directory",
+            return_value=contextlib.nullcontext(temporary),
+        ) as profile:
+            self.assertEqual(self._main(["--windows-temp"]), 0)
+        profile.assert_called_once_with(enabled=True)
+        self.assertTrue(self.processes.calls)
+        for _, _, environment, _ in self.processes.calls:
+            self.assertEqual(environment["TEMP"], str(temporary))
+            self.assertEqual(environment["TMP"], str(temporary))
+            self.assertEqual(environment["TMPDIR"], str(temporary))
+
+    def testCliReportsTemporaryProfileSetupErrors(self) -> None:
+        """Keep temporary-profile failures visible instead of skipping tests."""
+        with patch.object(
+            self.runner,
+            "_windows_temp_directory",
+            side_effect=PermissionError("temporary profile denied"),
+        ):
+            self.assertEqual(self._main(["--windows-temp"]), 2)
+        self.assertEqual(self.processes.calls, [])
+        self.assertIn("temporary profile denied", self.errors.getvalue())
 
     def testCliReportsProcessStartupFailure(self) -> None:
         """

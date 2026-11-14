@@ -54,15 +54,14 @@ class TestIBaseExceptionHandlerContract(TestCase):
         with self.assertRaises(TypeError):
             Handler()
 
-    def testRemovedHooksCannotReenterTheHandler(self) -> None:
-        """Verify removed hooks cannot reenter the handler.
-
-        Neither the contract nor Base retains obsolete invocation paths.
-        """
-        for handler in (IBaseExceptionHandler, BaseExceptionHandler):
-            for name in ("report", "handleHTTP", "handleCLI"):
-                with self.subTest(handler=handler, name=name):
-                    self.assertFalse(hasattr(handler, name))
+    def testLegacyHooksRemainConcreteCompatibilityMethods(self) -> None:
+        """Retain legacy calls without requiring them from new implementations."""
+        for name in ("report", "handleHTTP", "handleCLI"):
+            with self.subTest(method=name):
+                self.assertFalse(hasattr(IBaseExceptionHandler, name))
+                self.assertTrue(
+                    inspect.iscoroutinefunction(getattr(BaseExceptionHandler, name)),
+                )
 
     def testRuntimeAnnotationsPreserveImplementationParameters(self) -> None:
         """Resolve runtime type hints and retain public call parameters."""

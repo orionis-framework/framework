@@ -1,50 +1,49 @@
-# ruff: noqa: ANN401, PLC0415, TC001, TC002, TC003
+# ruff: noqa: ANN401, PLC0415, TC001, TC002
 # Preserve heterogeneous bound values and defer the optional Oracle type import.
 # Keep compiler annotations resolvable for runtime dependency reflection.
 """Translate Orionis query plans into engine-executable statements."""
 
 from __future__ import annotations
+
 import operator
+from collections.abc import Callable, Iterable, Sequence
 from typing import Any, ClassVar
+from uuid import UUID
+
 import sqlalchemy
 from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_
 from sqlalchemy.exc import NoSuchModuleError
 from sqlalchemy.schema import CreateTable, DropTable
-from sqlalchemy.sql import CompoundSelect
-from sqlalchemy.sql.elements import ClauseElement
+from sqlalchemy.sql import CompoundSelect, Delete, Insert, Select, Update
+from sqlalchemy.sql.elements import ClauseElement, ColumnElement
+from sqlalchemy.sql.expression import Executable
+from sqlalchemy.types import TypeEngine
+
 from orionis.database.dialect import missing_dependency_error
 from orionis.database.exceptions import QueryException
 from orionis.orm.query.expressions import (
     COLUMNLESS_WHERE_TYPES,
+    AggregateClause,
     AggregateFunction,
+    DeletePlan,
+    InsertPlan,
+    JoinCondition,
+    JoinExpression,
     JoinType,
     LockMode,
     RawExpression,
     SelectPlan,
     SortDirection,
     SubQueryColumn,
-    WhereType,
-)
-from orionis.orm.schema.types import ColumnType
-
-from collections.abc import Callable, Sequence
-from sqlalchemy.sql import Delete, Insert, Select, Update
-from sqlalchemy.sql.elements import ColumnElement
-from sqlalchemy.sql.expression import Executable
-from sqlalchemy.types import TypeEngine
-from orionis.orm.query.expressions import (
-    AggregateClause,
-    DeletePlan,
-    InsertPlan,
-    JoinCondition,
-    JoinExpression,
     UpdatePlan,
     WhereClause,
+    WhereType,
 )
 from orionis.orm.schema.column import ColumnDefinition
 from orionis.orm.schema.constraints import ForeignReference
 from orionis.orm.schema.table import TableDefinition
+from orionis.orm.schema.types import ColumnType
 
 # A resolvable FROM/JOIN source: either the raw engine Table or an
 # aliased projection of it (``Table.alias(name)``).
@@ -529,8 +528,8 @@ class SQLCompiler:
             If ``plan.lock`` is set for the Redshift backend.
         """
         if self._driver == "redshift" and plan.lock is not None:
-            message = "Amazon Redshift does not support row-level SELECT locks."
-            raise QueryException(message)
+            error_msg = "Amazon Redshift does not support row-level SELECT locks."
+            raise QueryException(error_msg)
 
     # ── Schemaless (raw) table support ──────────────────────────────────────
 
@@ -1864,7 +1863,36 @@ class SQLCompiler:
         if handler is None:
             error_msg = f"Unsupported where clause type '{kind}'."
             raise QueryException(error_msg)
-        return handler(column, self._clauseValue(sources, clause.value))
+        value = self._clauseValue(sources, clause.value)
+        if (
+            kind in (WhereType.IN, WhereType.NOT_IN)
+            and isinstance(column.type, sqlalchemy.String)
+            and isinstance(value, Iterable)
+            and not isinstance(value, (str, bytes, ClauseElement))
+        ):
+            value = [self._predicateValue(column, item) for item in value]
+        return handler(column, value)
+
+    @staticmethod
+    def _predicateValue(column: ColumnElement[Any], value: Any) -> Any:
+        """
+        Match UUID predicates to textual storage without changing UUID columns.
+
+        Parameters
+        ----------
+        column : sqlalchemy.sql.elements.ColumnElement
+            Resolved column, including its declared SQL type and any alias.
+        value : typing.Any
+            Predicate value to bind.
+
+        Returns
+        -------
+        typing.Any
+            Canonical UUID text for textual columns; the original value otherwise.
+        """
+        if isinstance(value, UUID) and isinstance(column.type, sqlalchemy.String):
+            return str(value)
+        return value
 
     def _clauseValue(self, sources: SourceMap, value: Any) -> Any:
         """
@@ -1891,8 +1919,8 @@ class SQLCompiler:
             return self._compileSelect(value, sources)
         return value
 
-    @staticmethod
     def _betweenExpression(
+        self,
         column: ColumnElement[Any],
         clause: WhereClause,
     ) -> ColumnElement[bool]:
@@ -1920,7 +1948,10 @@ class SQLCompiler:
         if len(bounds) != _BETWEEN_BOUNDS:
             error_msg = "BETWEEN conditions require exactly two boundary values."
             raise QueryException(error_msg)
-        expression = column.between(bounds[0], bounds[1])
+        expression = column.between(
+            self._predicateValue(column, bounds[0]),
+            self._predicateValue(column, bounds[1]),
+        )
         if clause.where_type is WhereType.NOT_BETWEEN:
             return ~expression
         return expression
@@ -1993,11 +2024,12 @@ class SQLCompiler:
             If the comparison operator has no supported handler.
         """
         op = clause.operator.strip().lower()
+        value = self._predicateValue(column, clause.value)
 
         # Promote NULL equality checks to IS NULL / IS NOT NULL semantics.
-        if clause.value is None and op in _EQUALITY_OPERATORS:
+        if value is None and op in _EQUALITY_OPERATORS:
             return column.is_(None)
-        if clause.value is None and op in _INEQUALITY_OPERATORS:
+        if value is None and op in _INEQUALITY_OPERATORS:
             return column.is_not(None)
 
         if (
@@ -2009,19 +2041,19 @@ class SQLCompiler:
             # predicates also back the cache store's compare-and-swap update.
             comparison = func.dbms_lob.compare(
                 column,
-                sqlalchemy.literal(clause.value, type_=column.type),
+                sqlalchemy.literal(value, type_=column.type),
             )
             return comparison == 0 if op in _EQUALITY_OPERATORS else comparison != 0
 
         pattern_handler = _PATTERN_OPERATORS.get(op)
         if pattern_handler is not None:
-            return pattern_handler(column, clause.value)
+            return pattern_handler(column, value)
 
         comparator = _COMPARATORS.get(op)
         if comparator is None:
             error_msg = f"Unsupported comparison operator '{clause.operator}'."
             raise QueryException(error_msg)
-        return comparator(column, clause.value)
+        return comparator(column, value)
 
     def _aggregateExpression(
         self,

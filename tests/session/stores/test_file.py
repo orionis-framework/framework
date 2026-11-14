@@ -120,7 +120,8 @@ class TestFileSessionStore(TestCase):
         """
         store = self._store()
         p = store._path("my-session")
-        self.assertEqual(p, self._directory / "my-session.json")
+        # The store resolves aliases such as Windows 8.3 temporary paths.
+        self.assertEqual(p, self._directory.resolve() / "my-session.json")
 
     # ── _serialize / _deserialize round-trip ─────────────────────────────────
 

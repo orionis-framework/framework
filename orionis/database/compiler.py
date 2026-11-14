@@ -1880,7 +1880,7 @@ class SQLCompiler:
 
         Parameters
         ----------
-        column : sqlalchemy.sql.elements.ColumnElement
+        column : ``sqlalchemy.sql.elements.ColumnElement``
             Resolved column, including its declared SQL type and any alias.
         value : typing.Any
             Predicate value to bind.

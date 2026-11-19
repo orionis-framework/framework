@@ -15,7 +15,7 @@ _CONNECTION_ENTITIES = {"sync": Sync, "database": Database, "redis": Redis}
 """Connection entities definitions used by ``queue``."""
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Queue(BaseEntity):
     """
     Configure named queue connections, failure storage, and workers.
@@ -30,6 +30,11 @@ class Queue(BaseEntity):
         Database connection and table used to preserve failed jobs.
     worker : orionis.foundation.config.queue.Worker | dict
         Default concurrency, polling interval, timeout, tries, and backoff.
+
+    Notes
+    -----
+    Public extra keyword arguments are retained as application-defined
+    attributes by ``BaseEntity``. They do not configure built-in queue behavior.
     """
 
     default: str = field(
@@ -102,7 +107,7 @@ class Queue(BaseEntity):
         Raises
         ------
         TypeError
-            If settings have an unexpected type or unsupported fields.
+            If settings have an unexpected type or invalid extra names.
         ValueError
             If a worker limit or duration is invalid.
         """
@@ -127,7 +132,7 @@ class Queue(BaseEntity):
         Raises
         ------
         TypeError
-            If settings have an unexpected type or unsupported fields.
+            If settings have an unexpected type or invalid extra names.
         ValueError
             If a database identifier is invalid.
         """
@@ -152,7 +157,7 @@ class Queue(BaseEntity):
         Raises
         ------
         TypeError
-            If a connection has an unexpected type or unsupported fields.
+            If a connection has an unexpected type or invalid extra names.
         ValueError
             If a connection name, driver, or nested setting is invalid.
         """

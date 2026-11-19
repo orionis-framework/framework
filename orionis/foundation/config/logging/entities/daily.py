@@ -12,7 +12,7 @@ _DEFAULT_PATH: str = "storage/logs/daily_{suffix}.log"
 """Default path identifier: ``storage/logs/daily_{suffix}.log``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Daily(BaseEntity):
     """
     Represent the configuration for daily log file rotation.

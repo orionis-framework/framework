@@ -9,7 +9,7 @@ from orionis.foundation.config.mail.entities.smtp import Smtp
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Mailers(BaseEntity):
     """
     Represent mail transport configurations for the application.

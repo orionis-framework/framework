@@ -207,6 +207,23 @@ value: "not a valid type!"
         self.assertGreater(system.violations, 0)
         self.assertIn("syntax error in annotation", diagnostics)
 
+    def testBaseEntityDocumentationIsComplete(self) -> None:
+        """Keep entity construction and metadata documentation publishable.
+
+        Returns
+        -------
+        None
+            Reject missing entity documentation and empty return descriptions.
+        """
+        entity = (
+            Path(__file__).resolve().parents[2]
+            / "orionis" / "support" / "entities" / "base.py"
+        )
+        system, diagnostics = self._buildSystem(
+            entity.read_text(encoding="utf-8"),
+        )
+        self.assertEqual(system.violations, 0, diagnostics)
+
     def testSchemaPreparationTypesRenderWithoutUnavailableLinks(self) -> None:
         """Keep ellipses and external schema types literal in production docstrings.
 

@@ -21,7 +21,7 @@ _CHANNEL_ENTITIES: tuple[tuple[str, type], ...] = (
 """Channel entities definitions used by ``channels``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Channels(BaseEntity):
     """
     Represent the available logging channels and their configurations.

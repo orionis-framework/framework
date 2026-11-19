@@ -13,7 +13,7 @@ _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
 """Define the supported scheduler driver names."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Scheduler(BaseEntity):
     """
     Represent the task scheduler configuration for the application.

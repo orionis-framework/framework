@@ -12,7 +12,7 @@ _CHANNEL_OPTIONS: frozenset[str] = frozenset(f.name for f in fields(Channels))
 """Pre-computed channel option names."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Logging(BaseEntity):
     """
     Represent the logging system configuration.

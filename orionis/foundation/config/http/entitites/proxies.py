@@ -7,7 +7,7 @@ from orionis.foundation.config.validation import copy_string_list
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class HTTPProxies(BaseEntity):
     """
     Represent the configuration for trusted HTTP proxies.

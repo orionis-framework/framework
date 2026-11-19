@@ -13,7 +13,6 @@ import sys
 import time
 from collections import OrderedDict, deque
 from contextlib import nullcontext, suppress
-from dataclasses import asdict
 from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
@@ -3321,7 +3320,7 @@ class Application(Container, IApplication):
         if dataclasses:
             for section, _, _, cls in dataclasses:
                 try:
-                    update_section(section, asdict(cls()), default_config)
+                    update_section(section, cls().toDict(), default_config)
                 except Exception as e:
                     error_msg = str(e)
                     raise RuntimeError(error_msg) from e

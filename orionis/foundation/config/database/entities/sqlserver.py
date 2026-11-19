@@ -14,7 +14,7 @@ _MAX_PORT: int = 65535
 """Valid TCP port boundary for the SQL Server listener."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class SQLServer(BaseEntity):
     """
     Represent the Microsoft SQL Server database configuration.

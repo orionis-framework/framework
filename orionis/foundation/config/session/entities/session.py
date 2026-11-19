@@ -15,7 +15,7 @@ _DRIVER_VALUES: frozenset[str] = frozenset(d.value for d in SessionDriver)
 """Driver values used by ``session``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Session(BaseEntity):
     """
     Configure the session middleware.

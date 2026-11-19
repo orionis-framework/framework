@@ -12,7 +12,7 @@ _CONNECTION_NAMES: frozenset[str] = frozenset(ConnectionName._member_names_)
 """Define the supported database connection names."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Database(BaseEntity):
     """
     Represent the general database configuration.

@@ -11,7 +11,7 @@ _DEFAULT_PATH: str = "storage/logs/weekly_{suffix}.log"
 """Default path identifier: ``storage/logs/weekly_{suffix}.log``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Weekly(BaseEntity):
     """
     Represent the configuration for weekly log file management.

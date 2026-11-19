@@ -11,7 +11,7 @@ _DEFAULT_PATH: str = "storage/logs/stack.log"
 """Default path identifier: ``storage/logs/stack.log``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Stack(BaseEntity):
     """
     Represent the configuration for a logging stack.

@@ -15,7 +15,7 @@ Pre-computed valid verbosity values: avoids building a list on every Testing() i
 """
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Testing(BaseEntity):
     """
     Configure testing settings.

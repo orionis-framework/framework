@@ -19,7 +19,7 @@ _ALLOWED_HTTP_METHODS: frozenset[str] = frozenset(
 """Module-level frozenset: avoids recreating the set per __validateAllowMethods call."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Cors(BaseEntity):
     """
     Represent a CORS configuration compatible with Starlette CORSMiddleware.

@@ -6,7 +6,7 @@ from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class File(BaseEntity):
     """
     Represent a file configuration entity for storing outgoing emails.

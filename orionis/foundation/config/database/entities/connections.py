@@ -22,7 +22,7 @@ _CONNECTION_ENTITIES: tuple[tuple[str, type], ...] = (
 """Table-driven mapping between connection field names and their entities."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Connections(BaseEntity):
     """
     Represent all database connections used by the application.

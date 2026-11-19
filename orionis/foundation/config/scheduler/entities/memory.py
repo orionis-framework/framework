@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Memory(BaseEntity):
     """
     Represent the configuration entity for an in-memory job store.

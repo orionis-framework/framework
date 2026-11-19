@@ -11,7 +11,7 @@ _DEFAULT_PATH: str = "storage/logs/hourly_{suffix}.log"
 """Default path identifier: ``storage/logs/hourly_{suffix}.log``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Hourly(BaseEntity):
     """
     Represent the configuration for hourly log file management.

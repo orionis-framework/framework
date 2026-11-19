@@ -15,7 +15,7 @@ _GUARD_NAMES: frozenset[str] = frozenset(Guards._member_names_)
 """Define the supported authentication guard names."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Auth(BaseEntity):
     """
     Represent the authentication and authorization configuration.

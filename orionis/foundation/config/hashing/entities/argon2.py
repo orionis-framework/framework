@@ -11,7 +11,7 @@ from orionis.hashing.hashers.functions import (
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Argon2(BaseEntity):
     """
     Represent the configuration entity for the Argon2id hashing driver.

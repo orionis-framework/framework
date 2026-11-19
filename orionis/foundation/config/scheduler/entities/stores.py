@@ -10,7 +10,7 @@ from orionis.foundation.config.validation import normalize_optional_store
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Stores(BaseEntity):
     """
     Represent a collection of scheduler job store backends.

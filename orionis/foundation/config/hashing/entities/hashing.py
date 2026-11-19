@@ -13,7 +13,7 @@ _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
 """Define the supported hashing driver names."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Hashing(BaseEntity):
     """
     Represent the password hashing configuration for the application.

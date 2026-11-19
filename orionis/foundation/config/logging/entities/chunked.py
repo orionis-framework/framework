@@ -11,7 +11,7 @@ _DEFAULT_PATH: str = "storage/logs/chunked_{suffix}.log"
 """Default path identifier: ``storage/logs/chunked_{suffix}.log``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Chunked(BaseEntity):
     """
     Configure chunked log file rotation.

@@ -11,7 +11,7 @@ _MIN_TOKEN_LENGTH = 32
 """Min token length value used by ``csrf``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class HTTPCsrf(BaseEntity):
     """
     CSRF protection configuration for web routes.

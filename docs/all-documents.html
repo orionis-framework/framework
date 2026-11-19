@@ -8595,7 +8595,7 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Provide dictionary serialization and field metadata for dataclass entities.</div>
+            <div class="summary">Initialize, serialize and describe dataclass entities with extra attributes.</div>
           </li><li id="orionis.support.facades">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades</div>
@@ -10924,22 +10924,14 @@
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Convert optional cache/scheduler store dictionaries into typed entities.</div>
-          </li><li id="orionis.support.entities.base._enum_serializer">
+          </li><li id="orionis.support.entities.base._serialize_value">
             
-            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.base<wbr></wbr>._enum<wbr></wbr>_serializer</div>
-            <div class="url">orionis.support.entities.base.html#_enum_serializer</div>
+            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.base<wbr></wbr>._serialize<wbr></wbr>_value</div>
+            <div class="url">orionis.support.entities.base.html#_serialize_value</div>
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Serialize enum members and preserve all other values.</div>
-          </li><li id="orionis.support.entities.base._dict_factory">
-            
-            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.base<wbr></wbr>._dict<wbr></wbr>_factory</div>
-            <div class="url">orionis.support.entities.base.html#_dict_factory</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Build a dictionary and serialize enum field values.</div>
+            <div class="summary">Recursively copy configuration values, entities and enum members.</div>
           </li><li id="orionis.support.entities.base._default_value">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.base<wbr></wbr>._default<wbr></wbr>_value</div>
@@ -10947,7 +10939,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Evaluate a declared default and serialize entity or enum values.</div>
+            <div class="summary">Evaluate a declared default and serialize the resulting value.</div>
           </li><li id="orionis.foundation.config.cache.entities.cache._DRIVER_NAMES">
             
             <div class="fullName">orionis<wbr></wbr>.foundation<wbr></wbr>.config<wbr></wbr>.cache<wbr></wbr>.entities<wbr></wbr>.cache<wbr></wbr>._DRIVER<wbr></wbr>_NAMES</div>
@@ -100256,7 +100248,7 @@ field.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Provide dictionary serialization and field metadata for dataclass entities.</div>
+            <div class="summary">Provide a shared constructor, serialization and dataclass metadata.</div>
           </li><li id="orionis.support.entities.BaseEntity.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>.__slots__</div>
@@ -100265,6 +100257,30 @@ field.</tt>.</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Declare that this class introduces no additional instance slots.</div>
+          </li><li id="orionis.support.entities.BaseEntity._orionis_field_metadata">
+            
+            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>._orionis<wbr></wbr>_field<wbr></wbr>_metadata</div>
+            <div class="url">orionis.support.entities.BaseEntity.html#_orionis_field_metadata</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Cache declared fields and normalized type names for each concrete class.</div>
+          </li><li id="orionis.support.entities.BaseEntity.__init__">
+            
+            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>.__init__</div>
+            <div class="url">orionis.support.entities.BaseEntity.html#__init__</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Initialize declared fields and public extra attributes.</div>
+          </li><li id="orionis.support.entities.BaseEntity._validateExtraNames">
+            
+            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>._validate<wbr></wbr>Extra<wbr></wbr>Names</div>
+            <div class="url">orionis.support.entities.BaseEntity.html#_validateExtraNames</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Validate names and storage for public extra attributes.</div>
           </li><li id="orionis.support.entities.BaseEntity.__post_init__">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>.__post<wbr></wbr>_init__</div>
@@ -100272,7 +100288,7 @@ field.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Provide a no-op initialization hook for subclass validation.</div>
+            <div class="summary">Provide a no-op hook for subclass validation and normalization.</div>
           </li><li id="orionis.support.entities.BaseEntity._cachedFieldMetadata">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>._cached<wbr></wbr>Field<wbr></wbr>Metadata</div>
@@ -100281,6 +100297,14 @@ field.</tt>.</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Retrieve field definitions and normalized types cached by class.</div>
+          </li><li id="orionis.support.entities.BaseEntity._dynamicAttributes">
+            
+            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>._dynamic<wbr></wbr>Attributes</div>
+            <div class="url">orionis.support.entities.BaseEntity.html#_dynamicAttributes</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Return public instance attributes that are not declared fields.</div>
           </li><li id="orionis.support.entities.BaseEntity.toDict">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>.to<wbr></wbr>Dict</div>
@@ -100288,7 +100312,7 @@ field.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Convert the dataclass instance to a recursively copied dictionary.</div>
+            <div class="summary">Return a recursively copied dictionary of declared and extra values.</div>
           </li><li id="orionis.support.entities.BaseEntity.getFields">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.entities<wbr></wbr>.<wbr></wbr>Base<wbr></wbr>Entity<wbr></wbr>.get<wbr></wbr>Fields</div>
@@ -100296,7 +100320,7 @@ field.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Describe field names, normalized types, defaults, and metadata.</div>
+            <div class="summary">Describe declared fields and, optionally, dynamic attributes.</div>
           </li><li id="orionis.support.formatter.serializer.Parser">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.formatter<wbr></wbr>.serializer<wbr></wbr>.<wbr></wbr>Parser</div>

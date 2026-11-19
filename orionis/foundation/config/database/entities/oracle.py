@@ -7,7 +7,7 @@ from orionis.foundation.config.database.enums import OracleEncoding, OracleNenco
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Oracle(BaseEntity):
     """
     Represent Oracle database configuration for oracledb.

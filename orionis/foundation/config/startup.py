@@ -42,7 +42,7 @@ _SECTION_MAP: tuple[tuple[str, type], ...] = (
 """Dispatch table: maps each field name to its expected concrete type."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Configuration(BaseEntity):
     """
     Represent the main configuration for Orionis Framework startup.

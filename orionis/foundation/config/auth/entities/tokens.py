@@ -11,7 +11,7 @@ _MAX_SECRET_BYTES: int = 128
 """Max secret bytes value used by ``tokens``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Tokens(BaseEntity):
     """
     Represent the configuration of personal access token authentication.

@@ -174,17 +174,7 @@
         
 
         
-            <div class="itemName"><code><a href="#_dict_factory" class="internal-link" title="orionis.support.entities.base._dict_factory">_dict<wbr></wbr>_factory</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="#_enum_serializer" class="internal-link" title="orionis.support.entities.base._enum_serializer">_enum<wbr></wbr>_serializer</a></code>
+            <div class="itemName"><code><a href="#_serialize_value" class="internal-link" title="orionis.support.entities.base._serialize_value">_serialize<wbr></wbr>_value</a></code>
             </div>
         
 
@@ -259,17 +249,7 @@
         
 
         
-            <div class="itemName"><code><a href="#_dict_factory" class="internal-link" title="orionis.support.entities.base._dict_factory">_dict<wbr></wbr>_factory</a></code>
-            </div>
-        
-
-    </li><li class="">
-        
-        
-        
-
-        
-            <div class="itemName"><code><a href="#_enum_serializer" class="internal-link" title="orionis.support.entities.base._enum_serializer">_enum<wbr></wbr>_serializer</a></code>
+            <div class="itemName"><code><a href="#_serialize_value" class="internal-link" title="orionis.support.entities.base._serialize_value">_serialize<wbr></wbr>_value</a></code>
             </div>
         
 
@@ -344,7 +324,37 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__init__" class="internal-link" title="orionis.support.entities.BaseEntity.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__post_init__" class="internal-link" title="orionis.support.entities.BaseEntity.__post_init__">__post<wbr></wbr>_init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_dynamicAttributes" class="internal-link" title="orionis.support.entities.BaseEntity._dynamicAttributes">_dynamic<wbr></wbr>Attributes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_validateExtraNames" class="internal-link" title="orionis.support.entities.BaseEntity._validateExtraNames">_validate<wbr></wbr>Extra<wbr></wbr>Names</a></code>
             </div>
         
 
@@ -384,6 +394,16 @@
 
         
             <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#__slots__" class="internal-link" title="orionis.support.entities.BaseEntity.__slots__">__slots__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.support.entities.BaseEntity.html#_orionis_field_metadata" class="internal-link" title="orionis.support.entities.BaseEntity._orionis_field_metadata">_orionis<wbr></wbr>_field<wbr></wbr>_metadata</a></code>
             </div>
         
 
@@ -469,11 +489,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <a href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/support/entities/base.py" class="sourceLink">(source)</a>
+          <a href="https://github.com/orionis-framework/framework/tree/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/entities/base.py" class="sourceLink">(source)</a>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Provide dictionary serialization and field metadata for dataclass entities.</p></div>
+          <div><p>Initialize, serialize and describe dataclass entities with extra attributes.</p></div>
         </div>
 
         <div id="split-tables">
@@ -484,17 +504,12 @@
     
     <td>Function</td>
     <td><code><a href="#_default_value" class="internal-link" title="orionis.support.entities.base._default_value">_default<wbr></wbr>_value</a></code></td>
-    <td>Evaluate a declared default and serialize entity or enum values.</td>
+    <td>Evaluate a declared default and serialize the resulting value.</td>
   </tr><tr class="function">
     
     <td>Function</td>
-    <td><code><a href="#_dict_factory" class="internal-link" title="orionis.support.entities.base._dict_factory">_dict<wbr></wbr>_factory</a></code></td>
-    <td>Build a dictionary and serialize enum field values.</td>
-  </tr><tr class="function">
-    
-    <td>Function</td>
-    <td><code><a href="#_enum_serializer" class="internal-link" title="orionis.support.entities.base._enum_serializer">_enum<wbr></wbr>_serializer</a></code></td>
-    <td>Serialize enum members and preserve all other values.</td>
+    <td><code><a href="#_serialize_value" class="internal-link" title="orionis.support.entities.base._serialize_value">_serialize<wbr></wbr>_value</a></code></td>
+    <td>Recursively copy configuration values, entities and enum members.</td>
   </tr>
 </table>
           
@@ -516,7 +531,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_default_value</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/support/entities/base.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/entities/base.py#L63">
       
       (source)
     </a>
@@ -528,26 +543,26 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Evaluate a declared default and serialize entity or enum values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Declared default value or zero-argument default provider.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Evaluated default with dataclasses and enums converted to data.</td></tr></table></div>
+    <div><p>Evaluate a declared default and serialize the resulting value.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Declared default value or zero-argument default provider.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">The serialized default or the serialized result of the provider.</td></tr></table></div>
   </div>
 </div><div class="basefunction">
   
   
-  <a name="orionis.support.entities.base._dict_factory">
+  <a name="orionis.support.entities.base._serialize_value">
     
   </a>
-  <a name="_dict_factory">
+  <a name="_serialize_value">
     
   </a>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">_dict_factory</span><span class="function-signature">(<span class="rst-sig-param">items: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/support/entities/base.py#L33">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_serialize_value</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1e905f4f103d47c61789d877eba472a5bd97681b/orionis/support/entities/base.py#L14">
       
       (source)
     </a>
-    <a class="headerLink" href="#_dict_factory" title="orionis.support.entities.base._dict_factory">
+    <a class="headerLink" href="#_serialize_value" title="orionis.support.entities.base._serialize_value">
       
       
       ¶
@@ -555,34 +570,14 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Build a dictionary and serialize enum field values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">items:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]</code></td><td class="fieldArgDesc">Field names and values supplied by <tt class="rst-docutils rst-literal">dataclasses.asdict</tt>.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">A dictionary with enum values serialized.</td></tr></table></div>
-  </div>
-</div><div class="basefunction">
-  
-  
-  <a name="orionis.support.entities.base._enum_serializer">
-    
-  </a>
-  <a name="_enum_serializer">
-    
-  </a>
-  <div class="functionHeader">
-    
-    
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">_enum_serializer</span><span class="function-signature">(<span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/151cc01a185b58950a1af149d51795198e703fd8/orionis/support/entities/base.py#L13">
-      
-      (source)
-    </a>
-    <a class="headerLink" href="#_enum_serializer" title="orionis.support.entities.base._enum_serializer">
-      
-      
-      ¶
-    </a>
-  </div>
-  <div class="docstring functionBody">
-    
-    <div><p>Serialize enum members and preserve all other values.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to serialize.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">The enum member's value, or the original value when it is not an enum.</td></tr></table></div>
+    <div><p>Recursively copy configuration values, entities and enum members.</p>
+<div class="rst-admonition rst-admonition-notes">
+<p class="rst-admonition-title rst-first">Notes</p>
+<p class="rst-last">Dictionaries and lists become plain dictionaries and lists. Tuples keep
+their shape, including named tuple types. Cyclic entity and container graphs
+are not supported.</p>
+</div>
+<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">value:</span><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">Value to convert or copy.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></td><td class="fieldArgDesc">A converted dataclass, enum value, container or deep copy.</td></tr></table></div>
   </div>
 </div>
         </div>
@@ -595,7 +590,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-13 22:12:39.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-18 23:00:50.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

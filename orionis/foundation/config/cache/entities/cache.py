@@ -12,7 +12,7 @@ _DRIVER_NAMES: frozenset[str] = frozenset(Drivers._member_names_)
 """Define the supported cache driver names."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Cache(BaseEntity):
     """
     Represent the cache configuration for the application.

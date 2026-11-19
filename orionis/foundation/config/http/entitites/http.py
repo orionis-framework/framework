@@ -18,7 +18,7 @@ from orionis.foundation.config.http.entitites.websocket import HTTPWebSocket
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class HTTP(BaseEntity):
     """
     Configure HTTP request handling and security.

@@ -5,7 +5,7 @@ from orionis.environment import Env
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Identity(BaseEntity):
     """
     Represent how the application identity is located and verified.

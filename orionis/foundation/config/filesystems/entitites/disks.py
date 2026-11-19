@@ -19,7 +19,7 @@ _DISK_ENTITIES: tuple[tuple[str, type], ...] = (
 """Disk entities definitions used by ``disks``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Disks(BaseEntity):
     """
     Represent the configuration for different filesystem disks.

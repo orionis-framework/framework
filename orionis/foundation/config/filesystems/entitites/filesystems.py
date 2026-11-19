@@ -12,7 +12,7 @@ _DISK_NAMES: frozenset[str] = frozenset(DiskName._member_names_)
 """Define the supported filesystem disk names."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Filesystems(BaseEntity):
     """
     Represent the filesystems configuration.

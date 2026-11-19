@@ -11,7 +11,7 @@ _DEFAULT_PATH: str = "storage/logs/monthly_{suffix}.log"
 """Default path identifier: ``storage/logs/monthly_{suffix}.log``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Monthly(BaseEntity):
     """
     Represent the configuration for monthly log file management.

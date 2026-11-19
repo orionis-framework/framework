@@ -12,7 +12,7 @@ _MAX_ROUNDS: int = 31
 """Max rounds value used by ``bcrypt``."""
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Bcrypt(BaseEntity):
     """
     Represent the configuration entity for the bcrypt hashing driver.

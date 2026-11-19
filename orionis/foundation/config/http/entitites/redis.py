@@ -7,7 +7,7 @@ from orionis.foundation.config.validation import validate_integer, validate_stri
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Redis(BaseEntity):
     """
     Configure the Redis connection used by HTTP rate limiting.

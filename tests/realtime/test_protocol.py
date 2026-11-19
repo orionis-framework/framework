@@ -389,19 +389,22 @@ class TestRealtimeConfiguration(TestCase):
 
     def testDefaultsAreFiniteAndFrozen(self) -> None:
         """
-        Expose a slotted entity compatible with standard configuration loading.
+        Expose frozen limits while retaining application-defined settings.
 
         Returns
         -------
         None
-            Entity serialization and immutability match the foundation conventions.
+            Declared limits and public extras serialize and reject reassignment.
         """
-        config = RealtimeConfig()
+        config = RealtimeConfig(label="custom")
         self.assertEqual(config.toDict()["max_message_size"], 1024 * 1024)
-        self.assertFalse(hasattr(config, "__dict__"))
-        field = "max_concurrent_invocations"
-        with self.assertRaises(dataclasses.FrozenInstanceError):
-            setattr(config, field, 0)
+        self.assertEqual(config.toDict()["label"], "custom")
+        for field in ("max_concurrent_invocations", "label"):
+            with (
+                self.subTest(field=field),
+                self.assertRaises(dataclasses.FrozenInstanceError),
+            ):
+                setattr(config, field, 0)
 
     def testAllLimitsRejectBooleansZeroAndNegativeValues(self) -> None:
         """

@@ -16,7 +16,7 @@ _MAX_PORT = 65535
 """Max port value used by ``redis``."""
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Redis(BaseEntity):
     """
     Configure a durable Redis queue connection.

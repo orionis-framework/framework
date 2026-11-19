@@ -10,7 +10,7 @@ _CONNECTION_ENTITIES = (("sync", Sync), ("database", Database), ("redis", Redis)
 """Connection entities definitions used by ``connections``."""
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Connections(BaseEntity):
     """
     Group the conventional validated queue connections.
@@ -60,7 +60,7 @@ class Connections(BaseEntity):
         Raises
         ------
         TypeError
-            If a connection has an unexpected type or unsupported fields.
+            If a connection has an unexpected type or invalid extra names.
         ValueError
             If a nested setting fails its connection's validation.
         """

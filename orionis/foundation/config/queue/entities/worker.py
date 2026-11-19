@@ -6,7 +6,7 @@ from orionis.foundation.config.validation import validate_integer, validate_seco
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Worker(BaseEntity):
     """
     Configure strictly validated queue worker defaults.

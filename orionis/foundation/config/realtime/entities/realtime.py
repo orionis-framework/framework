@@ -6,7 +6,7 @@ from orionis.foundation.config.validation import validate_integer, validate_seco
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, slots=True, kw_only=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class RealtimeConfig(BaseEntity):
     """
     Configure finite per-connection RPC budgets and broadcast concurrency.

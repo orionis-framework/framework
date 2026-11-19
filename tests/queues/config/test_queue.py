@@ -121,20 +121,47 @@ class TestQueueConfiguration(ConfigurationTestCase):
         self.assertEqual(first.backoff, (0.0, 1.0))
         self.assertEqual(second.backoff, (0.0, 1.0))
 
-    def testJobDiscoveryIsNotQueueConfiguration(self) -> None:
+    def testJobDiscoveryIsNotBuiltInQueueConfiguration(self) -> None:
         """
-        Keep the application jobs path out of queue connection settings.
+        Keep the application jobs path out of built-in queue settings.
 
         Returns
         -------
         None
-            Assert that job discovery is absent from connection configuration.
+            Assert that discovery is absent by default but allowed as an extra.
         """
         for entity_type in (Queue, BootstrapQueue):
             self.assertNotIn("job_modules", {item.name for item in fields(entity_type)})
             self.assertNotIn("job_modules", entity_type().toDict())
-        with self.assertRaises(TypeError):
-            Queue(job_modules=("app.jobs",))
+        self.assertEqual(
+            Queue(job_modules=("app.jobs",)).toDict()["job_modules"],
+            ("app.jobs",),
+        )
+
+    def testPublicExtrasSurviveNestedNormalization(self) -> None:
+        """
+        Preserve application-defined settings alongside validated queue fields.
+
+        Returns
+        -------
+        None
+            Assert that nested normalization and serialization retain extras.
+        """
+        url = "redis://127.0.0.1:6379/0"
+        for entity_type in (Queue, BootstrapQueue):
+            config = entity_type(
+                connections={
+                    "sync": {"strategy": "fifo"},
+                    "redis": {"url": url},
+                },
+                failed={"driver": "memory"},
+                worker={"unknown": 1},
+            )
+            payload = config.toDict()
+            self.assertEqual(payload["connections"]["sync"]["strategy"], "fifo")
+            self.assertEqual(payload["connections"]["redis"]["url"], url)
+            self.assertEqual(payload["failed"]["driver"], "memory")
+            self.assertEqual(payload["worker"]["unknown"], 1)
 
     def testRedisUsesStructuredSettingsInBothLayers(self) -> None:
         """
@@ -303,21 +330,20 @@ class TestQueueConfiguration(ConfigurationTestCase):
         with self.assertRaises(FrozenInstanceError):
             second.connections["local"].queue = "changed"
 
-    def testRejectsInvalidRoutingAndUnsupportedSettings(self) -> None:
+    def testRejectsInvalidRoutingAndSettings(self) -> None:
         """
-        Reject unknown backends, unsafe names, and dead configuration keys.
+        Reject unknown backends, unsafe names, and malformed settings.
 
         Returns
         -------
         None
-            Assert rejection of unsafe routing and unsupported settings.
+            Assert rejection of unsafe routing and invalid declared settings.
         """
         cases = (
             {"default": "missing"},
             {"connections": []},
             {"connections": {"sync": {"driver": "rabbitmq"}}},
             {"connections": {"sync": {"queue": "../escape"}}},
-            {"connections": {"sync": {"strategy": "fifo"}}},
             {"connections": {"sync": {"retry_after": True}}},
             {"connections": {"sync": None}},
             {
@@ -326,14 +352,8 @@ class TestQueueConfiguration(ConfigurationTestCase):
                     "database": {"table": "jobs;DROP"},
                 },
             },
-            {
-                "default": "redis",
-                "connections": {"redis": {"url": "http://example.test"}},
-            },
             {"failed": {"table": "failed.jobs"}},
-            {"failed": {"driver": "memory"}},
             {"failed": None},
-            {"worker": {"unknown": 1}},
             {"worker": None},
         )
         for settings in cases:
@@ -657,8 +677,6 @@ class TestQueueConfiguration(ConfigurationTestCase):
             config = Redis(port=65535, db=0, password=password)
             self.assertEqual(config.port, 65535)
             self.assertEqual(config.password, password)
-        with self.assertRaises(TypeError):
-            Redis(url="redis://127.0.0.1:6379/0")
 
     def testRedisStorageNamespacesExcludeCredentials(self) -> None:
         """

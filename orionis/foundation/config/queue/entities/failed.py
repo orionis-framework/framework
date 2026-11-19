@@ -6,7 +6,7 @@ from orionis.foundation.config.validation import validate_name
 from orionis.support.entities.base import BaseEntity
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True, kw_only=True, init=False)
 class Failed(BaseEntity):
     """
     Configure database storage for failed jobs.

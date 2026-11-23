@@ -3320,7 +3320,8 @@ class Application(Container, IApplication):
         if dataclasses:
             for section, _, _, cls in dataclasses:
                 try:
-                    update_section(section, cls().toDict(), default_config)
+                    value: dict = cls().toDict() if hasattr(cls(), "toDict") else {}
+                    update_section(section, value, default_config)
                 except Exception as e:
                     error_msg = str(e)
                     raise RuntimeError(error_msg) from e

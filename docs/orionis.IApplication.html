@@ -9975,7 +9975,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IApplication</span>(<a href="orionis.container.contracts.container.IContainer.html" class="internal-link" title="orionis.container.contracts.container.IContainer">IContainer</a>, ABC): <a href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L26" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.Application.html" class="internal-link">orionis.Application</a></code></p><p><a href="classIndex.html#orionis.IApplication">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">IApplication</span>(<a href="orionis.container.contracts.container.IContainer.html" class="internal-link" title="orionis.container.contracts.container.IContainer">IContainer</a>, ABC): <a href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L26" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.Application.html" class="internal-link">orionis.Application</a></code></p><p><a href="classIndex.html#orionis.IApplication">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -9983,7 +9983,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2280">
+          <table class="children sortable" id="id2295">
   
   
   <tr class="method">
@@ -10227,7 +10227,7 @@
             <p class="inheritedFrom">
               Inherited from <code><a href="orionis.container.contracts.container.IContainer.html" class="internal-link" title="orionis.container.contracts.container.IContainer">IContainer</a></code>:
             </p>
-            <table class="children sortable" id="id2281">
+            <table class="children sortable" id="id2296">
   
   
   <tr class="basemethod">
@@ -10306,7 +10306,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">aclose</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L795">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L795">
       
       (source)
     </a>
@@ -10336,7 +10336,7 @@ that do not manage headless reporting ownership.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">boot</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L775">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L775">
       
       (source)
     </a>
@@ -10367,7 +10367,7 @@ providers remain pending for a later retry.</td></tr></table></div>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">compile</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">invalidation_paths: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L180">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L180">
       
       (source)
     </a>
@@ -10402,7 +10402,7 @@ root, or <tt class="rst-docutils rst-literal">None</tt> for no additional invali
     <div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">def</span>&#160;<span class="py-defname">config</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">def</span>&#160;<span class="py-defname">config</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">def</span>&#160;<span class="py-defname">config</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code>T</code></span>) -&gt; <code>T</code>:</span></div></div>
     <div><span class="decorator">@abstractmethod<br /></span></div>
     
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L834">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L834">
       
       (source)
     </a>
@@ -10430,7 +10430,7 @@ Missing keys and non-dictionary parents return <tt class="rst-docutils rst-liter
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">create</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L756">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L756">
       
       (source)
     </a>
@@ -10460,7 +10460,7 @@ asynchronous provider boots or preparing HTTP handlers.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">getExceptionHandler</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code>IBaseExceptionHandler</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L378">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L378">
       
       (source)
     </a>
@@ -10489,7 +10489,7 @@ asynchronous provider boots or preparing HTTP handlers.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getMiddleware</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>IBaseMiddleware]]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L271">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L271">
       
       (source)
     </a>
@@ -10516,7 +10516,7 @@ asynchronous provider boots or preparing HTTP handlers.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">getScheduler</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code>IBaseScheduler</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L424">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L424">
       
       (source)
     </a>
@@ -10543,7 +10543,7 @@ asynchronous provider boots or preparing HTTP handlers.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">handleCommand</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">args: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L808">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L808">
       
       (source)
     </a>
@@ -10570,7 +10570,7 @@ asynchronous provider boots or preparing HTTP handlers.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isDebug</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L974">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L974">
       
       (source)
     </a>
@@ -10597,7 +10597,7 @@ asynchronous provider boots or preparing HTTP handlers.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isProduction</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L958">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L958">
       
       (source)
     </a>
@@ -10624,7 +10624,7 @@ asynchronous provider boots or preparing HTTP handlers.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">on</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">lifespan: <code>Lifespan</code>, </span><span class="rst-sig-param">*callbacks: <code>Callable[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr>Any] | Callable[<wbr></wbr><span class="rst-variable-ellipsis">...</span>, <wbr></wbr>Awaitable[<wbr></wbr>Any]]</code>, </span><span class="rst-sig-param">runtime: <code>Runtime | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L209">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L209">
       
       (source)
     </a>
@@ -10656,7 +10656,7 @@ asynchronous provider boots or preparing HTTP handlers.</p>
     <div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">def</span>&#160;<span class="py-defname">path</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Mapping[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Path]</code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">def</span>&#160;<span class="py-defname">path</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code>options.CorePathName</code></span>) -&gt; <code>Path</code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">def</span>&#160;<span class="py-defname">path</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Path | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span></div></div>
     <div><span class="decorator">@abstractmethod<br /></span></div>
     
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L887">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L887">
       
       (source)
     </a>
@@ -10684,7 +10684,7 @@ unknown key.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">resetRuntimeConfig</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L873">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L873">
       
       (source)
     </a>
@@ -10714,7 +10714,7 @@ creation or readiness flags.</p>
     <div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">def</span>&#160;<span class="py-defname">routingPaths</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>options.RoutingPaths</code>:</span></div></div><div class="function-overload"><div><span class="decorator">@overload<br /></span></div><div><span class="py-keyword">def</span>&#160;<span class="py-defname">routingPaths</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>Path] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span></div></div>
     <div><span class="decorator">@abstractmethod<br /></span></div>
     
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L923">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L923">
       
       (source)
     </a>
@@ -10744,7 +10744,7 @@ contain the health-check setting.</td></tr></table><table class="fieldTable"><tr
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">underMaintenance</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L990">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L990">
       
       (source)
     </a>
@@ -10775,7 +10775,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigApp</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**app_config: <code>Unpack[<wbr></wbr>options.AppOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L442">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L442">
       
       (source)
     </a>
@@ -10802,7 +10802,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigAuth</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**auth_config: <code>Unpack[<wbr></wbr>options.AuthOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L487">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L487">
       
       (source)
     </a>
@@ -10829,7 +10829,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigCache</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**cache_config: <code>Unpack[<wbr></wbr>options.CacheOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L511">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L511">
       
       (source)
     </a>
@@ -10856,7 +10856,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigDatabase</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**database_config: <code>Unpack[<wbr></wbr>options.DatabaseOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L559">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L559">
       
       (source)
     </a>
@@ -10883,7 +10883,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigFilesystems</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**filesystems_config: <code>Unpack[<wbr></wbr>options.FilesystemsOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L583">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L583">
       
       (source)
     </a>
@@ -10910,7 +10910,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigHttp</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**http_config: <code>Unpack[<wbr></wbr>options.HttpOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L535">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L535">
       
       (source)
     </a>
@@ -10937,7 +10937,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigLogging</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**logging_config: <code>Unpack[<wbr></wbr>options.LoggingOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L607">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L607">
       
       (source)
     </a>
@@ -10964,7 +10964,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigMail</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**mail_config: <code>Unpack[<wbr></wbr>options.MailOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L631">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L631">
       
       (source)
     </a>
@@ -10991,7 +10991,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigMcp</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**mcp_config: <code>Unpack[<wbr></wbr>options.McpOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L466">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L466">
       
       (source)
     </a>
@@ -11018,7 +11018,7 @@ as maintenance mode; use configuration for missing or unrecognized values.</p>
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigPaths</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**paths: <code>Unpack[<wbr></wbr>options.PathsOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L727">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L727">
       
       (source)
     </a>
@@ -11048,7 +11048,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigQueue</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**queue_config: <code>Unpack[<wbr></wbr>options.QueueOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L655">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L655">
       
       (source)
     </a>
@@ -11075,7 +11075,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigSession</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**session_config: <code>Unpack[<wbr></wbr>options.SessionOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L679">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L679">
       
       (source)
     </a>
@@ -11102,7 +11102,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withConfigTesting</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">**testing_config: <code>Unpack[<wbr></wbr>options.TestingOptions]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L703">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L703">
       
       (source)
     </a>
@@ -11129,7 +11129,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withExceptionHandler</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">handler: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>IBaseExceptionHandler]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L352">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L352">
       
       (source)
     </a>
@@ -11156,7 +11156,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withMiddleware</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">*middleware: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>IBaseMiddleware]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L245">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L245">
       
       (source)
     </a>
@@ -11183,7 +11183,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withProviders</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">*providers: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>IServiceProvider]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L282">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L282">
       
       (source)
     </a>
@@ -11210,7 +11210,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withRouting</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">api: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">web: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">console: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">health: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">ai: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">websocket: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L308">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L308">
       
       (source)
     </a>
@@ -11237,7 +11237,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">withScheduler</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">scheduler: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>IBaseScheduler]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L398">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L398">
       
       (source)
     </a>
@@ -11263,7 +11263,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L29">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L29">
       
       (source)
     </a>
@@ -11290,7 +11290,7 @@ Unknown keys are ignored, and <tt class="rst-docutils rst-literal">root</tt> rem
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">areProvidersBooted</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L57">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L57">
       
       (source)
     </a>
@@ -11318,7 +11318,7 @@ still boot on first resolution.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">basePath</span>: <code>Path</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L120">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L120">
       
       (source)
     </a>
@@ -11345,7 +11345,7 @@ still boot on first resolution.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">compiled</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L132">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L132">
       
       (source)
     </a>
@@ -11372,7 +11372,7 @@ still boot on first resolution.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">compiledInvalidationPathsDirs</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>Path]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L156">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L156">
       
       (source)
     </a>
@@ -11399,7 +11399,7 @@ still boot on first resolution.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">compiledInvalidationPathsFiles</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr>Path]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L168">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L168">
       
       (source)
     </a>
@@ -11426,7 +11426,7 @@ still boot on first resolution.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">compiledPath</span>: <code>Path | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L144">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L144">
       
       (source)
     </a>
@@ -11453,7 +11453,7 @@ still boot on first resolution.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">entryPoint</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L107">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L107">
       
       (source)
     </a>
@@ -11481,7 +11481,7 @@ the caller's filename.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">isBooted</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L32">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L32">
       
       (source)
     </a>
@@ -11509,7 +11509,7 @@ provider startup and HTTP kernel readiness.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">isCreated</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L45">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L45">
       
       (source)
     </a>
@@ -11536,7 +11536,7 @@ provider startup and HTTP kernel readiness.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">isHttpReady</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L70">
       
       (source)
     </a>
@@ -11564,7 +11564,7 @@ indicate listening sockets or deployment health.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">routeHealthCheck</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L95">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L95">
       
       (source)
     </a>
@@ -11591,7 +11591,7 @@ indicate listening sockets or deployment health.</td></tr></table></div>
   <div class="functionHeader">
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#property" class="intersphinx-link">property</a><br /></span><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-defname">startAt</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c4ff0697fcb1c72228409f235cf62a78b6982e0c/orionis/foundation/contracts/application.py#L83">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/foundation/contracts/application.py#L83">
       
       (source)
     </a>
@@ -11617,7 +11617,7 @@ indicate listening sockets or deployment health.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-23 23:03:09.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 07:49:38.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

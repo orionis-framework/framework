@@ -6,7 +6,7 @@ from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictClob(ColumnDefinition):
+class StrictClob[TValue = str](ColumnDefinition[TValue]):
     """The ``CLOB`` type, found in Oracle Database and Informix."""
 
     __slots__ = ()

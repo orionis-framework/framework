@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from orionis.console.entities.command import CommandInfo
     from orionis.console.fluent.contracts.command import ICommand
 
 
@@ -50,7 +51,7 @@ class IReactor(ABC):
         """
 
     @abstractmethod
-    async def info(self) -> list[dict]:
+    async def info(self) -> list[CommandInfo]:
         """
         Return registered commands metadata.
 

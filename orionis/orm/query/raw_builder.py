@@ -78,7 +78,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
 
     # ── Retrieval terminals ─────────────────────────────────────────────────
 
-    async def get(self) -> Collection:
+    async def get(self) -> Collection[dict[str, Any]]:
         """
         Execute the query and return every matching row.
 
@@ -140,7 +140,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
         key = column.rsplit(".", 1)[-1]
         return row.get(key) if row else None
 
-    async def pluck(self, column: str) -> Collection:
+    async def pluck(self, column: str) -> Collection[Any]:
         """
         Return one column of every matching row.
 
@@ -162,7 +162,7 @@ class RawQueryBuilder(QueryBuilderBase, IRawQueryBuilder):
         self,
         page: int = 1,
         per_page: int = _DEFAULT_PER_PAGE,
-    ) -> Paginator:
+    ) -> Paginator[dict[str, Any]]:
         """
         Execute the query returning a length-aware page of results.
 

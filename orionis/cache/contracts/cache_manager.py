@@ -6,10 +6,29 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any, Self
 from orionis.cache.contracts.repository import ICacheRepository
+from orionis.cache.locks.lock import CacheLock
 
 
 class ICacheManager(ABC):
     """Define the contract for cache manager implementations."""
+
+    def lock(self, key: str, timeout: float | None = None) -> CacheLock:
+        """
+        Return the default store's asynchronous lock for a key.
+
+        Parameters
+        ----------
+        key : str
+            Cache key that identifies the resource to lock.
+        timeout : float or None, optional
+            Acquisition timeout or lease duration in seconds, depending on the store.
+
+        Returns
+        -------
+        orionis.cache.locks.lock.CacheLock
+            Context manager that acquires the lock on entry and releases it on exit.
+        """
+        return self.store().lock(key, timeout)
 
     async def rememberOnce(
         self: Self,

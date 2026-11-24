@@ -10,7 +10,7 @@ import importlib
 import inspect
 import threading
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, ClassVar, Self, cast
+from typing import TYPE_CHECKING, Any, ClassVar, Self, cast, overload
 from orionis.container.context.manager import ScopeManager
 from orionis.container.context.scope import get_current_scope
 from orionis.container.contracts.container import IContainer
@@ -974,6 +974,22 @@ class Container(IContainer):
         # At this point, we have a binding and can resolve it according to its lifetime.
         return await self.__resolve(binding, *args, **kwargs)
 
+    @overload
+    async def make[T](
+        self,
+        key: type[T],
+        *args: object,
+        **kwargs: object,
+    ) -> T: ...
+
+    @overload
+    async def make(
+        self,
+        key: str,
+        *args: object,
+        **kwargs: object,
+    ) -> Any: ...
+
     async def make(
         self: Self,
         key: type[Any] | str,
@@ -1250,12 +1266,12 @@ class Container(IContainer):
             # Restore the previous stack state for this task
             _resolution_stack.reset(token)
 
-    async def build(
+    async def build[T](
         self: Self,
-        type_: type[Any],
+        type_: type[T],
         *args: object,
         **kwargs: object,
-    ) -> Any:
+    ) -> T:
         """
         Build and return an instance of the specified type.
 

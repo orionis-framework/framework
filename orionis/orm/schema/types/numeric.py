@@ -1,12 +1,13 @@
 """Declare a non-integer numeric column using the logical ``NUMERIC`` kind."""
 
 from __future__ import annotations
+from decimal import Decimal
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class Numeric(ColumnDefinition):
+class Numeric[TValue = float | Decimal](ColumnDefinition[TValue]):
     """Declare a non-integer numeric column using the logical ``NUMERIC`` kind."""
 
     __slots__ = ()

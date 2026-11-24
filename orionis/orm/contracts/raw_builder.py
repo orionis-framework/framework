@@ -58,7 +58,7 @@ class IRawQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def get(self) -> Collection:
+    async def get(self) -> Collection[dict[str, Any]]:
         """
         Execute the query and return every matching row.
 
@@ -96,7 +96,7 @@ class IRawQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def pluck(self, column: str) -> Collection:
+    async def pluck(self, column: str) -> Collection[Any]:
         """
         Return one column of every matching row.
 
@@ -112,7 +112,11 @@ class IRawQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def paginate(self, page: int = 1, per_page: int = 15) -> Paginator:
+    async def paginate(
+        self,
+        page: int = 1,
+        per_page: int = 15,
+    ) -> Paginator[dict[str, Any]]:
         """
         Execute the query returning a length-aware page of results.
 

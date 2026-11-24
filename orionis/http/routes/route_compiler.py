@@ -13,6 +13,8 @@ from orionis.http.routes.params_types import PARAM_TYPES
 from orionis.http.websocket_middleware import WebSocketMiddleware
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from orionis.http.routes.types import ExportedRoute
     from collections.abc import Callable
     from orionis.http.middleware import BaseMiddleware
 
@@ -77,7 +79,7 @@ def _action_name(handler: Callable | type) -> str:
     return name
 
 
-def _register_name(names: dict[str, str], route: dict) -> None:
+def _register_name(names: dict[str, str], route: ExportedRoute | dict) -> None:
     """
     Require one unambiguous URL template per route name.
 
@@ -111,7 +113,7 @@ class RouteCompiler(IRouteCompiler):
 
     def compile(
         self,
-        routes: list[dict],
+        routes: Sequence[ExportedRoute | dict],
         fallback: tuple | None,
         app_middleware: list[type] | None = None,
     ) -> tuple[dict[str, dict], tuple | None]:
@@ -238,7 +240,7 @@ class RouteCompiler(IRouteCompiler):
 
     def __compileRoute(  # NOSONAR
         self,
-        route: dict,
+        route: ExportedRoute | dict,
         app_middleware: list[type] | None = None,
     ) -> tuple[bool, CompiledRoute]:
         """
@@ -331,7 +333,7 @@ class RouteCompiler(IRouteCompiler):
         return is_static, compiled
 
     @staticmethod
-    def __buildAction(route: dict) -> tuple[RouteType, dict]:
+    def __buildAction(route: ExportedRoute | dict) -> tuple[RouteType, dict]:
         """
         Resolve the handler type and build the action descriptor for a route.
 
@@ -380,12 +382,11 @@ class RouteCompiler(IRouteCompiler):
             }
 
         # Controller-based route: [ControllerClass, 'method_name']
-        _class = route.get("class")
-        parse_action([_class, route.get("handler")])
+        _class, handler = parse_action([route.get("class"), route.get("handler")])
         return RouteType.CONTROLLER, {
             "class": _action_name(_class),
             "module": _class.__module__,
-            "method": route.get("handler"),
+            "method": handler,
         }
 
     @staticmethod

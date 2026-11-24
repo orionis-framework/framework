@@ -1,9 +1,10 @@
-# ruff: noqa: ANN401, TC003
+# ruff: noqa: ANN401, TC001, TC003
 """Define the contract for cache repository implementations."""
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any, Self
+from orionis.cache.locks.lock import CacheLock
 
 
 class ICacheRepository(ABC):
@@ -11,6 +12,24 @@ class ICacheRepository(ABC):
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
+
+    def lock(self, key: str, timeout: float | None = None) -> CacheLock:
+        """
+        Return the store's asynchronous lock for a key.
+
+        Parameters
+        ----------
+        key : str
+            Cache key that identifies the resource to lock.
+        timeout : float or None, optional
+            Acquisition timeout or lease duration in seconds, depending on the store.
+
+        Returns
+        -------
+        orionis.cache.locks.lock.CacheLock
+            Context manager that acquires the lock on entry and releases it on exit.
+        """
+        raise NotImplementedError
 
     async def rememberOnce(
         self: Self,

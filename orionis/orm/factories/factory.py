@@ -2,7 +2,7 @@
 # Keep arbitrary model attributes and runtime factory-property annotations.
 """Build and persist model instances from reusable attribute definitions."""
 
-from collections.abc import AsyncIterator, Callable, Iterator
+from collections.abc import AsyncGenerator, Callable, Generator
 from copy import deepcopy
 from inspect import iscoroutinefunction
 from typing import Any, Self
@@ -239,7 +239,7 @@ class Factory[TModel: Model]:
         self._fake.unique.clear()
         return self
 
-    def make(self, **overrides: Any) -> TModel | Collection:
+    def make(self, **overrides: Any) -> TModel | Collection[TModel]:
         """
         Construct models without database access or persistence events.
 
@@ -264,7 +264,7 @@ class Factory[TModel: Model]:
     async def create(
         self,
         **overrides: Any,
-    ) -> TModel | Collection:
+    ) -> TModel | Collection[TModel]:
         """
         Construct and save each model through Orionis's event lifecycle.
 
@@ -291,7 +291,7 @@ class Factory[TModel: Model]:
         finally:
             await stream.aclose()
 
-    def iterMake(self, **overrides: Any) -> Iterator[TModel]:
+    def iterMake(self, **overrides: Any) -> Generator[TModel]:
         """
         Yield unsaved models progressively, holding no result collection.
 
@@ -321,7 +321,7 @@ class Factory[TModel: Model]:
     async def iterCreate(
         self,
         **overrides: Any,
-    ) -> AsyncIterator[TModel]:
+    ) -> AsyncGenerator[TModel]:
         """
         Yield models immediately after each awaited save operation.
 

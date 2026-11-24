@@ -3,13 +3,16 @@
 # Exercise required hook signatures, synthetic secrets, and declared column names.
 from __future__ import annotations
 import ast
+import inspect
 import re
 from pathlib import Path
+from textwrap import dedent
 from typing import ClassVar
 import tests.orm.query.test_base_builder as plan_fixtures
 from orionis.orm import Boolean, DateTime, Integer, Model, String
 from orionis.orm.exceptions import OrmConfigurationException
-from orionis.orm.metaclass import pluralize, snake_case
+from orionis.orm.metaclass import _FORWARDED_BUILDER_METHODS, pluralize, snake_case
+from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.orm.schema.table import TableDefinition
 from orionis.test import TestCase
 
@@ -366,6 +369,43 @@ class TestModelMetaclass(TestCase):
 
 
 class TestModelQueryForwarding(TestCase):
+    def testForwardedDeclarationsTrackTheRuntimeBuilder(self) -> None:
+        """Keep the class-level typing surface aligned with the metaclass.
+
+        Returns
+        -------
+        None
+            Assert that every forwarded method has a matching declaration.
+        """
+        source = _ROOT / "orionis/orm/_model_queries.pyi"
+        definition = next(
+            node for node in ast.parse(source.read_text(encoding="utf-8")).body
+            if isinstance(node, ast.ClassDef) and node.name == "_ModelQueryMeta"
+        )
+        declarations = {
+            method.name: method for method in definition.body
+            if isinstance(method, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+        self.assertEqual(declarations.keys(), _FORWARDED_BUILDER_METHODS)
+        for name, method in declarations.items():
+            with self.subTest(method=name):
+                target = getattr(ModelQueryBuilder, name)
+                self.assertEqual(
+                    isinstance(method, ast.AsyncFunctionDef),
+                    inspect.iscoroutinefunction(target),
+                )
+                self.assertEqual(method.args.args[0].arg, "cls")
+                runtime = ast.parse(dedent(inspect.getsource(target))).body[0]
+                declared_args = method.args
+                runtime_args = runtime.args
+                del declared_args.args[0], runtime_args.args[0]
+                runtime_args.defaults = [
+                    ast.Constant(target.__globals__[value.id])
+                    if isinstance(value, ast.Name) else value
+                    for value in runtime_args.defaults
+                ]
+                self.assertEqual(ast.dump(declared_args), ast.dump(runtime_args))
+
     def testForwardedClassEntryPointsStartBuilders(self) -> None:
         """Start builders from forwarded class-level entry points.
 

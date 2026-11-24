@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from orionis.console.entities.task_event import TaskEvent as TaskEventEntity
     from orionis.console.base.contracts.listener import IBaseTaskListener
     from orionis.console.entities.task import Task as TaskEntity
     from orionis.console.enums.events import TaskEvent as TaskEventListener
@@ -254,7 +255,7 @@ class ITask(ABC):
     def on(
         self,
         event: TaskEventListener,
-        callback: Callable,
+        callback: Callable[[TaskEventEntity], object],
     ) -> ITask:
         """
         Register a callback for a specific task event.

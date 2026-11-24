@@ -1,12 +1,13 @@
 """Holds Python objects, serialized using ``pickle``."""
 
 from __future__ import annotations
+from typing import Any
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class PickleType(ColumnDefinition):
+class PickleType[TValue = Any](ColumnDefinition[TValue]):
     """Holds Python objects, serialized using ``pickle``."""
 
     __slots__ = ()

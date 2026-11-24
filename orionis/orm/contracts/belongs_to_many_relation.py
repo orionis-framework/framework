@@ -1,15 +1,18 @@
-# ruff: noqa: ANN401, TC001, TC003
+# ruff: noqa: ANN401, TC003
 # Accept dynamic pivot identities and retain runtime iterable annotations.
 """Contract for a many-to-many relationship backed by a pivot table."""
 
 from abc import abstractmethod
-from typing import Any
+from typing import Any, Self
+import orionis.orm as _orm
 from orionis.orm.contracts.relation import IRelation
 from orionis.support.types.collection import Collection
 from collections.abc import Iterable
 
 
-class IBelongsToManyRelation(IRelation):
+class IBelongsToManyRelation[TRelated: _orm.Model = Any](
+    IRelation[TRelated, Collection[TRelated]],
+):
     """
     Contract for a many-to-many relationship backed by a pivot table.
 
@@ -22,7 +25,7 @@ class IBelongsToManyRelation(IRelation):
     """Declare that this class introduces no additional instance slots."""
 
     @abstractmethod
-    async def getResults(self) -> Collection:
+    async def getResults(self) -> Collection[TRelated]:
         """
         Retrieve every related model linked to the bound parent.
 
@@ -37,7 +40,7 @@ class IBelongsToManyRelation(IRelation):
         self,
         column: str,
         *args: Any,
-    ) -> IBelongsToManyRelation:
+    ) -> Self:
         """
         Filter the pivot rows considered by this relationship query.
 

@@ -1,4 +1,4 @@
-# ruff: noqa: ANN401, SLF001, TC003
+# ruff: noqa: SLF001, TC003
 # Retain parent connection ownership, dynamic results, and runtime annotations.
 """Base class for every query builder bound to a parent model instance."""
 
@@ -8,7 +8,7 @@ from typing import Any
 from orionis.orm.contracts.relation import IRelation
 from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.support.types.collection import Collection
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Generator, Sequence
 
 
 class _ConstraintScope:
@@ -36,7 +36,10 @@ _CONSTRAINTS: ContextVar[_ConstraintScope | None] = ContextVar(
 """Context-local scope whose lifetime also applies to inherited contexts."""
 
 
-class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
+class Relation[TRelated: _orm.Model, TResult = Any](
+    ModelQueryBuilder[TRelated],
+    IRelation[TRelated, TResult],
+):
     """
     Base class for every query builder bound to a parent model instance.
 
@@ -96,13 +99,13 @@ class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
         error_msg = f"{type(self).__name__} must implement addConstraints()."
         raise NotImplementedError(error_msg)
 
-    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
+    def addEagerConstraints(self, models: Sequence[_orm.Model]) -> None:
         """
         Constrain the query to every parent instance of an eager batch.
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
 
         Returns
@@ -113,7 +116,7 @@ class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
         error_msg = f"{type(self).__name__} must implement addEagerConstraints()."
         raise NotImplementedError(error_msg)
 
-    async def getResults(self) -> Any:
+    async def getResults(self) -> TResult:
         """
         Execute the relationship query for its bound parent instance.
 
@@ -126,7 +129,7 @@ class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
         error_msg = f"{type(self).__name__} must implement getResults()."
         raise NotImplementedError(error_msg)
 
-    async def getEager(self) -> Collection:
+    async def getEager(self) -> Collection[TRelated]:
         """
         Execute the relationship query assembled for eager loading.
 
@@ -145,8 +148,8 @@ class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
 
     def match(
         self,
-        models: list[_orm.Model],
-        results: Collection,
+        models: Sequence[_orm.Model],
+        results: Collection[TRelated],
         name: str,
     ) -> None:
         """
@@ -154,7 +157,7 @@ class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
         results : orionis.support.types.Collection
             Rows produced by :meth:`orionis.orm.relations.Relation.getEager`.
@@ -171,7 +174,7 @@ class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
 
     # ── Ergonomics ────────────────────────────────────────────────────────
 
-    def __await__(self) -> Generator[Any, None, Any]:
+    def __await__(self) -> Generator[Any, None, TResult]:
         """
         Allow ``await`` directly on a relationship without a terminal.
 
@@ -187,10 +190,10 @@ class Relation[TRelated: _orm.Model](ModelQueryBuilder[TRelated], IRelation):
         return self.getResults().__await__()
 
     @classmethod
-    def noConstraints(
+    def noConstraints[T](
         cls,
-        callback: Callable[[], Relation[Any]],
-    ) -> Relation[Any]:
+        callback: Callable[[], T],
+    ) -> T:
         """
         Build a relationship instance without its single-parent constraint.
 

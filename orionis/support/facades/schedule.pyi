@@ -1,6 +1,10 @@
 # ruff: noqa: PYI021
 # Keep public facade methods documented alongside their static signatures.
 from collections.abc import Callable
+from orionis.console.entities.task import ScheduledTaskInfo
+from orionis.console.entities.scheduler_event import (
+    SchedulerEvent as SchedulerEventEntity,
+)
 from orionis.console.contracts.schedule import ISchedule
 from orionis.console.enums.events import SchedulerEvent
 from orionis.console.fluent.contracts.task import ITask
@@ -26,7 +30,7 @@ class Schedule(Facade):
         """Add a command for fluent configuration."""
 
     @classmethod
-    async def info(cls) -> list[dict]:
+    async def info(cls) -> list[ScheduledTaskInfo]:
         """Return information about the loaded tasks."""
 
     @classmethod
@@ -34,7 +38,11 @@ class Schedule(Facade):
         """Boot the scheduler and register all configured tasks."""
 
     @classmethod
-    def on(cls, event: SchedulerEvent, listener: Callable) -> ISchedule:
+    def on(
+        cls,
+        event: SchedulerEvent,
+        listener: Callable[[SchedulerEventEntity], object],
+    ) -> ISchedule:
         """Register a listener for a scheduler event."""
 
     @classmethod

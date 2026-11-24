@@ -1,7 +1,7 @@
 """Exercise MCP requests through the native dispatcher and JSON serialization."""
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Literal, NotRequired, TypedDict
 import msgspec
 from orionis.mcp.config import McpConfig
 from orionis.mcp.dispatcher import McpDispatcher
@@ -19,13 +19,61 @@ if TYPE_CHECKING:
     from orionis.mcp.server.primitives import Server
 
 
+class RpcError(TypedDict):
+    """Wire error with an optional data payload."""
+
+    code: int
+    """Numeric JSON-RPC error code."""
+    message: str
+    """Human-readable explanation of the error."""
+    data: NotRequired[object]
+    """Additional details supplied by the server for this error."""
+
+
+class RpcSuccess(TypedDict):
+    """Successful JSON-RPC response."""
+
+    jsonrpc: Literal["2.0"]
+    """JSON-RPC wire protocol version."""
+    id: str | int
+    """Identifier of the request that produced the result."""
+    result: object
+    """Decoded return value of the requested method."""
+
+
+class RpcFailure(TypedDict):
+    """JSON-RPC error response, optionally identifying its request."""
+
+    jsonrpc: Literal["2.0"]
+    """JSON-RPC wire protocol version."""
+    id: NotRequired[str | int]
+    """Identifier of the failed request when available."""
+    error: RpcError
+    """Protocol error reported by the server."""
+
+
+class RpcNotification(TypedDict):
+    """Out-of-band message emitted before the final response."""
+
+    jsonrpc: Literal["2.0"]
+    """JSON-RPC wire protocol version."""
+    method: str
+    """Name of the notification emitted by the server."""
+    params: dict[str, object]
+    """Arguments carried by this notification."""
+
+
+class EmptyResponse(TypedDict):
+    """No final response arrived on the stream."""
+
+
 @dataclass(frozen=True, slots=True)
 class McpTestResponse:
     """Decoded result and notifications from a complete wire round trip."""
 
-    message: dict[str, Any]
+    message: RpcSuccess | RpcFailure | EmptyResponse
     """Final decoded JSON-RPC response, or an empty mapping when none arrived."""
-    notifications: tuple[dict[str, object], ...] = ()
+    notifications: tuple[RpcNotification, ...] = ()
     """Decoded notifications received before the final response."""
 
     def assertOk(self) -> None:
@@ -136,7 +184,7 @@ class McpTestClient:
         *,
         meta: dict[str, object] | None = None,
         request_id: str | int = 1,
-    ) -> AsyncIterator[dict[str, object]]:
+    ) -> AsyncIterator[RpcSuccess | RpcFailure | RpcNotification]:
         """
         Keep the existing application's scope alive through the entire stream.
 
@@ -211,8 +259,8 @@ class McpTestClient:
         orionis.test.McpTestResponse
             Final response and preceding notifications in wire order.
         """
-        notifications = []
-        final = {}
+        notifications: list[RpcNotification] = []
+        final: RpcSuccess | RpcFailure | EmptyResponse = {}
         async for message in self.stream(
             method,
             params,

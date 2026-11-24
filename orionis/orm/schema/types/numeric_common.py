@@ -5,11 +5,12 @@ The SQL compiler rejects this placeholder as a concrete column type.
 """
 
 from __future__ import annotations
+from typing import Any
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class NumericCommon(ColumnDefinition):
+class NumericCommon[TValue = Any](ColumnDefinition[TValue]):
     """
     Describe the numeric-common placeholder kind.
 

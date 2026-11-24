@@ -3,6 +3,8 @@
 import ast
 import inspect
 from pathlib import Path
+from textwrap import dedent
+from typing import get_overloads
 from orionis.container.context.scope import ScopedContext
 from orionis.container.providers.deferrable_provider import DeferrableProvider
 from orionis.foundation.application import Application
@@ -18,22 +20,8 @@ from orionis.support import facades as facades_package
 from orionis.support.facades.mail import Mail
 from orionis.test import TestCase
 
-# Operations the facade stub publishes for application code.
-_CONSUMER_SURFACE = frozenset(
-    {
-        "attach",
-        "bcc",
-        "cc",
-        "fromAddress",
-        "html",
-        "mailer",
-        "raw",
-        "replyTo",
-        "send",
-        "subject",
-        "to",
-    },
-)
+# The facade specializes these operations for its registered service.
+_FACADE_METHODS = frozenset({"getFacadeAccessor", "resolve"})
 
 
 class AlertService:
@@ -229,10 +217,8 @@ class TestMailFacade(TestCase):
 
 
 class TestMailFacadeStub(TestCase):
-    def testDeclaresOnlyTheConsumerSurface(self) -> None:
-        """Publish composition and delivery operations only.
-
-        Validates that registration and facade internals stay out.
+    def testDeclaresTheManagerContractAndFacadeMethods(self) -> None:
+        """Publish every mail manager entry and the typed service accessors.
 
         Returns
         -------
@@ -240,12 +226,10 @@ class TestMailFacadeStub(TestCase):
             Assertions verify the behavior described above.
         """
         declared = {method.name for method in stub_methods()}
-        self.assertEqual(declared, _CONSUMER_SURFACE)
-        self.assertNotIn("extend", declared)
-        self.assertNotIn("getFacadeAccessor", declared)
+        self.assertEqual(declared, IMailManager.__abstractmethods__ | _FACADE_METHODS)
 
-    def testDeclaresEveryEntryAsAStaticMethod(self) -> None:
-        """Declare each entry as a static method on the facade class.
+    def testDeclaresEveryEntryAsAClassMethod(self) -> None:
+        """Declare each entry with the facade class as its receiver.
 
         Validates that class-level calls type check for consumers.
 
@@ -255,13 +239,17 @@ class TestMailFacadeStub(TestCase):
             Assertions verify the behavior described above.
         """
         for method in stub_methods():
-            decorators = {
-                node.id for node in method.decorator_list if isinstance(node, ast.Name)
-            }
-            self.assertIn("staticmethod", decorators, msg=method.name)
+            with self.subTest(method=method.name):
+                decorators = {ast.unparse(node) for node in method.decorator_list}
+                expected = {"classmethod"}
+                if method.name == "send":
+                    expected.add("overload")
+                self.assertEqual(decorators, expected)
+                positional = method.args.posonlyargs or method.args.args
+                self.assertEqual(positional[0].arg, "cls")
 
-    def testTerminalOperationsAreDeclaredAsynchronous(self) -> None:
-        """Mark only the terminal operations as coroutines in the stub.
+    def testResolutionAndDeliveryAreDeclaredAsynchronous(self) -> None:
+        """Declare service resolution and message delivery as coroutines.
 
         Validates that composition stays synchronous for consumers.
 
@@ -273,7 +261,7 @@ class TestMailFacadeStub(TestCase):
         for method in stub_methods():
             self.assertEqual(
                 isinstance(method, ast.AsyncFunctionDef),
-                method.name in {"send", "raw", "html"},
+                method.name in {"resolve", "send", "raw", "html"},
                 msg=method.name,
             )
 
@@ -290,8 +278,8 @@ class TestMailFacadeStub(TestCase):
         sends = [method for method in stub_methods() if method.name == "send"]
         self.assertEqual(len(sends), 3)
         self.assertEqual(
-            [method.args.posonlyargs[0].arg for method in sends],
-            ["mailable", "view", "content"],
+            [[arg.arg for arg in method.args.posonlyargs] for method in sends],
+            [["cls", "mailable"], ["cls", "view"], ["cls", "content"]],
         )
 
     def testSignaturesMatchTheImplementation(self) -> None:
@@ -304,32 +292,25 @@ class TestMailFacadeStub(TestCase):
         None
             Assertions verify the behavior described above.
         """
-        for method in stub_methods():
-            if method.name == "send":
-                continue
-
-            implemented = inspect.signature(
-                getattr(MailManager, method.name),
-                annotation_format=inspect.Format.STRING,
-            )
-            parameters = list(implemented.parameters.values())[1:]
-
-            self.assertEqual(
-                [argument.arg for argument in method.args.args],
-                [parameter.name for parameter in parameters],
-                msg=method.name,
-            )
-            self.assertEqual(
-                [ast.unparse(default) for default in method.args.defaults],
-                [
-                    repr(parameter.default)
-                    for parameter in parameters
-                    if parameter.default is not inspect.Parameter.empty
-                ],
-                msg=method.name,
-            )
-            self.assertEqual(
-                ast.unparse(method.returns),
-                implemented.return_annotation,
-                msg=method.name,
-            )
+        methods = stub_methods()
+        for name in sorted({method.name for method in methods}):
+            target = getattr(Mail if name in _FACADE_METHODS else MailManager, name)
+            declarations = [method for method in methods if method.name == name]
+            implementations = get_overloads(target) or [target]
+            for stub, function in zip(declarations, implementations, strict=True):
+                with self.subTest(method=name, signature=ast.unparse(stub.args)):
+                    runtime = ast.parse(dedent(inspect.getsource(function))).body[0]
+                    if not isinstance(runtime, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        self.fail(f"{name} must refer to a method")
+                    if runtime.returns is None or stub.returns is None:
+                        self.fail(f"{name} must declare a return annotation")
+                    # Instance methods on the manager are called on the facade class.
+                    receiver = (runtime.args.posonlyargs or runtime.args.args)[0]
+                    receiver.arg = "cls"
+                    self.assertEqual(ast.unparse(stub.args), ast.unparse(runtime.args))
+                    expected_return = (
+                        Mail.getFacadeAccessor().__name__
+                        if name == "resolve"
+                        else ast.unparse(runtime.returns)
+                    )
+                    self.assertEqual(ast.unparse(stub.returns), expected_return)

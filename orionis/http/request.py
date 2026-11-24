@@ -1015,13 +1015,13 @@ class Request(IRequest):
         raw = await self.__getBodyStream().read()
         return parse_msgpack(raw)
 
-    async def formUrlEncoded(self) -> dict[str, Any]:
+    async def formUrlEncoded(self) -> dict[str, str]:
         """
         Parse ``application/x-www-form-urlencoded`` body.
 
         Returns
         -------
-        dict[str, typing.Any]
+        dict[str, str]
             Parsed form fields. Result is cached.
 
         Raises

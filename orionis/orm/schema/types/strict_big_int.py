@@ -5,7 +5,7 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictBigInt(ColumnDefinition):
+class StrictBigInt[TValue = int](ColumnDefinition[TValue]):
     """The SQL ``BIGINT`` type."""
 
     __slots__ = ()

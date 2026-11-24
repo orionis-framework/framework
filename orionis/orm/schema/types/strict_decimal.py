@@ -1,6 +1,7 @@
 """The SQL ``DECIMAL`` type."""
 
 from __future__ import annotations
+from decimal import Decimal
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types._constants import (
@@ -10,7 +11,7 @@ from orionis.orm.schema.types._constants import (
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictDecimal(ColumnDefinition):
+class StrictDecimal[TValue = float | Decimal](ColumnDefinition[TValue]):
     """The SQL ``DECIMAL`` type."""
 
     __slots__ = ()

@@ -5,7 +5,7 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictInt(ColumnDefinition):
+class StrictInt[TValue = int](ColumnDefinition[TValue]):
     """Alias of ``INTEGER``."""
 
     __slots__ = ()

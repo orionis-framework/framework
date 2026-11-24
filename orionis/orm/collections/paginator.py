@@ -2,13 +2,12 @@
 # ruff: noqa: ANN401, TC001
 """Length-aware page of query results."""
 
-from __future__ import annotations
 import json
 from typing import Any
 from orionis.support.types.collection import Collection
 
 
-class Paginator:
+class Paginator[TItem = Any]:
     """
     Length-aware page of query results.
 
@@ -22,7 +21,7 @@ class Paginator:
 
     def __init__(
         self,
-        items: Collection,
+        items: Collection[TItem],
         total: int,
         page: int,
         per_page: int,
@@ -71,7 +70,7 @@ class Paginator:
     # ── Data access ─────────────────────────────────────────────────────────
 
     @property
-    def items(self) -> Collection:
+    def items(self) -> Collection[TItem]:
         """
         Return the items for the current page.
 

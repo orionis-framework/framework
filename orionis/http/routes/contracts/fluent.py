@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
-    from orionis.http.routes.types import MiddlewareInput
+    from orionis.http.routes.types import ExportedRoute, MiddlewareInput
 
 
 class IFluentRoute(ABC):
@@ -142,7 +142,7 @@ class IFluentRoute(ABC):
         """
 
     @abstractmethod
-    def export(self) -> dict:
+    def export(self) -> ExportedRoute:
         """
         Export a complete route configuration as a plain dictionary.
 

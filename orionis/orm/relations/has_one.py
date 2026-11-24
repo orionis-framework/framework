@@ -1,13 +1,16 @@
-# ruff: noqa: TC001
+# ruff: noqa: TC001, TC003
 # Keep model and collection annotations available to runtime introspection.
 """One-to-one relationship: the related table owns the foreign key."""
 
+from collections.abc import Sequence
 import orionis.orm as _orm
 from orionis.orm.relations.has_one_or_many import HasOneOrManyRelation
 from orionis.support.types.collection import Collection
 
 
-class HasOneRelation[TRelated: _orm.Model](HasOneOrManyRelation[TRelated]):
+class HasOneRelation[TRelated: _orm.Model](
+    HasOneOrManyRelation[TRelated, TRelated | None],
+):
     """
     One-to-one relationship: the related table owns the foreign key.
 
@@ -35,8 +38,8 @@ class HasOneRelation[TRelated: _orm.Model](HasOneOrManyRelation[TRelated]):
 
     def match(
         self,
-        models: list[_orm.Model],
-        results: Collection,
+        models: Sequence[_orm.Model],
+        results: Collection[TRelated],
         name: str,
     ) -> None:
         """
@@ -44,7 +47,7 @@ class HasOneRelation[TRelated: _orm.Model](HasOneOrManyRelation[TRelated]):
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
         results : orionis.support.types.Collection
             Related rows produced by ``getEager``.

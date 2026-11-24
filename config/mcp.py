@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.mcp.entities.mcp import McpConfig
 
-
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BootstrapMcp(McpConfig):
     # ----------------------------------------------------------------------------------

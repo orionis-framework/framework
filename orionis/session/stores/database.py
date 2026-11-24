@@ -21,7 +21,6 @@ from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, String, Text
 from orionis.session.contracts.store import ISessionStore
 from orionis.session.entities.record import SessionRecord
-
 from orionis.database.contracts.connection import IConnection
 
 # Default table name used when the session config does not override it.

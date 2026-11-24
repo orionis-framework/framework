@@ -8,10 +8,8 @@ Includes ``_global_trans``, ``_global_choice``, ``_global_locale``,
 """
 
 from __future__ import annotations
-
 from collections.abc import Callable
 from typing import Any
-
 from orionis.support.facades.lang import Lang
 
 

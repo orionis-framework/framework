@@ -6,7 +6,6 @@ import orionis.orm as _orm
 from abc import abstractmethod
 from typing import Any
 from orionis.orm.contracts.builder import IModelQueryBuilder
-
 from orionis.support.types.collection import Collection
 
 

@@ -4,7 +4,6 @@
 
 from abc import abstractmethod
 from orionis.auth.contracts.guard import IGuard
-
 import orionis.http as _http
 from collections.abc import Mapping
 from orionis.auth.contracts.authenticatable import IAuthenticatable

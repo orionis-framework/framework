@@ -11,7 +11,6 @@ from orionis.foundation.config.auth import (
     Tokens,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapAppAuth(Auth):
     # ----------------------------------------------------------------------------------

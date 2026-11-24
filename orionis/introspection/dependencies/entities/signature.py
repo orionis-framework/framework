@@ -6,7 +6,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from collections.abc import ItemsView
 from orionis.support.entities.base import BaseEntity
-
 from orionis.introspection.dependencies.entities.argument import Argument
 
 

@@ -7,7 +7,6 @@ from collections import defaultdict
 from typing import Any
 from orionis.orm.metaclass import snake_case
 from orionis.orm.relations.relation import Relation
-
 from orionis.support.types.collection import Collection
 
 

@@ -1,7 +1,6 @@
 """Hold already registered routes so a parent can compose their context."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 

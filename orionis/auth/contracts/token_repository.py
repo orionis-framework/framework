@@ -3,7 +3,6 @@
 """Define the persistence operations of personal access tokens."""
 
 from abc import ABC, abstractmethod
-
 from collections.abc import Iterable
 from datetime import datetime
 from orionis.auth.contracts.authorizable import IAuthorizable

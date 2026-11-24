@@ -3,7 +3,6 @@
 """Define how a persisted identity becomes an application object."""
 
 from abc import ABC, abstractmethod
-
 from collections.abc import Mapping
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 

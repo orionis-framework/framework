@@ -12,7 +12,6 @@ from orionis.foundation.config.cache import (
     Stores,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapCache(Cache):
     # ----------------------------------------------------------------------------------

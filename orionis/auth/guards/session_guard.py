@@ -12,7 +12,6 @@ from orionis.auth.remember import RememberMe
 from orionis.auth.tokens.functions import hash_token_secret
 from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.foundation.contracts.application import IApplication
-
 import orionis.http as _http
 from collections.abc import Mapping
 from orionis.auth.contracts.authenticatable import IAuthenticatable

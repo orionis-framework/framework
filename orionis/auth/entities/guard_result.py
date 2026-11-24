@@ -3,7 +3,6 @@
 """Carry what a guard learned about the incoming request."""
 
 from dataclasses import dataclass
-
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 
 

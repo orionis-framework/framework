@@ -5,7 +5,6 @@ from importlib import import_module
 from importlib.util import find_spec
 from sqlalchemy import text
 from sqlalchemy.engine import reflection
-
 from sqlalchemy.engine import Connection
 
 if find_spec("sqlalchemy_redshift") is not None:

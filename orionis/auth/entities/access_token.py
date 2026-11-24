@@ -3,7 +3,6 @@
 """Describe a stored personal access token."""
 
 from dataclasses import asdict, dataclass
-
 from datetime import datetime
 
 

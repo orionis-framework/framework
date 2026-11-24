@@ -12,7 +12,6 @@ from orionis.database.threaded.worker import (
     _complete_cleanup,
     _rollback_or_invalidate,
 )
-
 from collections.abc import AsyncIterator
 from sqlalchemy.engine import Engine
 

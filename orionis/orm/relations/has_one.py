@@ -4,7 +4,6 @@
 
 import orionis.orm as _orm
 from orionis.orm.relations.has_one_or_many import HasOneOrManyRelation
-
 from orionis.support.types.collection import Collection
 
 

@@ -10,7 +10,6 @@ from orionis.auth.contracts.identity_provider import IIdentityProvider
 from orionis.auth.contracts.token_repository import IAccessTokenRepository
 from orionis.auth.entities.guard_result import GuardResult
 from orionis.foundation.config.auth.enums.guards import Guards
-
 import orionis.http as _http
 
 

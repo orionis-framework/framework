@@ -22,7 +22,6 @@ from orionis.orm.relations.mixin import RelationsMixin
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.soft_deletes import SoftDeletesMixin
 from orionis.orm.state import StateMixin
-
 from orionis.database.contracts.connection import IConnection
 from orionis.orm.schema.table import TableDefinition
 from orionis.support.types.collection import Collection

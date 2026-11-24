@@ -5,7 +5,6 @@
 from functools import lru_cache
 from types import MappingProxyType
 from typing import Any
-
 from collections.abc import Callable
 from random import Random
 

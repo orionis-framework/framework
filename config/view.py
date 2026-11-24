@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.view import View
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapView(View):
     # ----------------------------------------------------------------------------------

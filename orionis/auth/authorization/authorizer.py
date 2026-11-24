@@ -9,7 +9,6 @@ from orionis.auth.authorization.registry import PolicyRegistry
 from orionis.auth.contracts.authorizer import IAuthorizer
 from orionis.auth.exceptions import PolicyNotFoundException
 from orionis.foundation.contracts.application import IApplication
-
 from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.auth.contracts.policy import IPolicy
 

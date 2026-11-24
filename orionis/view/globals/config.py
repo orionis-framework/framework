@@ -4,10 +4,8 @@
 """Provide view globals operations through ``_global_config``."""
 
 from __future__ import annotations
-
 from collections.abc import Callable
 from typing import Any
-
 from orionis.foundation.contracts.application import IApplication
 
 

@@ -3,9 +3,18 @@
 from typing import Any
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.console.core.contracts.reactor import IReactor
-from orionis.container.contracts.facade import IFacade
+from orionis.container.facades.facade import Facade
 
-class Reactor(IReactor, IFacade):
+class Reactor(Facade):
+
+    @classmethod
+    def getFacadeAccessor(cls) -> str:
+        """Return the container alias for the command reactor."""
+
+    @classmethod
+    async def resolve(cls, *args: object, **kwargs: object) -> IReactor:
+        """Resolve the command reactor from the container."""
+
     @classmethod
     def command(
         cls,
@@ -13,6 +22,10 @@ class Reactor(IReactor, IFacade):
         handler: list[type[Any] | str | None] | str,
     ) -> ICommand:
         """Register a command and return its fluent configuration."""
+
+    @classmethod
+    async def hasCommand(cls, signature: str) -> bool:
+        """Check whether the command signature is registered."""
 
     @classmethod
     async def call(

@@ -4,12 +4,10 @@
 """Translate Orionis query plans into engine-executable statements."""
 
 from __future__ import annotations
-
 import operator
 from collections.abc import Callable, Iterable, Sequence
 from typing import Any, ClassVar
 from uuid import UUID
-
 import sqlalchemy
 from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_

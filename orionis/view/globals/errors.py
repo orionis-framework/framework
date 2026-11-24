@@ -4,7 +4,6 @@
 """Expose validation errors from the current request session."""
 
 from __future__ import annotations
-
 from orionis.foundation.contracts.application import IApplication
 from orionis.session.contracts.session import ISession
 from orionis.view._failures import capture_service_failure

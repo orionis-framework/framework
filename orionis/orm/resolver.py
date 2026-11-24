@@ -6,7 +6,6 @@ from __future__ import annotations
 from typing import ClassVar
 from orionis.database.migrations.context import current_migration_connection
 from orionis.orm.exceptions import OrmConfigurationException
-
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
 

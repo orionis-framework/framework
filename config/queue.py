@@ -11,7 +11,6 @@ from orionis.foundation.config.queue import (
     Worker,
 )
 
-
 @dataclass(frozen=True, kw_only=True, slots=True)
 class BootstrapQueue(Queue):
     # ----------------------------------------------------------------------------------

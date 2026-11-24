@@ -19,7 +19,6 @@ from filelock import BaseFileLock, FileLock
 from orionis.session.contracts.store import ISessionStore
 from orionis.session.entities.record import SessionRecord
 from orionis.session.exceptions import SessionStorageException
-
 from orionis.support.concurrency import complete_on_cancel
 
 

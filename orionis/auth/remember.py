@@ -10,7 +10,6 @@ from orionis.auth.exceptions import AuthException
 from orionis.auth.tokens.functions import hash_token_secret
 from orionis.foundation.config.auth.entities.remember import RememberAuth
 from orionis.foundation.contracts.application import IApplication
-
 import orionis.http as _http
 from orionis.auth.contracts.authenticatable import IAuthenticatable
 

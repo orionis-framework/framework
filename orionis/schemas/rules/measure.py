@@ -5,7 +5,6 @@ from collections.abc import Sized
 from decimal import Decimal
 from math import nan
 from numbers import Number
-
 from orionis.support.concurrency import complete_on_cancel
 
 # Bytes per kilobyte, the unit size rules use to express file sizes.

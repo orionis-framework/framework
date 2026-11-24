@@ -13,7 +13,6 @@ from orionis.orm.metaclass import snake_case
 from orionis.orm.query.raw_builder import RawQueryBuilder
 from orionis.orm.relations.relation import Relation
 from orionis.support.types.collection import Collection
-
 from orionis.orm.query.expressions import AggregateFunction, WhereClause
 
 

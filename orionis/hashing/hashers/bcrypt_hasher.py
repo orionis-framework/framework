@@ -9,7 +9,6 @@ from orionis.hashing.contracts.hasher import IHasher
 from orionis.hashing.exceptions import HashConfigurationException
 from orionis.hashing.execution import HASH_WORKERS
 from orionis.hashing.hashers.functions import import_hasher_backend
-
 from orionis.support.concurrency import BoundedExecutor
 
 # Backend location and distribution name reported when it is missing

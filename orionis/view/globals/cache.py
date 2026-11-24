@@ -4,10 +4,8 @@
 """Provide view globals operations through ``_global_cache``."""
 
 from __future__ import annotations
-
 from collections.abc import Awaitable, Callable
 from typing import Any
-
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.foundation.contracts.application import IApplication
 

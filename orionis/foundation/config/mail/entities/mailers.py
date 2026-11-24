@@ -1,9 +1,7 @@
 """Represent mail transport configurations for the application."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass, field
-
 from orionis.foundation.config.mail.entities.file import File
 from orionis.foundation.config.mail.entities.smtp import Smtp
 from orionis.support.entities.base import BaseEntity

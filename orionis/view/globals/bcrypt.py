@@ -3,9 +3,7 @@
 """Provide view globals operations through ``_global_encrypt``, ``_global_decrypt``."""
 
 from __future__ import annotations
-
 from collections.abc import Awaitable, Callable
-
 from orionis.encrypter.contracts.encrypter import IEncrypter
 from orionis.foundation.contracts.application import IApplication
 

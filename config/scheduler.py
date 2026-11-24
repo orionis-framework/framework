@@ -10,7 +10,6 @@ from orionis.foundation.config.scheduler import (
     Stores,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapScheduler(Scheduler):
     # ----------------------------------------------------------------------------------

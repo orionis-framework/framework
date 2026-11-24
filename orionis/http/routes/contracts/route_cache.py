@@ -1,7 +1,6 @@
 """Define the contract for route cache implementations."""
 
 from __future__ import annotations
-
 from abc import ABC, abstractmethod
 
 

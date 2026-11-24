@@ -9,7 +9,6 @@ from dataclasses import fields
 from typing import Any
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.constraints.foreign_reference import ForeignReference
-
 from orionis.orm.schema.types.column_type import ColumnType
 
 # Sentinel used to distinguish "no default" from a legitimate ``None`` default.

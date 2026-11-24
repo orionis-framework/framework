@@ -3,12 +3,10 @@
 """Runtime representation of a single HTTP session."""
 
 from __future__ import annotations
-
 import secrets
 from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
-
 from orionis.session.contracts.session import ISession
 from orionis.session.flash import (
     ERRORS_KEY,

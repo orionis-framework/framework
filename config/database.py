@@ -25,7 +25,6 @@ from orionis.foundation.config.database import (
     SQLServerCharset,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapDatabase(Database):
     # ----------------------------------------------------------------------------------

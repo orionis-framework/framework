@@ -2,56 +2,71 @@
 # Keep public facade methods documented alongside their static signatures.
 from collections.abc import Mapping
 from typing import overload
-from orionis.container.contracts.facade import IFacade
+from orionis.container.facades.facade import Facade
+from orionis.mail.contracts.manager import IMailManager
 from orionis.mail.entities.address import Address
 from orionis.mail.entities.attachment import Attachment
 from orionis.mail.entities.content import Content
 from orionis.mail.entities.result import MailResult
 from orionis.mail.mailable import Mailable
 from orionis.mail.pending import PendingMail
-from orionis.mail.types import MessageCallback, Recipients
+from orionis.mail.types import MessageCallback, Recipients, TransportFactory
 
-class Mail(IFacade):
-    @staticmethod
-    def mailer(name: str) -> PendingMail:
+class Mail(Facade):
+
+    @classmethod
+    def getFacadeAccessor(cls) -> type[IMailManager]:
+        """Return the contract registered for the mail manager."""
+
+    @classmethod
+    async def resolve(cls, *args: object, **kwargs: object) -> IMailManager:
+        """Resolve the mail manager from the application container."""
+
+    @classmethod
+    def mailer(cls, name: str) -> PendingMail:
         """Start an independent chain selecting a named mailer."""
 
-    @staticmethod
-    def fromAddress(address: str | Address, name: str | None = None) -> PendingMail:
+    @classmethod
+    def fromAddress(
+        cls,
+        address: str | Address,
+        name: str | None = None,
+    ) -> PendingMail:
         """Start an independent chain with exactly one sender."""
 
-    @staticmethod
-    def to(addresses: Recipients, name: str | None = None) -> PendingMail:
+    @classmethod
+    def to(cls, addresses: Recipients, name: str | None = None) -> PendingMail:
         """Start an independent chain with primary recipients."""
 
-    @staticmethod
-    def cc(addresses: Recipients, name: str | None = None) -> PendingMail:
+    @classmethod
+    def cc(cls, addresses: Recipients, name: str | None = None) -> PendingMail:
         """Start an independent chain with carbon-copy recipients."""
 
-    @staticmethod
-    def bcc(addresses: Recipients, name: str | None = None) -> PendingMail:
+    @classmethod
+    def bcc(cls, addresses: Recipients, name: str | None = None) -> PendingMail:
         """Start an independent chain with hidden recipients."""
 
-    @staticmethod
-    def replyTo(addresses: Recipients, name: str | None = None) -> PendingMail:
+    @classmethod
+    def replyTo(cls, addresses: Recipients, name: str | None = None) -> PendingMail:
         """Start an independent chain with reply destinations."""
 
-    @staticmethod
-    def subject(value: str) -> PendingMail:
+    @classmethod
+    def subject(cls, value: str) -> PendingMail:
         """Start an independent chain with a literal subject."""
 
-    @staticmethod
-    def attach(attachment: Attachment) -> PendingMail:
+    @classmethod
+    def attach(cls, attachment: Attachment) -> PendingMail:
         """Start an independent chain with a deferred attachment."""
 
     @overload
-    @staticmethod
-    async def send(mailable: Mailable | type[Mailable], /) -> MailResult:
+    @classmethod
+    async def send(cls, mailable: Mailable | type[Mailable], /) -> MailResult:
         """Send a reusable mail declaration through the configured transport."""
 
     @overload
-    @staticmethod
+    @classmethod
     async def send(
+        cls,
         view: str,
         /,
         data: Mapping[str, object] | None = None,
@@ -60,8 +75,9 @@ class Mail(IFacade):
         """Render and send an HTML template with optional message customization."""
 
     @overload
-    @staticmethod
+    @classmethod
     async def send(
+        cls,
         content: Content,
         /,
         *,
@@ -69,13 +85,22 @@ class Mail(IFacade):
     ) -> MailResult:
         """Send explicit message content with optional customization."""
 
-    @staticmethod
-    async def raw(text: str, callback: MessageCallback | None = None) -> MailResult:
+    @classmethod
+    async def raw(
+        cls,
+        text: str,
+        callback: MessageCallback | None = None,
+    ) -> MailResult:
         """Send literal plain text without template interpretation."""
 
-    @staticmethod
+    @classmethod
     async def html(
+        cls,
         html: str,
         callback: MessageCallback | None = None,
     ) -> MailResult:
         """Send literal HTML without template interpretation."""
+
+    @classmethod
+    def extend(cls, driver: str, factory: TransportFactory) -> None:
+        """Register a transport factory for a custom mail driver."""

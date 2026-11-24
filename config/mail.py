@@ -10,7 +10,6 @@ from orionis.foundation.config.mail import (
     Smtp,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapMail(Mail):
     # ----------------------------------------------------------------------------------

@@ -5,7 +5,6 @@
 import orionis.orm as _orm
 from orionis.orm.metaclass import snake_case
 from orionis.orm.relations.relation import Relation
-
 from orionis.support.types.collection import Collection
 
 

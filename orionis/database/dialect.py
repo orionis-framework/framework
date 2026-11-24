@@ -18,7 +18,6 @@ from orionis.database.exceptions import (
     UnsupportedDriverException,
 )
 from orionis.database.threaded.worker import _wait_for_completion
-
 from collections.abc import Awaitable, Callable
 from sqlalchemy.engine import Connection as SqlConnection
 from sqlalchemy.engine.interfaces import Dialect

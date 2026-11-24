@@ -31,7 +31,6 @@ from orionis.database.threaded.worker import (
     _wait_for_completion,
 )
 from orionis.database.transaction import Transaction
-
 from collections.abc import AsyncGenerator, Mapping, Sequence
 from contextlib import AbstractAsyncContextManager
 from sqlalchemy.engine import CursorResult

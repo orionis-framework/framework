@@ -3,7 +3,6 @@
 """Define how an authenticated identity is extracted from a request."""
 
 from abc import ABC, abstractmethod
-
 import orionis.http as _http
 from orionis.auth.entities.guard_result import GuardResult
 

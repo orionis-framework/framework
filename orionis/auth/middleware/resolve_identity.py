@@ -19,7 +19,6 @@ from orionis.auth.exceptions import AuthenticationException
 from orionis.auth.remember import apply_remember_cookie
 from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.http.middleware import BaseMiddleware
-
 from orionis.auth.contracts.context import IAuthenticationContext
 from orionis.http.layer.contracts.middleware import NextCallable
 from orionis.http.request import Request

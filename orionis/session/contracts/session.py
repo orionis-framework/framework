@@ -3,7 +3,6 @@
 """Contract for a single HTTP session runtime object."""
 
 from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import Any

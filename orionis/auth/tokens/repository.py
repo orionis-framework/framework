@@ -13,7 +13,6 @@ from orionis.auth.exceptions import TokenException
 from orionis.auth.tokens.functions import generate_token_secret, hash_token_secret
 from orionis.foundation.contracts.application import IApplication
 from orionis.orm.contracts.query_builder import IQueryBuilder
-
 from collections.abc import Iterable
 from orionis.auth.contracts.authorizable import IAuthorizable
 from orionis.orm.query.base_builder import QueryBuilderBase

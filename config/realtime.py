@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.realtime import RealtimeConfig
 
-
 @dataclass(frozen=True, slots=True, kw_only=True)
 class BootstrapRealtime(RealtimeConfig):
     # ----------------------------------------------------------------------------------

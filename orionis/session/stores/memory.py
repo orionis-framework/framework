@@ -6,7 +6,6 @@
 from copy import deepcopy
 from datetime import UTC, datetime
 from orionis.session.contracts.store import ISessionStore
-
 from orionis.session.entities.record import SessionRecord
 
 

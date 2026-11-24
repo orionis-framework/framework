@@ -13,7 +13,6 @@ from orionis.foundation.config.http import (
     Redis,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapHTTP(HTTP):
     # ----------------------------------------------------------------------------------

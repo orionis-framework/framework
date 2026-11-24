@@ -9,7 +9,6 @@ from orionis.database.dialect import resolve_driver
 from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.orm.query.raw_builder import RawQueryBuilder
 from orionis.orm.schema.types.column_type import ColumnType
-
 from collections.abc import Callable
 from types import NotImplementedType
 from sqlalchemy.sql.elements import ColumnElement

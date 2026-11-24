@@ -14,7 +14,6 @@ from orionis.hashing.hashers.functions import ARGON2_MAX_THREADS as _MAX_THREADS
 from orionis.hashing.hashers.functions import (
     ARGON2_MEMORY_PER_THREAD as _MEMORY_PER_THREAD,
 )
-
 from orionis.support.concurrency import BoundedExecutor
 
 # Backend location and distribution name reported when it is missing

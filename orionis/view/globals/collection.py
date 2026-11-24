@@ -3,10 +3,8 @@
 """Provide view globals operations through ``_global_collect``."""
 
 from __future__ import annotations
-
 from collections.abc import Callable, Iterable
 from typing import Any
-
 from orionis.support.types.collection import Collection
 
 

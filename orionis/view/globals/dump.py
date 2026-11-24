@@ -5,12 +5,9 @@
 """Provide view globals operations through ``_global_dump``."""
 
 from __future__ import annotations
-
 from collections.abc import Callable
 from typing import Any
-
 from markupsafe import Markup
-
 from orionis.console.output.var_dumper import VarDumper
 
 

@@ -16,7 +16,6 @@ from orionis.introspection.dependencies.reflection import (
     _inspect_signature,
 )
 from orionis.introspection.reflection import Reflection as _Reflection
-
 from collections.abc import Callable
 from orionis.introspection.dependencies.entities.signature import (
     Signature,

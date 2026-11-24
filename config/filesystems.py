@@ -12,7 +12,6 @@ from orionis.foundation.config.filesystems import (
     Public,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapFilesystems(Filesystems):
     # ----------------------------------------------------------------------------------

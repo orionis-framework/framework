@@ -14,7 +14,6 @@ from orionis.foundation.config.auth.entities.password_reset import PasswordReset
 from orionis.foundation.contracts.application import IApplication
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.orm.contracts.query_builder import IQueryBuilder
-
 import orionis.orm as _orm
 from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 

@@ -7,7 +7,6 @@ from orionis.auth.concerns.functions import authorizable_key
 from orionis.auth.contracts.permission_repository import IPermissionRepository
 from orionis.auth.exceptions import AuthException
 from orionis.orm.contracts.query_builder import IQueryBuilder
-
 from orionis.auth.contracts.authorizable import IAuthorizable
 from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 

@@ -6,7 +6,6 @@ from orionis.foundation.config.testing import (
     VerbosityMode,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapTesting(Testing):
     # ----------------------------------------------------------------------------------

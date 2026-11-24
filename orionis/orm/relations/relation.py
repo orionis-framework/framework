@@ -8,7 +8,6 @@ from typing import Any
 from orionis.orm.contracts.relation import IRelation
 from orionis.orm.query.builder import ModelQueryBuilder
 from orionis.support.types.collection import Collection
-
 from collections.abc import Callable, Generator
 
 

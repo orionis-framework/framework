@@ -10,7 +10,6 @@ from orionis.auth.exceptions import IdentityProviderException
 from orionis.foundation.contracts.application import IApplication
 from orionis.hashing.contracts.hash_manager import IHashManager
 from orionis.orm.schema.types.column_type import ColumnType
-
 from collections.abc import Mapping
 import orionis.orm as _orm
 

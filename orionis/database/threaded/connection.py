@@ -13,7 +13,6 @@ from orionis.database.threaded.worker import (
     _complete_cleanup,
     _wait_for_completion,
 )
-
 from collections.abc import Callable, Mapping, Sequence
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.sql.expression import Executable

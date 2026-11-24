@@ -4,9 +4,7 @@
 """Provide view globals operations through ``_global_request``."""
 
 from __future__ import annotations
-
 from collections.abc import Awaitable, Callable
-
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.contracts.request import IRequest
 from orionis.view._failures import capture_service_failure

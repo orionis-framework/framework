@@ -1,13 +1,23 @@
 # ruff: noqa: PYI021
 # Keep public facade methods documented alongside their static signatures.
 from collections.abc import Sequence
-from orionis.container.contracts.facade import IFacade
+from orionis.container.facades.facade import Facade
+from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.fluent import FluentRoute
 from orionis.http.routes.group import RouteGroup
 from orionis.http.routes.types import MiddlewareInput, RouteAction
 from orionis.realtime.hub import Hub
 
-class Route(IFacade):
+class Route(Facade):
+
+    @classmethod
+    def getFacadeAccessor(cls) -> str:
+        """Return the container alias for the router."""
+
+    @classmethod
+    async def resolve(cls, *args: object, **kwargs: object) -> IRouter:
+        """Resolve the router from the container."""
+
     @classmethod
     def hub(
         cls,

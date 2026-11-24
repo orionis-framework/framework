@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-
 from orionis.introspection.dependencies.entities.signature import (
     Signature,
 )

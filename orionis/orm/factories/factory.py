@@ -17,7 +17,6 @@ from orionis.orm.factories.exceptions import (
 from orionis.orm.factories.sequence import Sequence
 from orionis.orm.model import Model
 from orionis.support.types.collection import Collection
-
 from orionis.orm.factories.fake import Fake
 
 type State = dict[str, Any] | Callable[[dict[str, Any]], dict[str, Any]]

@@ -44,10 +44,10 @@ class FileInfo:
     # naming convention of the framework (see ruff N815 waiver above).
     path: str
     size: int
-    lastModified: datetime
+    lastModified: datetime # NOSONAR
     visibility: str
-    mimeType: str | None = None
-    createdAt: datetime | None = None
+    mimeType: str | None = None # NOSONAR
+    createdAt: datetime | None = None # NOSONAR
     etag: str | None = None
     checksum: str | None = None
     url: str | None = None

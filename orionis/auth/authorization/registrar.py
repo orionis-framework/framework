@@ -8,7 +8,6 @@ from orionis.auth.concerns.functions import authorizable_key
 from orionis.auth.exceptions import AuthException
 from orionis.database.exceptions import QueryException
 from orionis.orm.contracts.query_builder import IQueryBuilder
-
 from orionis.auth.contracts.authorizable import IAuthorizable
 
 # Tables shipped by the framework migrations.

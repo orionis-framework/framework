@@ -10,7 +10,6 @@ from orionis.auth.middleware.resolve_identity import ResolveIdentityMiddleware
 from orionis.foundation.config.auth.enums.guards import Guards
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.responses import RedirectResponse
-
 from orionis.http.layer.contracts.middleware import NextCallable
 from orionis.http.request import Request
 from orionis.http.responses import Response

@@ -14,7 +14,6 @@ from orionis.auth.exceptions import (
     AuthorizationException,
 )
 from orionis.http.middleware import BaseMiddleware
-
 from orionis.http.layer.contracts.middleware import NextCallable
 from orionis.http.request import Request
 from orionis.http.responses import Response

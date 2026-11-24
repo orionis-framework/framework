@@ -8,7 +8,6 @@ from orionis.foundation.config.hashing import (
     Hashing,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapHashing(Hashing):
     # ----------------------------------------------------------------------------------

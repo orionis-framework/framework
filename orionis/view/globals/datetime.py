@@ -3,11 +3,8 @@
 """Provide view globals operations through ``_global_now``, ``_global_today``."""
 
 from __future__ import annotations
-
 from collections.abc import Callable
-
 import pendulum
-
 from orionis.support.facades.datetime import DateTime
 
 

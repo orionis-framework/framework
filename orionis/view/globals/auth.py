@@ -3,7 +3,6 @@
 """Provide view globals operations through ``_global_auth``."""
 
 from collections.abc import Callable
-
 from orionis.support.facades import Auth
 
 

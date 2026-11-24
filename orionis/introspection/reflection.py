@@ -6,7 +6,6 @@ from __future__ import annotations
 import abc
 import inspect
 import typing
-
 from collections.abc import Callable
 from orionis.introspection.abstract.contracts.reflection import (
     IReflectionAbstract,

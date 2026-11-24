@@ -3,9 +3,7 @@
 """Provide view globals operations through ``_global_app``."""
 
 from __future__ import annotations
-
 from collections.abc import Callable
-
 from orionis.foundation.contracts.application import IApplication
 
 

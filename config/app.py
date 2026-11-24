@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from orionis.environment import Env
 from orionis.foundation.config.app import App, Cipher, Environments
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapApp(App):
     # ----------------------------------------------------------------------------------

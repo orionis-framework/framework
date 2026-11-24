@@ -1,7 +1,6 @@
 """Represent a runtime-ready compiled HTTP or WebSocket route."""
 
 from __future__ import annotations
-
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 from orionis.http.routes.enums.protocols import RouteProtocol
@@ -9,7 +8,6 @@ from orionis.http.routes.enums.protocols import RouteProtocol
 if TYPE_CHECKING:
     from collections.abc import Callable
     from re import Pattern
-
     from orionis.http.routes.enums.route_types import RouteType
 
 

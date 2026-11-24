@@ -14,7 +14,6 @@ from orionis.foundation.config.logging import (
     Weekly,
 )
 
-
 @dataclass(frozen=True, kw_only=True)
 class BootstrapLogging(Logging):
     # ----------------------------------------------------------------------------------

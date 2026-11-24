@@ -4,10 +4,8 @@
 """Provide view globals operations through ``_global_stringable``."""
 
 from __future__ import annotations
-
 from collections.abc import Callable
 from typing import Any
-
 from orionis.support.types.stringable import Stringable
 
 

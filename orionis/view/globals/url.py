@@ -9,11 +9,9 @@ Includes ``_split_scheme``, ``_request_base_url``, ``_absolute_url``,
 """
 
 from __future__ import annotations
-
 from collections.abc import Awaitable, Callable
 from typing import Any
 from urllib.parse import urlencode
-
 from orionis.foundation.contracts.application import IApplication
 from orionis.http.contracts.request import IRequest
 from orionis.view._failures import capture_service_failure

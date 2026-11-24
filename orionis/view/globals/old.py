@@ -5,10 +5,8 @@
 """Provide view globals operations through ``_global_old``."""
 
 from __future__ import annotations
-
 from collections.abc import Awaitable, Callable
 from typing import Any
-
 from orionis.foundation.contracts.application import IApplication
 from orionis.session.contracts.session import ISession
 from orionis.view._failures import capture_service_failure

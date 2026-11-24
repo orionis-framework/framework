@@ -8,7 +8,6 @@ from orionis.database.contracts.transaction import ITransaction
 from orionis.database.migrations.context import current_migration_connection
 from orionis.orm.contracts.query_builder import IQueryBuilder
 from orionis.orm.query.raw_builder import RawQueryBuilder
-
 from orionis.database.contracts.connection import IConnection
 from orionis.orm.contracts.raw_builder import IRawQueryBuilder
 

@@ -1,12 +1,13 @@
 """The SQL ``REAL`` type."""
 
 from __future__ import annotations
+from decimal import Decimal
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictReal(ColumnDefinition):
+class StrictReal[TValue = float | Decimal](ColumnDefinition[TValue]):
     """The SQL ``REAL`` type."""
 
     __slots__ = ()

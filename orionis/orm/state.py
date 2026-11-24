@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 from copy import deepcopy
-from typing import Any
+from typing import Any, Self
 
 
 class StateMixin:
@@ -133,7 +133,7 @@ class StateMixin:
             return deepcopy(self._original)
         return deepcopy(self._original[key]) if key in self._original else default
 
-    def syncOriginal(self) -> Any:
+    def syncOriginal(self) -> Self:
         """
         Snapshot the current attributes as the new original state.
 

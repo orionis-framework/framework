@@ -6,7 +6,7 @@ from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class UnicodeText(ColumnDefinition):
+class UnicodeText[TValue = str](ColumnDefinition[TValue]):
     """An unbounded-length Unicode string type, e.g. ``NCLOB``/``NTEXT``."""
 
     __slots__ = ()

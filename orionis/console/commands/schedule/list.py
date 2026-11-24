@@ -74,7 +74,7 @@ class ScheduleListCommand(BaseCommand):
         await app.call(scheduler, "tasks", schedule=schedule_service)
 
         # Retrieve the list of scheduled jobs/events
-        tasks: list[dict[str, object]] = await schedule_service.info()
+        tasks = await schedule_service.info()
 
         # Display a message if no scheduled jobs are found
         if not tasks:

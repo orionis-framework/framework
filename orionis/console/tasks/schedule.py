@@ -26,6 +26,7 @@ from orionis.support.facades.logger import Log
 from orionis.support.facades.reactor import Reactor
 
 if TYPE_CHECKING:
+    from orionis.console.entities.task import ScheduledTaskInfo
     from collections.abc import Callable, Coroutine
     from apscheduler.events import JobEvent as APJobEvent
     from apscheduler.events import SchedulerEvent as APSchedulerEvent
@@ -160,9 +161,9 @@ class Schedule(ISchedule):
             return
 
         # Query the reactor for available commands and cache their signatures
-        commands: list[dict] = await self.__reactor.info()
+        commands = await self.__reactor.info()
         self.__available_command_signatures.update(
-            job.get("signature") for job in commands
+            job["signature"] for job in commands
         )
 
     def __suppressApschedulerLogging(self: Self) -> None:
@@ -220,7 +221,7 @@ class Schedule(ISchedule):
                 coalesce=default_coalesce,
             )
 
-    async def info(self: Self) -> list[dict]:
+    async def info(self: Self) -> list[ScheduledTaskInfo]:
         """
         Return scheduling metadata for all validated tasks.
 
@@ -818,7 +819,7 @@ class Schedule(ISchedule):
     def on(
         self: Self,
         event: SchedulerEvent,
-        listener: Callable,
+        listener: Callable[[SchedulerEventEntity], object],
     ) -> Self:
         """
         Register or replace a listener for a scheduler lifecycle event.

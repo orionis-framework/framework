@@ -5,16 +5,22 @@
 Includes ``snake_case``, ``pluralize``, ``ModelMetadata``, ``ModelMeta``.
 """
 
-from __future__ import annotations
+import orionis.orm as _orm
 import re
 from copy import copy
 from dataclasses import dataclass, field
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from orionis.orm import attributes as attributes_module
 from orionis.orm.exceptions import OrmConfigurationException
 from orionis.orm.schema.column import ColumnDefinition
 from orionis.orm.schema.table import TableDefinition
+
+if TYPE_CHECKING:
+    # The forwarded methods exist only as declarations in a .pyi file.
+    from orionis.orm._model_queries import _ModelQueryMeta  # pyright: ignore[reportMissingModuleSource]
+else:
+    _ModelQueryMeta = type
 
 # Pattern splitting CamelCase words for snake_case conversion.
 _CAMEL_BOUNDARY = re.compile(r"(?<!^)(?=[A-Z])")
@@ -311,7 +317,7 @@ class ModelMetadata:
         return attributes
 
 
-class ModelMeta(type):
+class ModelMeta(_ModelQueryMeta):
     """
     Metaclass discovering model columns and building their metadata.
 
@@ -400,7 +406,12 @@ class ModelMeta(type):
         )
         return cls
 
-    def __getattr__(cls, name: str) -> Any:
+    # This metaclass is installed on Model and its subclasses. The bound
+    # type parameter preserves the concrete model when a local scope is used.
+    def __getattr__[TModel: _orm.Model](
+        cls: type[TModel],  # pyright: ignore[reportGeneralTypeIssues]
+        name: str,
+    ) -> Callable[..., _orm.ModelQueryBuilder[TModel]]:
         """
         Forward chainable builder entry points from the model class.
 
@@ -418,7 +429,11 @@ class ModelMeta(type):
         -------
         typing.Any
             Bound builder method for whitelisted entry points, or a
-            bound local scope declared by the model.
+            bound local scope declared by the model. To publish a local scope's
+            name and arguments to editors, declare its classmethod signature
+            in an ``if TYPE_CHECKING:`` block on the model, e.g.
+            ``active(cls, since: date) -> ModelQueryBuilder[Self]`` for
+            ``scopeActive(query, since)``.
 
         Raises
         ------

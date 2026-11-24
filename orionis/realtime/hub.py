@@ -3,6 +3,7 @@
 """Provide realtime operations through ``HubContext``, ``Hub``."""
 
 from dataclasses import dataclass
+from orionis.auth.contracts.authenticatable import IAuthenticatable
 from orionis.http.websocket import WebSocket
 import orionis.realtime.clients as clients_module
 import orionis.realtime.groups as groups_module
@@ -16,7 +17,7 @@ class HubContext:
     """Identifier of the current realtime connection."""
     socket: WebSocket
     """WebSocket associated with the current realtime invocation."""
-    user: object | None = None
+    user: IAuthenticatable | None = None
     """Authenticated identity associated with the current connection."""
 
 

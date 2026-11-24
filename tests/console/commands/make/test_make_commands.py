@@ -407,6 +407,97 @@ class TestMakeCommands(TestCase):
                 self.assertEqual(len(command.successes), 1)
                 self.assertEqual(command.errors, [])
 
+    def testFacadeContractGeneratesBoundSignaturesWithoutImportingIt(self) -> None:
+        """
+        Read inheritance and overloads without executing application code.
+
+        Returns
+        -------
+        None
+            Assert that generated facade signatures preserve the parsed contract.
+        """
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "report_api.py").write_text(
+                "from typing import TYPE_CHECKING, overload\n"
+                "from orionis.foundation.config import options as config\n"
+                "raise RuntimeError('contract was imported')\n"
+                "class ReportsBase[T]:\n"
+                "    @staticmethod\n"
+                "    def format(value: str, /) -> bytes: ...\n"
+                "    def convert(self, cls: type[T], /, *, _cls: str) -> T: ...\n"
+                "class Reports(ReportsBase[int]):\n"
+                "    if TYPE_CHECKING:\n"
+                "        title: str\n"
+                "        class Metadata: ...\n"
+                "    def metadata(self) -> 'Metadata': ...\n"
+                "    def configure(self, config_data: config.AppOptions) -> None: ...\n"
+                "    @overload\n"
+                "    async def read(self, key: str) -> str: ...\n"
+                "    @overload\n"
+                "    async def read(self, key: int) -> bytes: ...\n"
+                "    async def read(self, key): ...\n"
+                "    def update(self, *, enabled: bool = True) -> None: ...\n",
+                encoding="utf-8",
+            )
+            command = MakeFacade()
+            command.setArguments(
+                {"accessor": "reports", "contract": "report_api.Reports"},
+            )
+            _, (_, path) = command.createFiles(_Application(root), "reports")
+            source = (root / path).read_text(encoding="utf-8")
+            self.assertIn("def format(cls, value: str, /) -> bytes:", source)
+            self.assertIn("def update(cls, *, enabled: bool=True) -> None:", source)
+            self.assertIn("async def read(cls, key: int) -> bytes:", source)
+            self.assertIn("async def read(cls, key: str) -> str:", source)
+            self.assertIn("title: ClassVar[str]", source)
+            self.assertIn(
+                "from orionis.foundation.config import options as _options", source,
+            )
+            self.assertIn("config_data: _options.AppOptions", source)
+            self.assertIn("-> report_api.Reports.Metadata:", source)
+            self.assertIn(
+                "convert(__cls, cls: type[int], /, *, _cls: str) -> int:",
+                source,
+            )
+            self.assertEqual(source.count("@overload"), 2)
+            self.assertEqual(source.count("@classmethod"), 9)
+            compile(source, str(path), "exec")
+
+    def testFacadeContractFailureLeavesNoPartialPair(self) -> None:
+        """
+        Validate the contract and preserve any independently existing stub.
+
+        Returns
+        -------
+        None
+            Assert that validation failures and collisions preserve existing files.
+        """
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            app = _Application(root)
+            command = MakeFacade()
+            command.setArguments({"accessor": "reports", "contract": "unknown.Reports"})
+            with self.assertRaises(ValueError):
+                command.createFiles(app, "reports")
+            self.assertFalse(list(root.rglob("reports.py")))
+
+            command.setArguments({"accessor": "reports", "contract": None})
+            _, (_, path) = command.createFiles(app, "reports")
+            stub = root / path
+            original = stub.read_bytes()
+            runtime = stub.with_suffix(".py")
+            initial_runtime = runtime.read_bytes()
+            with self.assertRaises(FileExistsError):
+                command.createFiles(app, "reports")
+            self.assertEqual(stub.read_bytes(), original)
+            self.assertEqual(runtime.read_bytes(), initial_runtime)
+            stub.with_suffix(".py").unlink()
+            with self.assertRaises(FileExistsError):
+                command.createFiles(app, "reports")
+            self.assertEqual(stub.read_bytes(), original)
+            self.assertFalse(stub.with_suffix(".py").exists())
+
     def testGeneratedStringLiteralsPreserveQuotedAndMultilineValues(self) -> None:
         """Verify generated literals preserve quoted and multiline values.
 

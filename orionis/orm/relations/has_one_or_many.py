@@ -1,7 +1,8 @@
-# ruff: noqa: TC001
+# ruff: noqa: TC001, TC003
 # Keep model and collection annotations available to runtime introspection.
 """Shared machinery for the ``hasOne``/``hasMany`` relationship kinds."""
 
+from collections.abc import Sequence
 import orionis.orm as _orm
 from collections import defaultdict
 from typing import Any
@@ -10,7 +11,9 @@ from orionis.orm.relations.relation import Relation
 from orionis.support.types.collection import Collection
 
 
-class HasOneOrManyRelation[TRelated: _orm.Model](Relation[TRelated]):
+class HasOneOrManyRelation[TRelated: _orm.Model, TResult = Any](
+    Relation[TRelated, TResult],
+):
     """
     Shared machinery for the ``hasOne``/``hasMany`` relationship kinds.
 
@@ -81,13 +84,13 @@ class HasOneOrManyRelation[TRelated: _orm.Model](Relation[TRelated]):
         else:
             self.where(self._foreign_key, value)
 
-    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
+    def addEagerConstraints(self, models: Sequence[_orm.Model]) -> None:
         """
         Constrain the query to the rows owned by every parent instance.
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
 
         Returns
@@ -106,7 +109,7 @@ class HasOneOrManyRelation[TRelated: _orm.Model](Relation[TRelated]):
 
     def _groupByForeignKey(
         self,
-        results: Collection,
+        results: Collection[TRelated],
     ) -> dict[Any, list[TRelated]]:
         """
         Group related rows by their foreign key value.

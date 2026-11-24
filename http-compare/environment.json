@@ -1,5 +1,5 @@
 {
-  "recorded_at": "2026-11-23T21:48:07.598887+00:00",
+  "recorded_at": "2026-11-24T04:11:07.040418+00:00",
   "os": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39",
   "architecture": "x86_64",
   "cpu": "Intel(R) Xeon(R) 6975P-C",
@@ -17,9 +17,9 @@
     "starlette": "1.10.0",
     "oha": "1.16.0"
   },
-  "commit": "aaa714e5cec6ecb0c18c7cbb4d6cb2251066612b",
+  "commit": "6bc489e67fa9badddc77d8d59078b603d485232d",
   "dirty": false,
-  "uv_lock_sha256": "c3f62684d9ff0c3bfacaf5f8690d1644a048e6194230072057f084939e0c91ae",
+  "uv_lock_sha256": "e0c55ceced58a84d20048bc4a57fd532fb2ed083aaf4163bd20ef0e5d9743bd4",
   "dependencies": [
     "APScheduler==3.11.3",
     "Faker==40.54.0",
@@ -87,6 +87,6 @@
     "uvloop==0.23.0",
     "watchfiles==1.3.0"
   ],
-  "run_url": "https://github.com/orionis-framework/framework/actions/runs/45273256233",
-  "oha_executable": "/tmp/http-compare-oha-azlnz82q/oha-linux-amd64"
+  "run_url": "https://github.com/orionis-framework/framework/actions/runs/45324559113",
+  "oha_executable": "/tmp/http-compare-oha-3vs6sx1e/oha-linux-amd64"
 }

@@ -11,7 +11,7 @@ from typing import Any
 from orionis.console.base.contracts.command import IBaseCommand
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.console.core.loader import Loader
-from orionis.console.entities.command import Command
+from orionis.console.entities.command import Command, CommandInfo
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.console.output.executor import Executor
 from orionis.console.output.help_command import HelpCommand
@@ -84,7 +84,7 @@ class Reactor(IReactor):
         """Catch instance for handling exceptions."""
 
         # Initialize cache for command information
-        self.__cache_info: list[dict] | None = None
+        self.__cache_info: list[CommandInfo] | None = None
         """Initialize cache for command information."""
 
     def __parseCommandArgs(
@@ -211,7 +211,7 @@ class Reactor(IReactor):
         """
         return await self.__loader.get(signature) is not None
 
-    async def info(self) -> list[dict]:
+    async def info(self) -> list[CommandInfo]:
         """
         Return cached metadata for non-internal commands.
 
@@ -229,7 +229,7 @@ class Reactor(IReactor):
             return self.__cache_info
 
         # Prepare a list to hold command information
-        commands_info = []
+        commands_info: list[CommandInfo] = []
 
         # Ensure all commands are loaded before retrieving their information
         all_commands: dict[str, Command] = await self.__loader.all()

@@ -23,33 +23,33 @@ text { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
 <line class="grid" x1="770.00" y1="92" x2="770.00" y2="388"/>
 <text class="muted" x="770.00" y="412" text-anchor="middle">80,000</text>
 <g data-framework="orionis-rsgi">
-<title>Orionis RSGI: 51,933.63 requests/s</title>
+<title>Orionis RSGI: 52,083.71 requests/s</title>
 <text class="label" x="138" y="127" text-anchor="end">Orionis RSGI</text>
-<rect class="bar" x="150" y="100" width="402.49" height="44" rx="6"/>
-<text class="label" x="562.49" y="127">51,933.63</text>
+<rect class="bar" x="150" y="100" width="403.65" height="44" rx="6"/>
+<text class="label" x="563.65" y="127">52,083.71</text>
 </g>
 <g data-framework="orionis-asgi">
-<title>Orionis ASGI: 50,521.96 requests/s</title>
+<title>Orionis ASGI: 50,377.99 requests/s</title>
 <text class="label" x="138" y="187" text-anchor="end">Orionis ASGI</text>
-<rect class="bar" x="150" y="160" width="391.55" height="44" rx="6"/>
-<text class="label" x="551.55" y="187">50,521.96</text>
+<rect class="bar" x="150" y="160" width="390.43" height="44" rx="6"/>
+<text class="label" x="550.43" y="187">50,377.99</text>
 </g>
 <g data-framework="starlette">
-<title>Starlette: 20,486.61 requests/s</title>
+<title>Starlette: 20,632.39 requests/s</title>
 <text class="label" x="138" y="247" text-anchor="end">Starlette</text>
-<rect class="bar" x="150" y="220" width="158.77" height="44" rx="6"/>
-<text class="label" x="318.77" y="247">20,486.61</text>
+<rect class="bar" x="150" y="220" width="159.90" height="44" rx="6"/>
+<text class="label" x="319.90" y="247">20,632.39</text>
 </g>
 <g data-framework="litestar">
-<title>Litestar: 17,431.49 requests/s</title>
+<title>Litestar: 17,471.16 requests/s</title>
 <text class="label" x="138" y="307" text-anchor="end">Litestar</text>
-<rect class="bar" x="150" y="280" width="135.09" height="44" rx="6"/>
-<text class="label" x="295.09" y="307">17,431.49</text>
+<rect class="bar" x="150" y="280" width="135.40" height="44" rx="6"/>
+<text class="label" x="295.40" y="307">17,471.16</text>
 </g>
 <g data-framework="fastapi">
-<title>FastAPI: 15,272.88 requests/s</title>
+<title>FastAPI: 15,389.58 requests/s</title>
 <text class="label" x="138" y="367" text-anchor="end">FastAPI</text>
-<rect class="bar" x="150" y="340" width="118.36" height="44" rx="6"/>
-<text class="label" x="278.36" y="367">15,272.88</text>
+<rect class="bar" x="150" y="340" width="119.27" height="44" rx="6"/>
+<text class="label" x="279.27" y="367">15,389.58</text>
 </g>
 </svg>

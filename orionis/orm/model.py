@@ -247,7 +247,7 @@ class Model(
     # ── Hydration ───────────────────────────────────────────────────────────
 
     @classmethod
-    def _newFromDatabase(cls: type[Self], row: dict[str, Any]) -> Model:
+    def _newFromDatabase(cls: type[Self], row: dict[str, Any]) -> Self:
         """
         Hydrate a model instance from a database row.
 
@@ -276,7 +276,7 @@ class Model(
     # ── Query entry points ──────────────────────────────────────────────────
 
     @classmethod
-    def query(cls: type[Self]) -> ModelQueryBuilder[Any]:
+    def query(cls: type[Self]) -> ModelQueryBuilder[Self]:
         """
         Start a new query builder bound to this model.
 
@@ -310,8 +310,8 @@ class Model(
     def addGlobalScope(
         cls: type[Self],
         name: str,
-        scope: Callable[[ModelQueryBuilder[Any]], None],
-    ) -> type[Model]:
+        scope: Callable[[ModelQueryBuilder[Self]], None],
+    ) -> type[Self]:
         """
         Register a constraint applied to every query of this model.
 
@@ -332,7 +332,7 @@ class Model(
         return cls
 
     @classmethod
-    def removeGlobalScope(cls: type[Self], name: str) -> type[Model]:
+    def removeGlobalScope(cls: type[Self], name: str) -> type[Self]:
         """
         Unregister a previously added global scope.
 
@@ -350,7 +350,7 @@ class Model(
         return cls
 
     @classmethod
-    async def all(cls: type[Self]) -> Collection:
+    async def all(cls: type[Self]) -> Collection[Self]:
         """
         Retrieve every row of the model table.
 
@@ -362,7 +362,7 @@ class Model(
         return await cls.query().get()
 
     @classmethod
-    async def find(cls: type[Self], key: Any) -> Model | None:
+    async def find(cls: type[Self], key: Any) -> Self | None:
         """
         Retrieve a model by its primary key.
 
@@ -379,7 +379,7 @@ class Model(
         return await cls.query().find(key)
 
     @classmethod
-    async def findOrFail(cls: type[Self], key: Any) -> Model:
+    async def findOrFail(cls: type[Self], key: Any) -> Self:
         """
         Retrieve a model by primary key or raise when absent.
 
@@ -401,7 +401,7 @@ class Model(
         return await cls.query().findOrFail(key)
 
     @classmethod
-    async def first(cls: type[Self]) -> Model | None:
+    async def first(cls: type[Self]) -> Self | None:
         """
         Retrieve the first row of the model table.
 
@@ -413,7 +413,7 @@ class Model(
         return await cls.query().first()
 
     @classmethod
-    async def firstOrFail(cls: type[Self]) -> Model:
+    async def firstOrFail(cls: type[Self]) -> Self:
         """
         Retrieve the first row or raise when the table is empty.
 
@@ -430,7 +430,7 @@ class Model(
         return await cls.query().firstOrFail()
 
     @classmethod
-    async def create(cls: type[Self], attributes: dict[str, Any]) -> Model:
+    async def create(cls: type[Self], attributes: dict[str, Any]) -> Self:
         """
         Create, persist, and return a new model.
 

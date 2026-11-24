@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from orionis.http.routes.fluent import FluentRoute
     from orionis.http.routes.group import RouteGroup
-    from orionis.http.routes.types import MiddlewareInput, RouteAction
+    from orionis.http.routes.types import RouterExport, MiddlewareInput, RouteAction
     from orionis.realtime.hub import Hub
 
 
@@ -350,7 +350,7 @@ class IRouter(ABC):
         """
 
     @abstractmethod
-    def export(self) -> dict:
+    def export(self) -> RouterExport:
         """
         Export all registered routes and the fallback handler.
 

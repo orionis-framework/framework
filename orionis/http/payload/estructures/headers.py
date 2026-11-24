@@ -2,7 +2,7 @@
 # Keep the existing boundary behavior and deliberately shaped fixtures.
 """Parse and expose HTTP headers with case-insensitive lookup."""
 
-from typing import TYPE_CHECKING, Self
+from typing import overload, TYPE_CHECKING, Self
 import re
 from orionis.support.patterns.final.meta import Final
 
@@ -148,6 +148,12 @@ class Headers(metaclass=Final):
         """
         return self._has_invalid_format
 
+    @overload
+    def get(self: Self, key: str, default: str) -> str: ...
+
+    @overload
+    def get(self: Self, key: str, default: None = None) -> str | None: ...
+
     def get(self: Self, key: str, default: str | None = None) -> str | None:
         """
         Return the last value for the given header key.
@@ -184,6 +190,12 @@ class Headers(metaclass=Final):
         if value is None:
             return 0
         return len(value) if isinstance(value, list) else 1
+
+    @overload
+    def getAll(self: Self, key: str) -> list[str]: ...
+
+    @overload
+    def getAll(self: Self, key: None = None) -> dict[str, list[str]]: ...
 
     def getAll(
         self: Self,

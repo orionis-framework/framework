@@ -4,9 +4,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Self
-from collections.abc import AsyncIterator, Iterable
+from collections.abc import AsyncIterator, Callable, Iterable
 from orionis.database.entities.result import InsertResult
 from orionis.orm.query.expressions import SelectPlan
+from orionis.orm.query.join_clause import JoinClause
 from orionis.orm.schema.table import TableDefinition
 from orionis.support.types.collection import Collection
 
@@ -693,7 +694,7 @@ class IQueryBuilderBase(ABC):
     def join(
         self: Self,
         table: str | TableDefinition,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -726,7 +727,7 @@ class IQueryBuilderBase(ABC):
     def leftJoin(
         self: Self,
         table: str | TableDefinition,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -758,7 +759,7 @@ class IQueryBuilderBase(ABC):
     def rightJoin(
         self: Self,
         table: str | TableDefinition,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -790,7 +791,7 @@ class IQueryBuilderBase(ABC):
     def fullJoin(
         self: Self,
         table: str | TableDefinition,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -846,7 +847,7 @@ class IQueryBuilderBase(ABC):
         self: Self,
         query: Any,
         alias: str,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -877,7 +878,7 @@ class IQueryBuilderBase(ABC):
         self: Self,
         query: Any,
         alias: str,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -908,7 +909,7 @@ class IQueryBuilderBase(ABC):
         self: Self,
         query: Any,
         alias: str,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:

@@ -4,7 +4,7 @@
 
 # Keep public view annotations resolvable through runtime introspection.
 from collections.abc import ItemsView, KeysView, ValuesView
-from typing import TYPE_CHECKING
+from typing import overload, TYPE_CHECKING
 from urllib.parse import unquote
 from orionis.support.patterns.final.meta import Final
 
@@ -58,6 +58,12 @@ class Cookies(metaclass=Final):
                 value = value[1:-1]
 
             self._data[key.strip()] = unquote(value)
+
+    @overload
+    def get(self, key: str, default: str) -> str: ...
+
+    @overload
+    def get(self, key: str, default: None = None) -> str | None: ...
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """

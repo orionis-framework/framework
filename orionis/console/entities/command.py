@@ -2,12 +2,29 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 from orionis.support.entities.base import BaseEntity
 
 if TYPE_CHECKING:
     import argparse
     from orionis.console.args.argument import Argument
+
+
+class CommandInfo(TypedDict):
+    """Metadata returned by the command reactor."""
+
+    signature: str
+    """CLI name used to invoke this command."""
+    timestamps: bool
+    """Whether command output includes execution timestamps."""
+    description: str
+    """Help text summarizing the command."""
+    arguments: list[Argument] | argparse.ArgumentParser | None
+    """Argument declarations or the parser built from them."""
+    object: type
+    """Command class instantiated by the reactor."""
+    method: str
+    """Name of the method invoked on the command instance."""
 
 
 @dataclass(kw_only=True)

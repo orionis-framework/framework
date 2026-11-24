@@ -16,7 +16,8 @@ from orionis.http.routes.route_id import RouteID
 if TYPE_CHECKING:
     from collections.abc import Callable
     from orionis.http.middleware import BaseMiddleware
-    from orionis.http.routes.types import MiddlewareInput, RouteAction
+    from orionis.http.websocket_middleware import WebSocketMiddleware
+    from orionis.http.routes.types import ExportedRoute, MiddlewareInput, RouteAction
     from orionis.realtime.hub import Hub
 
 
@@ -144,8 +145,9 @@ class FluentRoute(IFluentRoute):
         self.__handler: str | None = None
         self.__callable_handler: Callable | None = None
         self.__name: str | None = None
-        self.__middleware: list[type[BaseMiddleware]] = []
-        self.__without_middleware: set[type[BaseMiddleware]] = set()
+        self.__middleware: list[type[BaseMiddleware | WebSocketMiddleware]] = []
+        self.__without_middleware: set[type[BaseMiddleware | WebSocketMiddleware]]
+        self.__without_middleware = set()
         self.__kind: str = "web"
         self.__public: bool | None = None
         self.__view: str | None = view
@@ -383,8 +385,8 @@ class FluentRoute(IFluentRoute):
     def inheritGroup(
         self,
         prefix: str,
-        middleware: tuple[type[BaseMiddleware], ...],
-        without_middleware: frozenset[type[BaseMiddleware]],
+        middleware: tuple[type[BaseMiddleware | WebSocketMiddleware], ...],
+        without_middleware: frozenset[type[BaseMiddleware | WebSocketMiddleware]],
         *,
         public: bool | None = None,
     ) -> Self:
@@ -436,7 +438,7 @@ class FluentRoute(IFluentRoute):
         self.__kind = kind.strip().lower()
         return self
 
-    def export(self) -> dict:
+    def export(self) -> ExportedRoute:
         """
         Export a complete route configuration as a plain dictionary.
 

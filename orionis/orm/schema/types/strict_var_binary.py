@@ -6,7 +6,7 @@ from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictVarBinary(ColumnDefinition):
+class StrictVarBinary[TValue = bytes](ColumnDefinition[TValue]):
     """The SQL ``VARBINARY`` type."""
 
     __slots__ = ()

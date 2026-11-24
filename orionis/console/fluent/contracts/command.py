@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from orionis.console.args.argument import Argument
     from orionis.console.entities.command import Command as CommandEntity
 
 
@@ -58,7 +59,7 @@ class ICommand(ABC):
         """
 
     @abstractmethod
-    def arguments(self, args: list) -> ICommand:
+    def arguments(self, args: list[Argument]) -> ICommand:
         """
         Set CLI arguments for the command.
 

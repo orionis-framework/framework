@@ -1653,6 +1653,7 @@ dependencies = [
     { name = "redis", extra = ["hiredis"] },
     { name = "rich" },
     { name = "sqlalchemy", extra = ["asyncio"] },
+    { name = "typing-extensions" },
     { name = "uritemplate" },
     { name = "uvloop", marker = "sys_platform != 'win32'" },
 ]
@@ -1771,6 +1772,7 @@ requires-dist = [
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.1.8,<3.0" },
     { name = "sqlalchemy-redshift", marker = "extra == 'database'", specifier = ">=1.0.0,<2.0" },
     { name = "sqlalchemy-redshift", marker = "extra == 'redshift'", specifier = ">=1.0.0,<2.0" },
+    { name = "typing-extensions", specifier = ">=4.13.0" },
     { name = "uritemplate", specifier = ">=4.2.0,<5.0" },
     { name = "uvloop", marker = "sys_platform != 'win32'", specifier = ">=0.23.0" },
 ]

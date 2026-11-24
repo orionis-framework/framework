@@ -2,7 +2,6 @@
 # Public annotations remain available to runtime inspection.
 """Inspect the class and members of an existing object."""
 
-from __future__ import annotations
 import inspect
 import keyword
 import types
@@ -22,10 +21,10 @@ from orionis.introspection.dependencies.entities.signature import (
 )
 
 
-class ReflectionInstance(IReflectionInstance):
+class ReflectionInstance[T = Any](IReflectionInstance[T]):
     """Inspect the class and members of an existing object."""
 
-    def __init__(self, instance: Any) -> None:
+    def __init__(self, instance: T) -> None:
         """
         Initialize the ReflectionInstance with the given object instance.
 
@@ -69,7 +68,7 @@ class ReflectionInstance(IReflectionInstance):
             raise ValueError(error_msg)
 
         # Store the instance and its class metadata.
-        self._instance: Any = instance
+        self._instance: T = instance
         """The object instance to reflect."""
         self._cls: type = cls
         """Cls supplied through ``cls``."""
@@ -548,7 +547,7 @@ class ReflectionInstance(IReflectionInstance):
             },
         )
 
-    def getInstance(self) -> Any:
+    def getInstance(self) -> T:
         """
         Return the reflected object instance.
 
@@ -559,7 +558,7 @@ class ReflectionInstance(IReflectionInstance):
         """
         return self._instance
 
-    def getClass(self) -> type:
+    def getClass(self) -> type[T]:
         """
         Return the class of the instance.
 

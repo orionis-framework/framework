@@ -3,7 +3,7 @@
 """Relationship factories and loaded-relation storage for every model."""
 
 import orionis.orm as _orm
-from typing import Any
+from typing import Any, Self
 from orionis.orm.relations.belongs_to import BelongsToRelation
 from orionis.orm.relations.belongs_to_many import BelongsToManyRelation
 from orionis.orm.relations.has_many import HasManyRelation
@@ -173,7 +173,7 @@ class RelationsMixin:
 
     # ── Loaded relation storage ──────────────────────────────────────────────
 
-    def setRelation(self, name: str, value: Any) -> _orm.Model:
+    def setRelation(self, name: str, value: Any) -> Self:
         """
         Store an already-resolved relationship result.
 

@@ -48,6 +48,8 @@ El constructor, `fill()` y `update(attributes)` aplican asignación masiva. `fil
 
 La asignación directa (`article.status = "published"`) y `setAttribute` aplican mutadores/casts, pero no la lista `fillable`. Úsalas únicamente desde lógica confiable. Un mutador devuelve el valor a almacenar; luego se aplica el cast. Los casts disponibles son `int`, `float`, `bool`, `datetime`, `date`, `json` y `uuid`; `None` permanece `None`. Los casts no sustituyen validación de entrada ni restricciones SQL.
 
+El cast `datetime` devuelve un `pendulum.DateTime` en la zona horaria de la aplicación. Interpreta los valores sin zona como hora local de la aplicación y convierte los valores con zona y los timestamps POSIX sin cambiar el instante que representan.
+
 `toDict()`/`serialize()` convierten los atributos y relaciones cargadas; `hidden` excluye secretos y `appends` incorpora accessors calculados. `toJson(**kwargs)` produce JSON. `only(*keys)` y `exclude(*keys)` seleccionan desde la representación serializada. Ocultar una columna no cifra su contenido ni impide consultarla.
 
 ## Guardar y actualizar

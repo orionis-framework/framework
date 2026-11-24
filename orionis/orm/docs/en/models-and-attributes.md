@@ -48,6 +48,8 @@ The constructor, `fill()`, and `update(attributes)` apply mass-assignment rules.
 
 Direct assignment (`article.status = "published"`) and `setAttribute` apply mutators/casts but bypass `fillable`. Use them only in trusted logic. A mutator returns the stored value; casting follows. Available casts are `int`, `float`, `bool`, `datetime`, `date`, `json`, and `uuid`; `None` remains `None`. Casting does not replace input validation or SQL constraints.
 
+The `datetime` cast returns a `pendulum.DateTime` in the application timezone. It interprets naive values as application-local time and converts timezone-aware values and POSIX timestamps without changing the instant they represent.
+
 `toDict()`/`serialize()` convert attributes and loaded relationships; `hidden` excludes secrets and `appends` adds computed accessors. `toJson(**kwargs)` produces JSON. `only(*keys)` and `exclude(*keys)` select from the serialized representation. Hiding a column neither encrypts it nor prevents queries.
 
 ## Save and update

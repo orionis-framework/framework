@@ -3,14 +3,17 @@
 # Exercise required hook signatures, synthetic secrets, and declared column names.
 from __future__ import annotations
 import uuid
+import pendulum
 from datetime import UTC, date, datetime
 from typing import ClassVar
+from unittest.mock import patch
 import tests.orm.test_events as feature_fixtures
 import tests.orm.test_state as state_fixtures
 from orionis.orm import Integer, Model, StrictJson, String, Text
 from orionis.orm.attributes import get_cast_handler, serialize_for_storage
 from orionis.orm.exceptions import OrmException
 from orionis.orm.schema.types import Uuid
+from orionis.support.facades import DateTime
 from orionis.test import TestCase
 
 
@@ -67,12 +70,21 @@ class TestCastHandlers(TestCase):
             No return value.
         """
         handler = get_cast_handler("datetime")
-        now = datetime.now(UTC)
-        self.assertIs(handler(now), now)
-        parsed = handler("2026-07-24T10:30:00")
-        self.assertEqual(parsed, datetime(2026, 7, 24, 10, 30))
-        stamped = handler(0)
-        self.assertEqual(stamped, datetime.fromtimestamp(0, tz=UTC))
+        timezone = "America/Bogota"
+        cases = (
+            (datetime(2026, 7, 24, 15, 30, tzinfo=UTC), "2026-07-24T10:30:00-05:00"),
+            ("2026-07-24T10:30:00", "2026-07-24T10:30:00-05:00"),
+            ("2026-07-24T17:30:00+02:00", "2026-07-24T10:30:00-05:00"),
+            (0, "1969-12-31T19:00:00-05:00"),
+            (0.5, "1969-12-31T19:00:00.500000-05:00"),
+        )
+        with patch.object(DateTime, "_timezone", timezone):
+            for value, expected in cases:
+                with self.subTest(value=value):
+                    result = handler(value)
+                    self.assertIsInstance(result, pendulum.DateTime)
+                    self.assertEqual(result.timezone_name, timezone)
+                    self.assertEqual(result.isoformat(), expected)
 
     def testDateCastAcceptsMultipleShapes(self) -> None:
         """Cast dates from datetimes, dates, and ISO strings.

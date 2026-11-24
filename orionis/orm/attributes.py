@@ -1,9 +1,10 @@
-# ruff: noqa: ANN401, TC001, TC003
+# ruff: noqa: ANN401, TC001, TC002, TC003
 # Retain runtime annotations and dynamic attribute values.
 """Attribute handling behavior shared by every model."""
 
 from __future__ import annotations
 import json
+import pendulum
 import uuid
 from datetime import UTC, date, datetime
 from collections.abc import Callable
@@ -11,6 +12,7 @@ from typing import Any, Self
 from orionis.orm import metaclass as metaclass_module
 from orionis.orm.exceptions import MassAssignmentException, OrmException
 from orionis.orm.schema.types import ColumnType
+from orionis.support.facades import DateTime
 
 # Strings interpreted as truthy when casting to bool.
 _TRUTHY_STRINGS: frozenset[str] = frozenset({"1", "true", "yes", "on"})
@@ -36,7 +38,7 @@ def _cast_bool(value: Any) -> bool:
     return bool(value)
 
 
-def _cast_datetime(value: Any) -> datetime:
+def _cast_datetime(value: Any) -> pendulum.DateTime:
     """
     Cast a raw value to ``datetime``.
 
@@ -47,14 +49,14 @@ def _cast_datetime(value: Any) -> datetime:
 
     Returns
     -------
-    datetime.datetime
-        Datetime representation of the value.
+    ``pendulum.DateTime``
+        Datetime in the application timezone.
     """
-    if isinstance(value, datetime):
-        return value
     if isinstance(value, (int, float)):
-        return datetime.fromtimestamp(value, tz=UTC)
-    return datetime.fromisoformat(str(value))
+        value = datetime.fromtimestamp(value, tz=UTC)
+    elif not isinstance(value, datetime):
+        value = datetime.fromisoformat(str(value))
+    return DateTime.fromDatetime(value)
 
 
 def _cast_date(value: Any) -> date:

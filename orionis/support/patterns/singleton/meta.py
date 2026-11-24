@@ -1,6 +1,9 @@
+# ruff: noqa: SLF001
+# Each constructed class stores its singleton state on this metaclass.
 """Create one instance per class with synchronous and asynchronous access."""
 
 import threading
+from typing import cast
 
 _MISSING: object = object()
 """Sentinel distinguishing missing from ordinary values."""
@@ -9,8 +12,17 @@ _MISSING: object = object()
 class Singleton(type):
     """Create one instance per class with synchronous and asynchronous access."""
 
+    _singleton_instance: object
+    """Instance cached for this class, or the sentinel until construction succeeds."""
+
+    _singleton_lock: threading.Lock
+    """Lock that serializes construction of this class's instance."""
+
+    _singleton_owner: int | None
+    """Thread identifier used to detect recursive construction, or None when idle."""
+
     def __init__(
-        cls: type,
+        cls,
         name: str,
         bases: tuple[type, ...],
         namespace: dict[str, object],
@@ -39,11 +51,11 @@ class Singleton(type):
         type.__setattr__(cls, "_singleton_lock", threading.Lock())
         type.__setattr__(cls, "_singleton_owner", None)
 
-    def __call__(
-        cls: type,
+    def __call__[T](
+        cls: type[T],
         *args: object,
         **kwargs: object,
-    ) -> object:
+    ) -> T:
         """
         Create or retrieve the thread-safe singleton instance.
 
@@ -66,17 +78,18 @@ class Singleton(type):
         RuntimeError
             If the constructor recursively requests the same singleton.
         """
-        instance = cls._singleton_instance
+        state = cast("Singleton", cls)
+        instance = state._singleton_instance
         if instance is not _MISSING:
-            return instance
+            return cast("T", instance)
 
         owner = threading.get_ident()
-        if cls._singleton_owner == owner:
+        if state._singleton_owner == owner:
             error_msg = f"Recursive singleton construction for {cls.__name__}."
             raise RuntimeError(error_msg)
 
-        with cls._singleton_lock:
-            instance = cls._singleton_instance
+        with state._singleton_lock:
+            instance = state._singleton_instance
             if instance is _MISSING:
                 type.__setattr__(cls, "_singleton_owner", owner)
                 try:
@@ -85,13 +98,13 @@ class Singleton(type):
                 finally:
                     type.__setattr__(cls, "_singleton_owner", None)
 
-        return instance
+        return cast("T", instance)
 
-    async def __acall__(
-        cls: type,
+    async def __acall__[T](
+        cls: type[T],
         *args: object,
         **kwargs: object,
-    ) -> object:
+    ) -> T:
         """
         Create or retrieve the singleton instance through an awaitable API.
 

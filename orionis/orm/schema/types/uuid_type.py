@@ -1,12 +1,13 @@
 """Represent a database agnostic UUID datatype."""
 
 from __future__ import annotations
+from uuid import UUID
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class Uuid(ColumnDefinition):
+class Uuid[TValue = UUID | str](ColumnDefinition[TValue]):
     """Represent a database agnostic UUID datatype."""
 
     __slots__ = ()

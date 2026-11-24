@@ -7,7 +7,7 @@ import json
 import uuid
 from datetime import UTC, date, datetime
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Self
 from orionis.orm import metaclass as metaclass_module
 from orionis.orm.exceptions import MassAssignmentException, OrmException
 from orionis.orm.schema.types import ColumnType
@@ -215,7 +215,7 @@ class AttributesMixin:
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    def fill(self, attributes: dict[str, Any]) -> Any:
+    def fill(self, attributes: dict[str, Any]) -> Self:
         """
         Mass assign the given attributes honoring the assignment rules.
 

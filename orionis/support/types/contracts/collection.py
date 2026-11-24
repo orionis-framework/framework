@@ -2,20 +2,19 @@
 # Keep public callback annotations available for runtime contract inspection.
 """Define the contract for collection implementations."""
 
-from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Any, Self
+from typing import Any, Self, overload
 
 
-class ICollection(ABC):
+class ICollection[T = Any](ABC):
     """Define the contract for collection implementations."""
 
     @abstractmethod
     def take(
         self: Self,
         number: int,
-    ) -> ICollection:
+    ) -> ICollection[T]:
         """
         Take a specific number of items from the collection.
 
@@ -33,8 +32,8 @@ class ICollection(ABC):
     @abstractmethod
     def first(
         self: Self,
-        callback: Callable | None = None,
-    ) -> object:
+        callback: Callable[[T], object] | None = None,
+    ) -> T | None:
         """
         Return the first item in the collection, optionally filtered by a callback.
 
@@ -53,8 +52,8 @@ class ICollection(ABC):
     @abstractmethod
     def last(
         self: Self,
-        callback: Callable | None = None,
-    ) -> object:
+        callback: Callable[[T], object] | None = None,
+    ) -> T | None:
         """
         Return the last item in the collection, optionally filtered by a callback.
 
@@ -70,7 +69,7 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def all(self: Self) -> list[Any] | dict[Any, Any]:
+    def all(self: Self) -> list[T] | dict[Any, Any]:
         """
         Return all items in the collection.
 
@@ -139,10 +138,10 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def chunk(
-        self: Self,
+    def chunk[C: ICollection](
+        self: C,
         size: int,
-    ) -> ICollection:
+    ) -> ICollection[C]:
         """
         Divide the collection into smaller collections of a specified size.
 
@@ -158,7 +157,7 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def collapse(self: Self) -> ICollection:
+    def collapse(self: Self) -> ICollection[Any]:
         """
         Collapse the collection of arrays into a single, flat collection.
 
@@ -171,7 +170,7 @@ class ICollection(ABC):
     @abstractmethod
     def contains(
         self: Self,
-        key: str | Callable,
+        key: str | Callable[[T], object],
         value: object | None = None,
     ) -> bool:
         """
@@ -205,7 +204,7 @@ class ICollection(ABC):
     def diff(
         self: Self,
         items: list[Any] | ICollection,
-    ) -> ICollection:
+    ) -> ICollection[T]:
         """
         Return items not present in the given collection.
 
@@ -223,8 +222,8 @@ class ICollection(ABC):
     @abstractmethod
     def each(
         self: Self,
-        callback: Callable,
-    ) -> ICollection:
+        callback: Callable[[T], T],
+    ) -> ICollection[T]:
         """
         Iterate over items and apply the callback to each.
 
@@ -242,7 +241,7 @@ class ICollection(ABC):
     @abstractmethod
     def every(
         self: Self,
-        callback: Callable,
+        callback: Callable[[T], object],
     ) -> bool:
         """
         Determine whether all items satisfy the given callback condition.
@@ -261,8 +260,8 @@ class ICollection(ABC):
     @abstractmethod
     def filter(
         self: Self,
-        callback: Callable,
-    ) -> ICollection:
+        callback: Callable[[T], object],
+    ) -> ICollection[T]:
         """
         Filter items in the collection using a callback.
 
@@ -278,7 +277,7 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def flatten(self: Self) -> ICollection:
+    def flatten(self: Self) -> ICollection[Any]:
         """
         Flatten the collection into a single dimension.
 
@@ -292,7 +291,7 @@ class ICollection(ABC):
     def forget(
         self: Self,
         *keys: int | str,
-    ) -> ICollection:
+    ) -> Self:
         """
         Remove items from the collection by their keys.
 
@@ -312,7 +311,7 @@ class ICollection(ABC):
         self: Self,
         page: int,
         number: int,
-    ) -> ICollection:
+    ) -> ICollection[T]:
         """
         Slice the collection for pagination.
 
@@ -328,6 +327,15 @@ class ICollection(ABC):
         orionis.support.types.contracts.collection.ICollection
             A new Collection containing the paginated items.
         """
+
+    @overload
+    def get(self, key: int | str) -> T | None: ...
+
+    @overload
+    def get[D](self, key: int | str, default: Callable[[], D]) -> T | D: ...
+
+    @overload
+    def get[D](self, key: int | str, default: D) -> T | D: ...
 
     @abstractmethod
     def get(
@@ -385,10 +393,10 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def map(
+    def map[U](
         self: Self,
-        callback: Callable,
-    ) -> ICollection:
+        callback: Callable[[T], U],
+    ) -> ICollection[U]:
         """
         Apply a function to each item in the collection.
 
@@ -403,13 +411,24 @@ class ICollection(ABC):
             A new Collection containing the mapped items.
         """
 
+    @overload
+    def mapInto[U](
+        self,
+        cls: type[U],
+        method: None = None,
+        **kwargs: object,
+    ) -> ICollection[U | None]: ...
+
+    @overload
+    def mapInto(self, cls: type, method: str, **kwargs: object) -> ICollection[Any]: ...
+
     @abstractmethod
     def mapInto(
         self: Self,
         cls: type,
         method: str | None = None,
         **kwargs: object,
-    ) -> ICollection:
+    ) -> ICollection[Any]:
         """
         Map items into instances of the given class.
 
@@ -431,8 +450,8 @@ class ICollection(ABC):
     @abstractmethod
     def merge(
         self: Self,
-        items: list[Any] | ICollection,
-    ) -> ICollection:
+        items: list[T] | ICollection[T],
+    ) -> Self:
         """
         Merge the collection with the given items.
 
@@ -457,7 +476,7 @@ class ICollection(ABC):
         self: Self,
         value: str,
         key: str | None = None,
-    ) -> ICollection:
+    ) -> ICollection[Any]:
         """
         Extract values for a given key from all items.
 
@@ -475,7 +494,7 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def pop(self: Self) -> object:
+    def pop(self: Self) -> T | None:
         """
         Remove and return the last item from the collection.
 
@@ -488,8 +507,8 @@ class ICollection(ABC):
     @abstractmethod
     def prepend(
         self: Self,
-        value: object,
-    ) -> ICollection:
+        value: T,
+    ) -> Self:
         """
         Prepend an item to the beginning of the collection.
 
@@ -508,7 +527,7 @@ class ICollection(ABC):
     def pull(
         self: Self,
         key: int | str,
-    ) -> object:
+    ) -> T | None:
         """
         Remove and return an item from the collection by key.
 
@@ -526,8 +545,8 @@ class ICollection(ABC):
     @abstractmethod
     def push(
         self: Self,
-        value: object,
-    ) -> ICollection:
+        value: T,
+    ) -> Self:
         """
         Add an item to the end of the collection.
 
@@ -546,8 +565,8 @@ class ICollection(ABC):
     def put(
         self: Self,
         key: int | str,
-        value: object,
-    ) -> ICollection:
+        value: T,
+    ) -> Self:
         """
         Insert or update an item in the collection at the specified key.
 
@@ -564,11 +583,17 @@ class ICollection(ABC):
             The current collection instance with the updated item.
         """
 
+    @overload
+    def random(self, count: None = None) -> T | None: ...
+
+    @overload
+    def random(self, count: int) -> ICollection[T] | None: ...
+
     @abstractmethod
     def random(
         self: Self,
         count: int | None = None,
-    ) -> object | ICollection | None:
+    ) -> T | ICollection[T] | None:
         """
         Return one or more random items from the collection.
 
@@ -614,8 +639,8 @@ class ICollection(ABC):
     @abstractmethod
     def reject(
         self: Self,
-        callback: Callable,
-    ) -> ICollection:
+        callback: Callable[[T], object],
+    ) -> Self:
         """
         Reject items that pass a given truth test.
 
@@ -631,7 +656,7 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def reverse(self: Self) -> ICollection:
+    def reverse(self: Self) -> Self:
         """
         Reverse the order of items in the collection.
 
@@ -653,7 +678,7 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def shift(self: Self) -> object:
+    def shift(self: Self) -> T | None:
         """
         Remove and return the first item from the collection.
 
@@ -667,7 +692,7 @@ class ICollection(ABC):
     def sort(
         self: Self,
         key: str | None = None,
-    ) -> ICollection:
+    ) -> Self:
         """
         Sort the items in the collection.
 
@@ -724,7 +749,7 @@ class ICollection(ABC):
     def groupBy(
         self: Self,
         key: str,
-    ) -> ICollection:
+    ) -> ICollection[Any]:
         """
         Group items in the collection by a specified key.
 
@@ -744,8 +769,8 @@ class ICollection(ABC):
     @abstractmethod
     def transform(
         self: Self,
-        callback: Callable,
-    ) -> ICollection:
+        callback: Callable[[T], T],
+    ) -> ICollection[T]:
         """
         Transform each item in the collection using a callback.
 
@@ -763,8 +788,8 @@ class ICollection(ABC):
     @abstractmethod
     def unique(
         self: Self,
-        key: str | Callable | None = None,
-    ) -> ICollection:
+        key: str | Callable[[T], object] | None = None,
+    ) -> ICollection[T]:
         """
         Return unique items from the collection.
 
@@ -784,7 +809,7 @@ class ICollection(ABC):
         self: Self,
         key: str,
         *args: object,
-    ) -> ICollection:
+    ) -> ICollection[T]:
         """
         Filter items by a given key-value pair or comparison.
 
@@ -806,7 +831,7 @@ class ICollection(ABC):
         self: Self,
         key: str,
         values: list[Any] | ICollection,
-    ) -> ICollection:
+    ) -> ICollection[T]:
         """
         Filter items where a given key's value is in a list of values.
 
@@ -828,7 +853,7 @@ class ICollection(ABC):
         self: Self,
         key: str,
         values: list[Any] | ICollection,
-    ) -> ICollection:
+    ) -> ICollection[T]:
         """
         Filter items where a given key's value is not in a list of values.
 
@@ -846,10 +871,10 @@ class ICollection(ABC):
         """
 
     @abstractmethod
-    def zip(
+    def zip[U](
         self: Self,
-        items: list[Any] | ICollection,
-    ) -> ICollection:
+        items: list[U] | ICollection[U],
+    ) -> ICollection[list[T | U]]:
         """
         Zip the collection with the given items by index.
 
@@ -873,7 +898,7 @@ class ICollection(ABC):
     def setAppends(
         self: Self,
         appends: list[str],
-    ) -> ICollection:
+    ) -> Self:
         """
         Set the attributes to append to the Collection.
 

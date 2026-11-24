@@ -2,7 +2,9 @@
 # Preserve runtime injection types and resolve optional driver implementations lazily.
 """Expose an algorithm-agnostic hashing API."""
 
-from typing import Self
+from __future__ import annotations
+from typing import Literal, Self, overload
+from orionis import hashing
 from orionis.foundation.config.hashing.entities.hashing import Hashing as _HashingConfig
 from orionis.foundation.config.hashing.enums.drivers import Drivers
 from orionis.foundation.contracts.application import IApplication
@@ -65,6 +67,15 @@ class HashManager(IHashManager):
         """Configured backend drivers cached by their registered names."""
 
     # ── Driver resolution ───────────────────────────────────────────────────
+
+    @overload
+    def driver(self, name: Literal["argon2"]) -> hashing.Argon2Hasher: ...
+
+    @overload
+    def driver(self, name: Literal["bcrypt"]) -> hashing.BcryptHasher: ...
+
+    @overload
+    def driver(self, name: str | None = None) -> IHasher: ...
 
     def driver(self, name: str | None = None) -> IHasher:
         """

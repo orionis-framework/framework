@@ -6,7 +6,7 @@ from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictBlob(ColumnDefinition):
+class StrictBlob[TValue = bytes](ColumnDefinition[TValue]):
     """The SQL ``BLOB`` type."""
 
     __slots__ = ()

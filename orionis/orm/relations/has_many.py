@@ -1,11 +1,16 @@
+# ruff: noqa: TC003
+# Keep the public annotations available to runtime introspection.
 """One-to-many relationship: the related table owns the foreign key."""
 
+from collections.abc import Sequence
 import orionis.orm as _orm
 from orionis.orm.relations.has_one_or_many import HasOneOrManyRelation
 from orionis.support.types.collection import Collection
 
 
-class HasManyRelation[TRelated: _orm.Model](HasOneOrManyRelation[TRelated]):
+class HasManyRelation[TRelated: _orm.Model](
+    HasOneOrManyRelation[TRelated, Collection[TRelated]],
+):
     """
     One-to-many relationship: the related table owns the foreign key.
 
@@ -17,7 +22,7 @@ class HasManyRelation[TRelated: _orm.Model](HasOneOrManyRelation[TRelated]):
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
-    async def getResults(self) -> Collection:
+    async def getResults(self) -> Collection[TRelated]:
         """
         Retrieve every related row owned by the parent instance.
 
@@ -33,8 +38,8 @@ class HasManyRelation[TRelated: _orm.Model](HasOneOrManyRelation[TRelated]):
 
     def match(
         self,
-        models: list[_orm.Model],
-        results: Collection,
+        models: Sequence[_orm.Model],
+        results: Collection[TRelated],
         name: str,
     ) -> None:
         """
@@ -42,7 +47,7 @@ class HasManyRelation[TRelated: _orm.Model](HasOneOrManyRelation[TRelated]):
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
         results : orionis.support.types.Collection
             Related rows produced by ``getEager``.

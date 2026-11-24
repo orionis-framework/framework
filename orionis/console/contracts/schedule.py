@@ -5,7 +5,11 @@ from abc import ABC, abstractmethod
 from typing import Self, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from orionis.console.entities.task import ScheduledTaskInfo
     from collections.abc import Callable
+    from orionis.console.entities.scheduler_event import (
+        SchedulerEvent as SchedulerEventEntity,
+    )
     from orionis.console.enums.events import SchedulerEvent
     from orionis.console.fluent.contracts.task import ITask
 
@@ -14,7 +18,7 @@ class ISchedule(ABC):
     """Define the contract for schedule implementations."""
 
     @abstractmethod
-    async def info(self) -> list[dict]:
+    async def info(self) -> list[ScheduledTaskInfo]:
         """
         Retrieve information about all loaded fluent tasks.
 
@@ -43,7 +47,7 @@ class ISchedule(ABC):
     def on(
         self,
         event: SchedulerEvent,
-        listener: Callable,
+        listener: Callable[[SchedulerEventEntity], object],
     ) -> Self:
         """
         Register a listener for a scheduler event.

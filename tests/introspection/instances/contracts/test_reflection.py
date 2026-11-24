@@ -17,14 +17,28 @@ class _Partial(IReflectionInstance):
     """Implement one operation while leaving the rest abstract."""
 
     def clearCache(self) -> None:
-        """Implement one operation without completing the contract."""
+        """
+        Provide a no-op cache hook without completing the contract.
+
+        Returns
+        -------
+        None
+            Leave cache state unchanged in the partial implementation.
+        """
 
 
 class TestIReflectionInstance(TestCase):
     """Protect required operations and their real runtime signatures."""
 
     def testContractCannotBeInstantiated(self) -> None:
-        """Require implementations to supply all abstract operations."""
+        """
+        Require implementations to supply all abstract operations.
+
+        Returns
+        -------
+        None
+            Assert that the contract and partial implementation remain abstract.
+        """
         self.assertTrue(issubclass(IReflectionInstance, ABC))
         self.assertTrue(inspect.isabstract(IReflectionInstance))
         with self.assertRaises(TypeError):
@@ -33,7 +47,14 @@ class TestIReflectionInstance(TestCase):
             _Partial()
 
     def testRequiredOperations(self) -> None:
-        """Preserve the complete public abstract surface."""
+        """
+        Preserve the complete public abstract surface.
+
+        Returns
+        -------
+        None
+            Assert that the contract declares exactly the required operations.
+        """
         expected = {
             "getInstance",
             "getClass",
@@ -104,13 +125,27 @@ class TestIReflectionInstance(TestCase):
         self.assertEqual(IReflectionInstance.__abstractmethods__, expected)
 
     def testConcreteImplementationSatisfiesTheContract(self) -> None:
-        """Instantiate the real implementation with its supported target."""
+        """
+        Instantiate the real implementation with its supported target.
+
+        Returns
+        -------
+        None
+            Assert that the reflection instance satisfies the abstract contract.
+        """
         self.assertFalse(inspect.isabstract(ReflectionInstance))
         reflected = ReflectionInstance(_Target())
         self.assertIsInstance(reflected, IReflectionInstance)
 
     def testRuntimeSignaturesMatchTheContract(self) -> None:
-        """Resolve every annotation and preserve arguments, defaults and returns."""
+        """
+        Resolve every annotation and preserve arguments, defaults and returns.
+
+        Returns
+        -------
+        None
+            Assert that implementation signatures match the resolved contract.
+        """
         for name in sorted(IReflectionInstance.__abstractmethods__):
             with self.subTest(method=name):
                 expected = inspect.signature(
@@ -121,4 +156,6 @@ class TestIReflectionInstance(TestCase):
                     getattr(ReflectionInstance, name),
                     eval_str=True,
                 )
-                self.assertEqual(actual, expected)
+                # Compare the resolved generic signatures by spelling. Each class
+                # owns a distinct type parameter even when both use the name T.
+                self.assertEqual(str(actual), str(expected))

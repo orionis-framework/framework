@@ -6,7 +6,7 @@
 import orionis.orm as _orm
 import asyncio
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Any, Self
 from orionis.orm.contracts.belongs_to_many_relation import IBelongsToManyRelation
 from orionis.orm.metaclass import snake_case
@@ -17,8 +17,8 @@ from orionis.orm.query.expressions import AggregateFunction, WhereClause
 
 
 class BelongsToManyRelation[TRelated: _orm.Model](
-    Relation[TRelated],
-    IBelongsToManyRelation,
+    Relation[TRelated, Collection[TRelated]],
+    IBelongsToManyRelation[TRelated],
 ):
     """
     Many-to-many relationship backed by an intermediate pivot table.
@@ -185,13 +185,13 @@ class BelongsToManyRelation[TRelated: _orm.Model](
         value = getattr(self._parent, self._parent_key)
         self._parent_keys = (value,) if value is not None else ()
 
-    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
+    def addEagerConstraints(self, models: Sequence[_orm.Model]) -> None:
         """
         Capture every parent key involved in an eager-loaded batch.
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
 
         Returns
@@ -226,7 +226,7 @@ class BelongsToManyRelation[TRelated: _orm.Model](
         builder._connection_manager = self._connection_manager
         return builder.table(self._table)
 
-    async def getResults(self) -> Collection:
+    async def getResults(self) -> Collection[TRelated]:
         """
         Retrieve every related row linked to the parent instance.
 
@@ -240,8 +240,8 @@ class BelongsToManyRelation[TRelated: _orm.Model](
 
     def match(
         self,
-        models: list[_orm.Model],
-        results: Collection,
+        models: Sequence[_orm.Model],
+        results: Collection[TRelated],
         name: str,
     ) -> None:
         """
@@ -249,7 +249,7 @@ class BelongsToManyRelation[TRelated: _orm.Model](
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
         results : orionis.support.types.Collection
             Related rows produced by ``getEager``.
@@ -366,7 +366,7 @@ class BelongsToManyRelation[TRelated: _orm.Model](
 
     # ── Terminals resolving the pivot table before the related query ───────
 
-    async def get(self) -> Collection:
+    async def get(self) -> Collection[TRelated]:
         """
         Execute the query and hydrate every linked related row.
 
@@ -475,7 +475,7 @@ class BelongsToManyRelation[TRelated: _orm.Model](
         self,
         column: str,
         *args: Any,
-    ) -> BelongsToManyRelation[TRelated]:
+    ) -> Self:
         """
         Filter the pivot rows considered by this relationship query.
 

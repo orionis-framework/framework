@@ -299,20 +299,26 @@ class TestIContainer(TestCase):
         self.assertIsInstance(_ConcreteContainer(), IContainer)
 
     def testContainerImplementationMatchesTheContractSignatures(self) -> None:
-        """Match runtime parameter kinds, defaults, annotations, and return types."""
+        """
+        Match runtime parameter kinds, defaults, annotations, and return types.
+
+        Returns
+        -------
+        None
+            Assert matching signatures for all required container operations.
+        """
         for name in sorted(_ABSTRACT_METHODS):
             with self.subTest(method=name):
                 expected = inspect.signature(getattr(IContainer, name), eval_str=True)
                 actual = inspect.signature(getattr(Container, name), eval_str=True)
-                self.assertEqual(
-                    [item for key, item in actual.parameters.items() if key != "self"],
-                    [
-                        item
-                        for key, item in expected.parameters.items()
-                        if key != "self"
-                    ],
+                # The concrete and abstract declarations each bind their own T.
+                expected = expected.replace(
+                    parameters=list(expected.parameters.values())[1:],
                 )
-                self.assertEqual(actual.return_annotation, expected.return_annotation)
+                actual = actual.replace(
+                    parameters=list(actual.parameters.values())[1:],
+                )
+                self.assertEqual(str(actual), str(expected))
 
     def testAsynchronousContractMethodsStayAsynchronous(self) -> None:
         """

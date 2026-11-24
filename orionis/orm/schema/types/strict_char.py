@@ -6,7 +6,7 @@ from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictChar(ColumnDefinition):
+class StrictChar[TValue = str](ColumnDefinition[TValue]):
     """The SQL ``CHAR`` type."""
 
     __slots__ = ()

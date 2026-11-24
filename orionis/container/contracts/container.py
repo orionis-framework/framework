@@ -5,7 +5,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Any
+from typing import Any, overload
 from orionis.container.context.manager import ScopeManager
 
 
@@ -195,6 +195,22 @@ class IContainer(ABC):
         a new scope context before accessing scoped services.
         """
 
+    @overload
+    async def make[T](
+        self,
+        key: type[T],
+        *args: object,
+        **kwargs: object,
+    ) -> T: ...
+
+    @overload
+    async def make(
+        self,
+        key: str,
+        *args: object,
+        **kwargs: object,
+    ) -> Any: ...
+
     @abstractmethod
     async def make(
         self,
@@ -229,12 +245,12 @@ class IContainer(ABC):
         """
 
     @abstractmethod
-    async def build(
+    async def build[T](
         self,
-        type_: type[Any],
+        type_: type[T],
         *args: object,
         **kwargs: object,
-    ) -> Any:
+    ) -> T:
         """
         Build and return an instance of the specified type.
 

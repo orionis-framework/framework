@@ -9,6 +9,7 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 from orionis.console import Dumper as ConsoleDumper
+from orionis.console.debug.contracts.dumper import IDumper
 from orionis.console.debug.dumper import Dumper, HttpDump
 from orionis.container.context.manager import ScopeManager
 from orionis.container.facades.facade import Facade
@@ -52,7 +53,7 @@ class TestDebugFacade(TestCase):
 
     def testHasAMatchingFacadeStub(self) -> None:
         """
-        Verify that the facade stub inherits the shared typing contracts.
+        Verify that the stub exposes the facade and dumper operations on the class.
 
         Returns
         -------
@@ -68,8 +69,31 @@ class TestDebugFacade(TestCase):
         )
         self.assertEqual(
             [ast.unparse(base) for base in definition.bases],
-            ["IDumper", "IFacade"],
+            [base.__name__ for base in Debug.__bases__],
         )
+        methods = {
+            node.name: node for node in definition.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+        public_methods = IDumper.__abstractmethods__ | {"getFacadeAccessor", "resolve"}
+        self.assertGreaterEqual(methods.keys(), public_methods)
+        for name in public_methods:
+            with self.subTest(method=name):
+                method = methods[name]
+                self.assertIn(
+                    "classmethod",
+                    [ast.unparse(decorator) for decorator in method.decorator_list],
+                )
+                self.assertEqual(method.args.args[0].arg, "cls")
+                owner = Dumper if name in IDumper.__abstractmethods__ else Debug
+                self.assertEqual(
+                    isinstance(method, ast.AsyncFunctionDef),
+                    inspect.iscoroutinefunction(getattr(owner, name)),
+                )
+        annotation = methods["resolve"].returns
+        if annotation is None:
+            self.fail("Debug.resolve must declare its return type")
+        self.assertEqual(ast.unparse(annotation), IDumper.__name__)
 
     def testDumpPrintsSynchronouslyWithoutExiting(self) -> None:
         """

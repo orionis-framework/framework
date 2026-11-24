@@ -5,7 +5,7 @@ from orionis.container.facades.facade import Facade
 from orionis.http.routes.contracts.router import IRouter
 from orionis.http.routes.fluent import FluentRoute
 from orionis.http.routes.group import RouteGroup
-from orionis.http.routes.types import MiddlewareInput, RouteAction
+from orionis.http.routes.types import RouterExport, MiddlewareInput, RouteAction
 from orionis.realtime.hub import Hub
 
 class Route(Facade):
@@ -121,5 +121,5 @@ class Route(Facade):
         """Compose a group and return its flattened membership for nesting."""
 
     @classmethod
-    def export(cls) -> dict:
+    def export(cls) -> RouterExport:
         """Export all registered routes and the fallback handler."""

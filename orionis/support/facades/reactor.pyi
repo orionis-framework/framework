@@ -1,6 +1,7 @@
 # ruff: noqa: PYI021
 # Keep public facade methods documented alongside their static signatures.
 from typing import Any
+from orionis.console.entities.command import CommandInfo
 from orionis.console.fluent.contracts.command import ICommand
 from orionis.console.core.contracts.reactor import IReactor
 from orionis.container.facades.facade import Facade
@@ -36,5 +37,5 @@ class Reactor(Facade):
         """Execute a command in an isolated failure-reporting context."""
 
     @classmethod
-    async def info(cls) -> list[dict]:
+    async def info(cls) -> list[CommandInfo]:
         """Return cached metadata for non-internal commands."""

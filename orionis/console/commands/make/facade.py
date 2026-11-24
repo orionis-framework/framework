@@ -5,6 +5,7 @@
 from typing import ClassVar
 from orionis.console.args.argument import Argument
 from orionis.console.commands.make._base import MakeStubCommand
+from orionis.console.commands.make._facade_contract import interface_replacements
 from orionis.foundation.contracts.application import IApplication
 
 
@@ -17,11 +18,11 @@ class MakeFacade(MakeStubCommand):
     """Signature identifier: ``make:facade``."""
     description: str = "Creates a new facade class and interface."
     """Description identifier: ``Creates a new facade class and interface.``."""
-    template_name: str = "facade"
+    template_name: ClassVar[str] = "facade"
     """Template name identifier: ``facade``."""
-    path_key: str = "app_facades"
+    path_key: ClassVar[str] = "app_facades"
     """Path key identifier: ``app_facades``."""
-    success_label: str = "Facade"
+    success_label: ClassVar[str] = "Facade"
     """Success label identifier: ``Facade``."""
     arguments: ClassVar[list[Argument]] = [
         Argument(
@@ -35,6 +36,11 @@ class MakeFacade(MakeStubCommand):
             type_=str,
             required=True,
             help="The service identifier in the application container.",
+        ),
+        Argument(
+            name_or_flags="--contract",
+            type_=str,
+            help="Qualified Python service class used to generate facade methods.",
         ),
     ]
     """Command-line argument declarations accepted by this command."""
@@ -79,14 +85,21 @@ class MakeFacade(MakeStubCommand):
         tuple[tuple[str, str], ``...``]
             Success labels and generated application-relative paths.
         """
-        implementation = self.createFile(app, name)
-        interface = self.createFile(
-            app,
-            name,
-            template_name="facade_interface",
-            extension="pyi",
-            replacements={},
+        replacements = interface_replacements(
+            self.getArgument("contract"), app.basePath,
         )
+        implementation = self.createFile(app, name)
+        try:
+            interface = self.createFile(
+                app,
+                name,
+                template_name="facade_interface",
+                extension="pyi",
+                replacements=replacements,
+            )
+        except (OSError, TypeError, ValueError):
+            (app.basePath / implementation).unlink()
+            raise
         return (
             ("Facade", implementation),
             ("Facade interface", interface),

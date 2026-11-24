@@ -1,4 +1,4 @@
-# ruff: noqa: TC003
+# ruff: noqa: TC001, TC003
 # Public primitive metadata is consumed through runtime type reflection.
 """Provide mcp server operations.
 
@@ -8,6 +8,8 @@ Includes ``Primitive``, ``Tool``, ``Resource``, ``Prompt``.
 from types import MappingProxyType
 from collections.abc import Mapping
 from typing import ClassVar
+import orionis.mcp.server.catalog as catalog_module
+from orionis.mcp.server.extension import McpExtension
 from orionis.mcp.protocol.metadata import (
     CacheHint,
     ContentAnnotations,
@@ -99,13 +101,13 @@ class Server:
     """Instructions identifier: ``''``."""
     icons: ClassVar[tuple[Icon, ...]] = ()
     """Icon metadata advertised for the primitive or server."""
-    tools: ClassVar[tuple[object, ...]] = ()
+    tools: ClassVar[tuple[type[Tool] | catalog_module.ToolCatalog, ...]] = ()
     """Tool declarations available through this server or catalog."""
     resources: ClassVar[tuple[type[Resource], ...]] = ()
     """Resource declarations available through this server."""
     prompts: ClassVar[tuple[type[Prompt], ...]] = ()
     """Prompt declarations available through this server."""
-    extensions: ClassVar[tuple[object, ...]] = ()
+    extensions: ClassVar[tuple[McpExtension, ...]] = ()
     """Extensions registered for this server or transport."""
     cache: ClassVar[CacheHint] = CacheHint()
     """Cache policy or cached state used by this component."""

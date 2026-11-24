@@ -1,11 +1,12 @@
 """A type for ``datetime.time()`` objects."""
 
 from __future__ import annotations
+from datetime import time
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class Time(ColumnDefinition):
+class Time[TValue = time](ColumnDefinition[TValue]):
     """A type for ``datetime.time()`` objects."""
 
     __slots__ = ()

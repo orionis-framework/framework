@@ -1,11 +1,12 @@
 """Refers to the return type of the ``MATCH`` operator."""
 
 from __future__ import annotations
+from typing import Any
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class MatchType(ColumnDefinition):
+class MatchType[TValue = Any](ColumnDefinition[TValue]):
     """Refers to the return type of the ``MATCH`` operator."""
 
     __slots__ = ()

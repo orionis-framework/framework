@@ -1,6 +1,7 @@
-# ruff: noqa: ANN401, PLC0415, SLF001, TC001
+# ruff: noqa: ANN401, PLC0415, SLF001, TC001, TC003
 """Fluent query builder bound to a model class."""
 
+from collections.abc import Callable
 import asyncio
 import inspect
 from typing import Any, Self
@@ -32,7 +33,10 @@ _TRASHED_ONLY: str = "only"
 """Trashed only identifier: ``only``."""
 
 
-class ModelQueryBuilder[TModel: _orm.Model](QueryBuilderBase, IModelQueryBuilder):
+class ModelQueryBuilder[TModel: _orm.Model](
+    QueryBuilderBase,
+    IModelQueryBuilder[TModel],
+):
     """
     Fluent query builder bound to a model class.
 
@@ -85,7 +89,7 @@ class ModelQueryBuilder[TModel: _orm.Model](QueryBuilderBase, IModelQueryBuilder
         self._scopes_applied: bool = False
         """Scopes applied flag used by ``ModelQueryBuilder``."""
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name: str) -> Callable[..., Self]:
         """
         Expose the local scopes declared by the bound model.
 
@@ -330,7 +334,7 @@ class ModelQueryBuilder[TModel: _orm.Model](QueryBuilderBase, IModelQueryBuilder
 
     # ── Retrieval terminals ─────────────────────────────────────────────────
 
-    async def get(self) -> Collection:
+    async def get(self) -> Collection[TModel]:
         """
         Execute the query and hydrate every matching row.
 
@@ -472,7 +476,7 @@ class ModelQueryBuilder[TModel: _orm.Model](QueryBuilderBase, IModelQueryBuilder
         key = column.rsplit(".", 1)[-1]
         return getattr(instance, key) if instance is not None else None
 
-    async def pluck(self, column: str) -> Collection:
+    async def pluck(self, column: str) -> Collection[Any]:
         """
         Return one column of every matching row.
 
@@ -494,7 +498,7 @@ class ModelQueryBuilder[TModel: _orm.Model](QueryBuilderBase, IModelQueryBuilder
         self,
         page: int = 1,
         per_page: int = _DEFAULT_PER_PAGE,
-    ) -> Paginator:
+    ) -> Paginator[TModel]:
         """
         Execute the query returning a length-aware page of results.
 

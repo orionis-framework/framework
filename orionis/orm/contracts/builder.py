@@ -1,7 +1,6 @@
 # ruff: noqa: ANN401, TC001
 """Contract for the query builder bound to a model class."""
 
-from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Self
 import orionis.orm as _orm
@@ -10,7 +9,7 @@ from orionis.orm.contracts.base_builder import IQueryBuilderBase
 from orionis.support.types.collection import Collection
 
 
-class IModelQueryBuilder(IQueryBuilderBase):
+class IModelQueryBuilder[TModel: _orm.Model = Any](IQueryBuilderBase):
     """
     Contract for the query builder bound to a model class.
 
@@ -56,7 +55,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def get(self) -> Collection:
+    async def get(self) -> Collection[TModel]:
         """
         Execute the query and hydrate every matching row.
 
@@ -67,7 +66,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def first(self) -> _orm.Model | None:
+    async def first(self) -> TModel | None:
         """
         Execute the query and hydrate only the first matching row.
 
@@ -78,7 +77,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def firstOrFail(self) -> _orm.Model:
+    async def firstOrFail(self) -> TModel:
         """
         Return the first matching row or raise when none exists.
 
@@ -94,7 +93,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def find(self, key: Any) -> _orm.Model | None:
+    async def find(self, key: Any) -> TModel | None:
         """
         Retrieve a model by its primary key.
 
@@ -110,7 +109,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def findOrFail(self, key: Any) -> _orm.Model:
+    async def findOrFail(self, key: Any) -> TModel:
         """
         Retrieve a model by primary key or raise when absent.
 
@@ -147,7 +146,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def pluck(self, column: str) -> Collection:
+    async def pluck(self, column: str) -> Collection[Any]:
         """
         Return one column of every matching row.
 
@@ -163,7 +162,7 @@ class IModelQueryBuilder(IQueryBuilderBase):
         """
 
     @abstractmethod
-    async def paginate(self, page: int = 1, per_page: int = 15) -> Paginator:
+    async def paginate(self, page: int = 1, per_page: int = 15) -> Paginator[TModel]:
         """
         Execute the query returning a length-aware page of results.
 

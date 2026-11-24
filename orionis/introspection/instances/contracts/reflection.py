@@ -11,11 +11,11 @@ from orionis.introspection.dependencies.entities.signature import (
 )
 
 
-class IReflectionInstance(ABC):
+class IReflectionInstance[T = Any](ABC):
     """Define the contract for reflection instance implementations."""
 
     @abstractmethod
-    def getInstance(self) -> Any:
+    def getInstance(self) -> T:
         """
         Return the reflected object instance.
 
@@ -26,7 +26,7 @@ class IReflectionInstance(ABC):
         """
 
     @abstractmethod
-    def getClass(self) -> type:
+    def getClass(self) -> type[T]:
         """
         Return the class of the instance.
 

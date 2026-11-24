@@ -1,14 +1,15 @@
-# ruff: noqa: TC001
+# ruff: noqa: TC001, TC003
 # Resolve model and collection annotations through the lazy public package.
 """Inverse relationship: the foreign key lives on the parent row."""
 
+from collections.abc import Sequence
 import orionis.orm as _orm
 from orionis.orm.metaclass import snake_case
 from orionis.orm.relations.relation import Relation
 from orionis.support.types.collection import Collection
 
 
-class BelongsToRelation[TRelated: _orm.Model](Relation[TRelated]):
+class BelongsToRelation[TRelated: _orm.Model](Relation[TRelated, TRelated | None]):
     """
     Inverse relationship: the foreign key lives on the parent row.
 
@@ -78,13 +79,13 @@ class BelongsToRelation[TRelated: _orm.Model](Relation[TRelated]):
         else:
             self.where(self._owner_key, value)
 
-    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
+    def addEagerConstraints(self, models: Sequence[_orm.Model]) -> None:
         """
         Constrain the query to the rows owning every child's foreign key.
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Child instances being eager loaded together.
 
         Returns
@@ -117,8 +118,8 @@ class BelongsToRelation[TRelated: _orm.Model](Relation[TRelated]):
 
     def match(
         self,
-        models: list[_orm.Model],
-        results: Collection,
+        models: Sequence[_orm.Model],
+        results: Collection[TRelated],
         name: str,
     ) -> None:
         """
@@ -126,7 +127,7 @@ class BelongsToRelation[TRelated: _orm.Model](Relation[TRelated]):
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Child instances being eager loaded together.
         results : orionis.support.types.Collection
             Owning rows produced by ``getEager``.

@@ -2,15 +2,44 @@
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 from orionis.support.entities.base import BaseEntity
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from datetime import datetime
+    from orionis.console.entities.task_event import TaskEvent as TaskEventEntity
+    from orionis.console.enums.events import TaskEvent
     from apscheduler.triggers.cron import CronTrigger
     from apscheduler.triggers.date import DateTrigger
     from apscheduler.triggers.interval import IntervalTrigger
+
+
+class ScheduledTaskInfo(TypedDict):
+    """Metadata returned by the scheduler for one task."""
+
+    signature: str
+    """Command signature registered with the scheduler."""
+    args: list[str] | None
+    """Positional arguments passed to the scheduled command."""
+    kwargs: dict | None
+    """Keyword arguments passed to the scheduled command."""
+    purpose: str | None
+    """Description of the task's purpose."""
+    random_delay: int | None
+    """Maximum random delay, in seconds, added before execution."""
+    coalesce: bool | None
+    """Whether multiple missed runs are combined into one execution."""
+    max_instances: int | None
+    """Maximum number of concurrent runs of this task."""
+    misfire_grace_time: int | None
+    """Number of seconds a late run remains eligible for execution."""
+    start_date: str | None
+    """Formatted date and time when the task becomes eligible to run."""
+    end_date: str | None
+    """Formatted date and time after which the task stops running."""
+    details: str | None
+    """Human-readable description of the configured schedule."""
 
 
 @dataclass(kw_only=True)
@@ -94,6 +123,6 @@ class Task(BaseEntity):
     coalesce: bool | None = True
 
     # Optional listeners for event-specific logic, not included in equality checks
-    listeners: list[Callable[..., None]] = field(
+    listeners: list[tuple[TaskEvent, Callable[[TaskEventEntity], object]]] = field(
         default_factory=list,
     )

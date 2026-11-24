@@ -38,11 +38,11 @@ class BackgroundTasks(BackgroundTask):
         self.tasks: list[BackgroundTask] = list(tasks) if tasks else []
         """Optional sequence of BackgroundTask instances to initialize with."""
 
-    def addTask(
+    def addTask[**P](
         self,
-        func: Callable,
-        *args: object,
-        **kwargs: object,
+        func: Callable[P, object],
+        *args: P.args,
+        **kwargs: P.kwargs,
     ) -> None:
         """
         Add a new BackgroundTask to the task list.

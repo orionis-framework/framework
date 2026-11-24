@@ -1,4 +1,4 @@
-# ruff: noqa: ANN401, TC003
+# ruff: noqa: ANN401, TC002, TC003
 # Retain unrestricted template values and runtime-resolvable callable annotations.
 """Define the contract for the view-environment wrapper."""
 
@@ -6,6 +6,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
+import jinja2
 
 
 class IViewEnvironment(ABC):
@@ -98,7 +99,7 @@ class IViewEnvironment(ABC):
         """
 
     @abstractmethod
-    def getJinjaEnvironment(self) -> Any:
+    def getJinjaEnvironment(self) -> jinja2.Environment:
         """
         Return the underlying Jinja2 ``Environment`` instance.
 

@@ -5,6 +5,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from orionis.http.routes.types import ExportedRoute
     import re
     from collections.abc import Callable
 
@@ -15,7 +17,7 @@ class IRouteCompiler(ABC):
     @abstractmethod
     def compile(
         self,
-        routes: list[dict],
+        routes: Sequence[ExportedRoute | dict],
         fallback: tuple | None,
         app_middleware: list[type] | None = None,
     ) -> tuple[dict[str, dict], tuple | None]:

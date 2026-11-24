@@ -244,7 +244,8 @@ class TestRelationContext(TestCase):
         )
         for cls in classes:
             for parameter in cls.__type_params__:
-                self.assertIs(parameter.__bound__, Model)
+                expected = None if parameter.__name__ == "TResult" else Model
+                self.assertIs(parameter.__bound__, expected)
             for name, member in vars(cls).items():
                 function = (
                     member.__func__
@@ -255,4 +256,5 @@ class TestRelationContext(TestCase):
                     with self.subTest(owner=cls.__name__, method=name):
                         self.assertTrue(get_type_hints(function))
                         for parameter in function.__type_params__:
-                            self.assertIs(parameter.__bound__, Model)
+                            expected = None if name == "noConstraints" else Model
+                            self.assertIs(parameter.__bound__, expected)

@@ -6,7 +6,7 @@
 from __future__ import annotations
 import re
 from collections.abc import Callable, Generator, Mapping
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 from orionis.background.task import BackgroundTask
 from orionis.http.enums.status import HTTPStatus
 from orionis.http.responses import HTMLResponse
@@ -16,6 +16,10 @@ from orionis.support.concurrency import WorkQueueFullError
 from orionis.support.facades.session import Session
 from orionis.view.exceptions import ViewRenderException, ViewTemplateNotFoundException
 from orionis.view.contracts.engine import IViewEngine
+
+if TYPE_CHECKING:
+    from datetime import datetime
+    from typing import Literal
 
 # Closure qualname noise (e.g. ``_global_csrf_field.<locals>.``) leaked by
 # errors raised inside template globals; irrelevant for the developer.
@@ -186,6 +190,97 @@ class PendingView(_FlashData):
             mutations = self._mutations = []
         mutations.append((name, args, kwargs))
         return self
+
+    if TYPE_CHECKING:
+        # __getattr__ queues these HTMLResponse mutators and returns the pending view.
+        def addHeader(self, key: str, value: str) -> Self:
+            """
+            Append a response header after rendering.
+
+            Returns
+            -------
+            Self
+                Pending view with a queued operation to append the header.
+            """
+            ...
+
+        def setHeader(self, key: str, value: str) -> Self:
+            """
+            Replace a response header after rendering.
+
+            Returns
+            -------
+            Self
+                Pending view with a queued operation to replace the header values.
+            """
+            ...
+
+        def removeHeader(self, key: str) -> Self:
+            """
+            Remove a response header after rendering.
+
+            Returns
+            -------
+            Self
+                Pending view with a queued operation to remove the header.
+            """
+            ...
+
+        def withCookie(
+            self,
+            key: str,
+            value: str = "",
+            *,
+            max_age: int | None = None,
+            expires: datetime | str | int | None = None,
+            path: str | None = "/",
+            domain: str | None = None,
+            secure: bool = False,
+            http_only: bool = False,
+            same_site: Literal["lax", "strict", "none"] | None = "lax",
+            partitioned: bool = False,
+        ) -> Self:
+            """
+            Set one cookie on the rendered response.
+
+            Returns
+            -------
+            Self
+                Pending view with a queued operation to set the cookie.
+            """
+            ...
+
+        setCookie = withCookie  # noqa: N815
+
+        def withCookies(self, cookies: Mapping[str, str | Mapping[str, Any]]) -> Self:
+            """
+            Set the supplied cookies on the rendered response.
+
+            Returns
+            -------
+            Self
+                Pending view with a queued operation to set the supplied cookies.
+            """
+            ...
+
+        def withoutCookie(
+            self,
+            key: str,
+            *,
+            path: str = "/",
+            domain: str | None = None,
+        ) -> Self:
+            """
+            Expire a cookie on the rendered response.
+
+            Returns
+            -------
+            Self
+                Pending view with a queued operation to expire the cookie.
+            """
+            ...
+
+        deleteCookie = withoutCookie  # noqa: N815
 
     def __getattr__(self: Self, name: str) -> Callable[..., PendingView]:
         """

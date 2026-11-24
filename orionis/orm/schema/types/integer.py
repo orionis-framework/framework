@@ -5,7 +5,7 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class Integer(ColumnDefinition):
+class Integer[TValue = int](ColumnDefinition[TValue]):
     """A type for ``int`` integers."""
 
     __slots__ = ()

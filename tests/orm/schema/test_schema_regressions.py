@@ -37,6 +37,7 @@ class TestSchemaRegressions(TestCase):
         None
             No return value.
         """
+        item_type, = Paginator.__type_params__
         expectations = (
             (ColumnDefinition.__init__, "column_type", ColumnType),
             (ColumnOptions, "item_type", ColumnDefinition | None),
@@ -47,8 +48,8 @@ class TestSchemaRegressions(TestCase):
             (TableDefinition, "foreign_keys", tuple[CompositeForeignKey, ...]),
             (TableDefinition, "indexes", tuple[TableIndex, ...]),
             (TableDefinition, "unique_constraints", tuple[UniqueConstraint, ...]),
-            (Paginator.__init__, "items", Collection),
-            (Paginator.items.fget, "return", Collection),
+            (Paginator.__init__, "items", Collection[item_type]),
+            (Paginator.items.fget, "return", Collection[item_type]),
             (definition, "_OPTION_GETTER", Callable[[ColumnOptions], tuple[Any, ...]]),
         )
         for target, name, expected in expectations:
@@ -104,7 +105,7 @@ class TestSchemaRegressions(TestCase):
         script = """
 import importlib
 import sys
-from typing import get_type_hints
+from typing import get_args, get_origin, get_type_hints
 importlib.import_module(sys.argv[1])
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
@@ -113,7 +114,9 @@ from orionis.orm.collections.paginator import Paginator
 from orionis.support.types.collection import Collection
 assert get_type_hints(ColumnOptions)['item_type'] == ColumnDefinition | None
 assert get_type_hints(TableDefinition)['columns'] == dict[str, ColumnDefinition]
-assert get_type_hints(Paginator.__init__)['items'] is Collection
+items = get_type_hints(Paginator.__init__)['items']
+assert get_origin(items) is Collection
+assert get_args(items) == Paginator.__type_params__
 """
         for first in (
             "orionis.orm.schema.column.options",

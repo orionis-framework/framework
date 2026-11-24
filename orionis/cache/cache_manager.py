@@ -8,6 +8,7 @@ from threading import Lock
 from typing import Any, Self
 from orionis.cache.contracts.cache_manager import ICacheManager
 from orionis.cache.exceptions import CacheStoreException
+from orionis.cache.locks.lock import CacheLock
 from orionis.cache.repository import CacheRepository
 from orionis.foundation.config.cache.entities.cache import Cache as _CacheConfig
 from orionis.foundation.config.cache.enums.drivers import Drivers
@@ -482,7 +483,7 @@ class CacheManager(ICacheManager):
         """
         return await self.store().decrement(key, amount)
 
-    def lock(self: Self, key: str, timeout: float | None = None) -> Any:
+    def lock(self: Self, key: str, timeout: float | None = None) -> CacheLock:
         """
         Return an async context-manager lock for *key* on the default store.
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, overload
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -65,6 +65,14 @@ class IFormData(ABC):
         """
 
     # Abstract method for last-value retrieval by field name
+    @overload
+    @abstractmethod
+    def get(self, key: str) -> str | UploadedFile | None: ...
+
+    @overload
+    @abstractmethod
+    def get[D](self, key: str, default: D) -> str | UploadedFile | D: ...
+
     @abstractmethod
     def get(
         self,
@@ -130,7 +138,7 @@ class IFormData(ABC):
 
     # Abstract subscript accessor returning the last value for a key
     @abstractmethod
-    def __getitem__(self, key: str) -> object:
+    def __getitem__(self, key: str) -> str | UploadedFile | None:
         """
         Return the last value for *key* using subscript notation.
 

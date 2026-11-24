@@ -1,5 +1,3 @@
-# ruff: noqa: TC001
-# Expose the schema annotation to runtime dependency reflection.
 """Validate structured input against declared fields and validation rules."""
 
 from __future__ import annotations
@@ -37,7 +35,7 @@ class Schema:
     """Prevent per-instance dictionaries; the class is used statically."""
 
     @staticmethod
-    async def validate(payload: object, schema: type[SchemaType]) -> SchemaType:
+    async def validate[S: SchemaType](payload: object, schema: type[S]) -> S:
         """
         Validate a payload or existing struct and await its schema rules.
 

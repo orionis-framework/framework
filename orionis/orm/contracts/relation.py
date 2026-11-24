@@ -1,7 +1,8 @@
-# ruff: noqa: ANN401, TC001
+# ruff: noqa: TC001, TC003
 # Declare heterogeneous relation results and runtime-resolvable model types.
 """Contract for a query builder bound to a parent model instance."""
 
+from collections.abc import Sequence
 import orionis.orm as _orm
 from abc import abstractmethod
 from typing import Any
@@ -9,7 +10,9 @@ from orionis.orm.contracts.builder import IModelQueryBuilder
 from orionis.support.types.collection import Collection
 
 
-class IRelation(IModelQueryBuilder):
+class IRelation[TRelated: _orm.Model = Any, TResult = Any](
+    IModelQueryBuilder[TRelated],
+):
     """
     Contract for a query builder bound to a parent model instance.
 
@@ -37,13 +40,13 @@ class IRelation(IModelQueryBuilder):
         """
 
     @abstractmethod
-    def addEagerConstraints(self, models: list[_orm.Model]) -> None:
+    def addEagerConstraints(self, models: Sequence[_orm.Model]) -> None:
         """
         Constrain the query to every parent instance of an eager batch.
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
 
         Returns
@@ -53,7 +56,7 @@ class IRelation(IModelQueryBuilder):
         """
 
     @abstractmethod
-    async def getResults(self) -> Any:
+    async def getResults(self) -> TResult:
         """
         Execute the relationship query for its bound parent instance.
 
@@ -66,7 +69,7 @@ class IRelation(IModelQueryBuilder):
         """
 
     @abstractmethod
-    async def getEager(self) -> Collection:
+    async def getEager(self) -> Collection[TRelated]:
         """
         Execute the relationship query assembled for eager loading.
 
@@ -79,8 +82,8 @@ class IRelation(IModelQueryBuilder):
     @abstractmethod
     def match(
         self,
-        models: list[_orm.Model],
-        results: Collection,
+        models: Sequence[_orm.Model],
+        results: Collection[TRelated],
         name: str,
     ) -> None:
         """
@@ -88,7 +91,7 @@ class IRelation(IModelQueryBuilder):
 
         Parameters
         ----------
-        models : list of orionis.orm.Model
+        models : sequence of orionis.orm.Model
             Parent instances being eager loaded together.
         results : orionis.support.types.Collection
             Rows produced by :meth:`orionis.orm.contracts.relation.IRelation.getEager`.

@@ -3,7 +3,7 @@
 """Hold parsed multipart form fields and uploaded files."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, overload
 from orionis.http.payload.contracts.form_data import IFormData
 
 if TYPE_CHECKING:
@@ -104,6 +104,12 @@ class FormData(IFormData):
     # ---- Retrieval ----
 
     # Method returning the last value for a given key
+    @overload
+    def get(self, key: str) -> str | UploadedFile | None: ...
+
+    @overload
+    def get[D](self, key: str, default: D) -> str | UploadedFile | D: ...
+
     def get(
         self,
         key: str,
@@ -177,7 +183,7 @@ class FormData(IFormData):
     # ---- Mapping protocol ----
 
     # Subscript accessor delegating to get()
-    def __getitem__(self, key: str) -> object:
+    def __getitem__(self, key: str) -> str | UploadedFile | None:
         """
         Return the last value for *key* using subscript notation.
 

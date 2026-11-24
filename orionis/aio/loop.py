@@ -1,4 +1,4 @@
-# ruff: noqa: ANN401, BLE001, PLC0415
+# ruff: noqa: BLE001, PLC0415
 # Callable dispatch preserves arbitrary results and imports optional services lazily.
 # Cleanup failures retain their identity through the cancelled caller's coordinator.
 """Thread-safe, platform-aware asyncio event loop manager for the Orionis Framework."""
@@ -11,10 +11,10 @@ import sys
 import threading
 import types
 from contextlib import contextmanager, suppress
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, overload
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Coroutine, Generator
+    from collections.abc import Awaitable, Callable, Coroutine, Generator
 
 
 class Loop:
@@ -373,6 +373,24 @@ class Loop:
             )
         except Exception as error:
             Loop._reportAbandonedError(error, future)
+
+    @overload
+    @staticmethod
+    async def execute[R, **P](
+        func: Callable[P, Awaitable[R]],
+        /,
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> R: ...
+
+    @overload
+    @staticmethod
+    async def execute[R, **P](
+        func: Callable[P, R],
+        /,
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> R: ...
 
     @staticmethod
     async def execute(

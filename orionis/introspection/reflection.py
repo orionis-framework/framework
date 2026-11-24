@@ -28,7 +28,7 @@ class Reflection:
     """Select reflection helpers for classes, instances, functions and modules."""
 
     @staticmethod
-    def instance(instance: object) -> IReflectionInstance:
+    def instance[T](instance: T) -> IReflectionInstance[T]:
         """
         Create a ReflectionInstance for an object instance.
 

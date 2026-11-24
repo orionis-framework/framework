@@ -1,6 +1,6 @@
 """Parse query-string pairs while preserving repeated parameter values."""
 
-from typing import TYPE_CHECKING
+from typing import overload, TYPE_CHECKING
 from urllib.parse import parse_qsl
 from orionis.support.patterns.final.meta import Final
 
@@ -47,6 +47,12 @@ class QueryParams(metaclass=Final):
                 index[key] = [previous, value]
         self._index = index
         """Lookup index used to resolve registered entries."""
+
+    @overload
+    def get(self, key: str, default: str) -> str: ...
+
+    @overload
+    def get(self, key: str, default: None = None) -> str | None: ...
 
     def get(self, key: str, default: str | None = None) -> str | None:
         """

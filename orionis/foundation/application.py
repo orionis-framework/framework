@@ -1,4 +1,4 @@
-# ruff: noqa: ANN401, BLE001, PLC0415, PLR0913, SLF001
+# ruff: noqa: ANN401, BLE001, PLC0415, PLR0913, SLF001, TC001, TC003
 # Keep runtime reflection annotations and intentionally deferred imports.
 # Keep established public and external protocol names and signatures.
 # Preserve error ownership, cleanup, and non-recursive failure reporting.
@@ -18,7 +18,8 @@ from functools import lru_cache
 from importlib import import_module
 from pathlib import Path
 from threading import Lock
-from typing import TYPE_CHECKING, Any, Self
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, Self, Unpack, cast, overload
 from orionis.cache import FileBasedCache
 from orionis.console.base.contracts.scheduler import IBaseScheduler
 from orionis.console.contracts.kernel import IKernelCLI
@@ -35,6 +36,7 @@ from orionis.failure.runtime import (
     operation,
     prepare,
 )
+from orionis.foundation.config import options
 from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.core_config import get_core_config_mapping
 from orionis.foundation.core_exception_handler import CORE_EXCEPTION_HANDLER
@@ -53,7 +55,7 @@ from orionis.support.structures.freezer import FreezeThaw
 from orionis.support.concurrency import complete_on_cancel
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable, Coroutine, Mapping
+    from collections.abc import Awaitable, Callable, Coroutine
     from granian.rsgi import (
         HTTPProtocol,
         ProtocolClosed,
@@ -2783,7 +2785,7 @@ class Application(Container, IApplication):
 
     def withConfigApp(
         self: Self,
-        **app_config: object,
+        **app_config: Unpack[options.AppOptions],
     ) -> Self:
         """
         Set application configuration overrides for bootstrap.
@@ -2818,7 +2820,7 @@ class Application(Container, IApplication):
 
     def withConfigAuth(
         self: Self,
-        **auth_config: object,
+        **auth_config: Unpack[options.AuthOptions],
     ) -> Self:
         """
         Set authentication configuration overrides for bootstrap.
@@ -2851,7 +2853,7 @@ class Application(Container, IApplication):
         # Return the application instance for method chaining
         return self
 
-    def withConfigMcp(self: Self, **mcp_config: object) -> Self:
+    def withConfigMcp(self: Self, **mcp_config: Unpack[options.McpOptions]) -> Self:
         """
         Set MCP protocol limits and allowed origins for bootstrap.
 
@@ -2878,7 +2880,7 @@ class Application(Container, IApplication):
 
     def withConfigCache(
         self: Self,
-        **cache_config: object,
+        **cache_config: Unpack[options.CacheOptions],
     ) -> Self:
         """
         Set cache configuration overrides for bootstrap.
@@ -2913,7 +2915,7 @@ class Application(Container, IApplication):
 
     def withConfigHttp(
         self: Self,
-        **http_config: object,
+        **http_config: Unpack[options.HttpOptions],
     ) -> Self:
         """
         Set HTTP configuration overrides for bootstrap.
@@ -2948,7 +2950,7 @@ class Application(Container, IApplication):
 
     def withConfigDatabase(
         self: Self,
-        **database_config: object,
+        **database_config: Unpack[options.DatabaseOptions],
     ) -> Self:
         """
         Set database configuration overrides for bootstrap.
@@ -2983,7 +2985,7 @@ class Application(Container, IApplication):
 
     def withConfigFilesystems(
         self: Self,
-        **filesystems_config: object,
+        **filesystems_config: Unpack[options.FilesystemsOptions],
     ) -> Self:
         """
         Set filesystem configuration overrides for bootstrap.
@@ -3018,7 +3020,7 @@ class Application(Container, IApplication):
 
     def withConfigLogging(
         self: Self,
-        **logging_config: object,
+        **logging_config: Unpack[options.LoggingOptions],
     ) -> Self:
         """
         Set logging configuration overrides for bootstrap.
@@ -3053,7 +3055,7 @@ class Application(Container, IApplication):
 
     def withConfigMail(
         self: Self,
-        **mail_config: object,
+        **mail_config: Unpack[options.MailOptions],
     ) -> Self:
         """
         Set mail configuration overrides for bootstrap.
@@ -3088,7 +3090,7 @@ class Application(Container, IApplication):
 
     def withConfigQueue(
         self: Self,
-        **queue_config: object,
+        **queue_config: Unpack[options.QueueOptions],
     ) -> Self:
         """
         Set queue configuration overrides for bootstrap.
@@ -3123,7 +3125,7 @@ class Application(Container, IApplication):
 
     def withConfigSession(
         self: Self,
-        **session_config: object,
+        **session_config: Unpack[options.SessionOptions],
     ) -> Self:
         """
         Set session configuration overrides for bootstrap.
@@ -3158,7 +3160,7 @@ class Application(Container, IApplication):
 
     def withConfigTesting(
         self: Self,
-        **testing_config: object,
+        **testing_config: Unpack[options.TestingOptions],
     ) -> Self:
         """
         Set testing configuration overrides for bootstrap.
@@ -3193,7 +3195,7 @@ class Application(Container, IApplication):
 
     def withConfigPaths(
         self: Self,
-        **paths: str | Path | None,
+        **paths: Unpack[options.PathsOptions],
     ) -> Self:
         """
         Configure resolved application directories with core path overrides.
@@ -3590,6 +3592,15 @@ class Application(Container, IApplication):
 
     # --- Runtime Configuration Access Methods ---
 
+    @overload
+    def config(self, key: None = None) -> dict[str, object]: ...
+
+    @overload
+    def config(self, key: str) -> object: ...
+
+    @overload
+    def config[T](self, key: str, value: T) -> T: ...
+
     def config(
         self: Self,
         key: str | None = None,
@@ -3731,6 +3742,15 @@ class Application(Container, IApplication):
 
     # --- Application Path Access Method ---
 
+    @overload
+    def path(self, key: None = None) -> Mapping[str, Path]: ...
+
+    @overload
+    def path(self, key: options.CorePathName) -> Path: ...
+
+    @overload
+    def path(self, key: str) -> Path | None: ...
+
     def path(
         self: Self,
         key: str | None = None,
@@ -3778,10 +3798,16 @@ class Application(Container, IApplication):
         # Return the requested path or None if not found
         return paths.get(key)
 
+    @overload
+    def routingPaths(self, key: None = None) -> options.RoutingPaths: ...
+
+    @overload
+    def routingPaths(self, key: str) -> list[Path] | None: ...
+
     def routingPaths(
         self: Self,
         key: str | None = None,
-    ) -> list[Path] | dict | None:
+    ) -> list[Path] | options.RoutingPaths | None:
         """
         Return mutable copies of configured routing paths.
 
@@ -3825,14 +3851,14 @@ class Application(Container, IApplication):
 
         # Return complete routing configuration if no key specified
         if key is None:
-            return FreezeThaw.thaw(routing)
+            return cast("options.RoutingPaths", FreezeThaw.thaw(routing))
 
         # Validate key exists in valid routing types
         if key not in {"api", "web", "console", "ai", "websocket"}:
             return None
 
         # Thaw before returning: freeze converts lists→tuples; callers expect list[Path]
-        return FreezeThaw.thaw(routing.get(key))
+        return cast("list[Path] | None", FreezeThaw.thaw(routing.get(key)))
 
     # --- Environment Check Methods ---
 

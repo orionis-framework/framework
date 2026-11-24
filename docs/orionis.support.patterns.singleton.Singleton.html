@@ -194,8 +194,41 @@
         
          
 
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_singleton_instance" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_instance">_singleton<wbr></wbr>_instance</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_singleton_lock" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_lock">_singleton<wbr></wbr>_lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_singleton_owner" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_owner">_singleton<wbr></wbr>_owner</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -219,11 +252,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36585"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36855"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId36585">
+                <label class="lbl-toggle" for="expandableItemId36855">
                     
                     
                 </label>
@@ -284,7 +317,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36586"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId36856"> 
                     
                 </input>
 
@@ -344,8 +377,41 @@
         
          
 
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
         
-         
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_singleton_instance" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_instance">_singleton<wbr></wbr>_instance</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_singleton_lock" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_lock">_singleton<wbr></wbr>_lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_singleton_owner" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_owner">_singleton<wbr></wbr>_owner</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
 
         
          
@@ -426,7 +492,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Singleton</span>(<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>): <a href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/support/patterns/singleton/meta.py#L9" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.support.patterns.singleton.Singleton.__init__">Singleton(name, bases, namespace)</a></code></p><p><a href="classIndex.html#orionis.support.patterns.singleton.Singleton">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Singleton</span>(<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>): <a href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/support/patterns/singleton/meta.py#L12" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.support.patterns.singleton.Singleton.__init__">Singleton(name, bases, namespace)</a></code></p><p><a href="classIndex.html#orionis.support.patterns.singleton.Singleton">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -434,7 +500,7 @@
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id2152">
+          <table class="children sortable" id="id2166">
   
   
   <tr class="method">
@@ -452,6 +518,21 @@
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="orionis.support.patterns.singleton.Singleton.__init__">__init__</a></code></td>
     <td>Initialize per-class singleton state with a sentinel and lock.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#_singleton_instance" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_instance">_singleton<wbr></wbr>_instance</a></code></td>
+    <td>Instance cached for this class, or the sentinel until construction succeeds.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#_singleton_lock" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_lock">_singleton<wbr></wbr>_lock</a></code></td>
+    <td>Lock that serializes construction of this class's instance.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#_singleton_owner" class="internal-link" title="orionis.support.patterns.singleton.Singleton._singleton_owner">_singleton<wbr></wbr>_owner</a></code></td>
+    <td>Thread identifier used to detect recursive construction, or None when idle.</td>
   </tr>
 </table>
           
@@ -472,8 +553,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__acall__</span><span class="function-signature">(<span class="rst-sig-param">cls: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/support/patterns/singleton/meta.py#L90">
+    <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">__acall__</span><span class="function-signature">(<span class="rst-sig-param">cls: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>T]</code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code>T</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/support/patterns/singleton/meta.py#L103">
       
       (source)
     </a>
@@ -499,8 +580,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">__call__</span><span class="function-signature">(<span class="rst-sig-param">cls: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/support/patterns/singleton/meta.py#L42">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__call__</span><span class="function-signature">(<span class="rst-sig-param">cls: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>[<wbr></wbr>T]</code>, </span><span class="rst-sig-param">*args: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code></span>) -&gt; <code>T</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/support/patterns/singleton/meta.py#L54">
       
       (source)
     </a>
@@ -526,8 +607,8 @@
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">cls: <code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bases: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">namespace: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/support/patterns/singleton/meta.py#L12">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">cls, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">bases: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <wbr></wbr><span class="rst-variable-ellipsis">...</span>]</code>, </span><span class="rst-sig-param">namespace: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/support/patterns/singleton/meta.py#L24">
       
       (source)
     </a>
@@ -541,6 +622,87 @@
     
     <div><p>Initialize per-class singleton state with a sentinel and lock.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">cls:</span><code><a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a></code></td><td class="fieldArgDesc">Class whose singleton state is initialized.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Name of the class being initialized.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">bases:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<a href="https://docs.python.org/3/builtins/functions.html#type" class="intersphinx-link">type</a>, <tt class="rst-docutils rst-literal">...</tt>]</code></td><td class="fieldArgDesc">Base classes of the class being initialized.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">namespace:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></td><td class="fieldArgDesc">Attributes defined in the class body.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Complete the documented operation without returning a value.</td></tr></table></div>
   </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.support.patterns.singleton.Singleton._singleton_instance">
+    
+  </a>
+  <a name="_singleton_instance">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_singleton_instance</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/support/patterns/singleton/meta.py#L15">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_singleton_instance" title="orionis.support.patterns.singleton.Singleton._singleton_instance">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Instance cached for this class, or the sentinel until construction succeeds.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.support.patterns.singleton.Singleton._singleton_lock">
+    
+  </a>
+  <a name="_singleton_lock">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_singleton_lock</span>: <code><a href="https://docs.python.org/3/library/threading.html#threading.Lock" class="intersphinx-link">threading.Lock</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/support/patterns/singleton/meta.py#L18">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_singleton_lock" title="orionis.support.patterns.singleton.Singleton._singleton_lock">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Lock that serializes construction of this class's instance.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.support.patterns.singleton.Singleton._singleton_owner">
+    
+  </a>
+  <a name="_singleton_owner">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">_singleton_owner</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/support/patterns/singleton/meta.py#L21">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_singleton_owner" title="orionis.support.patterns.singleton.Singleton._singleton_owner">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Thread identifier used to detect recursive construction, or None when idle.</p></div>
+    
+  </div>
 </div>
         </div>
       
@@ -552,7 +714,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-19 16:29:18.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-23 22:17:21.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

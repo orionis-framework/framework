@@ -1,0 +1,999 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.console.commands.make._facade_contract._Module.html" class="internal-link" title="This class">_<wbr></wbr>Module</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#qualify" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.qualify">qualify</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#classes" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.classes">classes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#imported_modules" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.imported_modules">imported<wbr></wbr>_modules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#name" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#names" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.names">names</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.console.commands.make._facade_contract.html" class="internal-link" title="The parent of this class">_facade<wbr></wbr>_contract</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2750"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId2750">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.commands.make._facade_contract._Annotations.html" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations">_<wbr></wbr>Annotations</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#__init__" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#_attribute" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations._attribute">_attribute</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#_expression" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations._expression">_expression</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#_name" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations._name">_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#_subscript" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations._subscript">_subscript</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#annotation" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.annotation">annotation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#bindClass" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.bindClass">bind<wbr></wbr>Class</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#visit" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.visit">visit</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#aliases" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.aliases">aliases</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#bindings" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.bindings">bindings</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#class_names" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.class_names">class<wbr></wbr>_names</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#contract" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.contract">contract</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#imports" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.imports">imports</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#module" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.module">module</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#parameters" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.parameters">parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract._Annotations.html#receiver_parameter" class="internal-link" title="orionis.console.commands.make._facade_contract._Annotations.receiver_parameter">receiver<wbr></wbr>_parameter</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId2751"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.commands.make._facade_contract._Module.html" class="internal-link" title="orionis.console.commands.make._facade_contract._Module">_<wbr></wbr>Module</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#__init__" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.__init__">__init__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#qualify" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.qualify">qualify</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#classes" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.classes">classes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#imported_modules" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.imported_modules">imported<wbr></wbr>_modules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#name" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#names" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.names">names</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_bind_parameters" class="internal-link" title="orionis.console.commands.make._facade_contract._bind_parameters">_bind<wbr></wbr>_parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_bind_receiver" class="internal-link" title="orionis.console.commands.make._facade_contract._bind_receiver">_bind<wbr></wbr>_receiver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_declarations" class="internal-link" title="orionis.console.commands.make._facade_contract._declarations">_declarations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_declared_methods" class="internal-link" title="orionis.console.commands.make._facade_contract._declared_methods">_declared<wbr></wbr>_methods</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_load_module" class="internal-link" title="orionis.console.commands.make._facade_contract._load_module">_load<wbr></wbr>_module</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_parameters" class="internal-link" title="orionis.console.commands.make._facade_contract._parameters">_parameters</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_qualified_name" class="internal-link" title="orionis.console.commands.make._facade_contract._qualified_name">_qualified<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_signature" class="internal-link" title="orionis.console.commands.make._facade_contract._signature">_signature</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#interface_replacements" class="internal-link" title="orionis.console.commands.make._facade_contract.interface_replacements">interface<wbr></wbr>_replacements</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#_TYPE_PARAMETERS" class="internal-link" title="orionis.console.commands.make._facade_contract._TYPE_PARAMETERS">_TYPE<wbr></wbr>_PARAMETERS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.commands.make._facade_contract.html#Method" class="internal-link" title="orionis.console.commands.make._facade_contract.Method"><wbr></wbr>Method</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.console.html" class="internal-link" title="orionis.console">console</a></code><wbr></wbr>.<code><a href="orionis.console.commands.html" class="internal-link" title="orionis.console.commands">commands</a></code><wbr></wbr>.<code><a href="orionis.console.commands.make.html" class="internal-link" title="orionis.console.commands.make">make</a></code><wbr></wbr>.<code><a href="orionis.console.commands.make._facade_contract.html" class="internal-link" title="orionis.console.commands.make._facade_contract">_facade_contract</a></code><wbr></wbr>.<code><a href="orionis.console.commands.make._facade_contract._Module.html" class="internal-link" title="orionis.console.commands.make._facade_contract._Module">_Module</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">_Module</span>: <a href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/console/commands/make/_facade_contract.py#L43" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.__init__">_Module(name, path)</a></code></p><p><a href="classIndex.html#orionis.console.commands.make._facade_contract._Module">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Names and class declarations visible in a Python module.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id218">
+  
+  
+  <tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#__init__" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.__init__">__init__</a></code></td>
+    <td>Read the imports and classes defined by a contract module.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#qualify" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.qualify">qualify</a></code></td>
+    <td>Resolve the first component of a module-local reference.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#classes" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.classes">classes</a></code></td>
+    <td>Class declarations indexed by their names in this module.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#imported_modules" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.imported_modules">imported<wbr></wbr>_modules</a></code></td>
+    <td>Local module names mapped to the paths needed in import statements.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#name" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.name">name</a></code></td>
+    <td>Qualified name of the source module.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#names" class="internal-link" title="orionis.console.commands.make._facade_contract._Module.names">names</a></code></td>
+    <td>Local imported names mapped to their qualified names.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.make._facade_contract._Module.__init__">
+    
+  </a>
+  <a name="__init__">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/console/commands/make/_facade_contract.py#L46">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#__init__" title="orionis.console.commands.make._facade_contract._Module.__init__">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Read the imports and classes defined by a contract module.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Qualified name used to resolve relative imports.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></td><td class="fieldArgDesc">Python source or stub file to parse.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Record the declarations without importing the module.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
+  <a name="orionis.console.commands.make._facade_contract._Module.qualify">
+    
+  </a>
+  <a name="qualify">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">qualify</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/console/commands/make/_facade_contract.py#L86">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#qualify" title="orionis.console.commands.make._facade_contract._Module.qualify">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Resolve the first component of a module-local reference.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">name:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Local name or dotted reference from the module.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Qualified reference with the original attribute suffix.</td></tr></table></div>
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.make._facade_contract._Module.classes">
+    
+  </a>
+  <a name="classes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">classes</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/ast.html#ast.ClassDef" class="intersphinx-link">ast.ClassDef</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/console/commands/make/_facade_contract.py#L67">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#classes" title="orionis.console.commands.make._facade_contract._Module.classes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Class declarations indexed by their names in this module.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.make._facade_contract._Module.imported_modules">
+    
+  </a>
+  <a name="imported_modules">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">imported_modules</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/console/commands/make/_facade_contract.py#L65">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#imported_modules" title="orionis.console.commands.make._facade_contract._Module.imported_modules">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Local module names mapped to the paths needed in import statements.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.make._facade_contract._Module.name">
+    
+  </a>
+  <a name="name">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">name</span> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/console/commands/make/_facade_contract.py#L61">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#name" title="orionis.console.commands.make._facade_contract._Module.name">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Qualified name of the source module.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
+  <a name="orionis.console.commands.make._facade_contract._Module.names">
+    
+  </a>
+  <a name="names">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">names</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/console/commands/make/_facade_contract.py#L63">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#names" title="orionis.console.commands.make._facade_contract._Module.names">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Local imported names mapped to their qualified names.</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-23 22:17:21.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

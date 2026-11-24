@@ -1,0 +1,4183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Class</span>
+        <code class="thisobject"><a href="orionis.foundation.config.options.PathsOptions.html" class="internal-link" title="This class"><wbr></wbr>Paths<wbr></wbr>Options</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_console" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console">app<wbr></wbr>_console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_console_commands" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console_commands">app<wbr></wbr>_console<wbr></wbr>_commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_console_listeners" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console_listeners">app<wbr></wbr>_console<wbr></wbr>_listeners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_contracts" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_contracts">app<wbr></wbr>_contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_exceptions" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_exceptions">app<wbr></wbr>_exceptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_facades" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_facades">app<wbr></wbr>_facades</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http">app<wbr></wbr>_http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http_controllers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_controllers">app<wbr></wbr>_http<wbr></wbr>_controllers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http_middleware" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_middleware">app<wbr></wbr>_http<wbr></wbr>_middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http_schemas" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_schemas">app<wbr></wbr>_http<wbr></wbr>_schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http_schemas_rules" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_schemas_rules">app<wbr></wbr>_http<wbr></wbr>_schemas<wbr></wbr>_rules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_jobs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_jobs">app<wbr></wbr>_jobs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp">app<wbr></wbr>_mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp_prompts" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_prompts">app<wbr></wbr>_mcp<wbr></wbr>_prompts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp_resources" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_resources">app<wbr></wbr>_mcp<wbr></wbr>_resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp_servers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_servers">app<wbr></wbr>_mcp<wbr></wbr>_servers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp_tools" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_tools">app<wbr></wbr>_mcp<wbr></wbr>_tools</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_models" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_models">app<wbr></wbr>_models</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_notifications" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_notifications">app<wbr></wbr>_notifications</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_providers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_providers">app<wbr></wbr>_providers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_realtime" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime">app<wbr></wbr>_realtime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_realtime_hubs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime_hubs">app<wbr></wbr>_realtime<wbr></wbr>_hubs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_realtime_sockets" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime_sockets">app<wbr></wbr>_realtime<wbr></wbr>_sockets</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_services" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_services">app<wbr></wbr>_services</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bootstrap" class="internal-link" title="orionis.foundation.config.options.PathsOptions.bootstrap">bootstrap</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#config" class="internal-link" title="orionis.foundation.config.options.PathsOptions.config">config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database_factories" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_factories">database<wbr></wbr>_factories</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database_migrations" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_migrations">database<wbr></wbr>_migrations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database_schemas" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_schemas">database<wbr></wbr>_schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database_seeders" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_seeders">database<wbr></wbr>_seeders</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources">resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources_css" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_css">resources<wbr></wbr>_css</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources_js" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_js">resources<wbr></wbr>_js</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources_lang" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_lang">resources<wbr></wbr>_lang</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources_views" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_views">resources<wbr></wbr>_views</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#routes" class="internal-link" title="orionis.foundation.config.options.PathsOptions.routes">routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage">storage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_app" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app">storage<wbr></wbr>_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_app_private" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app_private">storage<wbr></wbr>_app<wbr></wbr>_private</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_app_public" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app_public">storage<wbr></wbr>_app<wbr></wbr>_public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_framework" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_framework">storage<wbr></wbr>_framework</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_logs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_logs">storage<wbr></wbr>_logs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#tests" class="internal-link" title="orionis.foundation.config.options.PathsOptions.tests">tests</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code><a href="orionis.foundation.config.options.html" class="internal-link" title="The parent of this class">options</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9290"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9290">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.AppOptions.html" class="internal-link" title="orionis.foundation.config.options.AppOptions"><wbr></wbr>App<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#cipher" class="internal-link" title="orionis.foundation.config.options.AppOptions.cipher">cipher</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#debug" class="internal-link" title="orionis.foundation.config.options.AppOptions.debug">debug</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#env" class="internal-link" title="orionis.foundation.config.options.AppOptions.env">env</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#fallback_locale" class="internal-link" title="orionis.foundation.config.options.AppOptions.fallback_locale">fallback<wbr></wbr>_locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#key" class="internal-link" title="orionis.foundation.config.options.AppOptions.key">key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#language_path" class="internal-link" title="orionis.foundation.config.options.AppOptions.language_path">language<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#locale" class="internal-link" title="orionis.foundation.config.options.AppOptions.locale">locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#maintenance" class="internal-link" title="orionis.foundation.config.options.AppOptions.maintenance">maintenance</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#name" class="internal-link" title="orionis.foundation.config.options.AppOptions.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#timezone" class="internal-link" title="orionis.foundation.config.options.AppOptions.timezone">timezone</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9291"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9291">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.AuthOptions.html" class="internal-link" title="orionis.foundation.config.options.AuthOptions"><wbr></wbr>Auth<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#default" class="internal-link" title="orionis.foundation.config.options.AuthOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#identity" class="internal-link" title="orionis.foundation.config.options.AuthOptions.identity">identity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#passwords" class="internal-link" title="orionis.foundation.config.options.AuthOptions.passwords">passwords</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#remember" class="internal-link" title="orionis.foundation.config.options.AuthOptions.remember">remember</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#session" class="internal-link" title="orionis.foundation.config.options.AuthOptions.session">session</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#tokens" class="internal-link" title="orionis.foundation.config.options.AuthOptions.tokens">tokens</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9292"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9292">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.CacheOptions.html" class="internal-link" title="orionis.foundation.config.options.CacheOptions"><wbr></wbr>Cache<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.CacheOptions.html#default" class="internal-link" title="orionis.foundation.config.options.CacheOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.CacheOptions.html#prefix" class="internal-link" title="orionis.foundation.config.options.CacheOptions.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.CacheOptions.html#stores" class="internal-link" title="orionis.foundation.config.options.CacheOptions.stores">stores</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9293"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9293">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.DatabaseOptions.html" class="internal-link" title="orionis.foundation.config.options.DatabaseOptions"><wbr></wbr>Database<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.DatabaseOptions.html#connections" class="internal-link" title="orionis.foundation.config.options.DatabaseOptions.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.DatabaseOptions.html#default" class="internal-link" title="orionis.foundation.config.options.DatabaseOptions.default">default</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9294"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9294">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.FilesystemsOptions.html" class="internal-link" title="orionis.foundation.config.options.FilesystemsOptions"><wbr></wbr>Filesystems<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.FilesystemsOptions.html#default" class="internal-link" title="orionis.foundation.config.options.FilesystemsOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.FilesystemsOptions.html#disks" class="internal-link" title="orionis.foundation.config.options.FilesystemsOptions.disks">disks</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9295"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9295">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.HttpOptions.html" class="internal-link" title="orionis.foundation.config.options.HttpOptions"><wbr></wbr>Http<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#body_limits" class="internal-link" title="orionis.foundation.config.options.HttpOptions.body_limits">body<wbr></wbr>_limits</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#cors" class="internal-link" title="orionis.foundation.config.options.HttpOptions.cors">cors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#csrf" class="internal-link" title="orionis.foundation.config.options.HttpOptions.csrf">csrf</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#monitor_disconnects" class="internal-link" title="orionis.foundation.config.options.HttpOptions.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#proxies" class="internal-link" title="orionis.foundation.config.options.HttpOptions.proxies">proxies</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#rate_limit" class="internal-link" title="orionis.foundation.config.options.HttpOptions.rate_limit">rate<wbr></wbr>_limit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#security" class="internal-link" title="orionis.foundation.config.options.HttpOptions.security">security</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#websocket" class="internal-link" title="orionis.foundation.config.options.HttpOptions.websocket">websocket</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9296"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9296">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.LoggingOptions.html" class="internal-link" title="orionis.foundation.config.options.LoggingOptions"><wbr></wbr>Logging<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.LoggingOptions.html#channels" class="internal-link" title="orionis.foundation.config.options.LoggingOptions.channels">channels</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.LoggingOptions.html#default" class="internal-link" title="orionis.foundation.config.options.LoggingOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.LoggingOptions.html#queue_capacity" class="internal-link" title="orionis.foundation.config.options.LoggingOptions.queue_capacity">queue<wbr></wbr>_capacity</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9297"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9297">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.MailOptions.html" class="internal-link" title="orionis.foundation.config.options.MailOptions"><wbr></wbr>Mail<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.MailOptions.html#default" class="internal-link" title="orionis.foundation.config.options.MailOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.MailOptions.html#from_address" class="internal-link" title="orionis.foundation.config.options.MailOptions.from_address">from<wbr></wbr>_address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.MailOptions.html#mailers" class="internal-link" title="orionis.foundation.config.options.MailOptions.mailers">mailers</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9298"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9298">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.McpOptions.html" class="internal-link" title="orionis.foundation.config.options.McpOptions"><wbr></wbr>Mcp<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#allowed_origins" class="internal-link" title="orionis.foundation.config.options.McpOptions.allowed_origins">allowed<wbr></wbr>_origins</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#default_page_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.default_page_size">default<wbr></wbr>_page<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_concurrent_requests" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_concurrent_requests">max<wbr></wbr>_concurrent<wbr></wbr>_requests</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_metadata_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_metadata_size">max<wbr></wbr>_metadata<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_page_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_page_size">max<wbr></wbr>_page<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_request_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_request_size">max<wbr></wbr>_request<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_resource_subscriptions" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_resource_subscriptions">max<wbr></wbr>_resource<wbr></wbr>_subscriptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_response_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_response_size">max<wbr></wbr>_response<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_subscriptions" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_subscriptions">max<wbr></wbr>_subscriptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#subscription_buffer_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.subscription_buffer_size">subscription<wbr></wbr>_buffer<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#subscription_keepalive" class="internal-link" title="orionis.foundation.config.options.McpOptions.subscription_keepalive">subscription<wbr></wbr>_keepalive</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#tool_search_max_calls" class="internal-link" title="orionis.foundation.config.options.McpOptions.tool_search_max_calls">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_calls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#tool_search_max_output_bytes" class="internal-link" title="orionis.foundation.config.options.McpOptions.tool_search_max_output_bytes">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_output<wbr></wbr>_bytes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#tool_search_max_results" class="internal-link" title="orionis.foundation.config.options.McpOptions.tool_search_max_results">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_results</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9299"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.PathsOptions.html" class="internal-link" title="orionis.foundation.config.options.PathsOptions"><wbr></wbr>Paths<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_console" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console">app<wbr></wbr>_console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_console_commands" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console_commands">app<wbr></wbr>_console<wbr></wbr>_commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_console_listeners" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console_listeners">app<wbr></wbr>_console<wbr></wbr>_listeners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_contracts" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_contracts">app<wbr></wbr>_contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_exceptions" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_exceptions">app<wbr></wbr>_exceptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_facades" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_facades">app<wbr></wbr>_facades</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http">app<wbr></wbr>_http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http_controllers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_controllers">app<wbr></wbr>_http<wbr></wbr>_controllers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http_middleware" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_middleware">app<wbr></wbr>_http<wbr></wbr>_middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http_schemas" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_schemas">app<wbr></wbr>_http<wbr></wbr>_schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_http_schemas_rules" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_schemas_rules">app<wbr></wbr>_http<wbr></wbr>_schemas<wbr></wbr>_rules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_jobs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_jobs">app<wbr></wbr>_jobs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp">app<wbr></wbr>_mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp_prompts" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_prompts">app<wbr></wbr>_mcp<wbr></wbr>_prompts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp_resources" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_resources">app<wbr></wbr>_mcp<wbr></wbr>_resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp_servers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_servers">app<wbr></wbr>_mcp<wbr></wbr>_servers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_mcp_tools" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_tools">app<wbr></wbr>_mcp<wbr></wbr>_tools</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_models" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_models">app<wbr></wbr>_models</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_notifications" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_notifications">app<wbr></wbr>_notifications</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_providers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_providers">app<wbr></wbr>_providers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_realtime" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime">app<wbr></wbr>_realtime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_realtime_hubs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime_hubs">app<wbr></wbr>_realtime<wbr></wbr>_hubs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_realtime_sockets" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime_sockets">app<wbr></wbr>_realtime<wbr></wbr>_sockets</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#app_services" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_services">app<wbr></wbr>_services</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#bootstrap" class="internal-link" title="orionis.foundation.config.options.PathsOptions.bootstrap">bootstrap</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#config" class="internal-link" title="orionis.foundation.config.options.PathsOptions.config">config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database_factories" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_factories">database<wbr></wbr>_factories</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database_migrations" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_migrations">database<wbr></wbr>_migrations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database_schemas" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_schemas">database<wbr></wbr>_schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#database_seeders" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_seeders">database<wbr></wbr>_seeders</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources">resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources_css" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_css">resources<wbr></wbr>_css</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources_js" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_js">resources<wbr></wbr>_js</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources_lang" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_lang">resources<wbr></wbr>_lang</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#resources_views" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_views">resources<wbr></wbr>_views</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#routes" class="internal-link" title="orionis.foundation.config.options.PathsOptions.routes">routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage">storage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_app" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app">storage<wbr></wbr>_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_app_private" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app_private">storage<wbr></wbr>_app<wbr></wbr>_private</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_app_public" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app_public">storage<wbr></wbr>_app<wbr></wbr>_public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_framework" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_framework">storage<wbr></wbr>_framework</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#storage_logs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_logs">storage<wbr></wbr>_logs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#tests" class="internal-link" title="orionis.foundation.config.options.PathsOptions.tests">tests</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9300"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9300">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.QueueOptions.html" class="internal-link" title="orionis.foundation.config.options.QueueOptions"><wbr></wbr>Queue<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html#connections" class="internal-link" title="orionis.foundation.config.options.QueueOptions.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html#default" class="internal-link" title="orionis.foundation.config.options.QueueOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html#failed" class="internal-link" title="orionis.foundation.config.options.QueueOptions.failed">failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html#worker" class="internal-link" title="orionis.foundation.config.options.QueueOptions.worker">worker</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9301"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9301">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.RoutingPaths.html" class="internal-link" title="orionis.foundation.config.options.RoutingPaths"><wbr></wbr>Routing<wbr></wbr>Paths</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#ai" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.ai">ai</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#api" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.api">api</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#console" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.console">console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#health" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.health">health</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#web" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.web">web</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#websocket" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.websocket">websocket</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9302"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9302">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.SessionOptions.html" class="internal-link" title="orionis.foundation.config.options.SessionOptions"><wbr></wbr>Session<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#cache" class="internal-link" title="orionis.foundation.config.options.SessionOptions.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#connection" class="internal-link" title="orionis.foundation.config.options.SessionOptions.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#cookie" class="internal-link" title="orionis.foundation.config.options.SessionOptions.cookie">cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#domain" class="internal-link" title="orionis.foundation.config.options.SessionOptions.domain">domain</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#driver" class="internal-link" title="orionis.foundation.config.options.SessionOptions.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#expire_on_close" class="internal-link" title="orionis.foundation.config.options.SessionOptions.expire_on_close">expire<wbr></wbr>_on<wbr></wbr>_close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#files" class="internal-link" title="orionis.foundation.config.options.SessionOptions.files">files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#http_only" class="internal-link" title="orionis.foundation.config.options.SessionOptions.http_only">http<wbr></wbr>_only</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#lifetime" class="internal-link" title="orionis.foundation.config.options.SessionOptions.lifetime">lifetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#partitioned" class="internal-link" title="orionis.foundation.config.options.SessionOptions.partitioned">partitioned</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#path" class="internal-link" title="orionis.foundation.config.options.SessionOptions.path">path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#renewal_interval" class="internal-link" title="orionis.foundation.config.options.SessionOptions.renewal_interval">renewal<wbr></wbr>_interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#same_site" class="internal-link" title="orionis.foundation.config.options.SessionOptions.same_site">same<wbr></wbr>_site</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#secure" class="internal-link" title="orionis.foundation.config.options.SessionOptions.secure">secure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#table" class="internal-link" title="orionis.foundation.config.options.SessionOptions.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#track_previous_url" class="internal-link" title="orionis.foundation.config.options.SessionOptions.track_previous_url">track<wbr></wbr>_previous<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9303"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9303">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.TestingOptions.html" class="internal-link" title="orionis.foundation.config.options.TestingOptions"><wbr></wbr>Testing<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#cache_results" class="internal-link" title="orionis.foundation.config.options.TestingOptions.cache_results">cache<wbr></wbr>_results</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#fail_fast" class="internal-link" title="orionis.foundation.config.options.TestingOptions.fail_fast">fail<wbr></wbr>_fast</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#file_pattern" class="internal-link" title="orionis.foundation.config.options.TestingOptions.file_pattern">file<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#method_pattern" class="internal-link" title="orionis.foundation.config.options.TestingOptions.method_pattern">method<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#start_dir" class="internal-link" title="orionis.foundation.config.options.TestingOptions.start_dir">start<wbr></wbr>_dir</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#verbosity" class="internal-link" title="orionis.foundation.config.options.TestingOptions.verbosity">verbosity</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.html#CorePathName" class="internal-link" title="orionis.foundation.config.options.CorePathName"><wbr></wbr>Core<wbr></wbr>Path<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride"><wbr></wbr>Path<wbr></wbr>Override</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="class"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.html" class="internal-link" title="orionis.foundation.config">config</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.options.html" class="internal-link" title="orionis.foundation.config.options">options</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.options.PathsOptions.html" class="internal-link" title="orionis.foundation.config.options.PathsOptions">PathsOptions</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          class documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">PathsOptions</span>(TypedDict): <a href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L302" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.foundation.config.options.PathsOptions">View In Hierarchy</a></p>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Paths accepted by Application.withConfigPaths.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id890">
+  
+  
+  <tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app">app</a></code></td>
+    <td>Application source code directory. Defaults to <tt class="rst-docutils rst-literal">app</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_console" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console">app<wbr></wbr>_console</a></code></td>
+    <td>Console components directory. Defaults to <tt class="rst-docutils rst-literal">app/console</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_console_commands" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console_commands">app<wbr></wbr>_console<wbr></wbr>_commands</a></code></td>
+    <td>Custom console commands directory. Defaults to <tt class="rst-docutils rst-literal">app/console/commands</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_console_listeners" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console_listeners">app<wbr></wbr>_console<wbr></wbr>_listeners</a></code></td>
+    <td>Console event listeners directory. Defaults to <tt class="rst-docutils rst-literal">app/console/listeners</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_contracts" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_contracts">app<wbr></wbr>_contracts</a></code></td>
+    <td>Application service contracts directory. Defaults to <tt class="rst-docutils rst-literal">app/contracts</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_exceptions" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_exceptions">app<wbr></wbr>_exceptions</a></code></td>
+    <td>Application exception handlers directory. Defaults to <tt class="rst-docutils rst-literal">app/exceptions</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_facades" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_facades">app<wbr></wbr>_facades</a></code></td>
+    <td>Application-defined facades directory. Defaults to <tt class="rst-docutils rst-literal">app/facades</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_http" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http">app<wbr></wbr>_http</a></code></td>
+    <td>HTTP components directory. Defaults to <tt class="rst-docutils rst-literal">app/http</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_http_controllers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_controllers">app<wbr></wbr>_http<wbr></wbr>_controllers</a></code></td>
+    <td>HTTP controllers directory. Defaults to <tt class="rst-docutils rst-literal">app/http/controllers</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_http_middleware" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_middleware">app<wbr></wbr>_http<wbr></wbr>_middleware</a></code></td>
+    <td>HTTP middleware directory. Defaults to <tt class="rst-docutils rst-literal">app/http/middleware</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_http_schemas" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_schemas">app<wbr></wbr>_http<wbr></wbr>_schemas</a></code></td>
+    <td>HTTP request schemas directory. Defaults to <tt class="rst-docutils rst-literal">app/http/schemas</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_http_schemas_rules" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_schemas_rules">app<wbr></wbr>_http<wbr></wbr>_schemas<wbr></wbr>_rules</a></code></td>
+    <td>Custom schema validation rules directory. Defaults to <tt class="rst-docutils rst-literal">app/http/schemas/rules</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_jobs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_jobs">app<wbr></wbr>_jobs</a></code></td>
+    <td>Queue jobs directory. Defaults to <tt class="rst-docutils rst-literal">app/jobs</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_mcp" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp">app<wbr></wbr>_mcp</a></code></td>
+    <td>MCP components directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_mcp_prompts" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_prompts">app<wbr></wbr>_mcp<wbr></wbr>_prompts</a></code></td>
+    <td>MCP prompts directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp/prompts</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_mcp_resources" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_resources">app<wbr></wbr>_mcp<wbr></wbr>_resources</a></code></td>
+    <td>MCP resources directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp/resources</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_mcp_servers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_servers">app<wbr></wbr>_mcp<wbr></wbr>_servers</a></code></td>
+    <td>MCP servers directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp/servers</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_mcp_tools" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_tools">app<wbr></wbr>_mcp<wbr></wbr>_tools</a></code></td>
+    <td>MCP tools directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp/tools</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_models" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_models">app<wbr></wbr>_models</a></code></td>
+    <td>ORM models directory. Defaults to <tt class="rst-docutils rst-literal">app/models</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_notifications" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_notifications">app<wbr></wbr>_notifications</a></code></td>
+    <td>Application notifications directory. Defaults to <tt class="rst-docutils rst-literal">app/notifications</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_providers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_providers">app<wbr></wbr>_providers</a></code></td>
+    <td>Service providers directory. Defaults to <tt class="rst-docutils rst-literal">app/providers</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_realtime" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime">app<wbr></wbr>_realtime</a></code></td>
+    <td>Realtime application components directory. Defaults to <tt class="rst-docutils rst-literal">app/realtime</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_realtime_hubs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime_hubs">app<wbr></wbr>_realtime<wbr></wbr>_hubs</a></code></td>
+    <td>Realtime hubs directory. Defaults to <tt class="rst-docutils rst-literal">app/realtime/hubs</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_realtime_sockets" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime_sockets">app<wbr></wbr>_realtime<wbr></wbr>_sockets</a></code></td>
+    <td>Realtime socket handlers directory. Defaults to <tt class="rst-docutils rst-literal">app/realtime/sockets</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#app_services" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_services">app<wbr></wbr>_services</a></code></td>
+    <td>Application services directory. Defaults to <tt class="rst-docutils rst-literal">app/services</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#bootstrap" class="internal-link" title="orionis.foundation.config.options.PathsOptions.bootstrap">bootstrap</a></code></td>
+    <td>Application bootstrap code directory. Defaults to <tt class="rst-docutils rst-literal">bootstrap</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#config" class="internal-link" title="orionis.foundation.config.options.PathsOptions.config">config</a></code></td>
+    <td>Configuration modules directory. Defaults to <tt class="rst-docutils rst-literal">config</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#database" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database">database</a></code></td>
+    <td>Database assets directory. Defaults to <tt class="rst-docutils rst-literal">database</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#database_factories" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_factories">database<wbr></wbr>_factories</a></code></td>
+    <td>Model factories directory. Defaults to <tt class="rst-docutils rst-literal">database/factories</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#database_migrations" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_migrations">database<wbr></wbr>_migrations</a></code></td>
+    <td>Database migrations directory. Defaults to <tt class="rst-docutils rst-literal">database/migrations</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#database_schemas" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_schemas">database<wbr></wbr>_schemas</a></code></td>
+    <td>Database schema definitions directory. Defaults to <tt class="rst-docutils rst-literal">database/schemas</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#database_seeders" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_seeders">database<wbr></wbr>_seeders</a></code></td>
+    <td>Database seeders directory. Defaults to <tt class="rst-docutils rst-literal">database/seeders</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#resources" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources">resources</a></code></td>
+    <td>Application resources directory. Defaults to <tt class="rst-docutils rst-literal">resources</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#resources_css" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_css">resources<wbr></wbr>_css</a></code></td>
+    <td>Stylesheets directory. Defaults to <tt class="rst-docutils rst-literal">resources/css</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#resources_js" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_js">resources<wbr></wbr>_js</a></code></td>
+    <td>JavaScript assets directory. Defaults to <tt class="rst-docutils rst-literal">resources/js</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#resources_lang" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_lang">resources<wbr></wbr>_lang</a></code></td>
+    <td>Translation files directory. Defaults to <tt class="rst-docutils rst-literal">resources/lang</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#resources_views" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_views">resources<wbr></wbr>_views</a></code></td>
+    <td>View templates directory. Defaults to <tt class="rst-docutils rst-literal">resources/views</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#routes" class="internal-link" title="orionis.foundation.config.options.PathsOptions.routes">routes</a></code></td>
+    <td>Route declarations directory. Defaults to <tt class="rst-docutils rst-literal">routes</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#storage" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage">storage</a></code></td>
+    <td>Application storage directory. Defaults to <tt class="rst-docutils rst-literal">storage</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#storage_app" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app">storage<wbr></wbr>_app</a></code></td>
+    <td>Application-managed files directory. Defaults to <tt class="rst-docutils rst-literal">storage/app</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#storage_app_private" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app_private">storage<wbr></wbr>_app<wbr></wbr>_private</a></code></td>
+    <td>Private application files directory. Defaults to <tt class="rst-docutils rst-literal">storage/app/private</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#storage_app_public" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app_public">storage<wbr></wbr>_app<wbr></wbr>_public</a></code></td>
+    <td>Public application files directory. Defaults to <tt class="rst-docutils rst-literal">storage/app/public</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#storage_framework" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_framework">storage<wbr></wbr>_framework</a></code></td>
+    <td>Framework runtime state directory. Defaults to <tt class="rst-docutils rst-literal">storage/framework</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#storage_logs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_logs">storage<wbr></wbr>_logs</a></code></td>
+    <td>Application logs directory. Defaults to <tt class="rst-docutils rst-literal">storage/logs</tt>.</td>
+  </tr><tr class="classvariable">
+    
+    <td>Class Variable</td>
+    <td><code><a href="#tests" class="internal-link" title="orionis.foundation.config.options.PathsOptions.tests">tests</a></code></td>
+    <td>Application tests directory. Defaults to <tt class="rst-docutils rst-literal">tests</tt>.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app">
+    
+  </a>
+  <a name="app">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L305">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app" title="orionis.foundation.config.options.PathsOptions.app">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application source code directory. Defaults to <tt class="rst-docutils rst-literal">app</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_console">
+    
+  </a>
+  <a name="app_console">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_console</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L307">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_console" title="orionis.foundation.config.options.PathsOptions.app_console">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Console components directory. Defaults to <tt class="rst-docutils rst-literal">app/console</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_console_commands">
+    
+  </a>
+  <a name="app_console_commands">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_console_commands</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L309">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_console_commands" title="orionis.foundation.config.options.PathsOptions.app_console_commands">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Custom console commands directory. Defaults to <tt class="rst-docutils rst-literal">app/console/commands</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_console_listeners">
+    
+  </a>
+  <a name="app_console_listeners">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_console_listeners</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L311">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_console_listeners" title="orionis.foundation.config.options.PathsOptions.app_console_listeners">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Console event listeners directory. Defaults to <tt class="rst-docutils rst-literal">app/console/listeners</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_contracts">
+    
+  </a>
+  <a name="app_contracts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_contracts</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L355">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_contracts" title="orionis.foundation.config.options.PathsOptions.app_contracts">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application service contracts directory. Defaults to <tt class="rst-docutils rst-literal">app/contracts</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_exceptions">
+    
+  </a>
+  <a name="app_exceptions">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_exceptions</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L313">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_exceptions" title="orionis.foundation.config.options.PathsOptions.app_exceptions">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application exception handlers directory. Defaults to <tt class="rst-docutils rst-literal">app/exceptions</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_facades">
+    
+  </a>
+  <a name="app_facades">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_facades</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L351">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_facades" title="orionis.foundation.config.options.PathsOptions.app_facades">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application-defined facades directory. Defaults to <tt class="rst-docutils rst-literal">app/facades</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_http">
+    
+  </a>
+  <a name="app_http">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_http</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L315">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_http" title="orionis.foundation.config.options.PathsOptions.app_http">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>HTTP components directory. Defaults to <tt class="rst-docutils rst-literal">app/http</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_http_controllers">
+    
+  </a>
+  <a name="app_http_controllers">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_http_controllers</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L317">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_http_controllers" title="orionis.foundation.config.options.PathsOptions.app_http_controllers">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>HTTP controllers directory. Defaults to <tt class="rst-docutils rst-literal">app/http/controllers</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_http_middleware">
+    
+  </a>
+  <a name="app_http_middleware">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_http_middleware</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L319">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_http_middleware" title="orionis.foundation.config.options.PathsOptions.app_http_middleware">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>HTTP middleware directory. Defaults to <tt class="rst-docutils rst-literal">app/http/middleware</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_http_schemas">
+    
+  </a>
+  <a name="app_http_schemas">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_http_schemas</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L321">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_http_schemas" title="orionis.foundation.config.options.PathsOptions.app_http_schemas">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>HTTP request schemas directory. Defaults to <tt class="rst-docutils rst-literal">app/http/schemas</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_http_schemas_rules">
+    
+  </a>
+  <a name="app_http_schemas_rules">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_http_schemas_rules</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L323">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_http_schemas_rules" title="orionis.foundation.config.options.PathsOptions.app_http_schemas_rules">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Custom schema validation rules directory. Defaults to <tt class="rst-docutils rst-literal">app/http/schemas/rules</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_jobs">
+    
+  </a>
+  <a name="app_jobs">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_jobs</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L353">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_jobs" title="orionis.foundation.config.options.PathsOptions.app_jobs">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Queue jobs directory. Defaults to <tt class="rst-docutils rst-literal">app/jobs</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_mcp">
+    
+  </a>
+  <a name="app_mcp">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_mcp</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L329">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_mcp" title="orionis.foundation.config.options.PathsOptions.app_mcp">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>MCP components directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_mcp_prompts">
+    
+  </a>
+  <a name="app_mcp_prompts">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_mcp_prompts</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L337">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_mcp_prompts" title="orionis.foundation.config.options.PathsOptions.app_mcp_prompts">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>MCP prompts directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp/prompts</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_mcp_resources">
+    
+  </a>
+  <a name="app_mcp_resources">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_mcp_resources</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L335">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_mcp_resources" title="orionis.foundation.config.options.PathsOptions.app_mcp_resources">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>MCP resources directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp/resources</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_mcp_servers">
+    
+  </a>
+  <a name="app_mcp_servers">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_mcp_servers</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L331">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_mcp_servers" title="orionis.foundation.config.options.PathsOptions.app_mcp_servers">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>MCP servers directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp/servers</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_mcp_tools">
+    
+  </a>
+  <a name="app_mcp_tools">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_mcp_tools</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L333">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_mcp_tools" title="orionis.foundation.config.options.PathsOptions.app_mcp_tools">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>MCP tools directory. Defaults to <tt class="rst-docutils rst-literal">app/mcp/tools</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_models">
+    
+  </a>
+  <a name="app_models">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_models</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L327">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_models" title="orionis.foundation.config.options.PathsOptions.app_models">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>ORM models directory. Defaults to <tt class="rst-docutils rst-literal">app/models</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_notifications">
+    
+  </a>
+  <a name="app_notifications">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_notifications</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L347">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_notifications" title="orionis.foundation.config.options.PathsOptions.app_notifications">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application notifications directory. Defaults to <tt class="rst-docutils rst-literal">app/notifications</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_providers">
+    
+  </a>
+  <a name="app_providers">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_providers</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L345">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_providers" title="orionis.foundation.config.options.PathsOptions.app_providers">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Service providers directory. Defaults to <tt class="rst-docutils rst-literal">app/providers</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_realtime">
+    
+  </a>
+  <a name="app_realtime">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_realtime</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L339">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_realtime" title="orionis.foundation.config.options.PathsOptions.app_realtime">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Realtime application components directory. Defaults to <tt class="rst-docutils rst-literal">app/realtime</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_realtime_hubs">
+    
+  </a>
+  <a name="app_realtime_hubs">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_realtime_hubs</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L343">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_realtime_hubs" title="orionis.foundation.config.options.PathsOptions.app_realtime_hubs">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Realtime hubs directory. Defaults to <tt class="rst-docutils rst-literal">app/realtime/hubs</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_realtime_sockets">
+    
+  </a>
+  <a name="app_realtime_sockets">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_realtime_sockets</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L341">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_realtime_sockets" title="orionis.foundation.config.options.PathsOptions.app_realtime_sockets">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Realtime socket handlers directory. Defaults to <tt class="rst-docutils rst-literal">app/realtime/sockets</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.app_services">
+    
+  </a>
+  <a name="app_services">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">app_services</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L349">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#app_services" title="orionis.foundation.config.options.PathsOptions.app_services">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application services directory. Defaults to <tt class="rst-docutils rst-literal">app/services</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.bootstrap">
+    
+  </a>
+  <a name="bootstrap">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">bootstrap</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L357">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#bootstrap" title="orionis.foundation.config.options.PathsOptions.bootstrap">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application bootstrap code directory. Defaults to <tt class="rst-docutils rst-literal">bootstrap</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.config">
+    
+  </a>
+  <a name="config">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">config</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L359">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#config" title="orionis.foundation.config.options.PathsOptions.config">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Configuration modules directory. Defaults to <tt class="rst-docutils rst-literal">config</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.database">
+    
+  </a>
+  <a name="database">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">database</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L361">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#database" title="orionis.foundation.config.options.PathsOptions.database">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database assets directory. Defaults to <tt class="rst-docutils rst-literal">database</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.database_factories">
+    
+  </a>
+  <a name="database_factories">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">database_factories</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L363">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#database_factories" title="orionis.foundation.config.options.PathsOptions.database_factories">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Model factories directory. Defaults to <tt class="rst-docutils rst-literal">database/factories</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.database_migrations">
+    
+  </a>
+  <a name="database_migrations">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">database_migrations</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L365">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#database_migrations" title="orionis.foundation.config.options.PathsOptions.database_migrations">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database migrations directory. Defaults to <tt class="rst-docutils rst-literal">database/migrations</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.database_schemas">
+    
+  </a>
+  <a name="database_schemas">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">database_schemas</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L367">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#database_schemas" title="orionis.foundation.config.options.PathsOptions.database_schemas">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database schema definitions directory. Defaults to <tt class="rst-docutils rst-literal">database/schemas</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.database_seeders">
+    
+  </a>
+  <a name="database_seeders">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">database_seeders</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L369">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#database_seeders" title="orionis.foundation.config.options.PathsOptions.database_seeders">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Database seeders directory. Defaults to <tt class="rst-docutils rst-literal">database/seeders</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.resources">
+    
+  </a>
+  <a name="resources">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">resources</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L371">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resources" title="orionis.foundation.config.options.PathsOptions.resources">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application resources directory. Defaults to <tt class="rst-docutils rst-literal">resources</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.resources_css">
+    
+  </a>
+  <a name="resources_css">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">resources_css</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L373">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resources_css" title="orionis.foundation.config.options.PathsOptions.resources_css">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Stylesheets directory. Defaults to <tt class="rst-docutils rst-literal">resources/css</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.resources_js">
+    
+  </a>
+  <a name="resources_js">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">resources_js</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L375">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resources_js" title="orionis.foundation.config.options.PathsOptions.resources_js">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>JavaScript assets directory. Defaults to <tt class="rst-docutils rst-literal">resources/js</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.resources_lang">
+    
+  </a>
+  <a name="resources_lang">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">resources_lang</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L377">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resources_lang" title="orionis.foundation.config.options.PathsOptions.resources_lang">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Translation files directory. Defaults to <tt class="rst-docutils rst-literal">resources/lang</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.resources_views">
+    
+  </a>
+  <a name="resources_views">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">resources_views</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L379">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#resources_views" title="orionis.foundation.config.options.PathsOptions.resources_views">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>View templates directory. Defaults to <tt class="rst-docutils rst-literal">resources/views</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.routes">
+    
+  </a>
+  <a name="routes">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">routes</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L381">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#routes" title="orionis.foundation.config.options.PathsOptions.routes">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Route declarations directory. Defaults to <tt class="rst-docutils rst-literal">routes</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.storage">
+    
+  </a>
+  <a name="storage">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">storage</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L383">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storage" title="orionis.foundation.config.options.PathsOptions.storage">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application storage directory. Defaults to <tt class="rst-docutils rst-literal">storage</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.storage_app">
+    
+  </a>
+  <a name="storage_app">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">storage_app</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L385">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storage_app" title="orionis.foundation.config.options.PathsOptions.storage_app">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application-managed files directory. Defaults to <tt class="rst-docutils rst-literal">storage/app</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.storage_app_private">
+    
+  </a>
+  <a name="storage_app_private">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">storage_app_private</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L387">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storage_app_private" title="orionis.foundation.config.options.PathsOptions.storage_app_private">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Private application files directory. Defaults to <tt class="rst-docutils rst-literal">storage/app/private</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.storage_app_public">
+    
+  </a>
+  <a name="storage_app_public">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">storage_app_public</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L389">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storage_app_public" title="orionis.foundation.config.options.PathsOptions.storage_app_public">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Public application files directory. Defaults to <tt class="rst-docutils rst-literal">storage/app/public</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.storage_framework">
+    
+  </a>
+  <a name="storage_framework">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">storage_framework</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L391">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storage_framework" title="orionis.foundation.config.options.PathsOptions.storage_framework">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Framework runtime state directory. Defaults to <tt class="rst-docutils rst-literal">storage/framework</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.storage_logs">
+    
+  </a>
+  <a name="storage_logs">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">storage_logs</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L393">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#storage_logs" title="orionis.foundation.config.options.PathsOptions.storage_logs">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application logs directory. Defaults to <tt class="rst-docutils rst-literal">storage/logs</tt>.</p></div>
+    
+  </div>
+</div><div class="baseclassvariable">
+  
+  
+  <a name="orionis.foundation.config.options.PathsOptions.tests">
+    
+  </a>
+  <a name="tests">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">tests</span>: <code><a href="orionis.foundation.config.options.html#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride">PathOverride</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L395">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#tests" title="orionis.foundation.config.options.PathsOptions.tests">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Application tests directory. Defaults to <tt class="rst-docutils rst-literal">tests</tt>.</p></div>
+    
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-23 22:17:21.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

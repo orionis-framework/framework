@@ -1,0 +1,5537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "DTD/xhtml1-strict.dtd">
+<html>
+  
+
+  <head>
+  
+  <title>API Reference | Orionis Framework</title>
+  <meta name="generator" content="pydoctor 25.10.1">
+    
+  </meta>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" type="image/svg+xml" href="orionis-icon.svg" />
+  <script src="orionis-theme.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="apidocs.css" />
+  <link rel="stylesheet" type="text/css" href="extra.css" />
+  <script src="orionis-ui.js" type="text/javascript" defer="defer"></script>
+  
+</head>
+
+  <body>
+
+    <header class="orionis-header">
+  <div class="orionis-header-inner">
+    <a class="orionis-brand" href="index.html" aria-label="Orionis API reference home">
+      <img class="orionis-brand-icon" src="orionis-icon.svg" width="38" height="38" alt="" />
+      <span class="orionis-brand-copy">
+        <span class="orionis-wordmark">ORIONIS</span>
+        <span class="orionis-brand-caption">API REFERENCE</span>
+      </span>
+    </a>
+    <div class="orionis-header-actions">
+      <nav class="orionis-header-links" aria-label="Orionis resources">
+        <a href="https://docs.orionis-framework.com">Guide <span aria-hidden="true">↗</span></a>
+        <a href="https://github.com/orionis-framework/framework">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+      <button class="orionis-icon-button" id="orionis-theme-toggle" type="button" aria-label="Toggle color theme" hidden="hidden">
+        <svg class="orionis-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+        <svg class="orionis-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"></path>
+        </svg>
+      </button>
+      <button class="orionis-icon-button" id="orionis-menu-toggle" type="button" aria-label="Open API navigation" aria-expanded="false" hidden="hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+    <nav class="navbar navbar-default mainnavbar">
+      
+  
+  <div class="container-fluid">
+
+
+    <div class="navbar-header">
+      
+      <div class="navlinks">
+        <span class="navbar-brand">
+          <a href="https://orionis-framework.com/" class="projecthome">Orionis</a> <a href="index.html">API Documentation</a>
+        </span>
+
+        <a href="moduleIndex.html">
+          Modules
+        </a>
+
+        <a href="classIndex.html">
+          Classes
+        </a>
+
+        <a href="nameIndex.html">
+          Names
+        </a>
+
+        <div id="search-box-container">
+          <div class="input-group">
+            <input id="search-box" type="search" name="search-query" placeholder="Search..." aria-label="Search" minlength="2" class="form-control" autocomplete="off" />
+            
+            <span class="input-group-btn">
+              <a style="display: none;" class="btn btn-default" id="search-clear-button" title="Clear" onclick="clearSearch()"><img src="fonts/x-circle.svg" alt="Clear" /></a>
+              <a class="btn btn-default" id="apidocs-help-button" title="Help" href="apidocs-help.html"><img src="fonts/info.svg" alt="Help" /></a>
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="search-results-container" style="display: none;">
+        
+        <div id="search-buttons">
+          <span class="label label-default" id="search-docstrings-button">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="toggle-search-in-docstrings-checkbox" value="false" onclick="toggleSearchInDocstrings()">
+              search in docstrings
+            </input>
+          </label>
+          </span>
+          
+        </div>
+        
+        <noscript>
+            <h1>Cannot search: JavaScript is not supported/enabled in your browser.</h1>
+        </noscript>
+
+        <div id="search-status"> </div>
+
+        <div class="warning" id="search-warn-box" style="display: none;">
+          <p class="rst-last"><span id="search-warn"></span></p>
+        </div>
+
+        <table id="search-results">
+          <!-- Filled dynamically by JS -->
+        </table>
+        
+        <div style="margin-top: 10px;">
+          <p>For more information on the search, visit the <a href="apidocs-help.html#rst-search">help page</a>.</p>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div>
+</nav>
+    
+    <div class="container-fluid">
+
+      <!-- Side navigation -->
+      <div class="sidebarcontainer" style="display: none;">
+        
+        <div class="sidebar"><nav class="sidebar">
+  
+
+  <div>
+
+      <div class="thingTitle">
+        <span>Module</span>
+        <code class="thisobject"><a href="orionis.foundation.config.options.html" class="internal-link" title="This module">options</a></code> 
+      </div>
+      
+      <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9089"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9089">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.AppOptions.html" class="internal-link" title="orionis.foundation.config.options.AppOptions"><wbr></wbr>App<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#cipher" class="internal-link" title="orionis.foundation.config.options.AppOptions.cipher">cipher</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#debug" class="internal-link" title="orionis.foundation.config.options.AppOptions.debug">debug</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#env" class="internal-link" title="orionis.foundation.config.options.AppOptions.env">env</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#fallback_locale" class="internal-link" title="orionis.foundation.config.options.AppOptions.fallback_locale">fallback<wbr></wbr>_locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#key" class="internal-link" title="orionis.foundation.config.options.AppOptions.key">key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#language_path" class="internal-link" title="orionis.foundation.config.options.AppOptions.language_path">language<wbr></wbr>_path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#locale" class="internal-link" title="orionis.foundation.config.options.AppOptions.locale">locale</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#maintenance" class="internal-link" title="orionis.foundation.config.options.AppOptions.maintenance">maintenance</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#name" class="internal-link" title="orionis.foundation.config.options.AppOptions.name">name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html#timezone" class="internal-link" title="orionis.foundation.config.options.AppOptions.timezone">timezone</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9090"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9090">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.AuthOptions.html" class="internal-link" title="orionis.foundation.config.options.AuthOptions"><wbr></wbr>Auth<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#default" class="internal-link" title="orionis.foundation.config.options.AuthOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#identity" class="internal-link" title="orionis.foundation.config.options.AuthOptions.identity">identity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#passwords" class="internal-link" title="orionis.foundation.config.options.AuthOptions.passwords">passwords</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#remember" class="internal-link" title="orionis.foundation.config.options.AuthOptions.remember">remember</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#session" class="internal-link" title="orionis.foundation.config.options.AuthOptions.session">session</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html#tokens" class="internal-link" title="orionis.foundation.config.options.AuthOptions.tokens">tokens</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9091"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9091">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.CacheOptions.html" class="internal-link" title="orionis.foundation.config.options.CacheOptions"><wbr></wbr>Cache<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.CacheOptions.html#default" class="internal-link" title="orionis.foundation.config.options.CacheOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.CacheOptions.html#prefix" class="internal-link" title="orionis.foundation.config.options.CacheOptions.prefix">prefix</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.CacheOptions.html#stores" class="internal-link" title="orionis.foundation.config.options.CacheOptions.stores">stores</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9092"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9092">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.DatabaseOptions.html" class="internal-link" title="orionis.foundation.config.options.DatabaseOptions"><wbr></wbr>Database<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.DatabaseOptions.html#connections" class="internal-link" title="orionis.foundation.config.options.DatabaseOptions.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.DatabaseOptions.html#default" class="internal-link" title="orionis.foundation.config.options.DatabaseOptions.default">default</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9093"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9093">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.FilesystemsOptions.html" class="internal-link" title="orionis.foundation.config.options.FilesystemsOptions"><wbr></wbr>Filesystems<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.FilesystemsOptions.html#default" class="internal-link" title="orionis.foundation.config.options.FilesystemsOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.FilesystemsOptions.html#disks" class="internal-link" title="orionis.foundation.config.options.FilesystemsOptions.disks">disks</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9094"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9094">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.HttpOptions.html" class="internal-link" title="orionis.foundation.config.options.HttpOptions"><wbr></wbr>Http<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#body_limits" class="internal-link" title="orionis.foundation.config.options.HttpOptions.body_limits">body<wbr></wbr>_limits</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#cors" class="internal-link" title="orionis.foundation.config.options.HttpOptions.cors">cors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#csrf" class="internal-link" title="orionis.foundation.config.options.HttpOptions.csrf">csrf</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#monitor_disconnects" class="internal-link" title="orionis.foundation.config.options.HttpOptions.monitor_disconnects">monitor<wbr></wbr>_disconnects</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#proxies" class="internal-link" title="orionis.foundation.config.options.HttpOptions.proxies">proxies</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#rate_limit" class="internal-link" title="orionis.foundation.config.options.HttpOptions.rate_limit">rate<wbr></wbr>_limit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#security" class="internal-link" title="orionis.foundation.config.options.HttpOptions.security">security</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html#websocket" class="internal-link" title="orionis.foundation.config.options.HttpOptions.websocket">websocket</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9095"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9095">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.LoggingOptions.html" class="internal-link" title="orionis.foundation.config.options.LoggingOptions"><wbr></wbr>Logging<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.LoggingOptions.html#channels" class="internal-link" title="orionis.foundation.config.options.LoggingOptions.channels">channels</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.LoggingOptions.html#default" class="internal-link" title="orionis.foundation.config.options.LoggingOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.LoggingOptions.html#queue_capacity" class="internal-link" title="orionis.foundation.config.options.LoggingOptions.queue_capacity">queue<wbr></wbr>_capacity</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9096"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9096">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.MailOptions.html" class="internal-link" title="orionis.foundation.config.options.MailOptions"><wbr></wbr>Mail<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.MailOptions.html#default" class="internal-link" title="orionis.foundation.config.options.MailOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.MailOptions.html#from_address" class="internal-link" title="orionis.foundation.config.options.MailOptions.from_address">from<wbr></wbr>_address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.MailOptions.html#mailers" class="internal-link" title="orionis.foundation.config.options.MailOptions.mailers">mailers</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9097"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9097">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.McpOptions.html" class="internal-link" title="orionis.foundation.config.options.McpOptions"><wbr></wbr>Mcp<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#allowed_origins" class="internal-link" title="orionis.foundation.config.options.McpOptions.allowed_origins">allowed<wbr></wbr>_origins</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#default_page_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.default_page_size">default<wbr></wbr>_page<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_concurrent_requests" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_concurrent_requests">max<wbr></wbr>_concurrent<wbr></wbr>_requests</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_metadata_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_metadata_size">max<wbr></wbr>_metadata<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_page_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_page_size">max<wbr></wbr>_page<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_request_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_request_size">max<wbr></wbr>_request<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_resource_subscriptions" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_resource_subscriptions">max<wbr></wbr>_resource<wbr></wbr>_subscriptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_response_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_response_size">max<wbr></wbr>_response<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#max_subscriptions" class="internal-link" title="orionis.foundation.config.options.McpOptions.max_subscriptions">max<wbr></wbr>_subscriptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#subscription_buffer_size" class="internal-link" title="orionis.foundation.config.options.McpOptions.subscription_buffer_size">subscription<wbr></wbr>_buffer<wbr></wbr>_size</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#subscription_keepalive" class="internal-link" title="orionis.foundation.config.options.McpOptions.subscription_keepalive">subscription<wbr></wbr>_keepalive</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#tool_search_max_calls" class="internal-link" title="orionis.foundation.config.options.McpOptions.tool_search_max_calls">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_calls</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#tool_search_max_output_bytes" class="internal-link" title="orionis.foundation.config.options.McpOptions.tool_search_max_output_bytes">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_output<wbr></wbr>_bytes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html#tool_search_max_results" class="internal-link" title="orionis.foundation.config.options.McpOptions.tool_search_max_results">tool<wbr></wbr>_search<wbr></wbr>_max<wbr></wbr>_results</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9098"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9098">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.PathsOptions.html" class="internal-link" title="orionis.foundation.config.options.PathsOptions"><wbr></wbr>Paths<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app">app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_console" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console">app<wbr></wbr>_console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_console_commands" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console_commands">app<wbr></wbr>_console<wbr></wbr>_commands</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_console_listeners" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_console_listeners">app<wbr></wbr>_console<wbr></wbr>_listeners</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_contracts" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_contracts">app<wbr></wbr>_contracts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_exceptions" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_exceptions">app<wbr></wbr>_exceptions</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_facades" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_facades">app<wbr></wbr>_facades</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_http" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http">app<wbr></wbr>_http</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_http_controllers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_controllers">app<wbr></wbr>_http<wbr></wbr>_controllers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_http_middleware" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_middleware">app<wbr></wbr>_http<wbr></wbr>_middleware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_http_schemas" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_schemas">app<wbr></wbr>_http<wbr></wbr>_schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_http_schemas_rules" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_http_schemas_rules">app<wbr></wbr>_http<wbr></wbr>_schemas<wbr></wbr>_rules</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_jobs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_jobs">app<wbr></wbr>_jobs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_mcp" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp">app<wbr></wbr>_mcp</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_mcp_prompts" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_prompts">app<wbr></wbr>_mcp<wbr></wbr>_prompts</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_mcp_resources" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_resources">app<wbr></wbr>_mcp<wbr></wbr>_resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_mcp_servers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_servers">app<wbr></wbr>_mcp<wbr></wbr>_servers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_mcp_tools" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_mcp_tools">app<wbr></wbr>_mcp<wbr></wbr>_tools</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_models" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_models">app<wbr></wbr>_models</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_notifications" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_notifications">app<wbr></wbr>_notifications</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_providers" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_providers">app<wbr></wbr>_providers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_realtime" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime">app<wbr></wbr>_realtime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_realtime_hubs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime_hubs">app<wbr></wbr>_realtime<wbr></wbr>_hubs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_realtime_sockets" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_realtime_sockets">app<wbr></wbr>_realtime<wbr></wbr>_sockets</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#app_services" class="internal-link" title="orionis.foundation.config.options.PathsOptions.app_services">app<wbr></wbr>_services</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#bootstrap" class="internal-link" title="orionis.foundation.config.options.PathsOptions.bootstrap">bootstrap</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#config" class="internal-link" title="orionis.foundation.config.options.PathsOptions.config">config</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#database" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database">database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#database_factories" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_factories">database<wbr></wbr>_factories</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#database_migrations" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_migrations">database<wbr></wbr>_migrations</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#database_schemas" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_schemas">database<wbr></wbr>_schemas</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#database_seeders" class="internal-link" title="orionis.foundation.config.options.PathsOptions.database_seeders">database<wbr></wbr>_seeders</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#resources" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources">resources</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#resources_css" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_css">resources<wbr></wbr>_css</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#resources_js" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_js">resources<wbr></wbr>_js</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#resources_lang" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_lang">resources<wbr></wbr>_lang</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#resources_views" class="internal-link" title="orionis.foundation.config.options.PathsOptions.resources_views">resources<wbr></wbr>_views</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#routes" class="internal-link" title="orionis.foundation.config.options.PathsOptions.routes">routes</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#storage" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage">storage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#storage_app" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app">storage<wbr></wbr>_app</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#storage_app_private" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app_private">storage<wbr></wbr>_app<wbr></wbr>_private</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#storage_app_public" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_app_public">storage<wbr></wbr>_app<wbr></wbr>_public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#storage_framework" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_framework">storage<wbr></wbr>_framework</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#storage_logs" class="internal-link" title="orionis.foundation.config.options.PathsOptions.storage_logs">storage<wbr></wbr>_logs</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html#tests" class="internal-link" title="orionis.foundation.config.options.PathsOptions.tests">tests</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9099"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9099">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.QueueOptions.html" class="internal-link" title="orionis.foundation.config.options.QueueOptions"><wbr></wbr>Queue<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html#connections" class="internal-link" title="orionis.foundation.config.options.QueueOptions.connections">connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html#default" class="internal-link" title="orionis.foundation.config.options.QueueOptions.default">default</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html#failed" class="internal-link" title="orionis.foundation.config.options.QueueOptions.failed">failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html#worker" class="internal-link" title="orionis.foundation.config.options.QueueOptions.worker">worker</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9100"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9100">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.RoutingPaths.html" class="internal-link" title="orionis.foundation.config.options.RoutingPaths"><wbr></wbr>Routing<wbr></wbr>Paths</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#ai" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.ai">ai</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#api" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.api">api</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#console" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.console">console</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#health" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.health">health</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#web" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.web">web</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html#websocket" class="internal-link" title="orionis.foundation.config.options.RoutingPaths.websocket">websocket</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9101"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9101">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.SessionOptions.html" class="internal-link" title="orionis.foundation.config.options.SessionOptions"><wbr></wbr>Session<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#cache" class="internal-link" title="orionis.foundation.config.options.SessionOptions.cache">cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#connection" class="internal-link" title="orionis.foundation.config.options.SessionOptions.connection">connection</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#cookie" class="internal-link" title="orionis.foundation.config.options.SessionOptions.cookie">cookie</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#domain" class="internal-link" title="orionis.foundation.config.options.SessionOptions.domain">domain</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#driver" class="internal-link" title="orionis.foundation.config.options.SessionOptions.driver">driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#expire_on_close" class="internal-link" title="orionis.foundation.config.options.SessionOptions.expire_on_close">expire<wbr></wbr>_on<wbr></wbr>_close</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#files" class="internal-link" title="orionis.foundation.config.options.SessionOptions.files">files</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#http_only" class="internal-link" title="orionis.foundation.config.options.SessionOptions.http_only">http<wbr></wbr>_only</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#lifetime" class="internal-link" title="orionis.foundation.config.options.SessionOptions.lifetime">lifetime</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#partitioned" class="internal-link" title="orionis.foundation.config.options.SessionOptions.partitioned">partitioned</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#path" class="internal-link" title="orionis.foundation.config.options.SessionOptions.path">path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#renewal_interval" class="internal-link" title="orionis.foundation.config.options.SessionOptions.renewal_interval">renewal<wbr></wbr>_interval</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#same_site" class="internal-link" title="orionis.foundation.config.options.SessionOptions.same_site">same<wbr></wbr>_site</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#secure" class="internal-link" title="orionis.foundation.config.options.SessionOptions.secure">secure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#table" class="internal-link" title="orionis.foundation.config.options.SessionOptions.table">table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html#track_previous_url" class="internal-link" title="orionis.foundation.config.options.SessionOptions.track_previous_url">track<wbr></wbr>_previous<wbr></wbr>_url</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9102"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9102">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.TestingOptions.html" class="internal-link" title="orionis.foundation.config.options.TestingOptions"><wbr></wbr>Testing<wbr></wbr>Options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#cache_results" class="internal-link" title="orionis.foundation.config.options.TestingOptions.cache_results">cache<wbr></wbr>_results</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#fail_fast" class="internal-link" title="orionis.foundation.config.options.TestingOptions.fail_fast">fail<wbr></wbr>_fast</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#file_pattern" class="internal-link" title="orionis.foundation.config.options.TestingOptions.file_pattern">file<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#method_pattern" class="internal-link" title="orionis.foundation.config.options.TestingOptions.method_pattern">method<wbr></wbr>_pattern</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#start_dir" class="internal-link" title="orionis.foundation.config.options.TestingOptions.start_dir">start<wbr></wbr>_dir</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html#verbosity" class="internal-link" title="orionis.foundation.config.options.TestingOptions.verbosity">verbosity</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CorePathName" class="internal-link" title="orionis.foundation.config.options.CorePathName"><wbr></wbr>Core<wbr></wbr>Path<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride"><wbr></wbr>Path<wbr></wbr>Override</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+  </div><div>
+
+      <div class="thingTitle">
+        <span>Package</span>
+        <code><a href="orionis.foundation.config.html" class="internal-link" title="The parent of this module">config</a></code> 
+      </div>
+      
+      <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9103"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9103">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.app.html" class="internal-link" title="orionis.foundation.config.app">app</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.entities.html" class="internal-link" title="orionis.foundation.config.app.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.enums.html" class="internal-link" title="orionis.foundation.config.app.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.App.html" class="internal-link" title="orionis.foundation.config.app.App"><wbr></wbr>App</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.Cipher.html" class="internal-link" title="orionis.foundation.config.app.Cipher"><wbr></wbr>Cipher</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.Environments.html" class="internal-link" title="orionis.foundation.config.app.Environments"><wbr></wbr>Environments</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.html#__dir__" class="internal-link" title="orionis.foundation.config.app.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.html#__getattr__" class="internal-link" title="orionis.foundation.config.app.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.app.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.app._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9104"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9104">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.auth.html" class="internal-link" title="orionis.foundation.config.auth">auth</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.entities.html" class="internal-link" title="orionis.foundation.config.auth.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.enums.html" class="internal-link" title="orionis.foundation.config.auth.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.Auth.html" class="internal-link" title="orionis.foundation.config.auth.Auth"><wbr></wbr>Auth</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.Identity.html" class="internal-link" title="orionis.foundation.config.auth.Identity"><wbr></wbr>Identity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.PasswordReset.html" class="internal-link" title="orionis.foundation.config.auth.PasswordReset"><wbr></wbr>Password<wbr></wbr>Reset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.RememberAuth.html" class="internal-link" title="orionis.foundation.config.auth.RememberAuth"><wbr></wbr>Remember<wbr></wbr>Auth</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.SessionAuth.html" class="internal-link" title="orionis.foundation.config.auth.SessionAuth"><wbr></wbr>Session<wbr></wbr>Auth</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.Tokens.html" class="internal-link" title="orionis.foundation.config.auth.Tokens"><wbr></wbr>Tokens</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.html#__dir__" class="internal-link" title="orionis.foundation.config.auth.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.html#__getattr__" class="internal-link" title="orionis.foundation.config.auth.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.auth.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.auth._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9105"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9105">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.cache.html" class="internal-link" title="orionis.foundation.config.cache">cache</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.entities.html" class="internal-link" title="orionis.foundation.config.cache.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.enums.html" class="internal-link" title="orionis.foundation.config.cache.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Cache.html" class="internal-link" title="orionis.foundation.config.cache.Cache"><wbr></wbr>Cache</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Database.html" class="internal-link" title="orionis.foundation.config.cache.Database"><wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Drivers.html" class="internal-link" title="orionis.foundation.config.cache.Drivers"><wbr></wbr>Drivers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.File.html" class="internal-link" title="orionis.foundation.config.cache.File"><wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Memcached.html" class="internal-link" title="orionis.foundation.config.cache.Memcached"><wbr></wbr>Memcached</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Memory.html" class="internal-link" title="orionis.foundation.config.cache.Memory"><wbr></wbr>Memory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Redis.html" class="internal-link" title="orionis.foundation.config.cache.Redis"><wbr></wbr>Redis</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.Stores.html" class="internal-link" title="orionis.foundation.config.cache.Stores"><wbr></wbr>Stores</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.html#__dir__" class="internal-link" title="orionis.foundation.config.cache.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.html#__getattr__" class="internal-link" title="orionis.foundation.config.cache.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.cache.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.cache._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9106"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9106">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.database.html" class="internal-link" title="orionis.foundation.config.database">database</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.entities.html" class="internal-link" title="orionis.foundation.config.database.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.enums.html" class="internal-link" title="orionis.foundation.config.database.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.ConnectionName.html" class="internal-link" title="orionis.foundation.config.database.ConnectionName"><wbr></wbr>Connection<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Connections.html" class="internal-link" title="orionis.foundation.config.database.Connections"><wbr></wbr>Connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Database.html" class="internal-link" title="orionis.foundation.config.database.Database"><wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQL.html" class="internal-link" title="orionis.foundation.config.database.MySQL"><wbr></wbr>My<wbr></wbr>SQL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCharset.html" class="internal-link" title="orionis.foundation.config.database.MySQLCharset"><wbr></wbr>My<wbr></wbr>SQLCharset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLCollation.html" class="internal-link" title="orionis.foundation.config.database.MySQLCollation"><wbr></wbr>My<wbr></wbr>SQLCollation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.MySQLEngine.html" class="internal-link" title="orionis.foundation.config.database.MySQLEngine"><wbr></wbr>My<wbr></wbr>SQLEngine</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Oracle.html" class="internal-link" title="orionis.foundation.config.database.Oracle"><wbr></wbr>Oracle</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.OracleEncoding.html" class="internal-link" title="orionis.foundation.config.database.OracleEncoding"><wbr></wbr>Oracle<wbr></wbr>Encoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.OracleNencoding.html" class="internal-link" title="orionis.foundation.config.database.OracleNencoding"><wbr></wbr>Oracle<wbr></wbr>Nencoding</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQL.html" class="internal-link" title="orionis.foundation.config.database.PGSQL">PGSQL</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCharset.html" class="internal-link" title="orionis.foundation.config.database.PGSQLCharset"><wbr></wbr>PGSQLCharset</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLCollation.html" class="internal-link" title="orionis.foundation.config.database.PGSQLCollation"><wbr></wbr>PGSQLCollation</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.PGSQLSSLMode.html" class="internal-link" title="orionis.foundation.config.database.PGSQLSSLMode"><wbr></wbr>PGSQLSSLMode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.Redshift.html" class="internal-link" title="orionis.foundation.config.database.Redshift"><wbr></wbr>Redshift</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.RedshiftSSLMode.html" class="internal-link" title="orionis.foundation.config.database.RedshiftSSLMode"><wbr></wbr>Redshift<wbr></wbr>SSLMode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLite.html" class="internal-link" title="orionis.foundation.config.database.SQLite"><wbr></wbr>SQLite</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteForeignKey.html" class="internal-link" title="orionis.foundation.config.database.SQLiteForeignKey"><wbr></wbr>SQLite<wbr></wbr>Foreign<wbr></wbr>Key</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteJournalMode.html" class="internal-link" title="orionis.foundation.config.database.SQLiteJournalMode"><wbr></wbr>SQLite<wbr></wbr>Journal<wbr></wbr>Mode</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLiteSynchronous.html" class="internal-link" title="orionis.foundation.config.database.SQLiteSynchronous"><wbr></wbr>SQLite<wbr></wbr>Synchronous</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServer.html" class="internal-link" title="orionis.foundation.config.database.SQLServer"><wbr></wbr>SQLServer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.SQLServerCharset.html" class="internal-link" title="orionis.foundation.config.database.SQLServerCharset"><wbr></wbr>SQLServer<wbr></wbr>Charset</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#__dir__" class="internal-link" title="orionis.foundation.config.database.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#__getattr__" class="internal-link" title="orionis.foundation.config.database.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.database.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.database._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9107"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9107">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.filesystems.html" class="internal-link" title="orionis.foundation.config.filesystems">filesystems</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.entitites.html" class="internal-link" title="orionis.foundation.config.filesystems.entitites">entitites</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.enums.html" class="internal-link" title="orionis.foundation.config.filesystems.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Azure.html" class="internal-link" title="orionis.foundation.config.filesystems.Azure"><wbr></wbr>Azure</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Disks.html" class="internal-link" title="orionis.foundation.config.filesystems.Disks"><wbr></wbr>Disks</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Filesystems.html" class="internal-link" title="orionis.foundation.config.filesystems.Filesystems"><wbr></wbr>Filesystems</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.GCS.html" class="internal-link" title="orionis.foundation.config.filesystems.GCS">GCS</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Local.html" class="internal-link" title="orionis.foundation.config.filesystems.Local"><wbr></wbr>Local</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.Public.html" class="internal-link" title="orionis.foundation.config.filesystems.Public"><wbr></wbr>Public</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.S3.html" class="internal-link" title="orionis.foundation.config.filesystems.S3">S3</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.html#__dir__" class="internal-link" title="orionis.foundation.config.filesystems.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.html#__getattr__" class="internal-link" title="orionis.foundation.config.filesystems.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.filesystems.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.filesystems._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9108"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9108">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.hashing.html" class="internal-link" title="orionis.foundation.config.hashing">hashing</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.entities.html" class="internal-link" title="orionis.foundation.config.hashing.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.enums.html" class="internal-link" title="orionis.foundation.config.hashing.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.Argon2.html" class="internal-link" title="orionis.foundation.config.hashing.Argon2"><wbr></wbr>Argon2</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.Bcrypt.html" class="internal-link" title="orionis.foundation.config.hashing.Bcrypt"><wbr></wbr>Bcrypt</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.Drivers.html" class="internal-link" title="orionis.foundation.config.hashing.Drivers"><wbr></wbr>Drivers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.Hashing.html" class="internal-link" title="orionis.foundation.config.hashing.Hashing"><wbr></wbr>Hashing</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.html#__dir__" class="internal-link" title="orionis.foundation.config.hashing.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.html#__getattr__" class="internal-link" title="orionis.foundation.config.hashing.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.hashing.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.hashing._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9109"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9109">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.http.html" class="internal-link" title="orionis.foundation.config.http">http</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.entitites.html" class="internal-link" title="orionis.foundation.config.http.entitites">entitites</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.Cors.html" class="internal-link" title="orionis.foundation.config.http.Cors"><wbr></wbr>Cors</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTP.html" class="internal-link" title="orionis.foundation.config.http.HTTP">HTTP</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPBodyLimits.html" class="internal-link" title="orionis.foundation.config.http.HTTPBodyLimits"><wbr></wbr>HTTPBody<wbr></wbr>Limits</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPCsrf.html" class="internal-link" title="orionis.foundation.config.http.HTTPCsrf"><wbr></wbr>HTTPCsrf</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPProxies.html" class="internal-link" title="orionis.foundation.config.http.HTTPProxies"><wbr></wbr>HTTPProxies</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPRateLimit.html" class="internal-link" title="orionis.foundation.config.http.HTTPRateLimit"><wbr></wbr>HTTPRate<wbr></wbr>Limit</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPSecurity.html" class="internal-link" title="orionis.foundation.config.http.HTTPSecurity"><wbr></wbr>HTTPSecurity</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.HTTPWebSocket.html" class="internal-link" title="orionis.foundation.config.http.HTTPWebSocket"><wbr></wbr>HTTPWeb<wbr></wbr>Socket</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.Redis.html" class="internal-link" title="orionis.foundation.config.http.Redis"><wbr></wbr>Redis</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.html#__dir__" class="internal-link" title="orionis.foundation.config.http.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.html#__getattr__" class="internal-link" title="orionis.foundation.config.http.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.http.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.http._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9110"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9110">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.logging.html" class="internal-link" title="orionis.foundation.config.logging">logging</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.entities.html" class="internal-link" title="orionis.foundation.config.logging.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.enums.html" class="internal-link" title="orionis.foundation.config.logging.enums">enums</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.validators.html" class="internal-link" title="orionis.foundation.config.logging.validators">validators</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Channels.html" class="internal-link" title="orionis.foundation.config.logging.Channels"><wbr></wbr>Channels</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Chunked.html" class="internal-link" title="orionis.foundation.config.logging.Chunked"><wbr></wbr>Chunked</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Daily.html" class="internal-link" title="orionis.foundation.config.logging.Daily"><wbr></wbr>Daily</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Hourly.html" class="internal-link" title="orionis.foundation.config.logging.Hourly"><wbr></wbr>Hourly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Level.html" class="internal-link" title="orionis.foundation.config.logging.Level"><wbr></wbr>Level</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Logging.html" class="internal-link" title="orionis.foundation.config.logging.Logging"><wbr></wbr>Logging</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Monthly.html" class="internal-link" title="orionis.foundation.config.logging.Monthly"><wbr></wbr>Monthly</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Stack.html" class="internal-link" title="orionis.foundation.config.logging.Stack"><wbr></wbr>Stack</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.Weekly.html" class="internal-link" title="orionis.foundation.config.logging.Weekly"><wbr></wbr>Weekly</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.html#__dir__" class="internal-link" title="orionis.foundation.config.logging.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.html#__getattr__" class="internal-link" title="orionis.foundation.config.logging.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.logging.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.logging._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9111"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9111">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.mail.html" class="internal-link" title="orionis.foundation.config.mail">mail</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.entities.html" class="internal-link" title="orionis.foundation.config.mail.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.enums.html" class="internal-link" title="orionis.foundation.config.mail.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.File.html" class="internal-link" title="orionis.foundation.config.mail.File"><wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.FromAddress.html" class="internal-link" title="orionis.foundation.config.mail.FromAddress"><wbr></wbr>From<wbr></wbr>Address</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.Mail.html" class="internal-link" title="orionis.foundation.config.mail.Mail"><wbr></wbr>Mail</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.MailDriver.html" class="internal-link" title="orionis.foundation.config.mail.MailDriver"><wbr></wbr>Mail<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.Mailers.html" class="internal-link" title="orionis.foundation.config.mail.Mailers"><wbr></wbr>Mailers</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.Smtp.html" class="internal-link" title="orionis.foundation.config.mail.Smtp"><wbr></wbr>Smtp</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.html#__dir__" class="internal-link" title="orionis.foundation.config.mail.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.html#__getattr__" class="internal-link" title="orionis.foundation.config.mail.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mail.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.mail._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9112"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9112">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.mcp.html" class="internal-link" title="orionis.foundation.config.mcp">mcp</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.mcp.entities.html" class="internal-link" title="orionis.foundation.config.mcp.entities">entities</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class=" thisobject">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9113"> 
+                    
+                </input>
+
+                <label class="lbl-toggle notExpandable" for="">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.options.html" class="internal-link" title="orionis.foundation.config.options">options</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AppOptions.html" class="internal-link" title="orionis.foundation.config.options.AppOptions"><wbr></wbr>App<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.AuthOptions.html" class="internal-link" title="orionis.foundation.config.options.AuthOptions"><wbr></wbr>Auth<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.CacheOptions.html" class="internal-link" title="orionis.foundation.config.options.CacheOptions"><wbr></wbr>Cache<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.DatabaseOptions.html" class="internal-link" title="orionis.foundation.config.options.DatabaseOptions"><wbr></wbr>Database<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.FilesystemsOptions.html" class="internal-link" title="orionis.foundation.config.options.FilesystemsOptions"><wbr></wbr>Filesystems<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.HttpOptions.html" class="internal-link" title="orionis.foundation.config.options.HttpOptions"><wbr></wbr>Http<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.LoggingOptions.html" class="internal-link" title="orionis.foundation.config.options.LoggingOptions"><wbr></wbr>Logging<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.MailOptions.html" class="internal-link" title="orionis.foundation.config.options.MailOptions"><wbr></wbr>Mail<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.McpOptions.html" class="internal-link" title="orionis.foundation.config.options.McpOptions"><wbr></wbr>Mcp<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.PathsOptions.html" class="internal-link" title="orionis.foundation.config.options.PathsOptions"><wbr></wbr>Paths<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.QueueOptions.html" class="internal-link" title="orionis.foundation.config.options.QueueOptions"><wbr></wbr>Queue<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.RoutingPaths.html" class="internal-link" title="orionis.foundation.config.options.RoutingPaths"><wbr></wbr>Routing<wbr></wbr>Paths</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.SessionOptions.html" class="internal-link" title="orionis.foundation.config.options.SessionOptions"><wbr></wbr>Session<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.options.TestingOptions.html" class="internal-link" title="orionis.foundation.config.options.TestingOptions"><wbr></wbr>Testing<wbr></wbr>Options</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#CorePathName" class="internal-link" title="orionis.foundation.config.options.CorePathName"><wbr></wbr>Core<wbr></wbr>Path<wbr></wbr>Name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride"><wbr></wbr>Path<wbr></wbr>Override</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9114"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9114">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.queue.html" class="internal-link" title="orionis.foundation.config.queue">queue</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.entities.html" class="internal-link" title="orionis.foundation.config.queue.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.enums.html" class="internal-link" title="orionis.foundation.config.queue.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Connections.html" class="internal-link" title="orionis.foundation.config.queue.Connections"><wbr></wbr>Connections</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Database.html" class="internal-link" title="orionis.foundation.config.queue.Database"><wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Failed.html" class="internal-link" title="orionis.foundation.config.queue.Failed"><wbr></wbr>Failed</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Queue.html" class="internal-link" title="orionis.foundation.config.queue.Queue"><wbr></wbr>Queue</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Redis.html" class="internal-link" title="orionis.foundation.config.queue.Redis"><wbr></wbr>Redis</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Sync.html" class="internal-link" title="orionis.foundation.config.queue.Sync"><wbr></wbr>Sync</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.Worker.html" class="internal-link" title="orionis.foundation.config.queue.Worker"><wbr></wbr>Worker</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.html#__dir__" class="internal-link" title="orionis.foundation.config.queue.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.html#__getattr__" class="internal-link" title="orionis.foundation.config.queue.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.queue.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.queue._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9115"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9115">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.realtime.html" class="internal-link" title="orionis.foundation.config.realtime">realtime</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.realtime.entities.html" class="internal-link" title="orionis.foundation.config.realtime.entities">entities</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.realtime.html#__dir__" class="internal-link" title="orionis.foundation.config.realtime.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.realtime.html#__getattr__" class="internal-link" title="orionis.foundation.config.realtime.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.realtime.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.realtime._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9116"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9116">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.scheduler.html" class="internal-link" title="orionis.foundation.config.scheduler">scheduler</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.entities.html" class="internal-link" title="orionis.foundation.config.scheduler.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.enums.html" class="internal-link" title="orionis.foundation.config.scheduler.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Database.html" class="internal-link" title="orionis.foundation.config.scheduler.Database"><wbr></wbr>Database</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Memory.html" class="internal-link" title="orionis.foundation.config.scheduler.Memory"><wbr></wbr>Memory</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Redis.html" class="internal-link" title="orionis.foundation.config.scheduler.Redis"><wbr></wbr>Redis</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Scheduler.html" class="internal-link" title="orionis.foundation.config.scheduler.Scheduler"><wbr></wbr>Scheduler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.Stores.html" class="internal-link" title="orionis.foundation.config.scheduler.Stores"><wbr></wbr>Stores</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.html#__dir__" class="internal-link" title="orionis.foundation.config.scheduler.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.html#__getattr__" class="internal-link" title="orionis.foundation.config.scheduler.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.scheduler.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.scheduler._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9117"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9117">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.session.html" class="internal-link" title="orionis.foundation.config.session">session</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.entities.html" class="internal-link" title="orionis.foundation.config.session.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.enums.html" class="internal-link" title="orionis.foundation.config.session.enums">enums</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.helpers.html" class="internal-link" title="orionis.foundation.config.session.helpers">helpers</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.Session.html" class="internal-link" title="orionis.foundation.config.session.Session"><wbr></wbr>Session</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.SessionDriver.html" class="internal-link" title="orionis.foundation.config.session.SessionDriver"><wbr></wbr>Session<wbr></wbr>Driver</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.html#__dir__" class="internal-link" title="orionis.foundation.config.session.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.html#__getattr__" class="internal-link" title="orionis.foundation.config.session.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.session.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.session._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9118"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9118">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.startup.html" class="internal-link" title="orionis.foundation.config.startup">startup</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.startup.Configuration.html" class="internal-link" title="orionis.foundation.config.startup.Configuration"><wbr></wbr>Configuration</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        
+         
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.startup.html#_SECTION_MAP" class="internal-link" title="orionis.foundation.config.startup._SECTION_MAP">_SECTION<wbr></wbr>_MAP</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9119"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9119">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.testing.html" class="internal-link" title="orionis.foundation.config.testing">testing</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.entities.html" class="internal-link" title="orionis.foundation.config.testing.entities">entities</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.enums.html" class="internal-link" title="orionis.foundation.config.testing.enums">enums</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.Testing.html" class="internal-link" title="orionis.foundation.config.testing.Testing"><wbr></wbr>Testing</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.html#__dir__" class="internal-link" title="orionis.foundation.config.testing.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.html#__getattr__" class="internal-link" title="orionis.foundation.config.testing.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.testing.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.testing._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9120"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9120">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.validation.html" class="internal-link" title="orionis.foundation.config.validation">validation</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#_enum_values" class="internal-link" title="orionis.foundation.config.validation._enum_values">_enum<wbr></wbr>_values</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#copy_string_list" class="internal-link" title="orionis.foundation.config.validation.copy_string_list">copy<wbr></wbr>_string<wbr></wbr>_list</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#normalize_enum" class="internal-link" title="orionis.foundation.config.validation.normalize_enum">normalize<wbr></wbr>_enum</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#normalize_optional_store" class="internal-link" title="orionis.foundation.config.validation.normalize_optional_store">normalize<wbr></wbr>_optional<wbr></wbr>_store</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_boolean" class="internal-link" title="orionis.foundation.config.validation.validate_boolean">validate<wbr></wbr>_boolean</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_cookie_name" class="internal-link" title="orionis.foundation.config.validation.validate_cookie_name">validate<wbr></wbr>_cookie<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_driver" class="internal-link" title="orionis.foundation.config.validation.validate_driver">validate<wbr></wbr>_driver</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_http_origin" class="internal-link" title="orionis.foundation.config.validation.validate_http_origin">validate<wbr></wbr>_http<wbr></wbr>_origin</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_integer" class="internal-link" title="orionis.foundation.config.validation.validate_integer">validate<wbr></wbr>_integer</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_name" class="internal-link" title="orionis.foundation.config.validation.validate_name">validate<wbr></wbr>_name</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_seconds" class="internal-link" title="orionis.foundation.config.validation.validate_seconds">validate<wbr></wbr>_seconds</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_store_db" class="internal-link" title="orionis.foundation.config.validation.validate_store_db">validate<wbr></wbr>_store<wbr></wbr>_db</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_store_port" class="internal-link" title="orionis.foundation.config.validation.validate_store_port">validate<wbr></wbr>_store<wbr></wbr>_port</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_store_table" class="internal-link" title="orionis.foundation.config.validation.validate_store_table">validate<wbr></wbr>_store<wbr></wbr>_table</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#validate_string" class="internal-link" title="orionis.foundation.config.validation.validate_string">validate<wbr></wbr>_string</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#_ENUM_SCALAR_TYPES" class="internal-link" title="orionis.foundation.config.validation._ENUM_SCALAR_TYPES">_ENUM<wbr></wbr>_SCALAR<wbr></wbr>_TYPES</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#_MAX_STORE_PORT" class="internal-link" title="orionis.foundation.config.validation._MAX_STORE_PORT">_MAX<wbr></wbr>_STORE<wbr></wbr>_PORT</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#_NAME_PATTERN" class="internal-link" title="orionis.foundation.config.validation._NAME_PATTERN">_NAME<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#_STORE_TABLE_PATTERN" class="internal-link" title="orionis.foundation.config.validation._STORE_TABLE_PATTERN">_STORE<wbr></wbr>_TABLE<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.validation.html#_TABLE_PATTERN" class="internal-link" title="orionis.foundation.config.validation._TABLE_PATTERN">_TABLE<wbr></wbr>_PATTERN</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId9121"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId9121">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.foundation.config.view.html" class="internal-link" title="orionis.foundation.config.view">view</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        <div class="childrenKindTitle">Modules</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.view.entities.html" class="internal-link" title="orionis.foundation.config.view.entities">entities</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.view.View.html" class="internal-link" title="orionis.foundation.config.view.View"><wbr></wbr>View</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.view.html#__dir__" class="internal-link" title="orionis.foundation.config.view.__dir__">__dir__</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.view.html#__getattr__" class="internal-link" title="orionis.foundation.config.view.__getattr__">__getattr__</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Variables</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.foundation.config.view.html#_EXPORTS" class="internal-link" title="orionis.foundation.config.view._EXPORTS">_EXPORTS</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li>
+</ul> 
+
+        
+        
+
+        
+         
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+  </div>
+
+</nav>
+        </div>
+        <div id="collapse-sidebar">
+          <a class="btn btn-link" onclick="toggleSideBarCollapse()" title="Toggle Sidebar Collapse">
+          </a>
+        </div> 
+        <script src="sidebartoggle.js" type="text/javascript"></script>
+       
+      </div>
+
+      <main class="">
+        
+
+        <div class="orionis-subheader">
+  <nav class="orionis-breadcrumb" aria-label="Documentation breadcrumb">
+    <a href="index.html">REFERENCE</a>
+    <span aria-hidden="true">/</span>
+    <span>ORIONIS FRAMEWORK</span>
+  </nav>
+  <section class="orionis-hero" aria-labelledby="orionis-hero-title">
+    <div class="orionis-hero-content">
+      <p class="orionis-eyebrow"><span class="orionis-status-dot" aria-hidden="true"></span> THE ORIONIS API</p>
+      <h2 id="orionis-hero-title">Build with <span class="orionis-accent">clarity.</span></h2>
+      <p class="orionis-hero-description">Explore the building blocks of an async-first Python framework. Every module, class, and method — connected, searchable, and ready to build with.</p>
+      <div class="orionis-hero-actions">
+        <a class="orionis-button" href="moduleIndex.html">Explore modules <span aria-hidden="true">→</span></a>
+        <a class="orionis-button orionis-button-secondary" href="classIndex.html">View classes</a>
+      </div>
+    </div>
+    <div class="orionis-hero-constellation" aria-hidden="true">
+      <span class="orionis-star orionis-star-one"></span>
+      <span class="orionis-star orionis-star-two"></span>
+      <span class="orionis-star orionis-star-three"></span>
+      <span class="orionis-star orionis-star-four"></span>
+    </div>
+  </section>
+</div>
+
+        <div class="page-header">
+          <h1 class="module"><code><code><a href="index.html" class="internal-link">orionis</a></code><wbr></wbr>.<code><a href="orionis.foundation.html" class="internal-link" title="orionis.foundation">foundation</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.html" class="internal-link" title="orionis.foundation.config">config</a></code><wbr></wbr>.<code><a href="orionis.foundation.config.options.html" class="internal-link" title="orionis.foundation.config.options">options</a></code></code></h1>
+          <div id="show-private">
+            <button class="btn btn-link" onclick="togglePrivate()">Toggle Private API</button>
+          </div>
+        </div>
+
+        <div class="categoryHeader">
+          module documentation
+        </div>
+
+        <div class="extrasDocstring">
+          <a href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py" class="sourceLink">(source)</a>
+        </div>
+
+        <div class="moduleDocstring">
+          <div><p>Keyword options for application bootstrap and the routing-path snapshot.</p></div>
+        </div>
+
+        <div id="split-tables">
+          <table class="children sortable" id="id877">
+  
+  
+  <tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.AppOptions.html" class="internal-link" title="orionis.foundation.config.options.AppOptions"><wbr></wbr>App<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the app configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.AuthOptions.html" class="internal-link" title="orionis.foundation.config.options.AuthOptions"><wbr></wbr>Auth<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the auth configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.CacheOptions.html" class="internal-link" title="orionis.foundation.config.options.CacheOptions"><wbr></wbr>Cache<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the cache configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.DatabaseOptions.html" class="internal-link" title="orionis.foundation.config.options.DatabaseOptions"><wbr></wbr>Database<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the database configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.FilesystemsOptions.html" class="internal-link" title="orionis.foundation.config.options.FilesystemsOptions"><wbr></wbr>Filesystems<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the filesystems configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.HttpOptions.html" class="internal-link" title="orionis.foundation.config.options.HttpOptions"><wbr></wbr>Http<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the http configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.LoggingOptions.html" class="internal-link" title="orionis.foundation.config.options.LoggingOptions"><wbr></wbr>Logging<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the logging configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.MailOptions.html" class="internal-link" title="orionis.foundation.config.options.MailOptions"><wbr></wbr>Mail<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the mail configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.McpOptions.html" class="internal-link" title="orionis.foundation.config.options.McpOptions"><wbr></wbr>Mcp<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the mcp configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.PathsOptions.html" class="internal-link" title="orionis.foundation.config.options.PathsOptions"><wbr></wbr>Paths<wbr></wbr>Options</a></code></td>
+    <td>Paths accepted by Application.withConfigPaths.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.QueueOptions.html" class="internal-link" title="orionis.foundation.config.options.QueueOptions"><wbr></wbr>Queue<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the queue configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.RoutingPaths.html" class="internal-link" title="orionis.foundation.config.options.RoutingPaths"><wbr></wbr>Routing<wbr></wbr>Paths</a></code></td>
+    <td>Copies of configured route files and the optional health endpoint.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.SessionOptions.html" class="internal-link" title="orionis.foundation.config.options.SessionOptions"><wbr></wbr>Session<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the session configuration section.</td>
+  </tr><tr class="class">
+    
+    <td>Class</td>
+    <td><code><a href="orionis.foundation.config.options.TestingOptions.html" class="internal-link" title="orionis.foundation.config.options.TestingOptions"><wbr></wbr>Testing<wbr></wbr>Options</a></code></td>
+    <td>Built-in keyword overrides for the testing configuration section.</td>
+  </tr><tr class="typealias">
+    
+    <td>Type Alias</td>
+    <td><code><a href="#CorePathName" class="internal-link" title="orionis.foundation.config.options.CorePathName"><wbr></wbr>Core<wbr></wbr>Path<wbr></wbr>Name</a></code></td>
+    <td>Names guaranteed to exist in the application path mapping after configuration.</td>
+  </tr><tr class="typealias">
+    
+    <td>Type Alias</td>
+    <td><code><a href="#PathOverride" class="internal-link" title="orionis.foundation.config.options.PathOverride"><wbr></wbr>Path<wbr></wbr>Override</a></code></td>
+    <td>Directory override resolved during bootstrap. Strings are relative to the application root and None uses the default.</td>
+  </tr>
+</table>
+          
+
+            
+        </div>
+
+        <div id="child-list">
+          <div class="basetypealias">
+  
+  
+  <a name="orionis.foundation.config.options.CorePathName">
+    
+  </a>
+  <a name="CorePathName">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">CorePathName</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" class="intersphinx-link">typing.TypeAlias</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L244">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#CorePathName" title="orionis.foundation.config.options.CorePathName">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Names guaranteed to exist in the application path mapping after configuration.</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/library/typing.html#typing.Literal" class="intersphinx-link">Literal</a>[<wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">root</span><span class="rst-variable-quote">'</span>,
+        <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">app</span><span class="rst-variable-quote">'</span>,
+        <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">app_console</span><span class="rst-variable-quote">'</span>,
+        <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">app_console_commands</span><span class="rst-variable-quote">'</span>,
+        <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">app_console_listeners</span><span class="rst-variable-quote">'</span>,
+        <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">app_exceptions</span><span class="rst-variable-quote">'</span>,
+        <wbr></wbr><span class="rst-variable-quote">'</span><span class="rst-variable-string">app_http</span><span class="rst-variable-quote">'</span>,
+<span class="rst-variable-ellipsis">...</span></code></pre></td></tr></table>
+  </div>
+</div><div class="basetypealias">
+  
+  
+  <a name="orionis.foundation.config.options.PathOverride">
+    
+  </a>
+  <a name="PathOverride">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">PathOverride</span>: <code><a href="https://docs.python.org/3/library/typing.html#typing.TypeAlias" class="intersphinx-link">typing.TypeAlias</a></code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/foundation/config/options.py#L295">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#PathOverride" title="orionis.foundation.config.options.PathOverride">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Directory override resolved during bootstrap. Strings are relative to the application
+root and None uses the default.</p></div>
+    <table class="valueTable"><tr class="fieldStart"><td class="fieldName">Value</td></tr><tr><td><pre class="constant-value"><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></pre></td></tr></table>
+  </div>
+</div>
+        </div>
+      
+      </main>
+    </div>
+
+    <footer class="orionis-footer">
+  
+  <div class="orionis-footer-inner">
+    <div class="orionis-footer-copy">
+      <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-23 22:17:21.</span></p>
+    </div>
+    <nav class="orionis-footer-links" aria-label="Additional resources">
+      <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/orionis-framework/framework">Source on GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <!-- Keep Pydoctor's search engine and its required load order intact. -->
+  <script src="ajax.js" type="text/javascript"></script>
+  <script src="searchlib.js" type="text/javascript"></script>
+  <script src="search.js" type="text/javascript"></script>
+</footer>
+  
+    <script src="pydoctor.js" type="text/javascript"></script>
+
+  </body>
+</html>

@@ -244,6 +244,16 @@
         
 
         
+            <div class="itemName"><code><a href="#lock" class="internal-link" title="orionis.cache.contracts.ICacheManager.lock">lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#pull" class="internal-link" title="orionis.cache.contracts.ICacheManager.pull">pull</a></code>
             </div>
         
@@ -593,6 +603,16 @@
         
 
         
+            <div class="itemName"><code><a href="#lock" class="internal-link" title="orionis.cache.contracts.ICacheManager.lock">lock</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#pull" class="internal-link" title="orionis.cache.contracts.ICacheManager.pull">pull</a></code>
             </div>
         
@@ -783,6 +803,16 @@
 
         
             <div class="itemName"><code><a href="orionis.cache.contracts.ICacheRepository.html#increment" class="internal-link" title="orionis.cache.contracts.ICacheRepository.increment">increment</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.cache.contracts.ICacheRepository.html#lock" class="internal-link" title="orionis.cache.contracts.ICacheRepository.lock">lock</a></code>
             </div>
         
 
@@ -1036,7 +1066,7 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ICacheManager</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L11" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.cache.CacheManager.html" class="internal-link">orionis.cache.CacheManager</a></code></p><p><a href="classIndex.html#orionis.cache.contracts.ICacheManager">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ICacheManager</span>(ABC): <a href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L12" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.cache.CacheManager.html" class="internal-link">orionis.cache.CacheManager</a></code></p><p><a href="classIndex.html#orionis.cache.contracts.ICacheManager">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
@@ -1087,6 +1117,11 @@
     <td>Async Method</td>
     <td><code><a href="#increment" class="internal-link" title="orionis.cache.contracts.ICacheManager.increment">increment</a></code></td>
     <td>Increment the integer at <em>key</em> in the default store.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#lock" class="internal-link" title="orionis.cache.contracts.ICacheManager.lock">lock</a></code></td>
+    <td>Return the default store's asynchronous lock for a key.</td>
   </tr><tr class="method">
     
     <td>Async Method</td>
@@ -1143,7 +1178,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">add</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code>Any</code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L244">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L263">
       
       (source)
     </a>
@@ -1170,7 +1205,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">clear</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L136">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L155">
       
       (source)
     </a>
@@ -1197,7 +1232,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">decrement</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">amount: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L282">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L301">
       
       (source)
     </a>
@@ -1224,7 +1259,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">delete</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L120">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L139">
       
       (source)
     </a>
@@ -1251,7 +1286,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">get</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L68">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L87">
       
       (source)
     </a>
@@ -1278,7 +1313,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">getMany</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">keys: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L147">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L166">
       
       (source)
     </a>
@@ -1305,7 +1340,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">has</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L123">
       
       (source)
     </a>
@@ -1332,7 +1367,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">increment</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">amount: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 1</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L264">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L283">
       
       (source)
     </a>
@@ -1349,6 +1384,33 @@
 </div><div class="basemethod">
   
   
+  <a name="orionis.cache.contracts.ICacheManager.lock">
+    
+  </a>
+  <a name="lock">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">lock</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">timeout: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>CacheLock</code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L15">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#lock" title="orionis.cache.contracts.ICacheManager.lock">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    <div class="interfaceinfo">overridden in <code><a href="orionis.cache.CacheManager.html" class="internal-link">orionis.cache.CacheManager</a></code></div>
+    <div><p>Return the default store's asynchronous lock for a key.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">key:</span><code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></td><td class="fieldArgDesc">Cache key that identifies the resource to lock.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">timeout:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Acquisition timeout or lease duration in seconds, depending on the store.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="orionis.cache.locks.lock.CacheLock.html" class="internal-link">orionis.cache.locks.lock.CacheLock</a></code></td><td class="fieldArgDesc">Context manager that acquires the lock on entry and releases it on exit.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.cache.contracts.ICacheManager.pull">
     
   </a>
@@ -1359,7 +1421,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">pull</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L228">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L247">
       
       (source)
     </a>
@@ -1386,7 +1448,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">remember</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">resolver: <code>Callable</code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L185">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L204">
       
       (source)
     </a>
@@ -1413,7 +1475,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">rememberForever</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">resolver: <code>Callable</code></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L210">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L229">
       
       (source)
     </a>
@@ -1440,7 +1502,7 @@
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">rememberOnce</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">resolver: <code>Callable</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">wait_timeout: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> = 10, </span><span class="rst-sig-param">lease: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code>Any</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L14">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L33">
       
       (source)
     </a>
@@ -1467,7 +1529,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">set</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code>Any</code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L84">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L103">
       
       (source)
     </a>
@@ -1494,7 +1556,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">setMany</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">values: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>Any]</code>, </span><span class="rst-sig-param">ttl: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L163">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L182">
       
       (source)
     </a>
@@ -1521,7 +1583,7 @@
     
     <div><span class="decorator">@abstractmethod<br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">store</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="orionis.cache.contracts.ICacheRepository.html" class="internal-link" title="orionis.cache.contracts.ICacheRepository">ICacheRepository</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/59f4765532b539609dbe1b315e9ddb82dff367ff/orionis/cache/contracts/cache_manager.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/2a331d521a3d66de93d2f5ff0b409ab0b85349db/orionis/cache/contracts/cache_manager.py#L71">
       
       (source)
     </a>
@@ -1546,7 +1608,7 @@
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-19 16:29:18.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-23 22:17:21.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -691,6 +691,15 @@
     <loc>https://api.orionis-framework.com/orionis.console.commands.make._base.MakeStubCommand.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.make._facade_contract._Annotations.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.make._facade_contract._Module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.commands.make._facade_contract.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.commands.make.console_listener.html</loc>
   </url>
   <url>
@@ -1186,6 +1195,9 @@
     <loc>https://api.orionis-framework.com/orionis.console.dynamic.progress_bar.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.entities.command.CommandInfo.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.entities.Command.html</loc>
   </url>
   <url>
@@ -1208,6 +1220,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.entities.task.module.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.entities.task.ScheduledTaskInfo.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.console.entities.TaskEvent.html</loc>
@@ -2569,6 +2584,51 @@
     <loc>https://api.orionis-framework.com/orionis.foundation.config.mcp.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.AppOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.AuthOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.CacheOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.DatabaseOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.FilesystemsOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.HttpOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.LoggingOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.MailOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.McpOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.PathsOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.QueueOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.RoutingPaths.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.SessionOptions.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.foundation.config.options.TestingOptions.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.foundation.config.queue.Connections.html</loc>
   </url>
   <url>
@@ -3548,6 +3608,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.http.routes.types.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.http.routes.types.RouterExport.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.http.ServerSentEvent.html</loc>
@@ -4726,10 +4789,10 @@
     <loc>https://api.orionis-framework.com/orionis.orm.metaclass.ModelMetadata.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.Model.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.model.html</loc>
   </url>
   <url>
-    <loc>https://api.orionis-framework.com/orionis.orm.model.module.html</loc>
+    <loc>https://api.orionis-framework.com/orionis.orm.model.Model.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.provider.html</loc>
@@ -6523,7 +6586,22 @@
     <loc>https://api.orionis-framework.com/orionis.test.clients.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.test.clients.mcp.EmptyResponse.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.test.clients.mcp.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.test.clients.mcp.RpcError.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.test.clients.mcp.RpcFailure.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.test.clients.mcp.RpcNotification.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.test.clients.mcp.RpcSuccess.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.test.contracts.engine.html</loc>

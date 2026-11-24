@@ -6,10 +6,13 @@ from __future__ import annotations
 import operator
 from collections.abc import Callable
 from dataclasses import fields
-from typing import Any
+from typing import TYPE_CHECKING, Any, Self
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.constraints.foreign_reference import ForeignReference
 from orionis.orm.schema.types.column_type import ColumnType
+
+if TYPE_CHECKING:
+    from orionis.orm.model import Model
 
 # Sentinel used to distinguish "no default" from a legitimate ``None`` default.
 _NO_DEFAULT: object = object()
@@ -30,7 +33,7 @@ _DEFAULT_OPTION_VALUES: tuple[Any, ...] = _OPTION_GETTER(ColumnOptions())
 """Store the values used by columns with no type-specific options."""
 
 
-class ColumnDefinition:
+class ColumnDefinition[TValue = Any]:
     """
     Framework-agnostic description of a database column.
 
@@ -38,6 +41,11 @@ class ColumnDefinition:
     :class:`orionis.orm.schema.types.String` subclass this definition and
     expose a fluent API to declare constraints. The definition never touches
     the underlying SQL engine; the database compiler translates it later.
+
+    On a model instance a declared column reads as its Python value, or
+    None before it has a value. If a cast or accessor changes that type,
+    specify the result on the declaration, for example ``String[Decimal]()``
+    for a string column exposed as a Decimal.
     """
 
     __slots__ = (
@@ -80,6 +88,28 @@ class ColumnDefinition:
         "zero_indexes",
     )
     """Declare the instance attribute slots reserved by this class."""
+
+    if TYPE_CHECKING:
+        # ModelMeta removes declarations. Model attributes expose the stored
+        # value, or None for a declared column that has not been populated.
+        def __get__(self, instance: Model, owner: type[Model]) -> TValue | None:
+            """Read the model attribute through its configured accessor or cast.
+
+            Returns
+            -------
+            ``TValue`` or None
+                Stored or transformed value, or None when unset.
+            """
+            ...
+
+        def __set__(self, instance: Model, value: object) -> None:
+            """Accept input for the model's configured mutator and cast.
+
+            Returns
+            -------
+            None
+                Assignment stores the processed value on the model.
+            """
 
     def __init__(
         self,
@@ -135,7 +165,7 @@ class ColumnDefinition:
 
     # ── Fluent constraints ──────────────────────────────────────────────────
 
-    def primary(self) -> ColumnDefinition:
+    def primary(self) -> Self:
         """
         Mark the column as the primary key of the table.
 
@@ -147,7 +177,7 @@ class ColumnDefinition:
         self.is_primary = True
         return self
 
-    def nullable(self) -> ColumnDefinition:
+    def nullable(self) -> Self:
         """
         Allow the column to store ``NULL`` values.
 
@@ -159,7 +189,7 @@ class ColumnDefinition:
         self.is_nullable = True
         return self
 
-    def default(self, value: Any) -> ColumnDefinition:
+    def default(self, value: Any) -> Self:
         """
         Assign a default value applied when no value is provided on insert.
 
@@ -176,7 +206,7 @@ class ColumnDefinition:
         self.default_value = value
         return self
 
-    def unique(self) -> ColumnDefinition:
+    def unique(self) -> Self:
         """
         Add a unique constraint to the column.
 
@@ -188,7 +218,7 @@ class ColumnDefinition:
         self.is_unique = True
         return self
 
-    def index(self) -> ColumnDefinition:
+    def index(self) -> Self:
         """
         Create a non-unique index on the column.
 
@@ -200,7 +230,7 @@ class ColumnDefinition:
         self.has_index = True
         return self
 
-    def foreign(self, reference: str) -> ColumnDefinition:
+    def foreign(self, reference: str) -> Self:
         """
         Declare a foreign key pointing at another table column.
 
@@ -222,7 +252,7 @@ class ColumnDefinition:
         self.foreign_ref = ForeignReference.parse(reference)
         return self
 
-    def autoIncrement(self) -> ColumnDefinition:
+    def autoIncrement(self) -> Self:
         """
         Mark the column as auto-incrementing.
 
@@ -234,7 +264,7 @@ class ColumnDefinition:
         self.is_auto_increment = True
         return self
 
-    def comment(self, text: str) -> ColumnDefinition:
+    def comment(self, text: str) -> Self:
         """
         Attach a descriptive comment rendered alongside the column DDL.
 

@@ -5,7 +5,7 @@ from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class SmallInteger(ColumnDefinition):
+class SmallInteger[TValue = int](ColumnDefinition[TValue]):
     """A type for smaller ``int`` integers. Typically generates ``SMALLINT``."""
 
     __slots__ = ()

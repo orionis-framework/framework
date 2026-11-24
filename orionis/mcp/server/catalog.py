@@ -3,14 +3,14 @@
 """Hide catalog tools behind bounded search_tools and execute_tools tools."""
 
 from dataclasses import dataclass
-from orionis.mcp.server.primitives import Tool
+import orionis.mcp.server.primitives as primitives_module
 
 
 @dataclass(frozen=True, slots=True, init=False)
 class ToolCatalog:
     """Hide catalog tools behind bounded search_tools and execute_tools tools."""
 
-    tools: tuple[type[Tool], ...]
+    tools: tuple[type[primitives_module.Tool], ...]
     """Value supplied for ``*tools``."""
     search_name: str
     """Value supplied for ``search_name``."""
@@ -19,7 +19,7 @@ class ToolCatalog:
 
     def __init__(
         self,
-        *tools: type[Tool],
+        *tools: type[primitives_module.Tool],
         search_name: str = "search_tools",
         execute_name: str = "execute_tools",
     ) -> None:

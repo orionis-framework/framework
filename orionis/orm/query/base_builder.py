@@ -1022,7 +1022,7 @@ class QueryBuilderBase:
     def join(
         self: Self,
         table: str | TableDefinition,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -1067,7 +1067,7 @@ class QueryBuilderBase:
     def leftJoin(
         self: Self,
         table: str | TableDefinition,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -1110,7 +1110,7 @@ class QueryBuilderBase:
     def rightJoin(
         self: Self,
         table: str | TableDefinition,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -1153,7 +1153,7 @@ class QueryBuilderBase:
     def fullJoin(
         self: Self,
         table: str | TableDefinition,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
         *,
@@ -1227,7 +1227,7 @@ class QueryBuilderBase:
         self: Self,
         query: Any,
         alias: str,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -1270,7 +1270,7 @@ class QueryBuilderBase:
         self: Self,
         query: Any,
         alias: str,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:
@@ -1313,7 +1313,7 @@ class QueryBuilderBase:
         self: Self,
         query: Any,
         alias: str,
-        first: Any | None = None,
+        first: str | Callable[[JoinClause], object] | None = None,
         operator: str | None = None,
         second: str | None = None,
     ) -> Self:

@@ -2,7 +2,6 @@
 # Keep public callback and iterator annotations resolvable during reflection.
 """Provide collection operations over an ordered sequence of values."""
 
-from __future__ import annotations
 import contextlib
 import json
 import operator
@@ -10,8 +9,8 @@ import secrets
 from functools import reduce
 from itertools import groupby
 from random import SystemRandom
-from collections.abc import Callable, Iterator
-from typing import Any, Self, cast
+from collections.abc import Callable, Iterable, Iterator
+from typing import Any, Self, cast, overload
 from dotty_dict import dotty
 from orionis.support.types.contracts.collection import ICollection
 from orionis.support.types.uniqueness import unique_items
@@ -36,7 +35,7 @@ getattr calls, eliminating the hasattr+getattr double-lookup.
 """
 
 
-class Collection(ICollection):
+class Collection[T = Any](ICollection[T]):
     """Provide collection operations over an ordered sequence of values."""
 
     def __hash__(self: Self) -> int:
@@ -53,7 +52,7 @@ class Collection(ICollection):
 
     def __init__(
         self: Self,
-        items: list[Any] | dict[Any, Any] | None = None,
+        items: list[T] | dict[Any, Any] | None = None,
     ) -> None:
         """
         Initialize a new Collection instance.
@@ -68,7 +67,7 @@ class Collection(ICollection):
         None
             This method does not return a value.
         """
-        self._items = items if items is not None else []
+        self._items: list[Any] | dict[Any, Any] = items if items is not None else []
         """Initial items for the collection (default is None)."""
         self.__appends__ = []
         """Computed attributes appended when collection items are serialized."""
@@ -76,7 +75,7 @@ class Collection(ICollection):
     def take(
         self: Self,
         number: int,
-    ) -> Collection:
+    ) -> Collection[T]:
         """
         Take a specific number of items from the collection.
 
@@ -97,8 +96,8 @@ class Collection(ICollection):
 
     def first(
         self: Self,
-        callback: Callable | None = None,
-    ) -> object:
+        callback: Callable[[T], object] | None = None,
+    ) -> T | None:
         """
         Return the first item in the collection, optionally filtered by a callback.
 
@@ -124,8 +123,8 @@ class Collection(ICollection):
 
     def last(
         self: Self,
-        callback: Callable | None = None,
-    ) -> object:
+        callback: Callable[[T], object] | None = None,
+    ) -> T | None:
         """
         Return the last item in the collection, optionally filtered by a callback.
 
@@ -149,7 +148,7 @@ class Collection(ICollection):
                 result = item
         return result
 
-    def all(self: Self) -> list[Any] | dict[Any, Any]:
+    def all(self: Self) -> list[T] | dict[Any, Any]:
         """
         Return all items in the collection.
 
@@ -244,10 +243,11 @@ class Collection(ICollection):
             pass
         return result
 
-    def chunk(
-        self: Self,
+    # A method-bound type preserves the concrete chunk within the mutable collection.
+    def chunk[C: Collection](  # noqa: PYI019
+        self: C,
         size: int,
-    ) -> Collection:
+    ) -> Collection[C]:
         """
         Divide the collection into smaller collections of a specified size.
 
@@ -268,9 +268,10 @@ class Collection(ICollection):
 
         # Divide the collection into chunks of the requested size.
         items = [self[i : i + size] for i in range(0, len(self._items), size)]
-        return self.__class__(items)
+        collection_type = cast("type[Collection[C]]", type(self))
+        return collection_type(items)
 
-    def collapse(self: Self) -> Collection:
+    def collapse(self: Self) -> Collection[Any]:
         """
         Collapse the collection of arrays into a single, flat collection.
 
@@ -287,7 +288,7 @@ class Collection(ICollection):
 
     def contains(
         self: Self,
-        key: str | Callable,
+        key: str | Callable[[T], object],
         value: object | None = None,
     ) -> bool:
         """
@@ -314,7 +315,7 @@ class Collection(ICollection):
             return any(key(x) for x in self._items)
 
         # Otherwise, check if key is in the collection.
-        return key in self
+        return key in cast("Iterable[object]", self)
 
     def count(self: Self) -> int:
         """
@@ -331,7 +332,7 @@ class Collection(ICollection):
     def diff(
         self: Self,
         items: list[Any] | ICollection,
-    ) -> Collection:
+    ) -> Collection[T]:
         """
         Return items not present in the given collection.
 
@@ -356,8 +357,8 @@ class Collection(ICollection):
 
     def each(
         self: Self,
-        callback: Callable,
-    ) -> Collection:
+        callback: Callable[[T], T],
+    ) -> Collection[T]:
         """
         Iterate over items and apply the callback to each.
 
@@ -383,7 +384,7 @@ class Collection(ICollection):
 
     def every(
         self: Self,
-        callback: Callable,
+        callback: Callable[[T], object],
     ) -> bool:
         """
         Determine whether all items satisfy the given callback condition.
@@ -404,8 +405,8 @@ class Collection(ICollection):
 
     def filter(
         self: Self,
-        callback: Callable,
-    ) -> Collection:
+        callback: Callable[[T], object],
+    ) -> Collection[T]:
         """
         Filter items in the collection using a callback.
 
@@ -423,7 +424,7 @@ class Collection(ICollection):
         self.__checkIsCallable(callback)
         return self.__class__([item for item in self._items if callback(item)])
 
-    def flatten(self: Self) -> Collection:
+    def flatten(self: Self) -> Collection[Any]:
         """
         Flatten the collection into a single dimension.
 
@@ -461,7 +462,7 @@ class Collection(ICollection):
     def forget(
         self: Self,
         *keys: int | str,
-    ) -> Collection:
+    ) -> Self:
         """
         Remove items from the collection by their keys.
 
@@ -485,7 +486,7 @@ class Collection(ICollection):
         self: Self,
         page: int,
         number: int,
-    ) -> Collection:
+    ) -> Collection[T]:
         """
         Slice the collection for pagination.
 
@@ -512,6 +513,15 @@ class Collection(ICollection):
         # Calculate start and end indices for the requested page
         start = (page - 1) * number
         return self.__class__(self._items[start : start + number])
+
+    @overload
+    def get(self, key: int | str) -> T | None: ...
+
+    @overload
+    def get[D](self, key: int | str, default: Callable[[], D]) -> T | D: ...
+
+    @overload
+    def get[D](self, key: int | str, default: D) -> T | D: ...
 
     def get(
         self: Self,
@@ -586,10 +596,10 @@ class Collection(ICollection):
         # Return True if the collection has no items
         return not self
 
-    def map(
+    def map[U](
         self: Self,
-        callback: Callable,
-    ) -> Collection:
+        callback: Callable[[T], U],
+    ) -> Collection[U]:
         """
         Apply a function to each item in the collection.
 
@@ -605,14 +615,26 @@ class Collection(ICollection):
         """
         # Ensure the callback is callable before mapping
         self.__checkIsCallable(callback)
-        return self.__class__([callback(x) for x in self._items])
+        collection_type = cast("type[Collection[U]]", type(self))
+        return collection_type([callback(x) for x in self._items])
+
+    @overload
+    def mapInto[U](
+        self,
+        cls: type[U],
+        method: None = None,
+        **kwargs: object,
+    ) -> Collection[U | None]: ...
+
+    @overload
+    def mapInto(self, cls: type, method: str, **kwargs: object) -> Collection[Any]: ...
 
     def mapInto(
         self: Self,
         cls: type,
         method: str | None = None,
         **kwargs: object,
-    ) -> Collection:
+    ) -> Collection[Any]:
         """
         Map items into instances of the given class.
 
@@ -635,9 +657,10 @@ class Collection(ICollection):
             error_msg = "cls must be a type"
             raise TypeError(error_msg)
 
+        collection_type = cast("type[Collection[Any]]", type(self))
         mapper = getattr(cls, method, None) if method else None
         if method and mapper is None:
-            return self.__class__([None] * len(self._items))
+            return collection_type([None] * len(self._items))
 
         results = []
         # Iterate through each item and map into the class or its method
@@ -649,12 +672,12 @@ class Collection(ICollection):
                     results.append(cls(item, **kwargs))
             except TypeError, AttributeError, ValueError:
                 results.append(None)
-        return self.__class__(results)
+        return collection_type(results)
 
     def merge(
         self: Self,
-        items: list[Any] | ICollection,
-    ) -> Collection:
+        items: list[T] | ICollection[T],
+    ) -> Self:
         """
         Merge the collection with the given items.
 
@@ -686,7 +709,7 @@ class Collection(ICollection):
         self: Self,
         value: str,
         key: str | None = None,
-    ) -> Collection:
+    ) -> Collection[Any]:
         """
         Extract values for a given key from all items.
 
@@ -722,7 +745,7 @@ class Collection(ICollection):
         # Return a new Collection with the plucked values
         return self.__class__(attributes)
 
-    def pop(self: Self) -> object:
+    def pop(self: Self) -> T | None:
         """
         Remove and return the last item from the collection.
 
@@ -740,8 +763,8 @@ class Collection(ICollection):
 
     def prepend(
         self: Self,
-        value: object,
-    ) -> Collection:
+        value: T,
+    ) -> Self:
         """
         Prepend an item to the beginning of the collection.
 
@@ -762,7 +785,7 @@ class Collection(ICollection):
     def pull(
         self: Self,
         key: int | str,
-    ) -> object:
+    ) -> T | None:
         """
         Remove and return an item from the collection by key.
 
@@ -785,8 +808,8 @@ class Collection(ICollection):
 
     def push(
         self: Self,
-        value: object,
-    ) -> Collection:
+        value: T,
+    ) -> Self:
         """
         Add an item to the end of the collection.
 
@@ -807,8 +830,8 @@ class Collection(ICollection):
     def put(
         self: Self,
         key: int | str,
-        value: object,
-    ) -> Collection:
+        value: T,
+    ) -> Self:
         """
         Insert or update an item in the collection at the specified key.
 
@@ -828,10 +851,16 @@ class Collection(ICollection):
         self[key] = value
         return self
 
+    @overload
+    def random(self, count: None = None) -> T | None: ...
+
+    @overload
+    def random(self, count: int) -> Collection[T] | None: ...
+
     def random(
         self: Self,
         count: int | None = None,
-    ) -> object | Collection | None:
+    ) -> T | Collection[T] | None:
         """
         Return one or more random items from the collection.
 
@@ -899,8 +928,8 @@ class Collection(ICollection):
 
     def reject(
         self: Self,
-        callback: Callable,
-    ) -> Collection:
+        callback: Callable[[T], object],
+    ) -> Self:
         """
         Reject items that pass a given truth test.
 
@@ -920,7 +949,7 @@ class Collection(ICollection):
         self._items = [item for item in self._items if not callback(item)]
         return self
 
-    def reverse(self: Self) -> Collection:
+    def reverse(self: Self) -> Self:
         """
         Reverse the order of items in the collection.
 
@@ -987,7 +1016,7 @@ class Collection(ICollection):
 
         return list(map(_serialize, self._items))
 
-    def shift(self: Self) -> object:
+    def shift(self: Self) -> T | None:
         """
         Remove and return the first item from the collection.
 
@@ -1002,7 +1031,7 @@ class Collection(ICollection):
     def sort(
         self: Self,
         key: str | None = None,
-    ) -> Collection:
+    ) -> Self:
         """
         Sort the items in the collection.
 
@@ -1072,7 +1101,7 @@ class Collection(ICollection):
     def groupBy(
         self: Self,
         key: str,
-    ) -> Collection:
+    ) -> Collection[Any]:
         """
         Group items in the collection by a specified key.
 
@@ -1100,8 +1129,8 @@ class Collection(ICollection):
 
     def transform(
         self: Self,
-        callback: Callable,
-    ) -> Collection:
+        callback: Callable[[T], T],
+    ) -> Collection[T]:
         """
         Transform each item in the collection using a callback.
 
@@ -1122,8 +1151,8 @@ class Collection(ICollection):
 
     def unique(
         self: Self,
-        key: str | Callable | None = None,
-    ) -> Collection:
+        key: str | Callable[[T], object] | None = None,
+    ) -> Collection[T]:
         """
         Return unique items from the collection.
 
@@ -1150,7 +1179,7 @@ class Collection(ICollection):
         # Otherwise, get unique items based on the specified key
         return self._getUniqueItemsByKey(key)
 
-    def _getUniqueItemsWithoutKey(self: Self) -> Collection:
+    def _getUniqueItemsWithoutKey(self: Self) -> Collection[T]:
         """
         Return unique items from the collection without using a key.
 
@@ -1166,7 +1195,10 @@ class Collection(ICollection):
             items = unique_items(list(self._items), lambda item: item)
         return self.__class__(items)
 
-    def _getUniqueItemsByKey(self: Self, key: str | Callable) -> Collection:
+    def _getUniqueItemsByKey(
+        self: Self,
+        key: str | Callable[[T], object],
+    ) -> Collection[T]:
         """
         Get unique items from the collection based on a specified key.
 
@@ -1187,7 +1219,7 @@ class Collection(ICollection):
         self: Self,
         key: str,
         *args: object,
-    ) -> Collection:
+    ) -> Collection[T]:
         """
         Filter items by a given key-value pair or comparison.
 
@@ -1235,7 +1267,7 @@ class Collection(ICollection):
         self: Self,
         key: str,
         values: list[Any] | ICollection,
-    ) -> Collection:
+    ) -> Collection[T]:
         """
         Filter items where a given key's value is in a list of values.
 
@@ -1282,7 +1314,7 @@ class Collection(ICollection):
         self: Self,
         key: str,
         values: list[Any] | ICollection,
-    ) -> Collection:
+    ) -> Collection[T]:
         """
         Filter items where a given key's value is not in a list of values.
 
@@ -1325,10 +1357,10 @@ class Collection(ICollection):
 
         return self.__class__(attributes)
 
-    def zip(
+    def zip[U](
         self: Self,
-        items: list[Any] | ICollection,
-    ) -> Collection:
+        items: list[U] | ICollection[U],
+    ) -> Collection[list[T | U]]:
         """
         Zip the collection with the given items by index.
 
@@ -1356,14 +1388,15 @@ class Collection(ICollection):
         items = self.__getItems(items)
 
         # Pair collection items with the supplied values.
-        return self.__class__(
+        collection_type = cast("type[Collection[list[T | U]]]", type(self))
+        return collection_type(
             [[x, y] for x, y in zip(self._items, items, strict=False)],
         )
 
     def setAppends(
         self: Self,
         appends: list[str],
-    ) -> Collection:
+    ) -> Self:
         """
         Set the attributes to append to the Collection.
 
@@ -1384,7 +1417,7 @@ class Collection(ICollection):
     def addRelation(
         self: Self,
         relation_data: dict[str, Any],
-    ) -> Collection:
+    ) -> Self:
         """
         Add relation data to the collection.
 
@@ -1400,9 +1433,11 @@ class Collection(ICollection):
         """
         # Add relation data to items if they support it
         for item in self:
-            if hasattr(item, "setRelation"):
+            set_relation = getattr(item, "setRelation", _MISSING)
+            if set_relation is not _MISSING:
+                setter = cast("Callable[[str, Any], object]", set_relation)
                 for key, value in relation_data.items():
-                    item.setRelation(key, value)
+                    setter(key, value)
         return self
 
     def __getValue(
@@ -1576,7 +1611,7 @@ class Collection(ICollection):
             except TypeError, ValueError:
                 return False
 
-    def __iter__(self: Self) -> Iterator[Any]:
+    def __iter__(self: Self) -> Iterator[T]:
         """
         Iterate over the items in the collection.
 
@@ -1610,10 +1645,16 @@ class Collection(ICollection):
             return other.all() == self._items
         return other == self._items
 
+    @overload
+    def __getitem__(self, item: int | str) -> T: ...
+
+    @overload
+    def __getitem__(self, item: slice) -> Self: ...
+
     def __getitem__(
         self: Self,
-        item: int | slice,
-    ) -> object | Collection:
+        item: int | str | slice,
+    ) -> T | Self:
         """
         Retrieve an item or a slice from the collection.
 
@@ -1630,12 +1671,15 @@ class Collection(ICollection):
         # Return a new Collection if a slice is provided, else return the item.
         if isinstance(item, slice):
             return self.__class__(self._items[item])
-        return self._items[item]
+        if isinstance(self._items, dict):
+            return self._items[item]
+        # A string key on a list raises the list's native TypeError.
+        return self._items[cast("int", item)]
 
     def __setitem__(
         self: Self,
         key: int | str,
-        value: object,
+        value: T,
     ) -> None:
         """
         Set the value at the specified key in the collection.

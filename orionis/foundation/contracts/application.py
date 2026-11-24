@@ -1,15 +1,17 @@
-# ruff: noqa: PLR0913
+# ruff: noqa: PLR0913, TC001, TC003
 # Keep established public and external protocol names and signatures.
 """Define application configuration, lifecycle and runtime entry points."""
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Self
+from pathlib import Path
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any, Self, Unpack, overload
 from orionis.container.contracts.container import IContainer
+from orionis.foundation.config import options
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable, Mapping
-    from pathlib import Path
+    from collections.abc import Awaitable, Callable
     from orionis.console.base.contracts.scheduler import IBaseScheduler
     from orionis.container.contracts.service_provider import IServiceProvider
     from orionis.failure.contracts.handler import IBaseExceptionHandler
@@ -440,7 +442,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigApp(
         self: Self,
-        **app_config: object,
+        **app_config: Unpack[options.AppOptions],
     ) -> Self:
         """
         Set application configuration overrides for bootstrap.
@@ -462,7 +464,7 @@ class IApplication(IContainer, ABC):
         """
 
     @abstractmethod
-    def withConfigMcp(self: Self, **mcp_config: object) -> Self:
+    def withConfigMcp(self: Self, **mcp_config: Unpack[options.McpOptions]) -> Self:
         """
         Set MCP protocol limits and allowed origins for bootstrap.
 
@@ -485,7 +487,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigAuth(
         self: Self,
-        **auth_config: object,
+        **auth_config: Unpack[options.AuthOptions],
     ) -> Self:
         """
         Set authentication configuration overrides for bootstrap.
@@ -509,7 +511,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigCache(
         self: Self,
-        **cache_config: object,
+        **cache_config: Unpack[options.CacheOptions],
     ) -> Self:
         """
         Set cache configuration overrides for bootstrap.
@@ -533,7 +535,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigHttp(
         self: Self,
-        **http_config: object,
+        **http_config: Unpack[options.HttpOptions],
     ) -> Self:
         """
         Set HTTP configuration overrides for bootstrap.
@@ -557,7 +559,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigDatabase(
         self: Self,
-        **database_config: object,
+        **database_config: Unpack[options.DatabaseOptions],
     ) -> Self:
         """
         Set database configuration overrides for bootstrap.
@@ -581,7 +583,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigFilesystems(
         self: Self,
-        **filesystems_config: object,
+        **filesystems_config: Unpack[options.FilesystemsOptions],
     ) -> Self:
         """
         Set filesystem configuration overrides for bootstrap.
@@ -605,7 +607,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigLogging(
         self: Self,
-        **logging_config: object,
+        **logging_config: Unpack[options.LoggingOptions],
     ) -> Self:
         """
         Set logging configuration overrides for bootstrap.
@@ -629,7 +631,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigMail(
         self: Self,
-        **mail_config: object,
+        **mail_config: Unpack[options.MailOptions],
     ) -> Self:
         """
         Set mail configuration overrides for bootstrap.
@@ -653,7 +655,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigQueue(
         self: Self,
-        **queue_config: object,
+        **queue_config: Unpack[options.QueueOptions],
     ) -> Self:
         """
         Set queue configuration overrides for bootstrap.
@@ -677,7 +679,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigSession(
         self: Self,
-        **session_config: object,
+        **session_config: Unpack[options.SessionOptions],
     ) -> Self:
         """
         Set session configuration overrides for bootstrap.
@@ -701,7 +703,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigTesting(
         self: Self,
-        **testing_config: object,
+        **testing_config: Unpack[options.TestingOptions],
     ) -> Self:
         """
         Set testing configuration overrides for bootstrap.
@@ -725,7 +727,7 @@ class IApplication(IContainer, ABC):
     @abstractmethod
     def withConfigPaths(
         self: Self,
-        **paths: str | Path | None,
+        **paths: Unpack[options.PathsOptions],
     ) -> Self:
         """
         Configure resolved application directories with core path overrides.
@@ -829,6 +831,15 @@ class IApplication(IContainer, ABC):
             If the configured kernel does not implement the CLI interface.
         """
 
+    @overload
+    def config(self, key: None = None) -> dict[str, object]: ...
+
+    @overload
+    def config(self, key: str) -> object: ...
+
+    @overload
+    def config[T](self, key: str, value: T) -> T: ...
+
     @abstractmethod
     def config(
         self: Self,
@@ -873,6 +884,15 @@ class IApplication(IContainer, ABC):
             ``True`` after the runtime mapping has been replaced.
         """
 
+    @overload
+    def path(self, key: None = None) -> Mapping[str, Path]: ...
+
+    @overload
+    def path(self, key: options.CorePathName) -> Path: ...
+
+    @overload
+    def path(self, key: str) -> Path | None: ...
+
     @abstractmethod
     def path(
         self: Self,
@@ -900,11 +920,17 @@ class IApplication(IContainer, ABC):
             If a supplied key is not a string.
         """
 
+    @overload
+    def routingPaths(self, key: None = None) -> options.RoutingPaths: ...
+
+    @overload
+    def routingPaths(self, key: str) -> list[Path] | None: ...
+
     @abstractmethod
     def routingPaths(
         self: Self,
         key: str | None = None,
-    ) -> list[Path] | dict | None:
+    ) -> list[Path] | options.RoutingPaths | None:
         """
         Return mutable copies of configured routing paths.
 

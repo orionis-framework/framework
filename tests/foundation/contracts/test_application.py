@@ -5,9 +5,11 @@ import re
 from inspect import Parameter, iscoroutinefunction, signature
 from pathlib import Path
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Unpack, get_args, get_origin, get_type_hints
 from orionis.foundation.application import Application
 from orionis.foundation.contracts.application import IApplication
+from orionis.foundation.config.options import CorePathName
+from orionis.foundation.core_paths import CORE_APP_PATHS
 from orionis.test import TestCase
 
 if TYPE_CHECKING:
@@ -114,7 +116,14 @@ class TestApplicationContract(TestCase):
                 for parameter in parameters
                 if parameter.arg not in {"self", "cls"}
             )
-            missing_result = not ("Returns\n-------" in doc or "Yields\n------" in doc)
+            # Overloads share the implementation's documentation.
+            overload = any(
+                isinstance(decorator, ast.Name) and decorator.id == "overload"
+                for decorator in node.decorator_list
+            )
+            missing_result = not (
+                overload or "Returns\n-------" in doc or "Yields\n------" in doc
+            )
             if (
                 missing_result
                 or missing_annotations
@@ -192,13 +201,17 @@ class TestApplicationContract(TestCase):
         None
             Assert that configuration values and path values are correctly typed.
         """
+        app_kwargs = get_type_hints(IApplication.withConfigApp)["app_config"]
+        self.assertIs(get_origin(app_kwargs), Unpack)
+        self.assertIs(get_type_hints(get_args(app_kwargs)[0])["debug"], bool)
+
+        path_kwargs = get_type_hints(IApplication.withConfigPaths)["paths"]
+        self.assertIs(get_origin(path_kwargs), Unpack)
+        path_options = get_args(path_kwargs)[0]
+        self.assertEqual(path_options.__optional_keys__, set(CORE_APP_PATHS))
         self.assertEqual(
-            signature(IApplication.withConfigApp).parameters["app_config"].annotation,
-            "object",
-        )
-        self.assertEqual(
-            signature(IApplication.withConfigPaths).parameters["paths"].annotation,
-            "str | Path | None",
+            set(get_args(CorePathName.__value__)),
+            {"root", *CORE_APP_PATHS},
         )
         self.assertEqual(
             signature(IApplication.path).return_annotation,

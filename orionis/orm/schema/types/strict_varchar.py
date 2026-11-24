@@ -7,7 +7,7 @@ from orionis.orm.schema.types._constants import DEFAULT_STRING_LENGTH
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class StrictVarChar(ColumnDefinition):
+class StrictVarChar[TValue = str](ColumnDefinition[TValue]):
     """The SQL ``VARCHAR`` type."""
 
     __slots__ = ()

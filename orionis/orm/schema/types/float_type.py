@@ -1,12 +1,13 @@
 """Type representing floating point types, such as ``FLOAT`` or ``REAL``."""
 
 from __future__ import annotations
+from decimal import Decimal
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class Float(ColumnDefinition):
+class Float[TValue = float | Decimal](ColumnDefinition[TValue]):
     """Type representing floating point types, such as ``FLOAT`` or ``REAL``."""
 
     __slots__ = ()

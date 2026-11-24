@@ -1,12 +1,13 @@
 from collections.abc import Awaitable, Callable, Mapping
 from contextlib import AbstractAsyncContextManager
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, overload, Unpack
 from orionis.console.base.contracts.scheduler import IBaseScheduler
 from orionis.container.context.manager import ScopeManager
 from orionis.container.contracts.service_provider import IServiceProvider
 from orionis.container.facades.facade import Facade
 from orionis.failure.contracts.handler import IBaseExceptionHandler
+from orionis.foundation.config import options
 from orionis.foundation.contracts.application import IApplication
 from orionis.foundation.enums.lifespan import Lifespan
 from orionis.foundation.enums.runtimes import Runtime
@@ -130,49 +131,82 @@ class Application(Facade):
     def getScheduler(cls) -> Awaitable[IBaseScheduler]: ...
 
     @classmethod
-    def withConfigApp(cls, **app_config: object) -> Awaitable[IApplication]: ...
+    def withConfigApp(
+        cls,
+        **app_config: Unpack[options.AppOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigAuth(cls, **auth_config: object) -> Awaitable[IApplication]: ...
+    def withConfigAuth(
+        cls,
+        **auth_config: Unpack[options.AuthOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigMcp(cls, **mcp_config: object) -> Awaitable[IApplication]: ...
+    def withConfigMcp(
+        cls,
+        **mcp_config: Unpack[options.McpOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigCache(cls, **cache_config: object) -> Awaitable[IApplication]: ...
+    def withConfigCache(
+        cls,
+        **cache_config: Unpack[options.CacheOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigHttp(cls, **http_config: object) -> Awaitable[IApplication]: ...
+    def withConfigHttp(
+        cls,
+        **http_config: Unpack[options.HttpOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
     def withConfigDatabase(
         cls,
-        **database_config: object,
+        **database_config: Unpack[options.DatabaseOptions],
     ) -> Awaitable[IApplication]: ...
 
     @classmethod
     def withConfigFilesystems(
         cls,
-        **filesystems_config: object,
+        **filesystems_config: Unpack[options.FilesystemsOptions],
     ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigLogging(cls, **logging_config: object) -> Awaitable[IApplication]: ...
+    def withConfigLogging(
+        cls,
+        **logging_config: Unpack[options.LoggingOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigMail(cls, **mail_config: object) -> Awaitable[IApplication]: ...
+    def withConfigMail(
+        cls,
+        **mail_config: Unpack[options.MailOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigQueue(cls, **queue_config: object) -> Awaitable[IApplication]: ...
+    def withConfigQueue(
+        cls,
+        **queue_config: Unpack[options.QueueOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigSession(cls, **session_config: object) -> Awaitable[IApplication]: ...
+    def withConfigSession(
+        cls,
+        **session_config: Unpack[options.SessionOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigTesting(cls, **testing_config: object) -> Awaitable[IApplication]: ...
+    def withConfigTesting(
+        cls,
+        **testing_config: Unpack[options.TestingOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
-    def withConfigPaths(cls, **paths: str | Path | None) -> Awaitable[IApplication]: ...
+    def withConfigPaths(
+        cls,
+        **paths: Unpack[options.PathsOptions],
+    ) -> Awaitable[IApplication]: ...
 
     @classmethod
     def create(cls) -> Awaitable[IApplication]: ...
@@ -183,27 +217,40 @@ class Application(Facade):
     @classmethod
     def aclose(cls) -> Awaitable[None]: ...
 
+    @overload
     @classmethod
-    def config(
-        cls,
-        key: str | None = None,
-        value: object = ...,
-    ) -> Awaitable[object]: ...
+    def config(cls, key: None = None) -> Awaitable[dict[str, object]]: ...
+
+    @overload
+    @classmethod
+    def config(cls, key: str) -> Awaitable[object]: ...
+
+    @overload
+    @classmethod
+    def config[T](cls, key: str, value: T) -> Awaitable[T]: ...
 
     @classmethod
     def resetRuntimeConfig(cls) -> Awaitable[bool]: ...
 
+    @overload
     @classmethod
-    def path(
-        cls,
-        key: str | None = None,
-    ) -> Awaitable[Path | Mapping[str, Path] | None]: ...
+    def path(cls, key: None = None) -> Awaitable[Mapping[str, Path]]: ...
 
+    @overload
     @classmethod
-    def routingPaths(
-        cls,
-        key: str | None = None,
-    ) -> Awaitable[list[Path] | dict | None]: ...
+    def path(cls, key: options.CorePathName) -> Awaitable[Path]: ...
+
+    @overload
+    @classmethod
+    def path(cls, key: str) -> Awaitable[Path | None]: ...
+
+    @overload
+    @classmethod
+    def routingPaths(cls, key: None = None) -> Awaitable[options.RoutingPaths]: ...
+
+    @overload
+    @classmethod
+    def routingPaths(cls, key: str) -> Awaitable[list[Path] | None]: ...
 
     @classmethod
     def isProduction(cls) -> Awaitable[bool]: ...
@@ -263,21 +310,31 @@ class Application(Facade):
     @classmethod
     def getCurrentScope(cls) -> Awaitable[ScopeManager | None]: ...
 
+    @overload
+    @classmethod
+    def make[T](
+        cls,
+        key: type[T],
+        *args: object,
+        **kwargs: object,
+    ) -> Awaitable[T]: ...
+
+    @overload
     @classmethod
     def make(
         cls,
-        key: type[Any] | str,
+        key: str,
         *args: object,
         **kwargs: object,
     ) -> Awaitable[Any]: ...
 
     @classmethod
-    def build(
+    def build[T](
         cls,
-        type_: type[Any],
+        type_: type[T],
         *args: object,
         **kwargs: object,
-    ) -> Awaitable[Any]: ...
+    ) -> Awaitable[T]: ...
 
     @classmethod
     def invoke(

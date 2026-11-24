@@ -5,7 +5,7 @@
 from __future__ import annotations
 import uuid
 from copy import deepcopy
-from datetime import UTC, datetime
+from datetime import datetime
 from collections.abc import Callable
 from typing import Any, ClassVar, Self
 from orionis.orm.attributes import AttributesMixin, serialize_for_storage
@@ -24,6 +24,7 @@ from orionis.orm.soft_deletes import SoftDeletesMixin
 from orionis.orm.state import StateMixin
 from orionis.database.contracts.connection import IConnection
 from orionis.orm.schema.table import TableDefinition
+from orionis.support.facades import DateTime
 from orionis.support.types.collection import Collection
 
 # Instance slots managed directly by the model machinery.
@@ -49,7 +50,7 @@ class Model(
     metaclass=ModelMeta,
 ):
     """
-    Base class of the Orionis active-record models.
+    Define active-record models and persist them through the query builder.
 
     Concrete models declare their columns with the fluent schema types
     and interact with the database exclusively through the Orionis query
@@ -607,23 +608,14 @@ class Model(
         """
         Produce the current timestamp for persistence operations.
 
-        Timezone-aware timestamps follow the selected update, creation,
-        or soft-delete column's timezone option, naive UTC otherwise.
+        Persistence normalizes this instant to UTC for each target column.
 
         Returns
         -------
         datetime.datetime
-            Current UTC timestamp.
+            Current timestamp in the application timezone.
         """
-        now = datetime.now(UTC)
-        meta = cls.__meta__
-        target = meta.updated_column or meta.created_column or meta.deleted_column
-        if target is not None:
-            column = meta.columns.get(target)
-            aware = column is not None and column.timezone
-            if not aware:
-                return now.replace(tzinfo=None)
-        return now
+        return DateTime.now()
 
     @classmethod
     def newUniqueId(cls: type[Self]) -> Any:

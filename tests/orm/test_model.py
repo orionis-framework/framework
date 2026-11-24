@@ -4,8 +4,9 @@
 # Exercise required hook signatures, synthetic secrets, and declared column names.
 from __future__ import annotations
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import ClassVar
+from unittest.mock import patch
 import tests.orm.test_events as feature_fixtures
 from orionis.database.connection import Connection
 from orionis.database.connection_manager import ConnectionManager
@@ -15,9 +16,11 @@ from orionis.orm.exceptions import (
     MassAssignmentException,
     ModelNotFoundException,
 )
+from orionis.orm.attributes import serialize_for_storage
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.types import Boolean
 from orionis.support.types.collection import Collection
+from orionis.support.facades import DateTime as Clock
 from orionis.test import TestCase
 
 
@@ -849,7 +852,148 @@ class TestUniqueIds(feature_fixtures._ModelFeatureTestCase):
 
 
 class TestModelConnectionRouting(TestCase):
-    """Exercise instance persistence using an overridable connection resolver."""
+    """
+    Verify model persistence through a custom connection resolver.
+
+    Use isolated SQLite connections to check timestamps and write routing.
+    """
+
+    async def _timestampModel(self) -> type[Model]:
+        """
+        Create a model and an isolated database with mixed timestamp columns.
+
+        Returns
+        -------
+        type[Model]
+            Model bound to the in-memory SQLite table.
+        """
+        connection = Connection("sqlite", {"driver": "sqlite", "database": ":memory:"})
+        self.addAsyncCleanup(connection.disconnect)
+
+        class Entry(Model):
+            """
+            Represent a row with managed timestamps and a local appointment.
+
+            Bind the test model to its own SQLite connection.
+            """
+
+            id = Integer().primary().autoIncrement()
+            name = String()
+            created_at = DateTime()
+            updated_at = DateTime(timezone=True)
+            deleted_at = DateTime().nullable()
+            appointment = DateTime().nullable()
+            soft_deletes = True
+            casts: ClassVar[dict[str, str]] = {
+                "created_at": "datetime", "appointment": "datetime",
+            }
+
+            @classmethod
+            def getConnection(cls) -> Connection:
+                """
+                Return the connection used by the test model.
+
+                Returns
+                -------
+                Connection
+                    In-memory SQLite database for the round-trip checks.
+                """
+                return connection
+
+        await connection.createTable(Entry.__meta__.table)
+        return Entry
+
+    async def testManagedTimestampsPreserveInstantAcrossSQLiteRoundTrip(self) -> None:
+        """
+        Expose application time and bind each managed column in UTC.
+
+        Returns
+        -------
+        None
+            Verify hydration, filtering and storage in the configured timezone.
+        """
+        model = await self._timestampModel()
+        with patch.object(Clock, "getTimezone", return_value="America/Bogota"):
+            appointment = "2026-11-24T02:00:00+00:00"
+            entry = await model.create({"name": "first", "appointment": appointment})
+            loaded = await model.findOrFail(entry.id)
+            self.assertEqual(
+                entry.created_at.isoformat(), loaded.created_at.isoformat(),
+            )
+            self.assertEqual(
+                entry.updated_at.isoformat(),
+                loaded.updated_at.isoformat(),
+            )
+            self.assertEqual(loaded.created_at.timezone_name, "America/Bogota")
+            self.assertEqual(loaded.updated_at.timezone_name, "America/Bogota")
+            stored = serialize_for_storage(model.__meta__, entry.toDict())
+            self.assertIsNone(stored["appointment"].tzinfo)
+            self.assertEqual(stored["appointment"].hour, 21)
+            self.assertEqual(
+                loaded.appointment.isoformat(), "2026-11-23T21:00:00-05:00",
+            )
+            self.assertEqual(await model.where("appointment", appointment).count(), 1)
+            self.assertIsNone(stored["created_at"].tzinfo)
+            self.assertEqual(
+                stored["created_at"].hour,
+                entry.created_at.astimezone(UTC).hour,
+            )
+            self.assertEqual(stored["updated_at"].utcoffset().total_seconds(), 0)
+            self.assertEqual(
+                await model.where("created_at", entry.created_at).count(), 1,
+            )
+            self.assertEqual(
+                await model.where(
+                    lambda q: q.whereIn("updated_at", [entry.updated_at]),
+                ).count(),
+                1,
+            )
+            self.assertEqual(
+                await model.where("id", entry.id).update({"name": "second"}), 1,
+            )
+            self.assertEqual(
+                (await model.findOrFail(entry.id)).updated_at.timezone_name,
+                "America/Bogota",
+            )
+            self.assertTrue(await entry.delete())
+            trashed = await model.query().onlyTrashed().findOrFail(entry.id)
+            self.assertEqual(
+                entry.deleted_at.isoformat(), trashed.deleted_at.isoformat(),
+            )
+
+            legacy = model._newFromDatabase({"created_at": "2026-11-24 02:00:00"})
+            self.assertEqual(legacy.created_at.isoformat(), "2026-11-23T21:00:00-05:00")
+
+    async def testBulkWritesPreserveBothOccurrencesOfRepeatedLocalTime(self) -> None:
+        """
+        Track and persist each occurrence of a repeated local time.
+
+        Returns
+        -------
+        None
+            Verify bulk filters, model updates and soft deletion across a DST fold.
+        """
+        model = await self._timestampModel()
+        with patch.object(Clock, "getTimezone", return_value="America/New_York"):
+            first = "2024-11-03T01:30:00-04:00"
+            second = "2024-11-03T01:30:00-05:00"
+            await model.query().insert([
+                {"name": name, "created_at": first, "updated_at": second}
+                for name in ("fold", "bulk")
+            ])
+            self.assertEqual(await model.where("created_at", first).count(), 2)
+            self.assertEqual(
+                await model.whereBetween("updated_at", (first, second)).count(), 2,
+            )
+            repeat = await model.where("name", "fold").firstOrFail()
+            repeat.created_at = second
+            self.assertTrue(repeat.isDirty("created_at"))
+            self.assertTrue(await repeat.save())
+            self.assertTrue(repeat.wasChanged("created_at"))
+            fetched = await model.findOrFail(repeat.id)
+            self.assertEqual(fetched.created_at.isoformat(), second)
+            self.assertFalse(fetched.isDirty())
+            self.assertEqual(await model.where("created_at", second).delete(), 1)
 
     async def testWritesUseDeclaredConnectionHookAndOneTimestamp(self) -> None:
         """Route all writes through the hook and share creation timestamps.

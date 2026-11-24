@@ -1,13 +1,39 @@
 # ruff: noqa: PT009
 # Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from faker import Faker
+from datetime import UTC
+from unittest.mock import patch
 from orionis.orm.factories._faker import create_faker
 from orionis.orm.factories.fake import Fake
 from orionis.test import TestCase
+from orionis.support.facades import DateTime
 
 
 class TestFactoryProvider(TestCase):
-    """Use the guaranteed Faker dependency with independent factory state."""
+    """
+    Verify Faker setup for model factories.
+
+    Check locale, timezone and random state across independent generators.
+    """
+
+    def testTemporalProvidersUseApplicationZoneUnlessOverridden(self) -> None:
+        """
+        Apply defaults to each provider view while honoring explicit arguments.
+
+        Returns
+        -------
+        None
+            Assert the timezone of each generated value.
+        """
+        with patch.object(DateTime, "getTimezone", return_value="America/Bogota"):
+            fake = create_faker("en_US", 42)
+            self.assertEqual(fake.dateTime().tzinfo, DateTime.getZoneInfo())
+            self.assertEqual(fake.unique.dateTime().tzinfo, DateTime.getZoneInfo())
+            self.assertEqual(
+                fake.optional.dateTime(prob=1).tzinfo, DateTime.getZoneInfo(),
+            )
+            self.assertEqual(fake.dateTime(UTC).tzinfo, UTC)
+            self.assertIsNone(fake.dateTime(tzinfo=None).tzinfo)
 
     def testProviderUsesInstalledFaker(self) -> None:
         """Expose native Faker data through the public facade.

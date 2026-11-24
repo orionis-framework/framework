@@ -23,6 +23,8 @@ Locks are thread-level, not process-level. Workers using the same pattern can ro
 
 Time channels use a suffix resolver and rotate when its suffix changes. Hourly uses `YYYY-MM-DD_HH`, daily `YYYY-MM-DD`, weekly the ISO year/week, and monthly `YYYY-MM`. `chunked` rotates when the tracked encoded byte size reaches `mb_size`, generates timestamp/counter suffixes, and gzip-compresses rotated files.
 
+Each log entry and each new time-based filename use the record creation instant in the active application zone, including when a queue delivers the record later. Changing the zone also updates existing channels. During a repeated hour, the second hourly file adds the UTC offset (for example, `2026-11-01_01_-0500`). `getSuffix(dt)` converts aware inputs to the resolver zone and interprets naive inputs as local time.
+
 `getNextRotationTime()` converts an aware input to the resolver timezone and interprets a naive input in that timezone. Weekly and monthly boundaries can fall later on the current Monday or first day of the month; an input already at the boundary advances to the next period. These calculations do not schedule handler rotation.
 
 ### Retention
@@ -91,12 +93,13 @@ with TemporaryDirectory() as root:
 ### Resolve deterministic time suffixes
 
 ```python
-from datetime import UTC, datetime, time
+from datetime import datetime, time
+from orionis.support.facades.datetime import DateTime
 from orionis.logging.handlers.daily_suffix_resolver import DailySuffixResolver
 from orionis.logging.handlers.monthly_suffix_resolver import MonthlySuffixResolver
 from orionis.logging.handlers.weekly_suffix_resolver import WeeklySuffixResolver
 
-moment = datetime(2026, 10, 6, 15, 30, tzinfo=UTC)
+moment = datetime(2026, 10, 6, 15, 30, tzinfo=DateTime.getZoneInfo())
 assert DailySuffixResolver(time(2, 0)).getSuffix(moment) == "2026-10-06"
 assert WeeklySuffixResolver().getSuffix(moment) == "2026-week41"
 assert MonthlySuffixResolver().getSuffix(moment) == "2026-10"

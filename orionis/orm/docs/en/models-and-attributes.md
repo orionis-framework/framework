@@ -40,7 +40,7 @@ The table name is derived through snake case and pluralization. Set `table = "co
 
 Declare `created_at` and `updated_at` with date/time types for automatic timestamp maintenance. `timestamps=True` alone **does not add columns**. Customize names with `CREATED_AT` and `UPDATED_AT`. `table_definition` shares a versioned definition with [migrations](../../../database/docs/en/schema.md); it cannot be combined with inline columns or conflicting table/PK settings.
 
-`freshTimestamp()` generates UTC time and honors the `timezone` option of the selected update, creation, or deletion column, in that order. A column without timezone uses naive UTC datetime rather than automatically representing local time. Override `newUniqueId()` for a client-identity policy other than the default UUID.
+`freshTimestamp()` returns an aware instant in the application timezone. The ORM stores its managed creation, update, and soft-delete timestamps in UTC using each column's own timezone flag. Reading an offset-less value from these columns treats it as UTC, including historical rows. Assigning an offset-less timestamp to the model uses application time. Override `newUniqueId()` for a custom client-generated identity.
 
 ## Control input and output
 
@@ -49,6 +49,8 @@ The constructor, `fill()`, and `update(attributes)` apply mass-assignment rules.
 Direct assignment (`article.status = "published"`) and `setAttribute` apply mutators/casts but bypass `fillable`. Use them only in trusted logic. A mutator returns the stored value; casting follows. Available casts are `int`, `float`, `bool`, `datetime`, `date`, `json`, and `uuid`; `None` remains `None`. Casting does not replace input validation or SQL constraints.
 
 The `datetime` cast returns a `pendulum.DateTime` in the application timezone. It interprets naive values as application-local time and converts timezone-aware values and POSIX timestamps without changing the instant they represent.
+
+A user-defined column with a `datetime` cast stores local application time when its SQL type discards the offset. Historical values use the same convention. During a fall-back transition two instants can share that wall time. Preserving the distinction for user-defined fields requires a type and backend that retain the offset or an explicit UTC representation. The `date` cast extracts the application-local day from a `datetime` and preserves plain dates.
 
 `toDict()`/`serialize()` convert attributes and loaded relationships; `hidden` excludes secrets and `appends` adds computed accessors. `toJson(**kwargs)` produces JSON. `only(*keys)` and `exclude(*keys)` select from the serialized representation. Hiding a column neither encrypts it nor prevents queries.
 

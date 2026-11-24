@@ -4,12 +4,27 @@
 
     function startClock() {
         var clock = document.getElementById('systemTime');
-        if (!clock) {
+        var timezone = clock?.dataset.timezone;
+        if (!timezone) {
+            return;
+        }
+        var formatter;
+        try {
+            formatter = new Intl.DateTimeFormat(undefined, {
+                timeZone: timezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hourCycle: 'h23',
+                timeZoneName: 'short'
+            });
+        } catch (error) {
+            // An older browser may lack this IANA zone. Keep the server-rendered label.
             return;
         }
         function tick() {
             var now = new Date();
-            clock.textContent = now.toUTCString().slice(17, 25) + ' UTC';
+            clock.textContent = formatter.format(now);
             clock.setAttribute('datetime', now.toISOString());
         }
         tick();
@@ -24,22 +39,21 @@
         }
         function selectFrame(id) {
             var selected = document.getElementById(id);
-            if (!selected || !selected.hasAttribute('data-trace-frame')) {
+            if (selected?.dataset.traceFrame === undefined) {
                 return false;
             }
-            var index;
-            for (index = 0; index < frames.length; index += 1) {
-                if (frames[index] === selected) {
-                    frames[index].removeAttribute('hidden');
+            for (const frame of frames) {
+                if (frame === selected) {
+                    frame.removeAttribute('hidden');
                 } else {
-                    frames[index].setAttribute('hidden', '');
+                    frame.setAttribute('hidden', '');
                 }
             }
-            for (index = 0; index < links.length; index += 1) {
-                if (links[index].getAttribute('data-frame-target') === id) {
-                    links[index].setAttribute('aria-current', 'true');
+            for (const link of links) {
+                if (link.dataset.frameTarget === id) {
+                    link.setAttribute('aria-current', 'true');
                 } else {
-                    links[index].removeAttribute('aria-current');
+                    link.removeAttribute('aria-current');
                 }
             }
             return true;
@@ -49,9 +63,9 @@
             if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
                 return;
             }
-            if (selectFrame(this.getAttribute('data-frame-target'))) {
+            if (selectFrame(this.dataset.frameTarget)) {
                 event.preventDefault();
-                var selected = document.getElementById(this.getAttribute('data-frame-target'));
+                var selected = document.getElementById(this.dataset.frameTarget);
                 selected.focus({ preventScroll: true });
                 selected.scrollIntoView({ block: 'nearest' });
             }
@@ -62,8 +76,8 @@
                 selectFrame(frames[0].id);
             }
         }
-        for (var index = 0; index < links.length; index += 1) {
-            links[index].addEventListener('click', followFrame);
+        for (const link of links) {
+            link.addEventListener('click', followFrame);
         }
         selectLocationFrame();
         window.addEventListener('hashchange', selectLocationFrame);
@@ -72,16 +86,16 @@
     function copyText(button, status, text, messages) {
         button.disabled = true;
         status.textContent = '';
-        status.removeAttribute('data-copy-state');
+        delete status.dataset.copyState;
         navigator.clipboard.writeText(text).then(function () {
             button.disabled = false;
             button.title = messages.copiedTitle;
-            status.setAttribute('data-copy-state', 'success');
+            status.dataset.copyState = 'success';
             status.textContent = messages.success;
         }, function () {
             button.disabled = false;
             button.title = messages.copyTitle;
-            status.setAttribute('data-copy-state', 'error');
+            status.dataset.copyState = 'error';
             status.textContent = messages.error;
         });
     }
@@ -89,7 +103,7 @@
     function enableCopyReport() {
         var button = document.getElementById('copy-exception');
         var status = document.getElementById('copy-status');
-        if (!button || !status || !navigator.clipboard || !navigator.clipboard.writeText) {
+        if (!button || !status || !navigator.clipboard?.writeText) {
             return;
         }
         button.removeAttribute('hidden');
@@ -101,13 +115,12 @@
                 document.getElementById('request-path').textContent
             ];
             var frames = document.querySelectorAll('[data-trace-frame]');
-            for (var index = 0; index < frames.length; index += 1) {
-                var values = frames[index].querySelectorAll('.file-info-value');
+            for (const frame of frames) {
+                var values = frame.querySelectorAll('.file-info-value');
                 report.push('\n' + values[0].textContent.trim() + ':' + values[1].textContent.trim());
-                var rows = frames[index].querySelectorAll('.source-row');
-                for (var row = 0; row < rows.length; row += 1) {
-                    report.push(rows[row].querySelector('.source-number').textContent + ' ' +
-                        rows[row].querySelector('.source-code').textContent);
+                for (const row of frame.querySelectorAll('.source-row')) {
+                    report.push(row.querySelector('.source-number').textContent + ' ' +
+                        row.querySelector('.source-code').textContent);
                 }
             }
             copyText(button, status, report.join('\n'), {
@@ -119,61 +132,84 @@
         });
     }
 
+    function copyDump() {
+        var panel = this.closest('.dump-panel');
+        var code = panel.querySelector('.dump-output code');
+        var status = panel.querySelector('[data-dump-copy-status]');
+        copyText(this, status, code.textContent, {
+            copyTitle: 'Copy dump content',
+            copiedTitle: 'Dump content copied',
+            success: 'Copied',
+            error: 'Copy failed'
+        });
+    }
+
     function enableDumpCopy() {
         var template = document.getElementById('dump-copy-action');
-        if (!template || !navigator.clipboard || !navigator.clipboard.writeText) {
+        if (!template || !navigator.clipboard?.writeText) {
             return;
         }
-        function copyDump() {
-            var panel = this.closest('.dump-panel');
-            var code = panel.querySelector('.dump-output code');
-            var status = panel.querySelector('[data-dump-copy-status]');
-            copyText(this, status, code.textContent, {
-                copyTitle: 'Copy dump content',
-                copiedTitle: 'Dump content copied',
-                success: 'Copied',
-                error: 'Copy failed'
-            });
-        }
-        var panels = document.querySelectorAll('.dump-panel');
-        for (var index = 0; index < panels.length; index += 1) {
+        for (const panel of document.querySelectorAll('.dump-panel')) {
             var action = template.content.cloneNode(true);
             action.querySelector('[data-copy-dump]').addEventListener('click', copyDump);
-            panels[index].querySelector('.code-header-info').appendChild(action);
+            panel.querySelector('.code-header-info').appendChild(action);
         }
     }
 
-    function highlightSource() {
-        // A small cosmetic tokenizer. Source text is only ever inserted as text nodes.
-        var tokens = /#[^\r\n]*|"(?:[^"\\\r\n]|\\[^\r\n])*"|'(?:[^'\\\r\n]|\\[^\r\n])*'|\b(?:False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)\b|\b\d+(?:\.\d+)?\b/g;
-        var blocks = document.querySelectorAll('code.source-code');
-        for (var index = 0; index < blocks.length; index += 1) {
-            var block = blocks[index];
-            var source = block.textContent;
-            // Keep unusually large source lines readable without expensive highlighting.
-            if (source.length > 20000) {
+    const sourceKeywords = new Set([
+        'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break',
+        'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally',
+        'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal',
+        'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'
+    ]);
+
+    function sourceToken(match, source) {
+        const text = match[0];
+        if (text === '"' || text === "'") {
+            // Match a complete string at this quote. Leave an unmatched quote as plain text.
+            const quoted = text === '"' ? /"(?:[^"\\\r\n]|\\[^\r\n])*"/y : /'(?:[^'\\\r\n]|\\[^\r\n])*'/y;
+            quoted.lastIndex = match.index;
+            const literal = quoted.exec(source);
+            return literal && { text: literal[0], className: 'syntax-string' };
+        }
+        if (text.startsWith('#')) {
+            return { text, className: 'syntax-comment' };
+        }
+        if (/^\d/.test(text)) {
+            return { text, className: 'syntax-number' };
+        }
+        return sourceKeywords.has(text) ? { text, className: 'syntax-keyword' } : null;
+    }
+
+    function highlightBlock(block) {
+        const source = block.textContent;
+        if (source.length > 20000) {
+            return;
+        }
+        const candidates = /#[^\r\n]*|["']|\b\d+(?:\.\d+)?\b|\b[A-Za-z_]\w*/g;
+        const fragment = document.createDocumentFragment();
+        let cursor = 0;
+        let match;
+        while ((match = candidates.exec(source)) !== null) {
+            const token = sourceToken(match, source);
+            if (!token) {
                 continue;
             }
-            var fragment = document.createDocumentFragment();
-            var cursor = 0;
-            var match;
-            tokens.lastIndex = 0;
-            while ((match = tokens.exec(source)) !== null) {
-                fragment.appendChild(document.createTextNode(source.slice(cursor, match.index)));
-                var token = document.createElement('span');
-                var first = match[0].charAt(0);
-                token.className = first === '#' ? 'syntax-comment' :
-                    (first === '"' || first === "'") ? 'syntax-string' :
-                        /[0-9]/.test(first) ? 'syntax-number' : 'syntax-keyword';
-                token.textContent = match[0];
-                fragment.appendChild(token);
-                cursor = tokens.lastIndex;
-            }
-            fragment.appendChild(document.createTextNode(source.slice(cursor)));
-            while (block.firstChild) {
-                block.removeChild(block.firstChild);
-            }
-            block.appendChild(fragment);
+            fragment.appendChild(document.createTextNode(source.slice(cursor, match.index)));
+            const span = document.createElement('span');
+            span.className = token.className;
+            span.textContent = token.text;
+            fragment.appendChild(span);
+            cursor = match.index + token.text.length;
+            candidates.lastIndex = cursor;
+        }
+        fragment.appendChild(document.createTextNode(source.slice(cursor)));
+        block.replaceChildren(fragment);
+    }
+
+    function highlightSource() {
+        for (const block of document.querySelectorAll('code.source-code')) {
+            highlightBlock(block);
         }
     }
 

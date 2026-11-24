@@ -800,7 +800,11 @@ class TestAuthManagerAuthorization(_ManagerCase):
 
 
 class TestAuthManagerTokens(_ManagerCase):
-    """Validate the personal access token flow through the manager."""
+    """
+    Verify personal access tokens through the authentication manager.
+
+    Exercise issuance and request authentication against persisted token records.
+    """
 
     async def testIssuesATokenForTheAuthenticatedIdentity(self) -> None:
         """Validate the common case of minting a token.
@@ -997,9 +1001,8 @@ class TestAuthManagerTokens(_ManagerCase):
             self.assertFalse(await self.auth.revokeCurrentToken())
 
     async def testAnExpiredTokenNeverAuthenticates(self) -> None:
-        """Validate the expiration path on a real request.
-
-        The middleware leaves the request anonymous.
+        """
+        Verify that a request with an expired token remains anonymous.
 
         Returns
         -------
@@ -1009,7 +1012,7 @@ class TestAuthManagerTokens(_ManagerCase):
         issued = await self.auth.createToken(
             "stale",
             tokenable=self.ada,
-            expires_at=datetime.now(UTC).replace(tzinfo=None) - timedelta(minutes=1),
+            expires_at=datetime.now(UTC) - timedelta(minutes=1),
         )
         middleware = _TokenIdentityMiddleware(self.auth, self.permissions)
 

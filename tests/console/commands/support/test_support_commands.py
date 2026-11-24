@@ -391,6 +391,52 @@ class TestSupportCommands(TestCase):
                 self.assertIn(type(error).__name__, console.error.call_args.args[0])
                 console.success.assert_not_called()
 
+    async def testClearsOnlyTheExplicitCacheStore(self) -> None:
+        """Clear the requested store even when the default store is unavailable.
+
+        Returns
+        -------
+        None
+            The selected repository receives the clear request and reports success.
+        """
+        command = ClearCacheCommand()
+        command.setArguments({"store": "file"})
+        cache = Mock(clear=AsyncMock(side_effect=QueryException("Unavailable")))
+        cache.store.return_value.clear = AsyncMock(return_value=True)
+        console = Mock()
+
+        result = await command.handle(cache, console)
+
+        self.assertEqual(result, 0)
+        cache.store.assert_called_once_with("file")
+        cache.store.return_value.clear.assert_awaited_once_with()
+        cache.clear.assert_not_awaited()
+        console.success.assert_called_once_with(
+            "Cache store 'file' cleared.", timestamp=False,
+        )
+
+    async def testReportsFailureResolvingTheExplicitCacheStore(self) -> None:
+        """Report store resolution errors without clearing the default cache.
+
+        Returns
+        -------
+        None
+            A failed selection yields a nonzero result and preserves the default.
+        """
+        command = ClearCacheCommand()
+        command.setArguments({"store": "database"})
+        cache = Mock(clear=AsyncMock())
+        cache.store.side_effect = QueryException("Unsupported cache connection")
+        console = Mock()
+
+        result = await command.handle(cache, console)
+
+        self.assertEqual(result, 1)
+        cache.store.assert_called_once_with("database")
+        cache.clear.assert_not_awaited()
+        self.assertIn("Unsupported cache connection", console.error.call_args.args[0])
+        console.success.assert_not_called()
+
     async def testReportsCacheClearFalseAsFailure(self) -> None:
         """Return failure when a backend reports that clearing did not succeed.
 

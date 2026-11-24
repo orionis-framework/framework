@@ -43,7 +43,7 @@ Registration commits through the native transaction context before scheduling em
 
 ## Caches and file changes
 
-The kernel retains the exact `DefaultResponses` service; each call creates a response with independent mutable state. Health retains at most two HTML bodies and invalidates them when application name/locale changes. Error and exception pages render per request and do not cache their payloads.
+The kernel retains the same `DefaultResponses` service. Each call creates a response with independent mutable state. Health retains at most two HTML bodies and invalidates them when the application name, locale or timezone changes. The footer clock displays the time in the application's IANA timezone. Error and exception pages render per request.
 
 Allowlisted assets retain paths rather than content or `stat` results. A selected file reflects content changes; adding a higher-priority candidate requires restarting or deleting `responses["favicon"]`, `responses["robots_txt"]` or `responses["sitemap_xml"]`. Missing selected files trigger reselection. Opening can still fail after response construction.
 

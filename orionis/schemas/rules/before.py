@@ -2,6 +2,7 @@
 # Keep rule interface parameter names compatible with keyword callers.
 """Ensure a date comes strictly before a reference moment."""
 
+from datetime import UTC
 from orionis.schemas.rules.temporal import resolve_moment, to_datetime
 from orionis.schemas.rule import Rule
 
@@ -59,21 +60,22 @@ class Before(Rule):
         instance: object,
     ) -> bool:
         """
-        Validate a field value against the reference moment.
+        Check whether a temporal value falls earlier than the reference instant.
 
         Parameters
         ----------
         field : str
-            Field name associated with the value.
+            Name of the field being validated.
         value : object
-            Value to validate.
+            Date, datetime, or text. Interpret naive inputs in the application zone.
         instance : object
             Schema instance used to resolve sibling field references.
 
         Returns
         -------
         bool
-            Return ``True`` when the value passes validation.
+            True for an instant earlier than the reference. Other non-string types
+            pass through to type validation.
         """
         moment = to_datetime(value)
 
@@ -85,4 +87,4 @@ class Before(Rule):
         if reference is None:
             return False
 
-        return moment < reference
+        return moment.astimezone(UTC) < reference.astimezone(UTC)

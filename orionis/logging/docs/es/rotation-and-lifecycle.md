@@ -23,6 +23,8 @@ Los locks son de hilo, no de proceso. Varios workers sobre el mismo patrón pued
 
 Los canales de tiempo usan un resolver y rotan cuando cambia su sufijo. Hourly usa `YYYY-MM-DD_HH`, daily `YYYY-MM-DD`, weekly año/semana ISO y monthly `YYYY-MM`. `chunked` rota al alcanzar `mb_size` en bytes codificados, genera sufijos timestamp/contador y comprime rotados con gzip.
 
+Cada registro y cada nuevo archivo de rotación por fecha usan el instante de creación del registro en la zona vigente de la aplicación, incluso cuando una cola lo entrega más tarde. Los canales abiertos también siguen los cambios de zona. Cuando se repite una hora, el segundo archivo horario añade el desplazamiento respecto de UTC (por ejemplo, `2026-11-01_01_-0500`). `getSuffix(dt)` convierte las entradas con zona a la zona del resolver e interpreta las entradas sin zona como hora local.
+
 `getNextRotationTime()` convierte las entradas con zona horaria a la zona del resolver e interpreta las entradas sin zona en esa misma zona. El siguiente límite semanal o mensual puede ocurrir más tarde el lunes o el primer día del mes actual; una entrada situada exactamente en el límite avanza al periodo siguiente. Estos cálculos no programan la rotación del handler.
 
 ### Retención
@@ -91,12 +93,13 @@ with TemporaryDirectory() as root:
 ### Resolver sufijos de tiempo deterministas
 
 ```python
-from datetime import UTC, datetime, time
+from datetime import datetime, time
+from orionis.support.facades.datetime import DateTime
 from orionis.logging.handlers.daily_suffix_resolver import DailySuffixResolver
 from orionis.logging.handlers.monthly_suffix_resolver import MonthlySuffixResolver
 from orionis.logging.handlers.weekly_suffix_resolver import WeeklySuffixResolver
 
-moment = datetime(2026, 10, 6, 15, 30, tzinfo=UTC)
+moment = datetime(2026, 10, 6, 15, 30, tzinfo=DateTime.getZoneInfo())
 assert DailySuffixResolver(time(2, 0)).getSuffix(moment) == "2026-10-06"
 assert WeeklySuffixResolver().getSuffix(moment) == "2026-week41"
 assert MonthlySuffixResolver().getSuffix(moment) == "2026-10"

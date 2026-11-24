@@ -12,6 +12,8 @@ La huella usa ruta absoluta, `st_mtime_ns` y tamaño de los archivos. No calcula
 
 ### Serializar tipos de framework
 
+Para valores `datetime` y `time` con una `ZoneInfo` con nombre, el serializador guarda el identificador IANA y recupera sus reglas de horario de verano. Conserva `fold` para las horas locales que se repiten. Los artefactos anteriores que solo contienen un desplazamiento ISO se siguen leyendo con ese desplazamiento fijo.
+
 `from orionis.cache.serializer import Serializer` expone `dumps`, `loads`, `dumpToFile` y `loadFromFile`. Además de contenedores y primitivos, admite bytes, Path, fechas/horas, timedelta, Decimal, UUID, complejos, tuplas, sets, frozensets, enums, tipos y el sentinel `MISSING`. Admite referencias importables a tipos y enums anidados, y codifica recursivamente los valores de enum. Usa marcadores `__type__` y `__value__`; evita utilizar esos nombres en mapas de negocio que deban volver intactos.
 
 Este formato es para artefactos locales de confianza. La reconstrucción de enums y tipos puede importar módulos por nombre: no deserialices payloads aportados por clientes ni archivos modificables por usuarios no confiables. No incluye firma ni cifrado. Un archivo ausente, vacío o ilegible devuelve `None` en `loadFromFile`; JSON corrupto o un marcador desconocido puede propagar un error. Trata el caché como regenerable y define si tu arranque lo descarta o falla.

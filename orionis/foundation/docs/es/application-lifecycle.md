@@ -6,6 +6,8 @@
 
 Antes de `create()`, métodos `with...` construyen metadata mutable. La creación carga config/providers, congela el snapshot, registra aplicación y expone una copia runtime mutable. `config(key, value)` cambia solo runtime; `resetRuntimeConfig()` restaura desde el snapshot.
 
+Orionis aplica `app.timezone` antes del registro de los proveedores y de sus métodos de arranque síncronos, también al cargar la configuración compilada. La llamada `app.config("app.timezone", "America/Bogota")` actualiza la zona del proceso. Un nombre inválido produce `ValueError` y conserva el valor anterior. Las operaciones con fechas también consultan los cambios hechos sobre el diccionario de configuración. Al restablecer la configuración se recupera la zona de arranque. Las tareas ya programadas conservan la zona con la que se crearon.
+
 ### Etapas de creación y readiness
 
 `create()` completa config y registro de providers. `boot()` además espera boots de providers eager para uso headless, sin ejecutar hooks ni kernels HTTP/CLI. `isCreated`/`isBooted`, `areProvidersBooted` e `isHttpReady` distinguen etapas.

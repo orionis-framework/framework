@@ -1452,7 +1452,79 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4319"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4332"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId4332">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.console.fluent._calendar.html" class="internal-link" title="orionis.console.fluent._calendar">_calendar</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent._calendar.CalendarCronTrigger.html" class="internal-link" title="orionis.console.fluent._calendar.CalendarCronTrigger"><wbr></wbr>Calendar<wbr></wbr>Cron<wbr></wbr>Trigger</a></code>
+            </div>
+        
+
+    </li>
+</ul>
+
+        <div class="childrenKindTitle">Functions</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.console.fluent._calendar.html#_after_transition" class="internal-link" title="orionis.console.fluent._calendar._after_transition">_after<wbr></wbr>_transition</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        
+         
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4333"> 
                     
                 </input>
 
@@ -1498,11 +1570,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4320"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4334"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId4320">
+                <label class="lbl-toggle" for="expandableItemId4334">
                     
                     
                 </label>
@@ -1567,7 +1639,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4321"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4335"> 
                     
                 </input>
 
@@ -1619,11 +1691,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4322"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4336"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId4322">
+                <label class="lbl-toggle" for="expandableItemId4336">
                     
                     
                 </label>
@@ -1781,7 +1853,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4323"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId4337"> 
                     
                 </input>
 
@@ -3192,22 +3264,24 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Task</span>(<a href="orionis.console.fluent.contracts.task.ITask.html" class="internal-link" title="orionis.console.fluent.contracts.task.ITask">ITask</a>): <a href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L24" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.fluent.Task.__init__">Task(signature, args, kwargs, purpose)</a></code></p><p><a href="classIndex.html#orionis.console.fluent.Task">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Task</span>(<a href="orionis.console.fluent.contracts.task.ITask.html" class="internal-link" title="orionis.console.fluent.contracts.task.ITask">ITask</a>): <a href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L24" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.console.fluent.Task.__init__">Task(signature, args, kwargs, purpose)</a></code></p><p><a href="classIndex.html#orionis.console.fluent.Task">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Configure scheduled command execution with fluent scheduling options.</p></div>
+          <div><p>Configure a command's schedule, execution limits, and listeners.</p>
+<p>The task captures the application timezone when it is constructed.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id444">
+          <table class="children sortable" id="id446">
   
   
   <tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__datetime" class="internal-link" title="orionis.console.fluent.Task.__datetime">__datetime</a></code></td>
-    <td>Create a datetime instance from individual date and time components.</td>
+    <td>Resolve date and time components in the task's timezone.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -3855,7 +3929,7 @@ integer.</tt>.</td>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__datetime</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">year: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">month: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">day: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L144">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L148">
       
       (source)
     </a>
@@ -3867,10 +3941,7 @@ integer.</tt>.</td>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Create a datetime instance from individual date and time components.</p>
-<p>Validates all input parameters and constructs a datetime object using
-the provided year, month, day, hour, minute, and second values.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">year:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The year component.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">month:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The month component (1-12).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">day:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The day component (1-31).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hour:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">The hour component (0-23). Default is 0.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">minute:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">The minute component (0-59). Default is 0.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">second:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">The second component (0-59). Default is 0.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime.datetime</a></code></td><td class="fieldArgDesc">A datetime instance constructed from the provided components.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If year, month, day, hour, minute, or second are not integers.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If hour, minute, or second are outside their valid ranges.</td></tr></table></div>
+    <div><p>Resolve date and time components in the task's timezone.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">year:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The year component.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">month:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The month component (1-12).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">day:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></td><td class="fieldArgDesc">The day component (1-31).</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">hour:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">The hour component (0-23). Default is 0.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">minute:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">The minute component (0-59). Default is 0.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">second:</span><code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a>, <em>optional</em></code></td><td class="fieldArgDesc">The second component (0-59). Default is 0.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/datetime.html#datetime.datetime" class="intersphinx-link">datetime.datetime</a></code></td><td class="fieldArgDesc">Local datetime at the first occurrence of the supplied wall time.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If year, month, day, hour, minute, or second are not integers.</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#ValueError" class="intersphinx-link">ValueError</a></code></td><td>If the date or time is invalid or falls in a gap during a clock change.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -3885,7 +3956,7 @@ the provided year, month, day, hour, minute, and second values.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">signature: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">args: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">kwargs: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">purpose: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L51">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L55">
       
       (source)
     </a>
@@ -3917,7 +3988,7 @@ coalesce flag.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__setTrigger</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">trigger: <code>CronTrigger | DateTrigger | IntervalTrigger</code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">allow_jitter: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L230">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L237">
       
       (source)
     </a>
@@ -3944,7 +4015,7 @@ coalesce flag.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">coalesce</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">coalesce: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L355">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L362">
       
       (source)
     </a>
@@ -3972,7 +4043,7 @@ missed executions are run in sequence. Default is True.</td></tr></table><table 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">cron</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">year: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">month: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">day: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">week: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">day_of_week: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3578">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3585">
       
       (source)
     </a>
@@ -3999,7 +4070,7 @@ missed executions are run in sequence. Default is True.</td></tr></table><table 
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">daily</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2475">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2482">
       
       (source)
     </a>
@@ -4030,7 +4101,7 @@ Apply random delay (jitter) if configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">dailyAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2509">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2516">
       
       (source)
     </a>
@@ -4060,7 +4131,7 @@ daily execution at the specified time. Store a description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">endDate</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">year: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">month: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">day: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L500">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L507">
       
       (source)
     </a>
@@ -4087,7 +4158,7 @@ daily execution at the specified time. Store a description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">entity</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">random_delay: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = 0, </span><span class="rst-sig-param">max_instances: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = 1, </span><span class="rst-sig-param">misfire_grace_time: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = 0, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">coalesce: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a></span>) -&gt; <code>TaskEntity</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L262">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L269">
       
       (source)
     </a>
@@ -4130,7 +4201,7 @@ Exact schedules retain zero delay. Defaults to 0.</td></tr><tr><td class="fieldA
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">every</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">weeks: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">days: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">hours: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">minutes: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3490">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3497">
       
       (source)
     </a>
@@ -4161,7 +4232,7 @@ Sets up an IntervalTrigger with the specified intervals.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyDays</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">days: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2577">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2584">
       
       (source)
     </a>
@@ -4192,7 +4263,7 @@ random delay (jitter) if set.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyDaysAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">days: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2621">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2628">
       
       (source)
     </a>
@@ -4222,7 +4293,7 @@ for the specified interval and time. Returns True if scheduling was configured.<
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyEightHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2253">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2260">
       
       (source)
     </a>
@@ -4252,7 +4323,7 @@ Return True if scheduling was configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyEightHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2270">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2277">
       
       (source)
     </a>
@@ -4282,7 +4353,7 @@ Return True if scheduling was configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyElevenHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2386">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2393">
       
       (source)
     </a>
@@ -4312,7 +4383,7 @@ Returns True if scheduling was configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyElevenHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2403">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2410">
       
       (source)
     </a>
@@ -4342,7 +4413,7 @@ Returns True if scheduling was configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyEvenHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1819">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1826">
       
       (source)
     </a>
@@ -4374,7 +4445,7 @@ delay
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFifteenMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1273">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1280">
       
       (source)
     </a>
@@ -4405,7 +4476,7 @@ set, it is applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFifteenMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1291">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1298">
       
       (source)
     </a>
@@ -4437,7 +4508,7 @@ it targets an exact second.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFifteenSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L871">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L878">
       
       (source)
     </a>
@@ -4469,7 +4540,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiftyFiveMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1642">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1649">
       
       (source)
     </a>
@@ -4500,7 +4571,7 @@ an IntervalTrigger. The schedule can be restricted by <tt class="rst-docutils rs
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiftyFiveMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1661">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1668">
       
       (source)
     </a>
@@ -4534,7 +4605,7 @@ event should be executed.</td></tr></table><table class="fieldTable"><tr class="
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiftyFiveSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1020">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1027">
       
       (source)
     </a>
@@ -4565,7 +4636,7 @@ and <tt class="rst-docutils rst-literal">end_date</tt>. If a random delay (jitte
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiftyMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1595">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1602">
       
       (source)
     </a>
@@ -4597,7 +4668,7 @@ If a random delay (jitter) is set, it is applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiftyMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1615">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1622">
       
       (source)
     </a>
@@ -4629,7 +4700,7 @@ since it targets an exact second.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiftySeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1002">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1009">
       
       (source)
     </a>
@@ -4660,7 +4731,7 @@ IntervalTrigger. The scheduling window can be restricted by <tt class="rst-docut
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiveDays</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2827">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2834">
       
       (source)
     </a>
@@ -4691,7 +4762,7 @@ window can be restricted by <tt class="rst-docutils rst-literal">start_date</tt>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiveDaysAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2845">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2852">
       
       (source)
     </a>
@@ -4721,7 +4792,7 @@ window can be restricted by <tt class="rst-docutils rst-literal">start_date</tt>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiveHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2117">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2124">
       
       (source)
     </a>
@@ -4754,7 +4825,7 @@ will be applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiveHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2137">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2144">
       
       (source)
     </a>
@@ -4784,7 +4855,7 @@ will be applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiveMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1186">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1193">
       
       (source)
     </a>
@@ -4815,7 +4886,7 @@ IntervalTrigger. The scheduling window can be restricted by <tt class="rst-docut
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiveMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1204">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1211">
       
       (source)
     </a>
@@ -4847,7 +4918,7 @@ since it targets an exact second.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFiveSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L834">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L841">
       
       (source)
     </a>
@@ -4879,7 +4950,7 @@ using an <tt class="rst-docutils rst-literal">IntervalTrigger</tt>. The scheduli
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFortyFiveMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1548">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1555">
       
       (source)
     </a>
@@ -4910,7 +4981,7 @@ an IntervalTrigger. The schedule can be restricted by <tt class="rst-docutils rs
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFortyFiveMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1567">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1574">
       
       (source)
     </a>
@@ -4942,7 +5013,7 @@ an exact second.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFortyFiveSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L983">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L990">
       
       (source)
     </a>
@@ -4974,7 +5045,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFortyMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1502">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1509">
       
       (source)
     </a>
@@ -5006,7 +5077,7 @@ If a random delay (jitter) is set, it is applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFortyMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1522">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1529">
       
       (source)
     </a>
@@ -5038,7 +5109,7 @@ since it targets an exact second.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFortySeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L964">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L971">
       
       (source)
     </a>
@@ -5070,7 +5141,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFourDays</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2787">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2794">
       
       (source)
     </a>
@@ -5097,7 +5168,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFourDaysAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2801">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2808">
       
       (source)
     </a>
@@ -5124,7 +5195,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFourHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2070">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2077">
       
       (source)
     </a>
@@ -5157,7 +5228,7 @@ will be applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFourHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2090">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2097">
       
       (source)
     </a>
@@ -5187,7 +5258,7 @@ will be applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyFridayAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3222">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3229">
       
       (source)
     </a>
@@ -5217,7 +5288,7 @@ Fridays at the specified time. Stores a description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hours: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1853">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1860">
       
       (source)
     </a>
@@ -5249,7 +5320,7 @@ and random delay (jitter) if set.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hours: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1900">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1907">
       
       (source)
     </a>
@@ -5279,7 +5350,7 @@ with the specified interval and time.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyMinuteAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1082">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1089">
       
       (source)
     </a>
@@ -5313,7 +5384,7 @@ at the specified second of every minute. Ignore any previously set jitter.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minutes: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1038">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1045">
       
       (source)
     </a>
@@ -5344,7 +5415,7 @@ random delay (jitter) if set.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minutes: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1130">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1137">
       
       (source)
     </a>
@@ -5374,7 +5445,7 @@ specified second of every N-minute interval. Returns True if scheduling is set.<
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyMondayAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2969">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2976">
       
       (source)
     </a>
@@ -5405,7 +5476,7 @@ ranges.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyNineHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2297">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2304">
       
       (source)
     </a>
@@ -5435,7 +5506,7 @@ Returns True if scheduling was configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyNineHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2314">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2321">
       
       (source)
     </a>
@@ -5465,7 +5536,7 @@ Returns True if scheduling was configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyOddHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1785">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1792">
       
       (source)
     </a>
@@ -5497,7 +5568,7 @@ delay
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySaturdayAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3283">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3290">
       
       (source)
     </a>
@@ -5527,7 +5598,7 @@ Saturdays at the specified time. Store a description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L775">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L782">
       
       (source)
     </a>
@@ -5558,7 +5629,7 @@ True if scheduling is configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySevenDays</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2922">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2929">
       
       (source)
     </a>
@@ -5589,7 +5660,7 @@ window can be restricted by <tt class="rst-docutils rst-literal">start_date</tt>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySevenDaysAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2940">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2947">
       
       (source)
     </a>
@@ -5619,7 +5690,7 @@ window can be restricted by <tt class="rst-docutils rst-literal">start_date</tt>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySevenHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2208">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2215">
       
       (source)
     </a>
@@ -5650,7 +5721,7 @@ configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySevenHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2226">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2233">
       
       (source)
     </a>
@@ -5680,7 +5751,7 @@ configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySixDays</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2874">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2881">
       
       (source)
     </a>
@@ -5712,7 +5783,7 @@ configured, it is applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySixDaysAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2893">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2900">
       
       (source)
     </a>
@@ -5742,7 +5813,7 @@ configured, it is applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySixHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2164">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2171">
       
       (source)
     </a>
@@ -5772,7 +5843,7 @@ Returns True if scheduling was configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySixHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2181">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2188">
       
       (source)
     </a>
@@ -5802,7 +5873,7 @@ Returns True if scheduling was configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everySundayAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3345">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3352">
       
       (source)
     </a>
@@ -5832,7 +5903,7 @@ Sundays at the specified time. Store a description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTenHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2341">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2348">
       
       (source)
     </a>
@@ -5863,7 +5934,7 @@ Applies random delay (jitter) if configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTenHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2359">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2366">
       
       (source)
     </a>
@@ -5893,7 +5964,7 @@ Applies random delay (jitter) if configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTenMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1230">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1237">
       
       (source)
     </a>
@@ -5924,7 +5995,7 @@ IntervalTrigger. The scheduling window can be restricted by <tt class="rst-docut
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTenMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1248">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1255">
       
       (source)
     </a>
@@ -5955,7 +6026,7 @@ The scheduling window can be restricted by <tt class="rst-docutils rst-literal">
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTenSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L853">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L860">
       
       (source)
     </a>
@@ -5986,7 +6057,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThirtyFiveMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1453">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1460">
       
       (source)
     </a>
@@ -6017,7 +6088,7 @@ using an <tt class="rst-docutils rst-literal">IntervalTrigger</tt>. The schedule
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThirtyFiveMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1472">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1479">
       
       (source)
     </a>
@@ -6049,7 +6120,7 @@ using an <tt class="rst-docutils rst-literal">IntervalTrigger</tt>. The schedule
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThirtyFiveSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L945">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L952">
       
       (source)
     </a>
@@ -6081,7 +6152,7 @@ thirty-five seconds.</td></tr></table></div>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThirtyMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1406">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1413">
       
       (source)
     </a>
@@ -6113,7 +6184,7 @@ If a random delay (jitter) is set, it is applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThirtyMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1426">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1433">
       
       (source)
     </a>
@@ -6146,7 +6217,7 @@ exact second.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThirtySeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L927">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L934">
       
       (source)
     </a>
@@ -6177,7 +6248,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThreeDays</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2742">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2749">
       
       (source)
     </a>
@@ -6206,7 +6277,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThreeDaysAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2758">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2765">
       
       (source)
     </a>
@@ -6236,7 +6307,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThreeHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2022">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2029">
       
       (source)
     </a>
@@ -6269,7 +6340,7 @@ will be applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThreeHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2042">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2049">
       
       (source)
     </a>
@@ -6300,7 +6371,7 @@ used.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyThursdayAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3160">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3167">
       
       (source)
     </a>
@@ -6330,7 +6401,7 @@ Thursdays at the specified time. Stores a description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTuesdayAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3036">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3043">
       
       (source)
     </a>
@@ -6360,7 +6431,7 @@ Tuesdays at the specified time. Stores a description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwelveHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2430">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2437">
       
       (source)
     </a>
@@ -6391,7 +6462,7 @@ Applies random delay (jitter) if configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwelveHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2448">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2455">
       
       (source)
     </a>
@@ -6421,7 +6492,7 @@ Applies random delay (jitter) if configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwentyFiveMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1362">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1369">
       
       (source)
     </a>
@@ -6453,7 +6524,7 @@ applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwentyFiveMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1382">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1389">
       
       (source)
     </a>
@@ -6483,7 +6554,7 @@ minute interval. The schedule can be limited by <tt class="rst-docutils rst-lite
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwentyFiveSeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L909">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L916">
       
       (source)
     </a>
@@ -6514,7 +6585,7 @@ an IntervalTrigger. The schedule can be restricted by <tt class="rst-docutils rs
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwentyMinutes</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1317">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1324">
       
       (source)
     </a>
@@ -6545,7 +6616,7 @@ using an IntervalTrigger. The schedule can be limited by <tt class="rst-docutils
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwentyMinutesAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1336">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1343">
       
       (source)
     </a>
@@ -6577,7 +6648,7 @@ since it targets an exact second.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwentySeconds</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L890">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L897">
       
       (source)
     </a>
@@ -6609,7 +6680,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwoDays</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2697">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2704">
       
       (source)
     </a>
@@ -6638,7 +6709,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwoDaysAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L2713">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2720">
       
       (source)
     </a>
@@ -6668,7 +6739,7 @@ If a random delay (jitter) is set, it is not applied.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwoHours</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1976">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1983">
       
       (source)
     </a>
@@ -6700,7 +6771,7 @@ it will be applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyTwoHoursAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1995">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L2002">
       
       (source)
     </a>
@@ -6730,7 +6801,7 @@ it will be applied to the trigger.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyWednesdayAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3098">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3105">
       
       (source)
     </a>
@@ -6760,7 +6831,7 @@ Wednesdays at the specified time. Stores a description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">everyWeeks</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">weeks: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3442">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3449">
       
       (source)
     </a>
@@ -6791,7 +6862,7 @@ the scheduling was successfully configured.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hourly</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1688">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1695">
       
       (source)
     </a>
@@ -6823,7 +6894,7 @@ hourly intervals.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hourlyAt</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L1721">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L1728">
       
       (source)
     </a>
@@ -6854,7 +6925,7 @@ second. Store a human-readable description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">maxInstances</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">max_instances: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L594">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L601">
       
       (source)
     </a>
@@ -6881,7 +6952,7 @@ second. Store a human-readable description of the schedule.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">misfireGraceTime</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 60</span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L380">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L387">
       
       (source)
     </a>
@@ -6909,7 +6980,7 @@ integer greater than zero. Default is 60.</td></tr></table><table class="fieldTa
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">on</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">event: <code>TaskEvent</code>, </span><span class="rst-sig-param">callback: <code>Callable[<wbr></wbr>[<wbr></wbr>TaskEventEntity], <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L622">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L629">
       
       (source)
     </a>
@@ -6936,7 +7007,7 @@ integer greater than zero. Default is 60.</td></tr></table><table class="fieldTa
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">onceAt</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">year: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">month: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">day: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L701">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L708">
       
       (source)
     </a>
@@ -6968,7 +7039,7 @@ a DateTrigger for one-time execution.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">purpose</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">purpose: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L414">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L421">
       
       (source)
     </a>
@@ -6996,7 +7067,7 @@ non-empty string.</td></tr></table><table class="fieldTable"><tr class="fieldSta
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">randomDelay</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">max_seconds: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 10</span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L545">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L552">
       
       (source)
     </a>
@@ -7024,7 +7095,7 @@ Default is 10.</td></tr></table><table class="fieldTable"><tr class="fieldStart"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">registerListener</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">listener: <code>BaseTaskListener</code></span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L663">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L670">
       
       (source)
     </a>
@@ -7051,7 +7122,7 @@ Default is 10.</td></tr></table><table class="fieldTable"><tr class="fieldStart"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">startDate</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">year: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">month: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">day: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code>, </span><span class="rst-sig-param">hour: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">minute: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0, </span><span class="rst-sig-param">second: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 0</span>) -&gt; <code>Self</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L448">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L455">
       
       (source)
     </a>
@@ -7078,7 +7149,7 @@ Default is 10.</td></tr></table><table class="fieldTable"><tr class="fieldStart"
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">weekly</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L3406">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L3413">
       
       (source)
     </a>
@@ -7109,7 +7180,7 @@ configured, it is applied to the trigger.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_ERROR_MSG_INVALID_HOUR</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L40">
       
       (source)
     </a>
@@ -7136,7 +7207,7 @@ configured, it is applied to the trigger.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_ERROR_MSG_INVALID_INTERVAL</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L27">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L31">
       
       (source)
     </a>
@@ -7164,7 +7235,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_ERROR_MSG_INVALID_MINUTE</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L32">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L36">
       
       (source)
     </a>
@@ -7191,7 +7262,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_ERROR_MSG_INVALID_SECOND</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L34">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L38">
       
       (source)
     </a>
@@ -7218,7 +7289,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">_LISTENER_METHODS_MAP</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr>TaskEvent]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L40">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L44">
       
       (source)
     </a>
@@ -7251,7 +7322,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__allows_jitter</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L119">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L123">
       
       (source)
     </a>
@@ -7278,7 +7349,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__args</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>] | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L91">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L95">
       
       (source)
     </a>
@@ -7305,7 +7376,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__coalesce</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L141">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L145">
       
       (source)
     </a>
@@ -7332,7 +7403,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__default_tz</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L83">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L87">
       
       (source)
     </a>
@@ -7359,7 +7430,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__details</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L123">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L127">
       
       (source)
     </a>
@@ -7386,7 +7457,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__end_date</span>: <code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L112">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L116">
       
       (source)
     </a>
@@ -7413,7 +7484,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__kwargs</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L100">
       
       (source)
     </a>
@@ -7440,7 +7511,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__listeners</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a>[<wbr></wbr>TaskEvent, <wbr></wbr>Callable[<wbr></wbr>[<wbr></wbr>TaskEventEntity], <wbr></wbr><a href="https://docs.python.org/3/builtins/functions.html#object" class="intersphinx-link">object</a>]]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L127">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L131">
       
       (source)
     </a>
@@ -7467,7 +7538,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__max_instances</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L133">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L137">
       
       (source)
     </a>
@@ -7494,7 +7565,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__misfire_grace_time</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L137">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L141">
       
       (source)
     </a>
@@ -7521,7 +7592,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__purpose</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L100">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L104">
       
       (source)
     </a>
@@ -7548,7 +7619,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__random_delay</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L104">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L108">
       
       (source)
     </a>
@@ -7575,7 +7646,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__signature</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L87">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L91">
       
       (source)
     </a>
@@ -7602,7 +7673,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__start_date</span>: <code><a href="https://docs.python.org/3/library/datetime.html#module-datetime" class="intersphinx-link">datetime</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L112">
       
       (source)
     </a>
@@ -7629,7 +7700,7 @@ integer.</tt>.</p></div>
   <div class="functionHeader">
     
     <span class="py-defname">__trigger</span>: <code>CronTrigger | DateTrigger | IntervalTrigger | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/console/fluent/task.py#L116">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/console/fluent/task.py#L120">
       
       (source)
     </a>
@@ -7655,7 +7726,7 @@ integer.</tt>.</p></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 07:49:38.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 11:52:04.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

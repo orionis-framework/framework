@@ -1,6 +1,8 @@
 # ruff: noqa: PT009, PT027, SLF001
 # Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
+from datetime import UTC, datetime
+from unittest.mock import patch
 from sqlalchemy.dialects import registry as sqlalchemy_registry
 from orionis.database.compiler import SQLCompiler
 from orionis.database.exceptions import QueryException
@@ -45,6 +47,7 @@ from orionis.orm.schema.types import (
     Uuid,
 )
 from orionis.test import TestCase
+from orionis.support.facades.datetime import DateTime as ApplicationDateTime
 
 from typing import TYPE_CHECKING
 
@@ -71,6 +74,12 @@ def _make_table() -> TableDefinition:
 
 
 class TestSQLCompiler(TestCase):
+    """
+    Verify SQL compilation for Orionis query plans.
+
+    Inspect compiled statements and DDL across supported dialects.
+    """
+
     def setUp(self) -> None:
         """Create a fresh compiler and table definition per test.
 
@@ -626,6 +635,109 @@ class TestSQLCompiler(TestCase):
             self.assertIn(key, ddl)
         self.assertIn("varchar(50)", ddl)
         self.assertIn("decimal(10, 2)", ddl)
+
+    def testMysqlTimestampsRetainMicroseconds(self) -> None:
+        """
+        Compile temporal MySQL columns with Python's full datetime precision.
+
+        Returns
+        -------
+        None
+            Verify six fractional digits in generated MySQL temporal columns.
+        """
+        columns = {"created": DateTime(), "updated": StrictTimestamp(timezone=True)}
+        table = TableDefinition(name="temporal", columns=columns)
+        ddl = self._compiler.compileCreateTable(table).compile(
+            dialect=sqlalchemy_registry.load("mysql")(),
+        )
+        self.assertIn("DATETIME(6)", str(ddl))
+        self.assertIn("TIMESTAMP(6)", str(ddl))
+
+    def testOracleZonedTimestampBindsAndReadsUtc(self) -> None:
+        """
+        Preserve offset instants, application-local input and SQL NULL.
+
+        Check both SQLAlchemy processors without requiring an Oracle connection.
+        """
+        dialect = sqlalchemy_registry.load("oracle")()
+        timestamp = self._compiler._sqlType(StrictTimestamp(timezone=True))
+        oracle_type = timestamp.dialect_impl(dialect)
+        bind = oracle_type.bind_processor(dialect)
+        read = oracle_type.result_processor(dialect, None)
+        offset_value = datetime.fromisoformat("2025-02-02T07:04:05.123456-03:30")
+        utc = datetime.fromisoformat("2025-02-02T10:34:05.123456+00:00")
+        native = utc.replace(tzinfo=None)
+        self.assertEqual(bind(offset_value), native)
+        with patch.object(
+            ApplicationDateTime, "getTimezone", return_value="Asia/Tokyo",
+        ):
+            tokyo_wall = utc.replace(hour=19, tzinfo=None)
+            self.assertEqual(bind(tokyo_wall), native)
+        self.assertEqual(read(native), utc)
+        self.assertIs(read(native).tzinfo, UTC)
+        self.assertIsNone(bind(None))
+        self.assertIsNone(read(None))
+
+    def testOracleZonedTimestampCompilesWritesFiltersAndProjections(self) -> None:
+        """
+        Compile UTC conversion for timestamps in writes, filters and projections.
+
+        Check expanded IN literals and extraction around nested unions.
+        """
+        dialect = sqlalchemy_registry.load("oracle")()
+        table = TableDefinition(
+            name="moments", columns={"seen": StrictTimestamp(timezone=True)},
+        )
+        value = datetime.fromisoformat("2025-02-02T07:04:05.123456-03:30")
+        insert = self._compiler.compileInsert(
+            InsertPlan(table=table, values=[{"seen": value}]),
+        )
+        sql = str(insert.compile(dialect=dialect)).lower()
+        self.assertIn("from_tz(cast(:seen as timestamp), '+00:00')", sql)
+        plan = SelectPlan(table=table, columns=("seen",))
+        plan.wheres.append(
+            WhereClause(column="seen", where_type=WhereType.IN, value=(value, value)),
+        )
+        statement = self._compiler.compileSelect(plan)
+        literal = str(statement.compile(
+            dialect=dialect, compile_kwargs={"literal_binds": True},
+        )).lower()
+        self.assertEqual(literal.count("2025-02-02 10:34:05.123456"), 2)
+        self.assertEqual(literal.count("'+00:00'"), 2)
+        compound = statement.union_all(statement).subquery()
+        sql = str(compound.select().compile(dialect=dialect)).lower()
+        self.assertEqual(sql.count("sys_extract_utc("), 1)
+        self.assertIn("union all", sql)
+
+    def testOracleZonedTimestampPreservesTemporalColumnTypes(self) -> None:
+        """
+        Keep Oracle DATE, plain TIMESTAMP and other dialects' DDL compatible.
+
+        Check the physical storage types emitted for the same column definitions.
+        """
+        columns = {
+            "seen": StrictTimestamp(timezone=True),
+            "wall": StrictTimestamp(),
+            "legacy": DateTime(timezone=True),
+        }
+        ddl = self._compiler.compileCreateTable(
+            TableDefinition(name="moments", columns=columns),
+        )
+        for dialect_name, fragments in (
+            ("oracle", (
+                "seen TIMESTAMP WITH TIME ZONE", "wall TIMESTAMP NOT NULL",
+                "legacy DATE",
+            )),
+            ("postgresql", (
+                "seen TIMESTAMP WITH TIME ZONE", "wall TIMESTAMP WITHOUT TIME ZONE",
+            )),
+            ("mysql", ("seen TIMESTAMP(6)", "wall TIMESTAMP(6)", "legacy DATETIME(6)")),
+            ("sqlite", ("seen TIMESTAMP", "wall TIMESTAMP", "legacy DATETIME")),
+        ):
+            with self.subTest(dialect=dialect_name):
+                sql = str(ddl.compile(dialect=sqlalchemy_registry.load(dialect_name)()))
+                for fragment in fragments:
+                    self.assertIn(fragment, sql)
 
     def testForeignKeyAppearsInDdlWithPrefix(self) -> None:
         """Emit prefixed foreign key references in the DDL.

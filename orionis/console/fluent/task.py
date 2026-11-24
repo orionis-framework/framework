@@ -5,14 +5,14 @@
 from __future__ import annotations
 import secrets
 from copy import copy
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, ClassVar, Self
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from orionis.console.base.listener import BaseTaskListener
 from orionis.console.entities.task import Task as TaskEntity
 from orionis.console.enums.events import TaskEvent
+from orionis.console.fluent._calendar import CalendarCronTrigger as CronTrigger
 from orionis.console.fluent.contracts.task import ITask
 from orionis.support.facades.datetime import DateTime
 
@@ -22,7 +22,11 @@ if TYPE_CHECKING:
 
 
 class Task(ITask):
-    """Configure scheduled command execution with fluent scheduling options."""
+    """
+    Configure a command's schedule, execution limits, and listeners.
+
+    The task captures the application timezone when it is constructed.
+    """
 
     _ERROR_MSG_INVALID_INTERVAL = "Interval value must be a positive integer."
     """
@@ -151,10 +155,7 @@ class Task(ITask):
         second: int = 0,
     ) -> datetime:
         """
-        Create a datetime instance from individual date and time components.
-
-        Validates all input parameters and constructs a datetime object using
-        the provided year, month, day, hour, minute, and second values.
+        Resolve date and time components in the task's timezone.
 
         Parameters
         ----------
@@ -174,14 +175,14 @@ class Task(ITask):
         Returns
         -------
         datetime.datetime
-            A datetime instance constructed from the provided components.
+            Local datetime at the first occurrence of the supplied wall time.
 
         Raises
         ------
         TypeError
             If year, month, day, hour, minute, or second are not integers.
         ValueError
-            If hour, minute, or second are outside their valid ranges.
+            If the date or time is invalid or falls in a gap during a clock change.
         """
         # Validate that year, month, and day are integers.
         if (
@@ -216,8 +217,8 @@ class Task(ITask):
             error_msg = self._ERROR_MSG_INVALID_SECOND
             raise ValueError(error_msg)
 
-        # Construct and return a datetime instance.
-        return datetime(
+        # An explicit ambiguous time selects its first occurrence (fold=0).
+        local = datetime(
             year=year,
             month=month,
             day=day,
@@ -226,6 +227,12 @@ class Task(ITask):
             second=second,
             tzinfo=self.__default_tz,
         )
+        if local.astimezone(UTC).astimezone(self.__default_tz) != local:
+            message = (
+                f"Local time {local.isoformat()} does not exist in {self.__default_tz}."
+            )
+            raise ValueError(message)
+        return local
 
     def __setTrigger(
         self,

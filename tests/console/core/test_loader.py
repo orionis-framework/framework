@@ -198,6 +198,30 @@ class TestLoader(TestCase):
 
         self.assertEqual(self.mock_app.compiledInvalidationPathsFiles, [app_source])
 
+    def testRefreshesCachedArgumentsAfterFrameworkUpgrade(self) -> None:
+        """Invalidate command definitions saved by an earlier framework release.
+
+        Returns
+        -------
+        None
+            Both legacy definitions and definitions from a prior version expire.
+        """
+        self.mock_app.compiled = True
+        metadata = self.mock_app.compiledPath.parent / "framework.py"
+        definition = {"clear:cache": {"arguments": []}}
+        with patch("orionis.console.core.loader._FRAMEWORK_METADATA_PATH", metadata):
+            # A cache from before metadata tracking has only the old source hash.
+            Loader(self.mock_app)._Loader__persistence.save(definition)
+            metadata.write_text('VERSION = "1.8.1"\n', encoding="utf-8")
+            upgraded = Loader(self.mock_app)._Loader__persistence
+            self.assertIsNone(upgraded.get())
+            upgraded.save(definition)
+            unchanged = Loader(self.mock_app)._Loader__persistence
+            self.assertEqual(unchanged.get(), definition)
+
+            metadata.write_text('VERSION = "1.10.0"\n', encoding="utf-8")
+            self.assertIsNone(Loader(self.mock_app)._Loader__persistence.get())
+
     def testInitializationWithoutCache(self) -> None:
         """Verify that Loader initializes correctly without cache.
 

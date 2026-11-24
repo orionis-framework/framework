@@ -40,7 +40,11 @@ def abstract_registration(_self: ServiceProvider) -> None:
 
 
 class TestApplicationDiscovery(TestCase):
-    """Verify module ownership and provider availability during startup."""
+    """
+    Verify module ownership and provider availability during startup.
+
+    Inspect the registry as eager providers are registered.
+    """
 
     def testDiscoverProvidersRegistersEachOwnedClassOnce(self) -> None:
         """Register discovered providers in stable order without reexports.
@@ -89,7 +93,8 @@ class TestApplicationDiscovery(TestCase):
         self.assertEqual(seen, [alpha, beta])
 
     def testLoadPublishesDeferredProvidersBeforeEagerRegistration(self) -> None:
-        """Expose deferred service metadata during eager provider registration.
+        """
+        Verify that eager providers can access the deferred provider registry.
 
         Returns
         -------
@@ -103,17 +108,19 @@ class TestApplicationDiscovery(TestCase):
         observed: list[object] = []
 
         def resolve_eager_provider() -> None:
-            """Capture deferred metadata during eager registration.
+            """
+            Capture deferred metadata during eager registration.
 
             Returns
             -------
             None
-                Appends the visible provider registry.
+                Append the visible provider registry to the observations.
             """
             observed.append(app._deferred_providers)
 
         app._Application__resolveEagerProvider = resolve_eager_provider
-        app._Application__load()
+        with patch.object(app, "_Application__setTimezoneAndLocale"):
+            app._Application__load()
         self.assertEqual(observed, [deferred])
 
     def testLoadedConfigurationSeparatesCallerOwnedContainers(self) -> None:

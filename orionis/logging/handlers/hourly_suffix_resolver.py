@@ -1,69 +1,63 @@
 """Resolve log suffixes for hourly rotation windows."""
 
 from __future__ import annotations
-from datetime import datetime, timedelta
-from orionis.logging.contracts.suffix_resolver import SuffixResolver
-from orionis.support.facades.datetime import DateTime
+from datetime import UTC, datetime, timedelta
+from orionis.logging.handlers._local import ApplicationTimeResolver
 
 
-class HourlySuffixResolver(SuffixResolver):
-    """Resolve log suffixes for hourly rotation windows."""
+class HourlySuffixResolver(ApplicationTimeResolver):
+    """
+    Group log files by local hour and distinguish repeated hours.
 
-    __slots__ = ("tz",)
+    The second occurrence of an hour includes its UTC offset in the filename.
+    """
+
+    __slots__ = ()
     """Declare the instance attribute slots reserved by this class."""
-
-    def __init__(self) -> None:
-        """
-        Initialize the HourlySuffixResolver.
-
-        Returns
-        -------
-        None
-            This method does not return a value.
-        """
-        self.tz = DateTime.getZoneInfo()
-        """Tz produced by ``DateTime.getZoneInfo``."""
 
     def getSuffix(self, dt: datetime | None = None) -> str:
         """
-        Generate a suffix string for the given datetime in hourly format.
+        Build the hourly suffix in the resolver's timezone.
 
         Parameters
         ----------
         dt : datetime.datetime or None, optional
-            The datetime object to generate the suffix for. If None, uses the
-            current local datetime.
+            Aware instant, naive local wall time, or None for the current time.
 
         Returns
         -------
         str
-            The formatted suffix string in the form 'YYYY-MM-DD_HH'.
+            The local hour as ``YYYY-MM-DD_HH``, with an offset on a repeated hour.
         """
         # Use current local datetime if dt is not provided
-        if dt is None:
-            dt = datetime.now(tz=self.tz)
-        return dt.strftime("%Y-%m-%d_%H")
+        dt = self._local(dt)
+        return dt.strftime("%Y-%m-%d_%H_%z" if dt.fold else "%Y-%m-%d_%H")
 
     def getNextRotationTime(self, current_time: datetime) -> datetime:
         """
-        Calculate the next rotation time rounded to the next hour.
+        Find the next hourly rotation boundary.
 
         Parameters
         ----------
         current_time : datetime.datetime
-            The current instant. Naive values use the resolver timezone.
+            Reference instant, interpreted locally when it has no timezone.
 
         Returns
         -------
         datetime.datetime
-            The datetime object representing the next rotation time at the
-            start of the next hour.
+            First instant at which the local hour or its fold changes.
         """
-        local_time = (
-            current_time.replace(tzinfo=self.tz)
-            if current_time.tzinfo is None
-            else current_time.astimezone(self.tz)
-        )
-        return local_time.replace(minute=0, second=0, microsecond=0) + timedelta(
-            hours=1,
-        )
+        local_time = self._local(current_time)
+        start = local_time.astimezone(UTC).replace(microsecond=0)
+        label = (local_time.date(), local_time.hour, local_time.fold)
+        # Search elapsed seconds so half-hour transitions and repeated hours
+        # rotate at the instant when the filename actually changes.
+        low, high = 0, 3600
+        while high - low > 1:
+            middle = (low + high) // 2
+            probe = (start + timedelta(seconds=middle)).astimezone(local_time.tzinfo)
+            if (probe.date(), probe.hour, probe.fold) == label:
+                low = middle
+            else:
+                high = middle
+        return (start + timedelta(seconds=high)).astimezone(local_time.tzinfo)

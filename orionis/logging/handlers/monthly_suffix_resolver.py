@@ -2,86 +2,82 @@
 
 from __future__ import annotations
 from datetime import datetime, time
-from orionis.logging.contracts.suffix_resolver import SuffixResolver
-from orionis.support.facades.datetime import DateTime
+from orionis.logging.handlers._local import ApplicationTimeResolver
 
 _DECEMBER = 12
 """Identify the final month before the calendar year advances."""
 
 
-class MonthlySuffixResolver(SuffixResolver):
-    """Resolve log suffixes for monthly rotation windows."""
+class MonthlySuffixResolver(ApplicationTimeResolver):
+    """
+    Group log files by local calendar month.
 
-    __slots__ = ("at_time", "tz")
+    The monthly boundary falls on the first day at the configured local time.
+    """
+
+    __slots__ = ("at_time",)
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, at_time: time | None = None) -> None:
         """
-        Initialize the resolver with an optional rotation time.
+        Configure the monthly rotation boundary.
 
         Parameters
         ----------
         at_time : datetime.time or None, optional
-            The time of day when rotation should occur. Defaults to midnight.
+            Local rotation time, defaulting to midnight.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Store the local rotation time for the first day of each month.
         """
         self.at_time = at_time or time(0, 0, 0)
         """The time of day when rotation should occur. Defaults to midnight."""
-        self.tz = DateTime.getZoneInfo()
-        """Tz produced by ``DateTime.getZoneInfo``."""
+        super().__init__()
 
     def getSuffix(self, dt: datetime | None = None) -> str:
         """
-        Return the suffix string for the given datetime.
+        Build the suffix for a month in the resolver's timezone.
 
         Parameters
         ----------
         dt : datetime.datetime or None, optional
-            The datetime to generate the suffix for. If None, uses current
-            local datetime.
+            Aware instant, naive local wall time, or None for the current time.
 
         Returns
         -------
         str
-            The suffix in the format 'YYYY-MM'.
+            The local year and month as ``YYYY-MM``.
         """
         # Use current local datetime if none is provided
-        if dt is None:
-            dt = datetime.now(tz=self.tz)
+        dt = self._local(dt)
         return dt.strftime("%Y-%m")
 
     def getNextRotationTime(self, current_time: datetime) -> datetime:
         """
-        Compute the next rotation datetime after the current time.
+        Find the next monthly rotation boundary.
 
         Parameters
         ----------
         current_time : datetime.datetime
-            The current instant. Naive values use the resolver timezone.
+            Reference instant, interpreted locally when it has no timezone.
 
         Returns
         -------
         datetime.datetime
-            The datetime when the next rotation should occur.
+            First future start of a month at the configured local time.
         """
-        local_time = (
-            current_time.replace(tzinfo=self.tz)
-            if current_time.tzinfo is None
-            else current_time.astimezone(self.tz)
-        )
+        local_time = self._local(current_time)
         next_rotation = datetime.combine(
             local_time.date().replace(day=1),
             self.at_time,
-            tzinfo=self.tz,
+            tzinfo=local_time.tzinfo,
         )
-        if next_rotation <= local_time:
+        while not self._upcoming(next_rotation, local_time):
             next_rotation = (
-                next_rotation.replace(year=local_time.year + 1, month=1)
-                if local_time.month == _DECEMBER
-                else next_rotation.replace(month=local_time.month + 1)
+                next_rotation.replace(year=next_rotation.year + 1, month=1)
+                if next_rotation.month == _DECEMBER
+                else next_rotation.replace(month=next_rotation.month + 1)
             )
         return next_rotation

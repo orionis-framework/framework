@@ -117,6 +117,8 @@ Facade targets are configured by their owning modules and resolved from the curr
 
 `DateTime.formatLocal()` converts supplied timestamps, including Pendulum values, to the configured timezone and formats them using the configured locale. `today()`, `tomorrow()`, and `yesterday()` return Pendulum `DateTime` values at midnight. `isToday()` compares dates in the configured timezone, including when the input uses another offset.
 
+`parse()`, `fromFormat()`, `fromDatetime()` and `convertToLocal()` interpret offset-free input in the requested or configured timezone. Inputs carrying an offset keep their instant when converted. For example, in `America/Bogota`, `2026-01-15T00:30` is January 15 at 00:30 and `2026-01-15T00:30Z` is January 14 at 19:30. The `startOf` and `endOf` methods and their day/week/month/year shortcuts calculate boundaries in the requested or configured timezone, including when given a datetime. Offset-free text selects the first occurrence of a repeated hour. A Python datetime can select the second occurrence with `fold=1`.
+
 `Inspire` keeps the supplied nonempty quote list by reference. Later changes to that list affect selection; if it becomes empty, `random()` returns the fallback quote. Callers remain responsible for valid entries added after construction.
 
 ## Integration with Orionis

@@ -2,6 +2,7 @@
 # Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
+from unittest.mock import patch
 from orionis.schemas.rules.after import After
 from orionis.schemas.rules.after_or_equal import AfterOrEqual
 from orionis.schemas.rules.before import Before
@@ -20,6 +21,12 @@ _LATER = datetime(2024, 12, 31, 0, 0, 0)
 
 
 class TestAfter(TestCase):
+    """
+    Exercise date comparisons against literal and sibling references.
+
+    Cover local calendar dates and instants with explicit UTC offsets.
+    """
+
     async def testValueAfterLiteralReferencePasses(self) -> None:
         """Return True when the value comes after the referenced date.
 
@@ -142,6 +149,40 @@ class TestAfter(TestCase):
         rule = After("2024-01-01")
         self.assertTrue(await rule.enforce("born", None, _OWNER))
         self.assertTrue(await rule.enforce("born", 123, _OWNER))
+
+
+    async def testCalendarInputsShareMidnightInTheApplicationZone(self) -> None:
+        """
+        Compare date representations at the same local midnight.
+
+        Returns
+        -------
+        None
+            Verify strict and inclusive comparisons in the application timezone.
+        """
+        with patch.object(DateTime, "_timezone", "America/Bogota"):
+            for value in ("2026-01-15", date(2026, 1, 15), datetime(2026, 1, 15)):
+                after = After("2026-01-15")
+                self.assertFalse(await after.enforce("day", value, _OWNER))
+                by_midnight = BeforeOrEqual("2026-01-15")
+                self.assertTrue(await by_midnight.enforce("day", value, _OWNER))
+
+    async def testOffsetQualifiedTimesDuringRepeatedHour(self) -> None:
+        """
+        Compare both occurrences of a repeated local hour.
+
+        Returns
+        -------
+        None
+            Verify strict and inclusive ordering for instants with different offsets.
+        """
+        first = "2026-11-01T01:30:00-04:00"
+        second = "2026-11-01T01:30:00-05:00"
+        with patch.object(DateTime, "_timezone", "America/New_York"):
+            self.assertTrue(await After(first).enforce("time", second, _OWNER))
+            self.assertTrue(await Before(second).enforce("time", first, _OWNER))
+            self.assertFalse(await AfterOrEqual(second).enforce("time", first, _OWNER))
+            self.assertFalse(await BeforeOrEqual(first).enforce("time", second, _OWNER))
 
 
 class TestAfterOrEqual(TestCase):

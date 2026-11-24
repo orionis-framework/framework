@@ -3,12 +3,14 @@
 
 from __future__ import annotations
 import copy
+from datetime import datetime
 from collections.abc import AsyncIterator, Callable, Iterable
 from typing import Any, Self
 from orionis.database.contracts.connection import IConnection
 from orionis.database.contracts.connection_manager import IConnectionManager
 from orionis.database.entities.result import InsertResult
 from orionis.orm.collections.paginator import Paginator
+from orionis.orm.attributes import DateTimeStorage
 from orionis.orm.exceptions import InvalidQueryException
 from orionis.orm.query.expressions import (
     SUPPORTED_OPERATORS,
@@ -53,25 +55,17 @@ _DEFAULT_TIMESTAMP_COLUMN: str = "created_at"
 
 class QueryBuilderBase:
     """
-    Engine shared by every Orionis query builder.
+    Build query plans for model and table queries.
 
-    It owns the mutable :class:`orionis.orm.query.SelectPlan` and the whole fluent
-    clause
-    surface (projection, conditions, joins, grouping, ordering, paging,
-    locking, unions) plus the terminals that do not depend on how rows
-    are represented. Model-bound and model-less builders both derive
-    from it, so ``DB.table(...)`` and ``Model.query()`` share one single
-    implementation of the query language and one single SQL pipeline.
-
-    Subclasses only provide how the query reaches the database
-    (:meth:`orionis.orm.query.base_builder.QueryBuilderBase._connection`), how rows are
-    represented (``get``/``first``),
-    and how values are serialized before being written.
+    Assemble clauses and execute operations shared by ``DB.table()`` and
+    ``Model.query()``. Subclasses resolve the connection, materialize rows
+    and prepare values for storage.
     """
 
     __slots__ = (
         "_connection_manager",
         "_connection_name",
+        "_datetime_storage",
         "_plan",
         "_resolved_connection",
     )
@@ -93,6 +87,8 @@ class QueryBuilderBase:
         """
         self._connection_name: str | None = None
         """Name of the configured database connection to use."""
+        self._datetime_storage: dict[str, DateTimeStorage] | None = None
+        """Model column storage rules applied to datetime predicates."""
         self._connection_manager: IConnectionManager | None = None
         """Gateway manager retained independently of the process-wide resolver."""
         self._resolved_connection: IConnection | None = None
@@ -2105,6 +2101,41 @@ class QueryBuilderBase:
         )
         return self
 
+    def _filterValue(self, column: str, value: Any) -> Any:
+        """
+        Bind model datetime predicates using the target column's storage rules.
+
+        Parameters
+        ----------
+        column : str
+            Filtered column name, optionally qualified.
+        value : typing.Any
+            Scalar or collection supplied to the predicate.
+
+        Returns
+        -------
+        typing.Any
+            Bound value following the datetime storage rules of the target column.
+
+        Raises
+        ------
+        ValueError
+            If an ISO value for a datetime column is invalid.
+        """
+        if not self._datetime_storage or not isinstance(column, str):
+            return value
+        qualifier, _, name = column.rpartition(".")
+        if qualifier and qualifier not in (self._plan.alias, self._plan.table.name):
+            return value
+        storage = self._datetime_storage.get(name)
+        if storage is None:
+            return value
+        if isinstance(value, tuple):
+            return tuple(self._filterValue(column, item) for item in value)
+        if isinstance(value, (datetime, str, int, float)):
+            return storage.bind(value)
+        return value
+
     def _addTyped(
         self: Self,
         column: str,
@@ -2131,6 +2162,10 @@ class QueryBuilderBase:
         orionis.orm.query.base_builder.QueryBuilderBase
             The same builder, enabling fluent chaining.
         """
+        if where_type in (
+            WhereType.IN, WhereType.NOT_IN, WhereType.BETWEEN, WhereType.NOT_BETWEEN,
+        ):
+            value = self._filterValue(column, value)
         self._plan.wheres.append(
             WhereClause(
                 column=column,
@@ -2350,23 +2385,32 @@ class QueryBuilderBase:
                 error_msg = "Mapping conditions do not accept extra arguments."
                 raise InvalidQueryException(error_msg)
             target.extend(
-                WhereClause(column=key, value=value, boolean=boolean)
+                WhereClause(
+                    column=key, value=self._filterValue(key, value), boolean=boolean,
+                )
                 for key, value in column.items()
             )
             return
 
         if len(args) == 1:
             target.append(
-                WhereClause(column=column, value=args[0], boolean=boolean),
+                WhereClause(
+                    column=column,
+                    value=self._filterValue(column, args[0]),
+                    boolean=boolean,
+                ),
             )
             return
 
         if len(args) == _WHERE_WITH_OPERATOR:
+            operator = self._normalizeOperator(args[0])
             target.append(
                 WhereClause(
                     column=column,
-                    operator=self._normalizeOperator(args[0]),
-                    value=args[1],
+                    operator=operator,
+                    value=args[1]
+                    if "like" in operator
+                    else self._filterValue(column, args[1]),
                     boolean=boolean,
                 ),
             )
@@ -2390,6 +2434,7 @@ class QueryBuilderBase:
             Conditions declared inside the group, in declaration order.
         """
         nested = self._newQuery()
+        nested._datetime_storage = self._datetime_storage
         callback(nested)
         return nested.toPlan().wheres
 

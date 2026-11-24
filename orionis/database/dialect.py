@@ -102,6 +102,9 @@ _MYSQL_STRICT_MODE: str = (
 _MYSQL_RELAXED_MODE: str = "NO_ENGINE_SUBSTITUTION"
 """MySQL relaxed sql_mode applied when strict mode is disabled."""
 
+_MYSQL_UTC_SESSION = "SET SESSION time_zone='+00:00'"
+"""Make MySQL TIMESTAMP conversion independent of the server timezone."""
+
 # SQLite database markers that identify an in-memory database.
 _SQLITE_MEMORY_MARKERS: frozenset[str] = frozenset({":memory:", ""})
 """SQLite database markers that identify an in-memory database."""
@@ -316,6 +319,11 @@ def engine_options(
     -------
     dict
         Options such as pool class and driver connect arguments.
+
+    Raises
+    ------
+    orionis.database.UnsupportedDriverException
+        If the configuration names an unsupported driver.
     """
     driver = resolve_driver(config)
     options: dict[str, Any] = {
@@ -324,13 +332,12 @@ def engine_options(
         "hide_parameters": True,
     }
 
-    if driver == "sqlite":
+    if driver == "sqlite" and _is_sqlite_memory(config):
         # In-memory databases retain one connection with exclusive checkout.
-        if _is_sqlite_memory(config):
-            options["poolclass"] = QueuePool if sync else AsyncAdaptedQueuePool
-            options["pool_size"] = 1
-            options["max_overflow"] = 0
-            options["connect_args"] = {"check_same_thread": False}
+        options["poolclass"] = QueuePool if sync else AsyncAdaptedQueuePool
+        options["pool_size"] = 1
+        options["max_overflow"] = 0
+        options["connect_args"] = {"check_same_thread": False}
         return options
 
     if driver == "redshift":
@@ -344,6 +351,10 @@ def engine_options(
         )
         connect_args["sslmode"] = _enum_value(connect_args["sslmode"])
         options["connect_args"] = connect_args
+        return options
+
+    if driver == "mysql" and sync:
+        options["connect_args"] = {"init_command": _MYSQL_UTC_SESSION}
         return options
 
     if driver == "pgsql":
@@ -442,9 +453,8 @@ def configure_engine(
     """
     Apply driver-specific session settings to a freshly built engine.
 
-    For SQLite this installs a connect hook applying the configured
-    PRAGMA settings; for MySQL it applies the connection charset,
-    collation, and strict mode on every new pooled connection.
+    Apply SQLite PRAGMAs when connecting. Set the timezone, charset,
+    collation and SQL mode for each new MySQL connection.
 
     Parameters
     ----------
@@ -456,7 +466,12 @@ def configure_engine(
     Returns
     -------
     None
-        No return value.
+        Install connection event handlers on the supplied engine.
+
+    Raises
+    ------
+    orionis.database.UnsupportedDriverException
+        If the configuration names an unsupported driver.
     """
     statements = _session_statements(config)
     driver = resolve_driver(config)
@@ -695,9 +710,8 @@ def _mysql_session_commands(config: dict[str, Any]) -> tuple[str, ...]:
     """
     Build the MySQL session commands for a configuration.
 
-    Applies the connection charset and collation through ``SET NAMES``
-    and the strict (or relaxed) ``sql_mode`` preset, mirroring the
-    behavior of mainstream frameworks.
+    Pin TIMESTAMP reads and writes to UTC independently of the server's
+    timezone. Apply the configured charset, collation and SQL mode.
 
     Parameters
     ----------
@@ -709,7 +723,7 @@ def _mysql_session_commands(config: dict[str, Any]) -> tuple[str, ...]:
     tuple of str
         Session commands to run on each new pooled connection.
     """
-    commands: list[str] = []
+    commands = [_MYSQL_UTC_SESSION]
 
     # Charset and collation are validated as identifiers before being
     # embedded; both originate from trusted configuration entities.

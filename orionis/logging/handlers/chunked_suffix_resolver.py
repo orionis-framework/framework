@@ -1,53 +1,52 @@
 """Resolve log suffixes for configured time chunks."""
 
 from __future__ import annotations
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from threading import Lock
-from orionis.logging.contracts.suffix_resolver import SuffixResolver
-from orionis.support.facades.datetime import DateTime
+from orionis.logging.handlers._local import ApplicationTimeResolver
 
 
-class ChunkedSuffixResolver(SuffixResolver):
-    """Resolve log suffixes for configured time chunks."""
+class ChunkedSuffixResolver(ApplicationTimeResolver):
+    """
+    Name size-rotated log chunks with a local timestamp and counter.
 
-    __slots__ = ("_counter", "_lock", "tz")
+    The counter keeps chunks distinct when multiple rotations share a timestamp.
+    """
+
+    __slots__ = ("_counter", "_lock")
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self) -> None:
         """
-        Initialize the ChunkedSuffixResolver.
-
-        Sets up the counter, thread lock, and timezone for suffix generation.
+        Initialize the chunk counter and its lock.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Set up the counter so the first generated suffix uses value one.
         """
         self._counter = 0
         """Counter value used by ``ChunkedSuffixResolver``."""
         self._lock = Lock()
         """Lock protecting concurrent access to shared state."""
-        self.tz = DateTime.getZoneInfo()
-        """Tz produced by ``DateTime.getZoneInfo``."""
+        super().__init__()
 
     def getSuffix(self, dt: datetime | None = None) -> str:
         """
-        Generate a unique suffix for the log file.
+        Build the suffix for a size-rotated chunk in the resolver's timezone.
 
         Parameters
         ----------
         dt : datetime.datetime or None, optional
-            The datetime to use for the suffix. If None, uses current time.
+            Aware instant, naive local wall time, or None for the current time.
 
         Returns
         -------
         str
-            The generated suffix in the format 'YYYYMMDD_HHMMSS_counter'.
+            A local ``YYYYMMDD_HHMMSS`` timestamp and a unique counter.
         """
         # Use current time if no datetime is provided
-        if dt is None:
-            dt = datetime.now(tz=self.tz)
+        dt = self._local(dt)
         with self._lock:
             self._counter += 1
             # Suffix includes timestamp and a zero-padded counter
@@ -55,18 +54,18 @@ class ChunkedSuffixResolver(SuffixResolver):
 
     def getNextRotationTime(self, current_time: datetime) -> datetime:
         """
-        Compute the next rotation time for the log file.
+        Find the fallback rotation boundary.
 
         Parameters
         ----------
         current_time : datetime.datetime
-            The current datetime.
+            Reference instant, interpreted locally when it has no timezone.
 
         Returns
         -------
         datetime.datetime
-            The next rotation time. For size-based rotation, this is
-            current_time plus one hour.
+            Instant one elapsed hour later, expressed in the resolver's timezone.
         """
         # For size-based rotation, return current time plus one hour
-        return current_time + timedelta(hours=1)
+        local = self._local(current_time)
+        return (local.astimezone(UTC) + timedelta(hours=1)).astimezone(local.tzinfo)

@@ -12,6 +12,8 @@ The fingerprint uses absolute paths, `st_mtime_ns`, and file size. It does not h
 
 ### Serialize framework types
 
+For `datetime` and `time` values with a named `ZoneInfo`, the serializer stores the IANA identifier and restores its daylight-saving rules. It preserves `fold` for repeated local times. Older artifacts containing only an ISO offset remain readable with that fixed offset.
+
 `from orionis.cache.serializer import Serializer` exposes `dumps`, `loads`, `dumpToFile`, and `loadFromFile`. Beyond containers and primitives it supports bytes, Path, dates/times, timedelta, Decimal, UUID, complex values, tuples, sets, frozensets, enums, types, and the `MISSING` sentinel. Importable nested enum and type references are supported, and enum values are encoded recursively. It uses `__type__` and `__value__` markers; avoid these names in business mappings that must round-trip unchanged.
 
 This format is for trusted local artifacts. Restoring enums and types can import modules by name: do not deserialize client-supplied payloads or files writable by untrusted users. It includes no signature or encryption. `loadFromFile` returns `None` for absent, empty, or unreadable files; corrupt JSON or an unknown marker can propagate an error. Treat the cache as regenerable and decide whether startup should discard it or fail.

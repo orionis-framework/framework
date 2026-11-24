@@ -28,6 +28,8 @@ _MISSING_TYPE = type(_MISSING)
 """Define the sentinel type and command signature pattern."""
 _CORE_COMMANDS_PATH = Path(__file__).with_name("commands.py").resolve()
 """Core commands path used by ``loader``."""
+_FRAMEWORK_METADATA_PATH = Path(__file__).resolve().parents[2] / "metadata/framework.py"
+"""Track framework releases that change built-in command arguments."""
 _SIGNATURE_RE: re.Pattern[str] = re.compile(
     r"[a-z][a-z0-9]*(?::[a-z][a-z0-9]*(?:-[a-z0-9]+)*)?",
 )
@@ -150,6 +152,7 @@ class Loader(ILoader):
             monitored_files=[
                 *self.__app.compiledInvalidationPathsFiles,
                 _CORE_COMMANDS_PATH,
+                _FRAMEWORK_METADATA_PATH,
             ],
         )
 

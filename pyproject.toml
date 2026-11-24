@@ -25,7 +25,7 @@ exclude = [
 
 [project]
 name = "orionis"
-version = "1.8.1"
+version = "1.9.0"
 description = "Orionis Framework — Async-first full-stack framework for modern Python applications."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.14"
@@ -85,6 +85,7 @@ dependencies = [
     "pendulum>=3.3.0,<4.0",
     "psutil>=7.2.2,<8.0",
     "pwdlib[argon2,bcrypt]>=0.3.1",
+    "python-dateutil>=2.9.0.post0,<3.0",
     "python-dotenv>=1.2.4,<2.0",
     "redis[hiredis]>=8.1.0",
     "rich>=15.0.0,<16.0",
@@ -195,7 +196,7 @@ docs = [
 
 # Pydoctor reads this table independently of the PEP 621 project metadata.
 # The display name and link targets must therefore be configured explicitly.
-# DOCS.ps1 supplies the version from [project] and source links for the Git revision.
+# The documentation build supplies the project version and Git source links.
 [tool.pydoctor]
 project-name = "Orionis"
 project-url = "https://orionis-framework.com/"

@@ -23,6 +23,8 @@ Protege este handler con autenticación de sesión, CSRF y autorización para em
 
 El secreto aparece solo en `NewAccessToken.plain_text`. `repr` y `toDict()` lo omiten. Entrégalo una vez por un canal protegido y no lo registres. `AccessToken` conserva metadata inmutable; el repositorio guarda un digest, no un secreto recuperable.
 
+El parámetro `expires_at` con desplazamiento identifica un instante. Un vencimiento sin desplazamiento usa `app.timezone`. El repositorio guarda y compara instantes UTC, interpreta los valores históricos sin zona como UTC y devuelve los metadatos del token en la zona de la aplicación.
+
 ## Restringir permisos
 
 ```python

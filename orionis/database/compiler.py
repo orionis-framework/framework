@@ -11,6 +11,7 @@ from uuid import UUID
 import sqlalchemy
 from sqlalchemy import Column as SqlColumn
 from sqlalchemy import ForeignKey, MetaData, Table, and_, func, or_
+from sqlalchemy.dialects import mysql
 from sqlalchemy.exc import NoSuchModuleError
 from sqlalchemy.schema import CreateTable, DropTable
 from sqlalchemy.sql import CompoundSelect, Delete, Insert, Select, Update
@@ -20,6 +21,7 @@ from sqlalchemy.types import TypeEngine
 
 from orionis.database.dialect import missing_dependency_error
 from orionis.database.exceptions import QueryException
+from orionis.database.oracle_timestamp import OracleZonedTimestamp
 from orionis.orm.query.expressions import (
     COLUMNLESS_WHERE_TYPES,
     AggregateClause,
@@ -112,11 +114,8 @@ class SQLCompiler:
     """
     Translate Orionis query plans into engine-executable statements.
 
-    This is the only component, together with the connection and the
-    dialect helpers, aware of the underlying SQL toolkit. It converts
-    :class:`orionis.orm.schema.TableDefinition` objects into engine table metadata
-    (cached
-    per compiler) and query plans into executable statements.
+    Cache table metadata for each definition and compile query plans using
+    SQLAlchemy types and expressions for the selected database dialect.
 
     Attributes
     ----------
@@ -164,7 +163,9 @@ class SQLCompiler:
         ),
         ColumnType.DATE: lambda _c: sqlalchemy.Date(),
         ColumnType.TIME: lambda _c: sqlalchemy.Time(),
-        ColumnType.DATETIME: lambda c: sqlalchemy.DateTime(timezone=c.timezone),
+        ColumnType.DATETIME: lambda c: sqlalchemy.DateTime(
+            timezone=c.timezone,
+        ).with_variant(mysql.DATETIME(fsp=6), "mysql", "mariadb"),
         ColumnType.INTERVAL: lambda c: sqlalchemy.Interval(
             native=c.native,
             second_precision=c.second_precision,
@@ -215,7 +216,9 @@ class SQLCompiler:
             c.decimal_return_scale,
             asdecimal=c.as_decimal,
         ),
-        ColumnType.TIMESTAMP: lambda c: sqlalchemy.TIMESTAMP(timezone=c.timezone),
+        ColumnType.TIMESTAMP: lambda c: sqlalchemy.TIMESTAMP(
+            timezone=c.timezone,
+        ).with_variant(mysql.TIMESTAMP(fsp=6), "mysql", "mariadb"),
         ColumnType.BINARY: lambda c: sqlalchemy.BINARY(c.length),
         ColumnType.VARBINARY: lambda c: sqlalchemy.VARBINARY(c.length),
         ColumnType.BLOB: lambda c: sqlalchemy.BLOB(c.length),
@@ -1589,6 +1592,9 @@ class SQLCompiler:
             raise QueryException(error_msg)
 
         column_type = builder(definition)
+
+        if definition.column_type is ColumnType.TIMESTAMP and definition.timezone:
+            column_type = column_type.with_variant(OracleZonedTimestamp(), "oracle")
 
         if (
             self._driver == "oracle"

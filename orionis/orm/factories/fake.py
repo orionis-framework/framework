@@ -2,11 +2,63 @@
 # Preserve dynamically registered provider results and runtime annotations.
 """Generate fake data with optional and unique value constraints."""
 
-from functools import lru_cache
+from functools import lru_cache, wraps
+from inspect import signature
 from types import MappingProxyType
 from typing import Any
 from collections.abc import Callable
 from random import Random
+from faker.providers.date_time import Provider as DateTimeProvider
+from orionis.support.facades import DateTime
+
+
+def _with_timezone(
+    method: Callable[..., Any], provider_method: Any,
+) -> Callable[..., Any]:
+    """
+    Supply the application timezone to native temporal providers when omitted.
+
+    Parameters
+    ----------
+    method : collections.abc.Callable
+        Method bound to the selected normal, unique or optional view.
+    provider_method : typing.Any
+        Original provider method exposing its native signature.
+
+    Returns
+    -------
+    collections.abc.Callable
+        Generator preserving explicit timezone arguments.
+    """
+    if not isinstance(getattr(provider_method, "__self__", None), DateTimeProvider):
+        return method
+    parameters = tuple(signature(provider_method).parameters)
+    if "tzinfo" not in parameters:
+        return method
+    position = parameters.index("tzinfo")
+
+    @wraps(method)
+    def generate(*args: Any, **kwargs: Any) -> Any:
+        """
+        Invoke the provider with the configured timezone when omitted.
+
+        Parameters
+        ----------
+        *args : typing.Any
+            Positional arguments for the provider.
+        **kwargs : typing.Any
+            Keyword arguments for the selected provider view.
+
+        Returns
+        -------
+        typing.Any
+            Result of invoking the selected provider view.
+        """
+        if len(args) <= position and "tzinfo" not in kwargs:
+            kwargs["tzinfo"] = DateTime.getZoneInfo()
+        return method(*args, **kwargs)
+
+    return generate
 
 
 def _camel_case(name: str) -> str:
@@ -93,7 +145,11 @@ class _ProviderState:
 
 
 class _ProviderView:
-    """Expose fake-data provider methods through a configured view."""
+    """
+    Expose fake-data providers through a normal, unique or optional view.
+
+    Cache bound methods until the backing provider registry changes.
+    """
 
     __slots__ = ("_backend", "_cache", "_revision", "_state")
     """Declare the instance attribute slots reserved by this class."""
@@ -155,6 +211,7 @@ class _ProviderView:
         if original is not None:
             method = getattr(self._backend, original)
             if callable(method):
+                method = _with_timezone(method, getattr(self._state.backend, original))
                 self._cache[name] = method
                 return method
         error_msg = f"{type(self).__name__} has no provider method {name!r}."

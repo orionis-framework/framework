@@ -184,6 +184,16 @@
         
 
         
+            <div class="itemName"><code><a href="#equivalent" class="internal-link" title="orionis.cache.serializer.Serializer.equivalent">equivalent</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#loadFromFile" class="internal-link" title="orionis.cache.serializer.Serializer.loadFromFile">load<wbr></wbr>From<wbr></wbr>File</a></code>
             </div>
         
@@ -273,6 +283,16 @@
 
         
             <div class="itemName"><code><a href="#dumpToFile" class="internal-link" title="orionis.cache.serializer.Serializer.dumpToFile">dump<wbr></wbr>To<wbr></wbr>File</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#equivalent" class="internal-link" title="orionis.cache.serializer.Serializer.equivalent">equivalent</a></code>
             </div>
         
 
@@ -438,6 +458,16 @@
         
 
         
+            <div class="itemName"><code><a href="orionis.cache.serializer.html#_encode_temporal" class="internal-link" title="orionis.cache.serializer._encode_temporal">_encode<wbr></wbr>_temporal</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="orionis.cache.serializer.html#_identity" class="internal-link" title="orionis.cache.serializer._identity">_identity</a></code>
             </div>
         
@@ -550,11 +580,13 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Serializer</span>: <a href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/cache/serializer.py#L386" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.cache.serializer.Serializer">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Serializer</span>: <a href="https://github.com/orionis-framework/framework/tree/1.x/orionis/cache/serializer.py#L413" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.cache.serializer.Serializer">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Encode and decode cache values with the configured serialization format.</p></div>
+          <div><p>Encode and restore typed cache values.</p>
+<p>Preserve named timezones and folds when serializing datetimes and times.</p>
+</div>
         </div>
 
         <div id="split-tables">
@@ -571,6 +603,11 @@
     <td>Static Method</td>
     <td><code><a href="#dumpToFile" class="internal-link" title="orionis.cache.serializer.Serializer.dumpToFile">dump<wbr></wbr>To<wbr></wbr>File</a></code></td>
     <td>Write serialized data to a file atomically.</td>
+  </tr><tr class="staticmethod">
+    
+    <td>Static Method</td>
+    <td><code><a href="#equivalent" class="internal-link" title="orionis.cache.serializer.Serializer.equivalent">equivalent</a></code></td>
+    <td>Compare two values using their persisted representations.</td>
   </tr><tr class="staticmethod">
     
     <td>Static Method</td>
@@ -602,7 +639,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">dumps</span><span class="function-signature">(<span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">indent: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/cache/serializer.py#L389">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/cache/serializer.py#L444">
       
       (source)
     </a>
@@ -629,7 +666,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">dumpToFile</span><span class="function-signature">(<span class="rst-sig-param">data: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">file_path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/cache/serializer.py#L428">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/cache/serializer.py#L483">
       
       (source)
     </a>
@@ -646,6 +683,33 @@
 </div><div class="basestaticmethod">
   
   
+  <a name="orionis.cache.serializer.Serializer.equivalent">
+    
+  </a>
+  <a name="equivalent">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">equivalent</span><span class="function-signature">(<span class="rst-sig-param">left: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>, </span><span class="rst-sig-param">right: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/cache/serializer.py#L420">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#equivalent" title="orionis.cache.serializer.Serializer.equivalent">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Compare two values using their persisted representations.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">left:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">First cache value.</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">right:</span><code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">typing.Any</a></code></td><td class="fieldArgDesc">Second cache value.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code></td><td class="fieldArgDesc">Whether the encoded fields match, including named timezones and folds.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#TypeError" class="intersphinx-link">TypeError</a></code></td><td>If either value contains an unsupported type.</td></tr></table></div>
+  </div>
+</div><div class="basestaticmethod">
+  
+  
   <a name="orionis.cache.serializer.Serializer.loadFromFile">
     
   </a>
@@ -656,7 +720,7 @@
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">loadFromFile</span><span class="function-signature">(<span class="rst-sig-param">file_path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/cache/serializer.py#L471">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/cache/serializer.py#L526">
       
       (source)
     </a>
@@ -684,7 +748,7 @@ empty.</td></tr></table></div>
     
     <div><span class="decorator">@<a href="https://docs.python.org/3/builtins/functions.html#staticmethod" class="intersphinx-link">staticmethod</a><br /></span></div>
     <span class="py-keyword">def</span>&#160;<span class="py-defname">loads</span><span class="function-signature">(<span class="rst-sig-param">raw: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/stdtypes.html#bytes" class="intersphinx-link">bytes</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/cache/serializer.py#L411">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/cache/serializer.py#L466">
       
       (source)
     </a>
@@ -709,7 +773,7 @@ empty.</td></tr></table></div>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 07:49:38.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 11:52:04.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

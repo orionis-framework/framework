@@ -10,19 +10,23 @@ _CONCURRENT_CALLERS = 20
 
 
 class TestChunkedSuffixResolverSuffix(TestCase):
+    """
+    Verify the timestamp and counter used to name log chunks.
+
+    Cover explicit timestamps, the current time, and simultaneous requests.
+    """
+
     def testSuffixUsesTheTimestampAndCounterPattern(self) -> None:
-        """Build the suffix from the timestamp and an incremental counter.
+        """
+        Verify the initial chunk suffix for a fixed UTC timestamp.
 
-        Validates the naming scheme that keeps every size based chunk unique.
-
-        Returns
-        -------
-        None
-            No return value.
+        Check that it includes the date, time, and counter value one.
         """
         moment = datetime(2025, 4, 9, 14, 30, 5, tzinfo=UTC)
+        resolver = ChunkedSuffixResolver()
+        resolver.tz = UTC
         self.assertEqual(
-            ChunkedSuffixResolver().getSuffix(dt=moment),
+            resolver.getSuffix(dt=moment),
             "20250409_143005_0001",
         )
 
@@ -43,17 +47,13 @@ class TestChunkedSuffixResolverSuffix(TestCase):
         )
 
     def testSuffixCounterGrowsOnEveryCall(self) -> None:
-        """Increment the counter on every suffix request.
+        """
+        Verify that successive chunks receive increasing counters.
 
-        Validates that two chunks written within the same second never share a
-        file name.
-
-        Returns
-        -------
-        None
-            No return value.
+        Hold the timestamp fixed to exercise several rotations within one second.
         """
         resolver = ChunkedSuffixResolver()
+        resolver.tz = UTC
         moment = datetime(2025, 1, 1, 0, 0, 0, tzinfo=UTC)
         produced = [resolver.getSuffix(dt=moment) for _ in range(3)]
         self.assertEqual(

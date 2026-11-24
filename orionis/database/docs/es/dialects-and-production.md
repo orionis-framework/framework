@@ -8,6 +8,14 @@ PostgreSQL aplica `charset`, `search_path` y `sslmode` a sus rutas async y sync.
 
 Las opciones TLS tienen consecuencias reales. La plantilla de SQL Server incluye `DB_TRUST_SERVER_CERTIFICATE=True`; adapta ese valor a tu política de validación de certificados antes de producción. No publiques credenciales en manuales de aplicación, logs ni repositorios. Las opciones de pool dependen del dialecto y configuración efectiva; no presupongas variables `DB_POOL_*` inexistentes.
 
+Orionis abre las conexiones MySQL en UTC. Las columnas nuevas de tipo `DateTime` y `StrictTimestamp` se crean como `DATETIME(6)` y `TIMESTAMP(6)` para conservar microsegundos. En tablas existentes que usan precisión de segundos, prepara una migración explícita a precisión 6 conservando nulabilidad, valores predeterminados, claves y cláusulas de actualización. Las fracciones descartadas por el esquema anterior no se pueden recuperar.
+
+En Oracle, `StrictTimestamp(timezone=True)` usa `TIMESTAMP WITH TIME ZONE`. Las inserciones, actualizaciones y condiciones sobre columnas tipadas envían el instante en UTC y conservan los microsegundos. Las lecturas tipadas extraen UTC incluso cuando otro cliente guardó un desplazamiento distinto. El ORM muestra las marcas de tiempo gestionadas y los atributos con conversión a fecha y hora en la zona de la aplicación. En consultas SQL escritas a mano, usa `SYS_EXTRACT_UTC(columna)` cuando necesites obtener el valor UTC.
+
+Una versión anterior de Orionis podía guardar la hora UTC con el desplazamiento de una sesión Oracle configurada en otra zona. Para revisar marcas históricas de esas sesiones, compara el instante UTC almacenado con la hora original del evento antes de corregir las filas afectadas. Otros clientes pueden haber escrito marcas válidas con ese mismo desplazamiento.
+
+Las columnas `DateTime` de Oracle, incluidas las declaradas con `DateTime(timezone=True)`, conservan el tipo `DATE` y su precisión de segundos. En estas columnas las marcas de tiempo gestionadas guardan la hora UTC y las conversiones personalizadas guardan la hora local de la aplicación. Las filas existentes conservan su interpretación.
+
 ## Amazon Redshift
 
 Redshift utiliza el conector oficial `redshift-connector` y `sqlalchemy-redshift`; no se trata como PostgreSQL a través de asyncpg. Configuración básica:

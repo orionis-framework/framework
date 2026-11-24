@@ -38,13 +38,15 @@ La selección temporal (`dailyAt`, `everySeconds`, `cron`, etc.) es terminal y d
 | Fecha única | `onceAt(2027, 1, 10, 9, 0, 0)` |
 | Calendario cron | `cron(day_of_week="mon-fri", hour="9", minute="0")` |
 
-Existen helpers de minutos, horas, días y semanas, además de `startDate` y `endDate`. Usa intervalos para tiempo transcurrido y cron para calendario. No asumas que ambos responden igual a cambios de horario estacional. La zona viene de `app.timezone`, normalmente `APP_TIMEZONE`, con default `UTC`.
+Cada tarea conserva la zona de la aplicación vigente al definirla. Las tareas nuevas usan el valor actual de `app.timezone` (normalmente `APP_TIMEZONE`, con valor predeterminado `UTC`). `startDate`, `endDate` y `onceAt` rechazan las horas locales inexistentes y eligen la primera aparición de una hora repetida. Los calendarios como `dailyAt` y `cron` omiten las horas inexistentes y se ejecutan solo en la primera aparición de cada hora repetida. Los intervalos como `everyDays(1)` avanzan por segundos transcurridos, por lo que puede cambiar la hora local de ejecución.
 
 La agenda fluida guarda tareas por **firma de comando**. Registrar otra vez la misma firma reemplaza esa definición pendiente; no es una API para crear dos horarios independientes para una firma. Usa comandos con identidades distintas que deleguen al mismo servicio si necesitas agendas separadas.
 
 `TASKS_JITTER` se aplica a los triggers que admiten jitter, no solo a la metadata mostrada. Un `randomDelay(0)` de la tarea prevalece sobre ese default. `onceAt`, `everySeconds`, `everyMinuteAt`, `everyMinutesAt`, `hourlyAt` y `everyHoursAt` conservan horarios exactos y no heredan jitter; sus atajos conservan la misma política. Un retraso positivo explícito entra en conflicto con esos horarios y produce `ValueError`.
 
 ## Persistencia y valores predeterminados
+
+Al arrancar, `replace_existing=True` vuelve a registrar cada firma declarada con su política de calendario y su zona vigentes. Una tarea que solo figure en el almacenamiento persistente conserva el trigger serializado y su comportamiento anterior. Vuelve a declarar su firma para aplicar la política de calendario actual.
 
 La sección `scheduler` de `config/scheduler.py` usa:
 

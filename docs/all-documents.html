@@ -1948,6 +1948,14 @@
             <div class="kind">Package</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Group the console fluent components and public imports.</div>
+          </li><li id="orionis.console.fluent._calendar">
+            
+            <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>._calendar</div>
+            <div class="url">orionis.console.fluent._calendar.html</div>
+            <div class="type">Module</div>
+            <div class="kind">Module</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Schedule recurring commands against the local calendar.</div>
           </li><li id="orionis.console.fluent.command">
             
             <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>.command</div>
@@ -2516,6 +2524,14 @@
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Runner applying and reverting the application migrations.</div>
+          </li><li id="orionis.database.oracle_timestamp">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.oracle<wbr></wbr>_timestamp</div>
+            <div class="url">orionis.database.oracle_timestamp.html</div>
+            <div class="type">Module</div>
+            <div class="kind">Module</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Preserve Oracle timestamp instants across database session timezones.</div>
           </li><li id="orionis.database.provider">
             
             <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.provider</div>
@@ -5892,6 +5908,14 @@
             <div class="kind">Package</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Group the logging handlers components and public imports.</div>
+          </li><li id="orionis.logging.handlers._local">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local</div>
+            <div class="url">orionis.logging.handlers._local.html</div>
+            <div class="type">Module</div>
+            <div class="kind">Module</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Interpret local times for the built-in log rotation strategies.</div>
           </li><li id="orionis.logging.handlers.advanced_rotating_file_handler">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.advanced<wbr></wbr>_rotating<wbr></wbr>_file<wbr></wbr>_handler</div>
@@ -24236,6 +24260,14 @@
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Return <em>o</em> unchanged.</div>
+          </li><li id="orionis.cache.serializer._encode_temporal">
+            
+            <div class="fullName">orionis<wbr></wbr>.cache<wbr></wbr>.serializer<wbr></wbr>._encode<wbr></wbr>_temporal</div>
+            <div class="url">orionis.cache.serializer.html#_encode_temporal</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Encode a datetime or time with its timezone and fold.</div>
           </li><li id="orionis.cache.serializer._encode_subclass">
             
             <div class="fullName">orionis<wbr></wbr>.cache<wbr></wbr>.serializer<wbr></wbr>._encode<wbr></wbr>_subclass</div>
@@ -24339,7 +24371,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Decode recursively serialized cache payloads into Python objects.</div>
+            <div class="summary">Restore Python values from a typed cache payload.</div>
           </li><li id="orionis.cache.serializer.Serializer">
             
             <div class="fullName">orionis<wbr></wbr>.cache<wbr></wbr>.serializer<wbr></wbr>.<wbr></wbr>Serializer</div>
@@ -24347,7 +24379,15 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Encode and decode cache values with the configured serialization format.</div>
+            <div class="summary">Encode and restore typed cache values.</div>
+          </li><li id="orionis.cache.serializer.Serializer.equivalent">
+            
+            <div class="fullName">orionis<wbr></wbr>.cache<wbr></wbr>.serializer<wbr></wbr>.<wbr></wbr>Serializer<wbr></wbr>.equivalent</div>
+            <div class="url">orionis.cache.serializer.Serializer.html#equivalent</div>
+            <div class="type">Function</div>
+            <div class="kind">Static Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Compare two values using their persisted representations.</div>
           </li><li id="orionis.cache.serializer.Serializer.dumps">
             
             <div class="fullName">orionis<wbr></wbr>.cache<wbr></wbr>.serializer<wbr></wbr>.<wbr></wbr>Serializer<wbr></wbr>.dumps</div>
@@ -24387,7 +24427,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Persist named cache entries in a filesystem directory.</div>
+            <div class="summary">Persist a dictionary derived from monitored source files.</div>
           </li><li id="orionis.cache.FileBasedCache.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.cache<wbr></wbr>.<wbr></wbr>File<wbr></wbr>Based<wbr></wbr>Cache<wbr></wbr>.__slots__</div>
@@ -24491,7 +24531,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Save the provided data to the cache file if it has changed.</div>
+            <div class="summary">Save the artifact when its source hash or serialized contents change.</div>
           </li><li id="orionis.cache.FileBasedCache.clear">
             
             <div class="fullName">orionis<wbr></wbr>.cache<wbr></wbr>.<wbr></wbr>File<wbr></wbr>Based<wbr></wbr>Cache<wbr></wbr>.clear</div>
@@ -28727,6 +28767,14 @@ Please call create() first.</tt>.</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Mutable runtime view of the committed application configuration.</div>
+          </li><li id="orionis.Application.__applied_timezone">
+            
+            <div class="fullName">orionis<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>.__applied<wbr></wbr>_timezone</div>
+            <div class="url">orionis.Application.html#__applied_timezone</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Most recent IANA timezone applied to the date facade and process.</div>
           </li><li id="orionis.Application.__http_disconnect_monitoring">
             
             <div class="fullName">orionis<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>.__http<wbr></wbr>_disconnect<wbr></wbr>_monitoring</div>
@@ -29559,6 +29607,22 @@ Please call create() first.</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Freeze bootstrap metadata and mark configuration initialized.</div>
+          </li><li id="orionis.Application.__applyTimezone">
+            
+            <div class="fullName">orionis<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>.__apply<wbr></wbr>Timezone</div>
+            <div class="url">orionis.Application.html#__applyTimezone</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Apply the configured IANA timezone to the date facade and process.</div>
+          </li><li id="orionis.Application.__refreshTimezone">
+            
+            <div class="fullName">orionis<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>.__refresh<wbr></wbr>Timezone</div>
+            <div class="url">orionis.Application.html#__refreshTimezone</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Synchronize the runtime timezone with the current application settings.</div>
           </li><li id="orionis.Application.__setTimezoneAndLocale">
             
             <div class="fullName">orionis<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>.__set<wbr></wbr>Timezone<wbr></wbr>And<wbr></wbr>Locale</div>
@@ -29566,7 +29630,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Apply configured timezone and locale settings to runtime services.</div>
+            <div class="summary">Apply the timezone and locale before registering eager providers.</div>
           </li><li id="orionis.Application.__load">
             
             <div class="fullName">orionis<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>.__load</div>
@@ -32806,7 +32870,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Engine shared by every Orionis query builder.</div>
+            <div class="summary">Build query plans for model and table queries.</div>
           </li><li id="orionis.orm.query.base_builder.QueryBuilderBase.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.query<wbr></wbr>.base<wbr></wbr>_builder<wbr></wbr>.<wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>Base<wbr></wbr>.__slots__</div>
@@ -32831,6 +32895,14 @@ Please call create() first.</tt>.</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Name of the configured database connection to use.</div>
+          </li><li id="orionis.orm.query.base_builder.QueryBuilderBase._datetime_storage">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.query<wbr></wbr>.base<wbr></wbr>_builder<wbr></wbr>.<wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>Base<wbr></wbr>._datetime<wbr></wbr>_storage</div>
+            <div class="url">orionis.orm.query.base_builder.QueryBuilderBase.html#_datetime_storage</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Model column storage rules applied to datetime predicates.</div>
           </li><li id="orionis.orm.query.base_builder.QueryBuilderBase._connection_manager">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.query<wbr></wbr>.base<wbr></wbr>_builder<wbr></wbr>.<wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>Base<wbr></wbr>._connection<wbr></wbr>_manager</div>
@@ -33551,6 +33623,14 @@ Please call create() first.</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Append a join expression built from either calling convention.</div>
+          </li><li id="orionis.orm.query.base_builder.QueryBuilderBase._filterValue">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.query<wbr></wbr>.base<wbr></wbr>_builder<wbr></wbr>.<wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>Base<wbr></wbr>._filter<wbr></wbr>Value</div>
+            <div class="url">orionis.orm.query.base_builder.QueryBuilderBase.html#_filterValue</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Bind model datetime predicates using the target column's storage rules.</div>
           </li><li id="orionis.orm.query.base_builder.QueryBuilderBase._addTyped">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.query<wbr></wbr>.base<wbr></wbr>_builder<wbr></wbr>.<wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>Base<wbr></wbr>._add<wbr></wbr>Typed</div>
@@ -33814,7 +33894,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Precomputed metadata describing a model class.</div>
+            <div class="summary">Describe a model's columns, casts and persistence rules.</div>
           </li><li id="orionis.orm.metaclass.ModelMetadata.table_name">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.metaclass<wbr></wbr>.<wbr></wbr>Model<wbr></wbr>Metadata<wbr></wbr>.table<wbr></wbr>_name</div>
@@ -33935,6 +34015,14 @@ Please call create() first.</tt>.</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Soft delete timestamp column, when the model soft deletes.</div>
+          </li><li id="orionis.orm.metaclass.ModelMetadata.datetime_storage">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.metaclass<wbr></wbr>.<wbr></wbr>Model<wbr></wbr>Metadata<wbr></wbr>.datetime<wbr></wbr>_storage</div>
+            <div class="url">orionis.orm.metaclass.ModelMetadata.html#datetime_storage</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Map column names to storage rules for timestamps and explicit datetime casts.</div>
           </li><li id="orionis.orm.metaclass.ModelMetadata.uses_unique_ids">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.metaclass<wbr></wbr>.<wbr></wbr>Model<wbr></wbr>Metadata<wbr></wbr>.uses<wbr></wbr>_unique<wbr></wbr>_ids</div>
@@ -34014,7 +34102,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Metaclass discovering model columns and building their metadata.</div>
+            <div class="summary">Collect model columns and compile metadata at class creation.</div>
           </li><li id="orionis.orm.metaclass.ModelMeta.__new__">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.metaclass<wbr></wbr>.<wbr></wbr>Model<wbr></wbr>Meta<wbr></wbr>.__new__</div>
@@ -35288,6 +35376,22 @@ Please call create() first.</tt>.</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Return the container alias for the exception handler.</div>
+          </li><li id="orionis.support.facades.datetime._FORMATTER">
+            
+            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.datetime<wbr></wbr>._FORMATTER</div>
+            <div class="url">orionis.support.facades.datetime.module.html#_FORMATTER</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Parse date and time components from explicit Pendulum formats.</div>
+          </li><li id="orionis.support.facades.datetime._FORMAT_LITERALS">
+            
+            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.datetime<wbr></wbr>._FORMAT<wbr></wbr>_LITERALS</div>
+            <div class="url">orionis.support.facades.datetime.module.html#_FORMAT_LITERALS</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Match bracketed literals and escaped characters in Pendulum formats.</div>
           </li><li id="orionis.support.facades.DateTime">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time</div>
@@ -35312,6 +35416,14 @@ Please call create() first.</tt>.</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Default timezone and locale.</div>
+          </li><li id="orionis.support.facades.DateTime._refresh_timezone">
+            
+            <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>._refresh<wbr></wbr>_timezone</div>
+            <div class="url">orionis.support.facades.DateTime.html#_refresh_timezone</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Refresh the default timezone from the active application.</div>
           </li><li id="orionis.support.facades.DateTime._locale">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>._locale</div>
@@ -35343,7 +35455,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Set the default timezone for the application.</div>
+            <div class="summary">Set the default IANA timezone and cache its zone information.</div>
           </li><li id="orionis.support.facades.DateTime._setLocale">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>._set<wbr></wbr>Locale</div>
@@ -35359,7 +35471,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the configured timezone.</div>
+            <div class="summary">Read the timezone from the active application configuration.</div>
           </li><li id="orionis.support.facades.DateTime.getLocale">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.get<wbr></wbr>Locale</div>
@@ -35375,7 +35487,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the ZoneInfo object for the configured timezone.</div>
+            <div class="summary">Resolve the configured timezone as a standard-library zone.</div>
           </li><li id="orionis.support.facades.DateTime.now">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.now</div>
@@ -35383,7 +35495,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Get the current date and time.</div>
+            <div class="summary">Return the current time in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.today">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.today</div>
@@ -35391,7 +35503,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the current date at midnight in the selected timezone.</div>
+            <div class="summary">Return midnight today in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.tomorrow">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.tomorrow</div>
@@ -35399,7 +35511,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return tomorrow's date in the specified or default timezone.</div>
+            <div class="summary">Return midnight tomorrow in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.yesterday">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.yesterday</div>
@@ -35407,7 +35519,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the date for yesterday in the specified or default timezone.</div>
+            <div class="summary">Return midnight yesterday in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.parse">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.parse</div>
@@ -35415,7 +35527,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Parse a date string and convert it to the configured timezone.</div>
+            <div class="summary">Parse a date or time in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.fromFormat">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.from<wbr></wbr>Format</div>
@@ -35423,7 +35535,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Parse a date string using explicit format tokens.</div>
+            <div class="summary">Parse formatted text and express the result in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.local">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.local</div>
@@ -35439,7 +35551,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Create a timezone-naive datetime object.</div>
+            <div class="summary">Create a timezone-naive datetime from calendar components.</div>
           </li><li id="orionis.support.facades.DateTime.fromTimestamp">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.from<wbr></wbr>Timestamp</div>
@@ -35447,7 +35559,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Convert a Unix timestamp to a datetime in the configured timezone.</div>
+            <div class="summary">Express a Unix timestamp in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.fromDatetime">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.from<wbr></wbr>Datetime</div>
@@ -35455,7 +35567,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Convert a standard datetime object to the configured timezone.</div>
+            <div class="summary">Interpret a naive datetime locally or convert an aware instant.</div>
           </li><li id="orionis.support.facades.DateTime.datetime">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.datetime</div>
@@ -35463,7 +35575,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Create a datetime object in the configured timezone.</div>
+            <div class="summary">Create a datetime from wall-clock components in the selected zone.</div>
           </li><li id="orionis.support.facades.DateTime.duration">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.duration</div>
@@ -35487,7 +35599,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the start of the given unit of time (e.g. 'hour', 'decade').</div>
+            <div class="summary">Return the start of the calendar unit in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.endOf">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.end<wbr></wbr>Of</div>
@@ -35495,7 +35607,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the end of the given unit of time (e.g. 'hour', 'decade').</div>
+            <div class="summary">Return the end of the calendar unit in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.startOfDay">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.start<wbr></wbr>Of<wbr></wbr>Day</div>
@@ -35503,7 +35615,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the start of the day (00:00:00).</div>
+            <div class="summary">Return the start of the day in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.endOfDay">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.end<wbr></wbr>Of<wbr></wbr>Day</div>
@@ -35511,7 +35623,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the end of the day (23:59:59).</div>
+            <div class="summary">Return the end of the day in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.convertToLocal">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.convert<wbr></wbr>To<wbr></wbr>Local</div>
@@ -35519,7 +35631,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Convert a date to the configured local timezone.</div>
+            <div class="summary">Convert text or a datetime to the application timezone.</div>
           </li><li id="orionis.support.facades.DateTime.formatLocal">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.format<wbr></wbr>Local</div>
@@ -35535,7 +35647,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the start of the week (Monday 00:00:00).</div>
+            <div class="summary">Return the start of the week in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.endOfWeek">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.end<wbr></wbr>Of<wbr></wbr>Week</div>
@@ -35543,7 +35655,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the end of the week (Sunday 23:59:59).</div>
+            <div class="summary">Return the end of the week in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.startOfMonth">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.start<wbr></wbr>Of<wbr></wbr>Month</div>
@@ -35551,7 +35663,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the start of the month (first day at 00:00:00).</div>
+            <div class="summary">Return the start of the month in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.endOfMonth">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.end<wbr></wbr>Of<wbr></wbr>Month</div>
@@ -35559,7 +35671,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the end of the month (last day at 23:59:59).</div>
+            <div class="summary">Return the end of the month in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.startOfYear">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.start<wbr></wbr>Of<wbr></wbr>Year</div>
@@ -35567,7 +35679,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the start of the year (January 1st at 00:00:00).</div>
+            <div class="summary">Return the start of the year in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.endOfYear">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.end<wbr></wbr>Of<wbr></wbr>Year</div>
@@ -35575,7 +35687,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the end of the year (December 31st at 23:59:59).</div>
+            <div class="summary">Return the end of the year in the selected timezone.</div>
           </li><li id="orionis.support.facades.DateTime.addDays">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.add<wbr></wbr>Days</div>
@@ -35623,7 +35735,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Determine if the given date falls on a weekend.</div>
+            <div class="summary">Check whether the local calendar date falls on a weekend.</div>
           </li><li id="orionis.support.facades.DateTime.isToday">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.is<wbr></wbr>Today</div>
@@ -35631,7 +35743,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Check whether the date is today in the configured timezone.</div>
+            <div class="summary">Check whether an instant falls on today in the application timezone.</div>
           </li><li id="orionis.support.facades.DateTime.isFuture">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.is<wbr></wbr>Future</div>
@@ -35639,7 +35751,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Determine if the given date is in the future.</div>
+            <div class="summary">Check whether a datetime falls after the current instant.</div>
           </li><li id="orionis.support.facades.DateTime.isPast">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.is<wbr></wbr>Past</div>
@@ -35647,7 +35759,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Determine if the given date is in the past.</div>
+            <div class="summary">Check whether a datetime falls before the current instant.</div>
           </li><li id="orionis.support.facades.DateTime.isLeapYear">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.is<wbr></wbr>Leap<wbr></wbr>Year</div>
@@ -35655,7 +35767,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Determine if the year of the given date is a leap year.</div>
+            <div class="summary">Check whether the local calendar year is a leap year.</div>
           </li><li id="orionis.support.facades.DateTime.isBirthday">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.is<wbr></wbr>Birthday</div>
@@ -35663,7 +35775,7 @@ Please call create() first.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Class Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Determine if the given date shares month and day with another date.</div>
+            <div class="summary">Compare month and day on the application calendar.</div>
           </li><li id="orionis.support.facades.DateTime.closest">
             
             <div class="fullName">orionis<wbr></wbr>.support<wbr></wbr>.facades<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>.closest</div>
@@ -42043,6 +42155,46 @@ Awaitable[str]]</tt>.</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Return the cast handler registered under the given name.</div>
+          </li><li id="orionis.orm.attributes.local_stored_timestamp">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.attributes<wbr></wbr>.local<wbr></wbr>_stored<wbr></wbr>_timestamp</div>
+            <div class="url">orionis.orm.attributes.html#local_stored_timestamp</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Read an ORM-managed UTC timestamp, including offset-less legacy rows.</div>
+          </li><li id="orionis.orm.attributes.DateTimeStorage">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.attributes<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>Storage</div>
+            <div class="url">orionis.orm.attributes.DateTimeStorage.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Bind a datetime according to its column's storage policy.</div>
+          </li><li id="orionis.orm.attributes.DateTimeStorage.aware">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.attributes<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>Storage<wbr></wbr>.aware</div>
+            <div class="url">orionis.orm.attributes.DateTimeStorage.html#aware</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Whether the column accepts a datetime with an offset.</div>
+          </li><li id="orionis.orm.attributes.DateTimeStorage.managed">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.attributes<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>Storage<wbr></wbr>.managed</div>
+            <div class="url">orionis.orm.attributes.DateTimeStorage.html#managed</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Whether the ORM maintains this timestamp in UTC.</div>
+          </li><li id="orionis.orm.attributes.DateTimeStorage.bind">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.attributes<wbr></wbr>.<wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>Storage<wbr></wbr>.bind</div>
+            <div class="url">orionis.orm.attributes.DateTimeStorage.html#bind</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Store managed timestamps in UTC and user casts in application time.</div>
           </li><li id="orionis.orm.attributes.serialize_for_storage">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.attributes<wbr></wbr>.serialize<wbr></wbr>_for<wbr></wbr>_storage</div>
@@ -42058,7 +42210,7 @@ Awaitable[str]]</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Attribute handling behavior shared by every model.</div>
+            <div class="summary">Assign, cast and serialize model attributes.</div>
           </li><li id="orionis.orm.attributes.AttributesMixin.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.attributes<wbr></wbr>.<wbr></wbr>Attributes<wbr></wbr>Mixin<wbr></wbr>.__slots__</div>
@@ -42243,6 +42395,14 @@ Awaitable[str]]</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Stamp the soft delete column of the persisted row.</div>
+          </li><li id="orionis.orm.state._changed">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.state<wbr></wbr>._changed</div>
+            <div class="url">orionis.orm.state.html#_changed</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Compare aware datetimes by instant, including both sides of a DST fold.</div>
           </li><li id="orionis.orm.state.StateMixin">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.state<wbr></wbr>.<wbr></wbr>State<wbr></wbr>Mixin</div>
@@ -42250,7 +42410,7 @@ Awaitable[str]]</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Attribute state tracking behavior shared by every model.</div>
+            <div class="summary">Track model attributes against their last persisted snapshot.</div>
           </li><li id="orionis.orm.state.StateMixin.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.state<wbr></wbr>.<wbr></wbr>State<wbr></wbr>Mixin<wbr></wbr>.__slots__</div>
@@ -42330,7 +42490,7 @@ Awaitable[str]]</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Base class of the Orionis active-record models.</div>
+            <div class="summary">Define active-record models and persist them through the query builder.</div>
           </li><li id="orionis.orm.model.Model.__abstract__">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.model<wbr></wbr>.<wbr></wbr>Model<wbr></wbr>.__abstract__</div>
@@ -47162,7 +47322,7 @@ Awaitable[str]]</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the current UTC moment as a naive datetime.</div>
+            <div class="summary">Return the current UTC instant for persistence and validity checks.</div>
           </li><li id="orionis.auth.tokens.repository._as_datetime">
             
             <div class="fullName">orionis<wbr></wbr>.auth<wbr></wbr>.tokens<wbr></wbr>.repository<wbr></wbr>._as<wbr></wbr>_datetime</div>
@@ -47170,7 +47330,7 @@ Awaitable[str]]</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Coerce a stored timestamp into a datetime.</div>
+            <div class="summary">Convert a token deadline or stored timestamp to UTC.</div>
           </li><li id="orionis.auth.tokens.repository._unexpired_tokens">
             
             <div class="fullName">orionis<wbr></wbr>.auth<wbr></wbr>.tokens<wbr></wbr>.repository<wbr></wbr>._unexpired<wbr></wbr>_tokens</div>
@@ -48019,6 +48179,14 @@ Awaitable[str]]</tt>.</div>
             <div class="kind">Constant</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">MySQL relaxed sql_mode applied when strict mode is disabled.</div>
+          </li><li id="orionis.database.dialect._MYSQL_UTC_SESSION">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.dialect<wbr></wbr>._MYSQL<wbr></wbr>_UTC<wbr></wbr>_SESSION</div>
+            <div class="url">orionis.database.dialect.html#_MYSQL_UTC_SESSION</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Constant</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Make MySQL TIMESTAMP conversion independent of the server timezone.</div>
           </li><li id="orionis.database.dialect._SQLITE_MEMORY_MARKERS">
             
             <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.dialect<wbr></wbr>._SQLITE<wbr></wbr>_MEMORY<wbr></wbr>_MARKERS</div>
@@ -48315,6 +48483,62 @@ Awaitable[str]]</tt>.</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Extract the primitive value from a possible enum member.</div>
+          </li><li id="orionis.database.oracle_timestamp.OracleZonedTimestamp">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.oracle<wbr></wbr>_timestamp<wbr></wbr>.<wbr></wbr>Oracle<wbr></wbr>Zoned<wbr></wbr>Timestamp</div>
+            <div class="url">orionis.database.oracle_timestamp.OracleZonedTimestamp.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Bind and read Oracle TIMESTAMP WITH TIME ZONE values in UTC.</div>
+          </li><li id="orionis.database.oracle_timestamp.OracleZonedTimestamp.impl">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.oracle<wbr></wbr>_timestamp<wbr></wbr>.<wbr></wbr>Oracle<wbr></wbr>Zoned<wbr></wbr>Timestamp<wbr></wbr>.impl</div>
+            <div class="url">orionis.database.oracle_timestamp.OracleZonedTimestamp.html#impl</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Declare the underlying Oracle timestamp type with timezone support.</div>
+          </li><li id="orionis.database.oracle_timestamp.OracleZonedTimestamp.cache_ok">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.oracle<wbr></wbr>_timestamp<wbr></wbr>.<wbr></wbr>Oracle<wbr></wbr>Zoned<wbr></wbr>Timestamp<wbr></wbr>.cache<wbr></wbr>_ok</div>
+            <div class="url">orionis.database.oracle_timestamp.OracleZonedTimestamp.html#cache_ok</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Allow SQLAlchemy to cache statements that use this stateless type.</div>
+          </li><li id="orionis.database.oracle_timestamp.OracleZonedTimestamp._bindValue">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.oracle<wbr></wbr>_timestamp<wbr></wbr>.<wbr></wbr>Oracle<wbr></wbr>Zoned<wbr></wbr>Timestamp<wbr></wbr>._bind<wbr></wbr>Value</div>
+            <div class="url">orionis.database.oracle_timestamp.OracleZonedTimestamp.html#_bindValue</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Normalize an input instant before the driver discards its offset.</div>
+          </li><li id="orionis.database.oracle_timestamp.OracleZonedTimestamp._bindExpression">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.oracle<wbr></wbr>_timestamp<wbr></wbr>.<wbr></wbr>Oracle<wbr></wbr>Zoned<wbr></wbr>Timestamp<wbr></wbr>._bind<wbr></wbr>Expression</div>
+            <div class="url">orionis.database.oracle_timestamp.OracleZonedTimestamp.html#_bindExpression</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Attach the UTC offset explicitly to each bound Oracle timestamp.</div>
+          </li><li id="orionis.database.oracle_timestamp.OracleZonedTimestamp._columnExpression">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.oracle<wbr></wbr>_timestamp<wbr></wbr>.<wbr></wbr>Oracle<wbr></wbr>Zoned<wbr></wbr>Timestamp<wbr></wbr>._column<wbr></wbr>Expression</div>
+            <div class="url">orionis.database.oracle_timestamp.OracleZonedTimestamp.html#_columnExpression</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Extract the UTC instant before the driver decodes an Oracle timestamp.</div>
+          </li><li id="orionis.database.oracle_timestamp.OracleZonedTimestamp._readValue">
+            
+            <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.oracle<wbr></wbr>_timestamp<wbr></wbr>.<wbr></wbr>Oracle<wbr></wbr>Zoned<wbr></wbr>Timestamp<wbr></wbr>._read<wbr></wbr>Value</div>
+            <div class="url">orionis.database.oracle_timestamp.OracleZonedTimestamp.html#_readValue</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Restore the UTC metadata of a timestamp extracted by Oracle.</div>
           </li><li id="orionis.database.compiler.SqlSource">
             
             <div class="fullName">orionis<wbr></wbr>.database<wbr></wbr>.compiler<wbr></wbr>.<wbr></wbr>Sql<wbr></wbr>Source</div>
@@ -61056,6 +61280,46 @@ instead.</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Retrieve configured Command entity.</div>
+          </li><li id="orionis.console.fluent._calendar._after_transition">
+            
+            <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>._calendar<wbr></wbr>._after<wbr></wbr>_transition</div>
+            <div class="url">orionis.console.fluent._calendar.html#_after_transition</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Find the first unambiguous wall second after a clock transition.</div>
+          </li><li id="orionis.console.fluent._calendar.CalendarCronTrigger">
+            
+            <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>._calendar<wbr></wbr>.<wbr></wbr>Calendar<wbr></wbr>Cron<wbr></wbr>Trigger</div>
+            <div class="url">orionis.console.fluent._calendar.CalendarCronTrigger.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Choose the first occurrence of each existing local cron time.</div>
+          </li><li id="orionis.console.fluent._calendar.CalendarCronTrigger._calendar">
+            
+            <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>._calendar<wbr></wbr>.<wbr></wbr>Calendar<wbr></wbr>Cron<wbr></wbr>Trigger<wbr></wbr>._calendar</div>
+            <div class="url">orionis.console.fluent._calendar.CalendarCronTrigger.html#_calendar</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Cached UTC trigger that searches the task's cron fields by wall time.</div>
+          </li><li id="orionis.console.fluent._calendar.CalendarCronTrigger.__slots__">
+            
+            <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>._calendar<wbr></wbr>.<wbr></wbr>Calendar<wbr></wbr>Cron<wbr></wbr>Trigger<wbr></wbr>.__slots__</div>
+            <div class="url">orionis.console.fluent._calendar.CalendarCronTrigger.html#__slots__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Reserve storage for the cached calendar trigger.</div>
+          </li><li id="orionis.console.fluent._calendar.CalendarCronTrigger._getNextFireTime">
+            
+            <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>._calendar<wbr></wbr>.<wbr></wbr>Calendar<wbr></wbr>Cron<wbr></wbr>Trigger<wbr></wbr>._get<wbr></wbr>Next<wbr></wbr>Fire<wbr></wbr>Time</div>
+            <div class="url">orionis.console.fluent._calendar.CalendarCronTrigger.html#_getNextFireTime</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Find the next cron match within the task's scheduling window.</div>
           </li><li id="orionis.console.fluent.Task">
             
             <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>.<wbr></wbr>Task</div>
@@ -61063,7 +61327,7 @@ instead.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Configure scheduled command execution with fluent scheduling options.</div>
+            <div class="summary">Configure a command's schedule, execution limits, and listeners.</div>
           </li><li id="orionis.console.fluent.Task._ERROR_MSG_INVALID_INTERVAL">
             
             <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>.<wbr></wbr>Task<wbr></wbr>._ERROR<wbr></wbr>_MSG<wbr></wbr>_INVALID<wbr></wbr>_INTERVAL</div>
@@ -61240,7 +61504,7 @@ integer.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Create a datetime instance from individual date and time components.</div>
+            <div class="summary">Resolve date and time components in the task's timezone.</div>
           </li><li id="orionis.console.fluent.Task.__setTrigger">
             
             <div class="fullName">orionis<wbr></wbr>.console<wbr></wbr>.fluent<wbr></wbr>.<wbr></wbr>Task<wbr></wbr>.__set<wbr></wbr>Trigger</div>
@@ -67633,7 +67897,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Render the framework default HTTP error and status responses.</div>
+            <div class="summary">Render the framework's built-in error and status responses.</div>
           </li><li id="orionis.http.default.responses.DefaultResponses.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.__slots__</div>
@@ -67769,7 +68033,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Initialize instance with application and directory dependencies.</div>
+            <div class="summary">Initialize the default response renderer and its page and asset caches.</div>
           </li><li id="orionis.http.default.responses.DefaultResponses.__app">
             
             <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.__app</div>
@@ -67794,22 +68058,14 @@ been started.</tt>.</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Official asynchronous template rendering engine.</div>
-          </li><li id="orionis.http.default.responses.DefaultResponses.__app_name">
+          </li><li id="orionis.http.default.responses.DefaultResponses.__page_settings">
             
-            <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.__app<wbr></wbr>_name</div>
-            <div class="url">orionis.http.default.responses.DefaultResponses.html#__app_name</div>
+            <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.__page<wbr></wbr>_settings</div>
+            <div class="url">orionis.http.default.responses.DefaultResponses.html#__page_settings</div>
             <div class="type">Attribute</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Store the application name and locale.</div>
-          </li><li id="orionis.http.default.responses.DefaultResponses.__app_locale">
-            
-            <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.__app<wbr></wbr>_locale</div>
-            <div class="url">orionis.http.default.responses.DefaultResponses.html#__app_locale</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Instance Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">App locale produced by <tt class="rst-docutils rst-literal">self.__app.config</tt>.</div>
+            <div class="summary">Application name, locale and timezone used in cached HTML.</div>
           </li><li id="orionis.http.default.responses.DefaultResponses.__memory_cache">
             
             <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.__memory<wbr></wbr>_cache</div>
@@ -67905,7 +68161,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Render the application health state as an HTML or JSON response.</div>
+            <div class="summary">Render the current application health state as HTML or JSON.</div>
           </li><li id="orionis.http.default.responses.DefaultResponses.error">
             
             <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.error</div>
@@ -67937,7 +68193,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Refresh application labels and expire health bodies when they change.</div>
+            <div class="summary">Invalidate cached health pages when shared template settings change.</div>
           </li><li id="orionis.http.default.responses.DefaultResponses.__render">
             
             <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.__render</div>
@@ -67945,7 +68201,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Render a built-in template through the application's official engine.</div>
+            <div class="summary">Render a built-in template with the current application settings.</div>
           </li><li id="orionis.http.default.responses.DefaultResponses.asset">
             
             <div class="fullName">orionis<wbr></wbr>.http<wbr></wbr>.default<wbr></wbr>.responses<wbr></wbr>.<wbr></wbr>Default<wbr></wbr>Responses<wbr></wbr>.asset</div>
@@ -83521,7 +83777,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Rotate log files using size limits and resolved time suffixes.</div>
+            <div class="summary">Rotate log files by size or by the timestamp of each record.</div>
           </li><li id="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.advanced<wbr></wbr>_rotating<wbr></wbr>_file<wbr></wbr>_handler<wbr></wbr>.<wbr></wbr>Advanced<wbr></wbr>Rotating<wbr></wbr>File<wbr></wbr>Handler<wbr></wbr>.__init__</div>
@@ -83706,6 +83962,14 @@ been started.</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Remove old log files exceeding the backup count.</div>
+          </li><li id="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._restoreArchivedWindow">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.advanced<wbr></wbr>_rotating<wbr></wbr>_file<wbr></wbr>_handler<wbr></wbr>.<wbr></wbr>Advanced<wbr></wbr>Rotating<wbr></wbr>File<wbr></wbr>Handler<wbr></wbr>._restore<wbr></wbr>Archived<wbr></wbr>Window</div>
+            <div class="url">orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.html#_restoreArchivedWindow</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Restore an archived log window before appending a late record.</div>
           </li><li id="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._observeFailure">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.advanced<wbr></wbr>_rotating<wbr></wbr>_file<wbr></wbr>_handler<wbr></wbr>.<wbr></wbr>Advanced<wbr></wbr>Rotating<wbr></wbr>File<wbr></wbr>Handler<wbr></wbr>._observe<wbr></wbr>Failure</div>
@@ -83721,7 +83985,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Ensure the stream is available and up to date.</div>
+            <div class="summary">Open the destination for a record and rotate the previous file if needed.</div>
           </li><li id="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.emit">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.advanced<wbr></wbr>_rotating<wbr></wbr>_file<wbr></wbr>_handler<wbr></wbr>.<wbr></wbr>Advanced<wbr></wbr>Rotating<wbr></wbr>File<wbr></wbr>Handler<wbr></wbr>.emit</div>
@@ -83729,7 +83993,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Emit a log record.</div>
+            <div class="summary">Append a formatted record to its rotation window.</div>
           </li><li id="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.close">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.advanced<wbr></wbr>_rotating<wbr></wbr>_file<wbr></wbr>_handler<wbr></wbr>.<wbr></wbr>Advanced<wbr></wbr>Rotating<wbr></wbr>File<wbr></wbr>Handler<wbr></wbr>.close</div>
@@ -83738,6 +84002,70 @@ been started.</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Close the handler and release resources.</div>
+          </li><li id="orionis.logging.handlers._local.ApplicationTimeResolver">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>Time<wbr></wbr>Resolver</div>
+            <div class="url">orionis.logging.handlers._local.ApplicationTimeResolver.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Resolve log timestamps in the active application timezone.</div>
+          </li><li id="orionis.logging.handlers._local.ApplicationTimeResolver.__slots__">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>Time<wbr></wbr>Resolver<wbr></wbr>.__slots__</div>
+            <div class="url">orionis.logging.handlers._local.ApplicationTimeResolver.html#__slots__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Declare that this class introduces no additional instance slots.</div>
+          </li><li id="orionis.logging.handlers._local.ApplicationTimeResolver.__init__">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>Time<wbr></wbr>Resolver<wbr></wbr>.__init__</div>
+            <div class="url">orionis.logging.handlers._local.ApplicationTimeResolver.html#__init__</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Initialize the resolver with the application's default timezone.</div>
+          </li><li id="orionis.logging.handlers._local.ApplicationTimeResolver._zone">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>Time<wbr></wbr>Resolver<wbr></wbr>._zone</div>
+            <div class="url">orionis.logging.handlers._local.ApplicationTimeResolver.html#_zone</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Store the rotation zone override, or None to use the application zone.</div>
+          </li><li id="orionis.logging.handlers._local.ApplicationTimeResolver.tz">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>Time<wbr></wbr>Resolver<wbr></wbr>.tz</div>
+            <div class="url">orionis.logging.handlers._local.ApplicationTimeResolver.html#tz</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Property</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Return the active rotation zone.</div>
+          </li><li id="orionis.logging.handlers._local.ApplicationTimeResolver.tz.setter">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>Time<wbr></wbr>Resolver<wbr></wbr>.tz<wbr></wbr>.setter</div>
+            <div class="url">orionis.logging.handlers._local.ApplicationTimeResolver.html#tz.setter</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Set the timezone override for this resolver.</div>
+          </li><li id="orionis.logging.handlers._local.ApplicationTimeResolver._local">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>Time<wbr></wbr>Resolver<wbr></wbr>._local</div>
+            <div class="url">orionis.logging.handlers._local.ApplicationTimeResolver.html#_local</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Express a timestamp in the resolver's timezone.</div>
+          </li><li id="orionis.logging.handlers._local.ApplicationTimeResolver._upcoming">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>._local<wbr></wbr>.<wbr></wbr>Application<wbr></wbr>Time<wbr></wbr>Resolver<wbr></wbr>._upcoming</div>
+            <div class="url">orionis.logging.handlers._local.ApplicationTimeResolver.html#_upcoming</div>
+            <div class="type">Function</div>
+            <div class="kind">Static Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Check whether a proposed boundary exists and falls after the current time.</div>
           </li><li id="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.chunked<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Chunked<wbr></wbr>Suffix<wbr></wbr>Resolver</div>
@@ -83745,7 +84073,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Resolve log suffixes for configured time chunks.</div>
+            <div class="summary">Name size-rotated log chunks with a local timestamp and counter.</div>
           </li><li id="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.chunked<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Chunked<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.__slots__</div>
@@ -83761,7 +84089,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Initialize the ChunkedSuffixResolver.</div>
+            <div class="summary">Initialize the chunk counter and its lock.</div>
           </li><li id="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver._counter">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.chunked<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Chunked<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>._counter</div>
@@ -83778,14 +84106,6 @@ been started.</tt>.</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Lock protecting concurrent access to shared state.</div>
-          </li><li id="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.tz">
-            
-            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.chunked<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Chunked<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.tz</div>
-            <div class="url">orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.html#tz</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Instance Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Tz produced by <tt class="rst-docutils rst-literal">DateTime.getZoneInfo</tt>.</div>
           </li><li id="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.getSuffix">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.chunked<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Chunked<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Suffix</div>
@@ -83793,7 +84113,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Generate a unique suffix for the log file.</div>
+            <div class="summary">Build the suffix for a size-rotated chunk in the resolver's timezone.</div>
           </li><li id="orionis.logging.handlers.chunked_suffix_resolver.ChunkedSuffixResolver.getNextRotationTime">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.chunked<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Chunked<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Next<wbr></wbr>Rotation<wbr></wbr>Time</div>
@@ -83801,7 +84121,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Compute the next rotation time for the log file.</div>
+            <div class="summary">Find the fallback rotation boundary.</div>
           </li><li id="orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.daily<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Daily<wbr></wbr>Suffix<wbr></wbr>Resolver</div>
@@ -83809,7 +84129,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Resolve log suffixes for daily rotation windows.</div>
+            <div class="summary">Group log files by local calendar day.</div>
           </li><li id="orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.daily<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Daily<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.__slots__</div>
@@ -83825,7 +84145,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Initialize the DailySuffixResolver with an optional rotation time.</div>
+            <div class="summary">Configure the daily rotation boundary.</div>
           </li><li id="orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver.at_time">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.daily<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Daily<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.at<wbr></wbr>_time</div>
@@ -83834,14 +84154,6 @@ been started.</tt>.</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">The time of day when log rotation should occur. Defaults to midnight.</div>
-          </li><li id="orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver.tz">
-            
-            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.daily<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Daily<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.tz</div>
-            <div class="url">orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver.html#tz</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Instance Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Tz produced by <tt class="rst-docutils rst-literal">DateTime.getZoneInfo</tt>.</div>
           </li><li id="orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver.getSuffix">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.daily<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Daily<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Suffix</div>
@@ -83849,7 +84161,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Generate a date-based suffix for log files.</div>
+            <div class="summary">Build the suffix for a day in the resolver's timezone.</div>
           </li><li id="orionis.logging.handlers.daily_suffix_resolver.DailySuffixResolver.getNextRotationTime">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.daily<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Daily<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Next<wbr></wbr>Rotation<wbr></wbr>Time</div>
@@ -83857,7 +84169,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Calculate the next log rotation datetime.</div>
+            <div class="summary">Find the next daily rotation boundary.</div>
           </li><li id="orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.hourly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Hourly<wbr></wbr>Suffix<wbr></wbr>Resolver</div>
@@ -83865,7 +84177,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Resolve log suffixes for hourly rotation windows.</div>
+            <div class="summary">Group log files by local hour and distinguish repeated hours.</div>
           </li><li id="orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.hourly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Hourly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.__slots__</div>
@@ -83874,22 +84186,6 @@ been started.</tt>.</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Declare the instance attribute slots reserved by this class.</div>
-          </li><li id="orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver.__init__">
-            
-            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.hourly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Hourly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.__init__</div>
-            <div class="url">orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver.html#__init__</div>
-            <div class="type">Function</div>
-            <div class="kind">Method</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Initialize the HourlySuffixResolver.</div>
-          </li><li id="orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver.tz">
-            
-            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.hourly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Hourly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.tz</div>
-            <div class="url">orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver.html#tz</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Instance Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Tz produced by <tt class="rst-docutils rst-literal">DateTime.getZoneInfo</tt>.</div>
           </li><li id="orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver.getSuffix">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.hourly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Hourly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Suffix</div>
@@ -83897,7 +84193,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Generate a suffix string for the given datetime in hourly format.</div>
+            <div class="summary">Build the hourly suffix in the resolver's timezone.</div>
           </li><li id="orionis.logging.handlers.hourly_suffix_resolver.HourlySuffixResolver.getNextRotationTime">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.hourly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Hourly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Next<wbr></wbr>Rotation<wbr></wbr>Time</div>
@@ -83905,7 +84201,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Calculate the next rotation time rounded to the next hour.</div>
+            <div class="summary">Find the next hourly rotation boundary.</div>
           </li><li id="orionis.logging.handlers.monthly_suffix_resolver._DECEMBER">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.monthly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>._DECEMBER</div>
@@ -83921,7 +84217,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Resolve log suffixes for monthly rotation windows.</div>
+            <div class="summary">Group log files by local calendar month.</div>
           </li><li id="orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.monthly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Monthly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.__slots__</div>
@@ -83937,7 +84233,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Initialize the resolver with an optional rotation time.</div>
+            <div class="summary">Configure the monthly rotation boundary.</div>
           </li><li id="orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver.at_time">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.monthly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Monthly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.at<wbr></wbr>_time</div>
@@ -83946,14 +84242,6 @@ been started.</tt>.</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">The time of day when rotation should occur. Defaults to midnight.</div>
-          </li><li id="orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver.tz">
-            
-            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.monthly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Monthly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.tz</div>
-            <div class="url">orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver.html#tz</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Instance Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Tz produced by <tt class="rst-docutils rst-literal">DateTime.getZoneInfo</tt>.</div>
           </li><li id="orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver.getSuffix">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.monthly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Monthly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Suffix</div>
@@ -83961,7 +84249,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the suffix string for the given datetime.</div>
+            <div class="summary">Build the suffix for a month in the resolver's timezone.</div>
           </li><li id="orionis.logging.handlers.monthly_suffix_resolver.MonthlySuffixResolver.getNextRotationTime">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.monthly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Monthly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Next<wbr></wbr>Rotation<wbr></wbr>Time</div>
@@ -83969,7 +84257,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Compute the next rotation datetime after the current time.</div>
+            <div class="summary">Find the next monthly rotation boundary.</div>
           </li><li id="orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.weekly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Weekly<wbr></wbr>Suffix<wbr></wbr>Resolver</div>
@@ -83977,7 +84265,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Resolve log suffixes for weekly rotation windows.</div>
+            <div class="summary">Group log files by local ISO week.</div>
           </li><li id="orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.weekly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Weekly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.__slots__</div>
@@ -83993,7 +84281,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Initialize WeeklySuffixResolver.</div>
+            <div class="summary">Configure the weekly rotation boundary.</div>
           </li><li id="orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver.at_time">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.weekly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Weekly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.at<wbr></wbr>_time</div>
@@ -84002,14 +84290,6 @@ been started.</tt>.</div>
             <div class="kind">Instance Variable</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">The time of day when rotation should occur. Defaults to midnight.</div>
-          </li><li id="orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver.tz">
-            
-            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.weekly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Weekly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.tz</div>
-            <div class="url">orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver.html#tz</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Instance Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Tz produced by <tt class="rst-docutils rst-literal">DateTime.getZoneInfo</tt>.</div>
           </li><li id="orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver.getSuffix">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.weekly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Weekly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Suffix</div>
@@ -84017,7 +84297,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Generate a weekly suffix based on the provided datetime.</div>
+            <div class="summary">Build the suffix for a week in the resolver's timezone.</div>
           </li><li id="orionis.logging.handlers.weekly_suffix_resolver.WeeklySuffixResolver.getNextRotationTime">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.weekly<wbr></wbr>_suffix<wbr></wbr>_resolver<wbr></wbr>.<wbr></wbr>Weekly<wbr></wbr>Suffix<wbr></wbr>Resolver<wbr></wbr>.get<wbr></wbr>Next<wbr></wbr>Rotation<wbr></wbr>Time</div>
@@ -84025,7 +84305,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Calculate the next rotation datetime based on the current time.</div>
+            <div class="summary">Find the next weekly rotation boundary.</div>
           </li><li id="orionis.logging.handlers.rotating_handler_factory._create_stack">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.handlers<wbr></wbr>.rotating<wbr></wbr>_handler<wbr></wbr>_factory<wbr></wbr>._create<wbr></wbr>_stack</div>
@@ -84098,6 +84378,22 @@ been started.</tt>.</div>
             <div class="kind">Static Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Create and return a log handler based on the channel configuration.</div>
+          </li><li id="orionis.logging.logger._ApplicationFormatter">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.logger<wbr></wbr>._<wbr></wbr>Application<wbr></wbr>Formatter</div>
+            <div class="url">orionis.logging.logger._ApplicationFormatter.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Format record creation times in the application's timezone.</div>
+          </li><li id="orionis.logging.logger._ApplicationFormatter.formatTime">
+            
+            <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.logger<wbr></wbr>._<wbr></wbr>Application<wbr></wbr>Formatter<wbr></wbr>.format<wbr></wbr>Time</div>
+            <div class="url">orionis.logging.logger._ApplicationFormatter.html#formatTime</div>
+            <div class="type">Function</div>
+            <div class="kind">Method</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Format a log record's timestamp in the active application timezone.</div>
           </li><li id="orionis.logging.Logger">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.<wbr></wbr>Logger</div>
@@ -84241,7 +84537,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Return the formatter shared by matching message and date formats.</div>
+            <div class="summary">Return the application formatter shared by matching format patterns.</div>
           </li><li id="orionis.logging.Logger.__createChannelHandler">
             
             <div class="fullName">orionis<wbr></wbr>.logging<wbr></wbr>.<wbr></wbr>Logger<wbr></wbr>.__create<wbr></wbr>Channel<wbr></wbr>Handler</div>
@@ -90458,6 +90754,14 @@ been started.</tt>.</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Validate and detach attributes from caller-owned mutable data.</div>
+          </li><li id="orionis.orm.factories.fake._with_timezone">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.factories<wbr></wbr>.fake<wbr></wbr>._with<wbr></wbr>_timezone</div>
+            <div class="url">orionis.orm.factories.fake.module.html#_with_timezone</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Supply the application timezone to native temporal providers when omitted.</div>
           </li><li id="orionis.orm.factories.fake._camel_case">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.factories<wbr></wbr>.fake<wbr></wbr>._camel<wbr></wbr>_case</div>
@@ -90537,7 +90841,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Expose fake-data provider methods through a configured view.</div>
+            <div class="summary">Expose fake-data providers through a normal, unique or optional view.</div>
           </li><li id="orionis.orm.factories.fake._ProviderView.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.factories<wbr></wbr>.fake<wbr></wbr>._<wbr></wbr>Provider<wbr></wbr>View<wbr></wbr>.__slots__</div>
@@ -91249,7 +91553,7 @@ been started.</tt>.</div>
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Fluent query builder bound to a model class.</div>
+            <div class="summary">Build queries that hydrate and persist model instances.</div>
           </li><li id="orionis.orm.query.ModelQueryBuilder.__slots__">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.query<wbr></wbr>.<wbr></wbr>Model<wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>.__slots__</div>
@@ -91266,6 +91570,14 @@ been started.</tt>.</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Initialize the builder for a model class.</div>
+          </li><li id="orionis.orm.query.ModelQueryBuilder._datetime_storage">
+            
+            <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.query<wbr></wbr>.<wbr></wbr>Model<wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>._datetime<wbr></wbr>_storage</div>
+            <div class="url">orionis.orm.query.ModelQueryBuilder.html#_datetime_storage</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Instance Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Model column storage rules applied to datetime predicates.</div>
           </li><li id="orionis.orm.query.ModelQueryBuilder._model">
             
             <div class="fullName">orionis<wbr></wbr>.orm<wbr></wbr>.query<wbr></wbr>.<wbr></wbr>Model<wbr></wbr>Query<wbr></wbr>Builder<wbr></wbr>._model</div>
@@ -95161,7 +95473,7 @@ been started.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Validate a field value against the reference moment.</div>
+            <div class="summary">Check whether a temporal value falls later than the reference instant.</div>
           </li><li id="orionis.schemas.rules.AfterOrEqual">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>After<wbr></wbr>Or<wbr></wbr>Equal</div>
@@ -95218,7 +95530,7 @@ moment.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Validate a field value against the reference moment.</div>
+            <div class="summary">Check whether a temporal value falls at or after the reference instant.</div>
           </li><li id="orionis.schemas.rules.Alpha">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Alpha</div>
@@ -95370,7 +95682,7 @@ moment.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Validate a field value against the reference moment.</div>
+            <div class="summary">Check whether a temporal value falls earlier than the reference instant.</div>
           </li><li id="orionis.schemas.rules.BeforeOrEqual">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Before<wbr></wbr>Or<wbr></wbr>Equal</div>
@@ -95427,7 +95739,7 @@ moment.</tt>.</div>
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Validate a field value against the reference moment.</div>
+            <div class="summary">Check whether a temporal value falls at or before the reference instant.</div>
           </li><li id="orionis.schemas.rules.Between">
             
             <div class="fullName">orionis<wbr></wbr>.schemas<wbr></wbr>.rules<wbr></wbr>.<wbr></wbr>Between</div>

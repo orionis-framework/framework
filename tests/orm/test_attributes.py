@@ -28,6 +28,12 @@ class _Doc(Model):
 
 
 class TestCastHandlers(TestCase):
+    """
+    Verify ORM attribute casts.
+
+    Exercise supported Python inputs, wire formats and conversion errors.
+    """
+
     def testIntAndFloatCasts(self) -> None:
         """Cast textual and numeric inputs to int and float.
 
@@ -60,9 +66,8 @@ class TestCastHandlers(TestCase):
         self.assertFalse(handler(0))
 
     def testDatetimeCastAcceptsMultipleShapes(self) -> None:
-        """Cast datetimes from instances, ISO strings, and timestamps.
-
-        Validates every accepted datetime input shape.
+        """
+        Convert datetimes, ISO strings and POSIX timestamps to application time.
 
         Returns
         -------
@@ -78,7 +83,7 @@ class TestCastHandlers(TestCase):
             (0, "1969-12-31T19:00:00-05:00"),
             (0.5, "1969-12-31T19:00:00.500000-05:00"),
         )
-        with patch.object(DateTime, "_timezone", timezone):
+        with patch.object(DateTime, "getTimezone", return_value=timezone):
             for value, expected in cases:
                 with self.subTest(value=value):
                     result = handler(value)
@@ -87,9 +92,8 @@ class TestCastHandlers(TestCase):
                     self.assertEqual(result.isoformat(), expected)
 
     def testDateCastAcceptsMultipleShapes(self) -> None:
-        """Cast dates from datetimes, dates, and ISO strings.
-
-        Validates every accepted date input shape.
+        """
+        Extract the local date and preserve plain dates and ISO date strings.
 
         Returns
         -------
@@ -102,6 +106,10 @@ class TestCastHandlers(TestCase):
         self.assertEqual(handler(today), today)
         moment = datetime(2026, 7, 24, 8, 0)
         self.assertEqual(handler(moment), today)
+        with patch.object(DateTime, "getTimezone", return_value="America/Bogota"):
+            midnight = datetime(2026, 7, 24, 2, tzinfo=UTC)
+            self.assertEqual(handler(midnight), date(2026, 7, 23))
+            self.assertEqual(handler(today), today)
 
     def testJsonCastDecodesStringsOnly(self) -> None:
         """Decode JSON strings and pass decoded structures through.

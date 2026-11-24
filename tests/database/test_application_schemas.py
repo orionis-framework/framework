@@ -1,4 +1,4 @@
-# ruff: noqa: DTZ001, PT009, PT027, S105, S608
+# ruff: noqa: PT009, PT027, S105, S608
 # Preserve native TestCase assertions, boundary probes, and fixture signatures.
 # Use synthetic token data and fixed fixture table names, never credentials or user SQL.
 from __future__ import annotations
@@ -19,6 +19,7 @@ from orionis.database.schema.schema import Schema
 from orionis.orm.exceptions import MassAssignmentException
 from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.types import String
+from orionis.support.facades import DateTime
 from orionis.support.facades.schema import Schema as SchemaFacade
 from orionis.test import TestCase
 
@@ -320,7 +321,8 @@ class TestApplicationSchemas(TestCase):
         updated = await User.find(user.id)
         self.assertEqual(updated.name, "Ada Lovelace")
         self.assertIs(updated.active, expr2=False)
-        self.assertEqual(updated.email_verified_at, datetime(2026, 9, 28, 10, 30))
+        expected = DateTime.datetime(2026, 9, 28, 10, 30)
+        self.assertEqual(updated.email_verified_at, expected)
         self.assertEqual(updated.password, "digest")
         serialized = updated.toDict()
         self.assertNotIn("password", serialized)

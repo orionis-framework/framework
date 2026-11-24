@@ -45,6 +45,8 @@ assert all(product.isDirty("name") for product in products)
 
 `self.fake` es la facade de Faker con nombres camelCase: `firstName()`, `safeEmail()` y `word()` son ejemplos. `locale=` selecciona idioma; sin él se intenta `app.locale` y se utiliza `en_US` si no hay configuración/locale usable. `fake.unique` conserva valores vistos por esa instancia; `clearUnique()` permite reiniciar ese registro. Una vista unique derivada comparte inicialmente el historial de valores; limpiar esa vista inicia un historial independiente, conforme al comportamiento de Faker. La unicidad de Faker no garantiza unicidad contra filas existentes en la base. No uses estos datos para credenciales reales.
 
+Los generadores temporales de Faker que aceptan `tzinfo` usan la zona de la aplicación por defecto. Puedes indicar otra zona o pasar `tzinfo=None` para usar el comportamiento original del proveedor.
+
 `fake.optional` ofrece una vista de proveedores con parámetro `prob`; `fake.addProvider(provider)` registra proveedores personalizados e invalida métodos cacheados. `seedInstance(seed)` y `seedLocale(locale, seed)` permiten reseed explícito; `locales` devuelve una lista independiente. `UniqueFake` y `OptionalFake` están exportadas para tipado y extensión de estas vistas, sin exponer servicios dentro de los atributos generados.
 
 ## Persistir con control de fallos

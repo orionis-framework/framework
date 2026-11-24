@@ -15,6 +15,7 @@ from orionis.orm import attributes as attributes_module
 from orionis.orm.exceptions import OrmConfigurationException
 from orionis.orm.schema.column import ColumnDefinition
 from orionis.orm.schema.table import TableDefinition
+from orionis.orm.schema.types import ColumnType
 
 if TYPE_CHECKING:
     # The forwarded methods exist only as declarations in a .pyi file.
@@ -197,7 +198,7 @@ def pluralize(word: str) -> str:
 @dataclass(slots=True, eq=False)
 class ModelMetadata:
     """
-    Precomputed metadata describing a model class.
+    Describe a model's columns, casts and persistence rules.
 
     Built once by the metaclass so hot paths (hydration, persistence)
     never perform reflection at runtime.
@@ -234,6 +235,8 @@ class ModelMetadata:
         Update timestamp column, when present.
     deleted_column : str or None
         Soft delete timestamp column, when the model soft deletes.
+    datetime_storage : dict[str, orionis.orm.attributes.DateTimeStorage]
+        Map column names to storage rules for timestamps and explicit datetime casts.
     uses_unique_ids : bool
         Whether the primary key is a client-generated unique identifier.
     accessors : dict of str ``to`` str
@@ -265,6 +268,9 @@ class ModelMetadata:
     created_column: str | None = None
     updated_column: str | None = None
     deleted_column: str | None = None
+    datetime_storage: dict[str, attributes_module.DateTimeStorage] = field(
+        default_factory=dict,
+    )
     uses_unique_ids: bool = False
     accessors: dict[str, str] = field(default_factory=dict)
     mutators: dict[str, str] = field(default_factory=dict)
@@ -310,6 +316,10 @@ class ModelMetadata:
         dict
             The same mapping with cast values applied.
         """
+        for key, storage in self.datetime_storage.items():
+            value = attributes.get(key)
+            if storage.managed and value is not None:
+                attributes[key] = attributes_module.local_stored_timestamp(value)
         for key, handler in self.cast_lookup.items():
             value = attributes.get(key)
             if value is not None:
@@ -319,7 +329,7 @@ class ModelMetadata:
 
 class ModelMeta(_ModelQueryMeta):
     """
-    Metaclass discovering model columns and building their metadata.
+    Collect model columns and compile metadata at class creation.
 
     At class creation time the metaclass collects column definitions
     (including inherited ones), removes them from the class namespace so
@@ -339,6 +349,8 @@ class ModelMeta(_ModelQueryMeta):
 
         Parameters
         ----------
+        mcs : type[orionis.orm.metaclass.ModelMeta]
+            Metaclass constructing the model.
         name : str
             Name of the class being created.
         bases : tuple of type
@@ -348,13 +360,17 @@ class ModelMeta(_ModelQueryMeta):
         **kwargs : typing.Any
             Additional keyword arguments forwarded to ``type``.
 
-        mcs : type[orionis.orm.metaclass.ModelMeta]
-            Metaclass creating the model, including specialized subclasses.
-
         Returns
         -------
         type
             The created model class with ``__meta__`` attached.
+
+        Raises
+        ------
+        orionis.orm.OrmConfigurationException
+            If the declared table or soft-delete column is invalid.
+        orionis.orm.OrmException
+            If a model declares an unsupported cast.
         """
         cls = super().__new__(mcs, name, bases, namespace, **kwargs)
 
@@ -376,6 +392,19 @@ class ModelMeta(_ModelQueryMeta):
         updated = str(getattr(cls, "UPDATED_AT", "updated_at"))
         timestamps = bool(getattr(cls, "timestamps", True))
         deleted_column = mcs._resolveDeletedColumn(cls, columns)
+        managed = {created, updated} if timestamps else set()
+        if deleted_column is not None:
+            managed.add(deleted_column)
+        datetime_storage = {
+            key: attributes_module.DateTimeStorage(
+                aware=column.timezone, managed=key in managed,
+            )
+            for key, column in columns.items()
+            if column.column_type in (ColumnType.DATETIME, ColumnType.TIMESTAMP)
+            and (
+                key in managed or str(casts.get(key, "")).strip().lower() == "datetime"
+            )
+        }
 
         cls.__meta__ = ModelMetadata(
             table_name=table.name,
@@ -396,6 +425,7 @@ class ModelMeta(_ModelQueryMeta):
             created_column=created if timestamps and created in columns else None,
             updated_column=updated if timestamps and updated in columns else None,
             deleted_column=deleted_column,
+            datetime_storage=datetime_storage,
             uses_unique_ids=bool(getattr(cls, "uuids", False)),
             accessors=accessors,
             mutators=mutators,

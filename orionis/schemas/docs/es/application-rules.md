@@ -19,6 +19,8 @@ Las 49 validaciones incluidas se componen de 39 reglas ejecutables y 10 constrai
 | Archivos | `File`, `Image`, `MimeTypes(*mime_types)`, `Dimensions(...)`. Requieren un objeto de archivo compatible; una ruta enviada por el cliente no equivale a un upload. |
 | Servicios externos | `ActiveUrl`, `Unique(table, column, *, ignore=None, ignore_column="id", connection=None)`. |
 
+Las reglas temporales interpretan las entradas sin desplazamiento en la zona de la aplicación. Una fecha sin hora corresponde a la medianoche local. `After`, `Before` y sus variantes inclusivas comparan los instantes resultantes, incluidas las dos ocurrencias de una hora repetida cuando la entrada especifica el desplazamiento.
+
 Todas aceptan `message=` como opción keyword. `Between` y `Size` usan magnitud numérica, longitud para texto/colecciones y kilobytes para uploads. `Dimensions` admite `width`, `height`, `min_width`, `max_width`, `min_height`, `max_height`, `ratio`, `min_ratio`, `max_ratio`; los ratios pueden ser números o textos como `"3/2"`. El lector de imágenes inspecciona cabeceras; no convierte ni sanea un archivo.
 
 Las reglas que leen uploads ejecutan el lector síncrono fuera del hilo del loop.

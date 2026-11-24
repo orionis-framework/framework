@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import pendulum
 import uuid
+from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from collections.abc import Callable
 from typing import Any, Self
@@ -72,9 +73,14 @@ def _cast_date(value: Any) -> date:
     -------
     datetime.date
         Date representation of the value.
+
+    Raises
+    ------
+    ValueError
+        If the input string is not an ISO calendar date.
     """
     if isinstance(value, datetime):
-        return value.date()
+        return DateTime.fromDatetime(value).date()
     if isinstance(value, date):
         return value
     return date.fromisoformat(str(value))
@@ -158,6 +164,73 @@ def get_cast_handler(cast: str) -> Callable[[Any], Any]:
     return handler
 
 
+def local_stored_timestamp(value: datetime | str) -> pendulum.DateTime:
+    """
+    Read an ORM-managed UTC timestamp, including offset-less legacy rows.
+
+    Parameters
+    ----------
+    value : datetime.datetime or str
+        Driver value or ISO text from a managed timestamp column.
+
+    Returns
+    -------
+    ``pendulum.DateTime``
+        The stored UTC instant in the application timezone.
+
+    Raises
+    ------
+    ValueError
+        If a string cannot be parsed as an ISO datetime.
+    """
+    if isinstance(value, str):
+        value = datetime.fromisoformat(value)
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return DateTime.fromDatetime(value)
+
+
+@dataclass(frozen=True, slots=True)
+class DateTimeStorage:
+    """
+    Bind a datetime according to its column's storage policy.
+
+    Attributes
+    ----------
+    aware : bool
+        Whether the column accepts a datetime with an offset.
+    managed : bool
+        Whether the ORM maintains this timestamp in UTC.
+    """
+
+    aware: bool
+    managed: bool
+
+    def bind(self, value: datetime | str | float) -> datetime:
+        """
+        Store managed timestamps in UTC and user casts in application time.
+
+        Parameters
+        ----------
+        value : datetime.datetime, str or float
+            Datetime, ISO text or POSIX timestamp supplied to the model.
+
+        Returns
+        -------
+        datetime.datetime
+            Value using the timezone representation accepted by the column.
+
+        Raises
+        ------
+        ValueError
+            If a string cannot be parsed as an ISO datetime.
+        """
+        moment = _cast_datetime(value)
+        if self.managed:
+            moment = moment.astimezone(UTC)
+        return moment if self.aware else moment.replace(tzinfo=None)
+
+
 def serialize_for_storage(
     meta: metaclass_module.ModelMetadata,
     values: dict[str, Any],
@@ -166,8 +239,8 @@ def serialize_for_storage(
     Convert attribute values into driver-friendly storage values.
 
     Structures stored outside JSON or PickleType columns are serialized to
-    strings, and UUID objects targeting neither UUID nor PickleType columns
-    are stringified; every other value passes through unchanged.
+    strings, UUID objects are stringified outside native UUID or PickleType
+    columns, and ORM-maintained timestamps are normalized to UTC per column.
 
     Parameters
     ----------
@@ -186,28 +259,23 @@ def serialize_for_storage(
     for key, value in values.items():
         if value is None:
             continue
-        # JSON structures need explicit encoding outside JSON columns.
-        if isinstance(value, (dict, list)):
-            column = columns.get(key)
-            if column is not None and column.column_type not in {
-                ColumnType.JSON,
-                ColumnType.PICKLE_TYPE,
-            }:
-                serialized[key] = json.dumps(value)
-        # UUID objects need their string form outside UUID columns.
-        elif isinstance(value, uuid.UUID):
-            column = columns.get(key)
-            if column is not None and column.column_type not in {
-                ColumnType.UUID,
-                ColumnType.PICKLE_TYPE,
-            }:
-                serialized[key] = str(value)
+        storage = meta.datetime_storage.get(key)
+        if storage is not None and isinstance(value, (datetime, str, int, float)):
+            serialized[key] = storage.bind(value)
+            continue
+        column = columns.get(key)
+        if column is None or column.column_type == ColumnType.PICKLE_TYPE:
+            continue
+        if isinstance(value, (dict, list)) and column.column_type != ColumnType.JSON:
+            serialized[key] = json.dumps(value)
+        elif isinstance(value, uuid.UUID) and column.column_type != ColumnType.UUID:
+            serialized[key] = str(value)
     return serialized
 
 
 class AttributesMixin:
     """
-    Attribute handling behavior shared by every model.
+    Assign, cast and serialize model attributes.
 
     Provides mass assignment with fillable/guarded enforcement, cast
     application, and serialization helpers. The mixin operates on the
@@ -280,6 +348,8 @@ class AttributesMixin:
         handler = meta.cast_lookup.get(key)
         if handler is not None and value is not None:
             value = handler(value)
+        elif key in meta.datetime_storage and value is not None:
+            value = _cast_datetime(value)
         self._attributes[key] = value
 
     def getAttribute(self, key: str, default: Any = None) -> Any:

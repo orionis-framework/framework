@@ -4,19 +4,79 @@
 from __future__ import annotations
 import asyncio
 from datetime import UTC, datetime
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Self
 from unittest.mock import AsyncMock, MagicMock, patch
+from zoneinfo import ZoneInfo
 from apscheduler.jobstores.memory import MemoryJobStore
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.triggers.cron import CronTrigger
 import orionis.console.tasks.schedule as schedule_module
 from orionis.console.contracts.schedule import ISchedule
 from orionis.console.enums.events import SchedulerEvent
 from orionis.console.enums.states import ScheduleStates
 from orionis.console.fluent.contracts.task import ITask
+from orionis.console.tasks._backend import SchedulerBackend
 from orionis.console.tasks.schedule import Schedule
+from orionis.support.facades.datetime import DateTime
 from orionis.test import TestCase
 
 
 class TestSchedule(TestCase):
+    """
+    Verify the scheduler lifecycle and its registered jobs.
+
+    Exercise fluent task definitions, persistent stores, and scheduler events.
+    """
+
+    async def testRestartUpgradesDeclaredPersistentCronAndCatchup(self) -> None:
+        """
+        Verify that restarting replaces an older persisted cron trigger.
+
+        Replay missed runs from SQLite across a repeated local hour.
+        """
+        directory = self.enterContext(TemporaryDirectory())
+        url = f"sqlite:///{Path(directory) / 'jobs.db'}"
+        zone = ZoneInfo("America/New_York")
+        legacy = SchedulerBackend(event_loop=asyncio.get_running_loop(), timezone=zone)
+        legacy.add_jobstore(SQLAlchemyJobStore(url=url), "database")
+        legacy.add_job(
+            schedule_module._execute_scheduled_command,
+            CronTrigger(hour=1, minute=30, timezone=zone),
+            args=["app:cron", []], id="app:cron", jobstore="database",
+        )
+        legacy.start(paused=True)
+        legacy.shutdown()
+
+        stores = self._makeStores()
+        stores.config.store = stores.store = "database"
+        stores.database.return_value = SQLAlchemyJobStore(url=url)
+        reactor = MagicMock()
+        reactor.info = AsyncMock(return_value=[{"signature": "app:cron"}])
+        schedule = Schedule(reactor, MagicMock(), stores)
+        with (
+            patch.object(DateTime, "getZoneInfo", return_value=zone),
+            patch.object(schedule, "_Schedule__suppressApschedulerLogging"),
+        ):
+            schedule.command("app:cron").dailyAt(1, 30)
+            await schedule.boot()
+            try:
+                # Read back the serialized replacement and exercise APScheduler's
+                # missed-run enumeration over the autumn overlap.
+                job = schedule._Schedule__scheduler.get_job("app:cron", "database")
+                first = datetime(2026, 10, 31, 1, 30, tzinfo=zone)
+                job.next_run_time = first
+                due = job._get_run_times(datetime(2026, 11, 2, 3, tzinfo=zone))
+                self.assertEqual([instant.astimezone(UTC) for instant in due], [
+                    datetime(2026, 10, 31, 5, 30, tzinfo=UTC),
+                    datetime(2026, 11, 1, 5, 30, tzinfo=UTC),
+                    datetime(2026, 11, 2, 6, 30, tzinfo=UTC),
+                ])
+            finally:
+                schedule.shutdown(wait=0)
+                await schedule.wait()
+
     async def testPartialStartupReleasesTheFailingNativeStore(self) -> None:
         """
         Release an owned store even when its native startup fails.

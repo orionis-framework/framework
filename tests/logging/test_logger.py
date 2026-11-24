@@ -3,10 +3,12 @@
 # Direct logger construction isolates the application name from the test runner.
 import gc
 import logging
+from datetime import UTC, datetime
 from contextlib import ExitStack
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import AsyncMock, MagicMock, patch
+from zoneinfo import ZoneInfo
 from orionis.failure.base.handler import BaseExceptionHandler
 from orionis.failure.runtime import FailureRuntime, operation
 from orionis.foundation.config.logging.enums.levels import Level
@@ -15,6 +17,7 @@ from orionis.logging.handlers.advanced_rotating_file_handler import (
     AdvancedRotatingFileHandler,
 )
 from orionis.logging.logger import Logger
+from orionis.support.facades.datetime import DateTime
 from orionis.test import TestCase
 from tests.support.failure_runtime import activate_runtime
 
@@ -444,6 +447,12 @@ class TestLoggerMessages(_LoggerFixture):
 
 
 class TestLoggerFormatter(_LoggerFixture):
+    """
+    Verify timestamp formatting and formatter reuse across logging channels.
+
+    Read the files emitted by channels configured under a temporary root.
+    """
+
     def setUp(self) -> None:
         """Isolate the shared formatter cache and build a temporary root.
 
@@ -520,6 +529,34 @@ class TestLoggerFormatter(_LoggerFixture):
             )
         finally:
             logger.close()
+
+    def testExistingChannelUsesTheActiveZoneAndRecordInstant(self) -> None:
+        """
+        Verify that a channel applies timezone changes to an existing record.
+
+        Check the destination day and formatted time in Tokyo and Bogotá.
+        """
+        logger = Logger(
+            _make_app(
+                self._tmp.name,
+                default="daily",
+                channels={"daily": _channel(path=_DAILY_PATH)},
+            ),
+        )
+        self.addCleanup(logger.close)
+        channel = logger.getLogger()
+        record = logging.LogRecord("zone", logging.INFO, "", 1, "event", (), None)
+        record.created = datetime(2026, 1, 1, 3, tzinfo=UTC).timestamp()
+        for zone, date, hour in (
+            ("Asia/Tokyo", "2026-01-01", "12:00:00"),
+            ("America/Bogota", "2025-12-31", "22:00:00"),
+        ):
+            with patch.object(DateTime, "getZoneInfo", return_value=ZoneInfo(zone)):
+                channel.handle(record)
+            file = Path(self._tmp.name) / _DAILY_PATH.format(suffix=date)
+            self.assertEqual(
+                file.read_text(encoding="utf-8"), f"{date} {hour} [INFO]: event\n",
+            )
 
 
 class TestLoggerDefaultChannel(_LoggerFixture):

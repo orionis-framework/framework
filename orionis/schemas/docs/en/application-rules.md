@@ -19,6 +19,8 @@ The 49 bundled validations comprise 39 executable rules and 10 compiled structur
 | Files | `File`, `Image`, `MimeTypes(*mime_types)`, `Dimensions(...)`. They require a compatible file object; a client-provided path is not an upload. |
 | External services | `ActiveUrl`, `Unique(table, column, *, ignore=None, ignore_column="id", connection=None)`. |
 
+Date comparison rules interpret offset-free inputs in the application timezone. A date without a time denotes local midnight. `After`, `Before` and their inclusive variants compare the resulting instants, including both occurrences of a repeated hour when the input specifies an offset.
+
 All accept the keyword option `message=`. `Between` and `Size` measure numeric magnitude, text/collection length, and upload size in kilobytes. `Dimensions` accepts `width`, `height`, `min_width`, `max_width`, `min_height`, `max_height`, `ratio`, `min_ratio`, and `max_ratio`; ratios may be numbers or strings such as `"3/2"`. Image inspection reads headers; it does not convert or sanitize a file. Rules that read upload contents offload the synchronous file reader so disk-backed uploads do not block the event loop.
 
 Cancellation waits for an active synchronous upload read to finish before

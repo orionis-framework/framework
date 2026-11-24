@@ -13,6 +13,7 @@ import uuid
 from pathlib import Path
 from pkgutil import resolve_name
 from typing import TYPE_CHECKING, Any
+from zoneinfo import ZoneInfo
 import msgspec.json as _msgjson
 from orionis.support.types.sentinel import _MISSING_TYPE, MISSING
 
@@ -46,13 +47,34 @@ def _identity(o: Any) -> Any:
     return o
 
 
+def _encode_temporal(value: dt.datetime | dt.time) -> dict[str, Any]:
+    """
+    Encode a datetime or time with its timezone and fold.
+
+    Parameters
+    ----------
+    value : datetime.datetime or datetime.time
+        Calendar value to persist.
+
+    Returns
+    -------
+    dict[str, typing.Any]
+        Tagged ISO value with its IANA zone when known and its fold when set.
+    """
+    encoded: dict[str, Any] = {
+        _TK: "datetime" if isinstance(value, dt.datetime) else "time",
+        _VK: value.isoformat(),
+    }
+    if isinstance(value.tzinfo, ZoneInfo) and value.tzinfo.key is not None:
+        encoded["timezone"] = value.tzinfo.key
+    if value.fold:
+        encoded["fold"] = value.fold
+    return encoded
+
+
 def _encode_subclass(obj: Any, t: type) -> Any:
     """
     Encode subclass instances not covered by the exact-type dispatch table.
-
-    Walk a priority-ordered chain of ``isinstance`` checks to handle Path
-    subclasses, datetime hierarchy, collection subclasses, and sentinel
-    values. Raises ``TypeError`` for unsupported types.
 
     Parameters
     ----------
@@ -64,7 +86,7 @@ def _encode_subclass(obj: Any, t: type) -> Any:
     Returns
     -------
     typing.Any
-        JSON-compatible representation of *obj*.
+        JSON-compatible representation with deterministic ordering for sets.
 
     Raises
     ------
@@ -93,7 +115,11 @@ def _encode_subclass(obj: Any, t: type) -> Any:
         }
     for base in (tuple, frozenset, set):
         if isinstance(obj, base):
-            return {_TK: base.__name__, _VK: [_encode(v) for v in obj]}
+            items = [_encode(v) for v in obj]
+            return {
+                _TK: base.__name__,
+                _VK: items if base is tuple else sorted(items, key=_msgjson.encode),
+            }
     if isinstance(obj, enum.Enum):
         et = type(obj)
         class_path = f"{et.__module__}.{et.__qualname__}"
@@ -120,18 +146,12 @@ _ENCODE_EXACT: dict[type, Callable[[Any], Any]] = {
         _TK: "bytes",
         _VK: base64.b64encode(o).decode(),
     },
-    dt.datetime: lambda o: {
-        _TK: "datetime",
-        _VK: o.isoformat(),
-    },
+    dt.datetime: _encode_temporal,
     dt.date: lambda o: {
         _TK: "date",
         _VK: o.isoformat(),
     },
-    dt.time: lambda o: {
-        _TK: "time",
-        _VK: o.isoformat(),
-    },
+    dt.time: _encode_temporal,
     dt.timedelta: lambda o: {
         _TK: "timedelta",
         _VK: {"days": o.days, "seconds": o.seconds, "microseconds": o.microseconds},
@@ -351,7 +371,7 @@ _DECODE_DISPATCH: dict[str, Callable[[Any], Any]] = {
 
 def _decode(obj: Any) -> Any:
     """
-    Decode recursively serialized cache payloads into Python objects.
+    Restore Python values from a typed cache payload.
 
     Parameters
     ----------
@@ -361,30 +381,65 @@ def _decode(obj: Any) -> Any:
     Returns
     -------
     typing.Any
-        Decoded Python object, with typed payload wrappers resolved via
-        ``_DECODE_DISPATCH``.
+        Decoded value, including the original IANA timezone and fold when stored.
 
     Raises
     ------
     ValueError
-        If a serialized type key is present but has no registered decoder.
+        If a type tag is unknown or a temporal value is malformed.
+    zoneinfo.ZoneInfoNotFoundError
+        If the stored timezone is absent from the installed IANA database.
     """
     if type(obj) is list:
         return [_decode(v) for v in obj]
-    if type(obj) is dict:
-        if _TK in obj:
-            handler = _DECODE_DISPATCH.get(obj[_TK])
-            if handler is None:
-                error_msg = f"Unknown serialized type: {obj[_TK]}"
-                raise ValueError(error_msg)
-            return handler(obj[_VK])
+    if type(obj) is not dict:
+        return obj
+    if _TK not in obj:
         return {k: _decode(v) for k, v in obj.items()}
-    # Primitive types (str, int, float, bool, None) are returned as-is
-    return obj
+
+    handler = _DECODE_DISPATCH.get(obj[_TK])
+    if handler is None:
+        error_msg = f"Unknown serialized type: {obj[_TK]}"
+        raise ValueError(error_msg)
+    value = handler(obj[_VK])
+    if isinstance(value, (dt.datetime, dt.time)) and (
+        "timezone" in obj or "fold" in obj
+    ):
+        zone = ZoneInfo(obj["timezone"]) if "timezone" in obj else value.tzinfo
+        return value.replace(tzinfo=zone, fold=obj.get("fold", 0))
+    return value
 
 
 class Serializer:
-    """Encode and decode cache values with the configured serialization format."""
+    """
+    Encode and restore typed cache values.
+
+    Preserve named timezones and folds when serializing datetimes and times.
+    """
+
+    @staticmethod
+    def equivalent(left: Any, right: Any) -> bool:
+        """
+        Compare two values using their persisted representations.
+
+        Parameters
+        ----------
+        left : typing.Any
+            First cache value.
+        right : typing.Any
+            Second cache value.
+
+        Returns
+        -------
+        bool
+            Whether the encoded fields match, including named timezones and folds.
+
+        Raises
+        ------
+        TypeError
+            If either value contains an unsupported type.
+        """
+        return _encode(left) == _encode(right)
 
     @staticmethod
     def dumps(data: Any, indent: int | None = None) -> str:

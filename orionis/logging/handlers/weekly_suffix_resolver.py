@@ -2,77 +2,73 @@
 
 from __future__ import annotations
 from datetime import datetime, time, timedelta
-from orionis.logging.contracts.suffix_resolver import SuffixResolver
-from orionis.support.facades.datetime import DateTime
+from orionis.logging.handlers._local import ApplicationTimeResolver
 
 
-class WeeklySuffixResolver(SuffixResolver):
-    """Resolve log suffixes for weekly rotation windows."""
+class WeeklySuffixResolver(ApplicationTimeResolver):
+    """
+    Group log files by local ISO week.
 
-    __slots__ = ("at_time", "tz")
+    The weekly boundary falls on Monday at the configured local time.
+    """
+
+    __slots__ = ("at_time",)
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, at_time: time | None = None) -> None:
         """
-        Initialize WeeklySuffixResolver.
+        Configure the weekly rotation boundary.
 
         Parameters
         ----------
         at_time : datetime.time or None, optional
-            The time of day when rotation should occur. Defaults to midnight.
+            Local rotation time, defaulting to midnight.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Store the local rotation time for each Monday.
         """
         self.at_time = at_time or time(0, 0, 0)
         """The time of day when rotation should occur. Defaults to midnight."""
-        self.tz = DateTime.getZoneInfo()
-        """Tz produced by ``DateTime.getZoneInfo``."""
+        super().__init__()
 
     def getSuffix(self, dt: datetime | None = None) -> str:
         """
-        Generate a weekly suffix based on the provided datetime.
+        Build the suffix for a week in the resolver's timezone.
 
         Parameters
         ----------
         dt : datetime.datetime or None, optional
-            The datetime to use for suffix generation. If None, uses current
-            local datetime.
+            Aware instant, naive local wall time, or None for the current time.
 
         Returns
         -------
         str
-            The generated suffix in the format 'YYYY-weekWW'.
+            The ISO week year and number as ``YYYY-weekWW``.
         """
         # Use current local datetime if none is provided
-        if dt is None:
-            dt = datetime.now(tz=self.tz)
+        dt = self._local(dt)
         year, week, _ = dt.isocalendar()
         return f"{year}-week{week:02d}"
 
     def getNextRotationTime(self, current_time: datetime) -> datetime:
         """
-        Calculate the next rotation datetime based on the current time.
+        Find the next weekly rotation boundary.
 
         Parameters
         ----------
         current_time : datetime.datetime
-            The current instant. Naive values use the resolver timezone.
+            Reference instant, interpreted locally when it has no timezone.
 
         Returns
         -------
         datetime.datetime
-            The datetime when the next rotation should occur.
+            First future Monday at the configured local time.
         """
-        local_time = (
-            current_time.replace(tzinfo=self.tz)
-            if current_time.tzinfo is None
-            else current_time.astimezone(self.tz)
-        )
+        local_time = self._local(current_time)
         monday = local_time.date() - timedelta(days=local_time.weekday())
-        next_rotation = datetime.combine(monday, self.at_time, tzinfo=self.tz)
-        if next_rotation <= local_time:
+        next_rotation = datetime.combine(monday, self.at_time, tzinfo=local_time.tzinfo)
+        while not self._upcoming(next_rotation, local_time):
             next_rotation += timedelta(days=7)
         return next_rotation

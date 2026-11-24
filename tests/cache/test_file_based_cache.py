@@ -2,14 +2,22 @@
 # Preserve native TestCase assertions, boundary probes, and fixture signatures.
 from __future__ import annotations
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 from orionis.cache.file_based_cache import FileBasedCache
 from orionis.cache.serializer import Serializer
 from orionis.test import TestCase
 
 
 class TestFileBasedCache(TestCase):
+    """
+    Verify persistence and invalidation of file-based cache artifacts.
+
+    Use a temporary directory for each test.
+    """
+
     def setUp(self) -> None:
         """Create an isolated temporary directory before each test.
 
@@ -235,6 +243,29 @@ class TestFileBasedCache(TestCase):
         self.assertEqual(v1, v2)
         self.assertEqual(h1, h2)
         self.assertEqual(cache.get(), data)
+
+    def testSavePublishesEqualDatetimesWithDifferentZonesOrFolds(self) -> None:
+        """
+        Verify that saving a changed zone or fold replaces the cached value.
+
+        Returns
+        -------
+        None
+            Assert that the next read preserves the new timestamp and zone key.
+        """
+        cache = self._make()
+        zone = ZoneInfo("America/New_York")
+        first = datetime(2026, 11, 1, 1, 30, tzinfo=zone, fold=0)
+        cache.save({"meeting": first})
+        later = first.replace(fold=1)
+        cache.save({"meeting": later})
+        self.assertEqual(cache.get()["meeting"].timestamp(), later.timestamp())
+
+        local = datetime(2026, 3, 7, 12, tzinfo=zone)
+        cache.save({"meeting": local})
+        bogota = local.astimezone(ZoneInfo("America/Bogota"))
+        cache.save({"meeting": bogota})
+        self.assertEqual(cache.get()["meeting"].tzinfo.key, "America/Bogota")
 
     def testClearReturnsTrueWhenFileExists(self) -> None:
         """Return True after successfully removing an existing cache file.

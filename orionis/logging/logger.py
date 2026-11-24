@@ -7,6 +7,7 @@ import asyncio
 import logging
 import orionis.failure.runtime as failure_runtime
 from contextlib import suppress
+from datetime import datetime
 from pathlib import Path
 from threading import Lock
 from functools import partial
@@ -21,11 +22,49 @@ from orionis.logging.handlers.queued import (
 )
 from orionis.logging.handlers.rotating_handler_factory import RotatingHandlerFactory
 from orionis.support.concurrency import complete_on_cancel
+from orionis.support.facades.datetime import DateTime
+
+
+class _ApplicationFormatter(logging.Formatter):
+    """
+    Format record creation times in the application's timezone.
+
+    The formatter reads the active zone for each record so cached instances
+    follow configuration changes.
+    """
+
+    def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
+        """
+        Format a log record's timestamp in the active application timezone.
+
+        Parameters
+        ----------
+        record : logging.LogRecord
+            Record whose creation timestamp supplies the instant.
+        datefmt : str or None, optional
+            Explicit strftime pattern, or None for the standard logging format.
+
+        Returns
+        -------
+        str
+            Formatted local timestamp, including milliseconds when configured.
+        """
+        moment = datetime.fromtimestamp(record.created, DateTime.getZoneInfo())
+        if datefmt:
+            return moment.strftime(datefmt)
+        value = moment.strftime(self.default_time_format)
+        if self.default_msec_format:
+            return self.default_msec_format % (value, record.msecs)
+        return value
 
 
 class Logger(ILogger):
     # Identify the standard logger channel.
-    """Resolve logging channels and dispatch structured log records."""
+    """
+    Resolve logging channels and dispatch structured log records.
+
+    Channels share timestamp formatters that follow the active application zone.
+    """
 
     name: ClassVar[str] = "__orionis__"
 
@@ -270,12 +309,12 @@ class Logger(ILogger):
 
     def __createFormatter(self: Self) -> logging.Formatter:
         """
-        Return the formatter shared by matching message and date formats.
+        Return the application formatter shared by matching format patterns.
 
         Returns
         -------
-        ``logging.Formatter``
-            The configured formatter instance for log messages.
+        logging.Formatter
+            Formatter that reads the active application zone for each record.
         """
         # Identify the formatter by its message and date formats.
         cache_key: str = f"{self.__log_format}|{self.__date_format}"
@@ -285,7 +324,7 @@ class Logger(ILogger):
             return Logger._formatter_cache[cache_key]
 
         # Store the newly configured formatter.
-        formatter: logging.Formatter = logging.Formatter(
+        formatter: logging.Formatter = _ApplicationFormatter(
             self.__log_format,
             datefmt=self.__date_format,
         )

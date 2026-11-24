@@ -23,6 +23,8 @@ Protect this handler with session authentication, CSRF and authorization to issu
 
 The secret appears only in `NewAccessToken.plain_text`. `repr` and `toDict()` omit it. Deliver it once over a protected channel and keep it out of logs. `AccessToken` holds immutable metadata; the repository stores a digest rather than a recoverable secret.
 
+An explicit `expires_at` with an offset identifies an instant. A deadline without an offset uses `app.timezone`. The repository stores and compares UTC instants, reads historical offset-less database values as UTC, and returns token metadata in the application timezone.
+
 ## Restricting permission
 
 ```python

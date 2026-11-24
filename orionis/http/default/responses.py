@@ -95,16 +95,19 @@ def _status_message(status_code: int) -> str:
 
 
 class DefaultResponses(IDefaultResponses):
-    """Render the framework default HTTP error and status responses."""
+    """
+    Render the framework's built-in error and status responses.
+
+    Share the application name, locale and timezone across HTML pages.
+    """
 
     __slots__ = (
         "__app",
-        "__app_locale",
-        "__app_name",
         "__asset_paths",
         "__directory",
         "__engine",
         "__memory_cache",
+        "__page_settings",
     )
     """Declare the instance attribute slots reserved by this class."""
 
@@ -233,7 +236,7 @@ class DefaultResponses(IDefaultResponses):
         engine: IViewEngine,
     ) -> None:
         """
-        Initialize instance with application and directory dependencies.
+        Initialize the default response renderer and its page and asset caches.
 
         Parameters
         ----------
@@ -247,7 +250,7 @@ class DefaultResponses(IDefaultResponses):
         Returns
         -------
         None
-            This constructor does not return a value.
+            Retain the application, directory and view engine for subsequent requests.
         """
         # Store application, directory and official view engine dependencies.
         self.__app: IApplication = app
@@ -257,11 +260,8 @@ class DefaultResponses(IDefaultResponses):
         self.__engine: IViewEngine = engine
         """Official asynchronous template rendering engine."""
 
-        # Store the application name and locale.
-        self.__app_name: str = self.__app.config("app.name")
-        """Store the application name and locale."""
-        self.__app_locale: str = self.__app.config(_LOCALE_CONFIG_KEY)
-        """App locale produced by ``self.__app.config``."""
+        self.__page_settings: tuple[str, str, str] | None = None
+        """Application name, locale and timezone used in cached HTML."""
 
         # Initialize storage for asset paths and rendered page bodies.
         self.__memory_cache: dict[str, object] = {}
@@ -492,7 +492,9 @@ class DefaultResponses(IDefaultResponses):
 
     async def health(self, request: Request) -> HTMLResponse | JSONResponse:
         """
-        Render the application health state as an HTML or JSON response.
+        Render the current application health state as HTML or JSON.
+
+        Cache each HTML state using the application name, locale and timezone.
 
         Parameters
         ----------
@@ -522,7 +524,7 @@ class DefaultResponses(IDefaultResponses):
             )
 
         # Render the HTML state page and retain its encoded body.
-        self.__refreshContext()
+        settings = self.__refreshContext()
         cache = self.__memory_cache
         cached = cache.get(key_html)
         if cached is not None:
@@ -532,8 +534,6 @@ class DefaultResponses(IDefaultResponses):
                 headers=self._NO_CACHE_HEADERS,
             )
 
-        app_name = self.__app_name
-        locale = self.__app_locale
         html = await self.__render(template_page, {})
         response = HTMLResponse(
             content=html,
@@ -541,7 +541,7 @@ class DefaultResponses(IDefaultResponses):
             headers=self._NO_CACHE_HEADERS,
         )
         # Publish only bodies belonging to the current application identity.
-        if self.__app_name == app_name and self.__app_locale == locale:
+        if self.__page_settings == settings:
             cache[key_html] = response.getBody()
         return response
 
@@ -651,7 +651,14 @@ class DefaultResponses(IDefaultResponses):
         Returns
         -------
         orionis.http.HTMLResponse
-            Rendered exception page as an HTMLResponse with the given status code.
+            Diagnostic page with the supplied status and current application timezone.
+
+        Raises
+        ------
+        TypeError
+            If ``status_code`` is not an integer.
+        ValueError
+            If ``status_code`` is outside the range 100 to 599.
         """
         status_code = _validate_status_code(status_code)
         traceback_data = ExceptionParser(exception).toDict()
@@ -675,7 +682,6 @@ class DefaultResponses(IDefaultResponses):
                 "python_version": _PYTHON_VERSION,
                 "environment": config("app.env"),
                 "debug_mode": "Enabled" if config("app.debug") else "Disabled",
-                "timezone": DateTime.getTimezone(),
                 "interface": config("app.interface").upper(),
             },
         )
@@ -704,43 +710,46 @@ class DefaultResponses(IDefaultResponses):
         html = await self.__render("dump", {"dump_html": fragment})
         return HTMLResponse(content=html, headers={"Cache-Control": "no-store"})
 
-    def __refreshContext(self) -> None:
-        """Refresh application labels and expire health bodies when they change.
+    def __refreshContext(self) -> tuple[str, str, str]:
+        """
+        Invalidate cached health pages when shared template settings change.
 
         Returns
         -------
-        None
-            Update the labels used by subsequent template renders.
+        tuple[str, str, str]
+            Current application name, locale and timezone.
         """
         config = self.__app.config
-        app_name = config("app.name")
-        locale = config(_LOCALE_CONFIG_KEY)
-        if app_name != self.__app_name or locale != self.__app_locale:
-            self.__app_name = app_name
-            self.__app_locale = locale
+        settings = (
+            config("app.name"),
+            config(_LOCALE_CONFIG_KEY),
+            DateTime.getTimezone(),
+        )
+        if settings != self.__page_settings:
+            self.__page_settings = settings
             cache = self.__memory_cache
             cache.pop(self._HEALTH_STATES[False][3], None)
             cache.pop(self._HEALTH_STATES[True][3], None)
+        return settings
 
     async def __render(self, page: str, context: dict[str, object]) -> str:
         """
-        Render a built-in template through the application's official engine.
+        Render a built-in template with the current application settings.
 
         Parameters
         ----------
         page : str
             Internal template name, selected by this response service.
         context : dict[str, object]
-            Owned request context, filled with common template values.
+            Page-specific values extended with the shared template settings.
 
         Returns
         -------
         str
-            Rendered HTML document.
+            HTML document produced by the application view engine.
         """
-        self.__refreshContext()
-        context["app_name"] = self.__app_name
-        context["locale"] = self.__app_locale
+        app_name, locale, timezone = self.__refreshContext()
+        context.update(app_name=app_name, locale=locale, timezone=timezone)
         context["page"] = page
         context["asset_base"] = self._ASSET_BASE
         return await self.__engine.render(self._TEMPLATES[page], context)

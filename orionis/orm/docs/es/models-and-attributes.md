@@ -40,7 +40,7 @@ La tabla deriva del nombre de clase mediante snake case y pluralización. Usa `t
 
 Declara `created_at` y `updated_at` con tipos de fecha si quieres mantenimiento automático de timestamps. `timestamps=True` por sí solo **no añade columnas**. Los nombres se personalizan con `CREATED_AT` y `UPDATED_AT`. `table_definition` permite compartir una definición versionada con [migraciones](../../../database/docs/es/schema.md); no puede combinarse con columnas inline ni opciones de tabla/PK contradictorias.
 
-`freshTimestamp()` genera hora UTC y respeta la opción `timezone` de la columna de actualización, creación o borrado elegida, en ese orden. Una columna sin timezone usa datetime naive UTC; no representa automáticamente hora local. `newUniqueId()` se puede sobrescribir para una política de identidad cliente distinta del UUID predeterminado.
+`freshTimestamp()` devuelve un instante con la zona horaria de la aplicación. El ORM persiste los timestamps de creación, actualización y borrado lógico en UTC según la opción de cada columna. Al leer estas columnas, interpreta los valores sin zona como UTC, incluidas las filas históricas. Al asignar un valor sin zona al modelo, usa la hora de la aplicación. Puedes sobrescribir `newUniqueId()` para personalizar la generación de identidades.
 
 ## Controlar entrada y salida
 
@@ -49,6 +49,8 @@ El constructor, `fill()` y `update(attributes)` aplican asignación masiva. `fil
 La asignación directa (`article.status = "published"`) y `setAttribute` aplican mutadores/casts, pero no la lista `fillable`. Úsalas únicamente desde lógica confiable. Un mutador devuelve el valor a almacenar; luego se aplica el cast. Los casts disponibles son `int`, `float`, `bool`, `datetime`, `date`, `json` y `uuid`; `None` permanece `None`. Los casts no sustituyen validación de entrada ni restricciones SQL.
 
 El cast `datetime` devuelve un `pendulum.DateTime` en la zona horaria de la aplicación. Interpreta los valores sin zona como hora local de la aplicación y convierte los valores con zona y los timestamps POSIX sin cambiar el instante que representan.
+
+Una columna de negocio con cast `datetime` guarda la hora civil de la aplicación si su tipo SQL descarta el desplazamiento. Sus valores históricos reciben la misma interpretación. Durante el cambio al horario de invierno, dos instantes pueden tener la misma hora civil. Para conservar esa distinción en los campos de negocio se necesita un tipo y un motor que conserven el desplazamiento o una representación UTC explícita. El cast `date` extrae el día local de un `datetime` y conserva las fechas puras.
 
 `toDict()`/`serialize()` convierten los atributos y relaciones cargadas; `hidden` excluye secretos y `appends` incorpora accessors calculados. `toJson(**kwargs)` produce JSON. `only(*keys)` y `exclude(*keys)` seleccionan desde la representación serializada. Ocultar una columna no cifra su contenido ni impide consultarla.
 

@@ -8,6 +8,7 @@ import gzip
 import re
 import shutil
 import time
+from datetime import UTC, datetime
 from logging import Handler, LogRecord
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -20,7 +21,11 @@ _PATH_CACHE_LIMIT = 50
 
 
 class AdvancedRotatingFileHandler(Handler):
-    """Rotate log files using size limits and resolved time suffixes."""
+    """
+    Rotate log files by size or by the timestamp of each record.
+
+    A late record can reopen an earlier time window, including a compressed one.
+    """
 
     def __init__(
         self,
@@ -293,6 +298,47 @@ class AdvancedRotatingFileHandler(Handler):
             self._observeFailure(error, phase="cleanup")
             # Ignore cleanup errors to avoid affecting logging
 
+    def _restoreArchivedWindow(self, path: Path) -> None:
+        """
+        Restore an archived log window before appending a late record.
+
+        Parameters
+        ----------
+        path : pathlib.Path
+            Uncompressed log path for the window being reopened.
+
+        Returns
+        -------
+        None
+            Restore the archived contents when the uncompressed log is absent.
+
+        Raises
+        ------
+        OSError
+            If the archive is truncated or the filesystem operation fails.
+        """
+        archive = path.with_suffix(path.suffix + ".gz")
+        if path.exists() or not archive.exists():
+            return
+        restored: Path | None = None
+        try:
+            with (
+                gzip.open(archive, "rb") as source,
+                NamedTemporaryFile(dir=path.parent, delete=False) as output,
+            ):
+                restored = Path(output.name)
+                shutil.copyfileobj(source, output)
+            restored.replace(path)
+            restored = None
+            # The restored file now owns the complete history of this window.
+            archive.unlink()
+        except EOFError as cause:
+            message = f"Truncated log archive {archive}."
+            raise OSError(message) from cause
+        finally:
+            if restored is not None:
+                restored.unlink(missing_ok=True)
+
     def _observeFailure(self, error: BaseException, *, phase: str) -> None:
         """
         Observe a recovered sink error without changing rotation behavior.
@@ -316,17 +362,24 @@ class AdvancedRotatingFileHandler(Handler):
             phase=phase,
         )
 
-    def _ensureStream(self) -> None:
+    def _ensureStream(self, created: float | None = None) -> None:
         """
-        Ensure the stream is available and up to date.
+        Open the destination for a record and rotate the previous file if needed.
 
-        Checks if log rotation is needed and opens a new stream if required.
-        Updates the current suffix and file size accordingly.
+        Parameters
+        ----------
+        created : float or None, optional
+            Record creation time in POSIX seconds. None uses the resolver's clock.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Leave the destination stream open for appending.
+
+        Raises
+        ------
+        OSError
+            If the destination cannot be restored or opened.
         """
         if (
             self.max_bytes is not None
@@ -336,7 +389,10 @@ class AdvancedRotatingFileHandler(Handler):
             # Request unique chunk suffixes only when a new chunk is needed.
             current_suffix = self.current_suffix
         else:
-            current_suffix = self.suffix_resolver.getSuffix()
+            moment = (
+                datetime.fromtimestamp(created, UTC) if created is not None else None
+            )
+            current_suffix = self.suffix_resolver.getSuffix(moment)
 
         # Check if rotation is needed before writing
         if self._shouldRotate(current_suffix):
@@ -349,6 +405,8 @@ class AdvancedRotatingFileHandler(Handler):
             self.current_path = self._resolvePath(current_suffix)
 
             _p = Path(self.current_path)
+            if self.compress_rotated:
+                self._restoreArchivedWindow(_p)
             self.file_size = _p.stat().st_size if _p.exists() else 0
 
             # Open the current file for appended log lines.
@@ -361,17 +419,17 @@ class AdvancedRotatingFileHandler(Handler):
 
     def emit(self, record: LogRecord) -> None:
         """
-        Emit a log record.
+        Append a formatted record to its rotation window.
 
         Parameters
         ----------
-        record : ``logging.LogRecord``
-            The log record to emit.
+        record : logging.LogRecord
+            Record whose creation time determines its time-based destination.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Write the formatted record and update the file size on success.
         """
         try:
             # Format the record before acquiring the stream lock.
@@ -380,7 +438,7 @@ class AdvancedRotatingFileHandler(Handler):
             written_bytes = len(line.encode("utf-8")) if self._utf8_encoding else None
             with self._lock:
                 # Ensure the stream is ready and rotate if needed
-                self._ensureStream()
+                self._ensureStream(record.created)
 
                 if self.stream:
                     self.stream.write(line)

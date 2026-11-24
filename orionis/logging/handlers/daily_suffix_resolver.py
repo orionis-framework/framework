@@ -2,80 +2,76 @@
 
 from __future__ import annotations
 from datetime import datetime, time, timedelta
-from orionis.logging.contracts.suffix_resolver import SuffixResolver
-from orionis.support.facades.datetime import DateTime
+from orionis.logging.handlers._local import ApplicationTimeResolver
 
 
-class DailySuffixResolver(SuffixResolver):
-    """Resolve log suffixes for daily rotation windows."""
+class DailySuffixResolver(ApplicationTimeResolver):
+    """
+    Group log files by local calendar day.
 
-    __slots__ = ("at_time", "tz")
+    The daily boundary defaults to midnight in the resolver's timezone.
+    """
+
+    __slots__ = ("at_time",)
     """Declare the instance attribute slots reserved by this class."""
 
     def __init__(self, at_time: time | None = None) -> None:
         """
-        Initialize the DailySuffixResolver with an optional rotation time.
+        Configure the daily rotation boundary.
 
         Parameters
         ----------
         at_time : datetime.time or None, optional
-            The time of day when log rotation should occur. Defaults to midnight.
+            Local rotation time, defaulting to midnight.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Store the local time used for each daily boundary.
         """
         self.at_time = at_time or time(0, 0, 0)
         """The time of day when log rotation should occur. Defaults to midnight."""
-        self.tz = DateTime.getZoneInfo()
-        """Tz produced by ``DateTime.getZoneInfo``."""
+        super().__init__()
 
     def getSuffix(self, dt: datetime | None = None) -> str:
         """
-        Generate a date-based suffix for log files.
+        Build the suffix for a day in the resolver's timezone.
 
         Parameters
         ----------
         dt : datetime.datetime or None, optional
-            The datetime to use for generating the suffix. If None, uses current
-            local datetime.
+            Aware instant, naive local wall time, or None for the current time.
 
         Returns
         -------
         str
-            The date suffix in the format 'YYYY-MM-DD'.
+            The local date as ``YYYY-MM-DD``.
         """
         # Use current local datetime if none is provided
-        if dt is None:
-            dt = datetime.now(tz=self.tz)
+        dt = self._local(dt)
         return dt.strftime("%Y-%m-%d")
 
     def getNextRotationTime(self, current_time: datetime) -> datetime:
         """
-        Calculate the next log rotation datetime.
+        Find the next daily rotation boundary.
 
         Parameters
         ----------
         current_time : datetime.datetime
-            The current instant. Naive values use the resolver timezone.
+            Reference instant, interpreted locally when it has no timezone.
 
         Returns
         -------
         datetime.datetime
-            The datetime when the next log rotation should occur.
+            First future local date at the configured time.
         """
-        local_time = (
-            current_time.replace(tzinfo=self.tz)
-            if current_time.tzinfo is None
-            else current_time.astimezone(self.tz)
-        )
+        local_time = self._local(current_time)
         next_rotation = datetime.combine(
             local_time.date(),
             self.at_time,
-            tzinfo=self.tz,
+            tzinfo=local_time.tzinfo,
         )
         # If the calculated rotation time is not in the future, move to next day
-        if next_rotation <= local_time:
+        while not self._upcoming(next_rotation, local_time):
             next_rotation += timedelta(days=1)
         return next_rotation

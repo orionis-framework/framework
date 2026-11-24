@@ -295,7 +295,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId16968"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId17065"> 
                     
                 </input>
 
@@ -442,6 +442,88 @@
 
         
 
+    </li><li class="">
+        
+        
+        
+            <div class="itemName expandableItem">
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId17066"> 
+                    
+                </input>
+
+                <label class="lbl-toggle" for="expandableItemId17066">
+                    
+                    
+                </label>
+
+                <code><a href="orionis.orm.attributes.DateTimeStorage.html" class="internal-link" title="orionis.orm.attributes.DateTimeStorage"><wbr></wbr>Date<wbr></wbr>Time<wbr></wbr>Storage</a></code>
+
+                <div class="expandableContent">
+                    <div>
+        
+
+        
+         
+
+        
+        
+
+        <div class="childrenKindTitle">Methods</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.DateTimeStorage.html#bind" class="internal-link" title="orionis.orm.attributes.DateTimeStorage.bind">bind</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+
+        <div class="childrenKindTitle">Attributes</div>
+        <ul>
+    
+    <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.DateTimeStorage.html#aware" class="internal-link" title="orionis.orm.attributes.DateTimeStorage.aware">aware</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.DateTimeStorage.html#managed" class="internal-link" title="orionis.orm.attributes.DateTimeStorage.managed">managed</a></code>
+            </div>
+        
+
+    </li>
+</ul> 
+
+        
+         
+        
+      </div>
+                </div>
+            </div>
+            
+        
+
+        
+
     </li>
 </ul>
 
@@ -505,6 +587,16 @@
 
         
             <div class="itemName"><code><a href="orionis.orm.attributes.html#get_cast_handler" class="internal-link" title="orionis.orm.attributes.get_cast_handler">get<wbr></wbr>_cast<wbr></wbr>_handler</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.orm.attributes.html#local_stored_timestamp" class="internal-link" title="orionis.orm.attributes.local_stored_timestamp">local<wbr></wbr>_stored<wbr></wbr>_timestamp</a></code>
             </div>
         
 
@@ -606,11 +698,11 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AttributesMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L208" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.model.Model.html" class="internal-link">orionis.orm.model.Model</a></code></p><p><a href="classIndex.html#orionis.orm.attributes.AttributesMixin">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AttributesMixin</span>: <a href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L276" class="sourceLink">(source)</a></code></p><p>Known subclasses: <code><a href="orionis.orm.model.Model.html" class="internal-link">orionis.orm.model.Model</a></code></p><p><a href="classIndex.html#orionis.orm.attributes.AttributesMixin">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Attribute handling behavior shared by every model.</p>
+          <div><p>Assign, cast and serialize model attributes.</p>
 <p>Provides mass assignment with fillable/guarded enforcement, cast
 application, and serialization helpers. The mixin operates on the
 <tt class="rst-docutils rst-literal">_attributes</tt> mapping owned by the model instance.</p>
@@ -618,7 +710,7 @@ application, and serialization helpers. The mixin operates on the
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1588">
+          <table class="children sortable" id="id1603">
   
   
   <tr class="method">
@@ -692,7 +784,7 @@ application, and serialization helpers. The mixin operates on the
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">exclude</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*keys: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L400">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L470">
       
       (source)
     </a>
@@ -719,7 +811,7 @@ application, and serialization helpers. The mixin operates on the
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">fill</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Self" class="intersphinx-link">Self</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L220">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L288">
       
       (source)
     </a>
@@ -746,7 +838,7 @@ application, and serialization helpers. The mixin operates on the
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAttribute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">default: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>) -&gt; <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L285">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L355">
       
       (source)
     </a>
@@ -777,7 +869,7 @@ return value is what the caller sees.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">hasAccessor</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L310">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L380">
       
       (source)
     </a>
@@ -804,7 +896,7 @@ return value is what the caller sees.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">only</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">*keys: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L384">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L454">
       
       (source)
     </a>
@@ -831,7 +923,7 @@ return value is what the caller sees.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">serialize</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L356">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L426">
       
       (source)
     </a>
@@ -858,7 +950,7 @@ return value is what the caller sees.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">setAttribute</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">value: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L256">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L324">
       
       (source)
     </a>
@@ -889,7 +981,7 @@ afterwards so both features compose.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toDict</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L328">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L398">
       
       (source)
     </a>
@@ -920,7 +1012,7 @@ are added even though they have no column.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">toJson</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">**kwargs: <code><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L367">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L437">
       
       (source)
     </a>
@@ -946,7 +1038,7 @@ are added even though they have no column.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__slots__</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" class="intersphinx-link">tuple</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/attributes.py#L217">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/attributes.py#L285">
       
       (source)
     </a>
@@ -972,7 +1064,7 @@ are added even though they have no column.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 07:49:38.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 11:52:04.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

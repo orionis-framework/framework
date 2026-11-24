@@ -405,6 +405,8 @@ class Application(Container, IApplication):
         Initialize configuration dictionaries.
     __runtime_config
         Mutable runtime view of the committed application configuration.
+    __applied_timezone : str or None
+        Most recent IANA timezone applied to the date facade and process.
     __http_disconnect_monitoring
         Http disconnect monitoring flag used by ``Application``.
     __kernel_http_lock
@@ -1364,6 +1366,7 @@ class Application(Container, IApplication):
             # Initialize configuration dictionaries.
             self.__bootstrap: dict[str, Any] = {}
             self.__runtime_config: dict[str, Any] = {}
+            self.__applied_timezone: str | None = None
 
             # Initialize kernel caches.
             self.__kernel_cli: Callable | None = None
@@ -3394,42 +3397,82 @@ class Application(Container, IApplication):
 
     # --- Bootstrap Application Methods ---
 
-    def __setTimezoneAndLocale(self: Self) -> None:
+    def __applyTimezone(self, timezone: object) -> None:
         """
-        Apply configured timezone and locale settings to runtime services.
+        Apply the configured IANA timezone to the date facade and process.
+
+        Parameters
+        ----------
+        timezone : object
+            IANA timezone name from the application configuration.
 
         Returns
         -------
         None
-            Configure date handling, environment values, and supported system
-            timezone and locale settings.
+            Set ``TZ`` and refresh process-local time conversion where supported.
+
+        Raises
+        ------
+        ValueError
+            If the value is not a recognized timezone name.
         """
-        # Retrieve timezone and locale from configuration
-        tz: str | None = self.config("app.timezone")  # NOSONAR
-        lc: str | None = self.config("app.locale")  # NOSONAR
-
-        # Return early if neither timezone nor locale is configured
-        if not tz and not lc:
+        if timezone == self.__applied_timezone and timezone is not None:
             return
+        if not isinstance(timezone, str) or not timezone:
+            message = "'app.timezone' must identify a valid timezone."
+            raise ValueError(message)
 
-        # Load local date-time configuration for the application
         from orionis.support.facades import DateTime
 
-        DateTime._loadConfig(timezone_name=tz, locale=lc)
+        DateTime._setTimezone(timezone)
+        os.environ["TZ"] = timezone
+        if hasattr(time, "tzset"):
+            time.tzset()
+        self.__applied_timezone = timezone
 
-        # Update environment variables only for values that are set
-        if tz:
-            os.environ["TZ"] = tz
+    def __refreshTimezone(self) -> None:
+        """
+        Synchronize the runtime timezone with the current application settings.
+
+        Returns
+        -------
+        None
+            Use UTC when the settings omit the timezone.
+
+        Raises
+        ------
+        ValueError
+            If the configured value is not a recognized timezone name.
+        """
+        settings = self.__runtime_config.get("app")
+        timezone = (
+            settings.get("timezone", "UTC") if isinstance(settings, dict) else "UTC"
+        )
+        self.__applyTimezone(timezone)
+
+    def __setTimezoneAndLocale(self: Self) -> None:
+        """
+        Apply the timezone and locale before registering eager providers.
+
+        Returns
+        -------
+        None
+            Bind date handling to the live timezone and set the configured locale.
+
+        Raises
+        ------
+        ValueError
+            If the timezone or the Pendulum locale is invalid.
+        """
+        from orionis.support.facades import DateTime
+
+        lc = self.config("app.locale")
+        self.__refreshTimezone()
+        DateTime._refresh_timezone = self.__refreshTimezone
         if lc:
+            DateTime._loadConfig(locale=lc)
             os.environ["LC_ALL"] = lc
             os.environ["LANG"] = lc
-
-        # Set system timezone if supported by the platform
-        if tz and hasattr(time, "tzset"):
-            time.tzset()
-
-        # Set system locale if configured and valid
-        if lc:
             with suppress(locale.Error):
                 locale.setlocale(locale.LC_ALL, lc)
 
@@ -3437,13 +3480,18 @@ class Application(Container, IApplication):
         """
         Load bootstrap state and register providers without awaiting async boots.
 
-        Reuse restored compiled metadata; otherwise load configuration,
-        discover providers, persist the snapshot, and freeze bootstrap state.
+        Reuse compiled metadata when available. Apply the configured timezone
+        and locale before registering providers.
 
         Returns
         -------
         None
             Publish deferred bindings and register eager providers for startup.
+
+        Raises
+        ------
+        ValueError
+            If the configured timezone or Pendulum locale is invalid.
         """
         # Skip loading if already cached
         if not self.__is_compiled:
@@ -3465,6 +3513,8 @@ class Application(Container, IApplication):
             # Lock and commit the configuration
             self.__commitConfig()
 
+        self.__setTimezoneAndLocale()
+
         # Expose deferred services while eager providers register their bindings.
         providers: dict = self.__bootstrap.get("providers", {})
         self._deferred_providers = providers.get("deferred", {})
@@ -3476,8 +3526,8 @@ class Application(Container, IApplication):
         """
         Create application configuration and register eager services once.
 
-        Apply locale settings and cache runtime flags without awaiting
-        asynchronous provider boots or preparing HTTP handlers.
+        Apply the timezone and locale before eager registration and cache runtime
+        flags for the worker.
 
         Returns
         -------
@@ -3488,6 +3538,8 @@ class Application(Container, IApplication):
         ------
         TypeError
             If ``http.monitor_disconnects`` is neither a boolean nor ``None``.
+        ValueError
+            If the configured timezone or Pendulum locale is invalid.
         """
         # Prevent duplicate initialization if already booted
         if not self.__booted:
@@ -3502,9 +3554,6 @@ class Application(Container, IApplication):
 
             # Load and initialize all application components
             self.__load()
-
-            # Set timezone and locale based on configuration
-            self.__setTimezoneAndLocale()
 
             # Pre-compute and cache frequently accessed environment flags
             self.__is_production_cache = "prod" in str(self.config("app.env") or "")
@@ -3614,7 +3663,7 @@ class Application(Container, IApplication):
         key : str or None, optional
             Dot-separated key, or ``None`` with no value to return all settings.
         value : object, optional
-            Replacement value; omit to read the key. Explicit ``None`` is stored.
+            Replacement value for a write. Omit to read the key.
 
         Returns
         -------
@@ -3628,6 +3677,8 @@ class Application(Container, IApplication):
             If the application configuration is not initialized.
         TypeError
             If a keyed read or write uses a non-string key.
+        ValueError
+            If a live timezone update supplies an invalid name or a nested key.
         """
         # Ensure configuration is initialized before accessing or modifying it
         if not self.__configured:
@@ -3660,13 +3711,18 @@ class Application(Container, IApplication):
         """
         Restore mutable runtime settings from the bootstrap configuration.
 
-        Replace runtime containers with an isolated copy without changing
-        creation or readiness flags.
+        Replace runtime containers with an isolated copy and reapply the
+        bootstrap timezone if date handling has been initialized.
 
         Returns
         -------
         bool
             ``True`` after the runtime mapping has been replaced.
+
+        Raises
+        ------
+        ValueError
+            If the timezone being restored is invalid.
         """
         # Obtain current bootstrap configuration for runtime use
         bootstrap_config: dict = self.__bootstrap.get("config", {})
@@ -3676,6 +3732,8 @@ class Application(Container, IApplication):
 
         # Mark runtime configuration as ready for access
         self.__runtime_config_initialized = True
+        if self.__applied_timezone is not None:
+            self.__refreshTimezone()
 
         # Indicate successful reset
         return True
@@ -3724,7 +3782,24 @@ class Application(Container, IApplication):
         -------
         object
             The assigned value, unchanged.
+
+        Raises
+        ------
+        ValueError
+            If a live timezone update supplies an invalid name or a nested key.
         """
+        if self.__applied_timezone is not None and key_parts[0] == "app":
+            if len(key_parts) == 1:
+                timezone = (
+                    value.get("timezone", "UTC") if isinstance(value, dict) else "UTC"
+                )
+                self.__applyTimezone(timezone)
+            elif key_parts[1] == "timezone":
+                if key_parts != ("app", "timezone"):
+                    message = "'app.timezone' cannot contain nested settings."
+                    raise ValueError(message)
+                self.__applyTimezone(value)
+
         # Traverse the nested dictionary structure, creating intermediate
         # dictionaries as needed, and set the value at the specified path.
         current = self.__runtime_config

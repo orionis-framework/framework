@@ -4,12 +4,39 @@
 
 from __future__ import annotations
 from copy import deepcopy
+from datetime import UTC, datetime
 from typing import Any, Self
+
+
+def _changed(previous: Any, current: Any) -> bool:
+    """
+    Compare aware datetimes by instant, including both sides of a DST fold.
+
+    Parameters
+    ----------
+    previous : typing.Any
+        Original value recorded by the model.
+    current : typing.Any
+        Currently assigned value.
+
+    Returns
+    -------
+    bool
+        Whether the current value differs from the snapshot.
+    """
+    if (
+        isinstance(previous, datetime)
+        and isinstance(current, datetime)
+        and previous.utcoffset() is not None
+        and current.utcoffset() is not None
+    ):
+        return previous.astimezone(UTC) != current.astimezone(UTC)
+    return previous != current
 
 
 class StateMixin:
     """
-    Attribute state tracking behavior shared by every model.
+    Track model attributes against their last persisted snapshot.
 
     Tracks the original attribute snapshot taken at hydration or after
     the last successful save, the current attribute values, and the
@@ -32,7 +59,7 @@ class StateMixin:
         return {
             key: value
             for key, value in self._attributes.items()
-            if key not in original or original[key] != value
+            if key not in original or _changed(original[key], value)
         }
 
     def isDirty(self, *attributes: str) -> bool:
@@ -54,11 +81,11 @@ class StateMixin:
         if attributes:
             return any(
                 key in current
-                and (key not in original or original[key] != current[key])
+                and (key not in original or _changed(original[key], current[key]))
                 for key in attributes
             )
         return any(
-            key not in original or original[key] != value
+            key not in original or _changed(original[key], value)
             for key, value in current.items()
         )
 

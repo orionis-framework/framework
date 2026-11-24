@@ -10,7 +10,11 @@ from orionis.test import TestCase
 
 
 class TestDateTimeRegressions(TestCase):
-    """Exercise configured date behavior without leaking process defaults."""
+    """
+    Exercise date parsing, conversion, and formatting across timezones.
+
+    Each test restores the facade settings it changes.
+    """
 
     def setUp(self) -> None:
         """Restore facade and Pendulum defaults after each scenario."""
@@ -68,3 +72,112 @@ class TestDateTimeRegressions(TestCase):
             ),
         ):
             self.assertEqual(DateTime.formatLocal(format_string="MMMM"), "enero")
+
+    def testLocalInputAndExplicitOffsetsAcrossConstructors(self) -> None:
+        """
+        Check local input and explicit offsets across constructors.
+
+        Returns
+        -------
+        None
+            Verify wall times in Bogotá, offset conversion, and duration rejection.
+        """
+        wall_time = "2026-01-15T00:30:00"
+        for value in (
+            DateTime.parse(wall_time),
+            DateTime.fromFormat(wall_time, "YYYY-MM-DDTHH:mm:ss"),
+            DateTime.convertToLocal(wall_time),
+            DateTime.convertToLocal(datetime.fromisoformat(wall_time)),
+        ):
+            self.assertEqual(value.isoformat(), "2026-01-15T00:30:00-05:00")
+        for value in (
+            DateTime.parse(wall_time + "Z"),
+            DateTime.fromFormat(wall_time + "+00:00", "YYYY-MM-DDTHH:mm:ssZ"),
+        ):
+            self.assertEqual(value.isoformat(), "2026-01-14T19:30:00-05:00")
+        with self.assertRaises(TypeError):
+            DateTime.parse("P2D")
+
+    def testPartialDatesUseLocalCalendarAndKeepTimeOffsets(self) -> None:
+        """
+        Check how partial dates use a fixed local reference.
+
+        Returns
+        -------
+        None
+            Verify the calendar date and UTC offset for ISO and flexible inputs.
+        """
+        reference = pendulum.datetime(2030, 1, 1, 10, tz="America/Bogota")
+        with patch.object(DateTime, "now", return_value=reference):
+            self.assertEqual(
+                DateTime.parse("01:30:00Z").isoformat(), "2029-12-31T20:30:00-05:00",
+            )
+            self.assertEqual(
+                DateTime.parse("8:30 PM", strict=False).isoformat(),
+                "2030-01-01T20:30:00-05:00",
+            )
+            self.assertEqual(DateTime.parse("January 7", strict=False).year, 2030)
+
+    def testUnixFormatTokensAreAbsoluteAndNaiveFoldsArePreserved(self) -> None:
+        """
+        Check Unix timestamps and repeated wall times.
+
+        Returns
+        -------
+        None
+            Verify epoch units, explicit folds, and the default first occurrence.
+        """
+        for text, fmt in (("1", "X"), ("1000", "x")):
+            self.assertEqual(DateTime.fromFormat(text, fmt).timestamp(), 1)
+        timezone = "America/New_York"
+        for fold, offset in ((0, "-04:00"), (1, "-05:00")):
+            moment = pendulum.naive(2026, 11, 1, 1, 30, fold=fold)
+            local = DateTime.fromDatetime(moment, timezone)
+            self.assertTrue(local.isoformat().endswith(offset))
+        for moment in (
+            DateTime.fromFormat("2026-11-01 01:30", "YYYY-MM-DD HH:mm", timezone),
+            DateTime.parse("2026-11-01T01:30", timezone),
+            DateTime.datetime(2026, 11, 1, 1, 30, tz=timezone),
+            DateTime.fromDatetime(DateTime.naive(2026, 11, 1, 1, 30), timezone),
+        ):
+            self.assertEqual(moment.isoformat(), "2026-11-01T01:30:00-04:00")
+
+    def testBoundariesUseSelectedCalendarForAnExplicitInstant(self) -> None:
+        """
+        Check calendar boundaries for an explicit instant.
+
+        Returns
+        -------
+        None
+            Verify each boundary and the weekend predicate in the selected zone.
+        """
+        instant = pendulum.datetime(2026, 1, 1, 2, tz="UTC")
+        for unit in ("day", "week", "month", "year"):
+            for direction in ("start", "end"):
+                boundary = getattr(DateTime, direction + "Of" + unit.title())
+                for tz in (None, "Asia/Tokyo"):
+                    local = instant.in_timezone(tz or "America/Bogota")
+                    expected = getattr(local, direction + "_of")(unit)
+                    with self.subTest(unit=unit, direction=direction, tz=tz):
+                        self.assertEqual(
+                            boundary(instant, tz).isoformat(), expected.isoformat(),
+                        )
+        saturday = pendulum.datetime(2026, 1, 17, 2, tz="UTC")
+        self.assertFalse(DateTime.isWeekend(saturday))
+
+    def testPastAndFutureOrderRepeatedWallHoursByInstant(self) -> None:
+        """
+        Check past and future predicates during a repeated hour.
+
+        Returns
+        -------
+        None
+            Verify that the two offsets of the same wall time retain their order.
+        """
+        DateTime._setTimezone("America/New_York")
+        first = DateTime.parse("2026-11-01T01:30:00-04:00")
+        second = DateTime.parse("2026-11-01T01:30:00-05:00")
+        with patch.object(DateTime, "now", return_value=first.in_timezone("UTC")):
+            self.assertTrue(DateTime.isFuture(second))
+        with patch.object(DateTime, "now", return_value=second.in_timezone("UTC")):
+            self.assertTrue(DateTime.isPast(first))

@@ -542,11 +542,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13660"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13754"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId13660">
+                <label class="lbl-toggle" for="expandableItemId13754">
                     
                     
                 </label>
@@ -624,11 +624,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13661"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13755"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId13661">
+                <label class="lbl-toggle" for="expandableItemId13755">
                     
                     
                 </label>
@@ -643,6 +643,16 @@
         <ul>
     
     <li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.handlers._local.html" class="internal-link" title="orionis.logging.handlers._local">_local</a></code>
+            </div>
+        
+
+    </li><li class="">
         
         
         
@@ -753,11 +763,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13662"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13756"> 
                     
                 </input>
 
-                <label class="lbl-toggle notExpandable" for="">
+                <label class="lbl-toggle" for="expandableItemId13756">
                     
                     
                 </label>
@@ -771,8 +781,21 @@
         
          
 
+        <div class="childrenKindTitle">Classes</div>
+        <ul>
+    
+    <li class="">
         
         
+        
+
+        
+            <div class="itemName"><code><a href="orionis.logging.logger._ApplicationFormatter.html" class="internal-link" title="orionis.logging.logger._ApplicationFormatter">_<wbr></wbr>Application<wbr></wbr>Formatter</a></code>
+            </div>
+        
+
+    </li>
+</ul>
 
         
          
@@ -799,11 +822,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13663"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13757"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId13663">
+                <label class="lbl-toggle" for="expandableItemId13757">
                     
                     
                 </label>
@@ -864,7 +887,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13664"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13758"> 
                     
                 </input>
 
@@ -1365,15 +1388,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Logger</span>(<a href="orionis.logging.contracts.ILogger.html" class="internal-link" title="orionis.logging.contracts.ILogger">ILogger</a>): <a href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L26" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.Logger.__init__">Logger(app)</a></code></p><p><a href="classIndex.html#orionis.logging.Logger">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">Logger</span>(<a href="orionis.logging.contracts.ILogger.html" class="internal-link" title="orionis.logging.contracts.ILogger">ILogger</a>): <a href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L61" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.Logger.__init__">Logger(app)</a></code></p><p><a href="classIndex.html#orionis.logging.Logger">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Resolve logging channels and dispatch structured log records.</p></div>
+          <div><p>Resolve logging channels and dispatch structured log records.</p>
+<p>Channels share timestamp formatters that follow the active application zone.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1340">
+          <table class="children sortable" id="id1354">
   
   
   <tr class="method">
@@ -1390,7 +1415,7 @@
     
     <td>Method</td>
     <td><code><a href="#__createFormatter" class="internal-link" title="orionis.logging.Logger.__createFormatter">__create<wbr></wbr>Formatter</a></code></td>
-    <td>Return the formatter shared by matching message and date formats.</td>
+    <td>Return the application formatter shared by matching format patterns.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -1572,7 +1597,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__closeConfigurationHandlers</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">logger: <code><a href="https://docs.python.org/3/library/logging.html#logging.Logger" class="intersphinx-link">logging.Logger</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L200">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L239">
       
       (source)
     </a>
@@ -1599,7 +1624,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__createChannelHandler</span><span class="function-signature long-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">channel_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">channel_config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L295">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L334">
       
       (source)
     </a>
@@ -1626,7 +1651,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__createFormatter</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Formatter" class="intersphinx-link">logging.Formatter</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L271">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L310">
       
       (source)
     </a>
@@ -1638,7 +1663,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Return the formatter shared by matching message and date formats.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><tt class="rst-docutils rst-literal">logging.Formatter</tt></code></td><td class="fieldArgDesc">The configured formatter instance for log messages.</td></tr></table></div>
+    <div><p>Return the application formatter shared by matching format patterns.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/library/logging.html#logging.Formatter" class="intersphinx-link">logging.Formatter</a></code></td><td class="fieldArgDesc">Formatter that reads the active application zone for each record.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1653,7 +1678,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__del__</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L782">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L821">
       
       (source)
     </a>
@@ -1683,7 +1708,7 @@ properly released when the logger instance is garbage collected.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__discardChannelHandler</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">handler: <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>, </span><span class="rst-sig-param">channel_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L640">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L679">
       
       (source)
     </a>
@@ -1710,7 +1735,7 @@ properly released when the logger instance is garbage collected.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__discardUnpublishedHandler</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">handler: <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">phase: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L164">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L203">
       
       (source)
     </a>
@@ -1737,7 +1762,7 @@ properly released when the logger instance is garbage collected.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__ensureLoggerReady</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Logger" class="intersphinx-link">logging.Logger</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L368">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L407">
       
       (source)
     </a>
@@ -1767,7 +1792,7 @@ even if another thread closes the service after this method returns.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">app: <code>IApplication</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L36">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L75">
       
       (source)
     </a>
@@ -1794,7 +1819,7 @@ even if another thread closes the service after this method returns.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__initializeLogger</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L70">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L109">
       
       (source)
     </a>
@@ -1825,7 +1850,7 @@ the default channel is not present in the configuration.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__normalizeChannelConfig</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">config: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L337">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L376">
       
       (source)
     </a>
@@ -1852,7 +1877,7 @@ the default channel is not present in the configuration.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__queueHandler</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">handler: <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L246">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L285">
       
       (source)
     </a>
@@ -1879,7 +1904,7 @@ the default channel is not present in the configuration.</p>
     
     
     <span class="py-keyword">async&#160;def</span>&#160;<span class="py-defname">aclose</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L734">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L773">
       
       (source)
     </a>
@@ -1906,7 +1931,7 @@ the default channel is not present in the configuration.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L669">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L708">
       
       (source)
     </a>
@@ -1938,7 +1963,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">critical</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L479">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L518">
       
       (source)
     </a>
@@ -1965,7 +1990,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">debug</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L460">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L499">
       
       (source)
     </a>
@@ -1992,7 +2017,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">error</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L422">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L461">
       
       (source)
     </a>
@@ -2019,7 +2044,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getActiveChannel</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L757">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L796">
       
       (source)
     </a>
@@ -2046,7 +2071,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getActiveChannels</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L745">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L784">
       
       (source)
     </a>
@@ -2073,7 +2098,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getAvailableChannels</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#list" class="intersphinx-link">list</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L770">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L809">
       
       (source)
     </a>
@@ -2100,7 +2125,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">getLogger</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>) -&gt; <code><a href="https://docs.python.org/3/library/logging.html#logging.Logger" class="intersphinx-link">logging.Logger</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L498">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L537">
       
       (source)
     </a>
@@ -2127,7 +2152,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">info</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L402">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L441">
       
       (source)
     </a>
@@ -2154,7 +2179,7 @@ every handler before propagating an unexpected or queued delivery failure.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">reloadConfiguration</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L514">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L553">
       
       (source)
     </a>
@@ -2186,7 +2211,7 @@ public error; further failures are observed by the failure runtime.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">switchChannel</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">channel_name: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L545">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L584">
       
       (source)
     </a>
@@ -2218,7 +2243,7 @@ Only one channel is active at a time.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">warning</span><span class="function-signature">(<span class="rst-sig-param">self: <code>Self</code>, </span><span class="rst-sig-param">message: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L441">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L480">
       
       (source)
     </a>
@@ -2244,7 +2269,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_formatter_cache</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/logging.html#logging.Formatter" class="intersphinx-link">logging.Formatter</a>]]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L33">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L72">
       
       (source)
     </a>
@@ -2271,7 +2296,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">name</span>: <code>ClassVar[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L30">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L69">
       
       (source)
     </a>
@@ -2298,7 +2323,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__app</span>: <code>IApplication</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L50">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L89">
       
       (source)
     </a>
@@ -2325,7 +2350,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__config</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L52">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L91">
       
       (source)
     </a>
@@ -2352,7 +2377,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__date_format</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L63">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L102">
       
       (source)
     </a>
@@ -2379,7 +2404,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__default_level</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L106">
       
       (source)
     </a>
@@ -2406,7 +2431,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__handlers_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">logging.Handler</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L56">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L95">
       
       (source)
     </a>
@@ -2433,7 +2458,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__init_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L58">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L97">
       
       (source)
     </a>
@@ -2460,7 +2485,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__log_format</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L61">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L100">
       
       (source)
     </a>
@@ -2487,7 +2512,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__logger</span>: <code><a href="https://docs.python.org/3/library/logging.html#logging.Logger" class="intersphinx-link">logging.Logger</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L54">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L93">
       
       (source)
     </a>
@@ -2514,7 +2539,7 @@ Only one channel is active at a time.</p>
   <div class="functionHeader">
     
     <span class="py-defname">__logger_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/logger.py#L65">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/logger.py#L104">
       
       (source)
     </a>
@@ -2540,7 +2565,7 @@ Only one channel is active at a time.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 07:49:38.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 11:52:04.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

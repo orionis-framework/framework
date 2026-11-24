@@ -1258,6 +1258,12 @@
     <loc>https://api.orionis-framework.com/orionis.console.enums.TaskEvent.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.console.fluent._calendar.CalendarCronTrigger.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.console.fluent._calendar.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.console.fluent.Command.html</loc>
   </url>
   <url>
@@ -1658,6 +1664,12 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.MissingDatabaseDependencyException.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.oracle_timestamp.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.database.oracle_timestamp.OracleZonedTimestamp.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.database.provider.ConnectionManagerProvider.html</loc>
@@ -3901,6 +3913,12 @@
     <loc>https://api.orionis-framework.com/orionis.logging.contracts.suffix_resolver.SuffixResolver.html</loc>
   </url>
   <url>
+    <loc>https://api.orionis-framework.com/orionis.logging.handlers._local.ApplicationTimeResolver.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.logging.handlers._local.html</loc>
+  </url>
+  <url>
     <loc>https://api.orionis-framework.com/orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.html</loc>
   </url>
   <url>
@@ -3959,6 +3977,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.logging.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.logging.logger._ApplicationFormatter.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.logging.Logger.html</loc>
@@ -4628,6 +4649,9 @@
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.attributes.AttributesMixin.html</loc>
+  </url>
+  <url>
+    <loc>https://api.orionis-framework.com/orionis.orm.attributes.DateTimeStorage.html</loc>
   </url>
   <url>
     <loc>https://api.orionis-framework.com/orionis.orm.attributes.html</loc>

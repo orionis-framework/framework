@@ -7,6 +7,7 @@ import enum
 import tempfile
 import uuid
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from orionis.cache.serializer import Serializer
 from orionis.support.types.sentinel import MISSING
 from orionis.test import TestCase
@@ -18,6 +19,12 @@ class _Color(enum.Enum):
 
 
 class TestSerializer(TestCase):
+    """
+    Verify the typed cache format.
+
+    Cover in-memory round trips, legacy payloads and file operations.
+    """
+
     def testDumpsAndLoadsPrimitives(self) -> None:
         """Round-trip primitive scalar values through the serializer.
 
@@ -104,6 +111,57 @@ class TestSerializer(TestCase):
         result = Serializer.loads(Serializer.dumps(original))
         self.assertEqual(result, original)
         self.assertIsInstance(result, dt.datetime)
+
+    def testCalendarTimezoneSurvivesDaylightSavingTransition(self) -> None:
+        """
+        Verify that a restored datetime follows daylight-saving transitions.
+
+        Returns
+        -------
+        None
+            Assert that adding one day uses the new UTC offset.
+        """
+        zone = ZoneInfo("America/New_York")
+        original = dt.datetime(2026, 3, 7, 12, tzinfo=zone)
+        restored = Serializer.loads(Serializer.dumps(original))
+        self.assertEqual(restored.tzinfo.key, zone.key)
+        self.assertEqual(
+            (restored + dt.timedelta(days=1)).utcoffset(),
+            dt.timedelta(hours=-4),
+        )
+
+    def testAmbiguousDatetimeAndTimeRetainTheirOccurrence(self) -> None:
+        """
+        Verify that datetime and time values retain their fold during decoding.
+
+        Returns
+        -------
+        None
+            Assert that the later occurrence keeps its zone, fold and instant.
+        """
+        zone = ZoneInfo("America/New_York")
+        original = dt.datetime(2026, 11, 1, 1, 30, tzinfo=zone, fold=1)
+        for value in (original, original.timetz()):
+            restored = Serializer.loads(Serializer.dumps(value))
+            self.assertEqual(restored.tzinfo.key, zone.key)
+            self.assertEqual(restored.fold, 1)
+        self.assertEqual(
+            Serializer.loads(Serializer.dumps(original)).timestamp(),
+            original.timestamp(),
+        )
+
+    def testReadLegacyOffsetOnlyDatetime(self) -> None:
+        """
+        Verify that legacy timestamps with a fixed offset still decode.
+
+        Returns
+        -------
+        None
+            Assert that the original wall time and offset survive the read.
+        """
+        raw = '{"__type__":"datetime","__value__":"2025-02-01T09:15:00-05:00"}'
+        result = Serializer.loads(raw)
+        self.assertEqual(result.isoformat(), "2025-02-01T09:15:00-05:00")
 
     def testDumpsAndLoadsDate(self) -> None:
         """Round-trip a datetime.date through the serializer.

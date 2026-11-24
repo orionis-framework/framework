@@ -224,6 +224,16 @@
         
 
         
+            <div class="itemName"><code><a href="#_restoreArchivedWindow" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._restoreArchivedWindow">_restore<wbr></wbr>Archived<wbr></wbr>Window</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#_rotateFile" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._rotateFile">_rotate<wbr></wbr>File</a></code>
             </div>
         
@@ -465,7 +475,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13567"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId13652"> 
                     
                 </input>
 
@@ -546,6 +556,16 @@
 
         
             <div class="itemName"><code><a href="#_resolvePath" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._resolvePath">_resolve<wbr></wbr>Path</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#_restoreArchivedWindow" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._restoreArchivedWindow">_restore<wbr></wbr>Archived<wbr></wbr>Window</a></code>
             </div>
         
 
@@ -863,15 +883,17 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AdvancedRotatingFileHandler</span>(<a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a>): <a href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L22" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">AdvancedRotatingFileHandler(path_template, suffix_resolver, max_bytes, backup_count, ...)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">AdvancedRotatingFileHandler</span>(<a href="https://docs.python.org/3/library/logging.html#logging.Handler" class="intersphinx-link">Handler</a>): <a href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L23" class="sourceLink">(source)</a></code></p><p>Constructor: <code><a href="#__init__" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.__init__">AdvancedRotatingFileHandler(path_template, suffix_resolver, max_bytes, backup_count, ...)</a></code></p><p><a href="classIndex.html#orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Rotate log files using size limits and resolved time suffixes.</p></div>
+          <div><p>Rotate log files by size or by the timestamp of each record.</p>
+<p>A late record can reopen an earlier time window, including a compressed one.</p>
+</div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1322">
+          <table class="children sortable" id="id1329">
   
   
   <tr class="method">
@@ -893,7 +915,7 @@
     
     <td>Method</td>
     <td><code><a href="#_ensureStream" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._ensureStream">_ensure<wbr></wbr>Stream</a></code></td>
-    <td>Ensure the stream is available and up to date.</td>
+    <td>Open the destination for a record and rotate the previous file if needed.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -904,6 +926,11 @@
     <td>Method</td>
     <td><code><a href="#_resolvePath" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._resolvePath">_resolve<wbr></wbr>Path</a></code></td>
     <td>Resolve the full path by replacing the {suffix} placeholder.</td>
+  </tr><tr class="method">
+    
+    <td>Method</td>
+    <td><code><a href="#_restoreArchivedWindow" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._restoreArchivedWindow">_restore<wbr></wbr>Archived<wbr></wbr>Window</a></code></td>
+    <td>Restore an archived log window before appending a late record.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -923,7 +950,7 @@
     
     <td>Method</td>
     <td><code><a href="#emit" class="internal-link" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler.emit">emit</a></code></td>
-    <td>Emit a log record.</td>
+    <td>Append a formatted record to its rotation window.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
@@ -1030,7 +1057,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">__init__</span><span class="function-signature long-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path_template: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>, </span><span class="rst-sig-param">suffix_resolver: <code><a href="orionis.logging.contracts.suffix_resolver.SuffixResolver.html" class="internal-link" title="orionis.logging.contracts.suffix_resolver.SuffixResolver">SuffixResolver</a></code>, </span><span class="rst-sig-param">max_bytes: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, </span><span class="rst-sig-param">backup_count: <code><a href="https://docs.python.org/3/builtins/functions.html#int" class="intersphinx-link">int</a></code> = 5, </span><span class="rst-sig-param">encoding: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">utf-8</span><span class="rst-variable-quote">'</span>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">delay: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#True" class="intersphinx-link">True</a>, </span><span class="rst-sig-param">compress_rotated: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#False" class="intersphinx-link">False</a>, </span><span class="rst-sig-param">app_root: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> = <span class="rst-variable-quote">'</span><span class="rst-variable-string">.</span><span class="rst-variable-quote">'</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L25">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L30">
       
       (source)
     </a>
@@ -1057,7 +1084,7 @@
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_cleanupOldFiles</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L251">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L256">
       
       (source)
     </a>
@@ -1087,7 +1114,7 @@ files up to the configured backup count.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_compressFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">file_path: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L203">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L208">
       
       (source)
     </a>
@@ -1113,8 +1140,8 @@ files up to the configured backup count.</p>
   <div class="functionHeader">
     
     
-    <span class="py-keyword">def</span>&#160;<span class="py-defname">_ensureStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L319">
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_ensureStream</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">created: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> | <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> = <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L365">
       
       (source)
     </a>
@@ -1126,10 +1153,7 @@ files up to the configured backup count.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Ensure the stream is available and up to date.</p>
-<p>Checks if log rotation is needed and opens a new stream if required.
-Updates the current suffix and file size accordingly.</p>
-<table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Open the destination for a record and rotate the previous file if needed.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">created:</span><code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a>, <em>optional</em></code></td><td class="fieldArgDesc">Record creation time in POSIX seconds. None uses the resolver's clock.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Leave the destination stream open for appending.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the destination cannot be restored or opened.</td></tr></table></div>
   </div>
 </div><div class="basemethod">
   
@@ -1144,7 +1168,7 @@ Updates the current suffix and file size accordingly.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_observeFailure</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">error: <code><a href="https://docs.python.org/3/builtins/exceptions.html#BaseException" class="intersphinx-link">BaseException</a></code>, </span><span class="rst-sig-symbol">*, </span><span class="rst-sig-param">phase: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L296">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L342">
       
       (source)
     </a>
@@ -1171,7 +1195,7 @@ Updates the current suffix and file size accordingly.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_resolvePath</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">suffix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L114">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L119">
       
       (source)
     </a>
@@ -1188,6 +1212,33 @@ Updates the current suffix and file size accordingly.</p>
 </div><div class="basemethod">
   
   
+  <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._restoreArchivedWindow">
+    
+  </a>
+  <a name="_restoreArchivedWindow">
+    
+  </a>
+  <div class="functionHeader">
+    
+    
+    <span class="py-keyword">def</span>&#160;<span class="py-defname">_restoreArchivedWindow</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">path: <code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">Path</a></code></span>):</span>
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L301">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#_restoreArchivedWindow" title="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._restoreArchivedWindow">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="docstring functionBody">
+    
+    <div><p>Restore an archived log window before appending a late record.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">path:</span><code><a href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" class="intersphinx-link">pathlib.Path</a></code></td><td class="fieldArgDesc">Uncompressed log path for the window being reopened.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Restore the archived contents when the uncompressed log is absent.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Raises</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/exceptions.html#OSError" class="intersphinx-link">OSError</a></code></td><td>If the archive is truncated or the filesystem operation fails.</td></tr></table></div>
+  </div>
+</div><div class="basemethod">
+  
+  
   <a name="orionis.logging.handlers.advanced_rotating_file_handler.AdvancedRotatingFileHandler._rotateFile">
     
   </a>
@@ -1198,7 +1249,7 @@ Updates the current suffix and file size accordingly.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_rotateFile</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L175">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L180">
       
       (source)
     </a>
@@ -1228,7 +1279,7 @@ enabled, cleans up old log files, and resets the handler's state.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">_shouldRotate</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">current_suffix: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L154">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L159">
       
       (source)
     </a>
@@ -1255,7 +1306,7 @@ enabled, cleans up old log files, and resets the handler's state.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">close</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L397">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L455">
       
       (source)
     </a>
@@ -1285,7 +1336,7 @@ the handler. Ensures thread safety during the close operation.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">emit</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">record: <code><a href="https://docs.python.org/3/library/logging.html#logging.LogRecord" class="intersphinx-link">LogRecord</a></code></span>):</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L362">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L420">
       
       (source)
     </a>
@@ -1297,7 +1348,7 @@ the handler. Ensures thread safety during the close operation.</p>
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Emit a log record.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><tt class="rst-docutils rst-literal">logging.LogRecord</tt></code></td><td class="fieldArgDesc">The log record to emit.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">This method does not return a value.</td></tr></table></div>
+    <div><p>Append a formatted record to its rotation window.</p><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Parameters</td></tr><tr><td class="fieldArgContainer"><span class="fieldArg">record:</span><code><a href="https://docs.python.org/3/library/logging.html#logging.LogRecord" class="intersphinx-link">logging.LogRecord</a></code></td><td class="fieldArgDesc">Record whose creation time determines its time-based destination.</td></tr></table><table class="fieldTable"><tr class="fieldStart"><td class="fieldName" colspan="2">Returns</td></tr><tr><td class="fieldArgContainer"><code><a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code></td><td class="fieldArgDesc">Write the formatted record and update the file size on success.</td></tr></table></div>
   </div>
 </div><div class="baseinstancevariable">
   
@@ -1311,7 +1362,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cache_monotonic_expiry</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#float" class="intersphinx-link">float</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L102">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L107">
       
       (source)
     </a>
@@ -1338,7 +1389,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_cleanup_pattern</span>: <code><a href="https://docs.python.org/3/library/re.html#re.Pattern" class="intersphinx-link">re.Pattern</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L108">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L113">
       
       (source)
     </a>
@@ -1365,7 +1416,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_lock</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L96">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L101">
       
       (source)
     </a>
@@ -1392,7 +1443,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_path_cache</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>]</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L100">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L105">
       
       (source)
     </a>
@@ -1419,7 +1470,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">_utf8_encoding</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L77">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L82">
       
       (source)
     </a>
@@ -1446,7 +1497,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">app_root</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L83">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L88">
       
       (source)
     </a>
@@ -1473,7 +1524,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">backup_count</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L73">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L78">
       
       (source)
     </a>
@@ -1500,7 +1551,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">compress_rotated</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L81">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L86">
       
       (source)
     </a>
@@ -1527,7 +1578,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">current_path</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L88">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L93">
       
       (source)
     </a>
@@ -1554,7 +1605,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">current_suffix</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L90">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L95">
       
       (source)
     </a>
@@ -1581,7 +1632,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">delay</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L79">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L84">
       
       (source)
     </a>
@@ -1608,7 +1659,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">encoding</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L75">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L80">
       
       (source)
     </a>
@@ -1635,7 +1686,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">file_size</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L92">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L97">
       
       (source)
     </a>
@@ -1662,7 +1713,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">max_bytes</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L71">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L76">
       
       (source)
     </a>
@@ -1689,7 +1740,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">path_template</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L67">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L72">
       
       (source)
     </a>
@@ -1716,7 +1767,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">stream</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L86">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L91">
       
       (source)
     </a>
@@ -1743,7 +1794,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="functionHeader">
     
     <span class="py-defname">suffix_resolver</span> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/logging/handlers/advanced_rotating_file_handler.py#L69">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/logging/handlers/advanced_rotating_file_handler.py#L74">
       
       (source)
     </a>
@@ -1769,7 +1820,7 @@ the handler. Ensures thread safety during the close operation.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 07:49:38.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 11:52:04.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

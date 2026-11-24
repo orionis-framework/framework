@@ -38,13 +38,15 @@ Trigger methods (`dailyAt`, `everySeconds`, `cron`, and others) are terminal and
 | One date | `onceAt(2027, 1, 10, 9, 0, 0)` |
 | Cron calendar | `cron(day_of_week="mon-fri", hour="9", minute="0")` |
 
-Minute, hour, day, and week helpers are also available, along with `startDate` and `endDate`. Use intervals for elapsed time and cron for calendar scheduling. Do not assume identical behavior around daylight-saving changes. Timezone comes from `app.timezone`, normally `APP_TIMEZONE`, defaulting to `UTC`.
+A task retains the application zone selected when it is defined. New tasks use the current `app.timezone` (normally `APP_TIMEZONE`, default `UTC`). `startDate`, `endDate`, and `onceAt` reject nonexistent local times and select the first occurrence of a repeated hour. Calendar schedules such as `dailyAt` and `cron` skip nonexistent matches and fire only on the first occurrence of a repeated time. Fixed intervals such as `everyDays(1)` advance by elapsed seconds, so their displayed local hour can change.
 
 Fluent tasks are stored by **command signature**. Registering the same signature again replaces its pending definition; this is not an API for independent schedules sharing one signature. Use distinct commands delegating to one service when separate schedules are needed.
 
 `TASKS_JITTER` applies to triggers that permit jitter, not only to their displayed metadata. Per-task `randomDelay(0)` overrides that default. `onceAt`, `everySeconds`, `everyMinuteAt`, `everyMinutesAt`, `hourlyAt`, and `everyHoursAt` retain exact timing and do not inherit jitter; their convenience wrappers retain the same policy. An explicit positive delay conflicts with those schedules and raises `ValueError`.
 
 ## Persistence and defaults
+
+At startup, `replace_existing=True` rebuilds each declared signature with its current calendar policy and zone. A job kept only in the persistent store retains its serialized trigger and previous scheduling behavior. Redeclare that signature to apply the updated calendar policy.
 
 The `scheduler` section in `config/scheduler.py` uses:
 

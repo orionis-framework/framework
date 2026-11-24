@@ -13,6 +13,7 @@ from urllib.parse import urlsplit
 from orionis.console.output.var_dumper import VarDumper
 from orionis.http.default.responses import DefaultResponses
 from orionis.http.responses import FileResponse, Response
+from orionis.support.facades.datetime import DateTime
 from orionis.support.formatter.exceptions.parser import ExceptionParser
 from orionis.test import TestCase
 from orionis.view.engine import Jinja2Engine
@@ -195,7 +196,11 @@ def local_defaults(
 
 
 class TestDefaultTemplates(TestCase):
-    """Exercise default pages through the public framework rendering engine."""
+    """
+    Exercise default pages through the framework's view engine.
+
+    Inspect the rendered HTML and the resources referenced by each page.
+    """
 
     def setUp(self) -> None:
         """
@@ -300,6 +305,50 @@ class TestDefaultTemplates(TestCase):
         self.assertIn(b"New name", newer.getBody())
         self.assertIn(b'<html lang="es">', cached.getBody())
         self.assertEqual(cached.getBody(), newer.getBody())
+        self.assertEqual(engine.calls, 2)
+
+    async def testClockTimezoneInvalidatesBothHealthBodies(self) -> None:
+        """
+        Verify that a timezone change refreshes both cached health pages.
+
+        Returns
+        -------
+        None
+            Assert that both footers use the new zone with the same name and locale.
+        """
+        with replace_attribute(DateTime, "getTimezone", lambda: zone):
+            for zone in ("America/Bogota", "Europe/Madrid"):
+                for maintenance in (False, True):
+                    self.fixture.settings["app.maintenance"] = maintenance
+                    response = await self.defaults.health(_Request(wants_json=False))
+                    page = _Page(response.getBody())
+                    clock = next(attrs for tag, attrs in page.elements if tag == "time")
+                    self.assertEqual(clock["data-timezone"], zone)
+
+    async def testSlowHealthRenderCannotRestorePreviousClockTimezone(self) -> None:
+        """
+        Verify that a slow health render cannot cache a superseded timezone.
+
+        Returns
+        -------
+        None
+            Assert that a later request reuses the page rendered in the new zone.
+        """
+        engine = _SuspendedEngine(self.engine)
+        defaults = DefaultResponses(self.fixture, self.fixture, engine)
+        request = _Request(wants_json=False)
+        zone = "America/Bogota"
+        with replace_attribute(DateTime, "getTimezone", lambda: zone):
+            pending = asyncio.create_task(defaults.health(request))
+            await asyncio.wait_for(engine.started.wait(), 2)
+            try:
+                zone = "Europe/Madrid"
+                await defaults.health(request)
+            finally:
+                engine.release.set()
+            await asyncio.wait_for(pending, 2)
+            cached = await defaults.health(request)
+        self.assertIn(b'data-timezone="Europe/Madrid"', cached.getBody())
         self.assertEqual(engine.calls, 2)
 
     async def testEveryHtmlPageUsesInjectedViewEngine(self) -> None:

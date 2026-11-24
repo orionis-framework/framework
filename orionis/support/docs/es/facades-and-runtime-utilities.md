@@ -117,6 +117,8 @@ Los destinos de las fachadas se configuran en sus módulos propietarios y se res
 
 `DateTime.formatLocal()` convierte las fechas proporcionadas, incluidos valores Pendulum, a la zona configurada y las formatea con el locale configurado. `today()`, `tomorrow()` y `yesterday()` devuelven valores `DateTime` de Pendulum a medianoche. `isToday()` compara las fechas en la zona configurada, también cuando la entrada usa otro desplazamiento horario.
 
+`parse()`, `fromFormat()`, `fromDatetime()` y `convertToLocal()` interpretan las entradas sin desplazamiento en la zona solicitada o configurada. Si la entrada incluye un desplazamiento, la conversión preserva el instante. Por ejemplo, en `America/Bogota`, `2026-01-15T00:30` corresponde al 15 de enero a las 00:30 y `2026-01-15T00:30Z` al 14 de enero a las 19:30. Los métodos `startOf` y `endOf` y sus variantes de día, semana, mes y año calculan el límite en la zona solicitada o configurada, también al recibir una fecha explícita. El texto sin desplazamiento selecciona la primera ocurrencia de una hora repetida. Un objeto datetime de Python puede seleccionar la segunda con `fold=1`.
+
 `Inspire` conserva por referencia la lista no vacía de citas proporcionada. Sus modificaciones posteriores afectan a la selección; si queda vacía, `random()` devuelve la cita de respaldo. El llamador debe mantener válidas las entradas añadidas después de construir el servicio.
 
 ## Integración con Orionis

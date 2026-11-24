@@ -45,6 +45,8 @@ assert all(product.isDirty("name") for product in products)
 
 `self.fake` wraps Faker with camelCase names such as `firstName()`, `safeEmail()`, and `word()`. `locale=` selects a locale; otherwise the factory attempts `app.locale` and falls back to `en_US` when configuration or a usable locale is unavailable. `fake.unique` remembers values seen by that instance; `clearUnique()` resets that registry. A derived unique view initially shares the seen-value history; clearing that view starts an independent history, matching Faker's behavior. Faker uniqueness does not ensure uniqueness against existing database rows. Do not use generated data for real credentials.
 
+Faker's temporal methods with a `tzinfo` parameter default to the application timezone. Pass another timezone or use `tzinfo=None` for the provider's native behavior.
+
 `fake.optional` exposes a provider view accepting `prob`; `fake.addProvider(provider)` registers custom providers and invalidates cached methods. `seedInstance(seed)` and `seedLocale(locale, seed)` provide explicit reseeding; `locales` returns a detached list. `UniqueFake` and `OptionalFake` are exported for typing and extending these views without placing services in generated attributes.
 
 ## Persist with controlled failures

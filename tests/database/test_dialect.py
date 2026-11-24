@@ -17,6 +17,11 @@ from orionis.test import TestCase
 
 class TestDialect(TestCase):
     # ── Driver resolution ─────────────────────────────────────────────────────
+    """
+    Verify database URLs and per-driver connection settings.
+
+    Exercise the connection options used by the async and sync drivers.
+    """
 
     def testResolveDriverAcceptsSupportedDrivers(self) -> None:
         """Resolve every supported driver name.
@@ -294,9 +299,8 @@ class TestDialect(TestCase):
     # ── MySQL session commands ────────────────────────────────────────────────
 
     def testMysqlSessionAppliesCharsetCollationAndStrictMode(self) -> None:
-        """Build SET NAMES and strict sql_mode session commands.
-
-        Validates the MySQL session configuration mapping.
+        """
+        Verify the MySQL charset, collation, SQL mode and UTC session settings.
 
         Returns
         -------
@@ -312,6 +316,9 @@ class TestDialect(TestCase):
             },
         )
         self.assertIn("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci", commands)
+        self.assertIn("SET SESSION time_zone='+00:00'", commands)
+        options = engine_options({"driver": "mysql"}, sync=True)
+        self.assertEqual(options["connect_args"]["init_command"], commands[0])
         self.assertTrue(
             any("STRICT_TRANS_TABLES" in command for command in commands),
         )

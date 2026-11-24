@@ -2,7 +2,7 @@
 # Keep runtime types; token is a column name and lookup loads lazily.
 """Persist personal access tokens through the Orionis query builder."""
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, tzinfo
 from typing import Self
 import msgspec
 from orionis.auth.concerns.functions import authorizable_key
@@ -16,6 +16,7 @@ from orionis.orm.contracts.query_builder import IQueryBuilder
 from collections.abc import Iterable
 from orionis.auth.contracts.authorizable import IAuthorizable
 from orionis.orm.query.base_builder import QueryBuilderBase
+from orionis.support.facades import DateTime
 
 
 # Fallbacks applied when the configuration section is absent.
@@ -103,7 +104,8 @@ class AccessTokenRepository(IAccessTokenRepository):
             Abilities the token may use, or ``None`` to keep the full
             authorization of the identity.
         expires_at : datetime.datetime | None, optional
-            Explicit expiration. ``None`` applies the configured default.
+            Explicit expiration. A value without an offset uses the application
+            timezone. ``None`` applies the configured lifetime.
 
         Returns
         -------
@@ -113,7 +115,8 @@ class AccessTokenRepository(IAccessTokenRepository):
         Raises
         ------
         orionis.auth.TokenException
-            When the token name is empty.
+            If the name, expiration or abilities are invalid, or the inserted token
+            cannot be recovered.
         """
         if (
             not isinstance(name, str)
@@ -129,7 +132,7 @@ class AccessTokenRepository(IAccessTokenRepository):
 
         # Fall back to the configured lifetime when no explicit moment is
         # requested; a null expiration keeps the token alive until revoked.
-        deadline = _as_datetime(expires_at)
+        deadline = _as_datetime(expires_at, naive_zone=DateTime.getZoneInfo())
         if deadline is None and self.__expiration is not None:
             deadline = issued_at + timedelta(minutes=self.__expiration)
 
@@ -170,8 +173,8 @@ class AccessTokenRepository(IAccessTokenRepository):
             tokenable_id=tokenable_id,
             name=name,
             abilities=granted,
-            created_at=issued_at,
-            expires_at=deadline,
+            created_at=DateTime.fromDatetime(issued_at),
+            expires_at=DateTime.fromDatetime(deadline) if deadline else None,
         )
         return NewAccessToken(access_token=access_token, plain_text=plain_text)
 
@@ -281,9 +284,9 @@ class AccessTokenRepository(IAccessTokenRepository):
             tokenable_id=row.get("tokenable_id"),
             name=str(row.get("name")),
             abilities=abilities,
-            created_at=created_at,
-            expires_at=expires_at,
-            last_used_at=last_used_at,
+            created_at=DateTime.fromDatetime(created_at) if created_at else None,
+            expires_at=DateTime.fromDatetime(expires_at) if expires_at else None,
+            last_used_at=DateTime.fromDatetime(last_used_at) if last_used_at else None,
         )
 
     async def touch(self: Self, token_id: object) -> bool:
@@ -387,38 +390,31 @@ class AccessTokenRepository(IAccessTokenRepository):
 
 def _utc_now() -> datetime:
     """
-    Return the current UTC moment as a naive datetime.
-
-    Token columns are declared without a timezone so every dialect stores
-    the same value. Dropping the offset here keeps writes and reads
-    symmetric across SQLite, PostgreSQL and MySQL.
+    Return the current UTC instant for persistence and validity checks.
 
     Returns
     -------
     datetime.datetime
-        Current UTC moment without timezone information.
+        Current UTC moment with timezone information.
     """
-    return datetime.now(UTC).replace(tzinfo=None)
+    return datetime.now(UTC)
 
 
-def _as_datetime(value: object) -> datetime | None:
+def _as_datetime(value: object, *, naive_zone: tzinfo = UTC) -> datetime | None:
     """
-    Coerce a stored timestamp into a datetime.
-
-    Queries over a table the builder knows no schema for come back with
-    whatever the driver produced, and SQLite hands timestamps back as
-    plain strings. Normalising here keeps the expiration check correct on
-    every dialect.
+    Convert a token deadline or stored timestamp to UTC.
 
     Parameters
     ----------
     value : object
-        Raw value read from a timestamp column.
+        Expiration supplied by the caller or a timestamp read as text or datetime.
+    naive_zone : datetime.tzinfo, optional
+        Source timezone for an offset-less value. Stored timestamps use UTC.
 
     Returns
     -------
     datetime.datetime | None
-        Parsed UTC moment without an offset, or ``None`` for SQL NULL.
+        Parsed UTC moment, or ``None`` for SQL NULL.
 
     Raises
     ------
@@ -436,9 +432,9 @@ def _as_datetime(value: object) -> datetime | None:
     if not isinstance(value, datetime):
         error_msg = "Invalid token timestamp."
         raise TokenException(error_msg)
-    if value.tzinfo is not None:
-        value = value.astimezone(UTC).replace(tzinfo=None)
-    return value
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=naive_zone)
+    return value.astimezone(UTC)
 
 
 def _unexpired_tokens(query: QueryBuilderBase) -> None:
@@ -478,7 +474,7 @@ def _is_expired(value: datetime | None) -> bool:
 
     # Values stored without an offset are UTC by construction.
     moment = value if value.tzinfo is not None else value.replace(tzinfo=UTC)
-    return moment <= datetime.now(UTC)
+    return moment <= _utc_now()
 
 
 def _encode_abilities(abilities: frozenset[str] | None) -> str | None:

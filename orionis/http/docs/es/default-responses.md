@@ -43,7 +43,7 @@ El registro confirma mediante el contexto transaccional nativo antes de programa
 
 ## Cachés y cambios de archivos
 
-El kernel retiene el servicio exacto `DefaultResponses`; devuelve respuestas nuevas con estado mutable independiente. Salud conserva como máximo dos cuerpos HTML y los invalida cuando cambian nombre/locale. Errores y excepciones se renderizan por petición y sus datos no se cachean.
+El kernel conserva el mismo servicio `DefaultResponses`. Cada llamada devuelve una respuesta con estado mutable independiente. La ruta de salud guarda como máximo dos cuerpos HTML y los invalida cuando cambia el nombre, el idioma o la zona horaria de la aplicación. El reloj del pie de página muestra la hora en la zona IANA de la aplicación. Las páginas de error y excepción se renderizan por petición.
 
 Los recursos permitidos conservan paths, no contenido ni resultados `stat`. El archivo seleccionado sigue reflejando cambios de contenido; añadir un candidato de prioridad superior exige reiniciar o eliminar `responses["favicon"]`, `responses["robots_txt"]` o `responses["sitemap_xml"]`. Un archivo seleccionado desaparecido fuerza nueva selección. La apertura aún puede fallar después de construir la respuesta.
 

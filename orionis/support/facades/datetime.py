@@ -4,10 +4,23 @@
 
 from __future__ import annotations
 import pendulum
-from pendulum.tz.exceptions import InvalidTimezone
-from datetime import datetime as stdlib_datetime
-from typing import ClassVar
-from zoneinfo import ZoneInfo
+import re
+from dateutil.parser import parse as parse_flexible
+from pendulum.formatting import Formatter
+from pendulum.parsing import parse as parse_components
+from pendulum.parsing.exceptions import ParserError
+from datetime import UTC, date, datetime as stdlib_datetime, time
+from typing import TYPE_CHECKING, ClassVar
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+
+_FORMATTER = Formatter()
+"""Parse date and time components from explicit Pendulum formats."""
+_FORMAT_LITERALS = re.compile(r"\[[^\]]*\]|\\.")
+"""Match bracketed literals and escaped characters in Pendulum formats."""
 
 
 class DateTime:
@@ -24,6 +37,12 @@ class DateTime:
     # Default timezone and locale
     _timezone: str = "UTC"
     """Default timezone and locale."""
+    _refresh_timezone: ClassVar[Callable[[], None] | None] = None
+    """
+    Refresh the default timezone from the active application.
+
+    The application installs this callback when it loads its configuration.
+    """
     _locale: str = "en"
     """Locale identifier: ``en``."""
     _zoneinfo_cache: ClassVar[dict[str, ZoneInfo]] = {}
@@ -61,31 +80,30 @@ class DateTime:
     @classmethod
     def _setTimezone(cls, timezone_name: str) -> None:
         """
-        Set the default timezone for the application.
+        Set the default IANA timezone and cache its zone information.
 
         Parameters
         ----------
         timezone_name : str
-            Name of the timezone (e.g., 'America/Mexico_City').
+            IANA timezone name.
 
         Returns
         -------
         None
-            This method does not return a value.
+            Store the validated timezone for subsequent calls.
 
         Raises
         ------
         ValueError
-            If the timezone is invalid.
+            If the name does not identify an available timezone.
         """
         try:
-            # Check that the timezone name is recognized.
-            pendulum.timezone(timezone_name)
-            cls._timezone = timezone_name
-            cls._zoneinfo_cache.clear()
-        except InvalidTimezone as e:
+            zone = ZoneInfo(timezone_name)
+        except (ValueError, ZoneInfoNotFoundError) as e:
             error_msg = f"Invalid timezone '{timezone_name}': {e}"
             raise ValueError(error_msg) from e
+        cls._timezone = timezone_name
+        cls._zoneinfo_cache = {timezone_name: zone}
 
     @classmethod
     def _setLocale(cls, locale: str) -> None:
@@ -109,13 +127,15 @@ class DateTime:
     @classmethod
     def getTimezone(cls) -> str:
         """
-        Return the configured timezone.
+        Read the timezone from the active application configuration.
 
         Returns
         -------
         str
-            The currently configured timezone name.
+            Configured IANA timezone name, initially UTC.
         """
+        if cls._refresh_timezone is not None:
+            cls._refresh_timezone()
         return cls._timezone
 
     @classmethod
@@ -133,14 +153,14 @@ class DateTime:
     @classmethod
     def getZoneInfo(cls) -> ZoneInfo:
         """
-        Return the ZoneInfo object for the configured timezone.
+        Resolve the configured timezone as a standard-library zone.
 
         Returns
         -------
         zoneinfo.ZoneInfo
-            The ZoneInfo instance corresponding to the configured timezone.
+            Cached zone for the current application setting.
         """
-        _tz = cls._timezone
+        _tz = cls.getTimezone()
         cached = cls._zoneinfo_cache.get(_tz)
         if cached is None:
             cached = ZoneInfo(_tz)
@@ -150,70 +170,70 @@ class DateTime:
     @classmethod
     def now(cls, tz: str | None = None) -> pendulum.DateTime:
         """
-        Get the current date and time.
+        Return the current time in the selected timezone.
 
         Parameters
         ----------
-        tz : str | None, optional
-            Specific timezone name. If None, uses the configured default.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The current date and time in the specified or default timezone.
+            Current timezone-aware datetime.
         """
-        return pendulum.now(tz if tz is not None else cls._timezone)
+        return pendulum.now(tz if tz is not None else cls.getTimezone())
 
     @classmethod
     def today(cls, tz: str | None = None) -> pendulum.DateTime:
         """
-        Return the current date at midnight in the selected timezone.
+        Return midnight today in the selected timezone.
 
         Parameters
         ----------
-        tz : str | None, optional
-            Specific timezone name. If None, uses the configured default.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Midnight today in the specified or default timezone.
+            Start of the current local date.
         """
-        return pendulum.today(tz if tz is not None else cls._timezone)
+        return pendulum.today(tz if tz is not None else cls.getTimezone())
 
     @classmethod
     def tomorrow(cls, tz: str | None = None) -> pendulum.DateTime:
         """
-        Return tomorrow's date in the specified or default timezone.
+        Return midnight tomorrow in the selected timezone.
 
         Parameters
         ----------
-        tz : str | None, optional
-            Timezone name. If None, uses the configured default.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Midnight tomorrow in the specified or default timezone.
+            Start of the next local date.
         """
-        return pendulum.tomorrow(tz if tz is not None else cls._timezone)
+        return pendulum.tomorrow(tz if tz is not None else cls.getTimezone())
 
     @classmethod
     def yesterday(cls, tz: str | None = None) -> pendulum.DateTime:
         """
-        Return the date for yesterday in the specified or default timezone.
+        Return midnight yesterday in the selected timezone.
 
         Parameters
         ----------
-        tz : str | None, optional
-            Timezone name. If None, uses the configured default.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Midnight yesterday in the specified or default timezone.
+            Start of the previous local date.
         """
-        return pendulum.yesterday(tz if tz is not None else cls._timezone)
+        return pendulum.yesterday(tz if tz is not None else cls.getTimezone())
 
     @classmethod
     def parse(
@@ -224,30 +244,46 @@ class DateTime:
         strict: bool = True,
     ) -> pendulum.DateTime:
         """
-        Parse a date string and convert it to the configured timezone.
+        Parse a date or time in the selected timezone.
 
         Parameters
         ----------
         date_string : str
-            Date string to parse.
-        tz : str | None, optional
-            Specific timezone name. If None, uses the configured default.
+            Date or time text, optionally with a UTC offset, or the keyword ``now``.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
         strict : bool, optional
-            Whether to use strict parsing mode, by default True.
+            Allow only Pendulum syntax by default. Set to False for flexible dates.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Parsed datetime object in the specified or default timezone.
-        """
-        # Determine the timezone to use
-        timezone = tz if tz is not None else cls._timezone
-        parsed_dt = pendulum.parse(date_string, strict=strict)
+            Local datetime. A time without a date uses today in the selected zone.
 
-        # Convert to the configured timezone if necessary
-        if parsed_dt.timezone_name != timezone:
-            return parsed_dt.in_timezone(timezone)
-        return parsed_dt
+        Raises
+        ------
+        ValueError
+            If the text cannot be parsed with the selected mode.
+        TypeError
+            If the text describes a duration or interval instead of a date or time.
+        """
+        timezone = tz if tz is not None else cls.getTimezone()
+        if date_string == "now":
+            return cls.now(timezone)
+        try:
+            # Keep offsets on time-only ISO inputs until a calendar date is known.
+            parsed = parse_components(date_string, exact=True)
+        except ParserError:
+            if strict:
+                raise
+            midnight = stdlib_datetime.combine(cls.now(timezone).date(), time.min)
+            parsed = parse_flexible(date_string, default=midnight, yearfirst=True)
+
+        if isinstance(parsed, time):
+            parsed = stdlib_datetime.combine(cls.now(timezone).date(), parsed)
+        elif isinstance(parsed, date) and not isinstance(parsed, stdlib_datetime):
+            parsed = stdlib_datetime.combine(parsed, time.min)
+        return cls.fromDatetime(parsed, timezone)
 
     @classmethod
     def fromFormat(
@@ -258,31 +294,41 @@ class DateTime:
         locale: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Parse a date string using explicit format tokens.
+        Parse formatted text and express the result in the selected timezone.
 
         Parameters
         ----------
         date_string : str
-            Date string to parse.
+            Text matching the supplied format.
         fmt : str
-            Format string using pendulum's custom tokens (e.g. 'YYYY-MM-DD').
-        tz : str | None, optional
-            Specific timezone name. If None, uses the configured default.
-        locale : str | None, optional
-            Locale to use while parsing localized tokens (e.g. month or day
-            names). If None, uses the configured default.
+            Pendulum format tokens.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
+        locale : str or None, optional
+            Language for localized tokens. Defaults to the configured locale.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Parsed datetime object in the specified or default timezone.
+            Local datetime representing the instant encoded by an offset or Unix time.
+
+        Raises
+        ------
+        ValueError
+            If the text does not match the format or its components are invalid.
         """
-        return pendulum.from_format(
-            date_string,
-            fmt,
-            tz=tz if tz is not None else cls._timezone,
+        timezone = tz if tz is not None else cls.getTimezone()
+        parts = _FORMATTER.parse(
+            date_string, fmt, cls.now(timezone),
             locale=locale if locale is not None else cls._locale,
         )
+        # Pendulum expands Unix timestamps into UTC components without a tz.
+        tokens = _FORMAT_LITERALS.sub("", fmt)
+        if "X" in tokens or "x" in tokens:
+            parts["tz"] = "UTC"
+        elif parts["tz"] is None:
+            parts["tz"] = timezone
+        return pendulum.datetime(**parts, fold=0).in_timezone(timezone)
 
     @classmethod
     def local(
@@ -342,29 +388,29 @@ class DateTime:
         microsecond: int = 0,
     ) -> pendulum.DateTime:
         """
-        Create a timezone-naive datetime object.
+        Create a timezone-naive datetime from calendar components.
 
         Parameters
         ----------
         year : int
-            Year component.
+            Calendar year.
         month : int, optional
-            Month component, by default 1.
+            Month from 1 to 12.
         day : int, optional
-            Day component, by default 1.
+            Day of the month.
         hour : int, optional
-            Hour component, by default 0.
+            Hour from 0 to 23.
         minute : int, optional
-            Minute component, by default 0.
+            Minute from 0 to 59.
         second : int, optional
-            Second component, by default 0.
+            Second from 0 to 59.
         microsecond : int, optional
-            Microsecond component, by default 0.
+            Fractional second in microseconds.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Datetime object with no timezone information attached.
+            Wall time with the fold flag set to the first occurrence.
         """
         return pendulum.naive(
             year,
@@ -374,6 +420,7 @@ class DateTime:
             minute,
             second,
             microsecond,
+            fold=0,
         )
 
     @classmethod
@@ -383,21 +430,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Convert a Unix timestamp to a datetime in the configured timezone.
+        Express a Unix timestamp in the selected timezone.
 
         Parameters
         ----------
-        timestamp : int | float
-            Unix timestamp to convert.
-        tz : str | None, optional
-            Specific timezone name. If None, uses the configured default.
+        timestamp : float
+            Seconds since the Unix epoch.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Datetime object in the specified or default timezone.
+            Timezone-aware datetime representing the supplied instant.
         """
-        _tz = tz if tz is not None else cls._timezone
+        _tz = tz if tz is not None else cls.getTimezone()
         return pendulum.from_timestamp(timestamp, tz=_tz)
 
     @classmethod
@@ -407,38 +454,35 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Convert a standard datetime object to the configured timezone.
+        Interpret a naive datetime locally or convert an aware instant.
 
         Parameters
         ----------
-        dt : datetime.datetime or ``pendulum.DateTime``
-            Datetime object to convert.
+        dt : datetime.datetime
+            Datetime to convert. Naive inputs retain their fold flag.
         tz : str or None, optional
-            Specific timezone name. If None, uses the configured default.
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Datetime object in the specified or default timezone.
+            Timezone-aware datetime in the selected zone.
 
         Raises
         ------
         TypeError
-            If the input type is not supported.
+            If the input is not a datetime.
         """
-        timezone = tz if tz is not None else cls._timezone
+        timezone = tz if tz is not None else cls.getTimezone()
 
-        # Most specific type first: pendulum.DateTime ⊂ stdlib_datetime
-        if isinstance(dt, pendulum.DateTime):
-            return dt.in_timezone(timezone)
-        if isinstance(dt, stdlib_datetime):
-            if dt.tzinfo is None:
-                # Naive datetime: assume it is in the configured timezone
-                return pendulum.instance(dt, tz=timezone)
-            # Aware datetime: convert to the configured timezone
-            return pendulum.instance(dt).in_timezone(timezone)
-        error_msg = f"Unsupported type: {type(dt)}"
-        raise TypeError(error_msg)
+        if not isinstance(dt, stdlib_datetime):
+            error_msg = f"Unsupported type: {type(dt)}"
+            raise TypeError(error_msg)
+        if dt.utcoffset() is None:
+            return pendulum.DateTime.instance(dt.replace(tzinfo=None), tz=timezone)
+        if isinstance(dt, pendulum.DateTime) and dt.timezone_name == timezone:
+            return dt
+        return pendulum.instance(dt.astimezone(UTC)).in_timezone(timezone)
 
     @classmethod
     def datetime(
@@ -453,31 +497,31 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Create a datetime object in the configured timezone.
+        Create a datetime from wall-clock components in the selected zone.
 
         Parameters
         ----------
         year : int
-            Year component.
+            Calendar year.
         month : int, optional
-            Month component, by default 1.
+            Month from 1 to 12.
         day : int, optional
-            Day component, by default 1.
+            Day of the month.
         hour : int, optional
-            Hour component, by default 0.
+            Hour from 0 to 23.
         minute : int, optional
-            Minute component, by default 0.
+            Minute from 0 to 59.
         second : int, optional
-            Second component, by default 0.
+            Second from 0 to 59.
         microsecond : int, optional
-            Microsecond component, by default 0.
-        tz : str | None, optional
-            Specific timezone name. If None, uses the configured default.
+            Fractional second in microseconds.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            Datetime object in the specified or default timezone.
+            Timezone-aware datetime using the first occurrence of a repeated hour.
         """
         return pendulum.datetime(
             year,
@@ -487,7 +531,8 @@ class DateTime:
             minute,
             second,
             microsecond,
-            tz=tz if tz is not None else cls._timezone,
+            tz=tz if tz is not None else cls.getTimezone(),
+            fold=0,
         )
 
     @classmethod
@@ -581,27 +626,24 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the start of the given unit of time (e.g. 'hour', 'decade').
+        Return the start of the calendar unit in the selected timezone.
 
         Parameters
         ----------
         unit : str
-            Unit of time: 'second', 'minute', 'hour', 'day', 'week',
-            'month', 'quarter', 'year', 'decade' or 'century'.
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+            Pendulum calendar unit, such as day, week, month, or year.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the start of the given unit.
+            Local start of the calendar unit containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.start_of(unit)
+        local = cls.now(tz) if dt is None else cls.fromDatetime(dt, tz)
+        return local.start_of(unit)
 
     @classmethod
     def endOf(
@@ -611,27 +653,24 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the end of the given unit of time (e.g. 'hour', 'decade').
+        Return the end of the calendar unit in the selected timezone.
 
         Parameters
         ----------
         unit : str
-            Unit of time: 'second', 'minute', 'hour', 'day', 'week',
-            'month', 'quarter', 'year', 'decade' or 'century'.
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+            Pendulum calendar unit, such as day, week, month, or year.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the end of the given unit.
+            Local end of the calendar unit containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.end_of(unit)
+        local = cls.now(tz) if dt is None else cls.fromDatetime(dt, tz)
+        return local.end_of(unit)
 
     @classmethod
     def startOfDay(
@@ -640,24 +679,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the start of the day (00:00:00).
+        Return the start of the day in the selected timezone.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the start of the day.
+            Local start of the day containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.start_of("day")
+        return cls.startOf("day", dt, tz)
 
     @classmethod
     def endOfDay(
@@ -666,24 +702,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the end of the day (23:59:59).
+        Return the end of the day in the selected timezone.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the end of the day.
+            Local end of the day containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.end_of("day")
+        return cls.endOf("day", dt, tz)
 
     @classmethod
     def convertToLocal(
@@ -691,30 +724,28 @@ class DateTime:
         dt: str | stdlib_datetime | pendulum.DateTime,
     ) -> pendulum.DateTime:
         """
-        Convert a date to the configured local timezone.
+        Convert text or a datetime to the application timezone.
 
         Parameters
         ----------
-        dt : str | datetime.datetime | ``pendulum.DateTime``
-            Date to convert. Accepts string, standard datetime, or pendulum.DateTime.
+        dt : str or datetime.datetime
+            Input to parse or convert. A naive value represents local wall time.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The date converted to the configured timezone.
+            Datetime expressed in the application timezone.
+
+        Raises
+        ------
+        ValueError
+            If the text is invalid.
+        TypeError
+            If the input does not represent a date or time.
         """
-        _tz = cls._timezone
-        # Most specific type first: pendulum.DateTime ⊂ stdlib_datetime
-        if isinstance(dt, pendulum.DateTime):
-            if dt.timezone_name == _tz:
-                return dt
-            return dt.in_timezone(_tz)
         if isinstance(dt, str):
-            return pendulum.parse(dt).in_timezone(_tz)
-        if isinstance(dt, stdlib_datetime):
-            return pendulum.instance(dt).in_timezone(_tz)
-        error_msg = f"Unsupported type: {type(dt)}"
-        raise TypeError(error_msg)
+            return cls.parse(dt)
+        return cls.fromDatetime(dt)
 
     @classmethod
     def formatLocal(
@@ -747,24 +778,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the start of the week (Monday 00:00:00).
+        Return the start of the week in the selected timezone.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the start of the week.
+            Local start of the week containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.start_of("week")
+        return cls.startOf("week", dt, tz)
 
     @classmethod
     def endOfWeek(
@@ -773,24 +801,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the end of the week (Sunday 23:59:59).
+        Return the end of the week in the selected timezone.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the end of the week.
+            Local end of the week containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.end_of("week")
+        return cls.endOf("week", dt, tz)
 
     @classmethod
     def startOfMonth(
@@ -799,24 +824,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the start of the month (first day at 00:00:00).
+        Return the start of the month in the selected timezone.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the start of the month.
+            Local start of the month containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.start_of("month")
+        return cls.startOf("month", dt, tz)
 
     @classmethod
     def endOfMonth(
@@ -825,24 +847,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the end of the month (last day at 23:59:59).
+        Return the end of the month in the selected timezone.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the end of the month.
+            Local end of the month containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.end_of("month")
+        return cls.endOf("month", dt, tz)
 
     @classmethod
     def startOfYear(
@@ -851,24 +870,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the start of the year (January 1st at 00:00:00).
+        Return the start of the year in the selected timezone.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the start of the year.
+            Local start of the year containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.start_of("year")
+        return cls.startOf("year", dt, tz)
 
     @classmethod
     def endOfYear(
@@ -877,24 +893,21 @@ class DateTime:
         tz: str | None = None,
     ) -> pendulum.DateTime:
         """
-        Return the end of the year (December 31st at 23:59:59).
+        Return the end of the year in the selected timezone.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to use. If None, uses the current datetime.
-        tz : str | None, optional
-            The timezone to use. If None, uses the configured default.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to locate on the selected calendar. Defaults to the current time.
+        tz : str or None, optional
+            IANA timezone name. Defaults to the application timezone.
 
         Returns
         -------
         ``pendulum.DateTime``
-            The datetime at the end of the year.
+            Local end of the year containing the instant.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(tz if tz is not None else cls._timezone)
-        return dt.end_of("year")
+        return cls.endOf("year", dt, tz)
 
     @classmethod
     def addDays(cls, dt: pendulum.DateTime, days: int) -> pendulum.DateTime:
@@ -1014,96 +1027,92 @@ class DateTime:
         dt: pendulum.DateTime | None = None,
     ) -> bool:
         """
-        Determine if the given date falls on a weekend.
+        Check whether the local calendar date falls on a weekend.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to check. If None, uses the current datetime.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to check. Defaults to the current time.
 
         Returns
         -------
         bool
-            True if the date is Saturday or Sunday, False otherwise.
+            True for Saturday or Sunday in the application timezone.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(cls._timezone)
-        return dt.day_of_week in (pendulum.SATURDAY, pendulum.SUNDAY)
+        local = cls.now() if dt is None else cls.convertToLocal(dt)
+        return local.day_of_week in (pendulum.SATURDAY, pendulum.SUNDAY)
 
     @classmethod
     def isToday(cls, dt: pendulum.DateTime) -> bool:
         """
-        Check whether the date is today in the configured timezone.
+        Check whether an instant falls on today in the application timezone.
 
         Parameters
         ----------
         dt : ``pendulum.DateTime``
-            The datetime to check.
+            Datetime to compare.
 
         Returns
         -------
         bool
-            True if the date is today, False otherwise.
+            True when both local calendar dates match.
         """
         # Read the current date in the configured timezone.
-        today = pendulum.today(cls._timezone)
+        today = pendulum.today(cls.getTimezone())
         dt = cls.convertToLocal(dt)
         return dt.year == today.year and dt.month == today.month and dt.day == today.day
 
     @classmethod
     def isFuture(cls, dt: pendulum.DateTime) -> bool:
         """
-        Determine if the given date is in the future.
+        Check whether a datetime falls after the current instant.
 
         Parameters
         ----------
         dt : ``pendulum.DateTime``
-            The datetime to check.
+            Datetime to compare.
 
         Returns
         -------
         bool
-            True if the date is in the future, False otherwise.
+            True when the datetime is strictly after the current time.
         """
-        return dt > pendulum.now(cls._timezone)
+        return cls.fromDatetime(dt).astimezone(UTC) > cls.now("UTC")
 
     @classmethod
     def isPast(cls, dt: pendulum.DateTime) -> bool:
         """
-        Determine if the given date is in the past.
+        Check whether a datetime falls before the current instant.
 
         Parameters
         ----------
         dt : ``pendulum.DateTime``
-            The datetime to check.
+            Datetime to compare.
 
         Returns
         -------
         bool
-            True if the date is in the past, False otherwise.
+            True when the datetime is strictly before the current time.
         """
-        return dt < pendulum.now(cls._timezone)
+        return cls.fromDatetime(dt).astimezone(UTC) < cls.now("UTC")
 
     @classmethod
     def isLeapYear(cls, dt: pendulum.DateTime | None = None) -> bool:
         """
-        Determine if the year of the given date is a leap year.
+        Check whether the local calendar year is a leap year.
 
         Parameters
         ----------
-        dt : ``pendulum.DateTime`` | None, optional
-            The datetime to check. If None, uses the current datetime.
+        dt : ``pendulum.DateTime`` or None, optional
+            Instant to check. Defaults to the current time.
 
         Returns
         -------
         bool
-            True if the year is a leap year, False otherwise.
+            True when the year in the application timezone is a leap year.
         """
-        # Use current datetime if none is provided
-        if dt is None:
-            dt = pendulum.now(cls._timezone)
-        return dt.is_leap_year()
+        local = cls.now() if dt is None else cls.convertToLocal(dt)
+        return local.is_leap_year()
 
     @classmethod
     def isBirthday(
@@ -1112,23 +1121,22 @@ class DateTime:
         other: pendulum.DateTime | None = None,
     ) -> bool:
         """
-        Determine if the given date shares month and day with another date.
+        Compare month and day on the application calendar.
 
         Parameters
         ----------
         dt : ``pendulum.DateTime``
-            The reference date (e.g. a date of birth).
-        other : ``pendulum.DateTime`` | None, optional
-            The date to compare against. If None, uses the current datetime
-            in the configured timezone.
+            Birth date to compare.
+        other : ``pendulum.DateTime`` or None, optional
+            Reference datetime. Defaults to the current time.
 
         Returns
         -------
         bool
-            True if both dates share the same month and day, False otherwise.
+            True when the local month and day match.
         """
-        reference = other if other is not None else pendulum.now(cls._timezone)
-        return dt.is_birthday(reference)
+        reference = cls.now() if other is None else cls.convertToLocal(other)
+        return cls.convertToLocal(dt).is_birthday(reference)
 
     @classmethod
     def closest(

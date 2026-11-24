@@ -2,7 +2,11 @@
 # Preserve native TestCase assertions, boundary probes, and fixture signatures.
 # Keep established public and external protocol names and signatures.
 from __future__ import annotations
+import locale
+import os
 import tempfile
+import time
+import pendulum
 from pathlib import Path
 from unittest.mock import patch
 import orionis.foundation.application as application_module
@@ -11,6 +15,7 @@ from orionis.container.context.scope import ScopedContext
 from orionis.container.providers.service_provider import ServiceProvider
 from orionis.foundation.application import Application
 from orionis.foundation.core_paths import CORE_APP_PATHS
+from orionis.support.facades.datetime import DateTime
 from orionis.support.structures.freezer import FreezeThaw
 from orionis.test import TestCase
 
@@ -46,7 +51,11 @@ class SecondProvider(ServiceProvider):
 
 
 class TestApplicationConfiguration(TestCase):
-    """Exercise mutable configuration access and immutable bootstrap snapshots."""
+    """
+    Verify mutable application settings and immutable bootstrap snapshots.
+
+    Check how configuration reaches service providers and the date facade.
+    """
 
     def setUp(self) -> None:
         """
@@ -69,6 +78,70 @@ class TestApplicationConfiguration(TestCase):
             The test runner regains its original container context.
         """
         ScopedContext.reset(self._scope_token)
+
+    def testTimezoneAppliesToProvidersAndTracksRuntimeConfiguration(self) -> None:
+        """
+        Verify timezone configuration during startup, runtime edits and reset.
+
+        Returns
+        -------
+        None
+            Assert that providers and subsequent date reads see the configured zone.
+        """
+        if hasattr(time, "tzset"):
+            self.addCleanup(time.tzset)
+        self.enterContext(patch.dict(os.environ))
+        locale_before = locale.setlocale(locale.LC_ALL)
+        self.addCleanup(locale.setlocale, locale.LC_ALL, locale_before)
+        self.addCleanup(pendulum.set_locale, pendulum.get_locale())
+        for attr in ("_timezone", "_locale", "_refresh_timezone"):
+            self.enterContext(patch.object(DateTime, attr, getattr(DateTime, attr)))
+        self.enterContext(patch.object(DateTime, "_zoneinfo_cache", {}))
+        observed = []
+
+        def record_timezone(_provider: FirstProvider) -> None:
+            """
+            Record the timezone visible inside the provider hook.
+
+            Parameters
+            ----------
+            _provider : FirstProvider
+                Provider instance supplied by the registration or boot hook.
+
+            Returns
+            -------
+            None
+                Append the active timezone to the observations.
+            """
+            observed.append(DateTime.getTimezone())
+
+        self.enterContext(patch.object(FirstProvider, "register", record_timezone))
+        self.enterContext(patch.object(FirstProvider, "boot", record_timezone))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for startup in ("cold", "compiled"):
+                app = object.__new__(Application)
+                Application.__init__(app, root)
+                app.compile(path=str(root / "cache"))
+                if startup == "cold":
+                    app.withConfigApp(timezone="Asia/Tokyo", key=b"x" * 32)
+                    app.withProviders(FirstProvider)
+                DateTime._setTimezone("UTC")
+                app.create()
+                self.assertEqual(observed[-2:], ["Asia/Tokyo", "Asia/Tokyo"])
+                app.config("app.timezone", "America/Bogota")
+                self.assertEqual(DateTime.now().timezone_name, "America/Bogota")
+                self.assertEqual(os.environ["TZ"], "America/Bogota")
+                with self.assertRaises(ValueError):
+                    app.config("app.timezone", "Invalid/Timezone")
+                self.assertEqual(app.config("app.timezone"), "America/Bogota")
+                app.config("app")["timezone"] = "Europe/Paris"
+                self.assertEqual(DateTime.getZoneInfo().key, "Europe/Paris")
+                app.config()["app"] = {"timezone": "Asia/Kolkata"}
+                self.assertEqual(DateTime.today().timezone_name, "Asia/Kolkata")
+                app.resetRuntimeConfig()
+                self.assertEqual(DateTime.getTimezone(), "Asia/Tokyo")
+        self.assertEqual(len(observed), 4)
 
     def testReadsNestedAndFalsyValues(self) -> None:
         """

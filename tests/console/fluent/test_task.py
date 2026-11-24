@@ -1,7 +1,9 @@
 # ruff: noqa: ANN001, ANN201, ANN202, PT009, PT027, SLF001
 # Preserve native TestCase assertions, boundary probes, and fixture signatures.
-from datetime import datetime, timedelta
+from copy import copy
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
+from zoneinfo import ZoneInfo
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
@@ -9,6 +11,7 @@ from orionis.console.base.listener import BaseTaskListener
 from orionis.console.entities.task import Task as TaskEntity
 from orionis.console.enums.events import TaskEvent
 from orionis.console.fluent.task import Task
+from orionis.support.facades.datetime import DateTime
 from orionis.test import TestCase
 
 
@@ -37,6 +40,99 @@ class _ConcreteListener(BaseTaskListener):
 
 
 class TestTask(TestCase):
+    """
+    Verify schedules produced by the fluent task builder.
+
+    Inspect trigger instants, timing boundaries, and options on task entities.
+    """
+
+    def testExplicitLocalTimesHandleGapsAndFolds(self) -> None:
+        """
+        Verify how explicit task times handle clock transitions.
+
+        A spring gap raises ValueError. An autumn overlap selects its first instant.
+        """
+        zone = ZoneInfo("America/New_York")
+        with patch.object(DateTime, "getZoneInfo", return_value=zone):
+            for method in ("startDate", "endDate", "onceAt"):
+                with (
+                    self.subTest(method=method),
+                    self.assertRaisesRegex(
+                        ValueError,
+                        "does not exist",
+                    ),
+                ):
+                    getattr(_make_task(), method)(2026, 3, 8, 2, 30)
+            task = _make_task()
+            task.onceAt(2026, 11, 1, 1, 30)
+        self.assertEqual(
+            task.entity().trigger.run_date.astimezone(UTC),
+            datetime(2026, 11, 1, 5, 30, tzinfo=UTC),
+        )
+
+    def testCalendarRunsOncePerExistingLocalTime(self) -> None:
+        """
+        Verify that a calendar trigger fires once for each valid local match.
+
+        Check the spring gap and a scheduler restart during the second autumn hour.
+        """
+        zone = ZoneInfo("America/New_York")
+        with patch.object(DateTime, "getZoneInfo", return_value=zone):
+            task = _make_task()
+            task.cron(hour="2,3", minute="15")
+            spring = task.entity().trigger
+            task.dailyAt(1, 30)
+            autumn = task.entity().trigger
+        mar8 = datetime(2026, 3, 8, 0, tzinfo=zone)
+        self.assertEqual(
+            spring.get_next_fire_time(None, mar8), mar8.replace(hour=3, minute=15),
+        )
+        nov1 = datetime(2026, 11, 1, 0, tzinfo=zone)
+        first = autumn.get_next_fire_time(None, nov1)
+        self.assertEqual(
+            first.astimezone(UTC), datetime(2026, 11, 1, 5, 30, tzinfo=UTC),
+        )
+        expected = datetime(2026, 11, 2, 1, 30, tzinfo=zone)
+        self.assertEqual(copy(autumn).get_next_fire_time(first, first), expected)
+        restarting = datetime(2026, 11, 1, 1, 0, tzinfo=zone, fold=1)
+        self.assertEqual(autumn.get_next_fire_time(None, restarting), expected)
+
+    def testElapsedDaysAcrossDaylightSavingRemain24Hours(self) -> None:
+        """
+        Check the elapsed duration of a daily interval across a clock change.
+
+        The local firing hour advances while consecutive instants stay one day apart.
+        """
+        zone = ZoneInfo("America/New_York")
+        with patch.object(DateTime, "getZoneInfo", return_value=zone):
+            task = _make_task()
+            task.startDate(2026, 3, 7, 12)
+            task.everyDays(1)
+        trigger = task.entity().trigger
+        first = trigger.start_date
+        second = trigger.get_next_fire_time(first, first)
+        self.assertEqual(second.hour, 13)
+        self.assertEqual(
+            second.astimezone(UTC) - first.astimezone(UTC), timedelta(days=1),
+        )
+
+    def testCalendarEndIncludesTheLastRealMatchFollowingAGap(self) -> None:
+        """
+        Verify that a calendar end date includes a match just after a gap.
+
+        The trigger expires after it reaches that matching instant.
+        """
+        zone = ZoneInfo("America/New_York")
+        with patch.object(DateTime, "getZoneInfo", return_value=zone):
+            task = _make_task()
+            task.startDate(2026, 3, 8, 0)
+            task.endDate(2026, 3, 8, 3, 15)
+            task.cron(hour="2,3", minute="15,30")
+        trigger = task.entity().trigger
+        match = trigger.get_next_fire_time(None, trigger.start_date)
+        self.assertEqual(match, trigger.end_date)
+        self.assertIsNone(trigger.get_next_fire_time(match, match))
+
     def testSchedulerJitterDefaultsAffectIndependentTriggerSnapshots(self) -> None:
         """
         Apply inherited jitter to firing times without changing retained entities.

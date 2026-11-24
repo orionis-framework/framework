@@ -9,7 +9,11 @@ from orionis.cache.serializer import Serializer
 
 
 class FileBasedCache:
-    """Persist named cache entries in a filesystem directory."""
+    """
+    Persist a dictionary derived from monitored source files.
+
+    Reuse the artifact while its source hash and encoded values match.
+    """
 
     __slots__ = (
         "__file",
@@ -131,17 +135,24 @@ class FileBasedCache:
 
     def save(self, data: dict) -> tuple[int, str]:
         """
-        Save the provided data to the cache file if it has changed.
+        Save the artifact when its source hash or serialized contents change.
 
         Parameters
         ----------
         data : dict
-            The data to be cached.
+            Artifact contents supported by the cache serializer.
 
         Returns
         -------
         tuple[int, str]
-            A tuple containing the cache version and the sources hash.
+            Cache version and source hash.
+
+        Raises
+        ------
+        TypeError
+            If ``data`` is not a dictionary or contains an unsupported value.
+        OSError
+            If the cache file cannot be written or replaced.
         """
         # Validate that the input data is a dictionary
         if not isinstance(data, dict):
@@ -161,7 +172,7 @@ class FileBasedCache:
                 isinstance(existingmeta, dict)
                 and existingmeta.get("version") == self.CACHE_VERSION
                 and existingmeta.get("sourcesHash") == sourceshash
-                and existing.get("__data__") == data
+                and Serializer.equivalent(existing.get("__data__"), data)
             ):
                 return self.CACHE_VERSION, sourceshash
 

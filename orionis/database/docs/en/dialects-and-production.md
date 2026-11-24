@@ -8,6 +8,14 @@ PostgreSQL applies `charset`, `search_path`, and `sslmode` to both async and syn
 
 TLS options matter. The SQL Server template includes `DB_TRUST_SERVER_CERTIFICATE=True`; adapt that to your certificate-validation policy before production. Keep credentials out of application manuals, logs, and repositories. Pool options depend on the dialect and effective configuration; do not assume undocumented `DB_POOL_*` environment variables exist.
 
+Orionis opens MySQL connections in UTC. New `DateTime` and `StrictTimestamp` columns use `DATETIME(6)` and `TIMESTAMP(6)` to retain microseconds. For existing tables with second precision, write an explicit migration to precision 6 preserving nullability, defaults, keys and update clauses. Fractions discarded under the previous schema cannot be recovered.
+
+On Oracle, `StrictTimestamp(timezone=True)` uses `TIMESTAMP WITH TIME ZONE`. Typed inserts, updates and predicates send the UTC instant and retain microseconds. Typed reads extract UTC even when another client stored a different offset. The ORM presents managed timestamps and datetime casts in the application timezone. In handwritten SQL, use `SYS_EXTRACT_UTC(column)` when the caller needs the UTC value.
+
+An older Orionis writer could bind UTC wall time using a non-UTC Oracle session offset. For historical zoned timestamps from those sessions, compare the stored UTC instant with the original event time before correcting affected rows. Other clients may have written valid timestamps with the same offset.
+
+Oracle `DateTime` columns, including `DateTime(timezone=True)`, use the existing `DATE` type with second precision. Managed timestamps in these columns store UTC wall time. Custom datetime casts store application wall time. This preserves the interpretation of earlier rows.
+
 ## Amazon Redshift
 
 Redshift uses the official `redshift-connector` with `sqlalchemy-redshift`, rather than treating the service as PostgreSQL through asyncpg. Basic configuration:

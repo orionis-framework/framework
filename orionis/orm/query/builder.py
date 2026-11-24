@@ -38,7 +38,7 @@ class ModelQueryBuilder[TModel: _orm.Model](
     IModelQueryBuilder[TModel],
 ):
     """
-    Fluent query builder bound to a model class.
+    Build queries that hydrate and persist model instances.
 
     It adds model awareness on top of
     :class:`orionis.orm.query.base_builder.QueryBuilderBase`: rows
@@ -74,6 +74,7 @@ class ModelQueryBuilder[TModel: _orm.Model](
         """
         meta = model.__meta__
         super().__init__(meta.table)
+        self._datetime_storage = meta.datetime_storage
         self._model = model
         """Model class the queries run against."""
         self._meta = meta

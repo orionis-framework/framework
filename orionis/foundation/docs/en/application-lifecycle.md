@@ -6,6 +6,8 @@
 
 Before `create()`, fluent `with...` methods build mutable bootstrap metadata. Creation loads configuration and providers, freezes the bootstrap snapshot, registers the application, and exposes a separate mutable runtime-config copy. `config(key, value)` changes only runtime config; `resetRuntimeConfig()` restores it from the frozen snapshot.
 
+Orionis applies `app.timezone` before eager providers register or run their synchronous boot hooks, including when restoring a compiled configuration. Set `app.config("app.timezone", "America/Bogota")` to switch the worker's timezone. An invalid name raises `ValueError` and keeps the previous setting. Date operations also observe edits to the live configuration mapping. Resetting runtime config restores the bootstrap timezone. Scheduled triggers retain the timezone used when they were created.
+
 ### Creation and readiness stages
 
 `create()` completes configuration and provider registration. `boot()` also awaits eager provider boot methods for headless use, but intentionally does not run HTTP/CLI hooks or kernels. `isCreated`/`isBooted`, `areProvidersBooted`, and `isHttpReady` distinguish these stages.

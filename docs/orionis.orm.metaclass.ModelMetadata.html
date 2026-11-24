@@ -263,6 +263,16 @@
         
 
         
+            <div class="itemName"><code><a href="#datetime_storage" class="internal-link" title="orionis.orm.metaclass.ModelMetadata.datetime_storage">datetime<wbr></wbr>_storage</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
             <div class="itemName"><code><a href="#deleted_column" class="internal-link" title="orionis.orm.metaclass.ModelMetadata.deleted_column">deleted<wbr></wbr>_column</a></code>
             </div>
         
@@ -435,11 +445,11 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId17521"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId17619"> 
                     
                 </input>
 
-                <label class="lbl-toggle" for="expandableItemId17521">
+                <label class="lbl-toggle" for="expandableItemId17619">
                     
                     
                 </label>
@@ -614,7 +624,7 @@
         
         
             <div class="itemName expandableItem">
-                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId17522"> 
+                <input class="tocChildrenToggle" type="checkbox" id="expandableItemId17620"> 
                     
                 </input>
 
@@ -734,6 +744,16 @@
 
         
             <div class="itemName"><code><a href="#created_column" class="internal-link" title="orionis.orm.metaclass.ModelMetadata.created_column">created<wbr></wbr>_column</a></code>
+            </div>
+        
+
+    </li><li class="">
+        
+        
+        
+
+        
+            <div class="itemName"><code><a href="#datetime_storage" class="internal-link" title="orionis.orm.metaclass.ModelMetadata.datetime_storage">datetime<wbr></wbr>_storage</a></code>
             </div>
         
 
@@ -1095,18 +1115,18 @@
         </div>
 
         <div class="extrasDocstring">
-          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ModelMetadata</span>: <a href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L197" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.orm.metaclass.ModelMetadata">View In Hierarchy</a></p>
+          <p class="class-signature"><code><span class="py-keyword">class</span> <span class="py-defname">ModelMetadata</span>: <a href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L198" class="sourceLink">(source)</a></code></p><p><a href="classIndex.html#orionis.orm.metaclass.ModelMetadata">View In Hierarchy</a></p>
         </div>
 
         <div class="moduleDocstring">
-          <div><p>Precomputed metadata describing a model class.</p>
+          <div><p>Describe a model's columns, casts and persistence rules.</p>
 <p>Built once by the metaclass so hot paths (hydration, persistence)
 never perform reflection at runtime.</p>
 </div>
         </div>
 
         <div id="split-tables">
-          <table class="children sortable" id="id1630">
+          <table class="children sortable" id="id1645">
   
   
   <tr class="method">
@@ -1154,6 +1174,11 @@ never perform reflection at runtime.</p>
     <td>Instance Variable</td>
     <td><code><a href="#created_column" class="internal-link" title="orionis.orm.metaclass.ModelMetadata.created_column">created<wbr></wbr>_column</a></code></td>
     <td>Creation timestamp column, when present.</td>
+  </tr><tr class="instancevariable">
+    
+    <td>Instance Variable</td>
+    <td><code><a href="#datetime_storage" class="internal-link" title="orionis.orm.metaclass.ModelMetadata.datetime_storage">datetime<wbr></wbr>_storage</a></code></td>
+    <td>Map column names to storage rules for timestamps and explicit datetime casts.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
@@ -1250,7 +1275,7 @@ never perform reflection at runtime.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">applyCasts</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">attributes: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<wbr></wbr><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <wbr></wbr><a href="https://docs.python.org/3/library/typing.html#typing.Any" class="intersphinx-link">Any</a>]</code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L299">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L305">
       
       (source)
     </a>
@@ -1277,7 +1302,7 @@ never perform reflection at runtime.</p>
     
     
     <span class="py-keyword">def</span>&#160;<span class="py-defname">isFillable</span><span class="function-signature">(<span class="rst-sig-param"><span class="rst-undocumented">self</span>, </span><span class="rst-sig-param">key: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code></span>) -&gt; <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code>:</span>
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L278">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L284">
       
       (source)
     </a>
@@ -1303,7 +1328,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">accessors</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> str</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L269">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L275">
       
       (source)
     </a>
@@ -1330,7 +1355,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">appends</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L271">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L277">
       
       (source)
     </a>
@@ -1357,7 +1382,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">cast_lookup</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> collections.abc.Callable</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L258">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L261">
       
       (source)
     </a>
@@ -1384,7 +1409,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">casts</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> str</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L257">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L260">
       
       (source)
     </a>
@@ -1411,7 +1436,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">columns</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> orionis.orm.schema.column.ColumnDefinition</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L255">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L258">
       
       (source)
     </a>
@@ -1438,7 +1463,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">connection</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L264">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L267">
       
       (source)
     </a>
@@ -1465,7 +1490,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">created_column</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L265">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L268">
       
       (source)
     </a>
@@ -1483,6 +1508,33 @@ never perform reflection at runtime.</p>
 </div><div class="baseinstancevariable">
   
   
+  <a name="orionis.orm.metaclass.ModelMetadata.datetime_storage">
+    
+  </a>
+  <a name="datetime_storage">
+    
+  </a>
+  <div class="functionHeader">
+    
+    <span class="py-defname">datetime_storage</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a>[<a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a>, <a href="orionis.orm.attributes.DateTimeStorage.html" class="internal-link">orionis.orm.attributes.DateTimeStorage</a>]</code> =
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L271">
+      
+      (source)
+    </a>
+    <a class="headerLink" href="#datetime_storage" title="orionis.orm.metaclass.ModelMetadata.datetime_storage">
+      
+      
+      ¶
+    </a>
+  </div>
+  <div class="functionBody">
+    
+    <div><p>Map column names to storage rules for timestamps and explicit datetime casts.</p></div>
+    
+  </div>
+</div><div class="baseinstancevariable">
+  
+  
   <a name="orionis.orm.metaclass.ModelMetadata.deleted_column">
     
   </a>
@@ -1492,7 +1544,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">deleted_column</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L267">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L270">
       
       (source)
     </a>
@@ -1519,7 +1571,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">events</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> tuple</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L274">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L280">
       
       (source)
     </a>
@@ -1546,7 +1598,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">fillable</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L259">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L262">
       
       (source)
     </a>
@@ -1573,7 +1625,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">global_scopes</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> collections.abc.Callable</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L273">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L279">
       
       (source)
     </a>
@@ -1600,7 +1652,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">guarded</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L260">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L263">
       
       (source)
     </a>
@@ -1627,7 +1679,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">hidden</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#frozenset" class="intersphinx-link">frozenset</a> of <a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L261">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L264">
       
       (source)
     </a>
@@ -1654,7 +1706,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">incrementing</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L263">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L266">
       
       (source)
     </a>
@@ -1681,7 +1733,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">mutators</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> str</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L270">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L276">
       
       (source)
     </a>
@@ -1708,7 +1760,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">primary_key</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L256">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L259">
       
       (source)
     </a>
@@ -1735,7 +1787,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">scopes</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" class="intersphinx-link">dict</a> of str <tt class="rst-docutils rst-literal">to</tt> str</code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L272">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L278">
       
       (source)
     </a>
@@ -1762,7 +1814,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">table</span>: <code><a href="orionis.orm.schema.table.TableDefinition.html" class="internal-link" title="orionis.orm.schema.table.TableDefinition">orionis.orm.schema.TableDefinition</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L254">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L257">
       
       (source)
     </a>
@@ -1789,7 +1841,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">table_name</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L253">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L256">
       
       (source)
     </a>
@@ -1816,7 +1868,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">timestamps</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L262">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L265">
       
       (source)
     </a>
@@ -1843,7 +1895,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">updated_column</span>: <code><a href="https://docs.python.org/3/builtins/stdtypes.html#str" class="intersphinx-link">str</a> or <a href="https://docs.python.org/3/builtins/constants.html#None" class="intersphinx-link">None</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L266">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L269">
       
       (source)
     </a>
@@ -1870,7 +1922,7 @@ never perform reflection at runtime.</p>
   <div class="functionHeader">
     
     <span class="py-defname">uses_unique_ids</span>: <code><a href="https://docs.python.org/3/builtins/functions.html#bool" class="intersphinx-link">bool</a></code> =
-    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/c92a5909750ca33f76b3444a1075bd59f7d9213b/orionis/orm/metaclass.py#L268">
+    <a class="sourceLink" href="https://github.com/orionis-framework/framework/tree/1.x/orionis/orm/metaclass.py#L274">
       
       (source)
     </a>
@@ -1896,7 +1948,7 @@ never perform reflection at runtime.</p>
   <div class="orionis-footer-inner">
     <div class="orionis-footer-copy">
       <p>API documentation for <a href="https://orionis-framework.com/" class="projecthome">Orionis</a>.</p>
-      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 07:49:38.</span></p>
+      <p class="orionis-footer-meta">Generated with <a href="https://github.com/twisted/pydoctor/">Pydoctor</a> 25.10.1.<span class="orionis-footer-build"> Built 2026-11-24 11:52:04.</span></p>
     </div>
     <nav class="orionis-footer-links" aria-label="Additional resources">
       <a href="https://docs.orionis-framework.com">Read the guide <span aria-hidden="true">↗</span></a>

@@ -7,6 +7,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, ClassVar
+from unittest.mock import patch
 from orionis.auth.exceptions import TokenException
 from orionis.auth.guards.token_guard import TokenGuard
 from orionis.auth.tokens import repository as token_module
@@ -19,6 +20,7 @@ from orionis.orm.resolver import ConnectionResolver
 from orionis.orm.schema.table import TableDefinition
 from orionis.orm.schema.types import BigInteger, DateTime, String, Text
 from orionis.test import TestCase
+from orionis.support.facades import DateTime as Clock
 
 
 class _StubApp:
@@ -356,7 +358,54 @@ class _TokenCase(TestCase):
 
 
 class TestAccessTokenRepository(_TokenCase):
-    """Validate the persistence of personal access tokens."""
+    """
+    Verify personal token persistence and validation.
+
+    Use SQLite to exercise token lookup, expiration and revocation.
+    """
+
+    async def testLocalDeadlineAndHistoricalUtcRow(self) -> None:
+        """
+        Read legacy UTC rows and present new token metadata in application time.
+
+        Returns
+        -------
+        None
+            Verify that public dates use application time and stored deadlines use UTC.
+        """
+        with patch.object(Clock, "getTimezone", return_value="America/Bogota"):
+            local_deadline = Clock.now().add(days=3).naive()
+            issued = await self.repository.create(
+                self.identity, "clock", expires_at=local_deadline,
+            )
+            expected = Clock.fromDatetime(local_deadline)
+            self.assertEqual(
+                issued.access_token.expires_at.isoformat(), expected.isoformat(),
+            )
+            self.assertEqual(
+                issued.access_token.created_at.timezone_name, "America/Bogota",
+            )
+            row = await self.db.table("personal_access_tokens").first()
+            self.assertEqual(
+                token_module._as_datetime(row["expires_at"]), expected.astimezone(UTC),
+            )
+            await (
+                self.db.table("personal_access_tokens")
+                .where("id", row["id"])
+                .update(
+                    {
+                        "created_at": datetime(2026, 1, 15, 2, tzinfo=UTC).replace(
+                            tzinfo=None,
+                        ),
+                    },
+                )
+            )
+            retrieved = await self.repository.findByPlainText(issued.plain_text)
+            self.assertEqual(
+                retrieved.created_at.isoformat(), "2026-01-14T21:00:00-05:00",
+            )
+            self.assertEqual(retrieved.expires_at.isoformat(), expected.isoformat())
+            self.assertTrue(await self.repository.touch(row["id"]))
 
     async def testIssuesATokenAndStoresOnlyItsDigest(self) -> None:
         """Validate the core security property of opaque tokens.
@@ -483,9 +532,8 @@ class TestAccessTokenRepository(_TokenCase):
         self.assertEqual(found.abilities, frozenset())
 
     async def testRejectsAnExpiredToken(self) -> None:
-        """Validate that expiration is honoured on lookup.
-
-        An expired token is indistinguishable from an unknown one.
+        """
+        Verify that looking up an expired token yields no token record.
 
         Returns
         -------
@@ -495,7 +543,7 @@ class TestAccessTokenRepository(_TokenCase):
         issued = await self.repository.create(
             self.identity,
             "stale",
-            expires_at=datetime.now(UTC).replace(tzinfo=None) - timedelta(minutes=1),
+            expires_at=datetime.now(UTC) - timedelta(minutes=1),
         )
 
         self.assertIsNone(
@@ -503,9 +551,8 @@ class TestAccessTokenRepository(_TokenCase):
         )
 
     async def testAcceptsATokenThatHasNotExpiredYet(self) -> None:
-        """Validate the boundary of the expiration check.
-
-        A token valid for another hour must keep working.
+        """
+        Verify that a token remains usable until its expiration.
 
         Returns
         -------
@@ -515,7 +562,7 @@ class TestAccessTokenRepository(_TokenCase):
         issued = await self.repository.create(
             self.identity,
             "fresh",
-            expires_at=datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=1),
+            expires_at=datetime.now(UTC) + timedelta(hours=1),
         )
 
         self.assertIsNotNone(
@@ -631,9 +678,8 @@ class TestAccessTokenRepository(_TokenCase):
         self.assertFalse(await self.repository.touch(None))
 
     async def testPurgesExpiredAndRevokedTokens(self) -> None:
-        """Validate the maintenance operation.
-
-        Only unusable rows may be deleted.
+        """
+        Verify that cleanup removes expired and revoked tokens.
 
         Returns
         -------
@@ -644,7 +690,7 @@ class TestAccessTokenRepository(_TokenCase):
         expired = await self.repository.create(
             self.identity,
             "expired",
-            expires_at=datetime.now(UTC).replace(tzinfo=None) - timedelta(minutes=1),
+            expires_at=datetime.now(UTC) - timedelta(minutes=1),
         )
         revoked = await self.repository.create(self.identity, "revoked")
         await self.repository.revoke(revoked.access_token.id)
@@ -758,9 +804,48 @@ class TestAccessTokenRepository(_TokenCase):
         self.assertIsNotNone(issued.access_token.id)
         self.assertTrue(await self.repository.revoke(issued.access_token.id))
 
+    async def testHistoricalUtcDeadlinesWithColdCompiler(self) -> None:
+        """
+        Check both sides of a UTC expiration after dropping schema metadata.
+
+        Returns
+        -------
+        None
+            Verify lookup, usage and cleanup at the stored expiration boundary.
+        """
+        boundary = datetime(2026, 11, 1, 6, 30, tzinfo=UTC)
+        expired = await self.repository.create(self.identity, "expired")
+        valid = await self.repository.create(self.identity, "valid")
+        for token, delta in ((expired, 0), (valid, 1)):
+            timestamp = (boundary + timedelta(microseconds=delta)).replace(tzinfo=None)
+            await (
+                self.db.table("personal_access_tokens")
+                .where(
+                    "id",
+                    token.access_token.id,
+                )
+                .update({"expires_at": timestamp})
+            )
+        self.connection._compiler = SQLCompiler()
+        with (
+            patch.object(Clock, "getTimezone", return_value="America/New_York"),
+            patch.object(token_module, "_utc_now", return_value=boundary),
+        ):
+            self.assertIsNone(await self.repository.findByPlainText(expired.plain_text))
+            self.assertFalse(await self.repository.touch(expired.access_token.id))
+            self.assertIsNotNone(
+                await self.repository.findByPlainText(valid.plain_text),
+            )
+            self.assertTrue(await self.repository.touch(valid.access_token.id))
+            self.assertEqual(await self.repository.purgeExpired(), 1)
+
 
 class TestConfiguredTokenExpiration(_TokenCase):
-    """Validate the default lifetime configured for new tokens."""
+    """
+    Verify configured and explicit token lifetimes.
+
+    Use a fixed default lifetime and compare the issued metadata with storage.
+    """
 
     tokens_config: ClassVar[dict[str, Any]] = {"expiration": 60}
 
@@ -782,16 +867,15 @@ class TestConfiguredTokenExpiration(_TokenCase):
         self.assertEqual(token_module._as_datetime(row["expires_at"]), expected)
 
     async def testAnExplicitDeadlineWinsOverTheConfiguration(self) -> None:
-        """Validate that a caller may shorten or extend the lifetime.
-
-        The explicit value must not be overwritten by the default.
+        """
+        Verify that an explicit deadline overrides the configured lifetime.
 
         Returns
         -------
         None
             No return value.
         """
-        deadline = datetime.now(UTC).replace(tzinfo=None) + timedelta(days=7)
+        deadline = datetime.now(UTC) + timedelta(days=7)
 
         issued = await self.repository.create(
             self.identity,
@@ -803,7 +887,11 @@ class TestConfiguredTokenExpiration(_TokenCase):
 
 
 class TestTokenGuard(_TokenCase):
-    """Validate how API requests are authenticated."""
+    """
+    Verify bearer-token request authentication.
+
+    Exercise token lookup and identity resolution against persisted records.
+    """
 
     async def asyncSetUp(self) -> None:
         """Build the guard on top of the token repository.
@@ -884,9 +972,8 @@ class TestTokenGuard(_TokenCase):
         self.assertIsNone(await self.guard.resolve(bearer_request("")))
 
     async def testUnknownRevokedAndExpiredTokensAreRefused(self) -> None:
-        """Validate that every unusable token answers the same way.
-
-        The client cannot tell why the credential was rejected.
+        """
+        Verify identical authentication results for unusable tokens.
 
         Returns
         -------
@@ -898,7 +985,7 @@ class TestTokenGuard(_TokenCase):
         expired = await self.repository.create(
             self.identity,
             "expired",
-            expires_at=datetime.now(UTC).replace(tzinfo=None) - timedelta(minutes=1),
+            expires_at=datetime.now(UTC) - timedelta(minutes=1),
         )
 
         self.assertIsNone(await self.guard.resolve(bearer_request("forged")))

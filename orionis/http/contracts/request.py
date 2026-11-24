@@ -385,13 +385,13 @@ class IRequest(ABC):
         """
 
     @abstractmethod
-    async def formUrlEncoded(self) -> dict[str, Any]:
+    async def formUrlEncoded(self) -> dict[str, str]:
         """
         Parse the request body as URL-encoded form data.
 
         Returns
         -------
-        dict[str, typing.Any]
+        dict[str, str]
             The parsed form data as a dictionary.
         """
 

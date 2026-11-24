@@ -16,6 +16,17 @@ class IQueueManager(ABC):
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
 
+    async def boot(self) -> None:
+        """
+        Initialize the queue manager before accepting jobs.
+
+        Returns
+        -------
+        None
+            Complete any startup work required by the queue manager.
+        """
+        return # NOSONAR
+
     @abstractmethod
     def dispatch(self, job: BaseJob) -> PendingDispatch:
         """

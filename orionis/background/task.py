@@ -62,11 +62,11 @@ class BackgroundTask(IBackgroundTask):
     __slots__ = ("__args", "__func", "__is_async", "__kwargs")
     """Declare the instance attribute slots reserved by this class."""
 
-    def __init__(
+    def __init__[**P](
         self,
-        func: Callable,
-        *args: object,
-        **kwargs: object,
+        func: Callable[P, object],
+        *args: P.args,
+        **kwargs: P.kwargs,
     ) -> None:
         """
         Initialize the BackgroundTask instance.

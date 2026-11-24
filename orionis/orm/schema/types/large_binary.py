@@ -6,7 +6,7 @@ from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class LargeBinary(ColumnDefinition):
+class LargeBinary[TValue = bytes](ColumnDefinition[TValue]):
     """A type for large binary byte data, such as ``BLOB``/``BYTEA``."""
 
     __slots__ = ()

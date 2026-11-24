@@ -1,12 +1,13 @@
 """A type for ``datetime.timedelta()`` objects."""
 
 from __future__ import annotations
+from datetime import timedelta
 from orionis.orm.schema.column.definition import ColumnDefinition
 from orionis.orm.schema.column.options import ColumnOptions
 from orionis.orm.schema.types.column_type import ColumnType
 
 
-class Interval(ColumnDefinition):
+class Interval[TValue = timedelta](ColumnDefinition[TValue]):
     """A type for ``datetime.timedelta()`` objects."""
 
     __slots__ = ()

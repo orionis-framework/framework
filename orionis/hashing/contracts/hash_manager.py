@@ -1,7 +1,11 @@
+# ruff: noqa: TC001
+# Driver return types use lazy package exports for runtime reflection.
 """Define the contract for the hashing manager."""
 
 from __future__ import annotations
 from abc import abstractmethod
+from typing import Literal, overload
+from orionis import hashing
 from orionis.hashing.contracts.hasher import IHasher
 
 
@@ -16,6 +20,15 @@ class IHashManager(IHasher):
 
     __slots__ = ()
     """Declare that this class introduces no additional instance slots."""
+
+    @overload
+    def driver(self, name: Literal["argon2"]) -> hashing.Argon2Hasher: ...
+
+    @overload
+    def driver(self, name: Literal["bcrypt"]) -> hashing.BcryptHasher: ...
+
+    @overload
+    def driver(self, name: str | None = None) -> IHasher: ...
 
     @abstractmethod
     def driver(self, name: str | None = None) -> IHasher:

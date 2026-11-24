@@ -2707,9 +2707,9 @@ class Stringable(str):
 
     def when(
         self: Self,
-        condition: bool | Callable,
-        callback: Callable,
-        default: Callable | None = None,
+        condition: bool | Callable[[Stringable], object],
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute the given callback if condition is true.
@@ -2762,8 +2762,8 @@ class Stringable(str):
     def whenContains(
         self: Self,
         needles: str | list[str],
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if the string contains a given substring.
@@ -2788,8 +2788,8 @@ class Stringable(str):
     def whenContainsAll(
         self: Self,
         needles: list[str],
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if the string contains all specified substrings.
@@ -2814,8 +2814,8 @@ class Stringable(str):
 
     def whenEmpty(
         self: Self,
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if the string is empty.
@@ -2837,8 +2837,8 @@ class Stringable(str):
 
     def whenNotEmpty(
         self: Self,
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute the callback if the string is not empty.
@@ -2861,8 +2861,8 @@ class Stringable(str):
     def whenEndsWith(
         self: Self,
         needles: str | list[str],
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute the callback if the string ends with the given substring(s).
@@ -2887,8 +2887,8 @@ class Stringable(str):
     def whenDoesntEndWith(
         self: Self,
         needles: str | list[str],
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if the string does not end with the given substring(s).
@@ -2914,8 +2914,8 @@ class Stringable(str):
     def whenExactly(
         self: Self,
         value: str,
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if the string exactly matches the given value.
@@ -2940,8 +2940,8 @@ class Stringable(str):
     def whenNotExactly(
         self: Self,
         value: str,
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if string does not exactly match the given value.
@@ -2966,8 +2966,8 @@ class Stringable(str):
     def whenStartsWith(
         self: Self,
         needles: str | list[str],
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if the string starts with a given substring.
@@ -3003,8 +3003,8 @@ class Stringable(str):
     def whenDoesntStartWith(
         self: Self,
         needles: str | list[str],
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if the string does not start with the given substring(s).
@@ -3040,8 +3040,8 @@ class Stringable(str):
     def whenTest(
         self: Self,
         pattern: str,
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute callback if the string matches the given regular expression.
@@ -3181,7 +3181,7 @@ class Stringable(str):
         hash_obj.update(str(self).encode("utf-8"))
         return Stringable(hash_obj.hexdigest())
 
-    def pipe(self: Self, callback: Callable) -> Stringable:
+    def pipe(self: Self, callback: Callable[[Stringable], object]) -> Stringable:
         """
         Pass the string through the given callback and return the result.
 
@@ -3840,8 +3840,8 @@ class Stringable(str):
     def whenIs(
         self: Self,
         pattern: str | list[str],
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute the callback if the string matches the given pattern.
@@ -3865,8 +3865,8 @@ class Stringable(str):
 
     def whenIsAscii(
         self: Self,
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute the callback if the string is 7-bit ASCII.
@@ -3888,8 +3888,8 @@ class Stringable(str):
 
     def whenIsUuid(
         self: Self,
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute the callback if the string is a valid UUID.
@@ -3911,8 +3911,8 @@ class Stringable(str):
 
     def whenIsUlid(
         self: Self,
-        callback: Callable,
-        default: Callable | None = None,
+        callback: Callable[[Stringable], object],
+        default: Callable[[Stringable], object] | None = None,
     ) -> Stringable:
         """
         Execute the callback if the string is a valid ULID.

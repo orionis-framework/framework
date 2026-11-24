@@ -18,6 +18,7 @@ from orionis.support.facades.datetime import DateTime
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from orionis.console.entities.task_event import TaskEvent as TaskEventEntity
 
 
 class Task(ITask):
@@ -123,7 +124,9 @@ class Task(ITask):
         """Initialize the details for the task as None."""
 
         # Initialize list to hold task event listeners
-        self.__listeners: list[Callable] = []
+        self.__listeners: list[
+            tuple[TaskEvent, Callable[[TaskEventEntity], object]]
+        ] = []
         """Initialize list to hold task event listeners."""
 
         # Initialize the maximum instances attribute as 1
@@ -619,7 +622,7 @@ class Task(ITask):
     def on(
         self,
         event: TaskEvent,
-        callback: Callable,
+        callback: Callable[[TaskEventEntity], object],
     ) -> Self:
         """
         Register a callback for a specific task event.
